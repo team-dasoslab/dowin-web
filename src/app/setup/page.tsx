@@ -1,10 +1,26 @@
 "use client";
 
 import { useMockData } from "@/context/MockDataContext";
-import { Archive, ArrowLeft, Save, Target, Trash2, Zap } from "lucide-react";
+import {
+  Activity,
+  Archive,
+  ArrowLeft,
+  Plus,
+  Save,
+  Trash2,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+type MeasureInput = {
+  id: number;
+  name: string;
+  period: "WEEKLY" | "MONTHLY";
+  targetValue: number;
+};
 
 export default function SetupPage() {
   const {
@@ -15,189 +31,364 @@ export default function SetupPage() {
     archiveScoreboard,
   } = useMockData();
   const router = useRouter();
+  const param = useParams<{ mode: string }>();
+  const mode = param?.mode;
 
-  const [goalName, setGoalName] = useState(scoreboard?.goalName || "");
-  const [lagMeasure, setLagMeasure] = useState(scoreboard?.lagMeasure || "");
+  const [goalName, setGoalName] = useState("");
+  const [lagMeasure, setLagMeasure] = useState("");
+  const [measures, setMeasures] = useState<MeasureInput[]>([]);
 
-  const isEditMode = !!scoreboard;
+  const isEditMode = !!scoreboard || mode === "update";
+
+  useEffect(() => {
+    if (isEditMode && scoreboard) {
+      setGoalName(scoreboard.goalName);
+      setLagMeasure(scoreboard.lagMeasure);
+      setMeasures(
+        scoreboard.leadMeasures.map((lm) => ({
+          id: Math.random(),
+          name: lm.name,
+          period: lm.period === "DAILY" ? "WEEKLY" : lm.period,
+          targetValue: lm.targetValue,
+        })),
+      );
+    } else {
+      setMeasures([
+        { id: Date.now(), name: "", period: "WEEKLY", targetValue: 3 },
+      ]);
+    }
+  }, [isEditMode, scoreboard]);
+
+  const handleMeasureChange = (
+    id: number,
+    field: keyof MeasureInput,
+    value: string | number | "WEEKLY" | "MONTHLY",
+  ) => {
+    setMeasures((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
+    );
+  };
+
+  const addMeasureRow = () => {
+    setMeasures((prev) => [
+      ...prev,
+      { id: Date.now(), name: "", period: "WEEKLY", targetValue: 3 },
+    ]);
+  };
+
+  const removeMeasureRow = (id: number) => {
+    if (measures.length > 1) {
+      setMeasures((prev) => prev.filter((m) => m.id !== id));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isEditMode) {
-      updateScoreboard(goalName, lagMeasure);
-    } else {
-      createScoreboard(goalName, lagMeasure);
+    const validMeasures = measures.filter((m) => m.name.trim() !== "");
+    if (!goalName.trim() || !lagMeasure.trim() || validMeasures.length === 0) {
+      alert("가중목, 후행지표, 최소 1개의 선행지표를 입력해주세요.");
+      return;
     }
-    router.push("/");
+    if (isEditMode) {
+      updateScoreboard(goalName, lagMeasure, validMeasures);
+    } else {
+      createScoreboard(goalName, lagMeasure, validMeasures);
+    }
+    router.push("/dashboard/my");
   };
 
   return (
-    <div className="min-h-screen bg-background font-pretendard py-12 px-4">
-      <div className="max-w-[600px] mx-auto space-y-8 animate-linear-in">
-        {/* Navigation */}
-        <nav>
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
+        {/* ── 헤더 ── */}
+        <header className="flex items-center justify-between">
           <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors group"
+            href="/dashboard/my"
+            className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-            돌아가기
+            <ArrowLeft className="w-3.5 h-3.5" />
           </Link>
-        </nav>
-
-        <header className="space-y-2">
-          <div className="flex items-center gap-2 text-[10px] font-bold text-primary uppercase tracking-[0.2em]">
-            <Target className="w-3.5 h-3.5" />
-            점수판 설정
-          </div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-            {isEditMode ? "현재 목표 수정하기" : "도전할 목표를 설정하세요"}
-          </h1>
-          <p className="text-[13px] text-text-muted leading-relaxed">
-            한 번에 한 가지 목표에만 집중하는 것이 성공의 핵심입니다.
-          </p>
+          <p className="text-xs text-text-muted">점수판 설정</p>
+          <div className="w-8" />
         </header>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <section className="card-linear p-8 space-y-10">
-            <div className="space-y-5">
-              <div className="flex items-center gap-2 text-xs font-bold text-text-muted tracking-wide">
-                <Zap className="w-4 h-4 text-primary" />
-                1단계. 가중목
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm block font-bold text-text-primary ml-0.5">
-                  나의 목표는 무엇인가요?
-                </label>
-                <input
-                  value={goalName}
-                  onChange={(e) => setGoalName(e.target.value)}
-                  placeholder="예: 체중을 감량한다"
-                  className="w-full text-base p-3 bg-sub-background border border-border rounded-xl focus:border-primary outline-none transition-all placeholder:text-text-muted/40"
-                  required
-                />
-              </div>
+        {/* ── 페이지 타이틀 ── */}
+        <div className="space-y-1 px-0.5">
+          <h1 className="text-xl font-bold text-text-primary tracking-tight">
+            {isEditMode ? "현재 목표 수정" : "새로운 목표 설정"}
+          </h1>
+          <p className="text-xs text-text-muted leading-relaxed">
+            하나의 목표(WIG) · 성공 척도(후행지표) · 핵심 행동(선행지표)을
+            설정하세요.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* ── 가중목 ── */}
+          <div className="border border-border rounded-lg overflow-hidden">
+            <div className="px-5 py-3 bg-sub-background border-b border-border flex items-center gap-2">
+              <Zap className="w-3.5 h-3.5 text-primary" />
+              <span className="text-xs font-bold text-text-primary">
+                가중목 (WIG)
+              </span>
             </div>
-
-            <div className="space-y-5 pt-10 border-t border-border">
-              <div className="flex items-center gap-2 text-xs font-bold text-text-muted tracking-wide">
-                <TrendingUp className="w-4 h-4 text-success" />
-                2단계. 후행지표
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm block font-bold text-text-primary ml-0.5">
-                  성공 여부를 어떻게 측정할까요?
-                </label>
-                <input
-                  value={lagMeasure}
-                  onChange={(e) => setLagMeasure(e.target.value)}
-                  placeholder="예: 80kg에서 75kg까지 달성"
-                  className="w-full text-sm p-3 bg-sub-background border border-border rounded-xl focus:border-primary outline-none transition-all placeholder:text-text-muted/40 font-medium"
-                  required
-                />
-              </div>
+            <div className="p-5 space-y-3">
+              <label className="text-xs font-bold text-text-secondary block">
+                가장 중요한 목표는 무엇인가요?
+              </label>
+              <input
+                value={goalName}
+                onChange={(e) => setGoalName(e.target.value)}
+                placeholder="예: 연말까지 영업이익 20% 증대"
+                className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
+                required
+              />
             </div>
-          </section>
+          </div>
 
-          <div className="space-y-10">
-            <button
-              type="submit"
-              className="w-full btn-linear-primary py-3.5 flex items-center justify-center gap-2 text-sm font-bold shadow-lg shadow-primary/10"
-            >
-              <Save className="w-4 h-4" />
-              <span>{isEditMode ? "설정 저장하기" : "점수판 생성하기"}</span>
-            </button>
-
-            {isEditMode && (
-              <div className="space-y-6 pt-10">
-                <div className="rounded-xl border border-border divide-y divide-border overflow-hidden">
-                  {/* Archive Section */}
-                  <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
-                    <div className="space-y-1">
-                      <div className="text-sm font-bold text-text-primary">
-                        가중목 보관하기
-                      </div>
-                      <div className="text-xs text-text-muted leading-relaxed">
-                        현재 목표를 안전하게 종료하고 실행 기록으로 저장합니다.
-                        <br />
-                        보관 후에는 새로운 가중목을 설정할 수 있습니다.
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (
-                          confirm(
-                            "이 점수판을 종료하고 보관하시겠습니까? 새로운 목표를 설정할 수 있게 됩니다.",
-                          )
-                        ) {
-                          archiveScoreboard();
-                          router.push("/");
-                        }
-                      }}
-                      className="px-4 py-2 border border-border text-text-muted hover:text-text-primary hover:bg-sub-background rounded-lg text-xs font-bold transition-colors flex items-center gap-2 h-fit"
-                    >
-                      <Archive className="w-3.5 h-3.5" />
-                      보관하기
-                    </button>
-                  </div>
-
-                  {/* Delete Section */}
-                  <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-danger/[0.02]">
-                    <div className="space-y-1">
-                      <div className="text-sm font-bold text-danger">
-                        가중목 삭제하기
-                      </div>
-                      <div className="text-xs text-text-muted leading-relaxed">
-                        이 점수판과 관련된 모든 기록을 영구히 삭제합니다.
-                        <br />
-                        삭제된 데이터는 복구할 수 없으니 신중하게 결정해 주세요.
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (
-                          confirm(
-                            "정말 이 점수판을 영구 삭제하시겠습니까? 기록이 모두 사라집니다.",
-                          )
-                        ) {
-                          deleteScoreboard();
-                          router.push("/");
-                        }
-                      }}
-                      className="px-4 py-2 bg-danger text-white rounded-lg text-xs font-bold transition-transform active:scale-95 flex items-center gap-2 h-fit"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                      삭제하기
-                    </button>
-                  </div>
+          {/* ── 후행지표 ── */}
+          <div className="border border-border rounded-lg">
+            <div className="px-5 py-3 bg-sub-background border-b rounded-t-lg border-border flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-3.5 h-3.5 text-green-600" />
+                <span className="text-xs font-bold text-text-primary">
+                  후행지표
+                </span>
+              </div>
+              {/* 툴팁 */}
+              <div className="group relative">
+                <span className="cursor-help text-[10px] text-text-muted hover:text-primary transition-colors font-medium">
+                  지표 가이드 ›
+                </span>
+                <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                  <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
+                    좋은 후행지표
+                  </p>
+                  <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
+                    <li>
+                      <b className="text-text-primary">측정 가능:</b>{" "}
+                      시작점(X)과 목표점(Y)이 명확한가요?
+                    </li>
+                    <li>
+                      <b className="text-text-primary">결과 중심:</b> 최종 목표
+                      달성 여부를 나타내나요?
+                    </li>
+                  </ul>
                 </div>
               </div>
-            )}
+            </div>
+            <div className="p-5 space-y-3">
+              <label className="text-xs font-bold text-text-secondary block">
+                성공을 어떻게 측정할 건가요? (X → Y)
+              </label>
+              <input
+                value={lagMeasure}
+                onChange={(e) => setLagMeasure(e.target.value)}
+                placeholder="예: 1,000만 원에서 1,200만 원으로"
+                className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
+                required
+              />
+            </div>
           </div>
+
+          {/* ── 선행지표 ── */}
+          <div className="border border-border rounded-lg">
+            <div className="px-5 py-3 bg-sub-background border-b rounded-t-lg border-border flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Activity className="w-3.5 h-3.5 text-rose-500" />
+                <span className="text-xs font-bold text-text-primary">
+                  선행지표
+                </span>
+                <span className="text-[10px] text-text-muted">
+                  — 후행지표에 직접적 영향을 주는 핵심 행동
+                </span>
+              </div>
+              {/* 툴팁 */}
+              <div className="group relative">
+                <span className="cursor-help text-[10px] text-text-muted hover:text-primary transition-colors font-medium">
+                  4DX 가이드 ›
+                </span>
+                <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                  <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
+                    좋은 선행지표
+                  </p>
+                  <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
+                    <li>
+                      <b className="text-text-primary">예측성:</b> 이 행동이
+                      후행지표를 움직이나요?
+                    </li>
+                    <li>
+                      <b className="text-text-primary">통제 가능:</b> 직접
+                      실행하고 반복할 수 있나요?
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="divide-y divide-border">
+              {measures.map((measure, index) => (
+                <div key={measure.id} className="p-5 space-y-4">
+                  {/* 행동명 */}
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-text-secondary">
+                      핵심 행동 #{index + 1}
+                    </label>
+                    {measures.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeMeasureRow(measure.id)}
+                        className="text-[11px] text-danger font-bold hover:bg-danger/5 px-2 py-0.5 rounded transition-colors"
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    value={measure.name}
+                    onChange={(e) =>
+                      handleMeasureChange(measure.id, "name", e.target.value)
+                    }
+                    placeholder="예: 주 5회 핵심 고객에게 연락"
+                    className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
+                    required
+                  />
+
+                  {/* 주기 + 횟수 */}
+                  <div className="flex items-center gap-3">
+                    {/* 주기 토글 */}
+                    <div className="flex p-0.5 bg-sub-background border border-border rounded-lg gap-0.5 flex-shrink-0">
+                      {(["WEEKLY", "MONTHLY"] as const).map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => {
+                            handleMeasureChange(measure.id, "period", p);
+                            handleMeasureChange(
+                              measure.id,
+                              "targetValue",
+                              p === "WEEKLY" ? 3 : 1,
+                            );
+                          }}
+                          className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                            measure.period === p
+                              ? "bg-white text-primary border border-border shadow-sm"
+                              : "text-text-muted hover:text-text-primary"
+                          }`}
+                        >
+                          {p === "WEEKLY" ? "주 단위" : "월 단위"}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* 목표 횟수 */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min="1"
+                        max={measure.period === "WEEKLY" ? 7 : 31}
+                        value={measure.targetValue}
+                        onChange={(e) =>
+                          handleMeasureChange(
+                            measure.id,
+                            "targetValue",
+                            parseInt(e.target.value) || 1,
+                          )
+                        }
+                        className="w-14 text-center text-sm p-2 bg-white border border-border rounded-lg focus:border-primary outline-none transition-colors font-bold"
+                      />
+                      <span className="text-xs text-text-secondary font-medium whitespace-nowrap">
+                        회 / {measure.period === "WEEKLY" ? "주" : "월"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 핵심 행동 추가 버튼 */}
+            <div className="px-5 py-3 border-t border-dashed border-border">
+              <button
+                type="button"
+                onClick={addMeasureRow}
+                className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-text-muted hover:text-primary transition-colors py-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                핵심 행동 추가
+              </button>
+            </div>
+          </div>
+
+          {/* ── 저장 버튼 ── */}
+          <button
+            type="submit"
+            className="w-full btn-linear-primary py-3 flex items-center justify-center gap-2 text-sm font-bold"
+          >
+            <Save className="w-3.5 h-3.5" />
+            {isEditMode ? "변경사항 저장" : "점수판 생성"}
+          </button>
+
+          {/* ── 관리 영역 (수정 모드에서만) ── */}
+          {isEditMode && (
+            <div className="space-y-2 pt-4">
+              <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
+                관리
+              </p>
+              <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
+                {/* 보관 */}
+                <div className="px-5 py-4 flex items-center justify-between bg-white">
+                  <div>
+                    <p className="text-sm font-semibold text-text-primary">
+                      점수판 보관
+                    </p>
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      현재 목표를 종료하고 실행 기록으로 저장합니다.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm("이 점수판을 보관하시겠습니까?")) {
+                        archiveScoreboard();
+                        router.push("/dashboard");
+                      }
+                    }}
+                    className="flex-shrink-0 px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ml-4"
+                  >
+                    <Archive className="w-3.5 h-3.5" />
+                    보관
+                  </button>
+                </div>
+
+                {/* 삭제 */}
+                <div className="px-5 py-4 flex items-center justify-between bg-white">
+                  <div>
+                    <p className="text-sm font-semibold text-danger">
+                      점수판 삭제
+                    </p>
+                    <p className="text-[11px] text-text-muted mt-0.5">
+                      모든 기록을 영구 삭제합니다. 복구할 수 없습니다.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (confirm("정말 영구 삭제하시겠습니까?")) {
+                        deleteScoreboard();
+                        router.push("/dashboard");
+                      }
+                    }}
+                    className="flex-shrink-0 px-3 py-1.5 bg-danger text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ml-4 hover:bg-[rgba(200,20,60,1)]"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    삭제
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>
-  );
-}
-
-function TrendingUp(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-      <polyline points="16 7 22 7 22 13" />
-    </svg>
   );
 }

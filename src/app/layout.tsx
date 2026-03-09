@@ -3,8 +3,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "",
-  description: "",
+  title: "WIG Scoreboard",
+  description: "가장 중요한 목표에 집중하세요 (Linear Light Aesthetic)",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
