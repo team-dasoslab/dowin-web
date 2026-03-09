@@ -284,32 +284,34 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background font-pretendard">
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
         {/* ── 헤더 ── */}
-        <header className="flex items-center justify-between px-1">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center text-primary shrink-0">
               <Zap className="w-4 h-4 fill-current" />
             </div>
-            <div>
-              <h1 className="text-base font-bold text-text-primary tracking-tight">
+            <div className="min-w-0">
+              <h1 className="text-base font-bold text-text-primary tracking-tight truncate">
                 {workspaceName}
               </h1>
-              <p className="text-[11px] text-text-muted">팀 전체 현황</p>
+              <p className="text-[11px] text-text-muted truncate">
+                팀 전체 현황
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/dashboard/my"
-              className="px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5"
+              className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
             >
-              <Calendar className="w-3.5 h-3.5 text-text-muted" />
+              <Calendar className="w-3.5 h-3.5 text-text-muted shrink-0" />
               <span>나의 대시보드</span>
             </Link>
             <Link
               href="/profile"
-              className="px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5"
+              className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
             >
-              <UserIcon className="w-3.5 h-3.5 text-text-muted" />
+              <UserIcon className="w-3.5 h-3.5 text-text-muted shrink-0" />
               <span>내 프로필</span>
             </Link>
           </div>
