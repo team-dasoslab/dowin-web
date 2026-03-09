@@ -227,94 +227,97 @@ export default function MyDashboardPage() {
             </div>
           ) : (
             <div className="border border-border rounded-lg overflow-hidden">
-              {/* 테이블 헤더 */}
-              <div className="bg-sub-background border-b border-border">
-                <table className="w-full table-fixed text-xs">
-                  <colgroup>
-                    <col className="w-[38%]" />
-                    {DAY_LABELS.map((_, i) => (
-                      <col key={i} className="w-[8%]" />
-                    ))}
-                    <col className="w-[14%]" />
-                  </colgroup>
-                  <thead>
-                    <tr>
-                      <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
-                        선행지표
-                      </th>
-                      {DAY_LABELS.map((day, i) => (
-                        <th
-                          key={i}
-                          className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
-                            weekDates[i] === today
-                              ? "text-primary"
-                              : "text-text-muted"
-                          }`}
-                        >
-                          {day}
-                        </th>
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px]">
+                  {/* 테이블 헤더 */}
+                  <div className="bg-sub-background border-b border-border">
+                    <table className="w-full table-fixed text-xs">
+                      <colgroup>
+                        <col className="w-[38%]" />
+                        {DAY_LABELS.map((_, i) => (
+                          <col key={i} className="w-[8%]" />
+                        ))}
+                        <col className="w-[14%]" />
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                            선행지표
+                          </th>
+                          {DAY_LABELS.map((day, i) => (
+                            <th
+                              key={i}
+                              className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
+                                weekDates[i] === today
+                                  ? "text-primary"
+                                  : "text-text-muted"
+                              }`}
+                            >
+                              {day}
+                            </th>
+                          ))}
+                          <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                            달성
+                          </th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+
+                  {/* 테이블 바디 */}
+                  <table className="w-full table-fixed text-xs">
+                    <colgroup>
+                      <col className="w-[38%]" />
+                      {DAY_LABELS.map((_, i) => (
+                        <col key={i} className="w-[8%]" />
                       ))}
-                      <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
-                        달성
-                      </th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
+                      <col className="w-[14%]" />
+                    </colgroup>
+                    <tbody className="divide-y divide-border">
+                      {activeLeadMeasures.map((lm) => {
+                        const achievedCount = weekDates.filter(
+                          (date) =>
+                            lm.logs.find((l) => l.logDate === date)?.value,
+                        ).length;
+                        const rate = Math.round(
+                          (achievedCount / lm.targetValue) * 100,
+                        );
 
-              {/* 테이블 바디 */}
-              <table className="w-full table-fixed text-xs">
-                <colgroup>
-                  <col className="w-[38%]" />
-                  {DAY_LABELS.map((_, i) => (
-                    <col key={i} className="w-[8%]" />
-                  ))}
-                  <col className="w-[14%]" />
-                </colgroup>
-                <tbody className="divide-y divide-border">
-                  {activeLeadMeasures.map((lm) => {
-                    const achievedCount = weekDates.filter(
-                      (date) => lm.logs.find((l) => l.logDate === date)?.value,
-                    ).length;
-                    const rate = Math.round(
-                      (achievedCount / lm.targetValue) * 100,
-                    );
+                        return (
+                          <tr key={lm.id} className="bg-white">
+                            {/* 지표명 */}
+                            <td className="py-4 px-5">
+                              <Link
+                                href={`/measure/${lm.id}`}
+                                className="block font-semibold text-text-primary hover:text-primary transition-colors truncate text-sm"
+                              >
+                                {lm.name}
+                              </Link>
+                              <span className="text-[10px] text-text-muted">
+                                목표 {lm.targetValue}회 /{" "}
+                                {lm.period === "DAILY"
+                                  ? "일"
+                                  : lm.period === "WEEKLY"
+                                    ? "주"
+                                    : "월"}
+                              </span>
+                            </td>
 
-                    return (
-                      <tr key={lm.id} className="bg-white">
-                        {/* 지표명 */}
-                        <td className="py-4 px-5">
-                          <Link
-                            href={`/measure/${lm.id}`}
-                            className="block font-semibold text-text-primary hover:text-primary transition-colors truncate text-sm"
-                          >
-                            {lm.name}
-                          </Link>
-                          <span className="text-[10px] text-text-muted">
-                            목표 {lm.targetValue}회 /{" "}
-                            {lm.period === "DAILY"
-                              ? "일"
-                              : lm.period === "WEEKLY"
-                                ? "주"
-                                : "월"}
-                          </span>
-                        </td>
+                            {/* 요일별 O/X 토글 */}
+                            {weekDates.map((date, i) => {
+                              const isAchieved = lm.logs.find(
+                                (l) => l.logDate === date,
+                              )?.value;
+                              const isFuture = date > today;
+                              const isToday = date === today;
 
-                        {/* 요일별 O/X 토글 */}
-                        {weekDates.map((date, i) => {
-                          const isAchieved = lm.logs.find(
-                            (l) => l.logDate === date,
-                          )?.value;
-                          const isFuture = date > today;
-                          const isToday = date === today;
-
-                          return (
-                            <td key={date} className="py-3 text-center">
-                              <button
-                                onClick={() =>
-                                  updateLog(lm.id, date, !isAchieved)
-                                }
-                                className={`
+                              return (
+                                <td key={date} className="py-3 text-center">
+                                  <button
+                                    onClick={() =>
+                                      updateLog(lm.id, date, !isAchieved)
+                                    }
+                                    className={`
                                   w-7 h-7 mx-auto rounded-md flex items-center justify-center transition-colors cursor-pointer
                                   ${
                                     isAchieved
@@ -326,46 +329,50 @@ export default function MyDashboardPage() {
                                           : "bg-sub-background border border-border text-text-muted/40"
                                   }
                                 `}
-                              >
-                                {isAchieved ? (
-                                  <Check className="w-3.5 h-3.5" />
-                                ) : (
-                                  <span className="text-[9px] font-bold">
-                                    {date > today ? "" : "✕"}
-                                  </span>
-                                )}
-                              </button>
-                            </td>
-                          );
-                        })}
+                                  >
+                                    {isAchieved ? (
+                                      <Check className="w-3.5 h-3.5" />
+                                    ) : (
+                                      <span className="text-[9px] font-bold">
+                                        {date > today ? "" : "✕"}
+                                      </span>
+                                    )}
+                                  </button>
+                                </td>
+                              );
+                            })}
 
-                        {/* 달성률 */}
-                        <td className="py-4 px-3 text-center">
-                          <div className="flex flex-col items-center gap-1.5">
-                            <div className="w-10 h-1 bg-sub-background rounded-full overflow-hidden border border-border">
-                              <div
-                                className={`h-full rounded-full transition-all duration-500 ${
-                                  rate >= 100 ? "bg-green-500" : "bg-primary"
-                                }`}
-                                style={{ width: `${Math.min(rate, 100)}%` }}
-                              />
-                            </div>
-                            <span
-                              className={`text-[10px] font-bold font-mono ${
-                                rate >= 100
-                                  ? "text-green-600"
-                                  : "text-text-secondary"
-                              }`}
-                            >
-                              {achievedCount}/{lm.targetValue}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                            {/* 달성률 */}
+                            <td className="py-4 px-3 text-center">
+                              <div className="flex flex-col items-center gap-1.5">
+                                <div className="w-10 h-1 bg-sub-background rounded-full overflow-hidden border border-border">
+                                  <div
+                                    className={`h-full rounded-full transition-all duration-500 ${
+                                      rate >= 100
+                                        ? "bg-green-500"
+                                        : "bg-primary"
+                                    }`}
+                                    style={{ width: `${Math.min(rate, 100)}%` }}
+                                  />
+                                </div>
+                                <span
+                                  className={`text-[10px] font-bold font-mono ${
+                                    rate >= 100
+                                      ? "text-green-600"
+                                      : "text-text-secondary"
+                                  }`}
+                                >
+                                  {achievedCount}/{lm.targetValue}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
         </section>

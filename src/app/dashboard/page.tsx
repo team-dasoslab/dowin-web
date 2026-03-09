@@ -193,69 +193,71 @@ const WeeklyTable: React.FC<WeeklyTableProps> = ({
 
       {/* 테이블 */}
       <div className="border border-border rounded-lg overflow-hidden">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="bg-sub-background border-b border-border">
-              <th className="text-left px-3 py-2 text-text-secondary font-medium w-[40%]">
-                선행지표
-              </th>
-              {weekDates.map((date, i) => (
-                <th
-                  key={date}
-                  className={`text-center px-1 py-2 font-medium w-[8%] ${
-                    date === today
-                      ? "text-primary"
-                      : date > today
-                        ? "text-text-muted/50"
-                        : "text-text-secondary"
-                  }`}
-                >
-                  {DAY_LABELS[i]}
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs min-w-[500px]">
+            <thead>
+              <tr className="bg-sub-background border-b border-border">
+                <th className="text-left px-3 py-2 text-text-secondary font-medium w-[40%]">
+                  선행지표
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {activeLeadMeasures.map((lm, idx) => (
-              <tr
-                key={lm.id}
-                className={
-                  idx < activeLeadMeasures.length - 1
-                    ? "border-b border-border"
-                    : ""
-                }
-              >
-                <td className="px-3 py-2.5 text-text-primary font-medium truncate max-w-0">
-                  <span className="block truncate">{lm.name}</span>
-                </td>
-                {weekDates.map((date) => {
-                  const achieved = lm.logs.find(
-                    (l) => l.logDate === date,
-                  )?.value;
-                  const isFuture = date > today;
-                  return (
-                    <td
-                      key={date}
-                      className={`text-center px-1 py-2.5 ${isFuture ? "opacity-30" : ""}`}
-                    >
-                      {isFuture ? (
-                        <span className="text-text-muted">·</span>
-                      ) : achieved ? (
-                        <span className="text-green-600 font-bold text-sm">
-                          ○
-                        </span>
-                      ) : (
-                        <span className="text-red-400 font-bold text-sm">
-                          ✕
-                        </span>
-                      )}
-                    </td>
-                  );
-                })}
+                {weekDates.map((date, i) => (
+                  <th
+                    key={date}
+                    className={`text-center px-1 py-2 font-medium w-[8%] ${
+                      date === today
+                        ? "text-primary"
+                        : date > today
+                          ? "text-text-muted/50"
+                          : "text-text-secondary"
+                    }`}
+                  >
+                    {DAY_LABELS[i]}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {activeLeadMeasures.map((lm, idx) => (
+                <tr
+                  key={lm.id}
+                  className={
+                    idx < activeLeadMeasures.length - 1
+                      ? "border-b border-border"
+                      : ""
+                  }
+                >
+                  <td className="px-3 py-2.5 text-text-primary font-medium truncate max-w-0">
+                    <span className="block truncate">{lm.name}</span>
+                  </td>
+                  {weekDates.map((date) => {
+                    const achieved = lm.logs.find(
+                      (l) => l.logDate === date,
+                    )?.value;
+                    const isFuture = date > today;
+                    return (
+                      <td
+                        key={date}
+                        className={`text-center px-1 py-2.5 ${isFuture ? "opacity-30" : ""}`}
+                      >
+                        {isFuture ? (
+                          <span className="text-text-muted">·</span>
+                        ) : achieved ? (
+                          <span className="text-green-600 font-bold text-sm">
+                            ○
+                          </span>
+                        ) : (
+                          <span className="text-red-400 font-bold text-sm">
+                            ✕
+                          </span>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
