@@ -3,13 +3,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "WIG Scoreboard",
+  title: "WIG Tracker",
   description: "가장 중요한 목표에 집중하세요 (Linear Light Aesthetic)",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "WIG Scoreboard",
+    title: "WIG Tracker",
   },
   icons: {
     icon: "/favicon.svg",

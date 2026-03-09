@@ -61,7 +61,7 @@ export default function MeasureDetailPage() {
         {/* Navigation */}
         <nav>
           <Link
-            href="/my-dashboard"
+            href="/dashboard/my"
             className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors group"
           >
             <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />

@@ -1,8 +1,10 @@
 "use client";
 
+import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { useMockData } from "@/context/MockDataContext";
 import {
   ArrowLeft,
+  Bell,
   ChevronRight,
   Edit2,
   Key,
@@ -13,13 +15,23 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+interface MenuItem {
+  id: string;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  danger?: boolean;
+  onClick?: () => void;
+  rightElement?: React.ReactNode;
+}
+
 export default function ProfilePage() {
   const { user, updateProfile, logout } = useMockData();
   const router = useRouter();
 
   if (!user) return null;
 
-  const menuGroups = [
+  const menuGroups: { label: string; items: MenuItem[] }[] = [
     {
       label: "계정 설정",
       items: [
@@ -44,6 +56,20 @@ export default function ProfilePage() {
             alert(
               "보안을 위해 비밀번호 변경 링크가 등록된 메일로 발송됩니다. (프로토타입)",
             ),
+        },
+      ],
+    },
+    {
+      label: "알림 설정",
+      items: [
+        {
+          id: "push-notification",
+          icon: <Bell className="w-3.5 h-3.5" />,
+          title: "매일 밤 9시 알림",
+          description: "리드 지표 기록을 잊지 않도록 푸시 알림을 보냅니다.",
+          rightElement: (
+            <PushSubscriptionManager userId={user.id} variant="toggle" />
+          ),
         },
       ],
     },
@@ -124,42 +150,65 @@ export default function ProfilePage() {
 
               {/* 아이템 목록 */}
               <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
-                {group.items.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={item.onClick}
-                    className="w-full px-5 py-4 flex items-center justify-between bg-white hover:bg-sub-background transition-colors group"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* 아이콘 */}
-                      <div
-                        className={`w-7 h-7 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
-                          item.danger
-                            ? "border-danger/20 bg-danger/5 text-danger"
-                            : "border-border bg-sub-background text-text-muted group-hover:border-[rgba(205,207,213,1)]"
-                        }`}
-                      >
-                        {item.icon}
-                      </div>
-
-                      {/* 텍스트 */}
-                      <div className="text-left min-w-0">
-                        <p
-                          className={`text-sm font-semibold ${
-                            item.danger ? "text-danger" : "text-text-primary"
+                {group.items.map((item) => {
+                  const Content = (
+                    <div className="flex items-center justify-between w-full px-5 py-4 transition-colors group">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* 아이콘 */}
+                        <div
+                          className={`w-7 h-7 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
+                            item.danger
+                              ? "border-danger/20 bg-danger/5 text-danger"
+                              : "border-border bg-sub-background text-text-muted group-hover:border-[rgba(205,207,213,1)]"
                           }`}
                         >
-                          {item.title}
-                        </p>
-                        <p className="text-[11px] text-text-muted truncate">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
+                          {item.icon}
+                        </div>
 
-                    <ChevronRight className="w-3.5 h-3.5 text-text-muted/40 flex-shrink-0 ml-3" />
-                  </button>
-                ))}
+                        {/* 텍스트 */}
+                        <div className="text-left min-w-0">
+                          <p
+                            className={`text-sm font-semibold ${
+                              item.danger ? "text-danger" : "text-text-primary"
+                            }`}
+                          >
+                            {item.title}
+                          </p>
+                          <p className="text-[11px] text-text-muted truncate">
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {item.rightElement ? (
+                        item.rightElement
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 text-text-muted/40 flex-shrink-0 ml-3" />
+                      )}
+                    </div>
+                  );
+
+                  if (item.onClick) {
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={item.onClick}
+                        className="w-full bg-white hover:bg-sub-background"
+                      >
+                        {Content}
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="w-full bg-white transition-colors"
+                    >
+                      {Content}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ))}

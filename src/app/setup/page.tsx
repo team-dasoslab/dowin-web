@@ -37,6 +37,9 @@ export default function SetupPage() {
   const [goalName, setGoalName] = useState("");
   const [lagMeasure, setLagMeasure] = useState("");
   const [measures, setMeasures] = useState<MeasureInput[]>([]);
+  const [activeTooltip, setActiveTooltip] = useState<"lag" | "lead" | null>(
+    null,
+  );
 
   const isEditMode = !!scoreboard || mode === "update";
 
@@ -156,25 +159,39 @@ export default function SetupPage() {
                 </span>
               </div>
               {/* 툴팁 */}
-              <div className="group relative">
-                <span className="cursor-help text-[10px] text-text-muted hover:text-primary transition-colors font-medium">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setActiveTooltip(activeTooltip === "lag" ? null : "lag")
+                  }
+                  className="text-[10px] text-text-muted hover:text-primary transition-colors font-medium flex items-center gap-0.5"
+                >
                   지표 가이드 ›
-                </span>
-                <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                  <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
-                    좋은 후행지표
-                  </p>
-                  <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
-                    <li>
-                      <b className="text-text-primary">측정 가능:</b>{" "}
-                      시작점(X)과 목표점(Y)이 명확한가요?
-                    </li>
-                    <li>
-                      <b className="text-text-primary">결과 중심:</b> 최종 목표
-                      달성 여부를 나타내나요?
-                    </li>
-                  </ul>
-                </div>
+                </button>
+                {activeTooltip === "lag" && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setActiveTooltip(null)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg transition-all z-20">
+                      <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
+                        좋은 후행지표
+                      </p>
+                      <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
+                        <li>
+                          <b className="text-text-primary">측정 가능:</b>{" "}
+                          시작점(X)과 목표점(Y)이 명확한가요?
+                        </li>
+                        <li>
+                          <b className="text-text-primary">결과 중심:</b> 최종
+                          목표 달성 여부를 나타내나요?
+                        </li>
+                      </ul>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             <div className="p-5 space-y-3">
@@ -204,25 +221,39 @@ export default function SetupPage() {
                 </span>
               </div>
               {/* 툴팁 */}
-              <div className="group relative">
-                <span className="cursor-help text-[10px] text-text-muted hover:text-primary transition-colors font-medium">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setActiveTooltip(activeTooltip === "lead" ? null : "lead")
+                  }
+                  className="text-[10px] text-text-muted hover:text-primary transition-colors font-medium flex items-center gap-0.5"
+                >
                   4DX 가이드 ›
-                </span>
-                <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                  <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
-                    좋은 선행지표
-                  </p>
-                  <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
-                    <li>
-                      <b className="text-text-primary">예측성:</b> 이 행동이
-                      후행지표를 움직이나요?
-                    </li>
-                    <li>
-                      <b className="text-text-primary">통제 가능:</b> 직접
-                      실행하고 반복할 수 있나요?
-                    </li>
-                  </ul>
-                </div>
+                </button>
+                {activeTooltip === "lead" && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setActiveTooltip(null)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg transition-all z-20">
+                      <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
+                        좋은 선행지표
+                      </p>
+                      <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
+                        <li>
+                          <b className="text-text-primary">예측성:</b> 이 행동이
+                          후행지표를 움직이나요?
+                        </li>
+                        <li>
+                          <b className="text-text-primary">통제 가능:</b> 직접
+                          실행하고 반복할 수 있나요?
+                        </li>
+                      </ul>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

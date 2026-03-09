@@ -32,13 +32,16 @@
   "observability": {
     "enabled": true,
   },
-  // "d1_databases": [
-  //   {
-  //     "binding": "",
-  //     "database_name": "",
-  //     "database_id": "",
-  //   },
-  // ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wig-db",
+      "database_id": "0e1bfd28-d223-447c-ad6b-1f83f0038bfe",
+    },
+  ],
+  "triggers": {
+    "crons": ["0 12 * * *"],
+  },
   /**
    * Smart Placement
    * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
