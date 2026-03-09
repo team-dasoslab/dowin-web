@@ -5,8 +5,15 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "WIG Scoreboard",
   description: "가장 중요한 목표에 집중하세요 (Linear Light Aesthetic)",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "WIG Scoreboard",
+  },
   icons: {
     icon: "/favicon.svg",
+    apple: "/favicon-192x192.png",
   },
 };
 
@@ -15,6 +22,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -23,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
