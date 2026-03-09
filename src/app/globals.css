@@ -1,29 +1,25 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* === Brand Colors: Light Premium === */
-  --color-background: #f5f7fa;
-  --color-surface: #ffffff;
-  --color-surface-elevated: #ffffff;
-  --color-primary: #1a2340;
-  --color-primary-light: #2d3a5c;
-  --color-secondary: #4a6fa5;
-  --color-accent: #e5880a;
-  --color-accent-warm: #f4a940;
-  --color-success: #1a8c6a;
-  --color-danger: #d93025;
-  --color-text-primary: #1c1e29;
-  --color-text-secondary: #6b7280;
-  --color-text-muted: #9ca3af;
-  --color-border: #e5e7eb;
-  --color-border-light: #f0f1f3;
+  /* === Linear-like Light Mode Palette (RGBA) === */
+  --color-background: rgba(255, 255, 255, 1);
+  --color-sub-background: rgba(247, 248, 249, 1);
+  --color-surface: rgba(255, 255, 255, 1);
+  --color-surface-elevated: rgba(255, 255, 255, 1);
+  --color-primary: rgba(94, 106, 210, 1);
+  --color-primary-light: rgba(124, 137, 248, 1);
+  --color-accent: rgba(132, 204, 22, 1);
+  --color-success: rgba(21, 128, 61, 1);
+  --color-danger: rgba(225, 29, 72, 1);
+  --color-text-primary: rgba(17, 24, 39, 1);
+  --color-text-secondary: rgba(75, 85, 99, 1);
+  --color-text-muted: rgba(156, 163, 175, 1);
+  --color-border: rgba(226, 228, 233, 1);
+  --color-border-hover: rgba(205, 207, 213, 1);
 
   --font-pretendard:
-    "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
-    system-ui, Roboto, sans-serif;
+    "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
   --font-inter: "Inter", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-  --font-display: "Bebas Neue", sans-serif;
 }
 
 body {
@@ -31,155 +27,59 @@ body {
   color: var(--color-text-primary);
   font-family: var(--font-pretendard);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* === Premium Cards === */
-.card {
-  background: var(--color-surface);
-  border-radius: 1rem;
+/* === Linear Light Effects === */
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-border);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 6px 16px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
 }
 
-.card:hover {
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    0 12px 28px rgba(0, 0, 0, 0.06);
-}
-
-.card-elevated {
+.card-linear {
   background: var(--color-surface);
-  border-radius: 1.25rem;
   border: 1px solid var(--color-border);
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.05),
-    0 16px 40px rgba(0, 0, 0, 0.06);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-/* === Hero Background === */
-.gradient-hero {
-  background:
-    radial-gradient(
-      ellipse at 30% 0%,
-      rgba(74, 111, 165, 0.08) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse at 70% 0%,
-      rgba(26, 35, 64, 0.06) 0%,
-      transparent 50%
-    ),
-    var(--color-background);
+/* === Inputs & Buttons === */
+.input-linear {
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  color: var(--color-text-primary);
+  transition: border-color 0.15s ease;
 }
 
-/* === Buttons === */
-.btn-primary {
-  background: linear-gradient(135deg, #1a2340, #2d3a5c);
-  color: white;
-  border: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 14px rgba(26, 35, 64, 0.25);
+.input-linear:focus {
+  border-color: var(--color-primary);
+  outline: none;
 }
 
-.btn-primary:hover {
-  background: linear-gradient(135deg, #2d3a5c, #3d4e72);
-  box-shadow: 0 6px 20px rgba(26, 35, 64, 0.35);
-  transform: translateY(-1px);
+.btn-linear-primary {
+  background: var(--color-primary);
+  color: rgba(255, 255, 255, 1);
+  border-radius: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* === Gradient Accents === */
-.gradient-text {
-  background: linear-gradient(135deg, #1a2340, #4a6fa5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-accent {
-  background: linear-gradient(135deg, #e5880a, #f4a940);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.progress-gradient {
-  background: linear-gradient(90deg, #1a2340, #4a6fa5);
+.btn-linear-primary:active {
+  background: rgba(79, 90, 186, 1);
 }
 
 /* === Animations === */
-@keyframes fadeIn {
+@keyframes linearFadeIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
-}
-
-.animate-fade-in-scale {
-  animation: fadeInScale 0.4s ease-out forwards;
-}
-
-.animate-slide-in {
-  animation: slideIn 0.4s ease-out forwards;
-}
-
-.animate-pulse-slow {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+.animate-linear-in {
+  animation: linearFadeIn 0.3s ease-out forwards;
 }
