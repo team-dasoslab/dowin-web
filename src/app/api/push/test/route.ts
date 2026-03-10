@@ -34,13 +34,16 @@ export async function GET(req: NextRequest) {
 
   const sub = subscriptions[0];
 
-  webpush.setVapidDetails(
-    "mailto:admin@wig-scoreboard.com",
-    env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-    env.VAPID_PRIVATE_KEY,
-  );
-
   try {
+    const vapidPublicKey = env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    const vapidPrivateKey = env.VAPID_PRIVATE_KEY;
+
+    if (!vapidPublicKey || !vapidPrivateKey) {
+      throw new Error(
+        `VAPID keys missing. Public: ${!!vapidPublicKey}, Private: ${!!vapidPrivateKey}. Ensure they are set in Cloudflare secrets.`,
+      );
+    }
+
     await webpush.sendNotification(
       {
         endpoint: sub.endpoint,
@@ -55,12 +58,22 @@ export async function GET(req: NextRequest) {
         icon: "/favicon-192x192.png",
         data: { url: "/dashboard/my" },
       }),
+      {
+        vapidDetails: {
+          subject: "mailto:ixio0330@gmail.com",
+          publicKey: vapidPublicKey,
+          privateKey: vapidPrivateKey,
+        },
+      },
     );
     return NextResponse.json({ success: true, message: "Test push sent!" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Test push failed:", error);
     return NextResponse.json(
-      { error: "Failed to send test push" },
+      {
+        error: "Failed to send test push",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

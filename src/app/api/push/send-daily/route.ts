@@ -16,11 +16,15 @@ export async function GET(req: NextRequest) {
   const db = getDb(env.DB);
   const subscriptions = await db.select().from(pushSubscriptions);
 
-  webpush.setVapidDetails(
-    "mailto:admin@wig-scoreboard.com",
-    env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-    env.VAPID_PRIVATE_KEY,
-  );
+  const vapidPublicKey = env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const vapidPrivateKey = env.VAPID_PRIVATE_KEY;
+
+  if (!vapidPublicKey || !vapidPrivateKey) {
+    return NextResponse.json(
+      { error: "VAPID keys are not configured in production environment" },
+      { status: 500 },
+    );
+  }
 
   const results = await Promise.allSettled(
     subscriptions.map((sub) =>
@@ -38,6 +42,13 @@ export async function GET(req: NextRequest) {
           icon: "/favicon-192x192.png",
           data: { url: "/dashboard/my" },
         }),
+        {
+          vapidDetails: {
+            subject: "mailto:ixio0330@gmail.com",
+            publicKey: vapidPublicKey,
+            privateKey: vapidPrivateKey,
+          },
+        },
       ),
     ),
   );
