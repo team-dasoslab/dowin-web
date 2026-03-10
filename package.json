@@ -14,7 +14,8 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "gen:key": "npx web-push generate-vapid-keys --json"
+    "gen:key": "npx web-push generate-vapid-keys --json",
+    "gen:splash": "npx --yes pwa-asset-generator public/favicon.svg public/splash --background '#EFF0FA' --padding '30%' --splash-only --portrait-only --single-quotes --log false"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.33",
