@@ -67,7 +67,9 @@ export default function PushSubscriptionManager({
       }
 
       if (!("Notification" in window)) {
-        alert("이 브라우저는 알림 기능을 지원하지 않습니다.");
+        alert(
+          "이 브라우저는 알림 기능을 지원하지 않습니다. 아이폰을 사용 중이시라면 '홈 화면에 추가'를 통해 앱을 설치한 후 다시 시도해 주세요.",
+        );
         setLoading(false);
         return;
       }
@@ -75,17 +77,22 @@ export default function PushSubscriptionManager({
       // Request permission
       const permission = await window.Notification.requestPermission();
       if (permission !== "granted") {
-        alert("알림 권한이 거부되었습니다.");
+        alert(
+          "알림 권한이 거부되었습니다. 원활한 사용을 위해 브라우저 설정에서 알림을 허용해 주세요.",
+        );
         setLoading(false);
         return;
+      }
+
+      const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      if (!vapidPublicKey) {
+        throw new Error("VAPID Public Key가 환경 변수에 설정되지 않았습니다.");
       }
 
       // Subscribe to push
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-        ),
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
 
       // Save to server
@@ -104,10 +111,22 @@ export default function PushSubscriptionManager({
       setIsSubscribed(true);
       alert("매일 밤 9시 알림이 설정되었습니다! ✨");
     } catch (error) {
-      console.error("Push subscription failed:", error);
-      alert(
-        `알림 설정 중 오류가 발생했습니다: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      console.error("Push subscription technical error:", error);
+
+      // 사용자에게는 상황에 맞는 친절한 메시지 제공
+      if (error instanceof Error && error.message.includes("permission")) {
+        alert(
+          "브라우저의 알림 권한이 차단되어 있습니다. 설정에서 권한을 허용해 주세요.",
+        );
+      } else if (error instanceof Error && error.message.includes("VAPID")) {
+        alert(
+          "알림 서비스 설정에 문제가 발생했습니다. 관리자에게 문의해 주세요.",
+        );
+      } else {
+        alert(
+          "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -126,7 +145,7 @@ export default function PushSubscriptionManager({
         }
       }
       setIsSubscribed(false);
-      alert("알림 설정이 해제되었습니다.");
+      alert("알림 설정이 해제되었습니다. 언제든 다시 켜실 수 있습니다. 😊");
     } catch (error) {
       console.error("Unsubscribe failed:", error);
     } finally {
@@ -177,6 +196,9 @@ export default function PushSubscriptionManager({
 
 // Helper function
 function urlBase64ToUint8Array(base64String: string) {
+  if (!base64String) {
+    throw new Error("Base64 string is missing");
+  }
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
   const rawData = window.atob(base64);
