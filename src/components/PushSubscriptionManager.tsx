@@ -13,7 +13,7 @@ export default function PushSubscriptionManager({
   variant = "button",
 }: PushSubscriptionManagerProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     checkSubscription();
@@ -26,14 +26,14 @@ export default function PushSubscriptionManager({
       !("PushManager" in window) ||
       !("Notification" in window)
     ) {
-      setLoading(false);
+      setIsInitialLoading(false);
       return;
     }
 
     try {
       const registrations = await navigator.serviceWorker.getRegistrations();
       if (registrations.length === 0) {
-        setLoading(false);
+        setIsInitialLoading(false);
         return;
       }
       const subscription = await registrations[0].pushManager.getSubscription();
@@ -41,18 +41,22 @@ export default function PushSubscriptionManager({
     } catch (error) {
       console.error("Check subscription failed:", error);
     } finally {
-      setLoading(false);
+      setIsInitialLoading(false);
     }
   };
 
   const subscribe = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLoading(true);
+    // Optimistic update
+    setIsSubscribed(true);
+
     try {
       const registrations = await navigator.serviceWorker.getRegistrations();
       const registration = registrations[0];
 
       if (!registration) {
+        // Rollback
+        setIsSubscribed(false);
         if (process.env.NODE_ENV === "development") {
           alert(
             "PWA 서비스 워커가 등록되지 않았습니다. 빌드 후 프리뷰(yarn preview)에서 테스트해주세요.",
@@ -62,25 +66,26 @@ export default function PushSubscriptionManager({
             "브라우저 환경에서 알림 기능을 준비할 수 없습니다. 잠시 후 다시 시도해 주세요.",
           );
         }
-        setLoading(false);
         return;
       }
 
       if (!("Notification" in window)) {
+        // Rollback
+        setIsSubscribed(false);
         alert(
           "이 브라우저는 알림 기능을 지원하지 않습니다. 아이폰을 사용 중이시라면 '홈 화면에 추가'를 통해 앱을 설치한 후 다시 시도해 주세요.",
         );
-        setLoading(false);
         return;
       }
 
       // Request permission
       const permission = await window.Notification.requestPermission();
       if (permission !== "granted") {
+        // Rollback
+        setIsSubscribed(false);
         alert(
           "알림 권한이 거부되었습니다. 원활한 사용을 위해 브라우저 설정에서 알림을 허용해 주세요.",
         );
-        setLoading(false);
         return;
       }
 
@@ -108,9 +113,10 @@ export default function PushSubscriptionManager({
         );
       }
 
-      setIsSubscribed(true);
       alert("매일 밤 9시 알림이 설정되었습니다! ✨");
     } catch (error) {
+      // Rollback
+      setIsSubscribed(false);
       console.error("Push subscription technical error:", error);
 
       // 사용자에게는 상황에 맞는 친절한 메시지 제공
@@ -127,14 +133,14 @@ export default function PushSubscriptionManager({
           "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
         );
       }
-    } finally {
-      setLoading(false);
     }
   };
 
   const unsubscribe = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLoading(true);
+    // Optimistic update
+    setIsSubscribed(false);
+
     try {
       const registrations = await navigator.serviceWorker.getRegistrations();
       const registration = registrations[0];
@@ -144,16 +150,15 @@ export default function PushSubscriptionManager({
           await subscription.unsubscribe();
         }
       }
-      setIsSubscribed(false);
       alert("알림 설정이 해제되었습니다. 언제든 다시 켜실 수 있습니다. 😊");
     } catch (error) {
+      // Rollback
+      setIsSubscribed(true);
       console.error("Unsubscribe failed:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (loading) {
+  if (isInitialLoading) {
     if (variant === "toggle")
       return (
         <div className="w-10 h-5 bg-gray-200 animate-pulse rounded-full" />
