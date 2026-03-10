@@ -1,6 +1,7 @@
 "use client";
 
 import { useMockData } from "@/context/MockDataContext";
+import { useToast } from "@/context/ToastContext";
 import {
   Activity,
   Archive,
@@ -31,6 +32,7 @@ export default function SetupPage() {
     archiveScoreboard,
   } = useMockData();
   const router = useRouter();
+  const { showToast } = useToast();
   const param = useParams<{ mode: string }>();
   const mode = param?.mode;
 
@@ -89,7 +91,10 @@ export default function SetupPage() {
     e.preventDefault();
     const validMeasures = measures.filter((m) => m.name.trim() !== "");
     if (!goalName.trim() || !lagMeasure.trim() || validMeasures.length === 0) {
-      alert("가중목, 후행지표, 최소 1개의 선행지표를 입력해주세요.");
+      showToast(
+        "error",
+        "가중목, 후행지표, 최소 1개의 선행지표를 입력해주세요.",
+      );
       return;
     }
     if (isEditMode) {

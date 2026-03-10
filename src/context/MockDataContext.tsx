@@ -217,6 +217,7 @@ export const MockDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [scoreboard, setScoreboard] = useState<Scoreboard | null>(null);
   const [allScoreboards, setAllScoreboards] = useState<Scoreboard[]>([]); // New state for all scoreboards
   const workspaceName = "도토리 독서도임"; // Hardcoded workspace name for the prototype
+  // const router = useRouter();
 
   // Persistence for prototype
   useEffect(() => {
@@ -261,6 +262,7 @@ export const MockDataProvider: React.FC<{ children: React.ReactNode }> = ({
     setScoreboard(null); // Also clear scoreboard on logout
     localStorage.removeItem("wig_user");
     setAllScoreboards(MOCK_ALL_SCOREBOARDS); // Reset all scoreboards to initial mock state
+    // router.replace("/");
   };
 
   const updateLog = (measureId: string, date: string, value: boolean) => {

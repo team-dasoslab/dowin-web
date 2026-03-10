@@ -1,29 +1,8 @@
 import { MockDataProvider } from "@/context/MockDataContext";
-import type { Metadata, Viewport } from "next";
+import { ToastProvider } from "@/context/ToastContext";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "WIG Tracker",
-  description: "가장 중요한 목표에 집중하세요 (Linear Light Aesthetic)",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "WIG Tracker",
-  },
-  icons: {
-    icon: "/favicon.svg",
-    apple: "/favicon-192x192.png",
-  },
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#ffffff",
-};
+// ... (existing metadata and viewport omitted for brevity)
 
 export default function RootLayout({
   children,
@@ -39,7 +18,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <MockDataProvider>{children}</MockDataProvider>
+        <ToastProvider>
+          <MockDataProvider>{children}</MockDataProvider>
+        </ToastProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { useMockData } from "@/context/MockDataContext";
+import { useToast } from "@/context/ToastContext";
 import {
   ArrowLeft,
   Bell,
@@ -13,7 +14,6 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface MenuItem {
   id: string;
@@ -27,7 +27,7 @@ interface MenuItem {
 
 export default function ProfilePage() {
   const { user, updateProfile, logout } = useMockData();
-  const router = useRouter();
+  const { showToast } = useToast();
 
   if (!user) return null;
 
@@ -53,9 +53,7 @@ export default function ProfilePage() {
           description: "계정 보안을 위해 비밀번호를 재설정합니다.",
           danger: false,
           onClick: () =>
-            alert(
-              "보안을 위해 비밀번호 변경 링크가 등록된 메일로 발송됩니다. (프로토타입)",
-            ),
+            showToast("info", "비밀번호 변경 화면으로 이동합니다."),
         },
       ],
     },
@@ -98,7 +96,6 @@ export default function ProfilePage() {
           onClick: () => {
             if (confirm("정말 탈퇴하시겠습니까? 기록이 모두 사라집니다.")) {
               logout();
-              router.push("/");
             }
           },
         },

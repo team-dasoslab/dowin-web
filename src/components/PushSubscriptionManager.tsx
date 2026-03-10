@@ -1,5 +1,6 @@
 "use client";
 
+import { useToast } from "@/context/ToastContext";
 import { Bell, BellOff } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -14,6 +15,7 @@ export default function PushSubscriptionManager({
 }: PushSubscriptionManagerProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     checkSubscription();
@@ -58,11 +60,13 @@ export default function PushSubscriptionManager({
         // Rollback
         setIsSubscribed(false);
         if (process.env.NODE_ENV === "development") {
-          alert(
+          showToast(
+            "error",
             "PWA 서비스 워커가 등록되지 않았습니다. 빌드 후 프리뷰(yarn preview)에서 테스트해주세요.",
           );
         } else {
-          alert(
+          showToast(
+            "error",
             "브라우저 환경에서 알림 기능을 준비할 수 없습니다. 잠시 후 다시 시도해 주세요.",
           );
         }
@@ -72,7 +76,8 @@ export default function PushSubscriptionManager({
       if (!("Notification" in window)) {
         // Rollback
         setIsSubscribed(false);
-        alert(
+        showToast(
+          "error",
           "이 브라우저는 알림 기능을 지원하지 않습니다. 아이폰을 사용 중이시라면 '홈 화면에 추가'를 통해 앱을 설치한 후 다시 시도해 주세요.",
         );
         return;
@@ -83,7 +88,8 @@ export default function PushSubscriptionManager({
       if (permission !== "granted") {
         // Rollback
         setIsSubscribed(false);
-        alert(
+        showToast(
+          "error",
           "알림 권한이 거부되었습니다. 원활한 사용을 위해 브라우저 설정에서 알림을 허용해 주세요.",
         );
         return;
@@ -113,7 +119,7 @@ export default function PushSubscriptionManager({
         );
       }
 
-      alert("매일 밤 9시 알림이 설정되었습니다! ✨");
+      showToast("success", "매일 밤 9시 알림이 설정되었습니다! ✨");
     } catch (error) {
       // Rollback
       setIsSubscribed(false);
@@ -121,15 +127,18 @@ export default function PushSubscriptionManager({
 
       // 사용자에게는 상황에 맞는 친절한 메시지 제공
       if (error instanceof Error && error.message.includes("permission")) {
-        alert(
+        showToast(
+          "error",
           "브라우저의 알림 권한이 차단되어 있습니다. 설정에서 권한을 허용해 주세요.",
         );
       } else if (error instanceof Error && error.message.includes("VAPID")) {
-        alert(
+        showToast(
+          "error",
           "알림 서비스 설정에 문제가 발생했습니다. 관리자에게 문의해 주세요.",
         );
       } else {
-        alert(
+        showToast(
+          "error",
           "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
         );
       }
@@ -150,7 +159,7 @@ export default function PushSubscriptionManager({
           await subscription.unsubscribe();
         }
       }
-      alert("알림 설정이 해제되었습니다. 언제든 다시 켜실 수 있습니다. 😊");
+      showToast("info", "알림 설정이 해제되었습니다. 😊");
     } catch (error) {
       // Rollback
       setIsSubscribed(true);
