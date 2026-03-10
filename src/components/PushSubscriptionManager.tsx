@@ -23,7 +23,8 @@ export default function PushSubscriptionManager({
     if (
       typeof window === "undefined" ||
       !("serviceWorker" in navigator) ||
-      !("PushManager" in window)
+      !("PushManager" in window) ||
+      !("Notification" in window)
     ) {
       setLoading(false);
       return;
@@ -65,8 +66,14 @@ export default function PushSubscriptionManager({
         return;
       }
 
+      if (!("Notification" in window)) {
+        alert("이 브라우저는 알림 기능을 지원하지 않습니다.");
+        setLoading(false);
+        return;
+      }
+
       // Request permission
-      const permission = await Notification.requestPermission();
+      const permission = await window.Notification.requestPermission();
       if (permission !== "granted") {
         alert("알림 권한이 거부되었습니다.");
         setLoading(false);
@@ -82,17 +89,25 @@ export default function PushSubscriptionManager({
       });
 
       // Save to server
-      await fetch("/api/push/subscribe", {
+      const response = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subscription, userId }),
       });
 
+      if (!response.ok) {
+        throw new Error(
+          `서버 저장 실패: ${response.status} ${response.statusText}`,
+        );
+      }
+
       setIsSubscribed(true);
       alert("매일 밤 9시 알림이 설정되었습니다! ✨");
     } catch (error) {
       console.error("Push subscription failed:", error);
-      alert("알림 설정 중 오류가 발생했습니다.");
+      alert(
+        `알림 설정 중 오류가 발생했습니다: ${error instanceof Error ? error.message : String(error)}`,
+      );
     } finally {
       setLoading(false);
     }
