@@ -48,8 +48,8 @@ export async function GET(req: NextRequest) {
       const payload = await buildPushPayload(
         {
           data: JSON.stringify({
-            title: "WIG 리마인드",
-            body: "오늘의 목표를 달성하셨나요? 지금 바로 기록해보세요! ✨",
+            title: "리마인드",
+            body: "오늘 하루 끝나기 전까지 3시간 남았어요. 지금 시작하면 딱 맞아요!",
             icon: "/favicon-192x192.png",
             data: { url: "/dashboard/my" },
           }),
