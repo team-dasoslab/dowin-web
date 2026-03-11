@@ -1,11 +1,23 @@
 import { getDb } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+
+interface PushSubscription {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as { subscription: any; userId: string };
+    const body = (await req.json()) as {
+      subscription: PushSubscription;
+      userId: string;
+    };
     const { subscription, userId } = body;
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
@@ -32,5 +44,23 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Subscription error:", error);
     return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const body = (await req.json()) as { endpoint: string };
+    const { endpoint } = body;
+    const { env } = getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db
+      .delete(pushSubscriptions)
+      .where(eq(pushSubscriptions.endpoint, endpoint));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Unsubscribe error:", error);
+    return NextResponse.json({ error: "Failed to unsubscribe" }, { status: 500 });
   }
 }

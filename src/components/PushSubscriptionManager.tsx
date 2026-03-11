@@ -9,6 +9,28 @@ interface PushSubscriptionManagerProps {
   variant?: "button" | "toggle";
 }
 
+const checkiOSSupport = () => {
+  const ua = navigator.userAgent;
+  const isiOS = /iphone|ipad|ipod/i.test(ua);
+  if (!isiOS) return true;
+
+  const versionMatch = ua.match(/OS (\d+)_(\d+)/i);
+  if (versionMatch) {
+    const major = parseInt(versionMatch[1], 10);
+    const minor = parseInt(versionMatch[2], 10);
+    return major > 16 || (major === 16 && minor >= 4);
+  }
+
+  // Fallback for major versions like 'OS 17' without minor part
+  const majorVersionMatch = ua.match(/OS (\d+)/i);
+  if (majorVersionMatch) {
+    const major = parseInt(majorVersionMatch[1], 10);
+    return major > 16;
+  }
+
+  return false; // Assume not supported if version can't be parsed
+};
+
 export default function PushSubscriptionManager({
   userId,
   variant = "button",
@@ -33,12 +55,8 @@ export default function PushSubscriptionManager({
     }
 
     try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      if (registrations.length === 0) {
-        setIsInitialLoading(false);
-        return;
-      }
-      const subscription = await registrations[0].pushManager.getSubscription();
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
       setIsSubscribed(!!subscription);
     } catch (error) {
       console.error("Check subscription failed:", error);
@@ -49,29 +67,17 @@ export default function PushSubscriptionManager({
 
   const subscribe = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (!checkiOSSupport()) {
+      showToast("error", "iOS 16.4 이상에서만 알림을 지원합니다.");
+      return;
+    }
+
     // Optimistic update
     setIsSubscribed(true);
 
     try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      const registration = registrations[0];
-
-      if (!registration) {
-        // Rollback
-        setIsSubscribed(false);
-        if (process.env.NODE_ENV === "development") {
-          showToast(
-            "error",
-            "PWA 서비스 워커가 등록되지 않았습니다. 빌드 후 프리뷰(yarn preview)에서 테스트해주세요.",
-          );
-        } else {
-          showToast(
-            "error",
-            "브라우저 환경에서 알림 기능을 준비할 수 없습니다. 잠시 후 다시 시도해 주세요.",
-          );
-        }
-        return;
-      }
+      const registration = await navigator.serviceWorker.ready;
 
       if (!("Notification" in window)) {
         // Rollback
@@ -119,13 +125,12 @@ export default function PushSubscriptionManager({
         );
       }
 
-      showToast("success", "매일 밤 9시 알림이 설정되었습니다! ✨");
+      showToast("success", "매일 밤 9시 알림이 설정되었습니다.");
     } catch (error) {
       // Rollback
       setIsSubscribed(false);
       console.error("Push subscription technical error:", error);
 
-      // 사용자에게는 상황에 맞는 친절한 메시지 제공
       if (error instanceof Error && error.message.includes("permission")) {
         showToast(
           "error",
@@ -135,6 +140,15 @@ export default function PushSubscriptionManager({
         showToast(
           "error",
           "알림 서비스 설정에 문제가 발생했습니다. 관리자에게 문의해 주세요.",
+        );
+      } else if (
+        process.env.NODE_ENV === "development" &&
+        error instanceof Error &&
+        error.message.includes("service worker")
+      ) {
+        showToast(
+          "error",
+          "PWA 서비스 워커가 등록되지 않았습니다. 빌드 후 프리뷰(yarn preview)에서 테스트해주세요.",
         );
       } else {
         showToast(
@@ -151,15 +165,17 @@ export default function PushSubscriptionManager({
     setIsSubscribed(false);
 
     try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      const registration = registrations[0];
-      if (registration) {
-        const subscription = await registration.pushManager.getSubscription();
-        if (subscription) {
-          await subscription.unsubscribe();
-        }
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        await subscription.unsubscribe();
+        await fetch("/api/push/subscribe", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint: subscription.endpoint }),
+        });
       }
-      showToast("info", "알림 설정이 해제되었습니다. 😊");
+      showToast("info", "알림 설정이 해제되었습니다.");
     } catch (error) {
       // Rollback
       setIsSubscribed(true);

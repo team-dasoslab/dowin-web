@@ -1,8 +1,11 @@
 import { getDb } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
+import {
+  buildPushPayload,
+  type PushSubscription,
+} from "@block65/webcrypto-web-push";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest, NextResponse } from "next/server";
-import webpush from "web-push";
 
 import { eq } from "drizzle-orm";
 
@@ -44,28 +47,41 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    await webpush.sendNotification(
+    const subscription: PushSubscription = {
+      endpoint: sub.endpoint,
+      keys: {
+        p256dh: sub.p256dh,
+        auth: sub.auth,
+      },
+      expirationTime: null,
+    };
+
+    const payload = await buildPushPayload(
       {
-        endpoint: sub.endpoint,
-        keys: {
-          p256dh: sub.p256dh,
-          auth: sub.auth,
+        data: JSON.stringify({
+          title: "WIG 테스트 알림 🚀",
+          body: "성공적으로 알림이 전송되었습니다! 이제 9시마다 리마인드를 받아보세요.",
+          icon: "/favicon-192x192.png",
+          data: { url: "/dashboard/my" },
+        }),
+        options: {
+          ttl: 60,
         },
       },
-      JSON.stringify({
-        title: "WIG 테스트 알림 🚀",
-        body: "성공적으로 알림이 전송되었습니다! 이제 9시마다 리마인드를 받아보세요.",
-        icon: "/favicon-192x192.png",
-        data: { url: "/dashboard/my" },
-      }),
+      subscription,
       {
-        vapidDetails: {
-          subject: "mailto:ixio0330@gmail.com",
-          publicKey: vapidPublicKey,
-          privateKey: vapidPrivateKey,
-        },
+        subject: "mailto:ixio0330@gmail.com",
+        publicKey: vapidPublicKey,
+        privateKey: vapidPrivateKey,
       },
     );
+
+    const request = new Request(sub.endpoint, {
+      method: payload.method,
+      headers: payload.headers,
+      body: payload.body as unknown as ArrayBuffer,
+    });
+    await fetch(request);
     return NextResponse.json({ success: true, message: "Test push sent!" });
   } catch (error: any) {
     console.error("Test push failed:", error);

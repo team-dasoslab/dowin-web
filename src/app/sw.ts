@@ -22,8 +22,6 @@ const serwist = new Serwist({
 // Use 'any' casting to bypass environment-specific TS lint errors in the service worker
 const sw = self as any;
 
-serwist.addEventListeners();
-
 // 푸시 알림 수신 이벤트
 sw.addEventListener("push", (event: any) => {
   if (!event.data) return;
@@ -65,3 +63,5 @@ sw.addEventListener("notificationclick", (event: any) => {
       }),
   );
 });
+
+serwist.addEventListeners();
