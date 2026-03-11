@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Send request to /api/push/send-daily
         run: |
-          curl -X POST \
+          curl -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             -d '{}' \
