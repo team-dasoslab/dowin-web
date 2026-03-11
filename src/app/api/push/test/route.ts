@@ -81,7 +81,12 @@ export async function GET(req: NextRequest) {
       headers: payload.headers,
       body: payload.body as unknown as ArrayBuffer,
     });
-    await fetch(request);
+    const response = await fetch(request);
+    // 이게 있어야 실제 실패 여부를 알 수 있어요
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Push failed: ${response.status} - ${text}`);
+    }
     return NextResponse.json({ success: true, message: "Test push sent!" });
   } catch (error: any) {
     console.error("Test push failed:", error);
