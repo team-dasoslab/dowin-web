@@ -7,7 +7,7 @@ import {
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest, NextResponse } from "next/server";
 
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 // GET /api/push/test?userId=...
 export async function GET(req: NextRequest) {
@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
     .select()
     .from(pushSubscriptions)
     .where(eq(pushSubscriptions.userId, userId))
+    .orderBy(desc(pushSubscriptions.createdAt)) // 최신순 정렬
     .limit(1);
 
   if (subscriptions.length === 0) {
