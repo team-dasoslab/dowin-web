@@ -1,0 +1,16 @@
+name: Send Daily Push Notification
+
+on:
+  schedule:
+    # 21:00 KST is 12:00 UTC
+    - cron: "0 12 * * *"
+
+jobs:
+  send-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send request to /api/push/send-daily
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://wig.ixio0330.workers.dev/api/push/send-daily"
