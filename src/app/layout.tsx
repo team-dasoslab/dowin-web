@@ -1,3 +1,4 @@
+import SerwistRegistration from "@/components/SerwistRegistration";
 import { MockDataProvider } from "@/context/MockDataContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { Viewport } from "next";
@@ -101,6 +102,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <SerwistRegistration />
         <ToastProvider>
           <MockDataProvider>{children}</MockDataProvider>
         </ToastProvider>
