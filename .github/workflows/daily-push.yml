@@ -1,9 +1,10 @@
-name: Send Daily Push Notification
+name: Daily Push Notification Cron
 
 on:
   schedule:
     # 21:00 KST is 12:00 UTC
     - cron: "0 12 * * *"
+  workflow_dispatch:
 
 jobs:
   send-request:
