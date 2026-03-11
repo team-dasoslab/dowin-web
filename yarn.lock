@@ -11173,6 +11173,7 @@ __metadata:
     react-dom: "npm:^19.2.4"
     recharts: "npm:^3.7.0"
     serwist: "npm:^9.5.6"
+    sharp: "npm:^0.34.5"
     tailwindcss: "npm:^4"
     typescript: "npm:^5.7.4"
     vitest: "npm:^4.0.18"
