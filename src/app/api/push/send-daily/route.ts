@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
         {
           data: JSON.stringify({
             title: "리마인드",
-            body: "오늘 하루 끝나기 전까지 3시간 남았어요. 지금 시작하면 딱 맞아요!",
+            body: "아직 하루가 끝나지 않았어요! 지금 바로 일어나서 해볼까요?",
             icon: "/favicon-192x192.png",
             data: { url: "/dashboard/my" },
           }),
