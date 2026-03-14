@@ -1,0 +1,7 @@
+interface:
+  display_name: "WIG Quality Check"
+  short_description: "WIG verification and quality gates"
+  default_prompt: "Use $wig-quality-check to verify a WIG change against tests, quality gates, and regression checks before completion."
+
+policy:
+  allow_implicit_invocation: true

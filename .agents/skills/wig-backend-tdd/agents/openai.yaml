@@ -1,0 +1,7 @@
+interface:
+  display_name: "WIG Backend TDD"
+  short_description: "WIG backend API and TDD workflow"
+  default_prompt: "Use $wig-backend-tdd to implement or change a WIG backend API with the repository's TDD and API rules."
+
+policy:
+  allow_implicit_invocation: true

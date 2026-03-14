@@ -1,0 +1,7 @@
+interface:
+  display_name: "WIG Planning"
+  short_description: "WIG planning and documentation"
+  default_prompt: "Use $wig-planning to turn a WIG feature idea into a repository-aligned planning update and action list."
+
+policy:
+  allow_implicit_invocation: true

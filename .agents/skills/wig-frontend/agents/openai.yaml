@@ -1,0 +1,7 @@
+interface:
+  display_name: "WIG Frontend"
+  short_description: "WIG frontend and API integration"
+  default_prompt: "Use $wig-frontend to build or update WIG frontend code with the repository's UI and API integration conventions."
+
+policy:
+  allow_implicit_invocation: true
