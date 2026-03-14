@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { useMockData } from "@/context/MockDataContext";
 import {
   ArrowLeft,
@@ -11,6 +12,7 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -32,16 +34,64 @@ const getWeekDates = (): string[] => {
 };
 
 export default function MyDashboardPage() {
-  const { user, scoreboard, updateLog, workspaceName } = useMockData();
+  const { user, scoreboard, updateLog } = useMockData();
   const router = useRouter();
   const [weekDates, setWeekDates] = useState<string[]>([]);
+
+  // 워크스페이스 정보 조회 (API)
+  const { 
+    data: workspaceResponse, 
+    isLoading: isWorkspaceLoading, 
+    error: workspaceError 
+  } = useGetWorkspacesMe();
 
   useEffect(() => {
     if (!user) router.push("/");
     setWeekDates(getWeekDates());
   }, [user, router]);
 
+  // 워크스페이스가 없는 경우 (404 등) 캐시가 있을 수 있으므로 error status 체크
+  const is404 = (workspaceError as any)?.response?.status === 404 || workspaceResponse?.status === 404;
+  
+  // 404가 확실하면 로딩 중이라도 안내 UI를 바로 보여줌, 그 외 로딩은 스피너
+  if (isWorkspaceLoading && !is404) return <LoadingSpinner />;
   if (!user) return null;
+
+  const hasNoWorkspace = is404 || !workspaceResponse;
+  const workspace = workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+
+  if (hasNoWorkspace) {
+    return (
+      <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
+        <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
+          {/* 아이콘 */}
+          <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+            <Zap className="text-primary w-7 h-7" />
+          </div>
+
+          {/* 텍스트 */}
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+              소속된 워크스페이스가 없어요
+            </h1>
+            <p className="text-sm text-text-secondary leading-relaxed">
+              팀원들과 함께 목표를 공유하고 성장하기 위해
+              <br />
+              새로운 워크스페이스를 만들거나 초대받으세요.
+            </p>
+          </div>
+
+          {/* CTA */}
+          <Link
+            href="/workspace/new"
+            className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+          >
+            <Plus className="w-4 h-4" />새 워크스페이스 만들기
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const today = new Date().toISOString().split("T")[0];
   const weekLabel =
@@ -128,7 +178,7 @@ export default function MyDashboardPage() {
             </Link>
             <div className="min-w-0">
               <p className="text-[11px] text-text-muted truncate">
-                {workspaceName}
+                {workspace?.name}
               </p>
               <h1 className="text-sm font-bold text-text-primary truncate">
                 {user.nickname}님의 점수판

@@ -5,13 +5,15 @@
  * WIG(가중목) 서비스 API 명세서
  * OpenAPI spec version: 0.1.0
  */
+import {
+  useMutation
+} from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult,
-} from "@tanstack/react-query";
-import { useMutation } from "@tanstack/react-query";
+  UseMutationResult
+} from '@tanstack/react-query';
 
 import type {
   ErrorResponse,
@@ -19,353 +21,295 @@ import type {
   PostAuthLoginBody,
   PutAuthPassword200,
   PutAuthPasswordBody,
-  UnauthorizedErrorResponse,
-} from "../wig.schemas";
+  UnauthorizedErrorResponse
+} from '../wig.schemas';
 
-import { customInstance } from "../../mutator";
+import { customInstance } from '../../mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * @summary 로그인
  */
 export type postAuthLoginResponse200 = {
-  data: PostAuthLogin200;
-  status: 200;
-};
+  data: PostAuthLogin200
+  status: 200
+}
 
 export type postAuthLoginResponse401 = {
-  data: ErrorResponse;
-  status: 401;
-};
+  data: ErrorResponse
+  status: 401
+}
 
 export type postAuthLoginResponse422 = {
-  data: ErrorResponse;
-  status: 422;
-};
+  data: ErrorResponse
+  status: 422
+}
 
-export type postAuthLoginResponseSuccess = postAuthLoginResponse200 & {
+export type postAuthLoginResponseSuccess = (postAuthLoginResponse200) & {
   headers: Headers;
 };
-export type postAuthLoginResponseError = (
-  | postAuthLoginResponse401
-  | postAuthLoginResponse422
-) & {
+export type postAuthLoginResponseError = (postAuthLoginResponse401 | postAuthLoginResponse422) & {
   headers: Headers;
 };
 
-export type postAuthLoginResponse =
-  | postAuthLoginResponseSuccess
-  | postAuthLoginResponseError;
+export type postAuthLoginResponse = (postAuthLoginResponseSuccess | postAuthLoginResponseError)
 
 export const getPostAuthLoginUrl = () => {
-  return `/api/auth/login`;
-};
 
-export const postAuthLogin = async (
-  postAuthLoginBody: PostAuthLoginBody,
-  options?: RequestInit,
-): Promise<postAuthLoginResponse> => {
-  return customInstance<postAuthLoginResponse>(getPostAuthLoginUrl(), {
+
+  
+
+  return `/api/auth/login`
+}
+
+export const postAuthLogin = async (postAuthLoginBody: PostAuthLoginBody, options?: RequestInit): Promise<postAuthLoginResponse> => {
+  
+  return customInstance<postAuthLoginResponse>(getPostAuthLoginUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(postAuthLoginBody),
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      postAuthLoginBody,)
+  }
+);}
+  
 
-export const getPostAuthLoginMutationOptions = <
-  TError = ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAuthLogin>>,
-    TError,
-    { data: PostAuthLoginBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postAuthLogin>>,
-  TError,
-  { data: PostAuthLoginBody },
-  TContext
-> => {
-  const mutationKey = ["postAuthLogin"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAuthLogin>>,
-    { data: PostAuthLoginBody }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return postAuthLogin(data, requestOptions);
-  };
+export const getPostAuthLoginMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogin>>, TError,{data: PostAuthLoginBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAuthLogin>>, TError,{data: PostAuthLoginBody}, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['postAuthLogin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-export type PostAuthLoginMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAuthLogin>>
->;
-export type PostAuthLoginMutationBody = PostAuthLoginBody;
-export type PostAuthLoginMutationError = ErrorResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthLogin>>, {data: PostAuthLoginBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postAuthLogin(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAuthLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthLogin>>>
+    export type PostAuthLoginMutationBody = PostAuthLoginBody
+    export type PostAuthLoginMutationError = ErrorResponse
+
+    /**
  * @summary 로그인
  */
-export const usePostAuthLogin = <TError = ErrorResponse, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAuthLogin>>,
-      TError,
-      { data: PostAuthLoginBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postAuthLogin>>,
-  TError,
-  { data: PostAuthLoginBody },
-  TContext
-> => {
-  return useMutation(getPostAuthLoginMutationOptions(options), queryClient);
-};
-/**
+export const usePostAuthLogin = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogin>>, TError,{data: PostAuthLoginBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAuthLogin>>,
+        TError,
+        {data: PostAuthLoginBody},
+        TContext
+      > => {
+      return useMutation(getPostAuthLoginMutationOptions(options), queryClient);
+    }
+    /**
  * @summary 로그아웃
  */
 export type postAuthLogoutResponse204 = {
-  data: void;
-  status: 204;
-};
+  data: void
+  status: 204
+}
 
 export type postAuthLogoutResponse401 = {
-  data: UnauthorizedErrorResponse;
-  status: 401;
-};
+  data: UnauthorizedErrorResponse
+  status: 401
+}
 
-export type postAuthLogoutResponseSuccess = postAuthLogoutResponse204 & {
+export type postAuthLogoutResponseSuccess = (postAuthLogoutResponse204) & {
   headers: Headers;
 };
-export type postAuthLogoutResponseError = postAuthLogoutResponse401 & {
+export type postAuthLogoutResponseError = (postAuthLogoutResponse401) & {
   headers: Headers;
 };
 
-export type postAuthLogoutResponse =
-  | postAuthLogoutResponseSuccess
-  | postAuthLogoutResponseError;
+export type postAuthLogoutResponse = (postAuthLogoutResponseSuccess | postAuthLogoutResponseError)
 
 export const getPostAuthLogoutUrl = () => {
-  return `/api/auth/logout`;
-};
 
-export const postAuthLogout = async (
-  options?: RequestInit,
-): Promise<postAuthLogoutResponse> => {
-  return customInstance<postAuthLogoutResponse>(getPostAuthLogoutUrl(), {
+
+  
+
+  return `/api/auth/logout`
+}
+
+export const postAuthLogout = async ( options?: RequestInit): Promise<postAuthLogoutResponse> => {
+  
+  return customInstance<postAuthLogoutResponse>(getPostAuthLogoutUrl(),
+  {      
     ...options,
-    method: "POST",
-  });
-};
+    method: 'POST'
+    
+    
+  }
+);}
+  
 
-export const getPostAuthLogoutMutationOptions = <
-  TError = UnauthorizedErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAuthLogout>>,
-    TError,
-    void,
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postAuthLogout>>,
-  TError,
-  void,
-  TContext
-> => {
-  const mutationKey = ["postAuthLogout"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAuthLogout>>,
-    void
-  > = () => {
-    return postAuthLogout(requestOptions);
-  };
 
-  return { mutationFn, ...mutationOptions };
-};
+export const getPostAuthLogoutMutationOptions = <TError = UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext> => {
 
-export type PostAuthLogoutMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAuthLogout>>
->;
+const mutationKey = ['postAuthLogout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-export type PostAuthLogoutMutationError = UnauthorizedErrorResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthLogout>>, void> = () => {
+          
+
+          return  postAuthLogout(requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAuthLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthLogout>>>
+    
+    export type PostAuthLogoutMutationError = UnauthorizedErrorResponse
+
+    /**
  * @summary 로그아웃
  */
-export const usePostAuthLogout = <
-  TError = UnauthorizedErrorResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAuthLogout>>,
-      TError,
-      void,
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postAuthLogout>>,
-  TError,
-  void,
-  TContext
-> => {
-  return useMutation(getPostAuthLogoutMutationOptions(options), queryClient);
-};
-/**
+export const usePostAuthLogout = <TError = UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAuthLogout>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getPostAuthLogoutMutationOptions(options), queryClient);
+    }
+    /**
  * @summary 비밀번호 변경
  */
 export type putAuthPasswordResponse200 = {
-  data: PutAuthPassword200;
-  status: 200;
-};
+  data: PutAuthPassword200
+  status: 200
+}
 
 export type putAuthPasswordResponse400 = {
-  data: ErrorResponse;
-  status: 400;
-};
+  data: ErrorResponse
+  status: 400
+}
 
 export type putAuthPasswordResponse401 = {
-  data: UnauthorizedErrorResponse;
-  status: 401;
-};
+  data: UnauthorizedErrorResponse
+  status: 401
+}
 
 export type putAuthPasswordResponse422 = {
-  data: ErrorResponse;
-  status: 422;
-};
+  data: ErrorResponse
+  status: 422
+}
 
-export type putAuthPasswordResponseSuccess = putAuthPasswordResponse200 & {
+export type putAuthPasswordResponseSuccess = (putAuthPasswordResponse200) & {
   headers: Headers;
 };
-export type putAuthPasswordResponseError = (
-  | putAuthPasswordResponse400
-  | putAuthPasswordResponse401
-  | putAuthPasswordResponse422
-) & {
+export type putAuthPasswordResponseError = (putAuthPasswordResponse400 | putAuthPasswordResponse401 | putAuthPasswordResponse422) & {
   headers: Headers;
 };
 
-export type putAuthPasswordResponse =
-  | putAuthPasswordResponseSuccess
-  | putAuthPasswordResponseError;
+export type putAuthPasswordResponse = (putAuthPasswordResponseSuccess | putAuthPasswordResponseError)
 
 export const getPutAuthPasswordUrl = () => {
-  return `/api/auth/password`;
-};
 
-export const putAuthPassword = async (
-  putAuthPasswordBody: PutAuthPasswordBody,
-  options?: RequestInit,
-): Promise<putAuthPasswordResponse> => {
-  return customInstance<putAuthPasswordResponse>(getPutAuthPasswordUrl(), {
+
+  
+
+  return `/api/auth/password`
+}
+
+export const putAuthPassword = async (putAuthPasswordBody: PutAuthPasswordBody, options?: RequestInit): Promise<putAuthPasswordResponse> => {
+  
+  return customInstance<putAuthPasswordResponse>(getPutAuthPasswordUrl(),
+  {      
     ...options,
-    method: "PUT",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(putAuthPasswordBody),
-  });
-};
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      putAuthPasswordBody,)
+  }
+);}
+  
 
-export const getPutAuthPasswordMutationOptions = <
-  TError = ErrorResponse | UnauthorizedErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof putAuthPassword>>,
-    TError,
-    { data: PutAuthPasswordBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof putAuthPassword>>,
-  TError,
-  { data: PutAuthPasswordBody },
-  TContext
-> => {
-  const mutationKey = ["putAuthPassword"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof putAuthPassword>>,
-    { data: PutAuthPasswordBody }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return putAuthPassword(data, requestOptions);
-  };
+export const getPutAuthPasswordMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAuthPassword>>, TError,{data: PutAuthPasswordBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putAuthPassword>>, TError,{data: PutAuthPasswordBody}, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['putAuthPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-export type PutAuthPasswordMutationResult = NonNullable<
-  Awaited<ReturnType<typeof putAuthPassword>>
->;
-export type PutAuthPasswordMutationBody = PutAuthPasswordBody;
-export type PutAuthPasswordMutationError =
-  | ErrorResponse
-  | UnauthorizedErrorResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putAuthPassword>>, {data: PutAuthPasswordBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  putAuthPassword(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutAuthPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof putAuthPassword>>>
+    export type PutAuthPasswordMutationBody = PutAuthPasswordBody
+    export type PutAuthPasswordMutationError = ErrorResponse | UnauthorizedErrorResponse
+
+    /**
  * @summary 비밀번호 변경
  */
-export const usePutAuthPassword = <
-  TError = ErrorResponse | UnauthorizedErrorResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof putAuthPassword>>,
-      TError,
-      { data: PutAuthPasswordBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof putAuthPassword>>,
-  TError,
-  { data: PutAuthPasswordBody },
-  TContext
-> => {
-  return useMutation(getPutAuthPasswordMutationOptions(options), queryClient);
-};
+export const usePutAuthPassword = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAuthPassword>>, TError,{data: PutAuthPasswordBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putAuthPassword>>,
+        TError,
+        {data: PutAuthPasswordBody},
+        TContext
+      > => {
+      return useMutation(getPutAuthPasswordMutationOptions(options), queryClient);
+    }
+    

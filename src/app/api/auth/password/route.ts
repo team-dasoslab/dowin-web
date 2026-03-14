@@ -8,7 +8,7 @@ import { withErrorHandler } from "@/lib/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const PUT = withErrorHandler(async (request: Request) => {
-  const { env } = await getCloudflareContext();
+  const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const storage = new AuthStorage(db);
   const service = new AuthService(storage);

@@ -11,6 +11,29 @@ export interface User {
   isFirstLogin?: boolean;
 }
 
+export interface Workspace {
+  id?: number;
+  name?: string;
+  createdAt?: string;
+}
+
+export type WorkspaceMemberRole = typeof WorkspaceMemberRole[keyof typeof WorkspaceMemberRole];
+
+
+export const WorkspaceMemberRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
+export interface WorkspaceMember {
+  id?: number;
+  workspaceId?: number;
+  userId?: number;
+  nickname?: string;
+  role?: WorkspaceMemberRole;
+  createdAt?: string;
+}
+
 /**
  * 유효성 검사 실패 시 필드별 상세 오류 (선택)
  */
@@ -63,3 +86,12 @@ export type PostAdminUsers201 = {
   nickname?: string;
   initialPassword?: string;
 };
+
+export type PostWorkspacesBody = {
+  name: string;
+};
+
+export type PostWorkspacesJoinBody = {
+  workspaceId: number;
+};
+

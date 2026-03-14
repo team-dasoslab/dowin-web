@@ -7,7 +7,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies } from "next/headers";
 
 export const POST = withErrorHandler(async (_: Request) => {
-  const { env } = await getCloudflareContext();
+  const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const storage = new AuthStorage(db);
   const service = new AuthService(storage);

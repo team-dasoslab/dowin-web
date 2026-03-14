@@ -5,147 +5,127 @@
  * WIG(가중목) 서비스 API 명세서
  * OpenAPI spec version: 0.1.0
  */
+import {
+  useMutation
+} from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult,
-} from "@tanstack/react-query";
-import { useMutation } from "@tanstack/react-query";
+  UseMutationResult
+} from '@tanstack/react-query';
 
 import type {
   ErrorResponse,
   PostAdminUsers201,
   PostAdminUsersBody,
-  UnauthorizedErrorResponse,
-} from "../wig.schemas";
+  UnauthorizedErrorResponse
+} from '../wig.schemas';
 
-import { customInstance } from "../../mutator";
+import { customInstance } from '../../mutator';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
 
 /**
  * @summary [ADMIN] 새 멤버 추가
  */
 export type postAdminUsersResponse201 = {
-  data: PostAdminUsers201;
-  status: 201;
-};
+  data: PostAdminUsers201
+  status: 201
+}
 
 export type postAdminUsersResponse401 = {
-  data: UnauthorizedErrorResponse;
-  status: 401;
-};
+  data: UnauthorizedErrorResponse
+  status: 401
+}
 
 export type postAdminUsersResponse403 = {
-  data: ErrorResponse;
-  status: 403;
-};
+  data: ErrorResponse
+  status: 403
+}
 
 export type postAdminUsersResponse409 = {
-  data: ErrorResponse;
-  status: 409;
-};
+  data: ErrorResponse
+  status: 409
+}
 
-export type postAdminUsersResponseSuccess = postAdminUsersResponse201 & {
+export type postAdminUsersResponseSuccess = (postAdminUsersResponse201) & {
   headers: Headers;
 };
-export type postAdminUsersResponseError = (
-  | postAdminUsersResponse401
-  | postAdminUsersResponse403
-  | postAdminUsersResponse409
-) & {
+export type postAdminUsersResponseError = (postAdminUsersResponse401 | postAdminUsersResponse403 | postAdminUsersResponse409) & {
   headers: Headers;
 };
 
-export type postAdminUsersResponse =
-  | postAdminUsersResponseSuccess
-  | postAdminUsersResponseError;
+export type postAdminUsersResponse = (postAdminUsersResponseSuccess | postAdminUsersResponseError)
 
 export const getPostAdminUsersUrl = () => {
-  return `/api/admin/users`;
-};
 
-export const postAdminUsers = async (
-  postAdminUsersBody: PostAdminUsersBody,
-  options?: RequestInit,
-): Promise<postAdminUsersResponse> => {
-  return customInstance<postAdminUsersResponse>(getPostAdminUsersUrl(), {
+
+  
+
+  return `/api/admin/users`
+}
+
+export const postAdminUsers = async (postAdminUsersBody: PostAdminUsersBody, options?: RequestInit): Promise<postAdminUsersResponse> => {
+  
+  return customInstance<postAdminUsersResponse>(getPostAdminUsersUrl(),
+  {      
     ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(postAdminUsersBody),
-  });
-};
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      postAdminUsersBody,)
+  }
+);}
+  
 
-export const getPostAdminUsersMutationOptions = <
-  TError = UnauthorizedErrorResponse | ErrorResponse,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof postAdminUsers>>,
-    TError,
-    { data: PostAdminUsersBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof postAdminUsers>>,
-  TError,
-  { data: PostAdminUsersBody },
-  TContext
-> => {
-  const mutationKey = ["postAdminUsers"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof postAdminUsers>>,
-    { data: PostAdminUsersBody }
-  > = (props) => {
-    const { data } = props ?? {};
 
-    return postAdminUsers(data, requestOptions);
-  };
+export const getPostAdminUsersMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminUsers>>, TError,{data: PostAdminUsersBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAdminUsers>>, TError,{data: PostAdminUsersBody}, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['postAdminUsers'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-export type PostAdminUsersMutationResult = NonNullable<
-  Awaited<ReturnType<typeof postAdminUsers>>
->;
-export type PostAdminUsersMutationBody = PostAdminUsersBody;
-export type PostAdminUsersMutationError =
-  | UnauthorizedErrorResponse
-  | ErrorResponse;
+      
 
-/**
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminUsers>>, {data: PostAdminUsersBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postAdminUsers(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAdminUsersMutationResult = NonNullable<Awaited<ReturnType<typeof postAdminUsers>>>
+    export type PostAdminUsersMutationBody = PostAdminUsersBody
+    export type PostAdminUsersMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
  * @summary [ADMIN] 새 멤버 추가
  */
-export const usePostAdminUsers = <
-  TError = UnauthorizedErrorResponse | ErrorResponse,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAdminUsers>>,
-      TError,
-      { data: PostAdminUsersBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof postAdminUsers>>,
-  TError,
-  { data: PostAdminUsersBody },
-  TContext
-> => {
-  return useMutation(getPostAdminUsersMutationOptions(options), queryClient);
-};
+export const usePostAdminUsers = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminUsers>>, TError,{data: PostAdminUsersBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAdminUsers>>,
+        TError,
+        {data: PostAdminUsersBody},
+        TContext
+      > => {
+      return useMutation(getPostAdminUsersMutationOptions(options), queryClient);
+    }
+    
