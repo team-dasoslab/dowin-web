@@ -1,39 +1,72 @@
-import axios, { type AxiosRequestConfig, type AxiosHeaders } from "axios";
+import axios, { type AxiosRequestConfig } from "axios";
 
-// API 서버의 기본 URL
-const AXIOS_INSTANCE = axios.create({
-  baseURL: "http://localhost:3000", // 백엔드 서버 주소
-});
+const AXIOS_INSTANCE = axios.create();
+
+type CancelablePromise<T> = Promise<T> & {
+  cancel: () => void;
+};
+
+const normalizeHeaders = (
+  headers?: HeadersInit,
+): AxiosRequestConfig["headers"] => {
+  if (!headers) {
+    return undefined;
+  }
+
+  if (headers instanceof Headers) {
+    return Object.fromEntries(headers.entries());
+  }
+
+  if (Array.isArray(headers)) {
+    return Object.fromEntries(headers);
+  }
+
+  return headers;
+};
+
+const normalizeBody = (body?: BodyInit | null) => {
+  if (typeof body !== "string") {
+    return body;
+  }
+
+  try {
+    return JSON.parse(body);
+  } catch {
+    return body;
+  }
+};
 
 export const customInstance = <T>(
   url: string,
-  config: any, // Use any to allow RequestInit from Orval
-): Promise<T> => {
+  config: RequestInit = {},
+): CancelablePromise<T> => {
   const source = axios.CancelToken.source();
-  
-  // Convert RequestInit (fetch style) to AxiosRequestConfig
+  const { body, headers, signal, ...restConfig } = config;
+
   const axiosConfig: AxiosRequestConfig = {
     url,
     method: config.method,
-    headers: config.headers,
-    data: config.body ? JSON.parse(config.body) : undefined,
+    headers: normalizeHeaders(headers),
+    data: normalizeBody(body),
     cancelToken: source.token,
+    ...(signal ? { signal } : {}),
     withCredentials: true,
-    ...config, // Spread the rest
+    ...restConfig,
   };
 
-  const promise = AXIOS_INSTANCE(axiosConfig).then((response) => ({
-    data: response.data,
-    status: response.status,
-    headers: response.headers,
-  }));
+  const promise: CancelablePromise<T> = AXIOS_INSTANCE(axiosConfig).then(
+    (response) => ({
+      data: response.data,
+      status: response.status,
+      headers: response.headers,
+    }),
+  ) as CancelablePromise<T>;
 
-  // @ts-ignore
   promise.cancel = () => {
     source.cancel("Query was cancelled");
   };
 
-  return promise as any as Promise<T>;
+  return promise;
 };
 
 export default customInstance;
