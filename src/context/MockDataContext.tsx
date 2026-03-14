@@ -1,5 +1,8 @@
-"use client";
-
+import {
+  usePostAuthLogin,
+  usePostAuthLogout,
+  usePutAuthPassword,
+} from "@/api/generated/auth/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 // Types based on docs/dev/2026.03.09-database-schema.md
@@ -41,6 +44,7 @@ export type User = {
   id: string;
   nickname: string;
   customId: string;
+  isFirstLogin?: boolean;
 };
 
 interface MockDataContextType {
@@ -53,6 +57,10 @@ interface MockDataContextType {
   logout: () => void;
   updateLog: (measureId: string, date: string, value: boolean) => void;
   updateProfile: (nickname: string) => void;
+  changePassword: (
+    currentPw: string,
+    newPw: string,
+  ) => Promise<{ success: boolean; message?: string }>;
   // Management Features
   createScoreboard: (
     goalName: string,
@@ -216,8 +224,11 @@ export const MockDataProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [scoreboard, setScoreboard] = useState<Scoreboard | null>(null);
   const [allScoreboards, setAllScoreboards] = useState<Scoreboard[]>([]); // New state for all scoreboards
-  const workspaceName = "도토리 독서도임"; // Hardcoded workspace name for the prototype
-  // const router = useRouter();
+  const workspaceName = "도토리 독서모임"; // Hardcoded workspace name for the prototype
+
+  const loginMutation = usePostAuthLogin();
+  const logoutMutation = usePostAuthLogout();
+  const passwordMutation = usePutAuthPassword();
 
   // Persistence for prototype
   useEffect(() => {
@@ -227,7 +238,7 @@ export const MockDataProvider: React.FC<{ children: React.ReactNode }> = ({
       setUser(parsedUser);
       // Load all scoreboards and filter the active one for the user
       const userScoreboard = MOCK_ALL_SCOREBOARDS.find(
-        (sb) => sb.userId === parsedUser.id && sb.status === "ACTIVE",
+        (sb) => sb.userId === String(parsedUser.id) && sb.status === "ACTIVE",
       );
       setScoreboard(userScoreboard || null);
     }
@@ -236,33 +247,70 @@ export const MockDataProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const login = async (id: string, pw: string) => {
-    // Simple mock logic for 'admin'
-    if (id === "admin" && pw === "1234") {
-      // Assuming 'admin' is the customId for the first user
-      const loggedInUser = MOCK_USERS.find((u) => u.customId === id);
-      if (loggedInUser) {
+    try {
+      const res = await loginMutation.mutateAsync({
+        data: { customId: id, password: pw },
+      });
+
+      // Now 'res' has 'status' and 'data' because mutator is fixed
+      if (res.status === 200 && res.data.user) {
+        const loggedInUser: User = {
+          id: String(res.data.user.id),
+          nickname: res.data.user.nickname || "Unknown",
+          customId: id,
+          isFirstLogin: res.data.user.isFirstLogin,
+        };
         setUser(loggedInUser);
         localStorage.setItem("wig_user", JSON.stringify(loggedInUser));
-        // Find the active scoreboard for the logged-in user
+
+        // Find the active scoreboard for the logged-in user (fallback to mock for now)
         const userScoreboard = MOCK_ALL_SCOREBOARDS.find(
           (sb) => sb.userId === loggedInUser.id && sb.status === "ACTIVE",
         );
         setScoreboard(userScoreboard || null);
-        setAllScoreboards(MOCK_ALL_SCOREBOARDS); // Ensure all scoreboards are loaded
+        setAllScoreboards(MOCK_ALL_SCOREBOARDS);
         return true;
       }
+      return false;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
-    // For other mock users, assuming they can't login via the 'admin' path
-    // In a real app, this would be more robust
-    return false;
   };
 
-  const logout = () => {
-    setUser(null);
-    setScoreboard(null); // Also clear scoreboard on logout
-    localStorage.removeItem("wig_user");
-    setAllScoreboards(MOCK_ALL_SCOREBOARDS); // Reset all scoreboards to initial mock state
-    // router.replace("/");
+  const logout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setUser(null);
+      setScoreboard(null);
+      localStorage.removeItem("wig_user");
+      setAllScoreboards(MOCK_ALL_SCOREBOARDS);
+    }
+  };
+
+  const changePassword = async (currentPw: string, newPw: string) => {
+    try {
+      const res = await passwordMutation.mutateAsync({
+        data: { currentPassword: currentPw, newPassword: newPw },
+      });
+      if (res.status === 200) {
+        return { success: true, message: res.data.message };
+      }
+      return {
+        success: false,
+        message: "비밀번호 변경에 실패했습니다.",
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        message:
+          error?.response?.data?.error?.message ||
+          "비밀번호 변경에 실패했습니다.",
+      };
+    }
   };
 
   const updateLog = (measureId: string, date: string, value: boolean) => {
@@ -516,6 +564,7 @@ export const MockDataProvider: React.FC<{ children: React.ReactNode }> = ({
         logout,
         updateLog,
         updateProfile,
+        changePassword,
         createScoreboard,
         updateScoreboard,
         deleteScoreboard,

@@ -1,22 +1,19 @@
+"use client";
+
 import SerwistRegistration from "@/components/SerwistRegistration";
 import { MockDataProvider } from "@/context/MockDataContext";
 import { ToastProvider } from "@/context/ToastContext";
-import { Viewport } from "next";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 import "./globals.css";
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#ffffff",
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
@@ -103,9 +100,11 @@ export default function RootLayout({
       </head>
       <body>
         <SerwistRegistration />
-        <ToastProvider>
-          <MockDataProvider>{children}</MockDataProvider>
-        </ToastProvider>
+        <QueryClientProvider client={queryClient}>
+          <ToastProvider>
+            <MockDataProvider>{children}</MockDataProvider>
+          </ToastProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

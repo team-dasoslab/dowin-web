@@ -26,7 +26,7 @@ interface MenuItem {
 }
 
 export default function ProfilePage() {
-  const { user, updateProfile, logout } = useMockData();
+  const { user, updateProfile, logout, changePassword } = useMockData();
   const { showToast } = useToast();
 
   if (!user) return null;
@@ -52,8 +52,25 @@ export default function ProfilePage() {
           title: "비밀번호 변경",
           description: "계정 보안을 위해 비밀번호를 재설정합니다.",
           danger: false,
-          onClick: () =>
-            showToast("info", "비밀번호 변경 화면으로 이동합니다."),
+          onClick: async () => {
+            const currentPw = prompt("현재 비밀번호를 입력하세요:");
+            if (!currentPw) return;
+            const newPw = prompt("새로운 비밀번호를 입력하세요:");
+            if (!newPw) return;
+
+            const res = await changePassword(currentPw, newPw);
+            if (res.success) {
+              showToast(
+                "success",
+                res.message || "비밀번호가 성공적으로 변경되었습니다.",
+              );
+            } else {
+              showToast(
+                "error",
+                res.message || "비밀번호 변경에 실패했습니다.",
+              );
+            }
+          },
         },
       ],
     },

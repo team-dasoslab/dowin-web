@@ -37,6 +37,7 @@
       "binding": "DB",
       "database_name": "wig-db",
       "database_id": "0e1bfd28-d223-447c-ad6b-1f83f0038bfe",
+      "migrations_dir": "drizzle"
     },
   ],
   /**

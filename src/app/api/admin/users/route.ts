@@ -4,9 +4,11 @@ import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { adminCreateUserSchema } from "@/domain/auth/validation";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { withErrorHandler } from "@/lib/with-error-handler";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const POST = withErrorHandler(
-  async (request: Request, { env }: { env: CloudflareEnv }) => {
+  async (request: Request) => {
+    const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
     const storage = new AuthStorage(db);
     const service = new AuthService(storage);
