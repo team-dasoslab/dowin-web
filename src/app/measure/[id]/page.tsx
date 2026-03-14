@@ -1,6 +1,8 @@
 "use client";
 
 import { useMockData } from "@/context/MockDataContext";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import {
   ArrowLeft,
   Calendar,
@@ -60,13 +62,15 @@ export default function MeasureDetailPage() {
       <div className="max-w-[1000px] mx-auto p-8 space-y-8 animate-linear-in">
         {/* Navigation */}
         <nav>
-          <Link
-            href="/dashboard/my"
+          <Button
+            asChild
             className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text-primary transition-colors group"
           >
-            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
-            대시보드로 돌아가기
-          </Link>
+            <Link href="/dashboard/my">
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+              대시보드로 돌아가기
+            </Link>
+          </Button>
         </nav>
 
         {/* Header */}
@@ -95,7 +99,7 @@ export default function MeasureDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Chart Section */}
           <div className="lg:col-span-2 space-y-6">
-            <section className="card-linear p-8 space-y-6">
+            <Card className="card-linear p-8 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-primary" />
@@ -165,10 +169,10 @@ export default function MeasureDetailPage() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-            </section>
+            </Card>
 
             {/* History Table (Simulated) */}
-            <section className="card-linear overflow-hidden">
+            <Card className="card-linear overflow-hidden">
               <div className="px-6 py-4 bg-sub-background border-b border-border flex items-center justify-between">
                 <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider">
                   전체 기록 히스토리
@@ -205,12 +209,12 @@ export default function MeasureDetailPage() {
                   </div>
                 ))}
               </div>
-            </section>
+            </Card>
           </div>
 
           {/* Sidebar / Info */}
           <div className="space-y-6">
-            <section className="card-linear p-6 space-y-4">
+            <Card className="card-linear p-6 space-y-4">
               <h3 className="text-xs font-bold text-text-muted uppercase tracking-widest">
                 지표 정의 및 안내
               </h3>
@@ -228,13 +232,13 @@ export default function MeasureDetailPage() {
                   효과적입니다.
                 </p>
               </div>
-            </section>
+            </Card>
 
-            <button className="w-full btn-linear-primary py-3 text-sm">
+            <Button className="w-full btn-linear-primary py-3 text-sm">
               지표 설정 수정
-            </button>
+            </Button>
             <div className="space-y-3">
-              <button
+              <Button
                 onClick={() => {
                   if (
                     confirm(
@@ -248,8 +252,8 @@ export default function MeasureDetailPage() {
                 className="w-full py-2.5 text-xs font-bold text-text-muted border border-border rounded-md hover:bg-sub-background transition-colors"
               >
                 지표 보관하기
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   if (
                     confirm(
@@ -263,7 +267,7 @@ export default function MeasureDetailPage() {
                 className="w-full py-2.5 text-xs font-bold text-danger border border-danger/10 rounded-md hover:bg-danger/5 transition-colors"
               >
                 지표 삭제하기
-              </button>
+              </Button>
             </div>
           </div>
         </div>

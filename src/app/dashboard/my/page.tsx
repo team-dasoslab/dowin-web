@@ -1,6 +1,8 @@
 "use client";
 
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { useMockData } from "@/context/MockDataContext";
 import {
   ArrowLeft,
@@ -82,12 +84,14 @@ export default function MyDashboardPage() {
           </div>
 
           {/* CTA */}
-          <Link
-            href="/workspace/new"
+          <Button
+            asChild
             className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
           >
-            <Plus className="w-4 h-4" />새 워크스페이스 만들기
-          </Link>
+            <Link href="/workspace/new">
+              <Plus className="w-4 h-4" />새 워크스페이스 만들기
+            </Link>
+          </Button>
         </div>
       </div>
     );
@@ -122,12 +126,14 @@ export default function MyDashboardPage() {
           </div>
 
           {/* CTA */}
-          <Link
-            href="/setup?mode=create"
+          <Button
+            asChild
             className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
           >
-            <Plus className="w-4 h-4" />새 점수판 만들기
-          </Link>
+            <Link href="/setup?mode=create">
+              <Plus className="w-4 h-4" />새 점수판 만들기
+            </Link>
+          </Button>
         </div>
       </div>
     );
@@ -170,12 +176,14 @@ export default function MyDashboardPage() {
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {/* 팀 대시보드로 뒤로가기 */}
-            <Link
-              href="/dashboard"
+            <Button
+              asChild
               className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-            </Link>
+              <Link href="/dashboard">
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </Link>
+            </Button>
             <div className="min-w-0">
               <p className="text-[11px] text-text-muted truncate">
                 {workspace?.name}
@@ -187,25 +195,29 @@ export default function MyDashboardPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href="/setup?mode=update"
+            <Button
+              asChild
               className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
             >
-              <Settings className="w-3.5 h-3.5 text-text-muted shrink-0" />
-              <span>점수판 관리</span>
-            </Link>
-            <Link
-              href="/profile"
+              <Link href="/setup?mode=update">
+                <Settings className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                <span>점수판 관리</span>
+              </Link>
+            </Button>
+            <Button
+              asChild
               className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
             >
-              <UserIcon className="w-3.5 h-3.5 text-text-muted shrink-0" />
-              <span>내 프로필</span>
-            </Link>
+              <Link href="/profile">
+                <UserIcon className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                <span>내 프로필</span>
+              </Link>
+            </Button>
           </div>
         </header>
 
         {/* ── WIG 카드 ── */}
-        <section className="border border-border rounded-lg overflow-hidden">
+        <Card className="border border-border rounded-lg overflow-hidden">
           {/* 상단: 가중목 */}
           <div className="px-6 py-4 flex items-start gap-4 border-b border-border">
             <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -249,7 +261,7 @@ export default function MyDashboardPage() {
               </span>
             </div>
           </div>
-        </section>
+        </Card>
 
         {/* ── 주간 점수판 ── */}
         <section className="space-y-3">
@@ -261,13 +273,15 @@ export default function MyDashboardPage() {
               <span className="text-[11px] text-text-muted bg-sub-background border border-border px-2 py-1 rounded font-mono">
                 {weekLabel}
               </span>
-              <Link
-                href="/setup?mode=addMeasure"
+              <Button
+                asChild
                 className="px-2.5 py-1.5 bg-white border border-border rounded-lg text-[11px] font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary transition-colors flex items-center gap-1"
               >
-                <Plus className="w-3 h-3" />
-                지표 추가
-              </Link>
+                <Link href="/setup?mode=addMeasure">
+                  <Plus className="w-3 h-3" />
+                  지표 추가
+                </Link>
+              </Button>
             </div>
           </div>
 
@@ -363,7 +377,7 @@ export default function MyDashboardPage() {
 
                               return (
                                 <td key={date} className="py-3 text-center">
-                                  <button
+                                  <Button
                                     onClick={() =>
                                       updateLog(lm.id, date, !isAchieved)
                                     }
@@ -387,7 +401,7 @@ export default function MyDashboardPage() {
                                         {date > today ? "" : "✕"}
                                       </span>
                                     )}
-                                  </button>
+                                  </Button>
                                 </td>
                               );
                             })}

@@ -1,6 +1,9 @@
 "use client";
 
 import { Scoreboard, User, useMockData } from "@/context/MockDataContext";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 import { Calendar, Target, UserIcon, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -87,7 +90,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
         : "text-red-700 bg-red-50 border-red-200";
 
   return (
-    <div className="bg-white border border-border rounded-lg p-5 space-y-4 hover:border-[rgba(205,207,213,1)] transition-colors">
+    <Card className="bg-white border border-border rounded-lg p-5 space-y-4 hover:border-[rgba(205,207,213,1)] transition-colors">
       {/* 헤더 */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -103,11 +106,11 @@ const MemberCard: React.FC<MemberCardProps> = ({
             </p>
           </div>
         </div>
-        <span
+        <Badge
           className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded border ${rateColor}`}
         >
           {rate}%
-        </span>
+        </Badge>
       </div>
 
       {/* 후행지표 */}
@@ -155,7 +158,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
           })}
         </ul>
       )}
-    </div>
+    </Card>
   );
 };
 
@@ -302,20 +305,24 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href="/dashboard/my"
+            <Button
+              asChild
               className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
             >
-              <Calendar className="w-3.5 h-3.5 text-text-muted shrink-0" />
-              <span>나의 대시보드</span>
-            </Link>
-            <Link
-              href="/profile"
+              <Link href="/dashboard/my">
+                <Calendar className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                <span>나의 대시보드</span>
+              </Link>
+            </Button>
+            <Button
+              asChild
               className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
             >
-              <UserIcon className="w-3.5 h-3.5 text-text-muted shrink-0" />
-              <span>내 프로필</span>
-            </Link>
+              <Link href="/profile">
+                <UserIcon className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                <span>내 프로필</span>
+              </Link>
+            </Button>
           </div>
         </header>
 

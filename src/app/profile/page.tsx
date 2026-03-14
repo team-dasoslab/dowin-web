@@ -1,6 +1,9 @@
 "use client";
 
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 import { useMockData } from "@/context/MockDataContext";
 import { useToast } from "@/context/ToastContext";
 import {
@@ -125,18 +128,20 @@ export default function ProfilePage() {
       <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         {/* ── 헤더 ── */}
         <header className="flex items-center justify-between">
-          <Link
-            href="/dashboard/my"
+          <Button
+            asChild
             className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-          </Link>
+            <Link href="/dashboard/my">
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </Link>
+          </Button>
           <p className="text-xs text-text-muted">내 프로필</p>
           <div className="w-8" /> {/* 우측 균형 맞춤 */}
         </header>
 
         {/* ── 프로필 카드 ── */}
-        <section className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
+        <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
           <div className="w-11 h-11 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
             <UserIcon className="w-5 h-5 text-primary" />
           </div>
@@ -145,13 +150,13 @@ export default function ProfilePage() {
               <h1 className="text-lg font-bold text-text-primary tracking-tight">
                 {user.nickname}
               </h1>
-              <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20">
+              <Badge className="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20">
                 멤버
-              </span>
+              </Badge>
             </div>
             <p className="text-xs text-text-muted mt-0.5">@{user.customId}</p>
           </div>
-        </section>
+        </Card>
 
         {/* ── 메뉴 그룹 ── */}
         <div className="space-y-6">
@@ -204,13 +209,13 @@ export default function ProfilePage() {
 
                   if (item.onClick) {
                     return (
-                      <button
+                      <Button
                         key={item.id}
                         onClick={item.onClick}
                         className="w-full bg-white hover:bg-sub-background"
                       >
                         {Content}
-                      </button>
+                      </Button>
                     );
                   }
 

@@ -1,6 +1,8 @@
 "use client";
 
 import { usePostWorkspaces } from "@/api/generated/workspace/workspace";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { ArrowLeft, Plus, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -38,12 +40,14 @@ export default function NewWorkspacePage() {
       <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard/my"
+          <Button
+            asChild
             className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-          </Link>
+            <Link href="/dashboard/my">
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </Link>
+          </Button>
           <span className="text-xs font-bold text-text-muted">뒤로 가기</span>
         </div>
 
@@ -70,7 +74,7 @@ export default function NewWorkspacePage() {
             <label className="text-[11px] block font-bold text-text-secondary ml-0.5">
               워크스페이스 이름
             </label>
-            <input
+            <Input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -89,7 +93,7 @@ export default function NewWorkspacePage() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isPending || !name.trim()}
             className={`
@@ -109,7 +113,7 @@ export default function NewWorkspacePage() {
                 <span>워크스페이스 생성하기</span>
               </>
             )}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

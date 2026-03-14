@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { useMockData } from "@/context/MockDataContext";
 import { LogIn, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -36,7 +39,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 font-pretendard">
-      <div className="w-full max-w-[380px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
+      <Card className="w-full max-w-[380px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
         {/* ── 로고 및 타이틀 ── */}
         <div className="flex flex-col items-center text-center space-y-4 mb-10">
           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
@@ -59,7 +62,7 @@ export default function LoginPage() {
               <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
                 아이디
               </label>
-              <input
+              <Input
                 type="text"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
@@ -73,7 +76,7 @@ export default function LoginPage() {
               <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
                 비밀번호
               </label>
-              <input
+              <Input
                 type="password"
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
@@ -92,7 +95,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
             disabled={isLoading}
             className={`
@@ -112,9 +115,9 @@ export default function LoginPage() {
                 <span>시작하기</span>
               </>
             )}
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }
