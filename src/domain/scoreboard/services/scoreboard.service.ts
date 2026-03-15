@@ -1,4 +1,5 @@
 import {
+  BadRequestError,
   ConflictError,
   NotFoundError,
   PlatformError,
@@ -33,7 +34,8 @@ export interface ScoreboardStoragePort {
     id: number,
     input: UpdateScoreboardInput,
   ): Promise<ScoreboardRecord>;
-  archiveScoreboard(id: number): Promise<ScoreboardRecord>;
+  archiveScoreboard(id: number, endDate: string): Promise<ScoreboardRecord>;
+  reactivateScoreboard(id: number): Promise<ScoreboardRecord>;
   findArchivedScoreboards(
     userId: number,
     workspaceId: number,
@@ -103,7 +105,10 @@ export class ScoreboardService {
       throw new PlatformScoreboardArchivedError();
     }
 
-    return await this.scoreboardStorage.archiveScoreboard(id);
+    return await this.scoreboardStorage.archiveScoreboard(
+      id,
+      getCurrentDateString(),
+    );
   }
 
   async getHistory(userId: number): Promise<ScoreboardRecord[]> {
@@ -112,6 +117,29 @@ export class ScoreboardService {
       userId,
       workspace.id,
     );
+  }
+
+  async reactivateScoreboard(
+    id: number,
+    userId: number,
+  ): Promise<ScoreboardRecord> {
+    const scoreboard = await this.getOwnedScoreboard(id, userId);
+
+    if (scoreboard.status === "ACTIVE") {
+      throw new BadRequestError("SCOREBOARD_ALREADY_ACTIVE");
+    }
+
+    const workspace = await this.getWorkspace(userId);
+    const existing = await this.scoreboardStorage.findActiveScoreboard(
+      userId,
+      workspace.id,
+    );
+
+    if (existing) {
+      throw new ConflictError("ACTIVE_SCOREBOARD_EXISTS");
+    }
+
+    return await this.scoreboardStorage.reactivateScoreboard(id);
   }
 
   private async getWorkspace(userId: number): Promise<WorkspaceSummary> {
@@ -150,3 +178,7 @@ class PlatformScoreboardArchivedError extends PlatformError {
     super("SCOREBOARD_ARCHIVED");
   }
 }
+
+const getCurrentDateString = () => {
+  return new Date().toISOString().split("T")[0];
+};

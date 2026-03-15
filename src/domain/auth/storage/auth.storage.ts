@@ -1,8 +1,9 @@
+import { getDb } from "@/db";
+import { sessions, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { users, sessions } from "@/db/schema";
 
 export class AuthStorage {
-  constructor(private db: any) {}
+  constructor(private db: ReturnType<typeof getDb>) {}
 
   async findUserByCustomId(customId: string) {
     return await this.db.query.users.findFirst({
@@ -16,11 +17,13 @@ export class AuthStorage {
     });
   }
 
-  async createUser(data: { customId: string; nickname: string; passwordHash: string; isFirstLogin: boolean }) {
-    const [newUser] = await this.db
-      .insert(users)
-      .values(data)
-      .returning();
+  async createUser(data: {
+    customId: string;
+    nickname: string;
+    passwordHash: string;
+    isFirstLogin: boolean;
+  }) {
+    const [newUser] = await this.db.insert(users).values(data).returning();
     return newUser;
   }
 

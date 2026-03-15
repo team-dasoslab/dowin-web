@@ -30,6 +30,7 @@ If current code and docs differ, verify the implementation and preserve establis
 - Use Zod for form validation.
 - For server state, use generated Orval hooks and TanStack Query patterns.
 - After mutations, invalidate related queries.
+- Treat date display and date-key generation in the UI as KST-based unless the current feature explicitly requires another timezone.
 - Keep mobile behavior in scope, especially dashboard and scoreboard flows.
 
 For detailed file paths and doc priorities, read `references/frontend-rules.md`.

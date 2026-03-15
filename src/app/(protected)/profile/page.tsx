@@ -1,11 +1,23 @@
 "use client";
 
+import {
+  usePostAuthLogout,
+  usePutAuthPassword,
+} from "@/api/generated/auth/auth";
+import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+import {
+  getGetUsersMeQueryKey,
+  useGetUsersMe,
+  usePutUsersMe,
+} from "@/api/generated/profile/profile";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { useMockData } from "@/context/MockDataContext";
 import { useToast } from "@/context/ToastContext";
+import { validatePassword } from "@/domain/auth/validation";
+import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Bell,
@@ -13,7 +25,6 @@ import {
   Edit2,
   Key,
   LogOut,
-  Trash2,
   User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -29,10 +40,70 @@ interface MenuItem {
 }
 
 export default function ProfilePage() {
-  const { user, updateProfile, logout, changePassword } = useMockData();
+  const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const { data: profileResponse, isLoading: isProfileLoading } =
+    useGetUsersMe();
+  const updateNicknameMutation = usePutUsersMe();
+  const changePasswordMutation = usePutAuthPassword();
+  const logoutMutation = usePostAuthLogout();
 
-  if (!user) return null;
+  const user = profileResponse?.status === 200 ? profileResponse.data : null;
+  const pushUserId = user?.id != null ? String(user.id) : null;
+
+  if (isProfileLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  const nickname = user.nickname ?? "사용자";
+  const customId = user.customId ?? "";
+
+  const updateStoredNickname = (nickname: string) => {
+    const raw = window.localStorage.getItem("wig_user");
+
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as {
+        id?: string;
+        customId?: string;
+        nickname?: string;
+      };
+      window.localStorage.setItem(
+        "wig_user",
+        JSON.stringify({
+          ...parsed,
+          nickname,
+        }),
+      );
+    } catch {
+      // Ignore local storage parse errors
+    }
+  };
+
+  const getSafeNickname = (nextNickname: string | undefined) =>
+    nextNickname ?? nickname;
+
+  const handleLogout = async () => {
+    try {
+      const response = await logoutMutation.mutateAsync();
+      if (response.status !== 204) {
+        throw response;
+      }
+    } catch {
+      // Continue logout flow even when server-side logout fails.
+    } finally {
+      window.localStorage.removeItem("wig_user");
+      queryClient.clear();
+      window.location.replace("/");
+    }
+  };
 
   const menuGroups: { label: string; items: MenuItem[] }[] = [
     {
@@ -44,9 +115,40 @@ export default function ProfilePage() {
           title: "닉네임 변경",
           description: "대시보드에 표시될 이름을 변경합니다.",
           danger: false,
-          onClick: () => {
-            const next = prompt("새로운 닉네임을 입력하세요:", user.nickname);
-            if (next) updateProfile(next);
+          onClick: async () => {
+            const next = prompt("새로운 닉네임을 입력하세요:", nickname);
+
+            if (!next) {
+              return;
+            }
+
+            try {
+              const response = await updateNicknameMutation.mutateAsync({
+                data: {
+                  nickname: next,
+                },
+              });
+
+              if (response.status !== 200) {
+                throw response;
+              }
+
+              updateStoredNickname(getSafeNickname(response.data.nickname));
+              await Promise.all([
+                queryClient.invalidateQueries({
+                  queryKey: getGetUsersMeQueryKey(),
+                }),
+                queryClient.invalidateQueries({
+                  queryKey: getGetDashboardTeamQueryKey(undefined),
+                }),
+              ]);
+              showToast("success", "닉네임이 변경되었습니다.");
+            } catch (error) {
+              showToast(
+                "error",
+                getApiErrorMessage(error, "닉네임 변경에 실패했습니다."),
+              );
+            }
           },
         },
         {
@@ -56,21 +158,47 @@ export default function ProfilePage() {
           description: "계정 보안을 위해 비밀번호를 재설정합니다.",
           danger: false,
           onClick: async () => {
-            const currentPw = prompt("현재 비밀번호를 입력하세요:");
-            if (!currentPw) return;
-            const newPw = prompt("새로운 비밀번호를 입력하세요:");
-            if (!newPw) return;
+            const currentPw = prompt("현재 비밀번호를 입력하세요:")?.trim();
+            if (!currentPw) {
+              showToast("error", "현재 비밀번호를 입력해주세요.");
+              return;
+            }
 
-            const res = await changePassword(currentPw, newPw);
-            if (res.success) {
-              showToast(
-                "success",
-                res.message || "비밀번호가 성공적으로 변경되었습니다.",
-              );
-            } else {
+            const newPw = prompt("새로운 비밀번호를 입력하세요:")?.trim();
+            if (!newPw) {
+              showToast("error", "새 비밀번호를 입력해주세요.");
+              return;
+            }
+
+            if (!validatePassword(newPw)) {
               showToast(
                 "error",
-                res.message || "비밀번호 변경에 실패했습니다.",
+                "비밀번호는 8자 이상의 영문, 숫자, 허용된 특수문자 조합이어야 합니다.",
+              );
+              return;
+            }
+
+            try {
+              const response = await changePasswordMutation.mutateAsync({
+                data: {
+                  currentPassword: currentPw,
+                  newPassword: newPw,
+                },
+              });
+
+              if (response.status !== 200) {
+                throw response;
+              }
+
+              showToast(
+                "success",
+                response.data.message ||
+                  "비밀번호가 성공적으로 변경되었습니다.",
+              );
+            } catch (error) {
+              showToast(
+                "error",
+                getApiErrorMessage(error, "비밀번호 변경에 실패했습니다."),
               );
             }
           },
@@ -85,9 +213,9 @@ export default function ProfilePage() {
           icon: <Bell className="w-3.5 h-3.5" />,
           title: "매일 밤 9시 알림",
           description: "리드 지표 기록을 잊지 않도록 푸시 알림을 보냅니다.",
-          rightElement: (
-            <PushSubscriptionManager userId={user.id} variant="toggle" />
-          ),
+          rightElement: pushUserId ? (
+            <PushSubscriptionManager userId={pushUserId} variant="toggle" />
+          ) : null,
         },
       ],
     },
@@ -100,27 +228,31 @@ export default function ProfilePage() {
           title: "로그아웃",
           description: "현재 기기에서 세션을 종료합니다.",
           danger: false,
-          onClick: logout,
-        },
-      ],
-    },
-    {
-      label: "위험 구역",
-      items: [
-        {
-          id: "delete",
-          icon: <Trash2 className="w-3.5 h-3.5 text-danger" />,
-          title: "서비스 탈퇴",
-          description: "모든 데이터가 삭제되며 복구할 수 없습니다.",
-          danger: true,
           onClick: () => {
-            if (confirm("정말 탈퇴하시겠습니까? 기록이 모두 사라집니다.")) {
-              logout();
+            if (confirm("로그아웃할까요?")) {
+              void handleLogout();
             }
           },
         },
       ],
     },
+    // {
+    //   label: "위험 구역",
+    //   items: [
+    //     {
+    //       id: "delete",
+    //       icon: <Trash2 className="w-3.5 h-3.5 text-danger" />,
+    //       title: "서비스 탈퇴",
+    //       description: "모든 데이터가 삭제되며 복구할 수 없습니다.",
+    //       danger: true,
+    //       onClick: () => {
+    //         if (confirm("정말 탈퇴하시겠습니까? 기록이 모두 사라집니다.")) {
+    //           void handleLogout();
+    //         }
+    //       },
+    //     },
+    //   ],
+    // },
   ];
 
   return (
@@ -148,13 +280,10 @@ export default function ProfilePage() {
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold text-text-primary tracking-tight">
-                {user.nickname}
+                {nickname}
               </h1>
-              <Badge className="px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20">
-                멤버
-              </Badge>
             </div>
-            <p className="text-xs text-text-muted mt-0.5">@{user.customId}</p>
+            <p className="text-xs text-text-muted mt-0.5">@{customId}</p>
           </div>
         </Card>
 

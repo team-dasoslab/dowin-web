@@ -2,6 +2,7 @@
 
 import {
   getGetScoreboardsActiveQueryKey,
+  getGetScoreboardsQueryKey,
   useGetScoreboardsActive,
   usePostScoreboards,
   usePostScoreboardsIdArchive,
@@ -15,7 +16,11 @@ import {
   usePutLeadMeasuresId,
 } from "@/api/generated/lead-measure/lead-measure";
 import { useToast } from "@/context/ToastContext";
-import { getApiErrorMessage, toNumberId } from "@/lib/client/frontend-api";
+import {
+  getApiErrorMessage,
+  getApiErrorStatus,
+  toNumberId,
+} from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,14 +40,20 @@ export const useScoreboardSetup = () => {
     null,
   );
 
-  const { data: activeScoreboardResponse } = useGetScoreboardsActive({
+  const {
+    data: activeScoreboardResponse,
+    error: activeScoreboardError,
+  } = useGetScoreboardsActive({
     query: {
       retry: false,
     },
   });
 
+  const hasNoActiveScoreboard = getApiErrorStatus(activeScoreboardError) === 404;
   const activeScoreboard =
-    activeScoreboardResponse?.status === 200 ? activeScoreboardResponse.data : null;
+    hasNoActiveScoreboard || activeScoreboardResponse?.status !== 200
+      ? null
+      : activeScoreboardResponse.data;
   const scoreboardId = toNumberId(activeScoreboard?.id);
   const isEditMode = scoreboardId !== null && mode !== "create";
 
@@ -117,6 +128,9 @@ export const useScoreboardSetup = () => {
     await queryClient.invalidateQueries({
       queryKey: getGetScoreboardsActiveQueryKey(),
     });
+    await queryClient.invalidateQueries({
+      queryKey: getGetScoreboardsQueryKey(),
+    });
 
     if (targetScoreboardId !== null) {
       await queryClient.invalidateQueries({
@@ -173,6 +187,7 @@ export const useScoreboardSetup = () => {
         }
 
         await invalidateScoreboardQueries(createdScoreboardId);
+        showToast("success", "새 점수판을 만들었습니다.");
         return true;
       }
 
@@ -230,6 +245,7 @@ export const useScoreboardSetup = () => {
         }
 
         await invalidateScoreboardQueries(scoreboardId);
+        showToast("success", "점수판을 저장했습니다.");
       }
 
       return true;
@@ -252,6 +268,10 @@ export const useScoreboardSetup = () => {
         id: scoreboardId,
       });
       await invalidateScoreboardQueries(scoreboardId);
+      showToast(
+        "success",
+        "점수판을 보관했습니다. 새 점수판을 만들 수 있어요.",
+      );
       return true;
     } catch (error) {
       showToast(
@@ -268,6 +288,7 @@ export const useScoreboardSetup = () => {
     archive,
     goalName,
     handleMeasureChange,
+    isArchivePending: archiveScoreboardMutation.isPending,
     isEditMode,
     lagMeasure,
     measures,

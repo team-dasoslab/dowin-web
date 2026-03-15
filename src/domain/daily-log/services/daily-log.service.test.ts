@@ -21,17 +21,27 @@ describe("DailyLogService", () => {
     vi.clearAllMocks();
   });
 
-  it("미래 날짜 기록 시 400 에러를 던진다", async () => {
+  it("미래 날짜도 기록할 수 있다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
     findOwnedLeadMeasure.mockResolvedValue({
       id: 10,
       status: "ACTIVE",
       scoreboard: { id: 2, status: "ACTIVE" },
     });
+    upsertLog.mockResolvedValue({
+      id: 1,
+      leadMeasureId: 10,
+      logDate: "2999-01-01",
+      value: true,
+    });
 
-    await expect(
-      service.upsertLog(10, 100, "2999-01-01", true),
-    ).rejects.toThrow("FUTURE_DATE_NOT_ALLOWED");
+    await expect(service.upsertLog(10, 100, "2999-01-01", true)).resolves.toEqual({
+      id: 1,
+      leadMeasureId: 10,
+      logDate: "2999-01-01",
+      value: true,
+    });
+    expect(upsertLog).toHaveBeenCalledWith(10, "2999-01-01", true);
   });
 
   it("ARCHIVED 선행지표에는 기록할 수 없다", async () => {
@@ -70,6 +80,100 @@ describe("DailyLogService", () => {
           achievementRate: expect.any(Number),
         }),
       ],
+    });
+  });
+
+  it("월간 기록 조회 시 MONTHLY 지표만 집계한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 3회 유산소",
+        targetValue: 3,
+        period: "WEEKLY",
+        status: "ACTIVE",
+      },
+      {
+        id: 11,
+        name: "월 12회 근력운동",
+        targetValue: 12,
+        period: "MONTHLY",
+        status: "ACTIVE",
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 11, logDate: "2026-03-01", value: true },
+      { leadMeasureId: 11, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 11, logDate: "2026-03-04", value: false },
+    ]);
+
+    const result = await service.getMonthlyLogs(2, 100, "2026-03-01");
+
+    expect(result.monthStart).toBe("2026-03-01");
+    expect(result.monthEnd).toBe("2026-03-31");
+    expect(result.monthLabel).toBe("2026.03");
+    expect(result.summary).toEqual({
+      achieved: 2,
+      total: 30,
+      achievementRate: 6.7,
+      isWinning: false,
+    });
+    expect(result.leadMeasures).toHaveLength(1);
+    expect(result.leadMeasures[0]).toEqual(
+      expect.objectContaining({
+        id: 11,
+        achieved: 2,
+      }),
+    );
+    expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
+      [11],
+      "2026-03-01",
+      "2026-03-31",
+    );
+  });
+
+  it("monthStart가 월 1일이 아니어도 해당 월의 1일로 정규화한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([]);
+    findLogsForLeadMeasures.mockResolvedValue([]);
+
+    const result = await service.getMonthlyLogs(2, 100, "2026-03-18");
+
+    expect(result.monthStart).toBe("2026-03-01");
+    expect(result.monthEnd).toBe("2026-03-31");
+    expect(result.monthLabel).toBe("2026.03");
+  });
+
+  it("주간 지표는 주차별 목표 상한(min)으로 월간 summary를 계산한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 3회 유산소",
+        targetValue: 3,
+        period: "WEEKLY",
+        status: "ACTIVE",
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-04", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-05", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-06", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-07", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-08", value: true },
+    ]);
+
+    const result = await service.getMonthlyLogs(2, 100, "2026-03-01");
+
+    expect(result.summary).toEqual({
+      achieved: 3,
+      total: 18,
+      achievementRate: 16.7,
+      isWinning: false,
     });
   });
 });

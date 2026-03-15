@@ -34,6 +34,12 @@ export const adminCreateUserSchema = z.object({
     .string()
     .min(1, "닉네임을 입력해주세요.")
     .max(50, "닉네임은 50자 이하여야 합니다."),
+  password: z
+    .string()
+    .regex(
+      PW_REGEX,
+      "비밀번호는 8자 이상의 영문, 숫자, 허용된 특수문자 조합이어야 합니다.",
+    ),
 });
 
 export const validateCustomId = (id: string): boolean => ID_REGEX.test(id);

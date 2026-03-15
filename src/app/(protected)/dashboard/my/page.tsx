@@ -1,5 +1,7 @@
 "use client";
 
+import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
+import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -7,18 +9,15 @@ import { toNumberId } from "@/lib/client/frontend-api";
 import {
   ArrowLeft,
   Check,
-  Minus,
+  FolderArchive,
   Plus,
   Settings,
   Target,
   User as UserIcon,
-  X,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
-import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 
 type StoredUser = {
   nickname?: string;
@@ -51,23 +50,37 @@ export default function MyDashboardPage() {
     hasNoWorkspace,
     isLoading,
     isLogPending,
+    isMonthlyLogsLoading,
     isWeeklyLogsLoading,
-    overallRate,
+    monthlyOverallRate,
+    monthLabel,
     pendingLogKey,
     today,
     toggleLog,
     weekDates,
     weekLabel,
+    weeklyOverallRate,
     weeklyById,
     workspace,
   } = useDashboardScoreboard();
   const [nickname, setNickname] = useState<string | null>(null);
+  const weeklyGoalCount = activeLeadMeasures.filter(
+    (leadMeasure) => leadMeasure.period === "WEEKLY",
+  ).length;
+  const monthlyGoalCount = activeLeadMeasures.filter(
+    (leadMeasure) => leadMeasure.period === "MONTHLY",
+  ).length;
 
   useEffect(() => {
     setNickname(getStoredNickname());
   }, []);
 
-  if (isLoading || (activeScoreboard && isWeeklyLogsLoading && weeklyById.size === 0)) {
+  if (
+    isLoading ||
+    (activeScoreboard &&
+      (isWeeklyLogsLoading || isMonthlyLogsLoading) &&
+      weeklyById.size === 0)
+  ) {
     return <LoadingSpinner />;
   }
 
@@ -163,6 +176,15 @@ export default function MyDashboardPage() {
               asChild
               className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
             >
+              <Link href="/scoreboards">
+                <FolderArchive className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                <span>점수판 보관함</span>
+              </Link>
+            </Button>
+            <Button
+              asChild
+              className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
+            >
               <Link href="/setup?mode=update">
                 <Settings className="w-3.5 h-3.5 text-text-muted shrink-0" />
                 <span>점수판 관리</span>
@@ -181,39 +203,55 @@ export default function MyDashboardPage() {
         </header>
 
         <Card className="border border-border rounded-lg overflow-hidden">
-          <div className="px-6 py-4 flex items-start gap-4 border-b border-border">
-            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Zap className="w-4 h-4 text-primary" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">
-                가중목
-              </p>
-              <h2 className="text-lg font-bold text-text-primary tracking-tight">
-                {activeScoreboard.goalName}
-              </h2>
+          <div className="px-6 py-4 flex justify-between items-center gap-4 border-b border-border">
+            <div className="flex flex-row items-center gap-4">
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Zap className="w-4 h-4 text-primary" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
+                  가중목
+                </p>
+                <h2 className="text-lg font-bold text-text-primary">
+                  {activeScoreboard.goalName}
+                </h2>
+              </div>
             </div>
 
-            <div className="flex-shrink-0 text-right space-y-1">
+            <div className="text-right space-y-1">
               <p className="text-[10px] text-text-muted">이번 주 달성률</p>
               <p
                 className={`text-2xl font-bold font-mono tracking-tight ${
-                  overallRate >= 80
+                  weeklyOverallRate >= 80
                     ? "text-green-600"
-                    : overallRate >= 50
+                    : weeklyOverallRate >= 50
                       ? "text-amber-600"
                       : "text-text-primary"
                 }`}
               >
-                {overallRate}%
+                {weeklyOverallRate}%
               </p>
+              <div className="flex items-center justify-end gap-1 text-[10px] text-text-muted">
+                <span>이번 달 달성률{monthLabel ? ` (${monthLabel})` : ""}</span>
+                <strong
+                  className={`font-mono ${
+                    monthlyOverallRate >= 80
+                      ? "text-green-600"
+                      : monthlyOverallRate >= 50
+                        ? "text-amber-600"
+                        : "text-text-primary"
+                  }`}
+                >
+                  {monthlyOverallRate}%
+                </strong>
+              </div>
             </div>
           </div>
 
           <div className="px-6 py-3 bg-sub-background flex items-center gap-3">
-            <Target className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
-            <div>
-              <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest mr-3">
+            <Target className="w-3.5 h-3.5 text-text-muted" />
+            <div className="flex flex-row items-center">
+              <span className="text-[10px] font-bold text-text-muted tracking-widest mr-3">
                 후행지표
               </span>
               <span className="text-sm text-text-primary font-medium">
@@ -225,9 +263,15 @@ export default function MyDashboardPage() {
 
         <section className="space-y-3">
           <div className="flex items-center justify-between px-0.5">
-            <h2 className="text-sm font-bold text-text-primary">
-              주간 선행지표
-            </h2>
+            <div className="space-y-1">
+              <h2 className="text-sm font-bold text-text-primary">
+                주간 선행지표
+              </h2>
+              <p className="text-[11px] text-text-muted">
+                주간 목표({weeklyGoalCount}개)는 이번 주 기준으로 집계하고, 월간
+                목표({monthlyGoalCount}개)는 이번 달 누적으로 집계합니다.
+              </p>
+            </div>
             <div className="flex items-center gap-2">
               <span className="text-[11px] text-text-muted bg-sub-background border border-border px-2 py-1 rounded font-mono">
                 {weekLabel}
@@ -308,12 +352,9 @@ export default function MyDashboardPage() {
                         return (
                           <tr key={leadMeasure.id} className="bg-white">
                             <td className="py-4 px-5">
-                              <Link
-                                href={`/measure/${leadMeasure.id}`}
-                                className="block font-semibold text-text-primary hover:text-primary transition-colors truncate text-sm"
-                              >
+                              <p className="block font-semibold text-text-primary truncate text-sm">
                                 {leadMeasure.name}
-                              </Link>
+                              </p>
                               <span className="text-[10px] text-text-muted">
                                 목표 {targetValue}회 /{" "}
                                 {leadMeasure.period === "DAILY"
@@ -329,17 +370,17 @@ export default function MyDashboardPage() {
                                 weekly?.logs?.[date] === undefined
                                   ? null
                                   : weekly.logs[date];
-                              const isFuture = date > today;
                               const isToday = date === today;
                               const currentLogKey =
-                                leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
+                                leadMeasureId === null
+                                  ? null
+                                  : `${leadMeasureId}:${date}`;
                               const isPending = pendingLogKey === currentLogKey;
 
                               return (
                                 <td key={date} className="py-3 text-center">
                                   <Button
                                     disabled={
-                                      isFuture ||
                                       isPending ||
                                       isLogPending ||
                                       leadMeasureId === null
@@ -352,22 +393,14 @@ export default function MyDashboardPage() {
                                     className={`w-7 h-7 mx-auto rounded-md flex items-center justify-center border transition-colors ${
                                       currentValue === true
                                         ? "bg-primary border-primary text-white"
-                                        : currentValue === false
-                                          ? "bg-rose-50 border-rose-200 text-rose-500"
-                                          : isFuture
-                                            ? "bg-sub-background border-dashed border-border text-text-muted/30"
-                                            : isToday
-                                              ? "bg-primary/5 border-primary/30 text-primary"
-                                              : "bg-sub-background border-border text-text-muted"
-                                    } ${isFuture || isPending || isLogPending ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
+                                        : isToday
+                                          ? "bg-primary/5 border-primary/30 text-primary"
+                                          : "bg-sub-background border-border text-text-muted"
+                                    } ${isPending || isLogPending ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
                                   >
                                     {currentValue === true ? (
                                       <Check className="w-3.5 h-3.5" />
-                                    ) : currentValue === false ? (
-                                      <X className="w-3.5 h-3.5" />
-                                    ) : (
-                                      <Minus className="w-3.5 h-3.5" />
-                                    )}
+                                    ) : null}
                                   </Button>
                                 </td>
                               );

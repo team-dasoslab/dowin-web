@@ -2,8 +2,17 @@ import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 
+export interface AuthStoragePort {
+  findUserByCustomId: AuthStorage["findUserByCustomId"];
+  findUserById: AuthStorage["findUserById"];
+  createUser: AuthStorage["createUser"];
+  updateUserPassword: AuthStorage["updateUserPassword"];
+  createSession: AuthStorage["createSession"];
+  deleteSession: AuthStorage["deleteSession"];
+}
+
 export class AuthService {
-  constructor(private storage: AuthStorage) {}
+  constructor(private storage: AuthStoragePort) {}
 
   async login(customId: string, password: string) {
     // 1. 사용자 조회
@@ -62,9 +71,8 @@ export class AuthService {
     await this.storage.updateUserPassword(userId, newPasswordHash);
   }
 
-  async createUser(customId: string, nickname: string) {
-    const initialPassword = "user";
-    const passwordHash = await bcrypt.hash(initialPassword, 10);
+  async createUser(customId: string, nickname: string, password: string) {
+    const passwordHash = await bcrypt.hash(password, 10);
 
     const newUser = await this.storage.createUser({
       customId,
@@ -73,9 +81,6 @@ export class AuthService {
       isFirstLogin: true,
     });
 
-    return {
-      ...newUser,
-      initialPassword,
-    };
+    return newUser;
   }
 }

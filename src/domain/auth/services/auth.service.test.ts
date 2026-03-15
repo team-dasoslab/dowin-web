@@ -1,12 +1,32 @@
+import {
+  AuthService,
+  type AuthStoragePort,
+} from "@/domain/auth/services/auth.service";
 import bcrypt from "bcryptjs";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AuthService } from "@/domain/auth/services/auth.service";
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+  type MockedFunction,
+} from "vitest";
+
+type MockStorage = {
+  [K in keyof AuthStoragePort]: MockedFunction<AuthStoragePort[K]>;
+};
+
+const createMockStorage = (): MockStorage => ({
+  findUserByCustomId: vi.fn(),
+  findUserById: vi.fn(),
+  createUser: vi.fn(),
+  updateUserPassword: vi.fn(),
+  createSession: vi.fn(),
+  deleteSession: vi.fn(),
+});
 
 describe("Auth Service - login", () => {
-  const mockStorage = {
-    findUserByCustomId: vi.fn(),
-    createSession: vi.fn(),
-  } as any;
+  const mockStorage = createMockStorage();
   const service = new AuthService(mockStorage);
 
   beforeEach(() => {
@@ -20,6 +40,7 @@ describe("Auth Service - login", () => {
       passwordHash: await bcrypt.hash("password123", 10),
       nickname: "John",
       isFirstLogin: true,
+      createdAt: new Date(),
     };
 
     mockStorage.findUserByCustomId.mockResolvedValue(mockUser);
@@ -33,7 +54,7 @@ describe("Auth Service - login", () => {
   });
 
   it("아이디가 존재하지 않으면 에러를 던진다", async () => {
-    mockStorage.findUserByCustomId.mockResolvedValue(null);
+    mockStorage.findUserByCustomId.mockResolvedValue(undefined);
 
     await expect(service.login("unknown", "pass")).rejects.toThrow(
       "아이디 또는 비밀번호가 올바르지 않습니다",
@@ -47,6 +68,7 @@ describe("Auth Service - login", () => {
       passwordHash: await bcrypt.hash("correct-pass", 10),
       nickname: "John",
       isFirstLogin: true,
+      createdAt: new Date(),
     };
     mockStorage.findUserByCustomId.mockResolvedValue(mockUser);
 
@@ -57,9 +79,7 @@ describe("Auth Service - login", () => {
 });
 
 describe("Auth Service - logout", () => {
-  const mockStorage = {
-    deleteSession: vi.fn(),
-  } as any;
+  const mockStorage = createMockStorage();
   const service = new AuthService(mockStorage);
 
   it("세션 ID가 주어지면 세션을 삭제한다", async () => {
@@ -69,10 +89,7 @@ describe("Auth Service - logout", () => {
 });
 
 describe("Auth Service - changePassword", () => {
-  const mockStorage = {
-    findUserById: vi.fn(),
-    updateUserPassword: vi.fn(),
-  } as any;
+  const mockStorage = createMockStorage();
   const service = new AuthService(mockStorage);
 
   beforeEach(() => {
@@ -83,6 +100,10 @@ describe("Auth Service - changePassword", () => {
     const mockUser = {
       id: 1,
       passwordHash: await bcrypt.hash("old-pass", 10),
+      createdAt: new Date(),
+      customId: "john123",
+      nickname: "John",
+      isFirstLogin: false,
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
 
@@ -95,6 +116,10 @@ describe("Auth Service - changePassword", () => {
     const mockUser = {
       id: 1,
       passwordHash: await bcrypt.hash("old-pass", 10),
+      createdAt: new Date(),
+      customId: "john123",
+      nickname: "John",
+      isFirstLogin: false,
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
 
@@ -105,27 +130,39 @@ describe("Auth Service - changePassword", () => {
 });
 
 describe("Auth Service - createUser", () => {
-  const mockStorage = {
-    createUser: vi.fn(),
-  } as any;
+  const mockStorage = createMockStorage();
   const service = new AuthService(mockStorage);
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("새로운 사용자를 초기 비밀번호 'user'와 함께 생성한다", async () => {
+  it("새로운 사용자를 전달받은 비밀번호로 생성한다", async () => {
     const mockCreatedUser = {
       id: 2,
       customId: "newmember",
       nickname: "New Member",
+      passwordHash: "hashed-password",
+      isFirstLogin: true,
+      createdAt: new Date(),
     };
     mockStorage.createUser.mockResolvedValue(mockCreatedUser);
 
-    const result = await service.createUser("newmember", "New Member");
+    const result = await service.createUser(
+      "newmember",
+      "New Member",
+      "newSecurePass1!",
+    );
 
     expect(result.customId).toBe("newmember");
-    expect(result.initialPassword).toBe("user");
-    expect(mockStorage.createUser).toHaveBeenCalled();
+    expect(result).not.toHaveProperty("initialPassword");
+    expect(mockStorage.createUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customId: "newmember",
+        nickname: "New Member",
+        isFirstLogin: true,
+        passwordHash: expect.any(String),
+      }),
+    );
   });
 });

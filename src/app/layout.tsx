@@ -1,7 +1,6 @@
 "use client";
 
 import SerwistRegistration from "@/components/SerwistRegistration";
-import { MockDataProvider } from "@/context/MockDataContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
@@ -101,9 +100,7 @@ export default function RootLayout({
       <body>
         <SerwistRegistration />
         <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <MockDataProvider>{children}</MockDataProvider>
-          </ToastProvider>
+          <ToastProvider>{children}</ToastProvider>
         </QueryClientProvider>
       </body>
     </html>

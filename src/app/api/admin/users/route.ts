@@ -24,6 +24,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const newUser = await service.createUser(
     parsed.data.customId,
     parsed.data.nickname,
+    parsed.data.password,
   );
 
   return apiSuccess(newUser, 201);

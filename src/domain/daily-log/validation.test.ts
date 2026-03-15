@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   dailyLogDateParamSchema,
   dailyLogUpsertSchema,
+  monthlyLogsQuerySchema,
   weeklyLogsQuerySchema,
 } from "@/domain/daily-log/validation";
 
@@ -10,6 +11,12 @@ describe("DailyLog Validation", () => {
     const result = dailyLogUpsertSchema.safeParse({ value: true });
 
     expect(result.success).toBe(true);
+  });
+
+  it("미선택 상태는 DELETE로만 처리하고 false payload는 거부한다", () => {
+    const result = dailyLogUpsertSchema.safeParse({ value: false });
+
+    expect(result.success).toBe(false);
   });
 
   it("날짜 파라미터는 YYYY-MM-DD 형식이어야 한다", () => {
@@ -34,6 +41,15 @@ describe("DailyLog Validation", () => {
     ).toBe(true);
     expect(
       weeklyLogsQuerySchema.safeParse({ weekStart: "03-09-2026" }).success,
+    ).toBe(false);
+  });
+
+  it("월간 조회 쿼리의 monthStart 형식이 잘못되면 실패한다", () => {
+    expect(
+      monthlyLogsQuerySchema.safeParse({ monthStart: "2026-03-01" }).success,
+    ).toBe(true);
+    expect(
+      monthlyLogsQuerySchema.safeParse({ monthStart: "03-01-2026" }).success,
     ).toBe(false);
   });
 });

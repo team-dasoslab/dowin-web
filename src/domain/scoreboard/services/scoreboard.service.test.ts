@@ -11,6 +11,7 @@ describe("ScoreboardService", () => {
   const findOwnedScoreboard = vi.fn();
   const updateScoreboard = vi.fn();
   const archiveScoreboard = vi.fn();
+  const reactivateScoreboard = vi.fn();
   const findArchivedScoreboards = vi.fn();
   const findUserWorkspace = vi.fn();
 
@@ -20,6 +21,7 @@ describe("ScoreboardService", () => {
     findOwnedScoreboard,
     updateScoreboard,
     archiveScoreboard,
+    reactivateScoreboard,
     findArchivedScoreboards,
   };
 
@@ -152,7 +154,10 @@ describe("ScoreboardService", () => {
       const result = await service.archiveScoreboard(10, 1);
 
       expect(result).toEqual({ id: 10, status: "ARCHIVED" });
-      expect(archiveScoreboard).toHaveBeenCalledWith(10);
+      expect(archiveScoreboard).toHaveBeenCalledWith(
+        10,
+        expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+      );
     });
   });
 
@@ -167,6 +172,55 @@ describe("ScoreboardService", () => {
 
       expect(result).toEqual([{ id: 1, status: "ARCHIVED" }]);
       expect(findArchivedScoreboards).toHaveBeenCalledWith(1, 3);
+    });
+  });
+
+  describe("reactivateScoreboard", () => {
+    it("다른 활성 점수판이 없으면 ARCHIVED 점수판을 ACTIVE로 변경한다", async () => {
+      findUserWorkspace.mockResolvedValue({ id: 3 });
+      findOwnedScoreboard.mockResolvedValue({
+        id: 10,
+        status: "ARCHIVED",
+      });
+      findActiveScoreboard.mockResolvedValue(null);
+      reactivateScoreboard.mockResolvedValue({
+        id: 10,
+        status: "ACTIVE",
+      });
+
+      const result = await service.reactivateScoreboard(10, 1);
+
+      expect(result).toEqual({ id: 10, status: "ACTIVE" });
+      expect(findActiveScoreboard).toHaveBeenCalledWith(1, 3);
+      expect(reactivateScoreboard).toHaveBeenCalledWith(10);
+    });
+
+    it("이미 ACTIVE 점수판이면 400 에러를 던진다", async () => {
+      findUserWorkspace.mockResolvedValue({ id: 3 });
+      findOwnedScoreboard.mockResolvedValue({
+        id: 10,
+        status: "ACTIVE",
+      });
+
+      await expect(service.reactivateScoreboard(10, 1)).rejects.toThrow(
+        "SCOREBOARD_ALREADY_ACTIVE",
+      );
+    });
+
+    it("다른 활성 점수판이 있으면 409 에러를 던진다", async () => {
+      findUserWorkspace.mockResolvedValue({ id: 3 });
+      findOwnedScoreboard.mockResolvedValue({
+        id: 10,
+        status: "ARCHIVED",
+      });
+      findActiveScoreboard.mockResolvedValue({
+        id: 99,
+        status: "ACTIVE",
+      });
+
+      await expect(service.reactivateScoreboard(10, 1)).rejects.toThrow(
+        "ACTIVE_SCOREBOARD_EXISTS",
+      );
     });
   });
 });

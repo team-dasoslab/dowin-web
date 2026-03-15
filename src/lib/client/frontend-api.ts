@@ -4,9 +4,28 @@ type ApiErrorShape = {
     data?: {
       error?: {
         message?: string;
+        details?: Record<string, string[] | undefined>;
       };
     };
   };
+};
+
+const getFirstDetailMessage = (
+  details: Record<string, string[] | undefined> | undefined,
+): string | undefined => {
+  if (!details) {
+    return undefined;
+  }
+
+  for (const messages of Object.values(details)) {
+    const firstMessage = messages?.[0];
+
+    if (firstMessage) {
+      return firstMessage;
+    }
+  }
+
+  return undefined;
 };
 
 export const getApiErrorStatus = (error: unknown): number | undefined => {
@@ -17,9 +36,10 @@ export const getApiErrorMessage = (
   error: unknown,
   fallback: string,
 ): string => {
-  const message = (error as ApiErrorShape)?.response?.data?.error?.message;
+  const apiError = (error as ApiErrorShape)?.response?.data?.error;
+  const detailMessage = getFirstDetailMessage(apiError?.details);
 
-  return message || fallback;
+  return detailMessage || apiError?.message || fallback;
 };
 
 export const toNumberId = (

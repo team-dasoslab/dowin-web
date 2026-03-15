@@ -1,111 +1,47 @@
 "use client";
 
+import { useScoreboardSetup } from "@/app/(protected)/setup/_hooks/useScoreboardSetup";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { useMockData } from "@/context/MockDataContext";
-import { useToast } from "@/context/ToastContext";
 import {
   Activity,
   Archive,
   ArrowLeft,
   Plus,
   Save,
-  Trash2,
   TrendingUp,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-type MeasureInput = {
-  id: number;
-  name: string;
-  period: "WEEKLY" | "MONTHLY";
-  targetValue: number;
-};
+import { useRouter } from "next/navigation";
 
 export default function SetupPage() {
-  const {
-    scoreboard,
-    createScoreboard,
-    updateScoreboard,
-    deleteScoreboard,
-    archiveScoreboard,
-  } = useMockData();
   const router = useRouter();
-  const { showToast } = useToast();
-  const param = useParams<{ mode: string }>();
-  const mode = param?.mode;
-
-  const [goalName, setGoalName] = useState("");
-  const [lagMeasure, setLagMeasure] = useState("");
-  const [measures, setMeasures] = useState<MeasureInput[]>([]);
-  const [activeTooltip, setActiveTooltip] = useState<"lag" | "lead" | null>(
-    null,
-  );
-
-  const isEditMode = !!scoreboard || mode === "update";
-
-  useEffect(() => {
-    if (isEditMode && scoreboard) {
-      setGoalName(scoreboard.goalName);
-      setLagMeasure(scoreboard.lagMeasure);
-      setMeasures(
-        scoreboard.leadMeasures.map((lm) => ({
-          id: Math.random(),
-          name: lm.name,
-          period: lm.period === "DAILY" ? "WEEKLY" : lm.period,
-          targetValue: lm.targetValue,
-        })),
-      );
-    } else {
-      setMeasures([
-        { id: Date.now(), name: "", period: "WEEKLY", targetValue: 3 },
-      ]);
-    }
-  }, [isEditMode, scoreboard]);
-
-  const handleMeasureChange = (
-    id: number,
-    field: keyof MeasureInput,
-    value: string | number | "WEEKLY" | "MONTHLY",
-  ) => {
-    setMeasures((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
-    );
-  };
-
-  const addMeasureRow = () => {
-    setMeasures((prev) => [
-      ...prev,
-      { id: Date.now(), name: "", period: "WEEKLY", targetValue: 3 },
-    ]);
-  };
-
-  const removeMeasureRow = (id: number) => {
-    if (measures.length > 1) {
-      setMeasures((prev) => prev.filter((m) => m.id !== id));
-    }
-  };
+  const {
+    activeTooltip,
+    addMeasureRow,
+    archive,
+    goalName,
+    handleMeasureChange,
+    isArchivePending,
+    isEditMode,
+    lagMeasure,
+    measures,
+    removeMeasureRow,
+    setActiveTooltip,
+    setGoalName,
+    setLagMeasure,
+    submit,
+  } = useScoreboardSetup();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const validMeasures = measures.filter((m) => m.name.trim() !== "");
-    if (!goalName.trim() || !lagMeasure.trim() || validMeasures.length === 0) {
-      showToast(
-        "error",
-        "가중목, 후행지표, 최소 1개의 선행지표를 입력해주세요.",
-      );
-      return;
-    }
-    if (isEditMode) {
-      updateScoreboard(goalName, lagMeasure, validMeasures);
-    } else {
-      createScoreboard(goalName, lagMeasure, validMeasures);
-    }
-    router.push("/dashboard/my");
+    void submit().then((isSuccess) => {
+      if (isSuccess) {
+        router.push("/dashboard/my");
+      }
+    });
   };
 
   return (
@@ -113,14 +49,16 @@ export default function SetupPage() {
       <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         {/* ── 헤더 ── */}
         <header className="flex items-center justify-between">
-          <Button
-            asChild
-            className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors"
-          >
-            <Link href="/dashboard/my">
-              <ArrowLeft className="w-3.5 h-3.5" />
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              asChild
+              className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors"
+            >
+              <Link href="/dashboard/my">
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </Link>
+            </Button>
+          </div>
           <p className="text-xs text-text-muted">점수판 설정</p>
           <div className="w-8" />
         </header>
@@ -128,11 +66,10 @@ export default function SetupPage() {
         {/* ── 페이지 타이틀 ── */}
         <div className="space-y-1 px-0.5">
           <h1 className="text-xl font-bold text-text-primary tracking-tight">
-            {isEditMode ? "현재 목표 수정" : "새로운 목표 설정"}
+            {isEditMode ? "현재 목표 수정" : "다음 점수판 정하기"}
           </h1>
           <p className="text-xs text-text-muted leading-relaxed">
-            하나의 목표(WIG) · 성공 척도(후행지표) · 핵심 행동(선행지표)을
-            설정하세요.
+            하나의 목표(WIG) · 성공 척도(후행지표) · 핵심 행동(선행지표)을 설정하세요.
           </p>
         </div>
 
@@ -142,7 +79,7 @@ export default function SetupPage() {
             <div className="px-5 py-3 bg-sub-background border-b border-border flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-primary" />
               <span className="text-xs font-bold text-text-primary">
-                가중목 (WIG)
+                가중목
               </span>
             </div>
             <div className="p-5 space-y-3">
@@ -375,8 +312,7 @@ export default function SetupPage() {
               <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
                 관리
               </p>
-              <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
-                {/* 보관 */}
+              <div className="border border-border rounded-lg overflow-hidden">
                 <div className="px-5 py-4 flex items-center justify-between bg-white">
                   <div>
                     <p className="text-sm font-semibold text-text-primary">
@@ -388,41 +324,16 @@ export default function SetupPage() {
                   </div>
                   <Button
                     type="button"
+                    disabled={isArchivePending}
                     onClick={() => {
                       if (confirm("이 점수판을 보관하시겠습니까?")) {
-                        archiveScoreboard();
-                        router.push("/dashboard");
+                        void archive();
                       }
                     }}
                     className="flex-shrink-0 px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ml-4"
                   >
                     <Archive className="w-3.5 h-3.5" />
-                    보관
-                  </Button>
-                </div>
-
-                {/* 삭제 */}
-                <div className="px-5 py-4 flex items-center justify-between bg-white">
-                  <div>
-                    <p className="text-sm font-semibold text-danger">
-                      점수판 삭제
-                    </p>
-                    <p className="text-[11px] text-text-muted mt-0.5">
-                      모든 기록을 영구 삭제합니다. 복구할 수 없습니다.
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      if (confirm("정말 영구 삭제하시겠습니까?")) {
-                        deleteScoreboard();
-                        router.push("/dashboard");
-                      }
-                    }}
-                    className="flex-shrink-0 px-3 py-1.5 bg-danger text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ml-4 hover:bg-[rgba(200,20,60,1)]"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    삭제
+                    {isArchivePending ? "보관 중..." : "보관"}
                   </Button>
                 </div>
               </div>

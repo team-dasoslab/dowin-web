@@ -1,5 +1,4 @@
 import {
-  BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "@/lib/server/errors";
@@ -55,10 +54,6 @@ export class DailyLogService {
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
-    }
-
-    if (date > new Date().toISOString().slice(0, 10)) {
-      throw new BadRequestError("FUTURE_DATE_NOT_ALLOWED");
     }
 
     return await this.dailyLogStorage.upsertLog(leadMeasureId, date, value);
@@ -132,6 +127,123 @@ export class DailyLogService {
     };
   }
 
+  async getMonthlyLogs(
+    scoreboardId: number,
+    userId: number,
+    monthStart?: string,
+  ): Promise<{
+    monthStart: string;
+    monthEnd: string;
+    monthLabel: string;
+    summary: {
+      achieved: number;
+      total: number;
+      achievementRate: number;
+      isWinning: boolean;
+    };
+    leadMeasures: Array<{
+      id: number;
+      name: string;
+      targetValue: number;
+      logs: Record<string, boolean | null>;
+      achieved: number;
+      achievementRate: number;
+    }>;
+  }> {
+    const scoreboard = await this.getOwnedScoreboard(scoreboardId, userId);
+    if (!scoreboard) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const normalizedMonthStart = normalizeMonthStart(monthStart);
+    const monthDates = getMonthDates(normalizedMonthStart);
+    const monthEnd = monthDates[monthDates.length - 1];
+    const measures = (
+      await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
+        scoreboardId,
+        "active",
+      )
+    ).filter((measure) => measure.period === "WEEKLY" || measure.period === "MONTHLY");
+    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
+      measures.map((measure) => measure.id),
+      normalizedMonthStart,
+      monthEnd,
+    );
+    const weekStarts = getWeekStartsInMonth(monthDates);
+    const leadMeasures = measures.map((measure) => {
+      const measureLogs = logs.filter((log) => log.leadMeasureId === measure.id);
+      const logMap = Object.fromEntries(
+        monthDates.map((date) => [date, null as boolean | null]),
+      );
+
+      for (const log of measureLogs) {
+        logMap[log.logDate] = log.value;
+      }
+
+      const achieved = measureLogs.filter((log) => log.value).length;
+
+      return {
+        id: measure.id,
+        name: measure.name,
+        targetValue: measure.targetValue,
+        logs: logMap,
+        achieved,
+        achievementRate:
+          measure.targetValue > 0
+            ? Number(((achieved / measure.targetValue) * 100).toFixed(1))
+            : 0,
+      };
+    });
+    const totalAchieved = measures.reduce((accumulator, measure) => {
+      const measureLogs = logs.filter(
+        (log) => log.leadMeasureId === measure.id && log.value,
+      );
+
+      if (measure.period === "MONTHLY") {
+        return accumulator + Math.min(measureLogs.length, measure.targetValue);
+      }
+
+      const weeklyAchieved = weekStarts.reduce((weekAccumulator, weekStart) => {
+        const weekTrueCount = measureLogs.filter(
+          (log) => getWeekStart(log.logDate) === weekStart,
+        ).length;
+
+        return weekAccumulator + Math.min(weekTrueCount, measure.targetValue);
+      }, 0);
+
+      return accumulator + weeklyAchieved;
+    }, 0);
+    const totalTarget = measures.reduce((accumulator, measure) => {
+      if (measure.period === "MONTHLY") {
+        return accumulator + measure.targetValue;
+      }
+
+      return accumulator + measure.targetValue * weekStarts.length;
+    }, 0);
+    const summaryRate =
+      totalTarget > 0
+        ? Number(((totalAchieved / totalTarget) * 100).toFixed(1))
+        : 0;
+
+    return {
+      monthStart: normalizedMonthStart,
+      monthEnd,
+      monthLabel: `${normalizedMonthStart.slice(0, 4)}.${normalizedMonthStart.slice(
+        5,
+        7,
+      )}`,
+      summary: {
+        achieved: totalAchieved,
+        total: totalTarget,
+        achievementRate: summaryRate,
+        isWinning: summaryRate >= 80,
+      },
+      leadMeasures: leadMeasures.filter((measure) =>
+        measures.find((item) => item.id === measure.id)?.period === "MONTHLY",
+      ),
+    };
+  }
+
   private async getOwnedScoreboard(scoreboardId: number, userId: number) {
     const workspace = await this.workspaceStorage.findUserWorkspace(userId);
     if (!workspace) {
@@ -170,7 +282,7 @@ function getCurrentWeekStart() {
   const diff = today.getDate() - day + (day === 0 ? -6 : 1);
   const monday = new Date(today);
   monday.setDate(diff);
-  return monday.toISOString().slice(0, 10);
+  return formatDateLocal(monday);
 }
 
 function getWeekDates(weekStart: string) {
@@ -178,6 +290,75 @@ function getWeekDates(weekStart: string) {
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(base);
     date.setDate(base.getDate() + index);
-    return date.toISOString().slice(0, 10);
+    return formatDateLocal(date);
   });
+}
+
+function getCurrentMonthStart() {
+  const today = new Date();
+  return `${today.getFullYear()}-${pad2(today.getMonth() + 1)}-01`;
+}
+
+function normalizeMonthStart(monthStart?: string) {
+  if (!monthStart) {
+    return getCurrentMonthStart();
+  }
+
+  const [yearRaw, monthRaw] = monthStart.split("-");
+  const year = Number(yearRaw);
+  const month = Number(monthRaw);
+
+  if (
+    Number.isInteger(year) &&
+    Number.isInteger(month) &&
+    month >= 1 &&
+    month <= 12
+  ) {
+    return `${year}-${pad2(month)}-01`;
+  }
+
+  return getCurrentMonthStart();
+}
+
+function getMonthDates(monthStart: string) {
+  const [yearRaw, monthRaw] = monthStart.split("-");
+  const year = Number(yearRaw);
+  const month = Number(monthRaw);
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  return Array.from({ length: daysInMonth }, (_, index) => {
+    const date = new Date(year, month - 1, index + 1);
+    return formatDateLocal(date);
+  });
+}
+
+function getWeekStart(dateString: string) {
+  const [yearRaw, monthRaw, dayRaw] = dateString.split("-");
+  const year = Number(yearRaw);
+  const month = Number(monthRaw);
+  const day = Number(dayRaw);
+  const date = new Date(year, month - 1, day);
+  const weekDay = date.getDay();
+  const diff = date.getDate() - weekDay + (weekDay === 0 ? -6 : 1);
+  return formatDateLocal(new Date(year, month - 1, diff));
+}
+
+function getWeekStartsInMonth(monthDates: string[]) {
+  const weekStarts = new Set<string>();
+
+  for (const date of monthDates) {
+    weekStarts.add(getWeekStart(date));
+  }
+
+  return Array.from(weekStarts.values());
+}
+
+function pad2(value: number) {
+  return String(value).padStart(2, "0");
+}
+
+function formatDateLocal(date: Date) {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(
+    date.getDate(),
+  )}`;
 }

@@ -118,14 +118,27 @@ export class ScoreboardStorage {
     return updated;
   }
 
-  async archiveScoreboard(id: number): Promise<ScoreboardRecord> {
+  async archiveScoreboard(
+    id: number,
+    endDate: string,
+  ): Promise<ScoreboardRecord> {
     const [archived] = (await this.db
       .update(scoreboards)
-      .set({ status: "ARCHIVED" })
+      .set({ status: "ARCHIVED", endDate })
       .where(eq(scoreboards.id, id))
       .returning()) as ScoreboardRecord[];
 
     return archived;
+  }
+
+  async reactivateScoreboard(id: number): Promise<ScoreboardRecord> {
+    const [reactivated] = (await this.db
+      .update(scoreboards)
+      .set({ status: "ACTIVE", endDate: null })
+      .where(eq(scoreboards.id, id))
+      .returning()) as ScoreboardRecord[];
+
+    return reactivated;
   }
 
   async findArchivedScoreboards(

@@ -21,6 +21,7 @@ type TeamScoreboard = {
     id: number;
     name: string;
     targetValue: number;
+    period: "DAILY" | "WEEKLY" | "MONTHLY";
     status: "ACTIVE" | "ARCHIVED";
   }>;
 };
@@ -32,8 +33,8 @@ type ScoreboardLookupPort = {
 type DailyLogLookupPort = {
   findLogsForLeadMeasures(
     leadMeasureIds: number[],
-    weekStart: string,
-    weekEnd: string,
+    rangeStart: string,
+    rangeEnd: string,
   ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean }>>;
 };
 
@@ -55,6 +56,9 @@ export class DashboardService {
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     const weekDates = getWeekDates(normalizedWeekStart);
     const weekEnd = weekDates[6];
+    const normalizedMonthStart = normalizeMonthStart(normalizedWeekStart);
+    const monthDates = getMonthDates(normalizedMonthStart);
+    const monthEnd = monthDates[monthDates.length - 1];
     const members = await this.workspaceStorage.findMembers(workspace.id);
     const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
       workspace.id,
@@ -66,8 +70,10 @@ export class DashboardService {
     );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       allLeadMeasureIds,
-      normalizedWeekStart,
-      weekEnd,
+      normalizedWeekStart < normalizedMonthStart
+        ? normalizedWeekStart
+        : normalizedMonthStart,
+      weekEnd > monthEnd ? weekEnd : monthEnd,
     );
     const logsByLeadMeasure = new Map<number, Array<(typeof logs)[number]>>();
 
@@ -102,6 +108,8 @@ export class DashboardService {
             achieved: 0,
             total: 0,
             achievementRate: 0,
+            weeklyAchievementRate: 0,
+            monthlyAchievementRate: 0,
             isWinning: false,
             leadMeasures: [],
           };
@@ -129,22 +137,70 @@ export class DashboardService {
               id: leadMeasure.id,
               name: leadMeasure.name,
               targetValue: leadMeasure.targetValue,
+              period: leadMeasure.period,
               achieved,
               achievementRate,
               logs: logMap,
             };
           });
 
-        const achieved = leadMeasures.reduce(
+        const weeklyLeadMeasures = leadMeasures.filter(
+          (leadMeasure) => leadMeasure.period !== "MONTHLY",
+        );
+        const achieved = weeklyLeadMeasures.reduce(
           (sum, leadMeasure) => sum + leadMeasure.achieved,
           0,
         );
-        const total = leadMeasures.reduce(
+        const total = weeklyLeadMeasures.reduce(
           (sum, leadMeasure) => sum + leadMeasure.targetValue,
           0,
         );
         const achievementRate =
-          total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
+          weeklyLeadMeasures.length > 0
+            ? Math.round(
+                weeklyLeadMeasures.reduce(
+                  (sum, leadMeasure) => sum + leadMeasure.achievementRate,
+                  0,
+                ) / weeklyLeadMeasures.length,
+              )
+            : 0;
+        const monthlyMeasures = leadMeasures.filter(
+          (leadMeasure) => leadMeasure.period === "WEEKLY" || leadMeasure.period === "MONTHLY",
+        );
+        const weekStartsInMonth = getWeekStartsInMonth(monthDates);
+        const monthlyAchieved = monthlyMeasures.reduce((sum, leadMeasure) => {
+          const truthyLogs = (logsByLeadMeasure.get(leadMeasure.id) ?? []).filter(
+            (log) =>
+              log.value &&
+              log.logDate >= normalizedMonthStart &&
+              log.logDate <= monthEnd,
+          );
+
+          if (leadMeasure.period === "MONTHLY") {
+            return sum + Math.min(truthyLogs.length, leadMeasure.targetValue);
+          }
+
+          const weeklyAchieved = weekStartsInMonth.reduce((weekSum, monthWeekStart) => {
+            const weekTrueCount = truthyLogs.filter(
+              (log) => getWeekStart(log.logDate) === monthWeekStart,
+            ).length;
+
+            return weekSum + Math.min(weekTrueCount, leadMeasure.targetValue);
+          }, 0);
+
+          return sum + weeklyAchieved;
+        }, 0);
+        const monthlyTotal = monthlyMeasures.reduce((sum, leadMeasure) => {
+          if (leadMeasure.period === "MONTHLY") {
+            return sum + leadMeasure.targetValue;
+          }
+
+          return sum + leadMeasure.targetValue * weekStartsInMonth.length;
+        }, 0);
+        const monthlyAchievementRate =
+          monthlyTotal > 0
+            ? Math.round((monthlyAchieved / monthlyTotal) * 100)
+            : 0;
 
         return {
           userId: member.userId,
@@ -157,8 +213,18 @@ export class DashboardService {
           achieved,
           total,
           achievementRate,
+          weeklyAchievementRate: achievementRate,
+          monthlyAchievementRate,
           isWinning: achievementRate >= 80,
-          leadMeasures,
+          leadMeasures: leadMeasures.map((leadMeasure) => ({
+            id: leadMeasure.id,
+            name: leadMeasure.name,
+            period: leadMeasure.period,
+            targetValue: leadMeasure.targetValue,
+            achieved: leadMeasure.achieved,
+            achievementRate: leadMeasure.achievementRate,
+            logs: leadMeasure.logs,
+          })),
         };
       }),
     };
@@ -175,10 +241,53 @@ function getCurrentWeekStart() {
 }
 
 function getWeekDates(weekStart: string) {
-  const base = new Date(weekStart);
+  const base = parseDate(weekStart);
   return Array.from({ length: DAY_LABELS.length }, (_, index) => {
     const date = new Date(base);
-    date.setDate(base.getDate() + index);
-    return date.toISOString().slice(0, 10);
+    date.setUTCDate(base.getUTCDate() + index);
+    return formatDate(date);
   });
+}
+
+function normalizeMonthStart(date?: string) {
+  if (!date) {
+    const today = new Date();
+    return `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}-01`;
+  }
+
+  return `${date.slice(0, 7)}-01`;
+}
+
+function getMonthDates(monthStart: string) {
+  const [yearString, monthString] = monthStart.split("-");
+  const year = Number(yearString);
+  const month = Number(monthString);
+  const lastDate = new Date(Date.UTC(year, month, 0)).getUTCDate();
+
+  return Array.from({ length: lastDate }, (_, index) => {
+    const date = new Date(Date.UTC(year, month - 1, index + 1));
+    return formatDate(date);
+  });
+}
+
+function getWeekStart(date: string) {
+  const current = parseDate(date);
+  const day = current.getUTCDay();
+  const diff = current.getUTCDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(current);
+  monday.setUTCDate(diff);
+  return formatDate(monday);
+}
+
+function getWeekStartsInMonth(monthDates: string[]) {
+  return [...new Set(monthDates.map((date) => getWeekStart(date)))];
+}
+
+function parseDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function formatDate(date: Date) {
+  return date.toISOString().slice(0, 10);
 }

@@ -87,4 +87,28 @@ describe("ScoreboardStorage", () => {
     expect(result).toEqual([{ id: 1 }]);
     expect(findMany).toHaveBeenCalled();
   });
+
+  it("점수판을 보관하면서 종료일을 저장한다", async () => {
+    returning.mockResolvedValue([{ id: 1, status: "ARCHIVED" }]);
+
+    const result = await storage.archiveScoreboard(1, "2026-03-16");
+
+    expect(result).toEqual({ id: 1, status: "ARCHIVED" });
+    expect(set).toHaveBeenCalledWith({
+      status: "ARCHIVED",
+      endDate: "2026-03-16",
+    });
+  });
+
+  it("점수판을 재활성화하면서 종료일을 비운다", async () => {
+    returning.mockResolvedValue([{ id: 1, status: "ACTIVE" }]);
+
+    const result = await storage.reactivateScoreboard(1);
+
+    expect(result).toEqual({ id: 1, status: "ACTIVE" });
+    expect(set).toHaveBeenCalledWith({
+      status: "ACTIVE",
+      endDate: null,
+    });
+  });
 });

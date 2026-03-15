@@ -114,3 +114,7 @@ body {
 .animate-toast-out {
   animation: toastOut 0.3s ease-in forwards;
 }
+
+.swagger-ui .topbar {
+  display: none;
+}

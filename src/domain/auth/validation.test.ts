@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-// @ts-ignore
 import {
   adminCreateUserSchema,
   loginSchema,
@@ -7,6 +5,7 @@ import {
   validateCustomId,
   validatePassword,
 } from "@/domain/auth/validation";
+import { describe, expect, it } from "vitest";
 
 describe("Auth Validation", () => {
   describe("validateCustomId", () => {
@@ -92,13 +91,22 @@ describe("Auth Validation", () => {
         const result = adminCreateUserSchema.safeParse({
           customId: "newuser",
           nickname: "New User",
+          password: "newSecurePass1!",
         });
         expect(result.success).toBe(true);
+      });
+      it("비밀번호 누락 시 실패한다", () => {
+        const result = adminCreateUserSchema.safeParse({
+          customId: "newuser",
+          nickname: "New User",
+        });
+        expect(result.success).toBe(false);
       });
       it("닉네임 누락 시 실패한다", () => {
         const result = adminCreateUserSchema.safeParse({
           customId: "newuser",
           nickname: "",
+          password: "newSecurePass1!",
         });
         expect(result.success).toBe(false);
       });

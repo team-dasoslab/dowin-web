@@ -53,6 +53,14 @@ describe("DashboardService", () => {
             id: 31,
             name: "아침 러닝",
             targetValue: 5,
+            period: "WEEKLY",
+            status: "ACTIVE",
+          },
+          {
+            id: 32,
+            name: "주간 회고",
+            targetValue: 2,
+            period: "MONTHLY",
             status: "ACTIVE",
           },
         ],
@@ -62,6 +70,9 @@ describe("DashboardService", () => {
       { leadMeasureId: 31, logDate: "2026-03-09", value: true },
       { leadMeasureId: 31, logDate: "2026-03-10", value: false },
       { leadMeasureId: 31, logDate: "2026-03-11", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-09", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-11", value: true },
     ]);
 
     const result = await service.getTeamDashboard(11, "2026-03-09");
@@ -83,17 +94,37 @@ describe("DashboardService", () => {
           achieved: 2,
           total: 5,
           achievementRate: 40,
+          weeklyAchievementRate: 40,
+          monthlyAchievementRate: 13,
           isWinning: false,
           leadMeasures: [
             {
               id: 31,
               name: "아침 러닝",
+              period: "WEEKLY",
               targetValue: 5,
               achieved: 2,
               achievementRate: 40,
               logs: {
                 "2026-03-09": true,
                 "2026-03-10": false,
+                "2026-03-11": true,
+                "2026-03-12": null,
+                "2026-03-13": null,
+                "2026-03-14": null,
+                "2026-03-15": null,
+              },
+            },
+            {
+              id: 32,
+              name: "주간 회고",
+              period: "MONTHLY",
+              targetValue: 2,
+              achieved: 3,
+              achievementRate: 150,
+              logs: {
+                "2026-03-09": true,
+                "2026-03-10": true,
                 "2026-03-11": true,
                 "2026-03-12": null,
                 "2026-03-13": null,
@@ -114,6 +145,8 @@ describe("DashboardService", () => {
           achieved: 0,
           total: 0,
           achievementRate: 0,
+          weeklyAchievementRate: 0,
+          monthlyAchievementRate: 0,
           isWinning: false,
           leadMeasures: [],
         },
@@ -121,9 +154,9 @@ describe("DashboardService", () => {
     });
     expect(findActiveScoreboardsByWorkspace).toHaveBeenCalledWith(3);
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
-      [31],
-      "2026-03-09",
-      "2026-03-15",
+      [31, 32],
+      "2026-03-01",
+      "2026-03-31",
     );
   });
 });

@@ -14,6 +14,7 @@ export type ErrorCode =
   | "ALREADY_IN_WORKSPACE"
   | "CANNOT_REMOVE_LAST_ADMIN"
   | "ACTIVE_SCOREBOARD_EXISTS"
+  | "SCOREBOARD_ALREADY_ACTIVE"
   | "SCOREBOARD_ARCHIVED"
   | "LEAD_MEASURE_ARCHIVED"
   | "FUTURE_DATE_NOT_ALLOWED";
@@ -32,6 +33,7 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   ALREADY_IN_WORKSPACE: "이미 워크스페이스에 소속되어 있습니다.",
   CANNOT_REMOVE_LAST_ADMIN: "마지막 관리자는 퇴출할 수 없습니다.",
   ACTIVE_SCOREBOARD_EXISTS: "이미 활성화된 점수판이 있습니다.",
+  SCOREBOARD_ALREADY_ACTIVE: "이미 활성화된 점수판입니다.",
   SCOREBOARD_ARCHIVED: "보관된 점수판은 수정할 수 없습니다.",
   LEAD_MEASURE_ARCHIVED: "보관된 선행지표에는 기록을 추가할 수 없습니다.",
   FUTURE_DATE_NOT_ALLOWED: "미래 날짜에는 기록할 수 없습니다.",
@@ -43,6 +45,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   INVALID_CREDENTIALS: 401,
   WRONG_PASSWORD: 400,
   FUTURE_DATE_NOT_ALLOWED: 400,
+  SCOREBOARD_ALREADY_ACTIVE: 400,
   FORBIDDEN: 403,
   CANNOT_REMOVE_LAST_ADMIN: 403,
   SCOREBOARD_ARCHIVED: 403,

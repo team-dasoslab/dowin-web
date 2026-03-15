@@ -11,6 +11,38 @@ export interface User {
   isFirstLogin?: boolean;
 }
 
+/**
+ * @nullable
+ */
+export type UserProfileRole = typeof UserProfileRole[keyof typeof UserProfileRole] | null;
+
+
+export const UserProfileRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
+export interface UserProfile {
+  id?: number;
+  customId?: string;
+  nickname?: string;
+  /** @nullable */
+  role?: UserProfileRole;
+  /** @nullable */
+  workspaceId?: number | null;
+  /** @nullable */
+  workspaceName?: string | null;
+  createdAt?: string;
+}
+
+export interface UserProfileUpdateRequest {
+  /**
+   * @minLength 2
+   * @maxLength 20
+   */
+  nickname: string;
+}
+
 export interface Workspace {
   id?: number;
   name?: string;
@@ -133,11 +165,47 @@ export interface WeeklyLogsResponse {
   leadMeasures?: WeeklyLogItem[];
 }
 
+export type MonthlyLogItemLogs = {[key: string]: boolean | null};
+
+export interface MonthlyLogItem {
+  id?: number;
+  name?: string;
+  targetValue?: number;
+  logs?: MonthlyLogItemLogs;
+  achieved?: number;
+  achievementRate?: number;
+}
+
+export interface PeriodSummary {
+  achieved?: number;
+  total?: number;
+  achievementRate?: number;
+  isWinning?: boolean;
+}
+
+export interface MonthlyLogsResponse {
+  monthStart?: string;
+  monthEnd?: string;
+  monthLabel?: string;
+  summary?: PeriodSummary;
+  leadMeasures?: MonthlyLogItem[];
+}
+
+export type TeamDashboardMemberMeasurePeriod = typeof TeamDashboardMemberMeasurePeriod[keyof typeof TeamDashboardMemberMeasurePeriod];
+
+
+export const TeamDashboardMemberMeasurePeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
 export type TeamDashboardMemberMeasureLogs = {[key: string]: boolean | null};
 
 export interface TeamDashboardMemberMeasure {
   id?: number;
   name?: string;
+  period?: TeamDashboardMemberMeasurePeriod;
   targetValue?: number;
   achieved?: number;
   achievementRate?: number;
@@ -166,6 +234,8 @@ export interface TeamDashboardMember {
   achieved?: number;
   total?: number;
   achievementRate?: number;
+  weeklyAchievementRate?: number;
+  monthlyAchievementRate?: number;
   isWinning?: boolean;
   leadMeasures?: TeamDashboardMemberMeasure[];
 }
@@ -263,13 +333,13 @@ export type PutAuthPassword200 = {
 export type PostAdminUsersBody = {
   customId: string;
   nickname: string;
+  password: string;
 };
 
 export type PostAdminUsers201 = {
   id?: number;
   customId?: string;
   nickname?: string;
-  initialPassword?: string;
 };
 
 export type PostWorkspacesBody = {
@@ -311,6 +381,10 @@ export type DeleteLeadMeasuresId200 = {
 
 export type GetScoreboardsScoreboardIdLogsWeeklyParams = {
 weekStart?: string;
+};
+
+export type GetScoreboardsScoreboardIdLogsMonthlyParams = {
+monthStart?: string;
 };
 
 export type GetDashboardTeamParams = {

@@ -582,4 +582,107 @@ export const usePostScoreboardsIdArchive = <TError = UnauthorizedErrorResponse |
       > => {
       return useMutation(getPostScoreboardsIdArchiveMutationOptions(options), queryClient);
     }
+    /**
+ * @summary 보관된 점수판 재활성화
+ */
+export type postScoreboardsIdReactivateResponse200 = {
+  data: ScoreboardSummary
+  status: 200
+}
+
+export type postScoreboardsIdReactivateResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postScoreboardsIdReactivateResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postScoreboardsIdReactivateResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postScoreboardsIdReactivateResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postScoreboardsIdReactivateResponseSuccess = (postScoreboardsIdReactivateResponse200) & {
+  headers: Headers;
+};
+export type postScoreboardsIdReactivateResponseError = (postScoreboardsIdReactivateResponse400 | postScoreboardsIdReactivateResponse401 | postScoreboardsIdReactivateResponse404 | postScoreboardsIdReactivateResponse409) & {
+  headers: Headers;
+};
+
+export type postScoreboardsIdReactivateResponse = (postScoreboardsIdReactivateResponseSuccess | postScoreboardsIdReactivateResponseError)
+
+export const getPostScoreboardsIdReactivateUrl = (id: number,) => {
+
+
+  
+
+  return `/api/scoreboards/${id}/reactivate`
+}
+
+export const postScoreboardsIdReactivate = async (id: number, options?: RequestInit): Promise<postScoreboardsIdReactivateResponse> => {
+  
+  return customInstance<postScoreboardsIdReactivateResponse>(getPostScoreboardsIdReactivateUrl(id),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+  
+
+
+
+export const getPostScoreboardsIdReactivateMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['postScoreboardsIdReactivate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  postScoreboardsIdReactivate(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostScoreboardsIdReactivateMutationResult = NonNullable<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>>
+    
+    export type PostScoreboardsIdReactivateMutationError = ErrorResponse | UnauthorizedErrorResponse
+
+    /**
+ * @summary 보관된 점수판 재활성화
+ */
+export const usePostScoreboardsIdReactivate = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postScoreboardsIdReactivate>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getPostScoreboardsIdReactivateMutationOptions(options), queryClient);
+    }
     

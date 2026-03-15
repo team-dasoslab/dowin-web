@@ -1,7 +1,7 @@
 "use client";
 
-import { useTeamDashboard } from "@/app/(protected)/dashboard/_hooks/useTeamDashboard";
 import { TeamDashboardMember } from "@/api/generated/wig.schemas";
+import { useTeamDashboard } from "@/app/(protected)/dashboard/_hooks/useTeamDashboard";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -31,9 +31,9 @@ const getRateTone = (rate: number) => {
 };
 
 function MemberCard({ member }: { member: TeamDashboardMember }) {
-  const achievementRate = member.achievementRate ?? 0;
-  const achieved = member.achieved ?? 0;
-  const total = member.total ?? 0;
+  const weeklyAchievementRate =
+    member.weeklyAchievementRate ?? member.achievementRate ?? 0;
+  const monthlyAchievementRate = member.monthlyAchievementRate ?? 0;
   const hasScoreboard = member.hasScoreboard ?? false;
 
   return (
@@ -47,16 +47,11 @@ function MemberCard({ member }: { member: TeamDashboardMember }) {
             <p className="text-sm font-bold text-text-primary truncate">
               {member.nickname}
             </p>
-            <p className="text-xs text-text-muted truncate">
+            <p className="text-xs text-text-secondary truncate">
               {hasScoreboard ? member.goalName : "활성 점수판 없음"}
             </p>
           </div>
         </div>
-        <Badge
-          className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded border ${getRateTone(achievementRate)}`}
-        >
-          {hasScoreboard ? `${achievementRate}%` : "미설정"}
-        </Badge>
       </div>
 
       <div className="flex items-center gap-2 text-xs text-text-secondary bg-sub-background border border-border rounded px-3 py-2">
@@ -69,37 +64,23 @@ function MemberCard({ member }: { member: TeamDashboardMember }) {
       </div>
 
       <div className="space-y-1.5">
-        <div className="flex justify-between text-[11px] text-text-muted">
-          <span>이번 주 달성도</span>
-          <span className="font-mono">
-            {achieved} / {total}
-          </span>
+        <div className="flex justify-between items-center text-[11px] text-text-primary">
+          <span>주간 달성률</span>
+          <Badge
+            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded border ${getRateTone(weeklyAchievementRate)}`}
+          >
+            {hasScoreboard ? `${weeklyAchievementRate}%` : "미설정"}
+          </Badge>
         </div>
-        <div className="h-1.5 w-full bg-sub-background rounded-full overflow-hidden border border-border">
-          <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
-            style={{ width: `${Math.min(achievementRate, 100)}%` }}
-          />
+        <div className="flex justify-between items-center text-[11px] text-text-primary">
+          <span>월간 달성률</span>
+          <Badge
+            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded border ${getRateTone(monthlyAchievementRate)}`}
+          >
+            {hasScoreboard ? `${monthlyAchievementRate}%` : "미설정"}
+          </Badge>
         </div>
       </div>
-
-      {hasScoreboard && (member.leadMeasures?.length ?? 0) > 0 ? (
-        <ul className="space-y-1">
-          {member.leadMeasures?.map((leadMeasure) => (
-            <li
-              key={leadMeasure.id}
-              className="flex justify-between items-center text-[11px]"
-            >
-              <span className="text-text-secondary truncate max-w-[75%]">
-                {leadMeasure.name}
-              </span>
-              <span className="font-mono text-text-muted flex-shrink-0">
-                {leadMeasure.achieved}/{leadMeasure.targetValue}
-              </span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
     </Card>
   );
 }
@@ -111,7 +92,10 @@ function WeeklyTable({
   member: TeamDashboardMember;
   weekDates: string[];
 }) {
-  if (!(member.hasScoreboard ?? false) || (member.leadMeasures?.length ?? 0) === 0) {
+  if (
+    !(member.hasScoreboard ?? false) ||
+    (member.leadMeasures?.length ?? 0) === 0
+  ) {
     return null;
   }
 
@@ -126,70 +110,126 @@ function WeeklyTable({
         <span className="text-xs font-bold text-text-primary">
           {member.nickname}
         </span>
-        <span className="text-xs text-text-muted">— {member.goalName}</span>
+        <span className="text-xs text-text-secondary">— {member.goalName}</span>
       </div>
 
       <div className="border border-border rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-xs min-w-[500px]">
-            <thead>
-              <tr className="bg-sub-background border-b border-border">
-                <th className="text-left px-3 py-2 text-text-secondary font-medium w-[40%]">
-                  선행지표
-                </th>
-                {weekDates.map((date, index) => (
-                  <th
-                    key={date}
-                    className={`text-center px-1 py-2 font-medium w-[8%] ${
-                      date === today
-                        ? "text-primary"
-                        : date > today
-                          ? "text-text-muted/50"
-                          : "text-text-secondary"
-                    }`}
-                  >
-                    {DAY_LABELS[index]}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {member.leadMeasures?.map((leadMeasure, index) => (
-                <tr
-                  key={leadMeasure.id}
-                  className={
-                    index < (member.leadMeasures?.length ?? 0) - 1
-                      ? "border-b border-border"
-                      : ""
-                  }
-                >
-                  <td className="px-3 py-2.5 text-text-primary font-medium truncate max-w-0">
-                    <span className="block truncate">{leadMeasure.name}</span>
-                  </td>
-                  {weekDates.map((date) => {
-                    const value = leadMeasure.logs?.[date] ?? null;
-                    const isFuture = date > today;
-                    return (
-                      <td
-                        key={date}
-                        className={`text-center px-1 py-2.5 ${isFuture ? "opacity-30" : ""}`}
+          <div className="min-w-[600px]">
+            <div className="bg-sub-background border-b border-border">
+              <table className="w-full table-fixed text-xs">
+                <colgroup>
+                  <col className="w-[38%]" />
+                  {DAY_LABELS.map((day) => (
+                    <col key={day} className="w-[8%]" />
+                  ))}
+                  <col className="w-[14%]" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                      선행지표
+                    </th>
+                    {DAY_LABELS.map((day, index) => (
+                      <th
+                        key={day}
+                        className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
+                          weekDates[index] === today
+                            ? "text-primary"
+                            : weekDates[index] > today
+                              ? "text-text-muted/50"
+                              : "text-text-muted"
+                        }`}
                       >
-                        {isFuture ? (
-                          <span className="text-text-muted">·</span>
-                        ) : value === true ? (
-                          <span className="text-green-600 font-bold text-sm">○</span>
-                        ) : value === false ? (
-                          <span className="text-red-400 font-bold text-sm">✕</span>
-                        ) : (
-                          <span className="text-text-muted">·</span>
-                        )}
+                        {day}
+                      </th>
+                    ))}
+                    <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                      달성
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <table className="w-full table-fixed text-xs">
+              <colgroup>
+                <col className="w-[38%]" />
+                {DAY_LABELS.map((day) => (
+                  <col key={day} className="w-[8%]" />
+                ))}
+                <col className="w-[14%]" />
+              </colgroup>
+              <tbody className="divide-y divide-border">
+                {member.leadMeasures?.map((leadMeasure) => {
+                  const achievedCount = leadMeasure.achieved ?? 0;
+                  const targetValue = leadMeasure.targetValue ?? 0;
+                  const rate =
+                    targetValue > 0
+                      ? Math.round((achievedCount / targetValue) * 100)
+                      : 0;
+
+                  return (
+                    <tr key={leadMeasure.id} className="bg-white">
+                      <td className="py-4 px-5">
+                        <p className="block font-semibold text-text-primary truncate text-sm">
+                          {leadMeasure.name}
+                        </p>
+                        <span className="text-[10px] text-text-muted">
+                          목표 {targetValue}회 /{" "}
+                          {leadMeasure.period === "DAILY"
+                            ? "일"
+                            : leadMeasure.period === "WEEKLY"
+                              ? "주"
+                              : "월"}
+                        </span>
                       </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      {weekDates.map((date) => {
+                        const value = leadMeasure.logs?.[date] ?? null;
+
+                        return (
+                          <td key={date} className="py-3 text-center">
+                            <span
+                              className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                                value === true
+                                  ? "text-green-600"
+                                  : date === today
+                                    ? "text-primary/50"
+                                    : "text-text-muted"
+                              }`}
+                            >
+                              {value === true ? "○" : ""}
+                            </span>
+                          </td>
+                        );
+                      })}
+                      <td className="py-4 px-3 text-center">
+                        <div className="flex flex-col items-center gap-1.5">
+                          <div className="w-10 h-1 bg-sub-background rounded-full overflow-hidden border border-border">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                rate >= 100 ? "bg-green-500" : "bg-primary"
+                              }`}
+                              style={{ width: `${Math.min(rate, 100)}%` }}
+                            />
+                          </div>
+                          <span
+                            className={`text-[10px] font-bold font-mono ${
+                              rate >= 100
+                                ? "text-green-600"
+                                : "text-text-secondary"
+                            }`}
+                          >
+                            {achievedCount}/{targetValue}
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -197,7 +237,8 @@ function WeeklyTable({
 }
 
 export default function DashboardPage() {
-  const { dashboard, hasNoWorkspace, isLoading, weekDates } = useTeamDashboard();
+  const { dashboard, hasNoWorkspace, isLoading, weekDates } =
+    useTeamDashboard();
 
   if (isLoading) {
     return (
@@ -239,7 +280,9 @@ export default function DashboardPage() {
 
   const weekLabel = formatWeekLabel(dashboard.weekStart, dashboard.weekEnd);
   const members = dashboard.members ?? [];
-  const membersWithScoreboard = members.filter((member) => member.hasScoreboard);
+  const membersWithScoreboard = members.filter(
+    (member) => member.hasScoreboard,
+  );
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
@@ -253,7 +296,9 @@ export default function DashboardPage() {
               <h1 className="text-base font-bold text-text-primary tracking-tight truncate">
                 {dashboard.workspaceName}
               </h1>
-              <p className="text-[11px] text-text-muted truncate">팀 전체 현황</p>
+              <p className="text-[11px] text-text-muted truncate">
+                팀 전체 현황
+              </p>
             </div>
           </div>
 
@@ -281,7 +326,9 @@ export default function DashboardPage() {
 
         <section className="space-y-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-bold text-text-primary">팀원 현황</h2>
+            <h2 className="text-sm font-bold text-text-primary">
+              팀원 현황 요약
+            </h2>
             <span className="text-[11px] text-text-muted bg-sub-background border border-border px-2 py-1 rounded font-mono">
               {weekLabel}
             </span>

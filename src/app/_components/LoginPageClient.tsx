@@ -3,7 +3,8 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { useMockData } from "@/context/MockDataContext";
+import { usePostAuthLogin } from "@/api/generated/auth/auth";
+import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { LogIn, Zap } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -12,23 +13,43 @@ export default function LoginPageClient() {
   const [id, setId] = useState("");
   const [pw, setPw] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useMockData();
+  const loginMutation = usePostAuthLogin();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError("");
 
-    const success = await login(id, pw);
-    if (success) {
+    try {
+      const response = await loginMutation.mutateAsync({
+        data: {
+          customId: id,
+          password: pw,
+        },
+      });
+
+      if (response.status !== 200 || !response.data.user) {
+        setError("아이디 또는 비밀번호가 올바르지 않습니다.");
+        return;
+      }
+
+      window.localStorage.setItem(
+        "wig_user",
+        JSON.stringify({
+          id: String(response.data.user.id),
+          customId: id,
+          nickname: response.data.user.nickname ?? "Unknown",
+          isFirstLogin: response.data.user.isFirstLogin,
+        }),
+      );
+
       const nextPath = searchParams.get("next");
       router.push(nextPath || "/dashboard/my");
-    } else {
-      setError("아이디 또는 비밀번호가 올바르지 않습니다.");
-      setIsLoading(false);
+    } catch (loginError) {
+      setError(
+        getApiErrorMessage(loginError, "아이디 또는 비밀번호가 올바르지 않습니다."),
+      );
     }
   };
 
@@ -90,17 +111,17 @@ export default function LoginPageClient() {
 
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={loginMutation.isPending}
             className={`
               w-full py-3.5 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all
               ${
-                isLoading
+                loginMutation.isPending
                   ? "bg-primary/50 text-white cursor-not-allowed"
                   : "btn-linear-primary shadow-lg shadow-primary/10"
               }
             `}
           >
-            {isLoading ? (
+            {loginMutation.isPending ? (
               <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
             ) : (
               <>
