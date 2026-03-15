@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -16,6 +16,7 @@ export const users = sqliteTable("users", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   members: many(workspaceMembers),
+  scoreboards: many(scoreboards),
 }));
 
 export const sessions = sqliteTable("sessions", {
@@ -50,6 +51,7 @@ export const workspaces = sqliteTable("workspaces", {
 
 export const workspacesRelations = relations(workspaces, ({ many }) => ({
   members: many(workspaceMembers),
+  scoreboards: many(scoreboards),
 }));
 
 export const workspaceMembers = sqliteTable("workspace_members", {
@@ -81,5 +83,100 @@ export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) =
   workspace: one(workspaces, {
     fields: [workspaceMembers.workspaceId],
     references: [workspaces.id],
+  }),
+}));
+
+export const scoreboards = sqliteTable(
+  "scoreboards",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    goalName: text("goal_name").notNull(),
+    lagMeasure: text("lag_measure").notNull(),
+    status: text("status", { enum: ["ACTIVE", "ARCHIVED"] })
+      .notNull()
+      .default("ACTIVE"),
+    startDate: text("start_date").notNull(),
+    endDate: text("end_date"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("idx_active_scoreboard")
+      .on(table.userId, table.workspaceId)
+      .where(sql`${table.status} = 'ACTIVE'`),
+  ],
+);
+
+export const scoreboardsRelations = relations(scoreboards, ({ one, many }) => ({
+  user: one(users, {
+    fields: [scoreboards.userId],
+    references: [users.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [scoreboards.workspaceId],
+    references: [workspaces.id],
+  }),
+  leadMeasures: many(leadMeasures),
+}));
+
+export const leadMeasures = sqliteTable("lead_measures", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  scoreboardId: integer("scoreboard_id")
+    .notNull()
+    .references(() => scoreboards.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  targetValue: integer("target_value").notNull().default(1),
+  period: text("period", { enum: ["DAILY", "WEEKLY", "MONTHLY"] })
+    .notNull()
+    .default("DAILY"),
+  status: text("status", { enum: ["ACTIVE", "ARCHIVED"] })
+    .notNull()
+    .default("ACTIVE"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(strftime('%s', 'now'))`),
+  archivedAt: integer("archived_at", { mode: "timestamp" }),
+});
+
+export const leadMeasuresRelations = relations(leadMeasures, ({ one, many }) => ({
+  scoreboard: one(scoreboards, {
+    fields: [leadMeasures.scoreboardId],
+    references: [scoreboards.id],
+  }),
+  dailyLogs: many(dailyLogs),
+}));
+
+export const dailyLogs = sqliteTable(
+  "daily_logs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    leadMeasureId: integer("lead_measure_id")
+      .notNull()
+      .references(() => leadMeasures.id, { onDelete: "cascade" }),
+    logDate: text("log_date").notNull(),
+    value: integer("value", { mode: "boolean" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("daily_logs_lead_measure_date_unique").on(
+      table.leadMeasureId,
+      table.logDate,
+    ),
+  ],
+);
+
+export const dailyLogsRelations = relations(dailyLogs, ({ one }) => ({
+  leadMeasure: one(leadMeasures, {
+    fields: [dailyLogs.leadMeasureId],
+    references: [leadMeasures.id],
   }),
 }));

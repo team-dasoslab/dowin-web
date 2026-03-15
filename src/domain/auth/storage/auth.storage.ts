@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { users, sessions } from "../../../db/schema";
+import { users, sessions } from "@/db/schema";
 
 export class AuthStorage {
   constructor(private db: any) {}

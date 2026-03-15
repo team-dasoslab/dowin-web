@@ -2,8 +2,8 @@ import { getDb } from "@/db";
 import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { adminCreateUserSchema } from "@/domain/auth/validation";
-import { apiError, apiSuccess } from "@/lib/api-response";
-import { withErrorHandler } from "@/lib/with-error-handler";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const POST = withErrorHandler(async (request: Request) => {

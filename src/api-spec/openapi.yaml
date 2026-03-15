@@ -236,6 +236,454 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  /scoreboards/active:
+    get:
+      summary: 현재 활성 점수판 조회
+      tags: [Scoreboard]
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Scoreboard' }
+        '404':
+          description: 활성 점수판 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /scoreboards:
+    get:
+      summary: 보관된 점수판 목록 조회
+      tags: [Scoreboard]
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ScoreboardSummary' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      summary: 점수판 생성
+      tags: [Scoreboard]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ScoreboardCreateRequest' }
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScoreboardSummary' }
+        '409':
+          description: 이미 활성 점수판 존재
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /scoreboards/{id}:
+    put:
+      summary: 점수판 수정
+      tags: [Scoreboard]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ScoreboardUpdateRequest' }
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ScoreboardSummary' }
+        '403':
+          description: 보관된 점수판 수정 시도
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: 점수판을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /scoreboards/{id}/archive:
+    post:
+      summary: 점수판 보관
+      tags: [Scoreboard]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 보관 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, status]
+                properties:
+                  id: { type: integer }
+                  status: { type: string, enum: [ARCHIVED] }
+        '403':
+          description: 이미 보관된 점수판
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: 점수판을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /scoreboards/{scoreboardId}/lead-measures:
+    get:
+      summary: 점수판 선행지표 목록 조회
+      tags: [LeadMeasure]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: scoreboardId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [active, all], default: active }
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/LeadMeasureListItem' }
+        '404':
+          description: 점수판을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      summary: 선행지표 생성
+      tags: [LeadMeasure]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: scoreboardId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LeadMeasureCreateRequest' }
+      responses:
+        '201':
+          description: 생성 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeadMeasure' }
+        '403':
+          description: ARCHIVED 점수판에 추가 시도
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: 점수판을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /lead-measures/{id}:
+    put:
+      summary: 선행지표 수정
+      tags: [LeadMeasure]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LeadMeasureUpdateRequest' }
+      responses:
+        '200':
+          description: 수정 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeadMeasure' }
+        '403':
+          description: ARCHIVED 선행지표 수정 시도
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: 선행지표를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      summary: 선행지표 삭제
+      tags: [LeadMeasure]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [warning, deleted]
+                properties:
+                  warning: { type: string }
+                  deleted: { type: boolean }
+        '403':
+          description: ARCHIVED 선행지표 삭제 시도
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: 선행지표를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /lead-measures/{id}/archive:
+    post:
+      summary: 선행지표 보관
+      tags: [LeadMeasure]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 보관 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeadMeasure' }
+        '404':
+          description: 선행지표를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /lead-measures/{id}/reactivate:
+    post:
+      summary: 선행지표 재활성화
+      tags: [LeadMeasure]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: 재활성화 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LeadMeasure' }
+        '404':
+          description: 선행지표를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /lead-measures/{leadMeasureId}/logs/{date}:
+    put:
+      summary: 일일 기록 생성 또는 수정
+      tags: [DailyLog]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: leadMeasureId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: date
+          in: path
+          required: true
+          schema: { type: string, format: date }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DailyLogUpsertRequest' }
+      responses:
+        '200':
+          description: 저장 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DailyLog' }
+        '400':
+          description: 미래 날짜 기록 시도
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '403':
+          description: ARCHIVED 선행지표 기록 시도
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: 선행지표를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+    delete:
+      summary: 일일 기록 삭제
+      tags: [DailyLog]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: leadMeasureId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: date
+          in: path
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '204':
+          description: 삭제 성공
+        '404':
+          description: 선행지표를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /scoreboards/{scoreboardId}/logs/weekly:
+    get:
+      summary: 주간 기록 조회
+      tags: [DailyLog]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: scoreboardId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: weekStart
+          in: query
+          required: false
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WeeklyLogsResponse' }
+        '404':
+          description: 점수판을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /dashboard/team:
+    get:
+      summary: 팀 대시보드 조회
+      tags: [Dashboard]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: weekStart
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - name: cursor
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TeamDashboardResponse' }
+        '404':
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
 components:
   schemas:
     User:
@@ -261,6 +709,169 @@ components:
         nickname: { type: string }
         role: { type: string, enum: [ADMIN, MEMBER] }
         createdAt: { type: string, format: date-time }
+
+    LeadMeasure:
+      type: object
+      properties:
+        id: { type: integer }
+        scoreboardId: { type: integer }
+        name: { type: string }
+        targetValue: { type: integer }
+        period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+        status: { type: string, enum: [ACTIVE, ARCHIVED] }
+        createdAt: { type: string, format: date-time }
+        archivedAt: { type: string, format: date-time, nullable: true }
+
+    WeeklyAchievement:
+      type: object
+      properties:
+        achieved: { type: integer }
+        total: { type: integer }
+
+    LeadMeasureListItem:
+      allOf:
+        - $ref: '#/components/schemas/LeadMeasure'
+        - type: object
+          properties:
+            weeklyAchievement:
+              $ref: '#/components/schemas/WeeklyAchievement'
+
+    LeadMeasureCreateRequest:
+      type: object
+      required: [name, targetValue, period]
+      properties:
+        name: { type: string }
+        targetValue: { type: integer, minimum: 1 }
+        period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+
+    LeadMeasureUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string }
+        targetValue: { type: integer, minimum: 1 }
+        period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+
+    DailyLog:
+      type: object
+      properties:
+        id: { type: integer }
+        leadMeasureId: { type: integer }
+        logDate: { type: string, format: date }
+        value: { type: boolean }
+        createdAt: { type: string, format: date-time }
+
+    DailyLogUpsertRequest:
+      type: object
+      required: [value]
+      properties:
+        value: { type: boolean }
+
+    WeeklyLogItem:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        targetValue: { type: integer }
+        logs:
+          type: object
+          additionalProperties:
+            type: boolean
+            nullable: true
+        achieved: { type: integer }
+        achievementRate: { type: number }
+
+    WeeklyLogsResponse:
+      type: object
+      properties:
+        weekStart: { type: string, format: date }
+        weekEnd: { type: string, format: date }
+        leadMeasures:
+          type: array
+          items: { $ref: '#/components/schemas/WeeklyLogItem' }
+
+    TeamDashboardMemberMeasure:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        targetValue: { type: integer }
+        achieved: { type: integer }
+        achievementRate: { type: number }
+        logs:
+          type: object
+          additionalProperties:
+            type: boolean
+            nullable: true
+
+    TeamDashboardMember:
+      type: object
+      properties:
+        userId: { type: integer }
+        nickname: { type: string }
+        role: { type: string, enum: [ADMIN, MEMBER] }
+        hasScoreboard: { type: boolean }
+        scoreboardId: { type: integer, nullable: true }
+        goalName: { type: string, nullable: true }
+        lagMeasure: { type: string, nullable: true }
+        achieved: { type: integer }
+        total: { type: integer }
+        achievementRate: { type: number }
+        isWinning: { type: boolean }
+        leadMeasures:
+          type: array
+          items: { $ref: '#/components/schemas/TeamDashboardMemberMeasure' }
+
+    TeamDashboardResponse:
+      type: object
+      properties:
+        workspaceId: { type: integer }
+        workspaceName: { type: string }
+        weekStart: { type: string, format: date }
+        weekEnd: { type: string, format: date }
+        members:
+          type: array
+          items: { $ref: '#/components/schemas/TeamDashboardMember' }
+
+    ScoreboardSummary:
+      type: object
+      properties:
+        id: { type: integer }
+        userId: { type: integer }
+        workspaceId: { type: integer }
+        goalName: { type: string }
+        lagMeasure: { type: string }
+        status: { type: string, enum: [ACTIVE, ARCHIVED] }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    Scoreboard:
+      allOf:
+        - $ref: '#/components/schemas/ScoreboardSummary'
+        - type: object
+          properties:
+            leadMeasures:
+              type: array
+              items: { $ref: '#/components/schemas/LeadMeasure' }
+
+    ScoreboardCreateRequest:
+      type: object
+      required: [goalName, lagMeasure, startDate]
+      properties:
+        goalName: { type: string }
+        lagMeasure: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
+
+    ScoreboardUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        goalName: { type: string }
+        lagMeasure: { type: string }
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date, nullable: true }
 
     ErrorResponse:
       type: object

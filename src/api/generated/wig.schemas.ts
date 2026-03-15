@@ -34,6 +34,191 @@ export interface WorkspaceMember {
   createdAt?: string;
 }
 
+export type LeadMeasurePeriod = typeof LeadMeasurePeriod[keyof typeof LeadMeasurePeriod];
+
+
+export const LeadMeasurePeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
+export type LeadMeasureStatus = typeof LeadMeasureStatus[keyof typeof LeadMeasureStatus];
+
+
+export const LeadMeasureStatus = {
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface LeadMeasure {
+  id?: number;
+  scoreboardId?: number;
+  name?: string;
+  targetValue?: number;
+  period?: LeadMeasurePeriod;
+  status?: LeadMeasureStatus;
+  createdAt?: string;
+  /** @nullable */
+  archivedAt?: string | null;
+}
+
+export interface WeeklyAchievement {
+  achieved?: number;
+  total?: number;
+}
+
+export type LeadMeasureListItem = LeadMeasure & {
+  weeklyAchievement?: WeeklyAchievement;
+};
+
+export type LeadMeasureCreateRequestPeriod = typeof LeadMeasureCreateRequestPeriod[keyof typeof LeadMeasureCreateRequestPeriod];
+
+
+export const LeadMeasureCreateRequestPeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
+export interface LeadMeasureCreateRequest {
+  name: string;
+  /** @minimum 1 */
+  targetValue: number;
+  period: LeadMeasureCreateRequestPeriod;
+}
+
+export type LeadMeasureUpdateRequestPeriod = typeof LeadMeasureUpdateRequestPeriod[keyof typeof LeadMeasureUpdateRequestPeriod];
+
+
+export const LeadMeasureUpdateRequestPeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
+export interface LeadMeasureUpdateRequest {
+  name?: string;
+  /** @minimum 1 */
+  targetValue?: number;
+  period?: LeadMeasureUpdateRequestPeriod;
+}
+
+export interface DailyLog {
+  id?: number;
+  leadMeasureId?: number;
+  logDate?: string;
+  value?: boolean;
+  createdAt?: string;
+}
+
+export interface DailyLogUpsertRequest {
+  value: boolean;
+}
+
+export type WeeklyLogItemLogs = {[key: string]: boolean | null};
+
+export interface WeeklyLogItem {
+  id?: number;
+  name?: string;
+  targetValue?: number;
+  logs?: WeeklyLogItemLogs;
+  achieved?: number;
+  achievementRate?: number;
+}
+
+export interface WeeklyLogsResponse {
+  weekStart?: string;
+  weekEnd?: string;
+  leadMeasures?: WeeklyLogItem[];
+}
+
+export type TeamDashboardMemberMeasureLogs = {[key: string]: boolean | null};
+
+export interface TeamDashboardMemberMeasure {
+  id?: number;
+  name?: string;
+  targetValue?: number;
+  achieved?: number;
+  achievementRate?: number;
+  logs?: TeamDashboardMemberMeasureLogs;
+}
+
+export type TeamDashboardMemberRole = typeof TeamDashboardMemberRole[keyof typeof TeamDashboardMemberRole];
+
+
+export const TeamDashboardMemberRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
+export interface TeamDashboardMember {
+  userId?: number;
+  nickname?: string;
+  role?: TeamDashboardMemberRole;
+  hasScoreboard?: boolean;
+  /** @nullable */
+  scoreboardId?: number | null;
+  /** @nullable */
+  goalName?: string | null;
+  /** @nullable */
+  lagMeasure?: string | null;
+  achieved?: number;
+  total?: number;
+  achievementRate?: number;
+  isWinning?: boolean;
+  leadMeasures?: TeamDashboardMemberMeasure[];
+}
+
+export interface TeamDashboardResponse {
+  workspaceId?: number;
+  workspaceName?: string;
+  weekStart?: string;
+  weekEnd?: string;
+  members?: TeamDashboardMember[];
+}
+
+export type ScoreboardSummaryStatus = typeof ScoreboardSummaryStatus[keyof typeof ScoreboardSummaryStatus];
+
+
+export const ScoreboardSummaryStatus = {
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface ScoreboardSummary {
+  id?: number;
+  userId?: number;
+  workspaceId?: number;
+  goalName?: string;
+  lagMeasure?: string;
+  status?: ScoreboardSummaryStatus;
+  startDate?: string;
+  /** @nullable */
+  endDate?: string | null;
+  createdAt?: string;
+}
+
+export type Scoreboard = ScoreboardSummary & {
+  leadMeasures?: LeadMeasure[];
+};
+
+export interface ScoreboardCreateRequest {
+  goalName: string;
+  lagMeasure: string;
+  startDate: string;
+  /** @nullable */
+  endDate?: string | null;
+}
+
+export interface ScoreboardUpdateRequest {
+  goalName?: string;
+  lagMeasure?: string;
+  startDate?: string;
+  /** @nullable */
+  endDate?: string | null;
+}
+
 /**
  * 유효성 검사 실패 시 필드별 상세 오류 (선택)
  */
@@ -93,5 +278,43 @@ export type PostWorkspacesBody = {
 
 export type PostWorkspacesJoinBody = {
   workspaceId: number;
+};
+
+export type PostScoreboardsIdArchive200Status = typeof PostScoreboardsIdArchive200Status[keyof typeof PostScoreboardsIdArchive200Status];
+
+
+export const PostScoreboardsIdArchive200Status = {
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export type PostScoreboardsIdArchive200 = {
+  id: number;
+  status: PostScoreboardsIdArchive200Status;
+};
+
+export type GetScoreboardsScoreboardIdLeadMeasuresParams = {
+status?: GetScoreboardsScoreboardIdLeadMeasuresStatus;
+};
+
+export type GetScoreboardsScoreboardIdLeadMeasuresStatus = typeof GetScoreboardsScoreboardIdLeadMeasuresStatus[keyof typeof GetScoreboardsScoreboardIdLeadMeasuresStatus];
+
+
+export const GetScoreboardsScoreboardIdLeadMeasuresStatus = {
+  active: 'active',
+  all: 'all',
+} as const;
+
+export type DeleteLeadMeasuresId200 = {
+  warning: string;
+  deleted: boolean;
+};
+
+export type GetScoreboardsScoreboardIdLogsWeeklyParams = {
+weekStart?: string;
+};
+
+export type GetDashboardTeamParams = {
+weekStart?: string;
+cursor?: string;
 };
 

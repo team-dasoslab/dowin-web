@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `daily_logs_lead_measure_date_unique` ON `daily_logs` (`lead_measure_id`,`log_date`);

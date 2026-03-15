@@ -1,7 +1,7 @@
+import { Button } from "@/components/ui/Button";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "../Button";
+import { Plus, Zap } from "lucide-react";
 import Link from "next/link";
-import { Zap, LogIn, Plus } from "lucide-react";
 
 const meta: Meta<typeof Button> = {
   title: "UI/Button",
@@ -30,7 +30,8 @@ export const Primary: Story = {
         <span>Primary Action</span>
       </div>
     ),
-    className: "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+    className:
+      "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
   },
 };
 
@@ -38,7 +39,8 @@ export const AsChildLink: Story = {
   args: {
     asChild: true,
     children: <Link href="#">Go to Dashboard</Link>,
-    className: "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+    className:
+      "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
   },
 };
 
@@ -48,13 +50,15 @@ export const Loading: Story = {
     children: (
       <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
     ),
-    className: "bg-primary/50 text-white px-5 py-3 rounded-lg flex items-center justify-center",
+    className:
+      "bg-primary/50 text-white px-5 py-3 rounded-lg flex items-center justify-center",
   },
 };
 
 export const IconButton: Story = {
   args: {
     children: <Plus className="w-4 h-4" />,
-    className: "w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-border-hover transition-colors",
+    className:
+      "w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-border-hover transition-colors",
   },
 };

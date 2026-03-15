@@ -5,7 +5,7 @@ import { MockDataProvider } from "@/context/MockDataContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import "./globals.css";
+import "@/app/globals.css";
 
 export default function RootLayout({
   children,

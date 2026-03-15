@@ -15,6 +15,20 @@
       "when": 1773491967091,
       "tag": "0001_open_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1773507155398,
+      "tag": "0002_cynical_dust",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1773508158988,
+      "tag": "0003_dusty_sinister_six",
+      "breakpoints": true
     }
   ]
 }

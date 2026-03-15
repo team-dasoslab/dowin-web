@@ -1,5 +1,5 @@
+import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { WorkspaceService } from "./workspace.service";
 
 describe("WorkspaceService", () => {
   const mockStorage = {

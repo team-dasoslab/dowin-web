@@ -2,9 +2,9 @@ import { getDb } from "@/db";
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { workspaceJoinSchema } from "@/domain/workspace/validation";
-import { apiError, apiSuccess } from "@/lib/api-response";
-import { getSession } from "@/lib/auth";
-import { withErrorHandler } from "@/lib/with-error-handler";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { getSession } from "@/lib/server/auth";
+import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const POST = withErrorHandler(async (request: Request) => {

@@ -6,7 +6,7 @@ import {
   passwordChangeSchema,
   validateCustomId,
   validatePassword,
-} from "./validation";
+} from "@/domain/auth/validation";
 
 describe("Auth Validation", () => {
   describe("validateCustomId", () => {

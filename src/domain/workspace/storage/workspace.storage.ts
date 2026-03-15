@@ -1,5 +1,5 @@
+import { workspaceMembers, workspaces } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { workspaces, workspaceMembers, users } from "../../../db/schema";
 
 export class WorkspaceStorage {
   constructor(private db: any) {}
@@ -22,7 +22,11 @@ export class WorkspaceStorage {
     return newWorkspace;
   }
 
-  async addMember(workspaceId: number, userId: number, role: "ADMIN" | "MEMBER"): Promise<void> {
+  async addMember(
+    workspaceId: number,
+    userId: number,
+    role: "ADMIN" | "MEMBER",
+  ): Promise<void> {
     await this.db.insert(workspaceMembers).values({
       workspaceId,
       userId,

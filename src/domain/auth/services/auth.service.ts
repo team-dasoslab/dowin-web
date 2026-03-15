@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
-import { AuthStorage } from "../storage/auth.storage";
+import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 
 export class AuthService {
   constructor(private storage: AuthStorage) {}

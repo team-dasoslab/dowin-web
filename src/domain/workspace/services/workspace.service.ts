@@ -1,5 +1,5 @@
-import { NotFoundError, ConflictError } from "../../../lib/errors";
-import { WorkspaceStorage } from "../storage/workspace.storage";
+import { ConflictError, NotFoundError } from "@/lib/server/errors";
+import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 
 export class WorkspaceService {
   constructor(private storage: WorkspaceStorage) {}

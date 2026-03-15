@@ -6,23 +6,18 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
-  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
-  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
-  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
-  UseInfiniteQueryOptions,
-  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -95,12 +90,6 @@ export const getWorkspacesMe = async ( options?: RequestInit): Promise<getWorksp
 
 
 
-export const getGetWorkspacesMeInfiniteQueryKey = () => {
-    return [
-    'infinite', `/api/workspaces/me`
-    ] as const;
-    }
-
 export const getGetWorkspacesMeQueryKey = () => {
     return [
     `/api/workspaces/me`
@@ -108,71 +97,6 @@ export const getGetWorkspacesMeQueryKey = () => {
     }
 
     
-export const getGetWorkspacesMeInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesMe>>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesMeInfiniteQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesMe>>> = ({ signal }) => getWorkspacesMe({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetWorkspacesMeInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesMe>>>
-export type GetWorkspacesMeInfiniteQueryError = UnauthorizedErrorResponse | ErrorResponse
-
-
-export function useGetWorkspacesMeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesMe>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWorkspacesMe>>,
-          TError,
-          Awaited<ReturnType<typeof getWorkspacesMe>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkspacesMeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesMe>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWorkspacesMe>>,
-          TError,
-          Awaited<ReturnType<typeof getWorkspacesMe>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkspacesMeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesMe>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary 내 워크스페이스 정보 조회
- */
-
-export function useGetWorkspacesMeInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesMe>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetWorkspacesMeInfiniteQueryOptions(options)
-
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
 export const getGetWorkspacesMeQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -476,12 +400,6 @@ export const getWorkspacesIdMembers = async (id: number, options?: RequestInit):
 
 
 
-export const getGetWorkspacesIdMembersInfiniteQueryKey = (id: number,) => {
-    return [
-    'infinite', `/api/workspaces/${id}/members`
-    ] as const;
-    }
-
 export const getGetWorkspacesIdMembersQueryKey = (id: number,) => {
     return [
     `/api/workspaces/${id}/members`
@@ -489,71 +407,6 @@ export const getGetWorkspacesIdMembersQueryKey = (id: number,) => {
     }
 
     
-export const getGetWorkspacesIdMembersInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesIdMembers>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesIdMembersInfiniteQueryKey(id);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesIdMembers>>> = ({ signal }) => getWorkspacesIdMembers(id, { signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetWorkspacesIdMembersInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesIdMembers>>>
-export type GetWorkspacesIdMembersInfiniteQueryError = UnauthorizedErrorResponse | ErrorResponse
-
-
-export function useGetWorkspacesIdMembersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesIdMembers>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWorkspacesIdMembers>>,
-          TError,
-          Awaited<ReturnType<typeof getWorkspacesIdMembers>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkspacesIdMembersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesIdMembers>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWorkspacesIdMembers>>,
-          TError,
-          Awaited<ReturnType<typeof getWorkspacesIdMembers>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkspacesIdMembersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesIdMembers>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary 워크스페이스 멤버 목록 조회
- */
-
-export function useGetWorkspacesIdMembersInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getWorkspacesIdMembers>>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetWorkspacesIdMembersInfiniteQueryOptions(id,options)
-
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
 export const getGetWorkspacesIdMembersQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 

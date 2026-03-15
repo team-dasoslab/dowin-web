@@ -39,23 +39,31 @@ For detailed file paths and doc priorities, read `references/backend-rules.md`.
 
 Open the matching domain doc and extract business rules, error cases, auth rules, and validation rules. Also inspect existing code in the same domain before changing structure.
 
+If the task adds or changes an API, update `src/api-spec/openapi.yaml` first so the contract is explicit before implementation.
+
 ### 2. Start with tests when the change is backend behavior
 
 Follow Red -> Green -> Refactor when feasible.
 
 - add or update focused tests near the implementation
+- default to `validation`, `service`, and `storage` tests for backend behavior
 - prioritize business-rule coverage over incidental coverage
 - add characterization tests before changing existing behavior when practical
+- add route tests only when HTTP-layer behavior is part of the change
+  - request parsing or response branching that is not trivial
+  - cookie/header handling
+  - file upload, streaming, redirects, or route-only integration behavior
 
 ### 3. Implement in the existing layers
 
 Preferred flow:
 
-1. route handler
+1. OpenAPI contract
 2. validation
 3. service
 4. storage
-5. shared lib helpers only if needed
+5. route handler
+6. shared lib helpers only if needed
 
 ### 4. Keep repository conventions
 
@@ -83,6 +91,7 @@ yarn gen:api
 
 ## Backend Checklist
 
+- If this is a new or changed API, was `src/api-spec/openapi.yaml` updated first?
 - Does the change match the domain business rules?
 - Is Zod validation present where request data enters?
 - Are auth and ownership checks correct?

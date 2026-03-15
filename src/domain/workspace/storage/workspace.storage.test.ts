@@ -1,6 +1,6 @@
+import { workspaceMembers, workspaces } from "@/db/schema";
+import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { workspaceMembers, workspaces } from "../../../db/schema";
-import { WorkspaceStorage } from "./workspace.storage";
 
 describe("WorkspaceStorage", () => {
   const mockDb = {
