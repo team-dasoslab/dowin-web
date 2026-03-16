@@ -165,11 +165,20 @@ export interface WeeklyLogsResponse {
   leadMeasures?: WeeklyLogItem[];
 }
 
+export type MonthlyLogItemPeriod = typeof MonthlyLogItemPeriod[keyof typeof MonthlyLogItemPeriod];
+
+
+export const MonthlyLogItemPeriod = {
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
 export type MonthlyLogItemLogs = {[key: string]: boolean | null};
 
 export interface MonthlyLogItem {
   id?: number;
   name?: string;
+  period?: MonthlyLogItemPeriod;
   targetValue?: number;
   logs?: MonthlyLogItemLogs;
   achieved?: number;

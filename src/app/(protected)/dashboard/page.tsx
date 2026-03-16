@@ -113,7 +113,80 @@ function WeeklyTable({
         <span className="text-xs text-text-secondary">— {member.goalName}</span>
       </div>
 
-      <div className="border border-border rounded-lg overflow-hidden">
+      <div className="space-y-3 md:hidden">
+        {member.leadMeasures?.map((leadMeasure) => {
+          const achievedCount = leadMeasure.achieved ?? 0;
+          const targetValue = leadMeasure.targetValue ?? 0;
+          const rate =
+            targetValue > 0
+              ? Math.round((achievedCount / targetValue) * 100)
+              : 0;
+
+          return (
+            <div
+              key={`${member.userId}-${leadMeasure.id}-mobile`}
+              className="rounded-lg border border-border bg-white p-4"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-text-primary">
+                    {leadMeasure.name}
+                  </p>
+                  <p className="text-[11px] text-text-muted">
+                    목표 {targetValue}회 /{" "}
+                    {leadMeasure.period === "DAILY"
+                      ? "일"
+                      : leadMeasure.period === "WEEKLY"
+                        ? "주"
+                        : "월"}
+                  </p>
+                </div>
+                <p
+                  className={`shrink-0 text-sm font-bold font-mono ${
+                    rate >= 100 ? "text-green-600" : "text-text-secondary"
+                  }`}
+                >
+                  {achievedCount}/{targetValue}
+                </p>
+              </div>
+
+              <div className="mt-3 grid grid-cols-7 gap-1.5">
+                {weekDates.map((date, index) => {
+                  const value = leadMeasure.logs?.[date] ?? null;
+
+                  return (
+                    <div
+                      key={`${member.userId}-${leadMeasure.id}-${date}-mobile`}
+                      className="space-y-1 text-center"
+                    >
+                      <p
+                        className={`text-[10px] font-bold ${
+                          date === today ? "text-primary" : "text-text-muted"
+                        }`}
+                      >
+                        {DAY_LABELS[index]}
+                      </p>
+                      <span
+                        className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                          value === true
+                            ? "text-green-600"
+                            : date === today
+                              ? "text-primary/50"
+                              : "text-text-muted"
+                        }`}
+                      >
+                        {value === true ? "○" : ""}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-lg border border-border md:block">
         <div className="overflow-x-auto">
           <div className="min-w-[600px]">
             <div className="bg-sub-background border-b border-border">

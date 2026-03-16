@@ -62,34 +62,6 @@ export default function ProfilePage() {
   const nickname = user.nickname ?? "사용자";
   const customId = user.customId ?? "";
 
-  const updateStoredNickname = (nickname: string) => {
-    const raw = window.localStorage.getItem("wig_user");
-
-    if (!raw) {
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(raw) as {
-        id?: string;
-        customId?: string;
-        nickname?: string;
-      };
-      window.localStorage.setItem(
-        "wig_user",
-        JSON.stringify({
-          ...parsed,
-          nickname,
-        }),
-      );
-    } catch {
-      // Ignore local storage parse errors
-    }
-  };
-
-  const getSafeNickname = (nextNickname: string | undefined) =>
-    nextNickname ?? nickname;
-
   const handleLogout = async () => {
     try {
       const response = await logoutMutation.mutateAsync();
@@ -99,7 +71,6 @@ export default function ProfilePage() {
     } catch {
       // Continue logout flow even when server-side logout fails.
     } finally {
-      window.localStorage.removeItem("wig_user");
       queryClient.clear();
       window.location.replace("/");
     }
@@ -133,7 +104,6 @@ export default function ProfilePage() {
                 throw response;
               }
 
-              updateStoredNickname(getSafeNickname(response.data.nickname));
               await Promise.all([
                 queryClient.invalidateQueries({
                   queryKey: getGetUsersMeQueryKey(),

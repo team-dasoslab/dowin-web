@@ -18,6 +18,8 @@
 - Use Zod for forms.
 - Use generated Orval hooks and TanStack Query for server state.
 - Invalidate related queries after mutations.
+- Treat mobile optimization as a required part of frontend work.
+- Check layout, readability, touch targets, scrolling flow, and primary actions on small screens.
 - Consider mobile layout, empty states, loading states, and failure rollback.
 
 ## Verification Defaults

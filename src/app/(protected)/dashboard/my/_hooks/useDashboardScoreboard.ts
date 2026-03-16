@@ -16,11 +16,19 @@ import {
   getGetScoreboardsActiveQueryKey,
   useGetScoreboardsActive,
 } from "@/api/generated/scoreboard/scoreboard";
-import { GetDashboardTeamParams } from "@/api/generated/wig.schemas";
+import {
+  GetDashboardTeamParams,
+  GetScoreboardsScoreboardIdLogsMonthlyParams,
+  GetScoreboardsScoreboardIdLogsWeeklyParams,
+} from "@/api/generated/wig.schemas";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import {
+  addDays,
+  addMonths,
   getTodayInKst,
+  getMonthStart,
   getWeekDates,
+  isValidDateString,
 } from "@/app/(protected)/dashboard/my/_lib/week";
 import { useToast } from "@/context/ToastContext";
 import {
@@ -29,15 +37,21 @@ import {
   toNumberId,
 } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 type WeeklyLogsQueryData =
   | getScoreboardsScoreboardIdLogsWeeklyResponse200
   | undefined;
 type DailyLogValue = boolean | null;
+type DashboardView = "week" | "month";
 
 const getNextLogValue = (value: DailyLogValue): DailyLogValue => {
   return value === true ? null : true;
+};
+
+const isDashboardView = (value: string | null): value is DashboardView => {
+  return value === "week" || value === "month";
 };
 
 const updateWeeklyLogsCache = (
@@ -82,11 +96,34 @@ const updateWeeklyLogsCache = (
 };
 
 export const useDashboardScoreboard = () => {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const [pendingLogKey, setPendingLogKey] = useState<string | null>(null);
-  const weekDates = getWeekDates();
   const today = getTodayInKst();
+  const selectedViewParam = searchParams.get("view");
+  const selectedView: DashboardView = isDashboardView(selectedViewParam)
+    ? selectedViewParam
+    : "week";
+  const rawSelectedDate = isValidDateString(searchParams.get("date"))
+    ? (searchParams.get("date") as string)
+    : today;
+  const weekDates = getWeekDates(rawSelectedDate);
+  const selectedWeekStart = weekDates[0] ?? today;
+  const selectedMonthStart = getMonthStart(rawSelectedDate);
+  const selectedDate =
+    selectedView === "month" ? rawSelectedDate : selectedWeekStart;
+  const currentWeekDates = getWeekDates(today);
+
+  const setPeriodState = (nextView: DashboardView, nextDate: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("view", nextView);
+    params.set("date", nextDate);
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const {
     data: workspaceResponse,
@@ -115,31 +152,40 @@ export const useDashboardScoreboard = () => {
       ? activeScoreboardResponse.data
       : null;
   const scoreboardId = toNumberId(activeScoreboard?.id);
+  const weeklyLogsParams: GetScoreboardsScoreboardIdLogsWeeklyParams = {
+    weekStart: selectedWeekStart,
+  };
+  const monthlyLogsParams: GetScoreboardsScoreboardIdLogsMonthlyParams = {
+    monthStart: selectedMonthStart,
+  };
   const weeklyLogsQueryKey =
     scoreboardId !== null
-      ? getGetScoreboardsScoreboardIdLogsWeeklyQueryKey(scoreboardId, undefined)
+      ? getGetScoreboardsScoreboardIdLogsWeeklyQueryKey(
+          scoreboardId,
+          weeklyLogsParams,
+        )
       : null;
   const monthlyLogsQueryKey =
     scoreboardId !== null
       ? getGetScoreboardsScoreboardIdLogsMonthlyQueryKey(
           scoreboardId,
-          undefined,
+          monthlyLogsParams,
         )
       : null;
   const dashboardTeamQueryKey = getGetDashboardTeamQueryKey(
-    weekDates.length === 7
-      ? ({ weekStart: weekDates[0] } satisfies GetDashboardTeamParams)
+    currentWeekDates.length === 7
+      ? ({ weekStart: currentWeekDates[0] } satisfies GetDashboardTeamParams)
       : undefined,
   );
 
   const { data: weeklyLogsResponse, isLoading: isWeeklyLogsLoading } =
-    useGetScoreboardsScoreboardIdLogsWeekly(scoreboardId ?? 0, undefined, {
+    useGetScoreboardsScoreboardIdLogsWeekly(scoreboardId ?? 0, weeklyLogsParams, {
       query: {
         enabled: scoreboardId !== null,
       },
     });
   const { data: monthlyLogsResponse, isLoading: isMonthlyLogsLoading } =
-    useGetScoreboardsScoreboardIdLogsMonthly(scoreboardId ?? 0, undefined, {
+    useGetScoreboardsScoreboardIdLogsMonthly(scoreboardId ?? 0, monthlyLogsParams, {
       query: {
         enabled: scoreboardId !== null,
       },
@@ -190,10 +236,44 @@ export const useDashboardScoreboard = () => {
       ? Math.round(weeklyTotalRate / weeklyTargetMeasures.length)
       : 0;
   const monthlyOverallRate = Math.round(monthlySummary?.achievementRate ?? 0);
+  const monthlyLeadMeasures =
+    monthlyLogsResponse?.status === 200
+      ? (monthlyLogsResponse.data.leadMeasures ?? [])
+      : [];
   const weekLabel =
     weekDates.length === 7
       ? `${weekDates[0].slice(5).replace("-", ".")} – ${weekDates[6].slice(5).replace("-", ".")}`
       : "";
+
+  const setSelectedView = (view: DashboardView) => {
+    setPeriodState(view, rawSelectedDate);
+  };
+
+  const setSelectedDate = (date: string) => {
+    if (!isValidDateString(date)) {
+      return;
+    }
+
+    setPeriodState(
+      selectedView,
+      selectedView === "month"
+        ? getMonthStart(date)
+        : (getWeekDates(date)[0] ?? date),
+    );
+  };
+
+  const movePeriod = (direction: -1 | 1) => {
+    const nextDate =
+      selectedView === "month"
+        ? addMonths(rawSelectedDate, direction)
+        : addDays(selectedWeekStart, direction * 7);
+
+    setPeriodState(selectedView, nextDate);
+  };
+
+  const resetToToday = () => {
+    setPeriodState(selectedView, today);
+  };
 
   const toggleLog = async (leadMeasureId: number, date: string) => {
     if (scoreboardId === null || pendingLogKey) {
@@ -286,9 +366,17 @@ export const useDashboardScoreboard = () => {
       deleteLogMutation.isPending,
     isMonthlyLogsLoading,
     isWeeklyLogsLoading,
+    monthlyLeadMeasures,
     monthlyOverallRate,
+    monthlySummary,
     pendingLogKey,
     scoreboardError,
+    selectedDate,
+    selectedView,
+    setSelectedDate,
+    setSelectedView,
+    movePeriod,
+    resetToToday,
     today,
     toggleLog,
     monthLabel,

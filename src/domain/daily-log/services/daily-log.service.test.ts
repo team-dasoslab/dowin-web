@@ -83,7 +83,7 @@ describe("DailyLogService", () => {
     });
   });
 
-  it("월간 기록 조회 시 MONTHLY 지표만 집계한다", async () => {
+  it("월간 기록 조회 시 WEEKLY와 MONTHLY 지표를 모두 반환한다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
@@ -103,6 +103,9 @@ describe("DailyLogService", () => {
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-03-02", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-05", value: true },
       { leadMeasureId: 11, logDate: "2026-03-01", value: true },
       { leadMeasureId: 11, logDate: "2026-03-03", value: true },
       { leadMeasureId: 11, logDate: "2026-03-04", value: false },
@@ -114,20 +117,28 @@ describe("DailyLogService", () => {
     expect(result.monthEnd).toBe("2026-03-31");
     expect(result.monthLabel).toBe("2026.03");
     expect(result.summary).toEqual({
-      achieved: 2,
+      achieved: 5,
       total: 30,
-      achievementRate: 6.7,
+      achievementRate: 16.7,
       isWinning: false,
     });
-    expect(result.leadMeasures).toHaveLength(1);
-    expect(result.leadMeasures[0]).toEqual(
-      expect.objectContaining({
-        id: 11,
-        achieved: 2,
-      }),
+    expect(result.leadMeasures).toHaveLength(2);
+    expect(result.leadMeasures).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 10,
+          period: "WEEKLY",
+          achieved: 3,
+        }),
+        expect.objectContaining({
+          id: 11,
+          period: "MONTHLY",
+          achieved: 2,
+        }),
+      ]),
     );
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
-      [11],
+      [10, 11],
       "2026-03-01",
       "2026-03-31",
     );

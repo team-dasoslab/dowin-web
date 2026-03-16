@@ -34,16 +34,6 @@ export default function LoginPageClient() {
         return;
       }
 
-      window.localStorage.setItem(
-        "wig_user",
-        JSON.stringify({
-          id: String(response.data.user.id),
-          customId: id,
-          nickname: response.data.user.nickname ?? "Unknown",
-          isFirstLogin: response.data.user.isFirstLogin,
-        }),
-      );
-
       const nextPath = searchParams.get("next");
       router.push(nextPath || "/dashboard/my");
     } catch (loginError) {

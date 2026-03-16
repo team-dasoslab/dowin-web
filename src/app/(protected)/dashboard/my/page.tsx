@@ -1,14 +1,21 @@
 "use client";
 
+import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
-import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
+import {
+  DAY_LABELS,
+  getMonthCalendarWeeks,
+} from "@/app/(protected)/dashboard/my/_lib/week";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
 import {
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
   Check,
+  Calendar,
   FolderArchive,
   Plus,
   Settings,
@@ -17,30 +24,253 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-type StoredUser = {
-  nickname?: string;
-};
+type MonthlyLeadMeasure = NonNullable<
+  ReturnType<typeof useDashboardScoreboard>["monthlyLeadMeasures"]
+>[number];
 
-const getStoredNickname = (): string | null => {
-  if (typeof window === "undefined") {
-    return null;
-  }
+function WeeklyMobileCards({
+  activeLeadMeasures,
+  isLogPending,
+  pendingLogKey,
+  today,
+  toggleLog,
+  weekDates,
+  weeklyById,
+}: {
+  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
+  isLogPending: boolean;
+  pendingLogKey: string | null;
+  today: string;
+  toggleLog: ReturnType<typeof useDashboardScoreboard>["toggleLog"];
+  weekDates: string[];
+  weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
+}) {
+  return (
+    <div className="space-y-3 md:hidden">
+      {activeLeadMeasures.map((leadMeasure) => {
+        const leadMeasureId = toNumberId(leadMeasure.id);
+        const weekly = weeklyById.get(leadMeasureId);
+        const achievedCount = weekly?.achieved ?? 0;
+        const targetValue = leadMeasure.targetValue ?? 0;
+        const rate =
+          targetValue > 0
+            ? Math.round((achievedCount / targetValue) * 100)
+            : 0;
 
-  const raw = window.localStorage.getItem("wig_user");
+        return (
+          <div
+            key={`weekly-mobile-${leadMeasure.id}`}
+            className="rounded-lg border border-border bg-white p-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-text-primary">
+                  {leadMeasure.name}
+                </p>
+                <p className="text-[11px] text-text-muted">
+                  목표 {targetValue}회 /{" "}
+                  {leadMeasure.period === "DAILY"
+                    ? "일"
+                    : leadMeasure.period === "WEEKLY"
+                      ? "주"
+                      : "월"}
+                </p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-[10px] text-text-muted">달성</p>
+                <p
+                  className={`text-sm font-bold font-mono ${
+                    rate >= 100 ? "text-green-600" : "text-text-secondary"
+                  }`}
+                >
+                  {achievedCount}/{targetValue}
+                </p>
+              </div>
+            </div>
 
-  if (!raw) {
-    return null;
-  }
+            <div className="mt-3 grid grid-cols-7 gap-1.5">
+              {weekDates.map((date, index) => {
+                const currentValue =
+                  weekly?.logs?.[date] === undefined ? null : weekly.logs[date];
+                const isToday = date === today;
+                const currentLogKey =
+                  leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
+                const isPending = pendingLogKey === currentLogKey;
 
-  try {
-    const user = JSON.parse(raw) as StoredUser;
-    return user.nickname ?? null;
-  } catch {
-    return null;
-  }
-};
+                return (
+                  <div key={`${leadMeasure.id}-${date}`} className="space-y-1 text-center">
+                    <p
+                      className={`text-[10px] font-bold ${
+                        isToday ? "text-primary" : "text-text-muted"
+                      }`}
+                    >
+                      {DAY_LABELS[index]}
+                    </p>
+                    <Button
+                      disabled={
+                        isPending || isLogPending || leadMeasureId === null
+                      }
+                      onClick={() => {
+                        if (leadMeasureId !== null) {
+                          void toggleLog(leadMeasureId, date);
+                        }
+                      }}
+                      className={`h-9 w-full rounded-md border text-sm transition-colors ${
+                        currentValue === true
+                          ? "border-primary bg-primary text-white"
+                          : isToday
+                            ? "border-primary/30 bg-primary/5 text-primary"
+                            : "border-border bg-sub-background text-text-muted"
+                      } ${
+                        isPending || isLogPending
+                          ? "cursor-not-allowed opacity-70"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      {currentValue === true ? (
+                        <Check className="mx-auto h-3.5 w-3.5" />
+                      ) : (
+                        <span className="text-[10px] font-mono">
+                          {date.slice(8, 10)}
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function MonthlyMobileCards({
+  monthWeeks,
+  monthLabel,
+  monthlyLeadMeasures,
+  today,
+}: {
+  monthWeeks: ReturnType<typeof getMonthCalendarWeeks>;
+  monthLabel?: string;
+  monthlyLeadMeasures: MonthlyLeadMeasure[];
+  today: string;
+}) {
+  return (
+    <div className="space-y-3 md:hidden">
+      {monthWeeks.map((weekDatesInMonth, weekIndex) => (
+        <div
+          key={`${monthLabel}-mobile-week-${weekIndex + 1}`}
+          className="rounded-lg border border-border bg-white p-4"
+        >
+          <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
+            <p className="text-sm font-bold text-text-primary">
+              {weekIndex + 1}주차
+            </p>
+            <p className="text-[11px] font-mono text-text-muted">
+              {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
+              {" – "}
+              {weekDatesInMonth
+                .filter((date): date is string => date !== null)
+                .at(-1)
+                ?.slice(5)
+                .replace("-", ".")}
+            </p>
+          </div>
+
+          <div className="mt-3 space-y-3">
+            {monthlyLeadMeasures.map((leadMeasure) => {
+              const targetValue = leadMeasure.targetValue ?? 0;
+              const visibleAchievedCount = weekDatesInMonth.reduce(
+                (count, date) => {
+                  if (!date) {
+                    return count;
+                  }
+
+                  return leadMeasure.logs?.[date] === true ? count + 1 : count;
+                },
+                0,
+              );
+              const rate =
+                targetValue > 0
+                  ? Math.round((visibleAchievedCount / targetValue) * 100)
+                  : 0;
+
+              return (
+                <div
+                  key={`${weekIndex}-${leadMeasure.id}-mobile`}
+                  className="rounded-lg border border-border bg-sub-background/40 p-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-text-primary">
+                        {leadMeasure.name}
+                      </p>
+                      <p className="text-[11px] text-text-muted">
+                        목표 {targetValue}회 /{" "}
+                        {leadMeasure.period === "WEEKLY" ? "주" : "월"}
+                      </p>
+                    </div>
+                    <p
+                      className={`shrink-0 text-xs font-bold font-mono ${
+                        rate >= 100 ? "text-green-600" : "text-text-secondary"
+                      }`}
+                    >
+                      {visibleAchievedCount}/{targetValue}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-7 gap-1.5">
+                    {weekDatesInMonth.map((date, dayIndex) => {
+                      const value = date ? (leadMeasure.logs?.[date] ?? null) : null;
+                      const isToday = date === today;
+
+                      return (
+                        <div
+                          key={`${weekIndex}-${leadMeasure.id}-${DAY_LABELS[dayIndex]}-mobile`}
+                          className="space-y-1 text-center"
+                        >
+                          <p
+                            className={`text-[10px] font-bold ${
+                              isToday ? "text-primary" : "text-text-muted"
+                            }`}
+                          >
+                            {DAY_LABELS[dayIndex]}
+                          </p>
+                          <span
+                            className={`inline-flex h-9 w-full items-center justify-center rounded-md border text-xs font-bold ${
+                              value === true
+                                ? "border-primary bg-primary text-white"
+                                : date === null
+                                  ? "border-transparent bg-transparent text-transparent"
+                                  : isToday
+                                    ? "border-primary/30 bg-primary/5 text-primary"
+                                    : "border-border bg-white text-text-muted"
+                            }`}
+                          >
+                            {value === true ? (
+                              <Check className="h-3.5 w-3.5" />
+                            ) : date ? (
+                              date.slice(8, 10)
+                            ) : (
+                              "."
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function MyDashboardPage() {
   const {
@@ -52,9 +282,17 @@ export default function MyDashboardPage() {
     isLogPending,
     isMonthlyLogsLoading,
     isWeeklyLogsLoading,
+    monthlyLeadMeasures,
     monthlyOverallRate,
+    monthlySummary,
     monthLabel,
+    movePeriod,
     pendingLogKey,
+    resetToToday,
+    selectedDate,
+    selectedView,
+    setSelectedDate,
+    setSelectedView,
     today,
     toggleLog,
     weekDates,
@@ -63,22 +301,27 @@ export default function MyDashboardPage() {
     weeklyById,
     workspace,
   } = useDashboardScoreboard();
-  const [nickname, setNickname] = useState<string | null>(null);
+  const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe({
+    query: {
+      retry: false,
+    },
+  });
+  const nickname =
+    profileResponse?.status === 200 ? profileResponse.data.nickname : null;
   const weeklyGoalCount = activeLeadMeasures.filter(
     (leadMeasure) => leadMeasure.period === "WEEKLY",
   ).length;
   const monthlyGoalCount = activeLeadMeasures.filter(
     (leadMeasure) => leadMeasure.period === "MONTHLY",
   ).length;
-
-  useEffect(() => {
-    setNickname(getStoredNickname());
-  }, []);
+  const monthWeeks = getMonthCalendarWeeks(selectedDate);
 
   if (
     isLoading ||
+    isProfileLoading ||
     (activeScoreboard &&
-      (isWeeklyLogsLoading || isMonthlyLogsLoading) &&
+      ((selectedView === "week" && isWeeklyLogsLoading) ||
+        (selectedView === "month" && isMonthlyLogsLoading)) &&
       weeklyById.size === 0)
   ) {
     return <LoadingSpinner />;
@@ -202,8 +445,8 @@ export default function MyDashboardPage() {
           </div>
         </header>
 
-        <Card className="border border-border rounded-lg overflow-hidden">
-          <div className="px-6 py-4 flex justify-between items-center gap-4 border-b border-border">
+        <Card className="overflow-hidden rounded-lg border border-border">
+          <div className="flex flex-col gap-4 border-b border-border px-4 py-4 sm:px-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-row items-center gap-4">
               <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                 <Zap className="w-4 h-4 text-primary" />
@@ -218,7 +461,7 @@ export default function MyDashboardPage() {
               </div>
             </div>
 
-            <div className="text-right space-y-1">
+            <div className="space-y-1 text-left sm:text-right">
               <p className="text-[10px] text-text-muted">이번 주 달성률</p>
               <p
                 className={`text-2xl font-bold font-mono tracking-tight ${
@@ -231,7 +474,7 @@ export default function MyDashboardPage() {
               >
                 {weeklyOverallRate}%
               </p>
-              <div className="flex items-center justify-end gap-1 text-[10px] text-text-muted">
+              <div className="flex flex-wrap items-center gap-1 text-[10px] text-text-muted sm:justify-end">
                 <span>이번 달 달성률{monthLabel ? ` (${monthLabel})` : ""}</span>
                 <strong
                   className={`font-mono ${
@@ -248,13 +491,13 @@ export default function MyDashboardPage() {
             </div>
           </div>
 
-          <div className="px-6 py-3 bg-sub-background flex items-center gap-3">
+          <div className="flex items-start gap-3 bg-sub-background px-4 py-3 sm:px-6 sm:items-center">
             <Target className="w-3.5 h-3.5 text-text-muted" />
-            <div className="flex flex-row items-center">
-              <span className="text-[10px] font-bold text-text-muted tracking-widest mr-3">
+            <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center">
+              <span className="text-[10px] font-bold text-text-muted tracking-widest sm:mr-3">
                 후행지표
               </span>
-              <span className="text-sm text-text-primary font-medium">
+              <span className="text-sm text-text-primary font-medium break-words">
                 {activeScoreboard.lagMeasure}
               </span>
             </div>
@@ -262,23 +505,90 @@ export default function MyDashboardPage() {
         </Card>
 
         <section className="space-y-3">
-          <div className="flex items-center justify-between px-0.5">
+          <div className="flex flex-col gap-3 rounded-lg border border-border bg-white p-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="inline-flex w-fit rounded-lg border border-border bg-sub-background p-1">
+                {(["week", "month"] as const).map((view) => {
+                  const isActive = selectedView === view;
+
+                  return (
+                    <Button
+                      key={view}
+                      type="button"
+                      onClick={() => setSelectedView(view)}
+                      className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
+                        isActive
+                          ? "bg-white text-primary shadow-sm"
+                          : "text-text-secondary"
+                      }`}
+                    >
+                      {view === "week" ? "주간" : "월간"}
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div className="grid grid-cols-[40px_minmax(0,1fr)_40px] items-center gap-2 sm:flex sm:items-center">
+                  <Button
+                    type="button"
+                    onClick={() => movePeriod(-1)}
+                    className="h-9 w-9 rounded-lg border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                  >
+                    <ChevronLeft className="mx-auto h-4 w-4" />
+                  </Button>
+                  <label className="flex h-9 min-w-0 items-center gap-2 rounded-lg border border-border bg-white px-3 text-xs text-text-secondary">
+                    <Calendar className="h-3.5 w-3.5 shrink-0 text-text-muted" />
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(event) => setSelectedDate(event.target.value)}
+                      className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
+                    />
+                  </label>
+                  <Button
+                    type="button"
+                    onClick={() => movePeriod(1)}
+                    className="h-9 w-9 rounded-lg border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                  >
+                    <ChevronRight className="mx-auto h-4 w-4" />
+                  </Button>
+                </div>
+                <Button
+                  type="button"
+                  onClick={resetToToday}
+                  className="h-9 w-full rounded-lg border border-border bg-white px-3 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary sm:w-auto"
+                >
+                  오늘로 돌아가기
+                </Button>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-text-muted">
+              {selectedView === "week"
+                ? "선택한 날짜가 포함된 한 주(월~일)를 보여줍니다."
+                : "선택한 날짜가 포함된 한 달 전체를 집계합니다."}
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 px-0.5 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <h2 className="text-sm font-bold text-text-primary">
-                주간 선행지표
+                {selectedView === "week" ? "주간 선행지표" : "월간 집계"}
               </h2>
               <p className="text-[11px] text-text-muted">
-                주간 목표({weeklyGoalCount}개)는 이번 주 기준으로 집계하고, 월간
-                목표({monthlyGoalCount}개)는 이번 달 누적으로 집계합니다.
+                {selectedView === "week"
+                  ? `주간 목표(${weeklyGoalCount}개)는 이번 주 기준으로 집계하고, 월간 목표(${monthlyGoalCount}개)는 이번 달 누적으로 집계합니다.`
+                  : `${monthLabel ?? "선택한 달"} 기준으로 주간/월간 목표(${weeklyGoalCount + monthlyGoalCount}개)를 함께 집계합니다.`}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[11px] text-text-muted bg-sub-background border border-border px-2 py-1 rounded font-mono">
-                {weekLabel}
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <span className="inline-flex w-fit text-[11px] text-text-muted bg-sub-background border border-border px-2 py-1 rounded font-mono">
+                {selectedView === "week" ? weekLabel : monthLabel}
               </span>
               <Button
                 asChild
-                className="px-2.5 py-1.5 bg-white border border-border rounded-lg text-[11px] font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary transition-colors flex items-center gap-1"
+                className="justify-center px-2.5 py-1.5 bg-white border border-border rounded-lg text-[11px] font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary transition-colors flex items-center gap-1"
               >
                 <Link href="/setup?mode=addMeasure">
                   <Plus className="w-3 h-3" />
@@ -292,10 +602,232 @@ export default function MyDashboardPage() {
             <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
               활성화된 선행지표가 없습니다.
             </div>
+          ) : selectedView === "month" ? (
+            <div className="space-y-4">
+              <div className="rounded-lg border border-border bg-white px-5 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-bold text-text-primary">
+                      월간 기록판
+                    </p>
+                    <p className="text-[11px] text-text-muted">
+                      선택한 달 전체 기록을 주차 흐름으로 보여줍니다.
+                    </p>
+                  </div>
+                  <p className="text-[11px] text-text-muted">
+                    총 {monthlySummary?.achieved ?? 0}/{monthlySummary?.total ?? 0}
+                    {" · "}
+                    {monthlyOverallRate}%
+                  </p>
+                </div>
+              </div>
+              {monthlyLeadMeasures.length === 0 ? (
+                <div className="rounded-lg border border-border bg-white p-8 text-center text-sm text-text-muted">
+                  선택한 달에 집계할 월간 선행지표가 없습니다.
+                </div>
+              ) : (
+                <>
+                  <MonthlyMobileCards
+                    monthLabel={monthLabel}
+                    monthWeeks={monthWeeks}
+                    monthlyLeadMeasures={monthlyLeadMeasures}
+                    today={today}
+                  />
+
+                  <div className="hidden space-y-4 md:block">
+                    {monthWeeks.map((weekDatesInMonth, weekIndex) => (
+                      <div
+                        key={`${monthLabel}-week-${weekIndex + 1}`}
+                        className="rounded-lg border border-border overflow-hidden bg-white"
+                      >
+                        <div className="border-b border-border bg-sub-background px-5 py-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-xs font-bold text-text-primary">
+                              {weekIndex + 1}주차
+                            </p>
+                            <p className="text-[11px] font-mono text-text-muted">
+                              {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
+                              {" – "}
+                              {weekDatesInMonth
+                                .filter((date): date is string => date !== null)
+                                .at(-1)
+                                ?.slice(5)
+                                .replace("-", ".")}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <div className="min-w-[600px]">
+                            <div className="bg-sub-background border-b border-border">
+                              <table className="w-full table-fixed text-xs">
+                                <colgroup>
+                                  <col className="w-[34%]" />
+                                  {DAY_LABELS.map((day) => (
+                                    <col key={day} className="w-[8%]" />
+                                  ))}
+                                  <col className="w-[10%]" />
+                                  <col className="w-[16%]" />
+                                </colgroup>
+                                <thead>
+                                  <tr>
+                                    <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                                      선행지표
+                                    </th>
+                                    {DAY_LABELS.map((label, dayIndex) => {
+                                      const date = weekDatesInMonth[dayIndex];
+                                      const isToday = date === today;
+
+                                      return (
+                                        <th
+                                          key={`${weekIndex}-${label}`}
+                                          className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
+                                            isToday ? "text-primary" : "text-text-muted"
+                                          }`}
+                                        >
+                                          <div>{label}</div>
+                                          <div className="mt-0.5 text-[10px] font-mono normal-case tracking-normal">
+                                            {date ? date.slice(8, 10) : ""}
+                                          </div>
+                                        </th>
+                                      );
+                                    })}
+                                    <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                                      기간
+                                    </th>
+                                    <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                                      달성
+                                    </th>
+                                  </tr>
+                                </thead>
+                              </table>
+                            </div>
+
+                            <table className="w-full table-fixed text-xs">
+                              <colgroup>
+                                <col className="w-[34%]" />
+                                {DAY_LABELS.map((day) => (
+                                  <col key={day} className="w-[8%]" />
+                                ))}
+                                <col className="w-[10%]" />
+                                <col className="w-[16%]" />
+                              </colgroup>
+                              <tbody className="divide-y divide-border">
+                                {monthlyLeadMeasures.map((leadMeasure) => {
+                                  const targetValue = leadMeasure.targetValue ?? 0;
+                                  const visibleAchievedCount = weekDatesInMonth.reduce(
+                                    (count, date) => {
+                                      if (!date) {
+                                        return count;
+                                      }
+
+                                      return leadMeasure.logs?.[date] === true
+                                        ? count + 1
+                                        : count;
+                                    },
+                                    0,
+                                  );
+                                  const rate =
+                                    targetValue > 0
+                                      ? Math.round(
+                                          (visibleAchievedCount / targetValue) * 100,
+                                        )
+                                      : 0;
+
+                                  return (
+                                    <tr key={`${weekIndex}-${leadMeasure.id}`} className="bg-white">
+                                      <td className="px-5 py-4">
+                                        <p className="truncate text-sm font-semibold text-text-primary">
+                                          {leadMeasure.name}
+                                        </p>
+                                        <p className="text-[10px] text-text-muted">
+                                          목표 {targetValue}회 /{" "}
+                                          {leadMeasure.period === "WEEKLY" ? "주" : "월"}
+                                        </p>
+                                      </td>
+
+                                      {weekDatesInMonth.map((date, dayIndex) => {
+                                        const value = date
+                                          ? (leadMeasure.logs?.[date] ?? null)
+                                          : null;
+                                        const isToday = date === today;
+
+                                        return (
+                                          <td
+                                            key={`${weekIndex}-${leadMeasure.id}-${DAY_LABELS[dayIndex]}`}
+                                            className="py-3 text-center"
+                                          >
+                                            <span
+                                              className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-bold ${
+                                                value === true
+                                                  ? "border-primary bg-primary text-white"
+                                                  : date === null
+                                                    ? "border-transparent bg-transparent text-transparent"
+                                                    : isToday
+                                                      ? "border-primary/30 bg-primary/5 text-primary"
+                                                      : "border-border bg-sub-background text-text-muted"
+                                              }`}
+                                            >
+                                              {value === true ? (
+                                                <Check className="h-3.5 w-3.5" />
+                                              ) : null}
+                                            </span>
+                                          </td>
+                                        );
+                                      })}
+
+                                      <td className="px-3 py-4 text-center text-[11px] text-text-secondary">
+                                        {leadMeasure.period === "WEEKLY" ? "주간" : "월간"}
+                                      </td>
+                                      <td className="px-3 py-4 text-center">
+                                        <div className="flex flex-col items-center gap-1.5">
+                                          <div className="w-10 h-1 overflow-hidden rounded-full border border-border bg-sub-background">
+                                            <div
+                                              className={`h-full rounded-full transition-all duration-500 ${
+                                                rate >= 100 ? "bg-green-500" : "bg-primary"
+                                              }`}
+                                              style={{ width: `${Math.min(rate, 100)}%` }}
+                                            />
+                                          </div>
+                                          <span
+                                            className={`text-[10px] font-bold font-mono ${
+                                              rate >= 100
+                                                ? "text-green-600"
+                                                : "text-text-secondary"
+                                            }`}
+                                          >
+                                            {visibleAchievedCount}/{targetValue}
+                                          </span>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           ) : (
-            <div className="border border-border rounded-lg overflow-hidden">
-              <div className="overflow-x-auto">
-                <div className="min-w-[600px]">
+            <>
+              <WeeklyMobileCards
+                activeLeadMeasures={activeLeadMeasures}
+                isLogPending={isLogPending}
+                pendingLogKey={pendingLogKey}
+                today={today}
+                toggleLog={toggleLog}
+                weekDates={weekDates}
+                weeklyById={weeklyById}
+              />
+
+              <div className="hidden overflow-hidden rounded-lg border border-border md:block">
+                <div className="overflow-x-auto">
+                  <div className="min-w-[600px]">
                   <div className="bg-sub-background border-b border-border">
                     <table className="w-full table-fixed text-xs">
                       <colgroup>
@@ -434,9 +966,10 @@ export default function MyDashboardPage() {
                       })}
                     </tbody>
                   </table>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </section>
       </div>

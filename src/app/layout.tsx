@@ -18,6 +18,10 @@ export default function RootLayout({
       <head>
         <title>WIG Tracker</title>
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="WIG Tracker" />

@@ -927,6 +927,7 @@ components:
       properties:
         id: { type: integer }
         name: { type: string }
+        period: { type: string, enum: [WEEKLY, MONTHLY] }
         targetValue: { type: integer }
         logs:
           type: object
