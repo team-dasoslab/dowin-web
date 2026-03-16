@@ -25,6 +25,7 @@ import {
   Edit2,
   Key,
   LogOut,
+  Smartphone,
   User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -35,6 +36,7 @@ interface MenuItem {
   title: string;
   description: string;
   danger?: boolean;
+  href?: string;
   onClick?: () => void;
   rightElement?: React.ReactNode;
 }
@@ -179,6 +181,13 @@ export default function ProfilePage() {
       label: "알림 설정",
       items: [
         {
+          id: "install-guide",
+          icon: <Smartphone className="w-3.5 h-3.5" />,
+          title: "iPhone 앱 설치 가이드",
+          description: "Safari에서 홈 화면에 추가하는 순서를 안내합니다.",
+          href: "/install-guide",
+        },
+        {
           id: "push-notification",
           icon: <Bell className="w-3.5 h-3.5" />,
           title: "매일 밤 9시 알림",
@@ -314,6 +323,14 @@ export default function ProfilePage() {
                         className="w-full bg-white hover:bg-sub-background"
                       >
                         {Content}
+                      </Button>
+                    );
+                  }
+
+                  if (item.href) {
+                    return (
+                      <Button key={item.id} asChild className="w-full bg-white hover:bg-sub-background">
+                        <Link href={item.href}>{Content}</Link>
                       </Button>
                     );
                   }
