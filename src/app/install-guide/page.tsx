@@ -28,7 +28,7 @@ const steps = [
     description:
       "화면 아래 메뉴에서 점 세 개 버튼을 눌러 추가 메뉴를 열어주세요.",
     icon: Ellipsis,
-    imageSrc: "/assets/guide/guide01.PNG",
+    imageSrc: "/assets/guide/guide01.png",
     imageAlt: "Safari 하단 더보기 버튼 예시",
   },
   {
@@ -44,7 +44,7 @@ const steps = [
     description:
       "공유 시트 옵션이 짧게 보이면 더보기를 눌러 전체 액션 목록을 확인합니다.",
     icon: ChevronRight,
-    imageSrc: "/assets/guide/guide02.PNG",
+    imageSrc: "/assets/guide/guide02.png",
     imageAlt: "Safari 공유 시트 더보기 예시",
   },
   {
@@ -53,7 +53,7 @@ const steps = [
     description:
       "액션 목록에서 홈 화면에 추가를 누르면 앱 아이콘 이름을 확인할 수 있습니다.",
     icon: PlusSquare,
-    imageSrc: "/assets/guide/guide03.PNG",
+    imageSrc: "/assets/guide/guide03.png",
     imageAlt: "홈 화면에 추가 메뉴 예시",
   },
   {
@@ -62,7 +62,7 @@ const steps = [
     description:
       "홈 화면에 WIG 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
     icon: House,
-    imageSrc: "/assets/guide/guide04.PNG",
+    imageSrc: "/assets/guide/guide04.png",
     imageAlt: "홈 화면에 설치된 WIG 예시",
   },
 ] as const;
