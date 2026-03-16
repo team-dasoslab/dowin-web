@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { usePostAuthLogin } from "@/api/generated/auth/auth";
+import { InlineSpinner } from "@/components/InlineSpinner";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { LogIn, Zap } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -112,7 +113,7 @@ export default function LoginPageClient() {
             `}
           >
             {loginMutation.isPending ? (
-              <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <InlineSpinner />
             ) : (
               <>
                 <LogIn className="w-4 h-4" />

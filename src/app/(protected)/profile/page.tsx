@@ -10,6 +10,7 @@ import {
   useGetUsersMe,
   usePutUsersMe,
 } from "@/api/generated/profile/profile";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
@@ -29,6 +30,7 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface MenuItem {
   id: string;
@@ -44,6 +46,7 @@ interface MenuItem {
 export default function ProfilePage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const [pendingAction, setPendingAction] = useState<string | null>(null);
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
   const updateNicknameMutation = usePutUsersMe();
@@ -54,7 +57,7 @@ export default function ProfilePage() {
   const pushUserId = user?.id != null ? String(user.id) : null;
 
   if (isProfileLoading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="프로필 정보를 불러오는 중입니다." />;
   }
 
   if (!user) {
@@ -63,6 +66,11 @@ export default function ProfilePage() {
 
   const nickname = user.nickname ?? "사용자";
   const customId = user.customId ?? "";
+  const isActionPending =
+    pendingAction !== null ||
+    updateNicknameMutation.isPending ||
+    changePasswordMutation.isPending ||
+    logoutMutation.isPending;
 
   const handleLogout = async () => {
     try {
@@ -96,6 +104,7 @@ export default function ProfilePage() {
             }
 
             try {
+              setPendingAction("nickname");
               const response = await updateNicknameMutation.mutateAsync({
                 data: {
                   nickname: next,
@@ -120,6 +129,8 @@ export default function ProfilePage() {
                 "error",
                 getApiErrorMessage(error, "닉네임 변경에 실패했습니다."),
               );
+            } finally {
+              setPendingAction(null);
             }
           },
         },
@@ -151,6 +162,7 @@ export default function ProfilePage() {
             }
 
             try {
+              setPendingAction("password");
               const response = await changePasswordMutation.mutateAsync({
                 data: {
                   currentPassword: currentPw,
@@ -172,6 +184,8 @@ export default function ProfilePage() {
                 "error",
                 getApiErrorMessage(error, "비밀번호 변경에 실패했습니다."),
               );
+            } finally {
+              setPendingAction(null);
             }
           },
         },
@@ -209,6 +223,7 @@ export default function ProfilePage() {
           danger: false,
           onClick: () => {
             if (confirm("로그아웃할까요?")) {
+              setPendingAction("logout");
               void handleLogout();
             }
           },
@@ -236,6 +251,17 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      {isActionPending && (
+        <LoadingOverlay
+          message={
+            pendingAction === "nickname"
+              ? "닉네임을 변경하는 중입니다."
+              : pendingAction === "password"
+                ? "비밀번호를 변경하는 중입니다."
+                : "로그아웃하는 중입니다."
+          }
+        />
+      )}
       <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         {/* ── 헤더 ── */}
         <header className="flex items-center justify-between">
@@ -319,6 +345,7 @@ export default function ProfilePage() {
                     return (
                       <Button
                         key={item.id}
+                        disabled={isActionPending}
                         onClick={item.onClick}
                         className="w-full bg-white hover:bg-sub-background"
                       >
@@ -329,7 +356,11 @@ export default function ProfilePage() {
 
                   if (item.href) {
                     return (
-                      <Button key={item.id} asChild className="w-full bg-white hover:bg-sub-background">
+                      <Button
+                        key={item.id}
+                        asChild
+                        className="w-full bg-white hover:bg-sub-background"
+                      >
                         <Link href={item.href}>{Content}</Link>
                       </Button>
                     );

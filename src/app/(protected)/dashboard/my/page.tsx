@@ -324,7 +324,7 @@ export default function MyDashboardPage() {
         (selectedView === "month" && isMonthlyLogsLoading)) &&
       weeklyById.size === 0)
   ) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="대시보드를 불러오는 중입니다." />;
   }
 
   if (hasNoWorkspace) {

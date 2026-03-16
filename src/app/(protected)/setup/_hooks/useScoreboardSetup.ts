@@ -43,6 +43,7 @@ export const useScoreboardSetup = () => {
   const {
     data: activeScoreboardResponse,
     error: activeScoreboardError,
+    isLoading: isActiveScoreboardLoading,
   } = useGetScoreboardsActive({
     query: {
       retry: false,
@@ -57,15 +58,12 @@ export const useScoreboardSetup = () => {
   const scoreboardId = toNumberId(activeScoreboard?.id);
   const isEditMode = scoreboardId !== null && mode !== "create";
 
-  const { data: leadMeasuresResponse } = useGetScoreboardsScoreboardIdLeadMeasures(
-    scoreboardId ?? 0,
-    undefined,
-    {
+  const { data: leadMeasuresResponse, isLoading: isLeadMeasuresLoading } =
+    useGetScoreboardsScoreboardIdLeadMeasures(scoreboardId ?? 0, undefined, {
       query: {
         enabled: scoreboardId !== null,
       },
-    },
-  );
+    });
 
   const leadMeasures =
     leadMeasuresResponse?.status === 200 ? leadMeasuresResponse.data : [];
@@ -288,6 +286,14 @@ export const useScoreboardSetup = () => {
     archive,
     goalName,
     handleMeasureChange,
+    isInitializing:
+      isActiveScoreboardLoading || (scoreboardId !== null && isLeadMeasuresLoading),
+    isSubmitPending:
+      createScoreboardMutation.isPending ||
+      updateScoreboardMutation.isPending ||
+      createLeadMeasureMutation.isPending ||
+      updateLeadMeasureMutation.isPending ||
+      deleteLeadMeasureMutation.isPending,
     isArchivePending: archiveScoreboardMutation.isPending,
     isEditMode,
     lagMeasure,

@@ -1,6 +1,9 @@
 "use client";
 
 import { useScoreboardSetup } from "@/app/(protected)/setup/_hooks/useScoreboardSetup";
+import { InlineSpinner } from "@/components/InlineSpinner";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -25,6 +28,7 @@ export default function SetupPage() {
     goalName,
     handleMeasureChange,
     isArchivePending,
+    isInitializing,
     isEditMode,
     lagMeasure,
     measures,
@@ -32,6 +36,7 @@ export default function SetupPage() {
     setActiveTooltip,
     setGoalName,
     setLagMeasure,
+    isSubmitPending,
     submit,
   } = useScoreboardSetup();
 
@@ -44,8 +49,25 @@ export default function SetupPage() {
     });
   };
 
+  if (isInitializing) {
+    return <LoadingSpinner message="점수판 정보를 불러오는 중입니다." />;
+  }
+
+  const isMutating = isSubmitPending || isArchivePending;
+
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      {isMutating && (
+        <LoadingOverlay
+          message={
+            isArchivePending
+              ? "점수판을 보관하는 중입니다."
+              : isEditMode
+                ? "점수판 변경사항을 저장하는 중입니다."
+                : "새 점수판을 만드는 중입니다."
+          }
+        />
+      )}
       <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         {/* ── 헤더 ── */}
         <header className="flex items-center justify-between">
@@ -88,6 +110,7 @@ export default function SetupPage() {
               </label>
               <Input
                 value={goalName}
+                disabled={isMutating}
                 onChange={(e) => setGoalName(e.target.value)}
                 placeholder="예: 연말까지 영업이익 20% 증대"
                 className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
@@ -109,6 +132,7 @@ export default function SetupPage() {
               <div className="relative">
                 <Button
                   type="button"
+                  disabled={isMutating}
                   onClick={() =>
                     setActiveTooltip(activeTooltip === "lag" ? null : "lag")
                   }
@@ -147,6 +171,7 @@ export default function SetupPage() {
               </label>
               <Input
                 value={lagMeasure}
+                disabled={isMutating}
                 onChange={(e) => setLagMeasure(e.target.value)}
                 placeholder="예: 1,000만 원에서 1,200만 원으로"
                 className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
@@ -171,6 +196,7 @@ export default function SetupPage() {
               <div className="relative">
                 <Button
                   type="button"
+                  disabled={isMutating}
                   onClick={() =>
                     setActiveTooltip(activeTooltip === "lead" ? null : "lead")
                   }
@@ -215,6 +241,7 @@ export default function SetupPage() {
                     {measures.length > 1 && (
                       <Button
                         type="button"
+                        disabled={isMutating}
                         onClick={() => removeMeasureRow(measure.id)}
                         className="text-[11px] text-danger font-bold hover:bg-danger/5 px-2 py-0.5 rounded transition-colors"
                       >
@@ -224,6 +251,7 @@ export default function SetupPage() {
                   </div>
                   <Input
                     value={measure.name}
+                    disabled={isMutating}
                     onChange={(e) =>
                       handleMeasureChange(measure.id, "name", e.target.value)
                     }
@@ -240,6 +268,7 @@ export default function SetupPage() {
                         <Button
                           key={p}
                           type="button"
+                          disabled={isMutating}
                           onClick={() => {
                             handleMeasureChange(measure.id, "period", p);
                             handleMeasureChange(
@@ -266,6 +295,7 @@ export default function SetupPage() {
                         min="1"
                         max={measure.period === "WEEKLY" ? 7 : 31}
                         value={measure.targetValue}
+                        disabled={isMutating}
                         onChange={(e) =>
                           handleMeasureChange(
                             measure.id,
@@ -288,6 +318,7 @@ export default function SetupPage() {
             <div className="px-5 py-3 border-t border-dashed border-border">
               <Button
                 type="button"
+                disabled={isMutating}
                 onClick={addMeasureRow}
                 className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-text-muted hover:text-primary transition-colors py-1"
               >
@@ -300,10 +331,21 @@ export default function SetupPage() {
           {/* ── 저장 버튼 ── */}
           <Button
             type="submit"
-            className="w-full btn-linear-primary py-3 flex items-center justify-center gap-2 text-sm font-bold"
+            disabled={isMutating}
+            className={`w-full py-3 flex items-center justify-center gap-2 text-sm font-bold rounded-lg transition-all ${
+              isMutating
+                ? "bg-primary/50 text-white cursor-not-allowed"
+                : "btn-linear-primary"
+            }`}
           >
-            <Save className="w-3.5 h-3.5" />
-            {isEditMode ? "변경사항 저장" : "점수판 생성"}
+            {isSubmitPending ? (
+              <InlineSpinner />
+            ) : (
+              <>
+                <Save className="w-3.5 h-3.5" />
+                {isEditMode ? "변경사항 저장" : "점수판 생성"}
+              </>
+            )}
           </Button>
 
           {/* ── 관리 영역 (수정 모드에서만) ── */}
@@ -324,7 +366,7 @@ export default function SetupPage() {
                   </div>
                   <Button
                     type="button"
-                    disabled={isArchivePending}
+                    disabled={isMutating}
                     onClick={() => {
                       if (confirm("이 점수판을 보관하시겠습니까?")) {
                         void archive();
@@ -332,7 +374,11 @@ export default function SetupPage() {
                     }}
                     className="flex-shrink-0 px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ml-4"
                   >
-                    <Archive className="w-3.5 h-3.5" />
+                    {isArchivePending ? (
+                      <InlineSpinner size="sm" className="border-text-secondary/20 border-t-text-secondary" />
+                    ) : (
+                      <Archive className="w-3.5 h-3.5" />
+                    )}
                     {isArchivePending ? "보관 중..." : "보관"}
                   </Button>
                 </div>

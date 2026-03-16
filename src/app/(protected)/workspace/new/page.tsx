@@ -1,6 +1,8 @@
 "use client";
 
 import { usePostWorkspaces } from "@/api/generated/workspace/workspace";
+import { InlineSpinner } from "@/components/InlineSpinner";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ArrowLeft, Plus, Zap } from "lucide-react";
@@ -43,6 +45,7 @@ export default function NewWorkspacePage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
+      {isPending && <LoadingOverlay message="워크스페이스를 만드는 중입니다." />}
       <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
@@ -83,6 +86,7 @@ export default function NewWorkspacePage() {
             <Input
               type="text"
               value={name}
+              disabled={isPending}
               onChange={(e) => setName(e.target.value)}
               placeholder="예: 마케팅 팀, WIG 프로젝트"
               autoFocus
@@ -112,7 +116,7 @@ export default function NewWorkspacePage() {
             `}
           >
             {isPending ? (
-              <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <InlineSpinner size="sm" />
             ) : (
               <>
                 <Plus className="w-4 h-4" />

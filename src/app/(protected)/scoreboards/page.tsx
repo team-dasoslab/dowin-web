@@ -1,6 +1,8 @@
 "use client";
 
 import { useScoreboardArchive } from "@/app/(protected)/scoreboards/_hooks/useScoreboardArchive";
+import { InlineSpinner } from "@/components/InlineSpinner";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -93,7 +95,7 @@ export default function ScoreboardsPage() {
   } = useScoreboardArchive();
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="점수판 목록을 불러오는 중입니다." />;
   }
 
   if (hasNoWorkspace) {
@@ -124,6 +126,9 @@ export default function ScoreboardsPage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      {pendingActionId !== null && (
+        <LoadingOverlay message="점수판 상태를 변경하는 중입니다." />
+      )}
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
@@ -184,7 +189,7 @@ export default function ScoreboardsPage() {
               action={
                 <Button
                   type="button"
-                  disabled={pendingActionId === activeScoreboardId}
+                  disabled={pendingActionId !== null}
                   onClick={() => {
                     if (confirm("현재 활성 점수판을 보관하시겠습니까?")) {
                       void archive(activeScoreboardId);
@@ -192,7 +197,14 @@ export default function ScoreboardsPage() {
                   }}
                   className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
                 >
-                  <Archive className="w-3.5 h-3.5" />
+                  {pendingActionId === activeScoreboardId ? (
+                    <InlineSpinner
+                      size="sm"
+                      className="border-text-secondary/20 border-t-text-secondary"
+                    />
+                  ) : (
+                    <Archive className="w-3.5 h-3.5" />
+                  )}
                   {pendingActionId === activeScoreboardId
                     ? "보관 중..."
                     : "보관"}
@@ -261,9 +273,7 @@ export default function ScoreboardsPage() {
                     action={
                       <Button
                         type="button"
-                        disabled={
-                          !scoreboardId || pendingActionId === scoreboardId
-                        }
+                        disabled={!scoreboardId || pendingActionId !== null}
                         onClick={() => {
                           if (!scoreboardId) {
                             return;
@@ -273,7 +283,14 @@ export default function ScoreboardsPage() {
                         }}
                         className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
                       >
-                        <RotateCcw className="w-3.5 h-3.5" />
+                        {pendingActionId === scoreboardId ? (
+                          <InlineSpinner
+                            size="sm"
+                            className="border-text-secondary/20 border-t-text-secondary"
+                          />
+                        ) : (
+                          <RotateCcw className="w-3.5 h-3.5" />
+                        )}
                         {pendingActionId === scoreboardId
                           ? "활성화 중..."
                           : "다시 활성화"}
