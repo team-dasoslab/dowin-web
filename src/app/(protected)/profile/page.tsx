@@ -57,7 +57,12 @@ export default function ProfilePage() {
   const pushUserId = user?.id != null ? String(user.id) : null;
 
   if (isProfileLoading) {
-    return <LoadingSpinner message="프로필 정보를 불러오는 중입니다." />;
+    return (
+      <LoadingSpinner
+        message="프로필 정보를 불러오는 중입니다."
+        variant="ios"
+      />
+    );
   }
 
   if (!user) {
@@ -258,6 +263,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background font-pretendard">
       {isActionPending && (
         <LoadingOverlay
+          variant="ios"
           message={
             pendingAction === "nickname"
               ? "닉네임을 변경하는 중입니다."

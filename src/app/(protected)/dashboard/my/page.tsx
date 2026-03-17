@@ -6,6 +6,7 @@ import {
   DAY_LABELS,
   getMonthCalendarWeeks,
 } from "@/app/(protected)/dashboard/my/_lib/week";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -393,6 +394,7 @@ export default function MyDashboardPage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      <LoadingOverlay message="대시보드를 불러오는 중입니다." />
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">

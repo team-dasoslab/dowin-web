@@ -1,20 +1,17 @@
 "use client";
 
+import { SignatureLoader, type SignatureLoaderVariant } from "@/components/SignatureLoader";
+
 type InlineSpinnerProps = {
   className?: string;
   size?: "sm" | "md";
+  variant?: SignatureLoaderVariant;
 };
 
 export function InlineSpinner({
   className = "",
   size = "md",
+  variant = "ios",
 }: InlineSpinnerProps) {
-  const sizeClassName = size === "sm" ? "w-4 h-4 border-2" : "w-5 h-5 border-2";
-
-  return (
-    <div
-      className={`${sizeClassName} rounded-full border-white/20 border-t-white animate-spin ${className}`.trim()}
-      aria-hidden="true"
-    />
-  );
+  return <SignatureLoader size={size} variant={variant} className={className} />;
 }

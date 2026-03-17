@@ -115,6 +115,22 @@ body {
   animation: toastOut 0.3s ease-in forwards;
 }
 
+@keyframes wigLoaderIos {
+  0%,
+  39%,
+  100% {
+    opacity: 0.16;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+.wig-loader-ios-bar {
+  animation: wigLoaderIos 0.9s linear infinite;
+}
+
 .swagger-ui .topbar {
   display: none;
 }
