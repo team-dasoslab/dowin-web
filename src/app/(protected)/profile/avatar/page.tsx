@@ -1,6 +1,7 @@
 "use client";
 
 import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+import type { UserProfileUpdateRequest } from "@/api/generated/wig.schemas";
 import {
   getGetUsersMeQueryKey,
   useGetUsersMe,
@@ -49,7 +50,9 @@ export default function ProfileAvatarPage() {
   const nickname = user.nickname ?? "사용자";
   const avatarKey = user.avatarKey ?? null;
 
-  const handleAvatarSelect = async (nextAvatarKey: string | null) => {
+  const handleAvatarSelect = async (
+    nextAvatarKey: UserProfileUpdateRequest["avatarKey"],
+  ) => {
     if (avatarKey === nextAvatarKey) {
       return;
     }
@@ -92,7 +95,10 @@ export default function ProfileAvatarPage() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       {isSaving ? (
-        <LoadingOverlay variant="ios" message="프로필 아이콘을 변경하는 중입니다." />
+        <LoadingOverlay
+          variant="ios"
+          message="프로필 아이콘을 변경하는 중입니다."
+        />
       ) : null}
       <div className="mx-auto max-w-[560px] space-y-6 p-4 md:p-8 animate-linear-in">
         <header className="flex items-center justify-between">
