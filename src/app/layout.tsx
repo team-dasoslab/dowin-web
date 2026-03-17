@@ -1,9 +1,10 @@
 "use client";
 
+import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
 import SerwistRegistration from "@/components/SerwistRegistration";
 import { ToastProvider } from "@/context/ToastContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "@/app/globals.css";
 
 export default function RootLayout({
@@ -21,6 +22,32 @@ export default function RootLayout({
         },
       }),
   );
+
+  useEffect(() => {
+    const preventGesture = (event: Event) => {
+      event.preventDefault();
+    };
+
+    const preventPinchZoom = (event: TouchEvent) => {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener("gesturestart", preventGesture);
+    document.addEventListener("gesturechange", preventGesture);
+    document.addEventListener("gestureend", preventGesture);
+    document.addEventListener("touchmove", preventPinchZoom, {
+      passive: false,
+    });
+
+    return () => {
+      document.removeEventListener("gesturestart", preventGesture);
+      document.removeEventListener("gesturechange", preventGesture);
+      document.removeEventListener("gestureend", preventGesture);
+      document.removeEventListener("touchmove", preventPinchZoom);
+    };
+  }, []);
 
   return (
     <html lang="ko" suppressHydrationWarning>
@@ -113,7 +140,10 @@ export default function RootLayout({
       <body>
         <SerwistRegistration />
         <QueryClientProvider client={queryClient}>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <NavigationHistoryTracker />
+            {children}
+          </ToastProvider>
         </QueryClientProvider>
       </body>
     </html>

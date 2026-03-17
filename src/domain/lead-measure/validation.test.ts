@@ -26,6 +26,26 @@ describe("LeadMeasure Validation", () => {
     expect(result.success).toBe(false);
   });
 
+  it("주간 목표 횟수가 7회를 초과하면 실패한다", () => {
+    const result = leadMeasureCreateSchema.safeParse({
+      name: "주 8회 운동",
+      targetValue: 8,
+      period: "WEEKLY",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("월간 목표 횟수가 31회를 초과하면 실패한다", () => {
+    const result = leadMeasureCreateSchema.safeParse({
+      name: "월 32회 회고",
+      targetValue: 32,
+      period: "MONTHLY",
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it("부분 수정 요청은 성공한다", () => {
     const result = leadMeasureUpdateSchema.safeParse({
       name: "주 3회 운동",

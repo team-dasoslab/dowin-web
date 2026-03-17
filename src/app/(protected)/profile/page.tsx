@@ -15,12 +15,12 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useToast } from "@/context/ToastContext";
 import { validatePassword } from "@/domain/auth/validation";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft,
   Bell,
   ChevronRight,
   Edit2,
@@ -195,13 +195,6 @@ export default function ProfilePage() {
       label: "알림 설정",
       items: [
         {
-          id: "install-guide",
-          icon: <Smartphone className="w-3.5 h-3.5" />,
-          title: "iPhone 앱 설치 가이드",
-          description: "Safari에서 홈 화면에 추가하는 순서를 안내합니다.",
-          href: "/install-guide",
-        },
-        {
           id: "push-notification",
           icon: <Bell className="w-3.5 h-3.5" />,
           title: "매일 밤 9시 알림",
@@ -209,6 +202,18 @@ export default function ProfilePage() {
           rightElement: pushUserId ? (
             <PushSubscriptionManager userId={pushUserId} variant="toggle" />
           ) : null,
+        },
+      ],
+    },
+    {
+      label: "앱 설치 가이드",
+      items: [
+        {
+          id: "install-guide-ios",
+          icon: <Smartphone className="w-3.5 h-3.5" />,
+          title: "iPhone 앱 설치 가이드",
+          description: "Safari에서 홈 화면에 추가하는 순서를 안내합니다.",
+          href: "/install-guide",
         },
       ],
     },
@@ -265,14 +270,7 @@ export default function ProfilePage() {
       <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         {/* ── 헤더 ── */}
         <header className="flex items-center justify-between">
-          <Button
-            asChild
-            className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors"
-          >
-            <Link href="/dashboard/my">
-              <ArrowLeft className="w-3.5 h-3.5" />
-            </Link>
-          </Button>
+          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
           <p className="text-xs text-text-muted">내 프로필</p>
           <div className="w-8" /> {/* 우측 균형 맞춤 */}
         </header>

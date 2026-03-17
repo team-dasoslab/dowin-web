@@ -7,16 +7,16 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import {
   Activity,
   Archive,
-  ArrowLeft,
+  Minus,
   Plus,
   Save,
   TrendingUp,
   Zap,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function SetupPage() {
@@ -32,6 +32,7 @@ export default function SetupPage() {
     isEditMode,
     lagMeasure,
     measures,
+    monthlyTargetMax,
     removeMeasureRow,
     setActiveTooltip,
     setGoalName,
@@ -72,14 +73,7 @@ export default function SetupPage() {
         {/* ── 헤더 ── */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Button
-              asChild
-              className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors"
-            >
-              <Link href="/dashboard/my">
-                <ArrowLeft className="w-3.5 h-3.5" />
-              </Link>
-            </Button>
+            <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
           </div>
           <p className="text-xs text-text-muted">점수판 설정</p>
           <div className="w-8" />
@@ -290,21 +284,49 @@ export default function SetupPage() {
 
                     {/* 목표 횟수 */}
                     <div className="flex items-center gap-2">
-                      <Input
-                        type="number"
-                        min="1"
-                        max={measure.period === "WEEKLY" ? 7 : 31}
-                        value={measure.targetValue}
-                        disabled={isMutating}
-                        onChange={(e) =>
-                          handleMeasureChange(
-                            measure.id,
-                            "targetValue",
-                            parseInt(e.target.value) || 1,
-                          )
-                        }
-                        className="w-14 text-center text-sm p-2 bg-white border border-border rounded-lg focus:border-primary outline-none transition-colors font-bold"
-                      />
+                      <div className="flex items-center rounded-lg border border-border bg-white">
+                        <Button
+                          type="button"
+                          disabled={
+                            isMutating || measure.targetValue <= 1
+                          }
+                          onClick={() =>
+                            handleMeasureChange(
+                              measure.id,
+                              "targetValue",
+                              measure.targetValue - 1,
+                            )
+                          }
+                          className="flex h-10 w-10 items-center justify-center rounded-l-lg text-text-secondary hover:bg-sub-background disabled:opacity-40"
+                          aria-label="횟수 감소"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <div className="flex h-10 min-w-12 items-center justify-center border-x border-border px-2 text-sm font-bold text-text-primary">
+                          {measure.targetValue}
+                        </div>
+                        <Button
+                          type="button"
+                          disabled={
+                            isMutating ||
+                            measure.targetValue >=
+                              (measure.period === "WEEKLY"
+                                ? 7
+                                : monthlyTargetMax)
+                          }
+                          onClick={() =>
+                            handleMeasureChange(
+                              measure.id,
+                              "targetValue",
+                              measure.targetValue + 1,
+                            )
+                          }
+                          className="flex h-10 w-10 items-center justify-center rounded-r-lg text-text-secondary hover:bg-sub-background disabled:opacity-40"
+                          aria-label="횟수 증가"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
                       <span className="text-xs text-text-secondary font-medium whitespace-nowrap">
                         회 / {measure.period === "WEEKLY" ? "주" : "월"}
                       </span>

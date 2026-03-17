@@ -5,8 +5,8 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { ArrowLeft, Plus, Zap } from "lucide-react";
-import Link from "next/link";
+import { SmartBackButton } from "@/components/ui/SmartBackButton";
+import { Plus, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -49,14 +49,7 @@ export default function NewWorkspacePage() {
       <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
-          <Button
-            asChild
-            className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0"
-          >
-            <Link href="/dashboard/my">
-              <ArrowLeft className="w-3.5 h-3.5" />
-            </Link>
-          </Button>
+          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0" />
           <span className="text-xs font-bold text-text-muted">뒤로 가기</span>
         </div>
 

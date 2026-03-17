@@ -1,3 +1,4 @@
+import { SESSION_TTL_SECONDS } from "@/domain/auth/constants";
 import { getDb } from "@/db";
 import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
@@ -32,7 +33,7 @@ export const POST = withErrorHandler(async (request: Request) => {
       secure: true,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: SESSION_TTL_SECONDS,
     });
 
     return apiSuccess({ user });

@@ -9,9 +9,9 @@ import {
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { toNumberId } from "@/lib/client/frontend-api";
 import {
-  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   Check,
@@ -396,14 +396,7 @@ export default function MyDashboardPage() {
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Button
-              asChild
-              className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0"
-            >
-              <Link href="/dashboard">
-                <ArrowLeft className="w-3.5 h-3.5" />
-              </Link>
-            </Button>
+            <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0" />
             <div className="min-w-0">
               <p className="text-[11px] text-text-muted truncate">
                 {workspace?.name}

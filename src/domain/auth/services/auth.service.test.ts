@@ -2,6 +2,7 @@ import {
   AuthService,
   type AuthStoragePort,
 } from "@/domain/auth/services/auth.service";
+import { SESSION_TTL_MS } from "@/domain/auth/constants";
 import bcrypt from "bcryptjs";
 import {
   beforeEach,
@@ -51,6 +52,17 @@ describe("Auth Service - login", () => {
     expect(result.user.nickname).toBe("John");
     expect(result.sessionId).toBeDefined();
     expect(mockStorage.findUserByCustomId).toHaveBeenCalled();
+    expect(mockStorage.createSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 1,
+        expiresAt: expect.any(Date),
+      }),
+    );
+
+    const expiresAt = mockStorage.createSession.mock.calls[0]?.[0]?.expiresAt;
+    expect(expiresAt.getTime()).toBeGreaterThan(
+      Date.now() + SESSION_TTL_MS - 5_000,
+    );
   });
 
   it("아이디가 존재하지 않으면 에러를 던진다", async () => {

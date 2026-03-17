@@ -27,7 +27,7 @@ paths:
           description: 로그인 성공
           headers:
             Set-Cookie:
-              schema: { type: string, example: "wig_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=86400" }
+              schema: { type: string, example: "wig_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=315360000" }
           content:
             application/json:
               schema:

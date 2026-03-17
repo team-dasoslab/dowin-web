@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
+import { SESSION_TTL_MS } from "@/domain/auth/constants";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 
 export interface AuthStoragePort {
@@ -28,9 +29,9 @@ export class AuthService {
       throw new Error("아이디 또는 비밀번호가 올바르지 않습니다");
     }
 
-    // 3. 세션 생성 (24시간 유효)
+    // 3. 세션 생성 (장기 유지)
     const sessionId = nanoid();
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
 
     await this.storage.createSession({
       id: sessionId,

@@ -53,7 +53,11 @@ describe("LeadMeasureService", () => {
 
   it("ARCHIVED 점수판에는 선행지표를 추가할 수 없다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ARCHIVED" });
+    findOwnedScoreboard.mockResolvedValue({
+      id: 2,
+      status: "ARCHIVED",
+      startDate: "2026-03-01",
+    });
 
     await expect(
       service.createLeadMeasure(2, 100, {
@@ -69,7 +73,7 @@ describe("LeadMeasureService", () => {
     findOwnedLeadMeasure.mockResolvedValue({
       id: 10,
       status: "ARCHIVED",
-      scoreboard: { id: 2, status: "ACTIVE" },
+      scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
     });
 
     await expect(
@@ -82,7 +86,7 @@ describe("LeadMeasureService", () => {
     findOwnedLeadMeasure.mockResolvedValue({
       id: 10,
       status: "ACTIVE",
-      scoreboard: { id: 2, status: "ACTIVE" },
+      scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
     });
     countLogsByLeadMeasure.mockResolvedValue(17);
 
@@ -93,5 +97,41 @@ describe("LeadMeasureService", () => {
       warning: "삭제된 기록은 복구할 수 없습니다. 17개의 기록이 함께 삭제됩니다.",
       deleted: true,
     });
+  });
+
+  it("주간 목표 횟수는 7회를 초과할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({
+      id: 2,
+      status: "ACTIVE",
+      startDate: "2026-03-01",
+    });
+
+    await expect(
+      service.createLeadMeasure(2, 100, {
+        name: "주 8회 운동",
+        targetValue: 8,
+        period: "WEEKLY",
+      }),
+    ).rejects.toThrow("VALIDATION_ERROR");
+    expect(createLeadMeasure).not.toHaveBeenCalled();
+  });
+
+  it("월간 목표 횟수는 점수판 시작월의 최대 일수를 초과할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({
+      id: 2,
+      status: "ACTIVE",
+      startDate: "2026-02-01",
+    });
+
+    await expect(
+      service.createLeadMeasure(2, 100, {
+        name: "월 29회 회고",
+        targetValue: 29,
+        period: "MONTHLY",
+      }),
+    ).rejects.toThrow("VALIDATION_ERROR");
+    expect(createLeadMeasure).not.toHaveBeenCalled();
   });
 });

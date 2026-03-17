@@ -25,7 +25,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { MeasureInput } from "@/app/(protected)/setup/_lib/measure";
-import { createEmptyMeasure } from "@/app/(protected)/setup/_lib/measure";
+import {
+  clampMeasureTargetValue,
+  createEmptyMeasure,
+  getDaysInMonthFromIsoDate,
+} from "@/app/(protected)/setup/_lib/measure";
 
 export const useScoreboardSetup = () => {
   const searchParams = useSearchParams();
@@ -57,6 +61,9 @@ export const useScoreboardSetup = () => {
       : activeScoreboardResponse.data;
   const scoreboardId = toNumberId(activeScoreboard?.id);
   const isEditMode = scoreboardId !== null && mode !== "create";
+  const referenceStartDate =
+    activeScoreboard?.startDate ?? new Date().toISOString().split("T")[0];
+  const monthlyTargetMax = getDaysInMonthFromIsoDate(referenceStartDate);
 
   const { data: leadMeasuresResponse, isLoading: isLeadMeasuresLoading } =
     useGetScoreboardsScoreboardIdLeadMeasures(scoreboardId ?? 0, undefined, {
@@ -87,7 +94,11 @@ export const useScoreboardSetup = () => {
           existingId: toNumberId(leadMeasure.id),
           name: leadMeasure.name ?? "",
           period: leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
-          targetValue: leadMeasure.targetValue ?? 1,
+          targetValue: clampMeasureTargetValue(
+            leadMeasure.targetValue ?? 1,
+            leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
+            monthlyTargetMax,
+          ),
         })),
       );
       return;
@@ -98,7 +109,7 @@ export const useScoreboardSetup = () => {
       setLagMeasure("");
       setMeasures([createEmptyMeasure()]);
     }
-  }, [activeScoreboard, isEditMode, leadMeasuresResponse]);
+  }, [activeScoreboard, isEditMode, leadMeasuresResponse, monthlyTargetMax]);
 
   const handleMeasureChange = (
     id: string,
@@ -106,9 +117,39 @@ export const useScoreboardSetup = () => {
     value: string | number | "WEEKLY" | "MONTHLY" | null,
   ) => {
     setMeasures((previous) =>
-      previous.map((measure) =>
-        measure.id === id ? { ...measure, [field]: value } : measure,
-      ),
+      previous.map((measure) => {
+        if (measure.id !== id) {
+          return measure;
+        }
+
+        if (
+          field === "period" &&
+          (value === "WEEKLY" || value === "MONTHLY")
+        ) {
+          return {
+            ...measure,
+            period: value,
+            targetValue: clampMeasureTargetValue(
+              measure.targetValue,
+              value,
+              monthlyTargetMax,
+            ),
+          };
+        }
+
+        if (field === "targetValue" && typeof value === "number") {
+          return {
+            ...measure,
+            targetValue: clampMeasureTargetValue(
+              value,
+              measure.period,
+              monthlyTargetMax,
+            ),
+          };
+        }
+
+        return { ...measure, [field]: value };
+      }),
     );
   };
 
@@ -298,6 +339,7 @@ export const useScoreboardSetup = () => {
     isEditMode,
     lagMeasure,
     measures,
+    monthlyTargetMax,
     removeMeasureRow,
     setActiveTooltip,
     setGoalName,

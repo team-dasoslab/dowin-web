@@ -1,9 +1,8 @@
 import { CopyServiceLinkButton } from "@/app/install-guide/_components/CopyServiceLinkButton";
 import { GuideImage } from "@/app/install-guide/_components/GuideImage";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import {
-  ArrowLeft,
   ChevronRight,
   Ellipsis,
   House,
@@ -12,7 +11,6 @@ import {
   Smartphone,
   Sparkles,
 } from "lucide-react";
-import Link from "next/link";
 
 const steps = [
   {
@@ -72,14 +70,7 @@ export default function InstallGuidePage() {
     <div className="min-h-screen bg-background font-pretendard">
       <div className="mx-auto flex max-w-[560px] flex-col gap-6 p-4 pb-10 animate-linear-in md:p-8">
         <header className="flex items-center justify-between">
-          <Button
-            asChild
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
-          >
-            <Link href="/">
-              <ArrowLeft className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
+          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary" />
           <p className="text-xs text-text-muted">iPhone 설치 가이드</p>
           <div className="w-8" />
         </header>
