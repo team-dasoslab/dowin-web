@@ -12,6 +12,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const shouldRegisterServiceWorker = process.env.NODE_ENV !== "development";
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -138,7 +139,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <SerwistRegistration />
+        {shouldRegisterServiceWorker ? <SerwistRegistration /> : null}
         <QueryClientProvider client={queryClient}>
           <ToastProvider>
             <Suspense fallback={null}>
