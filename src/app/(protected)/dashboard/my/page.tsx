@@ -1,6 +1,8 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
+import { MonthlyMobileCards } from "@/app/(protected)/dashboard/my/_components/MonthlyMobileCards";
+import { WeeklyMobileCards } from "@/app/(protected)/dashboard/my/_components/WeeklyMobileCards";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import {
   DAY_LABELS,
@@ -22,271 +24,20 @@ import {
   Users,
   User as UserIcon,
   Zap,
+  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 
-type MonthlyLeadMeasure = NonNullable<
-  ReturnType<typeof useDashboardScoreboard>["monthlyLeadMeasures"]
->[number];
-
-function MyDashboardSkeleton() {
-  return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-16 rounded-2xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-2xl bg-sub-background" />
-          <div className="h-48 rounded-2xl bg-sub-background" />
-        </div>
-        <div className="h-72 rounded-2xl bg-sub-background" />
-      </div>
-    </div>
-  );
-}
-
-function WeeklyMobileCards({
-  activeLeadMeasures,
-  isLogPending,
-  pendingLogKey,
-  today,
-  toggleLog,
-  weekDates,
-  weeklyById,
-}: {
-  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
-  isLogPending: boolean;
-  pendingLogKey: string | null;
-  today: string;
-  toggleLog: ReturnType<typeof useDashboardScoreboard>["toggleLog"];
-  weekDates: string[];
-  weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
-}) {
-  return (
-    <div className="space-y-3 md:hidden">
-      {activeLeadMeasures.map((leadMeasure) => {
-        const leadMeasureId = toNumberId(leadMeasure.id);
-        const weekly = weeklyById.get(leadMeasureId);
-        const achievedCount = weekly?.achieved ?? 0;
-        const targetValue = leadMeasure.targetValue ?? 0;
-        const rate =
-          targetValue > 0
-            ? Math.round((achievedCount / targetValue) * 100)
-            : 0;
-
-        return (
-          <div
-            key={`weekly-mobile-${leadMeasure.id}`}
-            className="rounded-lg border border-border bg-white p-4"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-text-primary">
-                  {leadMeasure.name}
-                </p>
-                <p className="text-[11px] text-text-muted">
-                  목표 {targetValue}회 /{" "}
-                  {leadMeasure.period === "DAILY"
-                    ? "일"
-                    : leadMeasure.period === "WEEKLY"
-                      ? "주"
-                      : "월"}
-                </p>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="text-[10px] text-text-muted">달성</p>
-                <p
-                  className={`text-sm font-bold font-mono ${
-                    rate >= 100 ? "text-green-600" : "text-text-secondary"
-                  }`}
-                >
-                  {achievedCount}/{targetValue}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-3 grid grid-cols-7 gap-1.5">
-              {weekDates.map((date, index) => {
-                const currentValue =
-                  weekly?.logs?.[date] === undefined ? null : weekly.logs[date];
-                const isToday = date === today;
-                const currentLogKey =
-                  leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
-                const isPending = pendingLogKey === currentLogKey;
-
-                return (
-                  <div key={`${leadMeasure.id}-${date}`} className="space-y-1 text-center">
-                    <p
-                      className={`text-[10px] font-bold ${
-                        isToday ? "text-primary" : "text-text-muted"
-                      }`}
-                    >
-                      {DAY_LABELS[index]}
-                    </p>
-                    <Button
-                      disabled={
-                        isPending || isLogPending || leadMeasureId === null
-                      }
-                      onClick={() => {
-                        if (leadMeasureId !== null) {
-                          void toggleLog(leadMeasureId, date);
-                        }
-                      }}
-                      className={`h-9 w-full rounded-md border text-sm transition-colors ${
-                        currentValue === true
-                          ? "border-primary bg-primary text-white"
-                          : isToday
-                            ? "border-primary/30 bg-primary/5 text-primary"
-                            : "border-border bg-sub-background text-text-muted"
-                      } ${
-                        isPending || isLogPending
-                          ? "cursor-not-allowed opacity-70"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      {currentValue === true ? (
-                        <Check className="mx-auto h-3.5 w-3.5" />
-                      ) : (
-                        <span className="text-[10px] font-mono">
-                          {date.slice(8, 10)}
-                        </span>
-                      )}
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function MonthlyMobileCards({
-  monthWeeks,
-  monthLabel,
-  monthlyLeadMeasures,
-  today,
-}: {
-  monthWeeks: ReturnType<typeof getMonthCalendarWeeks>;
-  monthLabel?: string;
-  monthlyLeadMeasures: MonthlyLeadMeasure[];
-  today: string;
-}) {
-  return (
-    <div className="space-y-3 md:hidden">
-      {monthWeeks.map((weekDatesInMonth, weekIndex) => (
-        <div
-          key={`${monthLabel}-mobile-week-${weekIndex + 1}`}
-          className="rounded-lg border border-border bg-white p-4"
-        >
-          <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
-            <p className="text-sm font-bold text-text-primary">
-              {weekIndex + 1}주차
-            </p>
-            <p className="text-[11px] font-mono text-text-muted">
-              {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
-              {" – "}
-              {weekDatesInMonth
-                .filter((date): date is string => date !== null)
-                .at(-1)
-                ?.slice(5)
-                .replace("-", ".")}
-            </p>
-          </div>
-
-          <div className="mt-3 space-y-3">
-            {monthlyLeadMeasures.map((leadMeasure) => {
-              const targetValue = leadMeasure.targetValue ?? 0;
-              const visibleAchievedCount = weekDatesInMonth.reduce(
-                (count, date) => {
-                  if (!date) {
-                    return count;
-                  }
-
-                  return leadMeasure.logs?.[date] === true ? count + 1 : count;
-                },
-                0,
-              );
-              const rate =
-                targetValue > 0
-                  ? Math.round((visibleAchievedCount / targetValue) * 100)
-                  : 0;
-
-              return (
-                <div
-                  key={`${weekIndex}-${leadMeasure.id}-mobile`}
-                  className="rounded-lg border border-border bg-sub-background/40 p-3"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-text-primary">
-                        {leadMeasure.name}
-                      </p>
-                      <p className="text-[11px] text-text-muted">
-                        목표 {targetValue}회 /{" "}
-                        {leadMeasure.period === "WEEKLY" ? "주" : "월"}
-                      </p>
-                    </div>
-                    <p
-                      className={`shrink-0 text-xs font-bold font-mono ${
-                        rate >= 100 ? "text-green-600" : "text-text-secondary"
-                      }`}
-                    >
-                      {visibleAchievedCount}/{targetValue}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 grid grid-cols-7 gap-1.5">
-                    {weekDatesInMonth.map((date, dayIndex) => {
-                      const value = date ? (leadMeasure.logs?.[date] ?? null) : null;
-                      const isToday = date === today;
-
-                      return (
-                        <div
-                          key={`${weekIndex}-${leadMeasure.id}-${DAY_LABELS[dayIndex]}-mobile`}
-                          className="space-y-1 text-center"
-                        >
-                          <p
-                            className={`text-[10px] font-bold ${
-                              isToday ? "text-primary" : "text-text-muted"
-                            }`}
-                          >
-                            {DAY_LABELS[dayIndex]}
-                          </p>
-                          <span
-                            className={`inline-flex h-9 w-full items-center justify-center rounded-md border text-xs font-bold ${
-                              value === true
-                                ? "border-primary bg-primary text-white"
-                                : date === null
-                                  ? "border-transparent bg-transparent text-transparent"
-                                  : isToday
-                                    ? "border-primary/30 bg-primary/5 text-primary"
-                                    : "border-border bg-white text-text-muted"
-                            }`}
-                          >
-                            {value === true ? (
-                              <Check className="h-3.5 w-3.5" />
-                            ) : date ? (
-                              date.slice(8, 10)
-                            ) : (
-                              "."
-                            )}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+const DASHBOARD_LINKS: {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+}[] = [
+  { href: "/dashboard", icon: Users, label: "팀 대시보드" },
+  { href: "/scoreboards", icon: FolderArchive, label: "점수판 보관함" },
+  { href: "/setup?mode=update", icon: Settings, label: "점수판 관리" },
+  { href: "/profile", icon: UserIcon, label: "내 프로필" },
+];
 
 export default function MyDashboardPage() {
   const {
@@ -344,67 +95,11 @@ export default function MyDashboardPage() {
   }
 
   if (hasNoWorkspace) {
-    return (
-      <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
-        <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
-          <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
-            <Zap className="text-primary w-7 h-7" />
-          </div>
-
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-              소속된 워크스페이스가 없어요
-            </h1>
-            <p className="text-sm text-text-secondary leading-relaxed">
-              팀원들과 함께 목표를 공유하고 성장하기 위해
-              <br />
-              새로운 워크스페이스를 만들거나 초대받으세요.
-            </p>
-          </div>
-
-          <Button
-            asChild
-            className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
-          >
-            <Link href="/workspace/new">
-              <Plus className="w-4 h-4" />새 워크스페이스 만들기
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
+    return <NoWorkspaceState />;
   }
 
   if (hasNoScoreboard || !activeScoreboard) {
-    return (
-      <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
-        <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
-          <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
-            <Zap className="text-primary w-7 h-7" />
-          </div>
-
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-              아직 목표가 없어요
-            </h1>
-            <p className="text-sm text-text-secondary leading-relaxed">
-              가장 중요한 단 하나의 목표, 가중목을 설정하고
-              <br />
-              매일의 성장을 기록하기 시작하세요.
-            </p>
-          </div>
-
-          <Button
-            asChild
-            className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
-          >
-            <Link href="/setup?mode=create">
-              <Plus className="w-4 h-4" />새 점수판 만들기
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
+    return <NoScoreboardState />;
   }
 
   return (
@@ -426,42 +121,18 @@ export default function MyDashboardPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <Button
-              asChild
-              className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-            >
-              <Link href="/dashboard">
-                <Users className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                <span>팀 대시보드</span>
-              </Link>
-            </Button>
-            <Button
-              asChild
-              className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-            >
-              <Link href="/scoreboards">
-                <FolderArchive className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                <span>점수판 보관함</span>
-              </Link>
-            </Button>
-            <Button
-              asChild
-              className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-            >
-              <Link href="/setup?mode=update">
-                <Settings className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                <span>점수판 관리</span>
-              </Link>
-            </Button>
-            <Button
-              asChild
-              className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-            >
-              <Link href="/profile">
-                <UserIcon className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                <span>내 프로필</span>
-              </Link>
-            </Button>
+            {DASHBOARD_LINKS.map(({ href, icon: Icon, label }) => (
+              <Button
+                key={href}
+                asChild
+                className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
+              >
+                <Link href={href}>
+                  <Icon className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                  <span>{label}</span>
+                </Link>
+              </Button>
+            ))}
           </div>
         </header>
 
@@ -992,6 +663,86 @@ export default function MyDashboardPage() {
             </>
           )}
         </section>
+      </div>
+    </div>
+  );
+}
+
+function MyDashboardSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
+        <div className="h-16 rounded-2xl bg-sub-background" />
+        <div className="h-24 rounded-2xl bg-sub-background" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="h-48 rounded-2xl bg-sub-background" />
+          <div className="h-48 rounded-2xl bg-sub-background" />
+        </div>
+        <div className="h-72 rounded-2xl bg-sub-background" />
+      </div>
+    </div>
+  );
+}
+
+function NoWorkspaceState() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
+      <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
+        <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+          <Zap className="text-primary w-7 h-7" />
+        </div>
+
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+            소속된 워크스페이스가 없어요
+          </h1>
+          <p className="text-sm text-text-secondary leading-relaxed">
+            팀원들과 함께 목표를 공유하고 성장하기 위해
+            <br />
+            새로운 워크스페이스를 만들거나 초대받으세요.
+          </p>
+        </div>
+
+        <Button
+          asChild
+          className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+        >
+          <Link href="/workspace/new">
+            <Plus className="w-4 h-4" />새 워크스페이스 만들기
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function NoScoreboardState() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
+      <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
+        <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+          <Zap className="text-primary w-7 h-7" />
+        </div>
+
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+            아직 목표가 없어요
+          </h1>
+          <p className="text-sm text-text-secondary leading-relaxed">
+            가장 중요한 단 하나의 목표, 가중목을 설정하고
+            <br />
+            매일의 성장을 기록하기 시작하세요.
+          </p>
+        </div>
+
+        <Button
+          asChild
+          className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+        >
+          <Link href="/setup?mode=create">
+            <Plus className="w-4 h-4" />새 점수판 만들기
+          </Link>
+        </Button>
       </div>
     </div>
   );

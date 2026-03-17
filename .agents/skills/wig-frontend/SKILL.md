@@ -27,6 +27,7 @@ If current code and docs differ, verify the implementation and preserve establis
 - Use `asChild` when a `Button` wraps `Link`.
 - React 19 means new `forwardRef` wrappers should not be introduced by default.
 - Use Lucide React for icons.
+- Page-local status components such as skeleton, empty, error, and no-workspace states should be declared at the bottom of the page file unless they are reused across multiple files.
 - Use Zod for form validation.
 - For server state, use generated Orval hooks and TanStack Query patterns.
 - After mutations, invalidate related queries.
