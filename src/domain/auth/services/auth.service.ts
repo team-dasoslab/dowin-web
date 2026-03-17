@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { nanoid } from "nanoid";
 import { SESSION_TTL_MS } from "@/domain/auth/constants";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
+import { ConflictError } from "@/lib/server/errors";
 
 export interface AuthStoragePort {
   findUserByCustomId: AuthStorage["findUserByCustomId"];
@@ -73,15 +74,40 @@ export class AuthService {
   }
 
   async createUser(customId: string, nickname: string, password: string) {
+    const existing = await this.storage.findUserByCustomId(customId);
+    if (existing) {
+      throw new ConflictError("CUSTOM_ID_ALREADY_EXISTS");
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const newUser = await this.storage.createUser({
-      customId,
-      nickname,
-      passwordHash,
-      isFirstLogin: true,
-    });
+    try {
+      const newUser = await this.storage.createUser({
+        customId,
+        nickname,
+        passwordHash,
+        isFirstLogin: true,
+      });
 
-    return newUser;
+      return newUser;
+    } catch (error) {
+      if (isCustomIdConflict(error)) {
+        throw new ConflictError("CUSTOM_ID_ALREADY_EXISTS");
+      }
+
+      throw error;
+    }
   }
+}
+
+function isCustomIdConflict(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return (
+    error.message.includes("users.custom_id") ||
+    error.message.includes("custom_id") ||
+    error.message.includes("UNIQUE constraint failed")
+  );
 }

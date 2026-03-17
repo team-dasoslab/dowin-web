@@ -10,12 +10,17 @@ import {
   useGetUsersMe,
   usePutUsersMe,
 } from "@/api/generated/profile/profile";
+import {
+  getGetWorkspacesMeQueryKey,
+  useGetWorkspacesMe,
+  usePutWorkspacesId,
+} from "@/api/generated/workspace/workspace";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { UserAvatar } from "@/components/UserAvatar";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
+import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { validatePassword } from "@/domain/auth/validation";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
@@ -30,6 +35,7 @@ import {
   LogOut,
   Smartphone,
   Sparkles,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -68,10 +74,18 @@ export default function ProfilePage() {
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
   const updateNicknameMutation = usePutUsersMe();
+  const updateWorkspaceMutation = usePutWorkspacesId();
   const changePasswordMutation = usePutAuthPassword();
   const logoutMutation = usePostAuthLogout();
+  const { data: workspaceResponse } = useGetWorkspacesMe({
+    query: {
+      retry: false,
+    },
+  });
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
+  const workspace =
+    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const pushUserId = user?.id != null ? String(user.id) : null;
 
   if (isProfileLoading) {
@@ -85,6 +99,7 @@ export default function ProfilePage() {
   const nickname = user.nickname ?? "사용자";
   const customId = user.customId ?? "";
   const avatarKey = user.avatarKey ?? null;
+  const isWorkspaceAdmin = user.role === "ADMIN";
   const isActionPending =
     pendingAction !== null ||
     updateNicknameMutation.isPending ||
@@ -218,6 +233,75 @@ export default function ProfilePage() {
       ],
     },
     {
+      label: "워크스페이스",
+      items: isWorkspaceAdmin
+        ? [
+            {
+              id: "workspace-name",
+              icon: <Edit2 className="w-3.5 h-3.5" />,
+              title: "워크스페이스 이름 변경",
+              description: "팀 공간 이름을 현재 운영 방식에 맞게 바꿉니다.",
+              onClick: async () => {
+                if (!workspace) {
+                  showToast("error", "수정할 워크스페이스가 없습니다.");
+                  return;
+                }
+
+                const next = prompt(
+                  "새로운 워크스페이스 이름을 입력하세요:",
+                  workspace.name ?? "",
+                )?.trim();
+
+                if (!next || next === workspace.name) {
+                  return;
+                }
+
+                try {
+                  setPendingAction("workspace-name");
+                  const response = await updateWorkspaceMutation.mutateAsync({
+                    id: workspace.id ?? 0,
+                    data: {
+                      name: next,
+                    },
+                  });
+
+                  if (response.status !== 200) {
+                    throw response;
+                  }
+
+                  await Promise.all([
+                    queryClient.invalidateQueries({
+                      queryKey: getGetWorkspacesMeQueryKey(),
+                    }),
+                    queryClient.invalidateQueries({
+                      queryKey: getGetDashboardTeamQueryKey(undefined),
+                    }),
+                  ]);
+                  showToast("success", "워크스페이스 이름이 변경되었습니다.");
+                } catch (error) {
+                  showToast(
+                    "error",
+                    getApiErrorMessage(
+                      error,
+                      "워크스페이스 이름 변경에 실패했습니다.",
+                    ),
+                  );
+                } finally {
+                  setPendingAction(null);
+                }
+              },
+            },
+            {
+              id: "members",
+              icon: <Users className="w-3.5 h-3.5" />,
+              title: "멤버 관리",
+              description: "팀원 추가와 멤버 퇴출을 관리합니다.",
+              href: "/profile/members",
+            },
+          ]
+        : [],
+    },
+    {
       label: "데이터",
       items: [
         {
@@ -307,9 +391,11 @@ export default function ProfilePage() {
           message={
             pendingAction === "nickname"
               ? "닉네임을 변경하는 중입니다."
-              : pendingAction === "password"
-                ? "비밀번호를 변경하는 중입니다."
-                : "로그아웃하는 중입니다."
+              : pendingAction === "workspace-name"
+                ? "워크스페이스 이름을 변경하는 중입니다."
+                : pendingAction === "password"
+                  ? "비밀번호를 변경하는 중입니다."
+                  : "로그아웃하는 중입니다."
           }
         />
       )}
@@ -342,91 +428,97 @@ export default function ProfilePage() {
 
         {/* ── 메뉴 그룹 ── */}
         <div className="space-y-6">
-          {menuGroups.map((group) => (
-            <div key={group.label} className="space-y-1.5">
-              {/* 그룹 레이블 */}
-              <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
-                {group.label}
-              </p>
+          {menuGroups
+            .filter((group) => group.items.length > 0)
+            .map((group) => (
+              <div key={group.label} className="space-y-1.5">
+                {/* 그룹 레이블 */}
+                <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
+                  {group.label}
+                </p>
 
-              {/* 아이템 목록 */}
-              <div className="border border-border rounded-lg overflow-hidden">
-                {group.items.map((item, index) => {
-                  const itemWrapperClassName =
-                    index < group.items.length - 1 ? "border-b border-border" : "";
-                  const Content = (
-                    <div className="flex items-center justify-between w-full px-5 py-4 transition-colors group">
-                      <div className="flex items-center gap-3 min-w-0">
-                        {/* 아이콘 */}
-                        <div
-                          className={`w-7 h-7 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
-                            item.danger
-                              ? "border-danger/20 bg-danger/5 text-danger"
-                              : "border-border bg-sub-background text-text-muted"
-                          }`}
-                        >
-                          {item.icon}
-                        </div>
-
-                        {/* 텍스트 */}
-                        <div className="text-left min-w-0">
-                          <p
-                            className={`text-sm font-semibold ${
-                              item.danger ? "text-danger" : "text-text-primary"
+                {/* 아이템 목록 */}
+                <div className="border border-border rounded-lg overflow-hidden">
+                  {group.items.map((item, index) => {
+                    const itemWrapperClassName =
+                      index < group.items.length - 1
+                        ? "border-b border-border"
+                        : "";
+                    const Content = (
+                      <div className="flex items-center justify-between w-full px-5 py-4 transition-colors group">
+                        <div className="flex items-center gap-3 min-w-0">
+                          {/* 아이콘 */}
+                          <div
+                            className={`w-7 h-7 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
+                              item.danger
+                                ? "border-danger/20 bg-danger/5 text-danger"
+                                : "border-border bg-sub-background text-text-muted"
                             }`}
                           >
-                            {item.title}
-                          </p>
-                          <p className="text-[11px] text-text-muted truncate">
-                            {item.description}
-                          </p>
+                            {item.icon}
+                          </div>
+
+                          {/* 텍스트 */}
+                          <div className="text-left min-w-0">
+                            <p
+                              className={`text-sm font-semibold ${
+                                item.danger
+                                  ? "text-danger"
+                                  : "text-text-primary"
+                              }`}
+                            >
+                              {item.title}
+                            </p>
+                            <p className="text-[11px] text-text-muted truncate">
+                              {item.description}
+                            </p>
+                          </div>
                         </div>
-                      </div>
 
-                      {item.rightElement ? (
-                        item.rightElement
-                      ) : (
-                        <ChevronRight className="w-3.5 h-3.5 text-text-muted/40 flex-shrink-0 ml-3" />
-                      )}
-                    </div>
-                  );
-
-                  if (item.onClick) {
-                    return (
-                      <div key={item.id} className={itemWrapperClassName}>
-                        <Button
-                          disabled={isActionPending}
-                          onClick={item.onClick}
-                          className="w-full bg-white"
-                        >
-                          {Content}
-                        </Button>
+                        {item.rightElement ? (
+                          item.rightElement
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5 text-text-muted/40 flex-shrink-0 ml-3" />
+                        )}
                       </div>
                     );
-                  }
 
-                  if (item.href) {
+                    if (item.onClick) {
+                      return (
+                        <div key={item.id} className={itemWrapperClassName}>
+                          <Button
+                            disabled={isActionPending}
+                            onClick={item.onClick}
+                            className="w-full bg-white"
+                          >
+                            {Content}
+                          </Button>
+                        </div>
+                      );
+                    }
+
+                    if (item.href) {
+                      return (
+                        <div key={item.id} className={itemWrapperClassName}>
+                          <Button asChild className="block w-full bg-white">
+                            <Link href={item.href}>{Content}</Link>
+                          </Button>
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div key={item.id} className={itemWrapperClassName}>
-                        <Button asChild className="block w-full bg-white">
-                          <Link href={item.href}>{Content}</Link>
-                        </Button>
+                      <div
+                        key={item.id}
+                        className={`w-full bg-white transition-colors ${itemWrapperClassName}`}
+                      >
+                        {Content}
                       </div>
                     );
-                  }
-
-                  return (
-                    <div
-                      key={item.id}
-                      className={`w-full bg-white transition-colors ${itemWrapperClassName}`}
-                    >
-                      {Content}
-                    </div>
-                  );
-                })}
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
     </div>

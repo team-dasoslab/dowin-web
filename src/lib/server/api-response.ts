@@ -11,6 +11,7 @@ export type ErrorCode =
   | "WRONG_PASSWORD"
   | "INVALID_INVITE_CODE"
   | "EXPIRED_INVITE_CODE"
+  | "CUSTOM_ID_ALREADY_EXISTS"
   | "ALREADY_IN_WORKSPACE"
   | "CANNOT_REMOVE_LAST_ADMIN"
   | "ACTIVE_SCOREBOARD_EXISTS"
@@ -30,6 +31,7 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   WRONG_PASSWORD: "현재 비밀번호가 올바르지 않습니다.",
   INVALID_INVITE_CODE: "존재하지 않는 초대 코드입니다.",
   EXPIRED_INVITE_CODE: "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
+  CUSTOM_ID_ALREADY_EXISTS: "이미 사용 중인 아이디입니다.",
   ALREADY_IN_WORKSPACE: "이미 워크스페이스에 소속되어 있습니다.",
   CANNOT_REMOVE_LAST_ADMIN: "마지막 관리자는 퇴출할 수 없습니다.",
   ACTIVE_SCOREBOARD_EXISTS: "이미 활성화된 점수판이 있습니다.",
@@ -53,6 +55,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   NOT_FOUND: 404,
   INVALID_INVITE_CODE: 404,
   EXPIRED_INVITE_CODE: 410,
+  CUSTOM_ID_ALREADY_EXISTS: 409,
   ALREADY_IN_WORKSPACE: 409,
   ACTIVE_SCOREBOARD_EXISTS: 409,
   VALIDATION_ERROR: 422,

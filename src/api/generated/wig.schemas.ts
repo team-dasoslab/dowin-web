@@ -161,11 +161,16 @@ export const WorkspaceMemberRole = {
 
 export interface WorkspaceMember {
   id?: number;
-  workspaceId?: number;
-  userId?: number;
   nickname?: string;
+  /** @nullable */
+  avatarKey?: string | null;
   role?: WorkspaceMemberRole;
+  isMe?: boolean;
   createdAt?: string;
+}
+
+export interface WorkspaceUpdateRequest {
+  name: string;
 }
 
 export type LeadMeasurePeriod = typeof LeadMeasurePeriod[keyof typeof LeadMeasurePeriod];
@@ -501,7 +506,6 @@ export type PostAdminUsersBody = {
 };
 
 export type PostAdminUsers201 = {
-  id?: number;
   customId?: string;
   nickname?: string;
 };
@@ -512,6 +516,10 @@ export type PostWorkspacesBody = {
 
 export type PostWorkspacesJoinBody = {
   workspaceId: number;
+};
+
+export type PutWorkspacesIdBody = {
+  name: string;
 };
 
 export type PostScoreboardsIdArchive200Status = typeof PostScoreboardsIdArchive200Status[keyof typeof PostScoreboardsIdArchive200Status];

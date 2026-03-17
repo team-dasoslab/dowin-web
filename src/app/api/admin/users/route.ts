@@ -2,7 +2,10 @@ import { getDb } from "@/db";
 import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { adminCreateUserSchema } from "@/domain/auth/validation";
+import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { getSession } from "@/lib/server/auth";
+import { requireWorkspaceAdmin } from "@/lib/server/authz";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -11,8 +14,14 @@ export const POST = withErrorHandler(async (request: Request) => {
   const db = getDb(env.DB);
   const storage = new AuthStorage(db);
   const service = new AuthService(storage);
+  const workspaceStorage = new WorkspaceStorage(db);
 
-  // TODO: Admin 권한 체크 필요
+  const session = await getSession(db);
+  if (!session) {
+    return apiError("UNAUTHORIZED");
+  }
+
+  const adminMembership = await requireWorkspaceAdmin(db, session.userId);
 
   const body = await request.json();
   const parsed = adminCreateUserSchema.safeParse(body);
@@ -26,6 +35,13 @@ export const POST = withErrorHandler(async (request: Request) => {
     parsed.data.nickname,
     parsed.data.password,
   );
+  await workspaceStorage.addMember(adminMembership.workspaceId, newUser.id, "MEMBER");
 
-  return apiSuccess(newUser, 201);
+  return apiSuccess(
+    {
+      customId: newUser.customId,
+      nickname: newUser.nickname,
+    },
+    201,
+  );
 });

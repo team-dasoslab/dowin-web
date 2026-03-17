@@ -23,40 +23,48 @@ paths:
                 customId: { type: string, example: john123 }
                 password: { type: string, format: password, example: user }
       responses:
-        '200':
+        "200":
           description: 로그인 성공
           headers:
             Set-Cookie:
-              schema: { type: string, example: "wig_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=315360000" }
+              schema:
+                {
+                  type: string,
+                  example: "wig_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=315360000",
+                }
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  user: { $ref: '#/components/schemas/User' }
-        '401':
+                  user: { $ref: "#/components/schemas/User" }
+        "401":
           description: 아이디 또는 비밀번호 불일치
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '422':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
           description: 입력값 유효성 오류
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /auth/logout:
     post:
       summary: 로그아웃
       tags: [Auth]
       responses:
-        '204':
+        "204":
           description: 로그아웃 성공
           headers:
             Set-Cookie:
-              schema: { type: string, example: "wig_sid=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0" }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema:
+                {
+                  type: string,
+                  example: "wig_sid=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
+                }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /auth/password:
     put:
@@ -74,26 +82,27 @@ paths:
                 currentPassword: { type: string, format: password }
                 newPassword: { type: string, format: password }
       responses:
-        '200':
+        "200":
           description: 비밀번호 변경 성공
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message: { type: string, example: "비밀번호가 변경되었습니다." }
-        '400':
+                  message:
+                    { type: string, example: "비밀번호가 변경되었습니다." }
+        "400":
           description: 현재 비밀번호 불일치
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '422':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
           description: 비밀번호 유효성 규칙 미충족
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /users/me:
     get:
@@ -101,18 +110,18 @@ paths:
       tags: [Profile]
       security: [{ sessionCookie: [] }]
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/UserProfile' }
-        '404':
+              schema: { $ref: "#/components/schemas/UserProfile" }
+        "404":
           description: 사용자를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
     put:
       summary: 내 프로필 변경
       tags: [Profile]
@@ -121,25 +130,25 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/UserProfileUpdateRequest' }
+            schema: { $ref: "#/components/schemas/UserProfileUpdateRequest" }
       responses:
-        '200':
+        "200":
           description: 변경 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/UserProfile' }
-        '422':
+              schema: { $ref: "#/components/schemas/UserProfile" }
+        "422":
           description: 닉네임 유효성 오류
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 사용자를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /admin/users:
     post:
@@ -158,28 +167,27 @@ paths:
                 nickname: { type: string }
                 password: { type: string }
       responses:
-        '201':
+        "201":
           description: 사용자 생성 성공
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id: { type: integer }
                   customId: { type: string }
                   nickname: { type: string }
-        '403':
+        "403":
           description: 관리자 권한 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '409':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
           description: 이미 사용 중인 ID
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /workspaces/me:
     get:
@@ -187,18 +195,18 @@ paths:
       tags: [Workspace]
       security: [{ sessionCookie: [] }]
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Workspace' }
-        '404':
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "404":
           description: 소속된 워크스페이스 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /workspaces:
     post:
@@ -215,18 +223,18 @@ paths:
               properties:
                 name: { type: string, example: "나의 워크스페이스" }
       responses:
-        '201':
+        "201":
           description: 생성 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Workspace' }
-        '403':
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "403":
           description: 권한 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /workspaces/join:
     post:
@@ -243,18 +251,18 @@ paths:
               properties:
                 workspaceId: { type: integer, example: 1 }
       responses:
-        '200':
+        "200":
           description: 참가 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Workspace' }
-        '400':
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "400":
           description: 잘못된 요청 또는 이미 가입됨
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /workspaces/{id}/members:
     get:
@@ -267,20 +275,88 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/WorkspaceMember' }
-        '403':
+                items: { $ref: "#/components/schemas/WorkspaceMember" }
+        "403":
           description: 해당 워크스페이스 접근 권한 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/{id}:
+    put:
+      summary: "[ADMIN] 워크스페이스 이름 변경"
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string, example: "새 워크스페이스 이름" }
+      responses:
+        "200":
+          description: 수정 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "403":
+          description: 해당 워크스페이스 관리자 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/{id}/members/{memberId}:
+    delete:
+      summary: "[ADMIN] 워크스페이스 멤버 강제 퇴출"
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: memberId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: 퇴출 성공
+        "403":
+          description: 권한 없음 또는 마지막 관리자/자기 자신 퇴출 불가
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 대상 멤버를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards/active:
     get:
@@ -288,18 +364,18 @@ paths:
       tags: [Scoreboard]
       security: [{ sessionCookie: [] }]
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/Scoreboard' }
-        '404':
+              schema: { $ref: "#/components/schemas/Scoreboard" }
+        "404":
           description: 활성 점수판 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards:
     get:
@@ -307,15 +383,15 @@ paths:
       tags: [Scoreboard]
       security: [{ sessionCookie: [] }]
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/ScoreboardSummary' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+                items: { $ref: "#/components/schemas/ScoreboardSummary" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       summary: 점수판 생성
       tags: [Scoreboard]
@@ -324,25 +400,25 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ScoreboardCreateRequest' }
+            schema: { $ref: "#/components/schemas/ScoreboardCreateRequest" }
       responses:
-        '201':
+        "201":
           description: 생성 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScoreboardSummary' }
-        '409':
+              schema: { $ref: "#/components/schemas/ScoreboardSummary" }
+        "409":
           description: 이미 활성 점수판 존재
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '422':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
           description: 입력값 유효성 오류
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards/{id}:
     put:
@@ -358,30 +434,30 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ScoreboardUpdateRequest' }
+            schema: { $ref: "#/components/schemas/ScoreboardUpdateRequest" }
       responses:
-        '200':
+        "200":
           description: 수정 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScoreboardSummary' }
-        '403':
+              schema: { $ref: "#/components/schemas/ScoreboardSummary" }
+        "403":
           description: 보관된 점수판 수정 시도
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 점수판을 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '422':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
           description: 입력값 유효성 오류
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards/{id}/archive:
     post:
@@ -394,7 +470,7 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        '200':
+        "200":
           description: 보관 성공
           content:
             application/json:
@@ -404,18 +480,18 @@ paths:
                 properties:
                   id: { type: integer }
                   status: { type: string, enum: [ARCHIVED] }
-        '403':
+        "403":
           description: 이미 보관된 점수판
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 점수판을 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards/{id}/reactivate:
     post:
@@ -428,28 +504,28 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        '200':
+        "200":
           description: 재활성화 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScoreboardSummary' }
-        '400':
+              schema: { $ref: "#/components/schemas/ScoreboardSummary" }
+        "400":
           description: 이미 활성 상태
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 점수판 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '409':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
           description: 이미 다른 활성 점수판 존재
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards/{scoreboardId}/lead-measures:
     get:
@@ -466,20 +542,20 @@ paths:
           required: false
           schema: { type: string, enum: [active, all], default: active }
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/LeadMeasureListItem' }
-        '404':
+                items: { $ref: "#/components/schemas/LeadMeasureListItem" }
+        "404":
           description: 점수판을 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       summary: 선행지표 생성
       tags: [LeadMeasure]
@@ -493,30 +569,30 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/LeadMeasureCreateRequest' }
+            schema: { $ref: "#/components/schemas/LeadMeasureCreateRequest" }
       responses:
-        '201':
+        "201":
           description: 생성 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/LeadMeasure' }
-        '403':
+              schema: { $ref: "#/components/schemas/LeadMeasure" }
+        "403":
           description: ARCHIVED 점수판에 추가 시도
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 점수판을 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '422':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
           description: 입력값 유효성 오류
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /lead-measures/{id}:
     put:
@@ -532,30 +608,30 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/LeadMeasureUpdateRequest' }
+            schema: { $ref: "#/components/schemas/LeadMeasureUpdateRequest" }
       responses:
-        '200':
+        "200":
           description: 수정 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/LeadMeasure' }
-        '403':
+              schema: { $ref: "#/components/schemas/LeadMeasure" }
+        "403":
           description: ARCHIVED 선행지표 수정 시도
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 선행지표를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '422':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
           description: 입력값 유효성 오류
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
     delete:
       summary: 선행지표 삭제
       tags: [LeadMeasure]
@@ -566,7 +642,7 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        '200':
+        "200":
           description: 삭제 성공
           content:
             application/json:
@@ -576,18 +652,18 @@ paths:
                 properties:
                   warning: { type: string }
                   deleted: { type: boolean }
-        '403':
+        "403":
           description: ARCHIVED 선행지표 삭제 시도
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 선행지표를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /lead-measures/{id}/archive:
     post:
@@ -600,18 +676,18 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        '200':
+        "200":
           description: 보관 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/LeadMeasure' }
-        '404':
+              schema: { $ref: "#/components/schemas/LeadMeasure" }
+        "404":
           description: 선행지표를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /lead-measures/{id}/reactivate:
     post:
@@ -624,18 +700,18 @@ paths:
           required: true
           schema: { type: integer }
       responses:
-        '200':
+        "200":
           description: 재활성화 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/LeadMeasure' }
-        '404':
+              schema: { $ref: "#/components/schemas/LeadMeasure" }
+        "404":
           description: 선행지표를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /lead-measures/{leadMeasureId}/logs/{date}:
     put:
@@ -655,30 +731,30 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DailyLogUpsertRequest' }
+            schema: { $ref: "#/components/schemas/DailyLogUpsertRequest" }
       responses:
-        '200':
+        "200":
           description: 저장 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/DailyLog' }
-        '403':
+              schema: { $ref: "#/components/schemas/DailyLog" }
+        "403":
           description: ARCHIVED 선행지표 기록 시도
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 선행지표를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '422':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
           description: 입력값 유효성 오류
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
     delete:
       summary: 일일 기록 삭제
       tags: [DailyLog]
@@ -693,15 +769,15 @@ paths:
           required: true
           schema: { type: string, format: date }
       responses:
-        '204':
+        "204":
           description: 삭제 성공
-        '404':
+        "404":
           description: 선행지표를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards/{scoreboardId}/logs/weekly:
     get:
@@ -718,18 +794,18 @@ paths:
           required: false
           schema: { type: string, format: date }
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/WeeklyLogsResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/WeeklyLogsResponse" }
+        "404":
           description: 점수판을 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /scoreboards/{scoreboardId}/logs/monthly:
     get:
@@ -746,18 +822,18 @@ paths:
           required: false
           schema: { type: string, format: date }
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/MonthlyLogsResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/MonthlyLogsResponse" }
+        "404":
           description: 점수판을 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /analytics/export-data:
     get:
@@ -790,23 +866,24 @@ paths:
           schema: { type: string, enum: [week, month] }
           description: 기간 라벨링/기본값 추론용 보기 단위
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/AnalyticsExportDataResponse' }
-        '422':
+              schema:
+                { $ref: "#/components/schemas/AnalyticsExportDataResponse" }
+        "422":
           description: "잘못된 기간 또는 필터 (예: from > to, 92일 초과)"
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
           description: 활성 점수판을 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /dashboard/team:
     get:
@@ -823,18 +900,18 @@ paths:
           required: false
           schema: { type: string }
       responses:
-        '200':
+        "200":
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/TeamDashboardResponse' }
-        '404':
+              schema: { $ref: "#/components/schemas/TeamDashboardResponse" }
+        "404":
           description: 워크스페이스를 찾을 수 없음
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ErrorResponse' }
-        '401':
-          $ref: '#/components/responses/UnauthorizedError'
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
 components:
   schemas:
@@ -971,11 +1048,17 @@ components:
       type: object
       properties:
         id: { type: integer }
-        workspaceId: { type: integer }
-        userId: { type: integer }
         nickname: { type: string }
+        avatarKey: { type: string, nullable: true }
         role: { type: string, enum: [ADMIN, MEMBER] }
+        isMe: { type: boolean }
         createdAt: { type: string, format: date-time }
+
+    WorkspaceUpdateRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
 
     LeadMeasure:
       type: object
@@ -997,11 +1080,11 @@ components:
 
     LeadMeasureListItem:
       allOf:
-        - $ref: '#/components/schemas/LeadMeasure'
+        - $ref: "#/components/schemas/LeadMeasure"
         - type: object
           properties:
             weeklyAchievement:
-              $ref: '#/components/schemas/WeeklyAchievement'
+              $ref: "#/components/schemas/WeeklyAchievement"
 
     LeadMeasureCreateRequest:
       type: object
@@ -1057,7 +1140,7 @@ components:
         weekEnd: { type: string, format: date }
         leadMeasures:
           type: array
-          items: { $ref: '#/components/schemas/WeeklyLogItem' }
+          items: { $ref: "#/components/schemas/WeeklyLogItem" }
 
     MonthlyLogItem:
       type: object
@@ -1081,10 +1164,10 @@ components:
         monthEnd: { type: string, format: date }
         monthLabel: { type: string, example: "2026.03" }
         summary:
-          $ref: '#/components/schemas/PeriodSummary'
+          $ref: "#/components/schemas/PeriodSummary"
         leadMeasures:
           type: array
-          items: { $ref: '#/components/schemas/MonthlyLogItem' }
+          items: { $ref: "#/components/schemas/MonthlyLogItem" }
 
     PeriodSummary:
       type: object
@@ -1127,17 +1210,17 @@ components:
       required: [periodMeta, summary, leadMeasureBreakdown, dailyRows]
       properties:
         periodMeta:
-          $ref: '#/components/schemas/AnalyticsExportPeriodMeta'
+          $ref: "#/components/schemas/AnalyticsExportPeriodMeta"
         summary:
-          $ref: '#/components/schemas/PeriodSummary'
+          $ref: "#/components/schemas/PeriodSummary"
         leadMeasureBreakdown:
           type: array
           items:
-            $ref: '#/components/schemas/AnalyticsExportLeadMeasureBreakdown'
+            $ref: "#/components/schemas/AnalyticsExportLeadMeasureBreakdown"
         dailyRows:
           type: array
           items:
-            $ref: '#/components/schemas/AnalyticsExportDailyRow'
+            $ref: "#/components/schemas/AnalyticsExportDailyRow"
 
     TeamDashboardMemberMeasure:
       type: object
@@ -1175,7 +1258,7 @@ components:
         isWinning: { type: boolean }
         leadMeasures:
           type: array
-          items: { $ref: '#/components/schemas/TeamDashboardMemberMeasure' }
+          items: { $ref: "#/components/schemas/TeamDashboardMemberMeasure" }
 
     TeamDashboardResponse:
       type: object
@@ -1186,7 +1269,7 @@ components:
         weekEnd: { type: string, format: date }
         members:
           type: array
-          items: { $ref: '#/components/schemas/TeamDashboardMember' }
+          items: { $ref: "#/components/schemas/TeamDashboardMember" }
 
     ScoreboardSummary:
       type: object
@@ -1203,12 +1286,12 @@ components:
 
     Scoreboard:
       allOf:
-        - $ref: '#/components/schemas/ScoreboardSummary'
+        - $ref: "#/components/schemas/ScoreboardSummary"
         - type: object
           properties:
             leadMeasures:
               type: array
-              items: { $ref: '#/components/schemas/LeadMeasure' }
+              items: { $ref: "#/components/schemas/LeadMeasure" }
 
     ScoreboardCreateRequest:
       type: object
@@ -1237,8 +1320,13 @@ components:
           required: [code, message]
           properties:
             code: { type: string, description: 머신 리더블 에러 코드 }
-            message: { type: string, description: 사람이 읽을 수 있는 한국어 메시지 }
-            details: { type: object, description: 유효성 검사 실패 시 필드별 상세 오류 (선택) }
+            message:
+              { type: string, description: 사람이 읽을 수 있는 한국어 메시지 }
+            details:
+              {
+                type: object,
+                description: 유효성 검사 실패 시 필드별 상세 오류 (선택),
+              }
 
   responses:
     UnauthorizedError:
@@ -1246,7 +1334,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
 
   securitySchemes:
     sessionCookie:

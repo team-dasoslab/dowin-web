@@ -177,4 +177,20 @@ describe("Auth Service - createUser", () => {
       }),
     );
   });
+
+  it("이미 사용 중인 아이디면 409 충돌 에러를 던진다", async () => {
+    mockStorage.findUserByCustomId.mockResolvedValue({
+      id: 2,
+      customId: "newmember",
+      nickname: "Existing",
+      avatarKey: null,
+      passwordHash: "hashed-password",
+      isFirstLogin: false,
+      createdAt: new Date(),
+    });
+
+    await expect(
+      service.createUser("newmember", "New Member", "newSecurePass1!"),
+    ).rejects.toThrow("CUSTOM_ID_ALREADY_EXISTS");
+  });
 });

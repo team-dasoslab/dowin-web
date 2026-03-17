@@ -1,30 +1,40 @@
 import { getDb } from "@/db";
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { workspaceMemberParamsSchema } from "@/domain/workspace/validation";
+import { apiError } from "@/lib/server/api-response";
 import { getSession } from "@/lib/server/auth";
 import { requireWorkspaceAdminInWorkspace } from "@/lib/server/authz";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { NextResponse } from "next/server";
 
-export const GET = withErrorHandler(
+export const DELETE = withErrorHandler(
   async (
     _request: Request,
-    { params }: { params: Promise<{ id: string }> },
+    { params }: { params: Promise<{ id: string; memberId: string }> },
   ) => {
-    const { id } = await params;
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
-    const storage = new WorkspaceStorage(db);
-    const service = new WorkspaceService(storage);
     const session = await getSession(db);
+
     if (!session) {
       return apiError("UNAUTHORIZED");
     }
 
-    const workspaceId = Number(id);
+    const parsed = workspaceMemberParamsSchema.safeParse(await params);
+    if (!parsed.success) {
+      return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    }
+
+    const workspaceId = parsed.data.id;
+    const memberId = parsed.data.memberId;
+
     await requireWorkspaceAdminInWorkspace(db, workspaceId, session.userId);
-    const members = await service.getMembers(workspaceId, session.userId);
-    return apiSuccess(members);
+
+    const service = new WorkspaceService(new WorkspaceStorage(db));
+    await service.removeMember(workspaceId, session.userId, memberId);
+
+    return new NextResponse(null, { status: 204 });
   },
 );
