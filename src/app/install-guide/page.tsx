@@ -1,5 +1,6 @@
 import { CopyServiceLinkButton } from "@/app/install-guide/_components/CopyServiceLinkButton";
 import { GuideImage } from "@/app/install-guide/_components/GuideImage";
+import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import {
@@ -9,7 +10,7 @@ import {
   PlusSquare,
   Share,
   Smartphone,
-  Sparkles,
+  Timer,
 } from "lucide-react";
 
 const steps = [
@@ -75,18 +76,27 @@ export default function InstallGuidePage() {
           <div className="w-8" />
         </header>
 
-        <Card className="overflow-hidden rounded-[1.5rem] border border-border bg-white">
-          <div className="bg-[linear-gradient(135deg,rgba(94,106,210,0.12),rgba(132,204,22,0.08))] px-5 py-6">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[11px] font-bold text-primary shadow-sm backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5" />
-              iPhone + Safari 기준
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-[24px] font-bold leading-tight tracking-tight text-text-primary">
-                홈 화면에 추가해서
-                <br />
-                WIG를 앱처럼 써보세요
-              </h1>
+        <Card className="overflow-hidden rounded-lg border border-border bg-white">
+          <div className="bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-5 py-5 sm:px-6">
+            <div className="space-y-3">
+              <div>
+                <Badge className="w-fit rounded-md border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+                  iPhone + Safari
+                </Badge>
+              </div>
+              <div className="space-y-1.5">
+                <h1 className="text-xl font-bold tracking-tight text-text-primary">
+                  홈 화면에 추가해서 WIG를 앱처럼 써보세요
+                </h1>
+                <p className="max-w-[520px] text-sm leading-6 text-text-secondary">
+                  iPhone에서는 Safari 기준으로 홈 화면에 추가하면 더 빠르게
+                  접속하고, 앱처럼 자연스럽게 사용할 수 있습니다.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] leading-none text-text-muted">
+                <Timer className="h-3 w-3" />
+                <span>설치 소요 약 1분</span>
+              </div>
             </div>
           </div>
         </Card>
@@ -124,7 +134,9 @@ export default function InstallGuidePage() {
 
                     {index === 0 ? <CopyServiceLinkButton /> : null}
 
-                    {"imageSrc" in step ? <GuideImage alt={step.imageAlt} src={step.imageSrc} /> : null}
+                    {"imageSrc" in step ? (
+                      <GuideImage alt={step.imageAlt} src={step.imageSrc} />
+                    ) : null}
                   </div>
                 </Card>
               </div>

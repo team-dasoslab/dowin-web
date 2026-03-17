@@ -13,20 +13,28 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
 import {
+  dismissProductUpdate,
+  getLatestMajorProductUpdate,
+  isProductUpdateDismissed,
+  readDismissedProductUpdate,
+} from "@/lib/product-updates";
+import {
+  Calendar,
+  Check,
   ChevronLeft,
   ChevronRight,
-  Check,
-  Calendar,
   FolderArchive,
   Plus,
   Settings,
   Target,
-  Users,
   User as UserIcon,
+  Users,
+  X,
   Zap,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const DASHBOARD_LINKS: {
   href: string;
@@ -40,6 +48,7 @@ const DASHBOARD_LINKS: {
 ];
 
 export default function MyDashboardPage() {
+  const [isUpdateCardVisible, setIsUpdateCardVisible] = useState(false);
   const {
     activeLeadMeasures,
     activeScoreboard,
@@ -82,6 +91,19 @@ export default function MyDashboardPage() {
     (leadMeasure) => leadMeasure.period === "MONTHLY",
   ).length;
   const monthWeeks = getMonthCalendarWeeks(selectedDate);
+  const latestMajorUpdate = getLatestMajorProductUpdate();
+
+  useEffect(() => {
+    if (!latestMajorUpdate) {
+      setIsUpdateCardVisible(false);
+      return;
+    }
+
+    const dismissed = readDismissedProductUpdate();
+    setIsUpdateCardVisible(
+      !isProductUpdateDismissed(latestMajorUpdate.id, dismissed),
+    );
+  }, [latestMajorUpdate]);
 
   if (
     isLoading ||
@@ -166,7 +188,9 @@ export default function MyDashboardPage() {
                 {weeklyOverallRate}%
               </p>
               <div className="flex flex-wrap items-center gap-1 text-[10px] text-text-muted sm:justify-end">
-                <span>이번 달 달성률{monthLabel ? ` (${monthLabel})` : ""}</span>
+                <span>
+                  이번 달 달성률{monthLabel ? ` (${monthLabel})` : ""}
+                </span>
                 <strong
                   className={`font-mono ${
                     monthlyOverallRate >= 80
@@ -194,6 +218,65 @@ export default function MyDashboardPage() {
             </div>
           </div>
         </Card>
+
+        {latestMajorUpdate && isUpdateCardVisible ? (
+          <Card className="overflow-hidden rounded-lg border border-border">
+            <div className="relative bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-4 py-4 sm:px-5">
+              <Button
+                type="button"
+                onClick={() => {
+                  dismissProductUpdate(latestMajorUpdate.id);
+                  setIsUpdateCardVisible(false);
+                }}
+                className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md border border-white/70 bg-white/80 text-text-muted hover:text-text-primary"
+                aria-label="이 업데이트 잠시 숨기기"
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
+
+              <div className="space-y-2.5 pr-10 sm:max-w-[84%] sm:pr-0">
+                <div>
+                  <span className="inline-flex w-fit rounded-md border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+                    새로운 기능 안내
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <h2 className="text-lg font-bold tracking-tight text-text-primary">
+                    {latestMajorUpdate.title}
+                  </h2>
+                  <p className="max-w-[520px] text-[13px] leading-5 text-text-secondary">
+                    {latestMajorUpdate.summary}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none text-text-muted">
+                  <Calendar className="h-3 w-3" />
+                  <span>{latestMajorUpdate.publishedAt}</span>
+                  <span className="text-border">•</span>
+                  <span>{latestMajorUpdate.tag}</span>
+                </div>
+
+                <div className="flex flex-row flex-wrap items-center gap-2 pt-0.5">
+                  <Button
+                    asChild
+                    className="justify-center rounded-lg bg-primary px-3 py-2 text-xs font-bold text-white hover:bg-primary/90"
+                  >
+                    <Link href={latestMajorUpdate.ctaHref}>
+                      {latestMajorUpdate.ctaLabel}
+                    </Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="justify-center rounded-lg border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                  >
+                    <Link href="/updates">새 기능 모아보기</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        ) : null}
 
         <section className="space-y-3">
           <div className="flex flex-col gap-3 rounded-lg border border-border bg-white p-4">
@@ -306,7 +389,8 @@ export default function MyDashboardPage() {
                     </p>
                   </div>
                   <p className="text-[11px] text-text-muted">
-                    총 {monthlySummary?.achieved ?? 0}/{monthlySummary?.total ?? 0}
+                    총 {monthlySummary?.achieved ?? 0}/
+                    {monthlySummary?.total ?? 0}
                     {" · "}
                     {monthlyOverallRate}%
                   </p>
@@ -337,7 +421,10 @@ export default function MyDashboardPage() {
                               {weekIndex + 1}주차
                             </p>
                             <p className="text-[11px] font-mono text-text-muted">
-                              {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
+                              {weekDatesInMonth
+                                .find(Boolean)
+                                ?.slice(5)
+                                .replace("-", ".")}
                               {" – "}
                               {weekDatesInMonth
                                 .filter((date): date is string => date !== null)
@@ -373,7 +460,9 @@ export default function MyDashboardPage() {
                                         <th
                                           key={`${weekIndex}-${label}`}
                                           className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
-                                            isToday ? "text-primary" : "text-text-muted"
+                                            isToday
+                                              ? "text-primary"
+                                              : "text-text-muted"
                                           }`}
                                         >
                                           <div>{label}</div>
@@ -405,9 +494,10 @@ export default function MyDashboardPage() {
                               </colgroup>
                               <tbody className="divide-y divide-border">
                                 {monthlyLeadMeasures.map((leadMeasure) => {
-                                  const targetValue = leadMeasure.targetValue ?? 0;
-                                  const visibleAchievedCount = weekDatesInMonth.reduce(
-                                    (count, date) => {
+                                  const targetValue =
+                                    leadMeasure.targetValue ?? 0;
+                                  const visibleAchievedCount =
+                                    weekDatesInMonth.reduce((count, date) => {
                                       if (!date) {
                                         return count;
                                       }
@@ -415,69 +505,81 @@ export default function MyDashboardPage() {
                                       return leadMeasure.logs?.[date] === true
                                         ? count + 1
                                         : count;
-                                    },
-                                    0,
-                                  );
+                                    }, 0);
                                   const rate =
                                     targetValue > 0
                                       ? Math.round(
-                                          (visibleAchievedCount / targetValue) * 100,
+                                          (visibleAchievedCount / targetValue) *
+                                            100,
                                         )
                                       : 0;
 
                                   return (
-                                    <tr key={`${weekIndex}-${leadMeasure.id}`} className="bg-white">
+                                    <tr
+                                      key={`${weekIndex}-${leadMeasure.id}`}
+                                      className="bg-white"
+                                    >
                                       <td className="px-5 py-4">
                                         <p className="truncate text-sm font-semibold text-text-primary">
                                           {leadMeasure.name}
                                         </p>
                                         <p className="text-[10px] text-text-muted">
                                           목표 {targetValue}회 /{" "}
-                                          {leadMeasure.period === "WEEKLY" ? "주" : "월"}
+                                          {leadMeasure.period === "WEEKLY"
+                                            ? "주"
+                                            : "월"}
                                         </p>
                                       </td>
 
-                                      {weekDatesInMonth.map((date, dayIndex) => {
-                                        const value = date
-                                          ? (leadMeasure.logs?.[date] ?? null)
-                                          : null;
-                                        const isToday = date === today;
+                                      {weekDatesInMonth.map(
+                                        (date, dayIndex) => {
+                                          const value = date
+                                            ? (leadMeasure.logs?.[date] ?? null)
+                                            : null;
+                                          const isToday = date === today;
 
-                                        return (
-                                          <td
-                                            key={`${weekIndex}-${leadMeasure.id}-${DAY_LABELS[dayIndex]}`}
-                                            className="py-3 text-center"
-                                          >
-                                            <span
-                                              className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-bold ${
-                                                value === true
-                                                  ? "border-primary bg-primary text-white"
-                                                  : date === null
-                                                    ? "border-transparent bg-transparent text-transparent"
-                                                    : isToday
-                                                      ? "border-primary/30 bg-primary/5 text-primary"
-                                                      : "border-border bg-sub-background text-text-muted"
-                                              }`}
+                                          return (
+                                            <td
+                                              key={`${weekIndex}-${leadMeasure.id}-${DAY_LABELS[dayIndex]}`}
+                                              className="py-3 text-center"
                                             >
-                                              {value === true ? (
-                                                <Check className="h-3.5 w-3.5" />
-                                              ) : null}
-                                            </span>
-                                          </td>
-                                        );
-                                      })}
+                                              <span
+                                                className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-bold ${
+                                                  value === true
+                                                    ? "border-primary bg-primary text-white"
+                                                    : date === null
+                                                      ? "border-transparent bg-transparent text-transparent"
+                                                      : isToday
+                                                        ? "border-primary/30 bg-primary/5 text-primary"
+                                                        : "border-border bg-sub-background text-text-muted"
+                                                }`}
+                                              >
+                                                {value === true ? (
+                                                  <Check className="h-3.5 w-3.5" />
+                                                ) : null}
+                                              </span>
+                                            </td>
+                                          );
+                                        },
+                                      )}
 
                                       <td className="px-3 py-4 text-center text-[11px] text-text-secondary">
-                                        {leadMeasure.period === "WEEKLY" ? "주간" : "월간"}
+                                        {leadMeasure.period === "WEEKLY"
+                                          ? "주간"
+                                          : "월간"}
                                       </td>
                                       <td className="px-3 py-4 text-center">
                                         <div className="flex flex-col items-center gap-1.5">
                                           <div className="w-10 h-1 overflow-hidden rounded-full border border-border bg-sub-background">
                                             <div
                                               className={`h-full rounded-full transition-all duration-500 ${
-                                                rate >= 100 ? "bg-green-500" : "bg-primary"
+                                                rate >= 100
+                                                  ? "bg-green-500"
+                                                  : "bg-primary"
                                               }`}
-                                              style={{ width: `${Math.min(rate, 100)}%` }}
+                                              style={{
+                                                width: `${Math.min(rate, 100)}%`,
+                                              }}
                                             />
                                           </div>
                                           <span
@@ -519,7 +621,40 @@ export default function MyDashboardPage() {
               <div className="hidden overflow-hidden rounded-lg border border-border md:block">
                 <div className="overflow-x-auto">
                   <div className="min-w-[600px]">
-                  <div className="bg-sub-background border-b border-border">
+                    <div className="bg-sub-background border-b border-border">
+                      <table className="w-full table-fixed text-xs">
+                        <colgroup>
+                          <col className="w-[38%]" />
+                          {DAY_LABELS.map((day) => (
+                            <col key={day} className="w-[8%]" />
+                          ))}
+                          <col className="w-[14%]" />
+                        </colgroup>
+                        <thead>
+                          <tr>
+                            <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                              선행지표
+                            </th>
+                            {DAY_LABELS.map((day, index) => (
+                              <th
+                                key={day}
+                                className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
+                                  weekDates[index] === today
+                                    ? "text-primary"
+                                    : "text-text-muted"
+                                }`}
+                              >
+                                {day}
+                              </th>
+                            ))}
+                            <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                              달성
+                            </th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
+
                     <table className="w-full table-fixed text-xs">
                       <colgroup>
                         <col className="w-[38%]" />
@@ -528,135 +663,105 @@ export default function MyDashboardPage() {
                         ))}
                         <col className="w-[14%]" />
                       </colgroup>
-                      <thead>
-                        <tr>
-                          <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
-                            선행지표
-                          </th>
-                          {DAY_LABELS.map((day, index) => (
-                            <th
-                              key={day}
-                              className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
-                                weekDates[index] === today
-                                  ? "text-primary"
-                                  : "text-text-muted"
-                              }`}
-                            >
-                              {day}
-                            </th>
-                          ))}
-                          <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
-                            달성
-                          </th>
-                        </tr>
-                      </thead>
-                    </table>
-                  </div>
+                      <tbody className="divide-y divide-border">
+                        {activeLeadMeasures.map((leadMeasure) => {
+                          const leadMeasureId = toNumberId(leadMeasure.id);
+                          const weekly = weeklyById.get(leadMeasureId);
+                          const achievedCount = weekly?.achieved ?? 0;
+                          const targetValue = leadMeasure.targetValue ?? 0;
+                          const rate =
+                            targetValue > 0
+                              ? Math.round((achievedCount / targetValue) * 100)
+                              : 0;
 
-                  <table className="w-full table-fixed text-xs">
-                    <colgroup>
-                      <col className="w-[38%]" />
-                      {DAY_LABELS.map((day) => (
-                        <col key={day} className="w-[8%]" />
-                      ))}
-                      <col className="w-[14%]" />
-                    </colgroup>
-                    <tbody className="divide-y divide-border">
-                      {activeLeadMeasures.map((leadMeasure) => {
-                        const leadMeasureId = toNumberId(leadMeasure.id);
-                        const weekly = weeklyById.get(leadMeasureId);
-                        const achievedCount = weekly?.achieved ?? 0;
-                        const targetValue = leadMeasure.targetValue ?? 0;
-                        const rate =
-                          targetValue > 0
-                            ? Math.round((achievedCount / targetValue) * 100)
-                            : 0;
-
-                        return (
-                          <tr key={leadMeasure.id} className="bg-white">
-                            <td className="py-4 px-5">
-                              <p className="block font-semibold text-text-primary truncate text-sm">
-                                {leadMeasure.name}
-                              </p>
-                              <span className="text-[10px] text-text-muted">
-                                목표 {targetValue}회 /{" "}
-                                {leadMeasure.period === "DAILY"
-                                  ? "일"
-                                  : leadMeasure.period === "WEEKLY"
-                                    ? "주"
-                                    : "월"}
-                              </span>
-                            </td>
-
-                            {weekDates.map((date) => {
-                              const currentValue =
-                                weekly?.logs?.[date] === undefined
-                                  ? null
-                                  : weekly.logs[date];
-                              const isToday = date === today;
-                              const currentLogKey =
-                                leadMeasureId === null
-                                  ? null
-                                  : `${leadMeasureId}:${date}`;
-                              const isPending = pendingLogKey === currentLogKey;
-
-                              return (
-                                <td key={date} className="py-3 text-center">
-                                  <Button
-                                    disabled={
-                                      isPending ||
-                                      isLogPending ||
-                                      leadMeasureId === null
-                                    }
-                                    onClick={() => {
-                                      if (leadMeasureId !== null) {
-                                        void toggleLog(leadMeasureId, date);
-                                      }
-                                    }}
-                                    className={`w-7 h-7 mx-auto rounded-md flex items-center justify-center border transition-colors ${
-                                      currentValue === true
-                                        ? "bg-primary border-primary text-white"
-                                        : isToday
-                                          ? "bg-primary/5 border-primary/30 text-primary"
-                                          : "bg-sub-background border-border text-text-muted"
-                                    } ${isPending || isLogPending ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
-                                  >
-                                    {currentValue === true ? (
-                                      <Check className="w-3.5 h-3.5" />
-                                    ) : null}
-                                  </Button>
-                                </td>
-                              );
-                            })}
-
-                            <td className="py-4 px-3 text-center">
-                              <div className="flex flex-col items-center gap-1.5">
-                                <div className="w-10 h-1 bg-sub-background rounded-full overflow-hidden border border-border">
-                                  <div
-                                    className={`h-full rounded-full transition-all duration-500 ${
-                                      rate >= 100
-                                        ? "bg-green-500"
-                                        : "bg-primary"
-                                    }`}
-                                    style={{ width: `${Math.min(rate, 100)}%` }}
-                                  />
-                                </div>
-                                <span
-                                  className={`text-[10px] font-bold font-mono ${
-                                    rate >= 100
-                                      ? "text-green-600"
-                                      : "text-text-secondary"
-                                  }`}
-                                >
-                                  {achievedCount}/{targetValue}
+                          return (
+                            <tr key={leadMeasure.id} className="bg-white">
+                              <td className="py-4 px-5">
+                                <p className="block font-semibold text-text-primary truncate text-sm">
+                                  {leadMeasure.name}
+                                </p>
+                                <span className="text-[10px] text-text-muted">
+                                  목표 {targetValue}회 /{" "}
+                                  {leadMeasure.period === "DAILY"
+                                    ? "일"
+                                    : leadMeasure.period === "WEEKLY"
+                                      ? "주"
+                                      : "월"}
                                 </span>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                              </td>
+
+                              {weekDates.map((date) => {
+                                const currentValue =
+                                  weekly?.logs?.[date] === undefined
+                                    ? null
+                                    : weekly.logs[date];
+                                const isToday = date === today;
+                                const currentLogKey =
+                                  leadMeasureId === null
+                                    ? null
+                                    : `${leadMeasureId}:${date}`;
+                                const isPending =
+                                  pendingLogKey === currentLogKey;
+
+                                return (
+                                  <td key={date} className="py-3 text-center">
+                                    <Button
+                                      disabled={
+                                        isPending ||
+                                        isLogPending ||
+                                        leadMeasureId === null
+                                      }
+                                      onClick={() => {
+                                        if (leadMeasureId !== null) {
+                                          void toggleLog(leadMeasureId, date);
+                                        }
+                                      }}
+                                      className={`w-7 h-7 mx-auto rounded-md flex items-center justify-center border transition-colors ${
+                                        currentValue === true
+                                          ? "bg-primary border-primary text-white"
+                                          : isToday
+                                            ? "bg-primary/5 border-primary/30 text-primary"
+                                            : "bg-sub-background border-border text-text-muted"
+                                      } ${isPending || isLogPending ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
+                                    >
+                                      {currentValue === true ? (
+                                        <Check className="w-3.5 h-3.5" />
+                                      ) : null}
+                                    </Button>
+                                  </td>
+                                );
+                              })}
+
+                              <td className="py-4 px-3 text-center">
+                                <div className="flex flex-col items-center gap-1.5">
+                                  <div className="w-10 h-1 bg-sub-background rounded-full overflow-hidden border border-border">
+                                    <div
+                                      className={`h-full rounded-full transition-all duration-500 ${
+                                        rate >= 100
+                                          ? "bg-green-500"
+                                          : "bg-primary"
+                                      }`}
+                                      style={{
+                                        width: `${Math.min(rate, 100)}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span
+                                    className={`text-[10px] font-bold font-mono ${
+                                      rate >= 100
+                                        ? "text-green-600"
+                                        : "text-text-secondary"
+                                    }`}
+                                  >
+                                    {achievedCount}/{targetValue}
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>

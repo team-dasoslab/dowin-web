@@ -1,0 +1,7 @@
+interface:
+  display_name: "WIG Product Updates"
+  short_description: "WIG update hub and promo card content"
+  default_prompt: "Use $wig-product-updates to add or refine WIG product update entries, promo card copy, and update hub metadata."
+
+policy:
+  allow_implicit_invocation: true

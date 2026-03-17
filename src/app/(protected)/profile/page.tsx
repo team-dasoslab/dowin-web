@@ -25,10 +25,11 @@ import {
   ChevronRight,
   Download,
   Edit2,
-  Image,
+  Image as ImageIcon,
   Key,
   LogOut,
   Smartphone,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -110,7 +111,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "avatar",
-          icon: <Image className="w-3.5 h-3.5" />,
+          icon: <ImageIcon className="w-3.5 h-3.5" />,
           title: "프로필 아이콘 변경",
           description: "마음에 드는 아이콘을 선택해 내 프로필에 적용합니다.",
           href: "/profile/avatar",
@@ -243,8 +244,15 @@ export default function ProfilePage() {
       ],
     },
     {
-      label: "앱 설치 가이드",
+      label: "앱 둘러보기",
       items: [
+        {
+          id: "updates",
+          icon: <Sparkles className="w-3.5 h-3.5" />,
+          title: "새 기능 모아보기",
+          description: "최근 추가되거나 좋아진 기능을 한 번에 확인합니다.",
+          href: "/updates",
+        },
         {
           id: "install-guide-ios",
           icon: <Smartphone className="w-3.5 h-3.5" />,
