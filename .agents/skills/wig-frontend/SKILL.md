@@ -30,6 +30,7 @@ If current code and docs differ, verify the implementation and preserve establis
 - Use Zod for form validation.
 - For server state, use generated Orval hooks and TanStack Query patterns.
 - After mutations, invalidate related queries.
+- Do not introduce `useSearchParams()` in a page path unless it is wrapped by a `Suspense` boundary. If the value can be resolved on the server, prefer reading the page `searchParams` prop and passing it down instead.
 - Treat date display and date-key generation in the UI as KST-based unless the current feature explicitly requires another timezone.
 - Keep mobile behavior in scope, especially dashboard and scoreboard flows.
 
@@ -90,6 +91,7 @@ yarn test
 - If a button navigates, is `asChild` used correctly?
 - Are loading, empty, and error states handled?
 - If server state changed, were related queries invalidated?
+- If query-string state is needed, did you choose between server `searchParams` props and client `useSearchParams()` intentionally, and add `Suspense` when using the client hook?
 - If API contracts changed, was `yarn gen:api` run?
 - If shared UI changed, was Storybook updated?
 - Was mobile layout considered?
