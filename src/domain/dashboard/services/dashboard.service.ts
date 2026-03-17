@@ -6,7 +6,7 @@ type WorkspaceLookupPort = {
     Array<{
       userId: number;
       role: "ADMIN" | "MEMBER";
-      user?: { nickname?: string | null } | null;
+      user?: { nickname?: string | null; avatarKey?: string | null } | null;
     }>
   >;
 };
@@ -100,6 +100,7 @@ export class DashboardService {
           return {
             userId: member.userId,
             nickname: member.user?.nickname ?? "이름 없음",
+            avatarKey: member.user?.avatarKey ?? null,
             role: member.role,
             hasScoreboard: false,
             scoreboardId: null,
@@ -205,6 +206,7 @@ export class DashboardService {
         return {
           userId: member.userId,
           nickname: member.user?.nickname ?? "이름 없음",
+          avatarKey: member.user?.avatarKey ?? null,
           role: member.role,
           hasScoreboard: true,
           scoreboardId: scoreboard.id,

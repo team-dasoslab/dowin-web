@@ -6,6 +6,7 @@ export const users = sqliteTable("users", {
   customId: text("custom_id").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   nickname: text("nickname").notNull(),
+  avatarKey: text("avatar_key"),
   isFirstLogin: integer("is_first_login", { mode: "boolean" })
     .notNull()
     .default(true),

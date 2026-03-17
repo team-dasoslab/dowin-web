@@ -1,8 +1,9 @@
 import { TeamDashboardMember } from "@/api/generated/wig.schemas";
 import { getRateTone } from "@/app/(protected)/dashboard/_lib/dashboard";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { Target, UserIcon } from "lucide-react";
+import { Target } from "lucide-react";
 
 type MemberCardProps = {
   member: TeamDashboardMember;
@@ -18,9 +19,13 @@ export function MemberCard({ member }: MemberCardProps) {
     <Card className="bg-white border border-border rounded-lg p-5 space-y-4 hover:border-[rgba(205,207,213,1)] transition-colors">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <UserIcon className="w-4 h-4 text-primary" />
-          </div>
+          <UserAvatar
+            avatarKey={member.avatarKey}
+            alt={`${member.nickname ?? "사용자"} 아바타`}
+            size={32}
+            className="flex-shrink-0"
+            fallbackClassName="rounded-md"
+          />
           <div className="min-w-0">
             <p className="text-sm font-bold text-text-primary truncate">
               {member.nickname}

@@ -6,10 +6,16 @@ export type ProfileRecord = {
   id: number;
   customId: string;
   nickname: string;
+  avatarKey: string | null;
   role: "ADMIN" | "MEMBER" | null;
   workspaceId: number | null;
   workspaceName: string | null;
   createdAt: Date;
+};
+
+export type UpdateProfileInput = {
+  nickname?: string;
+  avatarKey?: string | null;
 };
 
 export class ProfileStorage {
@@ -35,6 +41,7 @@ export class ProfileStorage {
       id: user.id,
       customId: user.customId,
       nickname: user.nickname,
+      avatarKey: user.avatarKey,
       role: membership?.role ?? null,
       workspaceId: membership?.workspaceId ?? null,
       workspaceName: membership?.workspace?.name ?? null,
@@ -42,10 +49,13 @@ export class ProfileStorage {
     };
   }
 
-  async updateNickname(userId: number, nickname: string): Promise<ProfileRecord | null> {
+  async updateProfile(
+    userId: number,
+    input: UpdateProfileInput,
+  ): Promise<ProfileRecord | null> {
     const [updated] = await this.db
       .update(users)
-      .set({ nickname })
+      .set(input)
       .where(eq(users.id, userId))
       .returning();
 
@@ -64,6 +74,7 @@ export class ProfileStorage {
       id: updated.id,
       customId: updated.customId,
       nickname: updated.nickname,
+      avatarKey: updated.avatarKey,
       role: membership?.role ?? null,
       workspaceId: membership?.workspaceId ?? null,
       workspaceName: membership?.workspace?.name ?? null,

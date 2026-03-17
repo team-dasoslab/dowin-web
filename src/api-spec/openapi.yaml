@@ -114,7 +114,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
     put:
-      summary: 내 닉네임 변경
+      summary: 내 프로필 변경
       tags: [Profile]
       security: [{ sessionCookie: [] }]
       requestBody:
@@ -851,6 +851,50 @@ components:
         id: { type: integer }
         customId: { type: string }
         nickname: { type: string }
+        avatarKey:
+          type: string
+          nullable: true
+          enum:
+            - smile.blue
+            - smile.green
+            - smile.mint
+            - smile.orange
+            - smile.pink
+            - smile.purple
+            - smile.red
+            - smile.yellow
+            - smile2.blue
+            - smile2.green
+            - smile2.mint
+            - smile2.orange
+            - smile2.pink
+            - smile2.purple
+            - smile2.red
+            - smile2.yellow
+            - smile3.blue
+            - smile3.green
+            - smile3.mint
+            - smile3.orange
+            - smile3.pink
+            - smile3.purple
+            - smile3.red
+            - smile3.yellow
+            - surprise.blue
+            - surprise.green
+            - surprise.mint
+            - surprise.orange
+            - surprise.pink
+            - surprise.purple
+            - surprise.red
+            - surprise.yellow
+            - surprise2.blue
+            - surprise2.green
+            - surprise2.mint
+            - surprise2.orange
+            - surprise2.pink
+            - surprise2.purple
+            - surprise2.red
+            - surprise2.yellow
         role:
           type: string
           enum: [ADMIN, MEMBER]
@@ -865,12 +909,56 @@ components:
 
     UserProfileUpdateRequest:
       type: object
-      required: [nickname]
+      minProperties: 1
       properties:
         nickname:
           type: string
           minLength: 2
           maxLength: 20
+        avatarKey:
+          type: string
+          nullable: true
+          enum:
+            - smile.blue
+            - smile.green
+            - smile.mint
+            - smile.orange
+            - smile.pink
+            - smile.purple
+            - smile.red
+            - smile.yellow
+            - smile2.blue
+            - smile2.green
+            - smile2.mint
+            - smile2.orange
+            - smile2.pink
+            - smile2.purple
+            - smile2.red
+            - smile2.yellow
+            - smile3.blue
+            - smile3.green
+            - smile3.mint
+            - smile3.orange
+            - smile3.pink
+            - smile3.purple
+            - smile3.red
+            - smile3.yellow
+            - surprise.blue
+            - surprise.green
+            - surprise.mint
+            - surprise.orange
+            - surprise.pink
+            - surprise.purple
+            - surprise.red
+            - surprise.yellow
+            - surprise2.blue
+            - surprise2.green
+            - surprise2.mint
+            - surprise2.orange
+            - surprise2.pink
+            - surprise2.purple
+            - surprise2.red
+            - surprise2.yellow
 
     Workspace:
       type: object
@@ -1071,6 +1159,9 @@ components:
       properties:
         userId: { type: integer }
         nickname: { type: string }
+        avatarKey:
+          type: string
+          nullable: true
         role: { type: string, enum: [ADMIN, MEMBER] }
         hasScoreboard: { type: boolean }
         scoreboardId: { type: integer, nullable: true }

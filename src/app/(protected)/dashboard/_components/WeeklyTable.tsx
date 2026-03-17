@@ -1,5 +1,5 @@
 import { TeamDashboardMember } from "@/api/generated/wig.schemas";
-import { UserIcon } from "lucide-react";
+import { UserAvatar } from "@/components/UserAvatar";
 
 const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -21,9 +21,12 @@ export function WeeklyTable({ member, weekDates }: WeeklyTableProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 px-1">
-        <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center">
-          <UserIcon className="w-3 h-3 text-primary" />
-        </div>
+        <UserAvatar
+          avatarKey={member.avatarKey}
+          alt={`${member.nickname ?? "사용자"} 아바타`}
+          size={20}
+          fallbackClassName="rounded"
+        />
         <span className="text-xs font-bold text-text-primary">
           {member.nickname}
         </span>

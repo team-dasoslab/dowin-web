@@ -1,0 +1,48 @@
+export const PROFILE_AVATAR_KEYS = [
+  "smile.blue",
+  "smile2.blue",
+  "smile3.blue",
+  "surprise.blue",
+  "surprise2.blue",
+  "smile.green",
+  "smile2.green",
+  "smile3.green",
+  "surprise.green",
+  "surprise2.green",
+  "smile.mint",
+  "smile2.mint",
+  "smile3.mint",
+  "surprise.mint",
+  "surprise2.mint",
+  "smile.orange",
+  "smile2.orange",
+  "smile3.orange",
+  "surprise.orange",
+  "surprise2.orange",
+  "smile.pink",
+  "smile2.pink",
+  "smile3.pink",
+  "surprise.pink",
+  "surprise2.pink",
+  "smile.purple",
+  "smile2.purple",
+  "smile3.purple",
+  "surprise.purple",
+  "surprise2.purple",
+  "smile.red",
+  "smile2.red",
+  "smile3.red",
+  "surprise.red",
+  "surprise2.red",
+  "smile.yellow",
+  "smile2.yellow",
+  "smile3.yellow",
+  "surprise.yellow",
+  "surprise2.yellow",
+] as const;
+
+export type ProfileAvatarKey = (typeof PROFILE_AVATAR_KEYS)[number];
+
+export function getProfileAvatarSrc(avatarKey: string) {
+  return `/assets/avatars/${avatarKey}.png`;
+}

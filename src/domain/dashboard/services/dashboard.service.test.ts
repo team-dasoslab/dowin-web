@@ -31,14 +31,14 @@ describe("DashboardService", () => {
         workspaceId: 3,
         userId: 11,
         role: "ADMIN",
-        user: { nickname: "지훈" },
+        user: { nickname: "지훈", avatarKey: "smile.blue" },
       },
       {
         id: 101,
         workspaceId: 3,
         userId: 12,
         role: "MEMBER",
-        user: { nickname: "민서" },
+        user: { nickname: "민서", avatarKey: null },
       },
     ]);
     findActiveScoreboardsByWorkspace.mockResolvedValue([
@@ -86,6 +86,7 @@ describe("DashboardService", () => {
         {
           userId: 11,
           nickname: "지훈",
+          avatarKey: "smile.blue",
           role: "ADMIN",
           hasScoreboard: true,
           scoreboardId: 21,
@@ -137,6 +138,7 @@ describe("DashboardService", () => {
         {
           userId: 12,
           nickname: "민서",
+          avatarKey: null,
           role: "MEMBER",
           hasScoreboard: false,
           scoreboardId: null,

@@ -1,9 +1,12 @@
 import { NotFoundError } from "@/lib/server/errors";
-import { ProfileRecord } from "@/domain/profile/storage/profile.storage";
+import {
+  ProfileRecord,
+  UpdateProfileInput,
+} from "@/domain/profile/storage/profile.storage";
 
 type ProfileStoragePort = {
   findProfileByUserId(userId: number): Promise<ProfileRecord | null>;
-  updateNickname(userId: number, nickname: string): Promise<ProfileRecord | null>;
+  updateProfile(userId: number, input: UpdateProfileInput): Promise<ProfileRecord | null>;
 };
 
 export class ProfileService {
@@ -19,8 +22,8 @@ export class ProfileService {
     return profile;
   }
 
-  async updateNickname(userId: number, nickname: string): Promise<ProfileRecord> {
-    const profile = await this.storage.updateNickname(userId, nickname);
+  async updateProfile(userId: number, input: UpdateProfileInput): Promise<ProfileRecord> {
+    const profile = await this.storage.updateProfile(userId, input);
 
     if (!profile) {
       throw new NotFoundError("NOT_FOUND");

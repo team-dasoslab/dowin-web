@@ -5,6 +5,7 @@ import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { getTodayInKst, getWeekDates } from "@/app/(protected)/dashboard/my/_lib/week";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
@@ -14,7 +15,7 @@ import {
   getApiErrorStatus,
   toNumberId,
 } from "@/lib/client/frontend-api";
-import { Download, User as UserIcon } from "lucide-react";
+import { Download } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -204,9 +205,13 @@ export default function ProfileExportPage() {
         </header>
 
         <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
-          <div className="w-11 h-11 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-            <UserIcon className="w-5 h-5 text-primary" />
-          </div>
+          <UserAvatar
+            avatarKey={user?.avatarKey}
+            alt={`${user?.nickname ?? "사용자"} 아바타`}
+            size={44}
+            className="flex-shrink-0"
+            fallbackClassName="rounded-lg"
+          />
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-text-primary tracking-tight">
               {user?.nickname ?? "사용자"}님의 CSV 다운로드

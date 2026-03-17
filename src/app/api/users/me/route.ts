@@ -38,10 +38,7 @@ export const PUT = withErrorHandler(async (request: Request) => {
     return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
-  const profile = await createService(db).updateNickname(
-    session.userId,
-    parsed.data.nickname,
-  );
+  const profile = await createService(db).updateProfile(session.userId, parsed.data);
 
   return apiSuccess(profile);
 });

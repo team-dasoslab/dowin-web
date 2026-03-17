@@ -11,6 +11,7 @@ import {
   usePutUsersMe,
 } from "@/api/generated/profile/profile";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { UserAvatar } from "@/components/UserAvatar";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -24,10 +25,10 @@ import {
   ChevronRight,
   Download,
   Edit2,
+  Image,
   Key,
   LogOut,
   Smartphone,
-  User as UserIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -82,6 +83,7 @@ export default function ProfilePage() {
 
   const nickname = user.nickname ?? "사용자";
   const customId = user.customId ?? "";
+  const avatarKey = user.avatarKey ?? null;
   const isActionPending =
     pendingAction !== null ||
     updateNicknameMutation.isPending ||
@@ -106,6 +108,13 @@ export default function ProfilePage() {
     {
       label: "계정 설정",
       items: [
+        {
+          id: "avatar",
+          icon: <Image className="w-3.5 h-3.5" />,
+          title: "프로필 아이콘 변경",
+          description: "마음에 드는 아이콘을 선택해 내 프로필에 적용합니다.",
+          href: "/profile/avatar",
+        },
         {
           id: "nickname",
           icon: <Edit2 className="w-3.5 h-3.5" />,
@@ -306,9 +315,13 @@ export default function ProfilePage() {
 
         {/* ── 프로필 카드 ── */}
         <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
-          <div className="w-11 h-11 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-            <UserIcon className="w-5 h-5 text-primary" />
-          </div>
+          <UserAvatar
+            avatarKey={avatarKey}
+            alt={`${nickname} 아바타`}
+            size={44}
+            className="flex-shrink-0"
+            fallbackClassName="rounded-lg"
+          />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold text-text-primary tracking-tight">
@@ -329,8 +342,10 @@ export default function ProfilePage() {
               </p>
 
               {/* 아이템 목록 */}
-              <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
-                {group.items.map((item) => {
+              <div className="border border-border rounded-lg overflow-hidden">
+                {group.items.map((item, index) => {
+                  const itemWrapperClassName =
+                    index < group.items.length - 1 ? "border-b border-border" : "";
                   const Content = (
                     <div className="flex items-center justify-between w-full px-5 py-4 transition-colors group">
                       <div className="flex items-center gap-3 min-w-0">
@@ -339,7 +354,7 @@ export default function ProfilePage() {
                           className={`w-7 h-7 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
                             item.danger
                               ? "border-danger/20 bg-danger/5 text-danger"
-                              : "border-border bg-sub-background text-text-muted group-hover:border-[rgba(205,207,213,1)]"
+                              : "border-border bg-sub-background text-text-muted"
                           }`}
                         >
                           {item.icon}
@@ -370,33 +385,32 @@ export default function ProfilePage() {
 
                   if (item.onClick) {
                     return (
-                      <Button
-                        key={item.id}
-                        disabled={isActionPending}
-                        onClick={item.onClick}
-                        className="w-full bg-white hover:bg-sub-background"
-                      >
-                        {Content}
-                      </Button>
+                      <div key={item.id} className={itemWrapperClassName}>
+                        <Button
+                          disabled={isActionPending}
+                          onClick={item.onClick}
+                          className="w-full bg-white"
+                        >
+                          {Content}
+                        </Button>
+                      </div>
                     );
                   }
 
                   if (item.href) {
                     return (
-                      <Button
-                        key={item.id}
-                        asChild
-                        className="w-full bg-white hover:bg-sub-background"
-                      >
-                        <Link href={item.href}>{Content}</Link>
-                      </Button>
+                      <div key={item.id} className={itemWrapperClassName}>
+                        <Button asChild className="block w-full bg-white">
+                          <Link href={item.href}>{Content}</Link>
+                        </Button>
+                      </div>
                     );
                   }
 
                   return (
                     <div
                       key={item.id}
-                      className="w-full bg-white transition-colors"
+                      className={`w-full bg-white transition-colors ${itemWrapperClassName}`}
                     >
                       {Content}
                     </div>
