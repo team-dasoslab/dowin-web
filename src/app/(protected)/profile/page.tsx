@@ -11,7 +11,6 @@ import {
   usePutUsersMe,
 } from "@/api/generated/profile/profile";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -43,6 +42,22 @@ interface MenuItem {
   rightElement?: React.ReactNode;
 }
 
+function ProfileSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
+        <div className="h-10 rounded-xl bg-sub-background" />
+        <div className="h-24 rounded-2xl bg-sub-background" />
+        <div className="space-y-4">
+          <div className="h-44 rounded-2xl bg-sub-background" />
+          <div className="h-36 rounded-2xl bg-sub-background" />
+          <div className="h-28 rounded-2xl bg-sub-background" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -57,12 +72,7 @@ export default function ProfilePage() {
   const pushUserId = user?.id != null ? String(user.id) : null;
 
   if (isProfileLoading) {
-    return (
-      <LoadingSpinner
-        message="프로필 정보를 불러오는 중입니다."
-        variant="ios"
-      />
-    );
+    return <ProfileSkeleton />;
   }
 
   if (!user) {

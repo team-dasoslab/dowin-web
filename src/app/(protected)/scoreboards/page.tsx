@@ -3,7 +3,6 @@
 import { useScoreboardArchive } from "@/app/(protected)/scoreboards/_hooks/useScoreboardArchive";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -81,6 +80,18 @@ function ScoreboardCard({
   );
 }
 
+function ScoreboardsSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
+        <div className="h-16 rounded-2xl bg-sub-background" />
+        <div className="h-44 rounded-2xl bg-sub-background" />
+        <div className="h-72 rounded-2xl bg-sub-background" />
+      </div>
+    </div>
+  );
+}
+
 export default function ScoreboardsPage() {
   const {
     activeScoreboard,
@@ -95,7 +106,7 @@ export default function ScoreboardsPage() {
   } = useScoreboardArchive();
 
   if (isLoading) {
-    return <LoadingSpinner message="점수판 목록을 불러오는 중입니다." />;
+    return <ScoreboardsSkeleton />;
   }
 
   if (hasNoWorkspace) {

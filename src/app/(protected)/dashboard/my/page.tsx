@@ -7,7 +7,6 @@ import {
   getMonthCalendarWeeks,
 } from "@/app/(protected)/dashboard/my/_lib/week";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
@@ -29,6 +28,22 @@ import Link from "next/link";
 type MonthlyLeadMeasure = NonNullable<
   ReturnType<typeof useDashboardScoreboard>["monthlyLeadMeasures"]
 >[number];
+
+function MyDashboardSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
+        <div className="h-16 rounded-2xl bg-sub-background" />
+        <div className="h-24 rounded-2xl bg-sub-background" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="h-48 rounded-2xl bg-sub-background" />
+          <div className="h-48 rounded-2xl bg-sub-background" />
+        </div>
+        <div className="h-72 rounded-2xl bg-sub-background" />
+      </div>
+    </div>
+  );
+}
 
 function WeeklyMobileCards({
   activeLeadMeasures,
@@ -325,7 +340,7 @@ export default function MyDashboardPage() {
         (selectedView === "month" && isMonthlyLogsLoading)) &&
       weeklyById.size === 0)
   ) {
-    return <LoadingSpinner message="대시보드를 불러오는 중입니다." />;
+    return <MyDashboardSkeleton />;
   }
 
   if (hasNoWorkspace) {

@@ -3,7 +3,6 @@
 import { useScoreboardSetup } from "@/app/(protected)/setup/_hooks/useScoreboardSetup";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -18,6 +17,20 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+
+function SetupSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
+        <div className="h-10 rounded-xl bg-sub-background" />
+        <div className="h-12 rounded-xl bg-sub-background" />
+        <div className="h-44 rounded-2xl bg-sub-background" />
+        <div className="h-44 rounded-2xl bg-sub-background" />
+        <div className="h-64 rounded-2xl bg-sub-background" />
+      </div>
+    </div>
+  );
+}
 
 export default function SetupPage() {
   const router = useRouter();
@@ -51,7 +64,7 @@ export default function SetupPage() {
   };
 
   if (isInitializing) {
-    return <LoadingSpinner message="점수판 정보를 불러오는 중입니다." />;
+    return <SetupSkeleton />;
   }
 
   const isMutating = isSubmitPending || isArchivePending;
