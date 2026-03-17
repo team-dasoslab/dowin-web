@@ -161,7 +161,7 @@ export function useGetUsersMe<TData = Awaited<ReturnType<typeof getUsersMe>>, TE
 
 
 /**
- * @summary 내 닉네임 변경
+ * @summary 내 프로필 변경
  */
 export type putUsersMeResponse200 = {
   data: UserProfile
@@ -247,7 +247,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PutUsersMeMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary 내 닉네임 변경
+ * @summary 내 프로필 변경
  */
 export const usePutUsersMe = <TError = UnauthorizedErrorResponse | ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putUsersMe>>, TError,{data: UserProfileUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}

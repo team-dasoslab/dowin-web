@@ -14,6 +14,55 @@ export interface User {
 /**
  * @nullable
  */
+export type UserProfileAvatarKey = typeof UserProfileAvatarKey[keyof typeof UserProfileAvatarKey] | null;
+
+
+export const UserProfileAvatarKey = {
+  smileblue: 'smile.blue',
+  smilegreen: 'smile.green',
+  smilemint: 'smile.mint',
+  smileorange: 'smile.orange',
+  smilepink: 'smile.pink',
+  smilepurple: 'smile.purple',
+  smilered: 'smile.red',
+  smileyellow: 'smile.yellow',
+  smile2blue: 'smile2.blue',
+  smile2green: 'smile2.green',
+  smile2mint: 'smile2.mint',
+  smile2orange: 'smile2.orange',
+  smile2pink: 'smile2.pink',
+  smile2purple: 'smile2.purple',
+  smile2red: 'smile2.red',
+  smile2yellow: 'smile2.yellow',
+  smile3blue: 'smile3.blue',
+  smile3green: 'smile3.green',
+  smile3mint: 'smile3.mint',
+  smile3orange: 'smile3.orange',
+  smile3pink: 'smile3.pink',
+  smile3purple: 'smile3.purple',
+  smile3red: 'smile3.red',
+  smile3yellow: 'smile3.yellow',
+  surpriseblue: 'surprise.blue',
+  surprisegreen: 'surprise.green',
+  surprisemint: 'surprise.mint',
+  surpriseorange: 'surprise.orange',
+  surprisepink: 'surprise.pink',
+  surprisepurple: 'surprise.purple',
+  surprisered: 'surprise.red',
+  surpriseyellow: 'surprise.yellow',
+  surprise2blue: 'surprise2.blue',
+  surprise2green: 'surprise2.green',
+  surprise2mint: 'surprise2.mint',
+  surprise2orange: 'surprise2.orange',
+  surprise2pink: 'surprise2.pink',
+  surprise2purple: 'surprise2.purple',
+  surprise2red: 'surprise2.red',
+  surprise2yellow: 'surprise2.yellow',
+} as const;
+
+/**
+ * @nullable
+ */
 export type UserProfileRole = typeof UserProfileRole[keyof typeof UserProfileRole] | null;
 
 
@@ -27,6 +76,8 @@ export interface UserProfile {
   customId?: string;
   nickname?: string;
   /** @nullable */
+  avatarKey?: UserProfileAvatarKey;
+  /** @nullable */
   role?: UserProfileRole;
   /** @nullable */
   workspaceId?: number | null;
@@ -35,12 +86,63 @@ export interface UserProfile {
   createdAt?: string;
 }
 
+/**
+ * @nullable
+ */
+export type UserProfileUpdateRequestAvatarKey = typeof UserProfileUpdateRequestAvatarKey[keyof typeof UserProfileUpdateRequestAvatarKey] | null;
+
+
+export const UserProfileUpdateRequestAvatarKey = {
+  smileblue: 'smile.blue',
+  smilegreen: 'smile.green',
+  smilemint: 'smile.mint',
+  smileorange: 'smile.orange',
+  smilepink: 'smile.pink',
+  smilepurple: 'smile.purple',
+  smilered: 'smile.red',
+  smileyellow: 'smile.yellow',
+  smile2blue: 'smile2.blue',
+  smile2green: 'smile2.green',
+  smile2mint: 'smile2.mint',
+  smile2orange: 'smile2.orange',
+  smile2pink: 'smile2.pink',
+  smile2purple: 'smile2.purple',
+  smile2red: 'smile2.red',
+  smile2yellow: 'smile2.yellow',
+  smile3blue: 'smile3.blue',
+  smile3green: 'smile3.green',
+  smile3mint: 'smile3.mint',
+  smile3orange: 'smile3.orange',
+  smile3pink: 'smile3.pink',
+  smile3purple: 'smile3.purple',
+  smile3red: 'smile3.red',
+  smile3yellow: 'smile3.yellow',
+  surpriseblue: 'surprise.blue',
+  surprisegreen: 'surprise.green',
+  surprisemint: 'surprise.mint',
+  surpriseorange: 'surprise.orange',
+  surprisepink: 'surprise.pink',
+  surprisepurple: 'surprise.purple',
+  surprisered: 'surprise.red',
+  surpriseyellow: 'surprise.yellow',
+  surprise2blue: 'surprise2.blue',
+  surprise2green: 'surprise2.green',
+  surprise2mint: 'surprise2.mint',
+  surprise2orange: 'surprise2.orange',
+  surprise2pink: 'surprise2.pink',
+  surprise2purple: 'surprise2.purple',
+  surprise2red: 'surprise2.red',
+  surprise2yellow: 'surprise2.yellow',
+} as const;
+
 export interface UserProfileUpdateRequest {
   /**
    * @minLength 2
    * @maxLength 20
    */
-  nickname: string;
+  nickname?: string;
+  /** @nullable */
+  avatarKey?: UserProfileUpdateRequestAvatarKey;
 }
 
 export interface Workspace {
@@ -283,6 +385,8 @@ export const TeamDashboardMemberRole = {
 export interface TeamDashboardMember {
   userId?: number;
   nickname?: string;
+  /** @nullable */
+  avatarKey?: string | null;
   role?: TeamDashboardMemberRole;
   hasScoreboard?: boolean;
   /** @nullable */
