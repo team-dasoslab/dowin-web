@@ -394,7 +394,9 @@ export default function MyDashboardPage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
-      <LoadingOverlay message="대시보드를 불러오는 중입니다." />
+      {isLogPending ? (
+        <LoadingOverlay message="기록을 반영하는 중입니다." />
+      ) : null}
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
