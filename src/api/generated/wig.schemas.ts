@@ -200,6 +200,57 @@ export interface MonthlyLogsResponse {
   leadMeasures?: MonthlyLogItem[];
 }
 
+export interface AnalyticsExportPeriodMeta {
+  from: string;
+  to: string;
+  /**
+   * @minimum 1
+   * @maximum 92
+   */
+  dayCount: number;
+}
+
+export type AnalyticsExportLeadMeasureBreakdownPeriod = typeof AnalyticsExportLeadMeasureBreakdownPeriod[keyof typeof AnalyticsExportLeadMeasureBreakdownPeriod];
+
+
+export const AnalyticsExportLeadMeasureBreakdownPeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
+export interface AnalyticsExportLeadMeasureBreakdown {
+  leadMeasureId: number;
+  name: string;
+  period: AnalyticsExportLeadMeasureBreakdownPeriod;
+  achieved: number;
+  total: number;
+  achievementRate: number;
+}
+
+export type AnalyticsExportDailyRowStatus = typeof AnalyticsExportDailyRowStatus[keyof typeof AnalyticsExportDailyRowStatus];
+
+
+export const AnalyticsExportDailyRowStatus = {
+  ACHIEVED: 'ACHIEVED',
+  MISSED: 'MISSED',
+  NOT_RECORDED: 'NOT_RECORDED',
+} as const;
+
+export interface AnalyticsExportDailyRow {
+  date: string;
+  leadMeasureId: number;
+  leadMeasureName: string;
+  status: AnalyticsExportDailyRowStatus;
+}
+
+export interface AnalyticsExportDataResponse {
+  periodMeta: AnalyticsExportPeriodMeta;
+  summary: PeriodSummary;
+  leadMeasureBreakdown: AnalyticsExportLeadMeasureBreakdown[];
+  dailyRows: AnalyticsExportDailyRow[];
+}
+
 export type TeamDashboardMemberMeasurePeriod = typeof TeamDashboardMemberMeasurePeriod[keyof typeof TeamDashboardMemberMeasurePeriod];
 
 
@@ -395,6 +446,33 @@ weekStart?: string;
 export type GetScoreboardsScoreboardIdLogsMonthlyParams = {
 monthStart?: string;
 };
+
+export type GetAnalyticsExportDataParams = {
+/**
+ * 조회 시작일 (YYYY-MM-DD)
+ */
+from: string;
+/**
+ * 조회 종료일 (YYYY-MM-DD, from~to 최대 92일)
+ */
+to: string;
+/**
+ * 조회할 선행지표 ID 목록. 미입력 시 전체 선행지표 포함
+ */
+leadMeasureIds?: number[];
+/**
+ * 기간 라벨링/기본값 추론용 보기 단위
+ */
+view?: GetAnalyticsExportDataView;
+};
+
+export type GetAnalyticsExportDataView = typeof GetAnalyticsExportDataView[keyof typeof GetAnalyticsExportDataView];
+
+
+export const GetAnalyticsExportDataView = {
+  week: 'week',
+  month: 'month',
+} as const;
 
 export type GetDashboardTeamParams = {
 weekStart?: string;

@@ -22,6 +22,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
   ChevronRight,
+  Download,
   Edit2,
   Key,
   LogOut,
@@ -203,6 +204,18 @@ export default function ProfilePage() {
               setPendingAction(null);
             }
           },
+        },
+      ],
+    },
+    {
+      label: "데이터",
+      items: [
+        {
+          id: "export",
+          icon: <Download className="w-3.5 h-3.5" />,
+          title: "CSV 다운로드",
+          description: "기간/지표를 선택해 내 기록을 CSV로 저장합니다.",
+          href: "/profile/export",
         },
       ],
     },

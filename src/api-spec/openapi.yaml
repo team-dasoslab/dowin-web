@@ -759,6 +759,55 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  /analytics/export-data:
+    get:
+      summary: 내 대시보드 export 데이터 조회
+      tags: [Analytics]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          description: 조회 시작일 (YYYY-MM-DD)
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+          description: 조회 종료일 (YYYY-MM-DD, from~to 최대 92일)
+        - name: leadMeasureIds
+          in: query
+          required: false
+          description: 조회할 선행지표 ID 목록. 미입력 시 전체 선행지표 포함
+          schema:
+            type: array
+            items: { type: integer }
+          style: form
+          explode: false
+        - name: view
+          in: query
+          required: false
+          schema: { type: string, enum: [week, month] }
+          description: 기간 라벨링/기본값 추론용 보기 단위
+      responses:
+        '200':
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnalyticsExportDataResponse' }
+        '422':
+          description: "잘못된 기간 또는 필터 (예: from > to, 92일 초과)"
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404':
+          description: 활성 점수판을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
   /dashboard/team:
     get:
       summary: 팀 대시보드 조회
@@ -956,6 +1005,51 @@ components:
         total: { type: integer }
         achievementRate: { type: number }
         isWinning: { type: boolean }
+
+    AnalyticsExportPeriodMeta:
+      type: object
+      required: [from, to, dayCount]
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        dayCount: { type: integer, minimum: 1, maximum: 92 }
+
+    AnalyticsExportLeadMeasureBreakdown:
+      type: object
+      required: [leadMeasureId, name, period, achieved, total, achievementRate]
+      properties:
+        leadMeasureId: { type: integer }
+        name: { type: string }
+        period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+        achieved: { type: integer }
+        total: { type: integer }
+        achievementRate: { type: number }
+
+    AnalyticsExportDailyRow:
+      type: object
+      required: [date, leadMeasureId, leadMeasureName, status]
+      properties:
+        date: { type: string, format: date }
+        leadMeasureId: { type: integer }
+        leadMeasureName: { type: string }
+        status: { type: string, enum: [ACHIEVED, MISSED, NOT_RECORDED] }
+
+    AnalyticsExportDataResponse:
+      type: object
+      required: [periodMeta, summary, leadMeasureBreakdown, dailyRows]
+      properties:
+        periodMeta:
+          $ref: '#/components/schemas/AnalyticsExportPeriodMeta'
+        summary:
+          $ref: '#/components/schemas/PeriodSummary'
+        leadMeasureBreakdown:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyticsExportLeadMeasureBreakdown'
+        dailyRows:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyticsExportDailyRow'
 
     TeamDashboardMemberMeasure:
       type: object
