@@ -4,7 +4,7 @@ import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker"
 import SerwistRegistration from "@/components/SerwistRegistration";
 import { ToastProvider } from "@/context/ToastContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import "@/app/globals.css";
 
 export default function RootLayout({
@@ -141,7 +141,9 @@ export default function RootLayout({
         <SerwistRegistration />
         <QueryClientProvider client={queryClient}>
           <ToastProvider>
-            <NavigationHistoryTracker />
+            <Suspense fallback={null}>
+              <NavigationHistoryTracker />
+            </Suspense>
             {children}
           </ToastProvider>
         </QueryClientProvider>
