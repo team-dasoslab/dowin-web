@@ -1,6 +1,7 @@
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Compass, Home, SearchX } from "lucide-react";
+import { Home } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -12,18 +13,14 @@ export default function NotFound() {
         <Card className="card-linear w-full max-w-xl rounded-[28px] border border-border/80 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8 animate-linear-in">
           <div className="space-y-6">
             <div className="flex items-center justify-between gap-3">
-              <div className="inline-flex items-center gap-2 rounded-full border border-border bg-sub-background px-3 py-1 text-[11px] font-semibold tracking-[0.18em] text-text-muted uppercase">
-                <SearchX className="h-3.5 w-3.5 text-primary" />
+              <Badge className="rounded-md border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
                 404 Not Found
-              </div>
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-                <Compass className="h-6 w-6 text-primary" />
-              </div>
+              </Badge>
             </div>
 
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-                WIG Tracker
+                WIG
               </p>
               <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
                 찾으시는 페이지가 없어요
