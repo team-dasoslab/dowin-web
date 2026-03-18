@@ -81,7 +81,7 @@ const updateWeeklyLogsCache = (
         const targetValue = leadMeasure.targetValue ?? 0;
         const achievementRate =
           targetValue > 0
-            ? Math.round((achieved / targetValue) * 1000) / 10
+            ? Math.round((Math.min(achieved, targetValue) / targetValue) * 1000) / 10
             : 0;
 
         return {
@@ -224,16 +224,21 @@ export const useDashboardScoreboard = () => {
     ]),
   );
 
-  const weeklyTotalRate = weeklyTargetMeasures.reduce(
+  const weeklyAchieved = weeklyTargetMeasures.reduce(
     (accumulator, leadMeasure) => {
       const weekly = weeklyById.get(toNumberId(leadMeasure.id));
-      return accumulator + (weekly?.achievementRate ?? 0);
+      const targetValue = leadMeasure.targetValue ?? 0;
+      return accumulator + Math.min(weekly?.achieved ?? 0, targetValue);
     },
     0,
   );
+  const weeklyTotalTarget = weeklyTargetMeasures.reduce(
+    (accumulator, leadMeasure) => accumulator + (leadMeasure.targetValue ?? 0),
+    0,
+  );
   const weeklyOverallRate =
-    weeklyTargetMeasures.length > 0
-      ? Math.round(weeklyTotalRate / weeklyTargetMeasures.length)
+    weeklyTotalTarget > 0
+      ? Math.round((weeklyAchieved / weeklyTotalTarget) * 100)
       : 0;
   const monthlyOverallRate = Math.round(monthlySummary?.achievementRate ?? 0);
   const monthlyLeadMeasures =

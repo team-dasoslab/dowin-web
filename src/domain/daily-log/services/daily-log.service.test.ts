@@ -83,6 +83,37 @@ describe("DailyLogService", () => {
     });
   });
 
+  it("주간 기록 조회 시 개별 지표 달성률은 100%를 초과하지 않는다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 3회 유산소",
+        targetValue: 3,
+        period: "WEEKLY",
+        status: "ACTIVE",
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-03-09", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-11", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-12", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-13", value: true },
+    ]);
+
+    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+
+    expect(result.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        achieved: 5,
+        achievementRate: 100,
+      }),
+    ]);
+  });
+
   it("월간 기록 조회 시 WEEKLY와 MONTHLY 지표를 모두 반환한다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });

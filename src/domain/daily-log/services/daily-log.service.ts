@@ -120,10 +120,7 @@ export class DailyLogService {
           targetValue: measure.targetValue,
           logs: logMap,
           achieved,
-          achievementRate:
-            measure.targetValue > 0
-              ? Number(((achieved / measure.targetValue) * 100).toFixed(1))
-              : 0,
+          achievementRate: getAchievementRate(achieved, measure.targetValue),
         };
       }),
     };
@@ -197,10 +194,7 @@ export class DailyLogService {
         targetValue: measure.targetValue,
         logs: logMap,
         achieved,
-        achievementRate:
-          measure.targetValue > 0
-            ? Number(((achieved / measure.targetValue) * 100).toFixed(1))
-            : 0,
+        achievementRate: getAchievementRate(achieved, measure.targetValue),
       };
     });
     const totalAchieved = measures.reduce((accumulator, measure) => {
@@ -281,6 +275,14 @@ export class DailyLogService {
 
     return measure;
   }
+}
+
+function getAchievementRate(achieved: number, targetValue: number) {
+  if (targetValue <= 0) {
+    return 0;
+  }
+
+  return Number(((Math.min(achieved, targetValue) / targetValue) * 100).toFixed(1));
 }
 
 function getCurrentWeekStart() {

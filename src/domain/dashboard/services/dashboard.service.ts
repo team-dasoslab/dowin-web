@@ -129,10 +129,10 @@ export class DashboardService {
             }
 
             const achieved = measureLogs.filter((log) => log.value).length;
-            const achievementRate =
-              leadMeasure.targetValue > 0
-                ? Number(((achieved / leadMeasure.targetValue) * 100).toFixed(1))
-                : 0;
+            const achievementRate = getAchievementRate(
+              achieved,
+              leadMeasure.targetValue,
+            );
 
             return {
               id: leadMeasure.id,
@@ -149,22 +149,15 @@ export class DashboardService {
           (leadMeasure) => leadMeasure.period !== "MONTHLY",
         );
         const achieved = weeklyLeadMeasures.reduce(
-          (sum, leadMeasure) => sum + leadMeasure.achieved,
+          (sum, leadMeasure) =>
+            sum + Math.min(leadMeasure.achieved, leadMeasure.targetValue),
           0,
         );
         const total = weeklyLeadMeasures.reduce(
           (sum, leadMeasure) => sum + leadMeasure.targetValue,
           0,
         );
-        const achievementRate =
-          weeklyLeadMeasures.length > 0
-            ? Math.round(
-                weeklyLeadMeasures.reduce(
-                  (sum, leadMeasure) => sum + leadMeasure.achievementRate,
-                  0,
-                ) / weeklyLeadMeasures.length,
-              )
-            : 0;
+        const achievementRate = total > 0 ? Math.round((achieved / total) * 100) : 0;
         const monthlyMeasures = leadMeasures.filter(
           (leadMeasure) => leadMeasure.period === "WEEKLY" || leadMeasure.period === "MONTHLY",
         );
@@ -231,6 +224,14 @@ export class DashboardService {
       }),
     };
   }
+}
+
+function getAchievementRate(achieved: number, targetValue: number) {
+  if (targetValue <= 0) {
+    return 0;
+  }
+
+  return Number(((Math.min(achieved, targetValue) / targetValue) * 100).toFixed(1));
 }
 
 function getCurrentWeekStart() {

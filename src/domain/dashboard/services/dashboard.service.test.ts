@@ -161,4 +161,75 @@ describe("DashboardService", () => {
       "2026-03-31",
     );
   });
+
+  it("팀 대시보드 주간 전체 달성률은 각 지표 목표 상한을 넘겨 합산하지 않는다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
+    findMembers.mockResolvedValue([
+      {
+        id: 100,
+        workspaceId: 3,
+        userId: 11,
+        role: "ADMIN",
+        user: { nickname: "지훈", avatarKey: "smile.blue" },
+      },
+    ]);
+    findActiveScoreboardsByWorkspace.mockResolvedValue([
+      {
+        id: 21,
+        userId: 11,
+        goalName: "루틴 만들기",
+        lagMeasure: "주간 실행",
+        status: "ACTIVE",
+        leadMeasures: [
+          {
+            id: 31,
+            name: "유산소",
+            targetValue: 3,
+            period: "WEEKLY",
+            status: "ACTIVE",
+          },
+          {
+            id: 32,
+            name: "근력",
+            targetValue: 5,
+            period: "WEEKLY",
+            status: "ACTIVE",
+          },
+        ],
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 31, logDate: "2026-03-09", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-11", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-12", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-13", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-09", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-10", value: true },
+    ]);
+
+    const result = await service.getTeamDashboard(11, "2026-03-09");
+
+    expect(result.members).toEqual([
+      expect.objectContaining({
+        userId: 11,
+        achieved: 5,
+        total: 8,
+        achievementRate: 63,
+        weeklyAchievementRate: 63,
+        leadMeasures: expect.arrayContaining([
+          expect.objectContaining({
+            id: 31,
+            achieved: 5,
+            achievementRate: 100,
+          }),
+          expect.objectContaining({
+            id: 32,
+            achieved: 2,
+            achievementRate: 40,
+          }),
+        ]),
+      }),
+    ]);
+  });
 });
