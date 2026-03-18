@@ -1,4 +1,5 @@
 import { TeamDashboardMember } from "@/api/generated/wig.schemas";
+import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import { UserAvatar } from "@/components/UserAvatar";
 
 const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
@@ -37,10 +38,6 @@ export function WeeklyTable({ member, weekDates }: WeeklyTableProps) {
         {member.leadMeasures?.map((leadMeasure) => {
           const achievedCount = leadMeasure.achieved ?? 0;
           const targetValue = leadMeasure.targetValue ?? 0;
-          const rate =
-            targetValue > 0
-              ? Math.round((achievedCount / targetValue) * 100)
-              : 0;
 
           return (
             <div
@@ -61,13 +58,10 @@ export function WeeklyTable({ member, weekDates }: WeeklyTableProps) {
                         : "월"}
                   </p>
                 </div>
-                <p
-                  className={`shrink-0 text-sm font-bold font-mono ${
-                    rate >= 100 ? "text-green-600" : "text-text-secondary"
-                  }`}
-                >
-                  {achievedCount}/{targetValue}
-                </p>
+                <AchievementProgress
+                  achievedCount={achievedCount}
+                  targetValue={targetValue}
+                />
               </div>
 
               <div className="mt-3 grid grid-cols-7 gap-1.5">

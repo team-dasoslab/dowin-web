@@ -1,5 +1,6 @@
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
+import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { Check } from "lucide-react";
@@ -53,8 +54,6 @@ function WeeklyMobileCard({
   const weekly = weeklyById.get(leadMeasureId);
   const achievedCount = weekly?.achieved ?? 0;
   const targetValue = leadMeasure.targetValue ?? 0;
-  const rate =
-    targetValue > 0 ? Math.round((achievedCount / targetValue) * 100) : 0;
 
   return (
     <div className="rounded-lg border border-border bg-white p-4">
@@ -72,16 +71,10 @@ function WeeklyMobileCard({
                 : "월"}
           </p>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="text-[10px] text-text-muted">달성</p>
-          <p
-            className={`text-sm font-bold font-mono ${
-              rate >= 100 ? "text-green-600" : "text-text-secondary"
-            }`}
-          >
-            {achievedCount}/{targetValue}
-          </p>
-        </div>
+        <AchievementProgress
+          achievedCount={achievedCount}
+          targetValue={targetValue}
+        />
       </div>
 
       <div className="mt-3 grid grid-cols-7 gap-1.5">

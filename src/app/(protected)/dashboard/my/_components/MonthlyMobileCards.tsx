@@ -1,4 +1,5 @@
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
+import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import {
   DAY_LABELS,
   getMonthCalendarWeeks,
@@ -98,10 +99,6 @@ function MonthlyMobileMeasureCard({
 
     return leadMeasure.logs?.[date] === true ? count + 1 : count;
   }, 0);
-  const rate =
-    targetValue > 0
-      ? Math.round((visibleAchievedCount / targetValue) * 100)
-      : 0;
 
   return (
     <div className="rounded-lg border border-border bg-sub-background/40 p-3">
@@ -114,13 +111,12 @@ function MonthlyMobileMeasureCard({
             목표 {targetValue}회 / {leadMeasure.period === "WEEKLY" ? "주" : "월"}
           </p>
         </div>
-        <p
-          className={`shrink-0 text-xs font-bold font-mono ${
-            rate >= 100 ? "text-green-600" : "text-text-secondary"
-          }`}
-        >
-          {visibleAchievedCount}/{targetValue}
-        </p>
+        <AchievementProgress
+          achievedCount={visibleAchievedCount}
+          targetValue={targetValue}
+          trackBackgroundClassName="bg-white"
+          valueTextSizeClassName="text-xs"
+        />
       </div>
 
       <div className="mt-3 grid grid-cols-7 gap-1.5">
