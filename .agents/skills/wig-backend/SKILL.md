@@ -1,9 +1,9 @@
 ---
-name: wig-backend-tdd
+name: wig-backend
 description: Use this skill when adding or changing WIG backend APIs, route handlers, services, storage code, validation, auth, or database-backed business rules. Trigger it for requests about API implementation, backend refactors, auth/session logic, storage changes, TDD-first backend work, or backend bug fixes in this repository.
 ---
 
-# Wig Backend Tdd
+# Wig Backend
 
 ## Overview
 
@@ -23,7 +23,7 @@ If docs conflict with code, verify the implementation and trust the current code
 ## WIG Backend Facts
 
 - Auth currently uses the `wig_sid` session cookie in active code paths.
-- Route handlers should use `withErrorHandler` from `src/lib/with-error-handler.ts`.
+- Route handlers should use `withErrorHandler` from `src/lib/server/with-error-handler.ts`.
 - Success and error responses should use `apiSuccess` and `apiError`.
 - Input validation should use Zod.
 - DB access should stay in `src/domain/*/storage`.
@@ -81,9 +81,14 @@ Use the smallest useful verification set first, then broaden:
 ```bash
 yarn test --run <changed-test-file>
 yarn test
-yarn tsc --noEmit
-yarn lint
+yarn eslint <changed-files>
 ```
+
+Repository note:
+
+- `yarn tsc --noEmit` currently fails on unrelated existing type errors in the repo.
+- `yarn lint` currently fails because the `next lint` script is misconfigured.
+- Run those only when they are directly relevant, and report whether failures are pre-existing.
 
 If the task changes API contracts, also update:
 

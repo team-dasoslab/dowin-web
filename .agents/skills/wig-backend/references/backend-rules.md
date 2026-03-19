@@ -27,9 +27,13 @@
 ```bash
 yarn test --run <changed-test-file>
 yarn test
-yarn tsc --noEmit
-yarn lint
+yarn eslint <changed-files>
 ```
+
+Current repo caveat:
+
+- `yarn tsc --noEmit` may fail because of existing unrelated type errors.
+- `yarn lint` is currently not a reliable gate because the script itself is broken.
 
 If API contracts changed:
 

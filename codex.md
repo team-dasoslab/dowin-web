@@ -242,7 +242,7 @@ Claude Code처럼 포괄적으로 요청해도 되지만, Codex에는 아래 형
 
 ### 어떤 요청이 어떤 스킬을 타는가
 
-- `wig-backend-tdd`
+- `wig-backend`
   - API 추가, 인증/세션 수정, 서비스/스토리지 수정, 백엔드 버그 수정
 - `wig-frontend`
   - 페이지 UI 변경, Orval 연동, Query invalidation, 공통 UI/Storybook 작업

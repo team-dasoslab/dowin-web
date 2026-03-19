@@ -36,7 +36,7 @@ This repository contains project-local skill drafts in `.agents/skills/`.
 
 Available local skills:
 
-- `wig-backend-tdd`
+- `wig-backend`
 - `wig-frontend`
 - `wig-planning`
 - `wig-quality-check`
@@ -44,7 +44,7 @@ Available local skills:
 
 Skill file locations:
 
-- `.agents/skills/wig-backend-tdd/SKILL.md`
+- `.agents/skills/wig-backend/SKILL.md`
 - `.agents/skills/wig-frontend/SKILL.md`
 - `.agents/skills/wig-planning/SKILL.md`
 - `.agents/skills/wig-quality-check/SKILL.md`
@@ -58,7 +58,7 @@ How to use them:
 
 Trigger examples:
 
-- `wig-backend-tdd`
+- `wig-backend`
   - "로그인 API 에러 응답 규격 맞춰줘"
   - "workspace 멤버 강퇴 API 추가해줘"
   - "daily log 미래 날짜 검증 버그 고쳐줘"
