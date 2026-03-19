@@ -47,6 +47,19 @@ export interface ScoreboardDbPort {
 export class ScoreboardStorage {
   constructor(private db: ScoreboardDbPort) {}
 
+  async findActiveScoreboardsForPush(): Promise<
+    Array<Pick<ScoreboardRecord, "id" | "userId" | "goalName">>
+  > {
+    return (await this.db.query.scoreboards.findMany({
+      where: eq(scoreboards.status, "ACTIVE"),
+      columns: {
+        id: true,
+        userId: true,
+        goalName: true,
+      },
+    })) as Array<Pick<ScoreboardRecord, "id" | "userId" | "goalName">>;
+  }
+
   async findActiveScoreboard(
     userId: number,
     workspaceId: number,

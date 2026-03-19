@@ -1,10 +1,11 @@
 import withSerwistInit from "@serwist/next";
 import type { NextConfig } from "next";
+import { serverRuntimeConfig } from "./src/config/server-runtime-config";
 
 const withSerwist = withSerwistInit({
   swSrc: "src/app/sw.ts",
   swDest: "public/sw.js",
-  disable: process.env.NODE_ENV === "development",
+  disable: serverRuntimeConfig.isDevelopment,
 });
 
 const nextConfig: NextConfig = {
@@ -13,7 +14,7 @@ const nextConfig: NextConfig = {
   turbopack: {},
 };
 
-export default process.env.NODE_ENV === "development"
+export default serverRuntimeConfig.isDevelopment
   ? nextConfig
   : withSerwist(nextConfig);
 

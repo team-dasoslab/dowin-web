@@ -1,0 +1,20 @@
+name: Weekly Focus Push Notification Cron
+
+on:
+  schedule:
+    # Thursday 15:00 KST is Thursday 06:00 UTC
+    - cron: "0 6 * * 4"
+  workflow_dispatch:
+
+jobs:
+  send-request:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Send request to /api/push/send-weekly-focus
+        run: |
+          curl -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json" \
+            -d '{}' \
+            "https://wig.ixio0330.workers.dev/api/push/send-weekly-focus"

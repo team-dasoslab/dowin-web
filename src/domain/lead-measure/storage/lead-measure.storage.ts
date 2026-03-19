@@ -1,10 +1,14 @@
 import { leadMeasures, scoreboards } from "@/db/schema";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
 export type LeadMeasureRecord = typeof leadMeasures.$inferSelect;
 export type LeadMeasureWithScoreboard = LeadMeasureRecord & {
   scoreboard: typeof scoreboards.$inferSelect;
 };
+export type LeadMeasureForPushRecord = Pick<
+  LeadMeasureRecord,
+  "id" | "scoreboardId" | "name" | "targetValue" | "period"
+>;
 
 export type CreateLeadMeasureInput = {
   scoreboardId: number;
@@ -43,6 +47,29 @@ export interface LeadMeasureDbPort {
 
 export class LeadMeasureStorage {
   constructor(private db: LeadMeasureDbPort) {}
+
+  async findActiveLeadMeasuresByScoreboardIds(
+    scoreboardIds: number[],
+  ): Promise<LeadMeasureForPushRecord[]> {
+    if (scoreboardIds.length === 0) {
+      return [];
+    }
+
+    return (await this.db.query.leadMeasures.findMany({
+      where: and(
+        inArray(leadMeasures.scoreboardId, scoreboardIds),
+        eq(leadMeasures.status, "ACTIVE"),
+      ),
+      columns: {
+        id: true,
+        scoreboardId: true,
+        name: true,
+        targetValue: true,
+        period: true,
+      },
+      orderBy: [asc(leadMeasures.createdAt)],
+    })) as LeadMeasureForPushRecord[];
+  }
 
   async findLeadMeasuresByScoreboard(
     scoreboardId: number,

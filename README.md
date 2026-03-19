@@ -73,7 +73,7 @@ yarn install
 
 - `.env.local`
   - Next.js 앱이 읽습니다.
-  - 브라우저에서 쓰는 `process.env.NEXT_PUBLIC_*` 값이 여기서 주입됩니다.
+  - 브라우저에서 쓰는 `NEXT_PUBLIC_*` 값이 여기서 주입됩니다.
 - `.dev.vars`
   - `wrangler dev`로 실행되는 Worker 런타임이 읽습니다.
   - API 라우트에서 `env.*`로 접근하는 값이 여기서 주입됩니다.

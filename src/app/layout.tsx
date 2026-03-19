@@ -2,6 +2,7 @@
 
 import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
 import SerwistRegistration from "@/components/SerwistRegistration";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { ToastProvider } from "@/context/ToastContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
@@ -12,7 +13,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const shouldRegisterServiceWorker = process.env.NODE_ENV !== "development";
+  const shouldRegisterServiceWorker = !publicRuntimeConfig.isDevelopment;
   const [queryClient] = useState(
     () =>
       new QueryClient({

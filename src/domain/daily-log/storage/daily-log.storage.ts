@@ -83,7 +83,19 @@ export class DailyLogStorage {
     weekStart: string,
     weekEnd: string,
   ): Promise<Record<number, number>> {
-    const logs = await this.findLogsForLeadMeasures(leadMeasureIds, weekStart, weekEnd);
+    return await this.countTrueLogsForLeadMeasuresInRange(
+      leadMeasureIds,
+      weekStart,
+      weekEnd,
+    );
+  }
+
+  async countTrueLogsForLeadMeasuresInRange(
+    leadMeasureIds: number[],
+    from: string,
+    to: string,
+  ): Promise<Record<number, number>> {
+    const logs = await this.findLogsForLeadMeasures(leadMeasureIds, from, to);
 
     return logs.reduce<Record<number, number>>((acc, log) => {
       if (log.value) {

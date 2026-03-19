@@ -86,7 +86,6 @@ export default function ProfilePage() {
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
-  const pushUserId = user?.id != null ? String(user.id) : null;
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
@@ -321,9 +320,7 @@ export default function ProfilePage() {
           icon: <Bell className="w-3.5 h-3.5" />,
           title: "매일 밤 9시 알림",
           description: "리드 지표 기록을 잊지 않도록 푸시 알림을 보냅니다.",
-          rightElement: pushUserId ? (
-            <PushSubscriptionManager userId={pushUserId} variant="toggle" />
-          ) : null,
+          rightElement: user ? <PushSubscriptionManager variant="toggle" /> : null,
         },
       ],
     },

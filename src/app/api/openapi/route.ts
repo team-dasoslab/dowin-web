@@ -1,10 +1,11 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { serverRuntimeConfig } from "@/config/server-runtime-config";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (process.env.NODE_ENV !== "development") {
+  if (!serverRuntimeConfig.isDevelopment) {
     return new Response("Not Found", { status: 404 });
   }
 

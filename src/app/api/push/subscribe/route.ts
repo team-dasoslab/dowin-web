@@ -1,5 +1,6 @@
 import { getDb } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
+import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
@@ -16,17 +17,21 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as {
       subscription: PushSubscription;
-      userId: string;
     };
-    const { subscription, userId } = body;
+    const { subscription } = body;
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
+    const session = await getSession(db);
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     // Save or update subscription
     await db
       .insert(pushSubscriptions)
       .values({
-        userId,
+        userId: String(session.userId),
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
       .onConflictDoUpdate({
         target: pushSubscriptions.endpoint,
         set: {
-          userId,
+          userId: String(session.userId),
           p256dh: subscription.keys.p256dh,
           auth: subscription.keys.auth,
         },
@@ -53,6 +58,11 @@ export async function DELETE(req: NextRequest) {
     const { endpoint } = body;
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
+    const session = await getSession(db);
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     await db
       .delete(pushSubscriptions)
