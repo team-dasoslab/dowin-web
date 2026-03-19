@@ -4,12 +4,11 @@
 
 1. `package.json`
 2. `docs/onboarding.md`
-3. `.agents/workflows/backend-tdd.md`
-4. `docs/dev/common/2026.03.12-api-conventions.md`
-5. `docs/dev/common/2026.03.12-security.md`
-6. `docs/dev/common/2026.03.14-common-utilities.md`
-7. the relevant `docs/dev/**/2026.03.12-domain-*.md`
-8. the current implementation in `src/app/api`, `src/domain`, `src/lib`, `src/db`
+3. `docs/dev/common/2026.03.12-api-conventions.md`
+4. `docs/dev/common/2026.03.12-security.md`
+5. `docs/dev/common/2026.03.14-common-utilities.md`
+6. the relevant `docs/dev/**/2026.03.12-domain-*.md`
+7. the current implementation in `src/app/api`, `src/domain`, `src/lib`, `src/db`
 
 ## Repository Conventions
 

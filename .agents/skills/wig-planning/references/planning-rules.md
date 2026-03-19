@@ -2,11 +2,10 @@
 
 ## Read Order
 
-1. `.agents/workflows/planning.md`
-2. `docs/onboarding.md`
-3. the relevant docs in `docs/planning/`
-4. the relevant docs in `docs/dev/`
-5. current implementation only when feasibility or status matters
+1. `docs/onboarding.md`
+2. the relevant docs in `docs/planning/`
+3. the relevant docs in `docs/dev/`
+4. current implementation only when feasibility or status matters
 
 ## Repository Conventions
 

@@ -10,7 +10,7 @@ Before making changes, read only the files needed for the task in this order:
 
 1. `README.md`
 2. `docs/onboarding.md`
-3. `.agents/workflows/*.md`
+3. the relevant `.agents/skills/*/SKILL.md`
 4. relevant `docs/dev/common/*`
 5. relevant domain docs in `docs/dev/**`
 6. current implementation files
@@ -20,15 +20,15 @@ If documents conflict with code, verify the implementation and prefer the curren
 ## Repository Rules
 
 - Use `yarn` only.
-- For backend changes, follow `.agents/workflows/backend-tdd.md`.
-- For frontend changes, follow `.agents/workflows/frontend.md`.
-- For planning and documentation work, follow `.agents/workflows/planning.md`.
+- For backend changes, follow `.agents/skills/wig-backend/SKILL.md`.
+- For frontend changes, follow `.agents/skills/wig-frontend/SKILL.md`.
+- For planning and documentation work, follow `.agents/skills/wig-planning/SKILL.md`.
 - Reuse existing patterns before introducing new structure.
 - Use Zod for input validation.
 - Use `apiSuccess`, `apiError`, and `withErrorHandler` patterns for API work.
 - Auth currently uses the `wig_sid` session cookie pattern in active code.
 - Update `src/api-spec/openapi.yaml` first when API contracts change.
-- Consider `docs/onboarding.md` and matching `docs/dev/` files for material workflow or architecture changes.
+- Consider `docs/onboarding.md` and matching `docs/dev/` files for material skill, process, or architecture changes.
 
 ## Project Skills
 
@@ -53,7 +53,7 @@ Skill file locations:
 How to use them:
 
 - If a task clearly matches one of these skills, read the matching `SKILL.md` first.
-- Use the skill as a repository-specific extension of the workflow docs, not as a replacement for reading the current code.
+- Use the skill as the repository-specific operating guide for that task, not as a replacement for reading the current code.
 - If these skills are later installed into `$CODEX_HOME/skills`, keep the installed copies aligned with the repository versions.
 
 Trigger examples:

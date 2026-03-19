@@ -13,10 +13,10 @@ Read only the files needed for the task.
 
 Start with:
 
-1. `.agents/workflows/frontend.md`
-2. `references/frontend-rules.md`
-3. the relevant domain doc
-4. the current page/component implementation
+1. `references/frontend-rules.md`
+2. the relevant domain doc
+3. the current page/component implementation
+4. API contract/generated client files when needed
 
 If current code and docs differ, verify the implementation and preserve established patterns.
 
@@ -105,4 +105,4 @@ Update docs when frontend conventions or user-facing flows change materially:
 
 - relevant domain doc in `docs/dev/`
 - `docs/onboarding.md`
-- `.agents/workflows/frontend.md` if the standard itself changed
+- this skill or `references/frontend-rules.md` if the frontend standard itself changed

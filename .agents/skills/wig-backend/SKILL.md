@@ -13,10 +13,10 @@ Read only the files needed for the current task.
 
 Start with:
 
-1. `.agents/workflows/backend-tdd.md`
-2. `references/backend-rules.md`
-3. the matching domain doc
-4. the current implementation
+1. `references/backend-rules.md`
+2. the matching domain doc
+3. the current implementation
+4. related common docs only when needed
 
 If docs conflict with code, verify the implementation and trust the current code path.
 
@@ -115,4 +115,4 @@ Update the relevant docs when backend behavior or contracts changed materially:
 
 - `src/api-spec/openapi.yaml`
 - matching domain doc in `docs/dev/`
-- `docs/onboarding.md` for workflow or architecture changes
+- `docs/onboarding.md` for backend process or architecture changes

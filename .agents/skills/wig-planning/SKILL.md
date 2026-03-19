@@ -13,10 +13,10 @@ Read only what is needed.
 
 Start with:
 
-1. `.agents/workflows/planning.md`
-2. `references/planning-rules.md`
-3. the relevant existing planning docs
-4. the relevant domain docs
+1. `references/planning-rules.md`
+2. the relevant existing planning docs
+3. the relevant domain docs
+4. implementation only when feasibility or status matters
 
 Read implementation only when feasibility or current status matters.
 

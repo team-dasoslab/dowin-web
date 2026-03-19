@@ -35,10 +35,12 @@ WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워
 1. [`README.md`](/README.md)
 2. [`docs/onboarding.md`](/docs/onboarding.md)
 3. 백엔드 첫 진입 시: [`docs/dev/backend/2026.03.18-backend-onboarding.md`](/docs/dev/backend/2026.03.18-backend-onboarding.md)
-4. 작업 유형별 워크플로우
-   - 문서/기획: [`.agents/workflows/planning.md`](/.agents/workflows/planning.md)
-   - 프론트: [`.agents/workflows/frontend.md`](/.agents/workflows/frontend.md)
-   - 백엔드: [`.agents/workflows/backend-tdd.md`](/.agents/workflows/backend-tdd.md)
+4. 작업 유형별 스킬
+   - 문서/기획: [`.agents/skills/wig-planning/SKILL.md`](/.agents/skills/wig-planning/SKILL.md)
+   - 프론트: [`.agents/skills/wig-frontend/SKILL.md`](/.agents/skills/wig-frontend/SKILL.md)
+   - 백엔드: [`.agents/skills/wig-backend/SKILL.md`](/.agents/skills/wig-backend/SKILL.md)
+   - 품질 점검: [`.agents/skills/wig-quality-check/SKILL.md`](/.agents/skills/wig-quality-check/SKILL.md)
+   - 제품 업데이트: [`.agents/skills/wig-product-updates/SKILL.md`](/.agents/skills/wig-product-updates/SKILL.md)
 5. 공통 설계 문서
    - [`docs/dev/common/2026.03.12-domain-overview.md`](/docs/dev/common/2026.03.12-domain-overview.md)
    - [`docs/dev/common/2026.03.12-api-conventions.md`](/docs/dev/common/2026.03.12-api-conventions.md)
