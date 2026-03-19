@@ -210,7 +210,7 @@ yarn preview
 - Dashboard: `/api/dashboard/team`
 - Profile: `/api/users/me`
 - Analytics: `/api/analytics/export-data`
-- Push: `/api/push/subscribe`, `/api/push/test`, `/api/push/send-daily`
+- Push: `/api/push/subscribe`, `/api/push/send-daily`
 - OpenAPI: `/api/openapi`
 
 주의할 점도 있다.
