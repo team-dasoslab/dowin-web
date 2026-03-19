@@ -6,12 +6,13 @@ WIG는 4DX(실행의 4가지 원칙)를 기반으로 개인/팀의 목표 실행
 ## 핵심 기능
 
 - 인증 및 세션 기반 로그인 (`wig_sid` 쿠키)
-- 워크스페이스 생성/참가 및 멤버 관리
+- 워크스페이스 생성/참가, 이름 변경, 멤버 관리
 - WIG(가중목) 점수판 생성, 보관, 재활성화
 - 선행지표(Lead Measure) 생성/관리
 - 일일 O/X 기록 및 주간/월간 달성률 집계
 - 내 대시보드 / 팀 대시보드 조회
-- 프로필 조회/수정
+- 프로필 조회/수정, preset avatar 선택, 푸시 알림 토글
+- 선행지표 CSV export
 
 ## 기술 스택
 
@@ -47,7 +48,7 @@ WIG는 4DX(실행의 4가지 원칙)를 기반으로 개인/팀의 목표 실행
 
 ### 1) 사전 준비
 
-- Node.js 20+
+- Node.js 18+
 - Yarn 4 (`corepack enable` 권장)
 - Cloudflare 계정 (배포 또는 D1 원격 작업 시)
 
@@ -66,7 +67,26 @@ yarn install
   - `VAPID_PRIVATE_KEY`
   - `CRON_SECRET`
 
-`.env.example`를 기준으로 로컬용 `.env`와 `.dev.vars`를 작성하면 됩니다.
+`.env.example`를 기준으로 로컬용 `.env.local`과 `.dev.vars`를 작성하면 됩니다.
+
+둘을 나누는 이유는 값을 읽는 실행 환경이 다르기 때문입니다.
+
+- `.env.local`
+  - Next.js 앱이 읽습니다.
+  - 브라우저에서 쓰는 `process.env.NEXT_PUBLIC_*` 값이 여기서 주입됩니다.
+- `.dev.vars`
+  - `wrangler dev`로 실행되는 Worker 런타임이 읽습니다.
+  - API 라우트에서 `env.*`로 접근하는 값이 여기서 주입됩니다.
+
+현재 WIG에서는 `NEXT_PUBLIC_VAPID_PUBLIC_KEY`가 클라이언트와 서버 양쪽에서 모두 필요하므로 두 파일에 모두 넣습니다.
+
+- `.env.local`
+  - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
+- `.dev.vars`
+  - `NEXTJS_ENV`
+  - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
+  - `VAPID_PRIVATE_KEY`
+  - `CRON_SECRET`
 
 ### 4) 로컬 DB 마이그레이션
 
@@ -125,5 +145,6 @@ yarn wrangler secret put <KEY_NAME>
 ## 문서 시작점
 
 - 온보딩: `docs/onboarding.md`
-- 스킬: `.agents/workflows/frontend.md`, `.agents/workflows/backend-tdd.md`, `.agents/workflows/planning.md`
+- 개발자 시작 문서: `docs/dev/README.md`
 - 도메인 개요: `docs/dev/common/2026.03.12-domain-overview.md`
+- 스킬: `.agents/workflows/frontend.md`, `.agents/workflows/backend-tdd.md`, `.agents/workflows/planning.md`
