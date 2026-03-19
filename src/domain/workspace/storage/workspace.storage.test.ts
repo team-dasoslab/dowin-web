@@ -7,9 +7,9 @@ type MockDb = {
     workspaces: {
       findFirst: ReturnType<typeof vi.fn>;
     };
-    workspaceMembers?: {
-      findFirst?: ReturnType<typeof vi.fn>;
-      findMany?: ReturnType<typeof vi.fn>;
+    workspaceMembers: {
+      findFirst: ReturnType<typeof vi.fn>;
+      findMany: ReturnType<typeof vi.fn>;
     };
   };
   insert: ReturnType<typeof vi.fn>;
@@ -29,6 +29,10 @@ describe("WorkspaceStorage", () => {
       workspaces: {
         findFirst: vi.fn(),
       },
+      workspaceMembers: {
+        findFirst: vi.fn(),
+        findMany: vi.fn(),
+      },
     },
     insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
@@ -41,7 +45,9 @@ describe("WorkspaceStorage", () => {
     where: vi.fn().mockReturnThis(),
   } satisfies MockDb;
 
-  const storage = new WorkspaceStorage(mockDb);
+  const storage = new WorkspaceStorage(
+    mockDb as unknown as ConstructorParameters<typeof WorkspaceStorage>[0],
+  );
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -51,8 +57,12 @@ describe("WorkspaceStorage", () => {
     it("사용자가 소속된 워크스페이스 정보를 반환한다", async () => {
       const mockWorkspace = { id: 1, name: "Test Workspace" };
       mockDb.query = {
+        workspaces: {
+          findFirst: vi.fn(),
+        },
         workspaceMembers: {
           findFirst: vi.fn().mockResolvedValue({ workspace: mockWorkspace }),
+          findMany: vi.fn(),
         },
       };
 
@@ -119,8 +129,8 @@ describe("WorkspaceStorage", () => {
     it("워크스페이스 멤버 목록을 반환한다", async () => {
       const mockMembers = [{ user: { nickname: "Tester" } }];
       mockDb.query.workspaceMembers = {
-        ...mockDb.query.workspaceMembers,
         findMany: vi.fn().mockResolvedValue(mockMembers),
+        findFirst: vi.fn(),
       };
 
       const result = await storage.findMembers(1);
@@ -134,8 +144,8 @@ describe("WorkspaceStorage", () => {
     it("사용자의 멤버십을 반환한다", async () => {
       const mockMembership = { userId: 123, role: "ADMIN" };
       mockDb.query.workspaceMembers = {
-        ...mockDb.query.workspaceMembers,
         findFirst: vi.fn().mockResolvedValue(mockMembership),
+        findMany: vi.fn(),
       };
 
       const result = await storage.findMembershipByUserId(123);
@@ -149,8 +159,8 @@ describe("WorkspaceStorage", () => {
     it("특정 워크스페이스의 멤버십을 반환한다", async () => {
       const mockMembership = { workspaceId: 1, userId: 123, role: "MEMBER" };
       mockDb.query.workspaceMembers = {
-        ...mockDb.query.workspaceMembers,
         findFirst: vi.fn().mockResolvedValue(mockMembership),
+        findMany: vi.fn(),
       };
 
       const result = await storage.findMembership(1, 123);
@@ -164,8 +174,8 @@ describe("WorkspaceStorage", () => {
     it("특정 멤버십 id를 조회한다", async () => {
       const mockMembership = { id: 9, workspaceId: 1, userId: 123, role: "MEMBER" };
       mockDb.query.workspaceMembers = {
-        ...mockDb.query.workspaceMembers,
         findFirst: vi.fn().mockResolvedValue(mockMembership),
+        findMany: vi.fn(),
       };
 
       const result = await storage.findMembershipById(1, 9);

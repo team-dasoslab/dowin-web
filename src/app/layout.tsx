@@ -107,6 +107,7 @@ export default function RootLayout({
         />
         {/* splash end */}
 
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap"

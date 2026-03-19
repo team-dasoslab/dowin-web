@@ -9,7 +9,59 @@ declare global {
   }
 }
 
-declare const self: ServiceWorkerGlobalScope;
+type PushMessageData = {
+  title: string;
+  body?: string;
+  icon?: string;
+  data?: {
+    url?: string;
+  };
+};
+
+type PushEventLike = Event & {
+  data?: {
+    json(): PushMessageData;
+  };
+  waitUntil(promise: Promise<unknown>): void;
+};
+
+type NotificationClickEventLike = Event & {
+  notification: Notification & {
+    data: {
+      url?: string;
+    };
+  };
+  waitUntil(promise: Promise<unknown>): void;
+};
+
+type ServiceWorkerClient = {
+  url: string;
+  focus(): Promise<unknown>;
+};
+
+type ServiceWorkerClients = {
+  matchAll(options?: {
+    type?: "window" | "worker" | "sharedworker" | "all";
+    includeUncontrolled?: boolean;
+  }): Promise<readonly ServiceWorkerClient[]>;
+  openWindow?(url: string): Promise<unknown>;
+};
+
+type ServiceWorkerScope = ServiceWorkerGlobalScope & {
+  addEventListener(
+    type: "push",
+    listener: (event: PushEventLike) => void,
+  ): void;
+  addEventListener(
+    type: "notificationclick",
+    listener: (event: NotificationClickEventLike) => void,
+  ): void;
+  registration: ServiceWorkerRegistration;
+  clients: ServiceWorkerClients;
+  __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+};
+
+declare const self: ServiceWorkerScope;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -19,11 +71,10 @@ const serwist = new Serwist({
   runtimeCaching: defaultCache,
 });
 
-// Use 'any' casting to bypass environment-specific TS lint errors in the service worker
-const sw = self as any;
+const sw = self;
 
 // 푸시 알림 수신 이벤트
-sw.addEventListener("push", (event: any) => {
+sw.addEventListener("push", (event) => {
   if (!event.data) return;
 
   try {
@@ -44,14 +95,14 @@ sw.addEventListener("push", (event: any) => {
 });
 
 // 알림 클릭 이벤트
-sw.addEventListener("notificationclick", (event: any) => {
+sw.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const urlToOpen = event.notification.data.url;
 
   event.waitUntil(
     sw.clients
       .matchAll({ type: "window", includeUncontrolled: true })
-      .then((windowClients: any[]) => {
+      .then((windowClients: readonly ServiceWorkerClient[]) => {
         for (const client of windowClients) {
           if (client.url === urlToOpen && "focus" in client) {
             return client.focus();

@@ -20,9 +20,11 @@ vi.mock("@/lib/server/auth", () => ({
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
-  WorkspaceService: vi.fn(() => ({
+  WorkspaceService: vi.fn(function MockWorkspaceService() {
+    return {
     getMembers: mockGetMembers,
-  })),
+    };
+  }),
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
@@ -81,6 +83,6 @@ describe("GET /api/workspaces/:id/members", () => {
     });
 
     expect(response.status).toBe(200);
-    expect(mockGetMembers).toHaveBeenCalledWith(1);
+    expect(mockGetMembers).toHaveBeenCalledWith(1, 1);
   });
 });

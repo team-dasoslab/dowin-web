@@ -122,7 +122,7 @@ describe("DashboardService", () => {
               period: "MONTHLY",
               targetValue: 2,
               achieved: 3,
-              achievementRate: 150,
+              achievementRate: 100,
               logs: {
                 "2026-03-09": true,
                 "2026-03-10": true,

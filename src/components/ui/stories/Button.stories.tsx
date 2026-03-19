@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Plus, Zap } from "lucide-react";
 import Link from "next/link";
 

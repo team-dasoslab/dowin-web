@@ -25,15 +25,19 @@ vi.mock("@/domain/auth/storage/auth.storage", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(() => ({
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
+    return {
     addMember: mockAddMember,
-  })),
+    };
+  }),
 }));
 
 vi.mock("@/domain/auth/services/auth.service", () => ({
-  AuthService: vi.fn(() => ({
+  AuthService: vi.fn(function MockAuthService() {
+    return {
     createUser: mockCreateUser,
-  })),
+    };
+  }),
 }));
 
 vi.mock("@/lib/server/authz", () => ({

@@ -1,4 +1,4 @@
-import { and, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, lte } from "drizzle-orm";
 import { dailyLogs } from "@/db/schema";
 
 export type DailyLogRecord = typeof dailyLogs.$inferSelect;

@@ -40,6 +40,7 @@ describe("Auth Service - login", () => {
       customId: "john123",
       passwordHash: await bcrypt.hash("password123", 10),
       nickname: "John",
+      avatarKey: null,
       isFirstLogin: true,
       createdAt: new Date(),
     };
@@ -79,6 +80,7 @@ describe("Auth Service - login", () => {
       customId: "john123",
       passwordHash: await bcrypt.hash("correct-pass", 10),
       nickname: "John",
+      avatarKey: null,
       isFirstLogin: true,
       createdAt: new Date(),
     };
@@ -115,6 +117,7 @@ describe("Auth Service - changePassword", () => {
       createdAt: new Date(),
       customId: "john123",
       nickname: "John",
+      avatarKey: null,
       isFirstLogin: false,
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
@@ -131,6 +134,7 @@ describe("Auth Service - changePassword", () => {
       createdAt: new Date(),
       customId: "john123",
       nickname: "John",
+      avatarKey: null,
       isFirstLogin: false,
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
@@ -154,6 +158,7 @@ describe("Auth Service - createUser", () => {
       id: 2,
       customId: "newmember",
       nickname: "New Member",
+      avatarKey: null,
       passwordHash: "hashed-password",
       isFirstLogin: true,
       createdAt: new Date(),

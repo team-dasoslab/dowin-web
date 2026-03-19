@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
       throw new Error(`Push failed: ${response.status} - ${text}`);
     }
     return NextResponse.json({ success: true, message: "Test push sent!" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Test push failed:", error);
     return NextResponse.json(
       {

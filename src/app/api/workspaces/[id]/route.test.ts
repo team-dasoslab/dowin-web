@@ -24,9 +24,11 @@ vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
-  WorkspaceService: vi.fn(() => ({
+  WorkspaceService: vi.fn(function MockWorkspaceService() {
+    return {
     updateWorkspaceName: mockUpdateWorkspaceName,
-  })),
+    };
+  }),
 }));
 
 vi.mock("@/lib/server/authz", () => ({
