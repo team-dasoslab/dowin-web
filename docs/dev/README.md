@@ -1,6 +1,6 @@
 # WIG Developer Onboarding
 
-최종 확인일: 2026-03-16
+최종 확인일: 2026-03-19
 
 이 문서는 WIG 저장소에 처음 들어온 개발자나 에이전트가 "무엇을 먼저 읽고, 어디를 고치고, 무엇을 조심해야 하는지"를 빠르게 파악하도록 만든 개발자용 시작 문서다. 기존 [`docs/onboarding.md`](/docs/onboarding.md)를 대체하지 않고, 현재 구현 기준으로 더 촘촘한 작업 안내를 보강한다.
 
@@ -8,7 +8,7 @@
 
 WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워크스페이스에 속하고, 활성 점수판을 만들고, 선행지표를 기록하면서 개인/팀 대시보드를 보는 구조다.
 
-현재 구현 중심축은 아래 7개다.
+현재 구현 중심축은 아래 9개다.
 
 - 인증: 로그인, 로그아웃, 비밀번호 변경, 관리자용 사용자 생성
 - 워크스페이스: 내 워크스페이스 조회, 생성, 참가, 멤버 조회
@@ -17,10 +17,12 @@ WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워
 - 일일 기록: 주간/월간 조회, 날짜별 기록 토글
 - 대시보드: 개인 뷰, 팀 뷰, 주간/월간 달성률
 - 프로필: 내 정보 조회, 닉네임 변경, 비밀번호 변경, 푸시 알림 토글
+- 업데이트 허브: `/updates` 인앱 새 기능 모아보기
+- export/analytics: `GET /api/analytics/export-data`와 CSV 다운로드
 
 아직 미완성 또는 후속 범위로 보이는 항목도 분명하다.
 
-- 별도 Analytics 제품화
+- 별도 Analytics 대시보드 제품화
 - 차트/시각화 고도화
 - 탈퇴 API
 - 팀 운영 고도화 기능
@@ -101,6 +103,10 @@ yarn preview
 - [`src/app/(protected)/setup/page.tsx`](</src/app/(protected)/setup/page.tsx>): 점수판/선행지표 설정
 - [`src/app/(protected)/scoreboards/page.tsx`](</src/app/(protected)/scoreboards/page.tsx>): 점수판 보관함
 - [`src/app/(protected)/profile/page.tsx`](</src/app/(protected)/profile/page.tsx>): 프로필/알림/로그아웃
+- [`src/app/(protected)/profile/avatar/page.tsx`](</src/app/(protected)/profile/avatar/page.tsx>): preset avatar 선택
+- [`src/app/(protected)/profile/members/page.tsx`](</src/app/(protected)/profile/members/page.tsx>): 관리자용 멤버 관리
+- [`src/app/(protected)/profile/export/page.tsx`](</src/app/(protected)/profile/export/page.tsx>): CSV 다운로드
+- [`src/app/(protected)/updates/page.tsx`](</src/app/(protected)/updates/page.tsx>): 새 기능 모아보기
 - [`src/app/(protected)/workspace/new/page.tsx`](</src/app/(protected)/workspace/new/page.tsx>): 워크스페이스 생성
 
 ### API 계약/생성 코드
@@ -163,6 +169,7 @@ yarn preview
 - 사용자는 워크스페이스가 없을 수 있다.
 - 이 경우 개인 대시보드와 보관함은 CTA 화면으로 빠진다.
 - 생성 화면은 `/workspace/new`에 있다.
+- 관리자는 프로필 하위에서 워크스페이스 이름 수정과 멤버 관리를 수행한다.
 
 ### Scoreboard / Lead Measure
 
@@ -180,9 +187,15 @@ yarn preview
 
 ### Profile / Push
 
-- 프로필은 `GET/PUT /api/users/me`를 사용한다.
+- 프로필은 `GET/PUT /api/users/me`를 사용하며 `avatarKey`도 함께 다룬다.
 - 비밀번호 변경은 Auth API를 재사용한다.
+- 프로필 하위에는 avatar 선택, 멤버 관리, CSV export 화면이 있다.
 - 푸시 알림은 브라우저 지원, 서비스워커, VAPID 키가 모두 맞아야 동작한다.
+
+### Analytics / Updates
+
+- 현재 analytics는 별도 대시보드 제품이 아니라 export API 중심으로 구현돼 있다.
+- `/updates`는 `src/content/product-updates.ts`를 원본으로 쓰는 인앱 업데이트 허브다.
 
 ## 7. 현재 API 표면
 
@@ -190,12 +203,13 @@ yarn preview
 
 - Auth: `/api/auth/login`, `/api/auth/logout`, `/api/auth/password`
 - Admin: `/api/admin/users`
-- Workspace: `/api/workspaces`, `/api/workspaces/me`, `/api/workspaces/join`, `/api/workspaces/:id/members`
+- Workspace: `/api/workspaces`, `/api/workspaces/me`, `/api/workspaces/:id`, `/api/workspaces/join`, `/api/workspaces/:id/members`, `/api/workspaces/:id/members/:memberId`
 - Scoreboard: `/api/scoreboards`, `/api/scoreboards/active`, `/api/scoreboards/:id`, `/api/scoreboards/:id/archive`, `/api/scoreboards/:id/reactivate`
 - Lead Measure: `/api/scoreboards/:id/lead-measures`, `/api/lead-measures/:id`, `/api/lead-measures/:id/archive`, `/api/lead-measures/:id/reactivate`
 - Daily Log: `/api/lead-measures/:id/logs/:date`, `/api/scoreboards/:id/logs/weekly`, `/api/scoreboards/:id/logs/monthly`
 - Dashboard: `/api/dashboard/team`
 - Profile: `/api/users/me`
+- Analytics: `/api/analytics/export-data`
 - Push: `/api/push/subscribe`, `/api/push/test`, `/api/push/send-daily`
 - OpenAPI: `/api/openapi`
 
@@ -236,18 +250,20 @@ Drizzle 스키마 기준 핵심 테이블은 아래와 같다.
 
 ## 10. 품질 상태와 검증 팁
 
-2026-03-16에 실제로 확인한 기준이다.
+2026-03-19에 실제로 확인한 기준이다.
 
 - `yarn tsc --noEmit`: 통과
-- `yarn lint`: 실패
-  - 현재 `next lint`가 `Invalid project directory provided, no such directory: /lint`로 종료됨
+- `yarn lint`: 통과
+- `yarn test --run`: 통과
+- `yarn test:storybook --run`: 별도 브라우저/Storybook 테스트 경로
 
-그래서 작업 시에는 "관련 범위만 최소 검증" 원칙이 더 중요하다.
+그래서 작업 시에는 "관련 범위만 최소 검증 후 필요 시 전역 게이트 확장" 원칙이 적절하다.
 
 - 타입 영향이 크면 `yarn tsc --noEmit`
 - API 계약 바뀌면 `yarn gen:api`
 - 도메인 로직 바뀌면 해당 `vitest` 테스트
 - 프론트 단일 파일 수정은 필요한 경우 `yarn eslint <file>`
+- Storybook browser 테스트가 필요한 UI 변경이면 `yarn test:storybook --run`
 
 ## 11. 처음 작업할 때 추천 동선
 
@@ -287,6 +303,6 @@ Drizzle 스키마 기준 핵심 테이블은 아래와 같다.
 
 - 기존 문서 일부는 계획 상태를 아직 포함하고 있어 실제 구현보다 넓거나 다를 수 있다.
 - 특히 Dashboard는 문서상 별도 `/api/dashboard/me`가 보이지만, 현재 개인 뷰는 활성 점수판과 로그 API 조합으로 동작한다.
-- 타입체크/린트 상태는 "정상"이라고 가정하면 안 된다. 작업 전에 실제 명령 결과를 다시 보는 편이 안전하다.
+- Storybook browser 테스트는 기본 `yarn test`에 포함되지 않는다. 브라우저 기반 검증이 필요하면 별도 명령으로 실행한다.
 
 이 문서로 시작한 뒤, 실제 변경은 항상 현재 코드와 테스트를 기준으로 판단하면 된다.

@@ -28,6 +28,7 @@ yarn test --run <changed-test-file>
 yarn test
 yarn tsc --noEmit
 yarn lint
+yarn eslint <changed-files>
 ```
 
 ### Frontend
@@ -44,6 +45,7 @@ Common commands:
 ```bash
 yarn tsc --noEmit
 yarn lint
+yarn eslint <changed-files>
 yarn test
 ```
 
@@ -77,6 +79,11 @@ Apply the broader gates:
 - `yarn tsc --noEmit`
 - `yarn lint`
 - key manual flows checked
+
+Current repo caveat:
+
+- `yarn test` is the console test path.
+- Browser-backed Storybook verification is separate via `yarn test:storybook --run`.
 
 ## Domain-Specific Checks
 

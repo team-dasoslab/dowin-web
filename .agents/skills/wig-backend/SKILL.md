@@ -81,19 +81,21 @@ Use the smallest useful verification set first, then broaden:
 ```bash
 yarn test --run <changed-test-file>
 yarn test
+yarn tsc --noEmit
+yarn lint
 yarn eslint <changed-files>
 ```
-
-Repository note:
-
-- `yarn tsc --noEmit` currently fails on unrelated existing type errors in the repo.
-- `yarn lint` currently fails because the `next lint` script is misconfigured.
-- Run those only when they are directly relevant, and report whether failures are pre-existing.
 
 If the task changes API contracts, also update:
 
 ```bash
 yarn gen:api
+```
+
+If browser-based Storybook verification matters, run separately:
+
+```bash
+yarn test:storybook --run
 ```
 
 ## Backend Checklist

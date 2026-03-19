@@ -25,6 +25,7 @@ If the quality doc conflicts with current implementation, verify the code and us
 - Backend verification should include business rules, auth, ownership, and error cases.
 - Frontend verification should include loading, empty, error, responsive, and rollback behavior where relevant.
 - Current auth implementation uses the `wig_sid` session cookie pattern.
+- Treat repository-wide `tsc` and `lint` results as potentially noisy until the known baseline issues are fixed.
 
 For detailed gates, command sets, and domain-specific checks, read `references/quality-rules.md`.
 

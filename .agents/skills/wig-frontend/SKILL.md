@@ -76,6 +76,7 @@ Run the smallest useful set first:
 ```bash
 yarn tsc --noEmit
 yarn lint
+yarn eslint <changed-files>
 ```
 
 Then run broader checks when the change is substantial:
@@ -83,6 +84,7 @@ Then run broader checks when the change is substantial:
 ```bash
 yarn storybook
 yarn test
+yarn test:storybook --run
 ```
 
 ## Frontend Checklist

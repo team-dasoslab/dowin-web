@@ -27,6 +27,7 @@
 ```bash
 yarn tsc --noEmit
 yarn lint
+yarn eslint <changed-files>
 ```
 
 If the change is substantial:
@@ -34,6 +35,7 @@ If the change is substantial:
 ```bash
 yarn storybook
 yarn test
+yarn test:storybook --run
 ```
 
 If API contracts changed:
