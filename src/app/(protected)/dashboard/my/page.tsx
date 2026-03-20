@@ -5,12 +5,21 @@ import { MonthlyMobileCards } from "@/app/(protected)/dashboard/my/_components/M
 import { WeeklyMobileCards } from "@/app/(protected)/dashboard/my/_components/WeeklyMobileCards";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import {
+  canPlayCelebration,
+  fireDashboardConfetti,
+  getCelebrationToastMessage,
+  getNextCelebrationEvent,
+  type CelebrationLevel,
+  type WeeklyCelebrationSnapshot,
+} from "@/app/(protected)/dashboard/my/_lib/dashboard-celebration";
+import {
   DAY_LABELS,
   getMonthCalendarWeeks,
 } from "@/app/(protected)/dashboard/my/_lib/week";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useToast } from "@/context/ToastContext";
 import { toNumberId } from "@/lib/client/frontend-api";
 import {
   dismissProductUpdate,
@@ -34,7 +43,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const DASHBOARD_LINKS: {
   href: string;
@@ -49,6 +58,16 @@ const DASHBOARD_LINKS: {
 
 export default function MyDashboardPage() {
   const [isUpdateCardVisible, setIsUpdateCardVisible] = useState(false);
+  const [celebrationEvent, setCelebrationEvent] = useState<{
+    id: number;
+    level: CelebrationLevel;
+  } | null>(null);
+  const previousWeeklySnapshotRef = useRef<WeeklyCelebrationSnapshot | null>(
+    null,
+  );
+  const previousCompletedMeasureIdsRef = useRef<Set<number>>(new Set());
+  const celebrationWatchRef = useRef(false);
+  const { showToast } = useToast();
   const {
     activeLeadMeasures,
     activeScoreboard,
@@ -90,6 +109,10 @@ export default function MyDashboardPage() {
   const monthlyGoalCount = activeLeadMeasures.filter(
     (leadMeasure) => leadMeasure.period === "MONTHLY",
   ).length;
+  const weeklyCelebrationSnapshot = getWeeklyCelebrationSnapshot(
+    activeLeadMeasures,
+    weeklyById,
+  );
   const monthWeeks = getMonthCalendarWeeks(selectedDate);
   const latestMajorUpdate = getLatestMajorProductUpdate();
 
@@ -104,6 +127,73 @@ export default function MyDashboardPage() {
       !isProductUpdateDismissed(latestMajorUpdate.id, dismissed),
     );
   }, [latestMajorUpdate]);
+
+  useEffect(() => {
+    const previousSnapshot = previousWeeklySnapshotRef.current;
+    const previousCompletedMeasureIds = previousCompletedMeasureIdsRef.current;
+    previousWeeklySnapshotRef.current = weeklyCelebrationSnapshot;
+    previousCompletedMeasureIdsRef.current = getCompletedWeeklyMeasureIds(
+      activeLeadMeasures,
+      weeklyById,
+    );
+
+    if (
+      previousSnapshot === null ||
+      selectedView !== "week" ||
+      !celebrationWatchRef.current
+    ) {
+      return;
+    }
+
+    if (
+      weeklyCelebrationSnapshot.totalCount === 0 ||
+      weeklyCelebrationSnapshot.completedCount <=
+        previousSnapshot.completedCount
+    ) {
+      if (!isLogPending) {
+        celebrationWatchRef.current = false;
+      }
+      return;
+    }
+
+    celebrationWatchRef.current = false;
+
+    setCelebrationEvent(
+      getNextCelebrationEvent({
+        activeLeadMeasures,
+        nextSnapshot: weeklyCelebrationSnapshot,
+        previousSnapshot,
+        previousCompletedMeasureIds,
+        weeklyById,
+      }),
+    );
+  }, [
+    activeLeadMeasures,
+    isLogPending,
+    selectedView,
+    weeklyById,
+    weeklyCelebrationSnapshot,
+  ]);
+
+  useEffect(() => {
+    if (!canPlayCelebration(celebrationEvent, isLogPending)) {
+      return;
+    }
+
+    void fireDashboardConfetti(celebrationEvent.level);
+
+    showToast("success", getCelebrationToastMessage(celebrationEvent));
+
+    const timeout = window.setTimeout(() => {
+      setCelebrationEvent((current) =>
+        current?.id === celebrationEvent.id ? null : current,
+      );
+    }, 2800);
+
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, [celebrationEvent, isLogPending, showToast]);
 
   if (
     isLoading ||
@@ -126,6 +216,9 @@ export default function MyDashboardPage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      {canPlayCelebration(celebrationEvent, isLogPending) ? (
+        <DashboardCelebrationOverlay level={celebrationEvent.level} />
+      ) : null}
       {isLogPending ? (
         <LoadingOverlay message="기록을 반영하는 중입니다." />
       ) : null}
@@ -611,6 +704,9 @@ export default function MyDashboardPage() {
               <WeeklyMobileCards
                 activeLeadMeasures={activeLeadMeasures}
                 isLogPending={isLogPending}
+                onBeforeToggle={() => {
+                  celebrationWatchRef.current = true;
+                }}
                 pendingLogKey={pendingLogKey}
                 today={today}
                 toggleLog={toggleLog}
@@ -713,6 +809,7 @@ export default function MyDashboardPage() {
                                       }
                                       onClick={() => {
                                         if (leadMeasureId !== null) {
+                                          celebrationWatchRef.current = true;
                                           void toggleLog(leadMeasureId, date);
                                         }
                                       }}
@@ -770,6 +867,70 @@ export default function MyDashboardPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[90] overflow-hidden">
+      <div
+        className={`absolute inset-x-0 top-0 h-64 animate-dashboard-celebration-flash ${
+          level === "all" ? "opacity-100" : "opacity-80"
+        }`}
+      />
+    </div>
+  );
+}
+
+function getWeeklyCelebrationSnapshot(
+  activeLeadMeasures: Array<{
+    id?: string | number;
+    period?: string;
+    targetValue?: number | null;
+  }>,
+  weeklyById: Map<number | null, { achieved?: number | null }>,
+): WeeklyCelebrationSnapshot {
+  const weeklyMeasures = activeLeadMeasures.filter(
+    (leadMeasure) => leadMeasure.period !== "MONTHLY",
+  );
+
+  return weeklyMeasures.reduce<WeeklyCelebrationSnapshot>(
+    (snapshot, leadMeasure) => {
+      const targetValue = leadMeasure.targetValue ?? 0;
+      const achieved =
+        weeklyById.get(toNumberId(leadMeasure.id))?.achieved ?? 0;
+      const isCompleted = targetValue > 0 && achieved >= targetValue;
+
+      return {
+        completedCount: snapshot.completedCount + (isCompleted ? 1 : 0),
+        totalCount: snapshot.totalCount + 1,
+      };
+    },
+    { completedCount: 0, totalCount: 0 },
+  );
+}
+
+function getCompletedWeeklyMeasureIds(
+  activeLeadMeasures: Array<{
+    id?: string | number;
+    period?: string;
+    targetValue?: number | null;
+  }>,
+  weeklyById: Map<number | null, { achieved?: number | null }>,
+) {
+  return new Set(
+    activeLeadMeasures
+      .filter((leadMeasure) => leadMeasure.period !== "MONTHLY")
+      .map((leadMeasure) => {
+        const leadMeasureId = toNumberId(leadMeasure.id);
+        const targetValue = leadMeasure.targetValue ?? 0;
+        const achieved = weeklyById.get(leadMeasureId)?.achieved ?? 0;
+
+        return leadMeasureId !== null && targetValue > 0 && achieved >= targetValue
+          ? leadMeasureId
+          : null;
+      })
+      .filter((leadMeasureId): leadMeasureId is number => leadMeasureId !== null),
   );
 }
 
