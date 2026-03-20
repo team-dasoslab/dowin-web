@@ -1,6 +1,8 @@
 import { getDb } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSession } from "@/lib/server/auth";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
@@ -24,7 +26,17 @@ export async function POST(req: NextRequest) {
     const session = await getSession(db);
 
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError("UNAUTHORIZED");
+    }
+
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: session.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
     }
 
     // Save or update subscription
@@ -45,7 +57,7 @@ export async function POST(req: NextRequest) {
         },
       });
 
-    return NextResponse.json({ success: true });
+    return apiSuccess({ success: true });
   } catch (error) {
     console.error("Subscription error:", error);
     return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
@@ -61,14 +73,24 @@ export async function DELETE(req: NextRequest) {
     const session = await getSession(db);
 
     if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError("UNAUTHORIZED");
+    }
+
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: session.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
     }
 
     await db
       .delete(pushSubscriptions)
       .where(eq(pushSubscriptions.endpoint, endpoint));
 
-    return NextResponse.json({ success: true });
+    return apiSuccess({ success: true });
   } catch (error) {
     console.error("Unsubscribe error:", error);
     return NextResponse.json({ error: "Failed to unsubscribe" }, { status: 500 });

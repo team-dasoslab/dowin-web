@@ -2,6 +2,7 @@
 
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useToast } from "@/context/ToastContext";
+import { getFetchErrorMessage } from "@/lib/client/frontend-api";
 import { Bell, BellOff } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -120,7 +121,10 @@ export default function PushSubscriptionManager({
 
       if (!response.ok) {
         throw new Error(
-          `서버 저장 실패: ${response.status} ${response.statusText}`,
+          await getFetchErrorMessage(
+            response,
+            `서버 저장 실패: ${response.status} ${response.statusText}`,
+          ),
         );
       }
 
@@ -152,7 +156,9 @@ export default function PushSubscriptionManager({
       } else {
         showToast(
           "error",
-          "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+          error instanceof Error
+            ? error.message
+            : "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
         );
       }
     }
@@ -168,17 +174,32 @@ export default function PushSubscriptionManager({
       const subscription = await registration.pushManager.getSubscription();
       if (subscription) {
         await subscription.unsubscribe();
-        await fetch("/api/push/subscribe", {
+        const response = await fetch("/api/push/subscribe", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ endpoint: subscription.endpoint }),
         });
+
+        if (!response.ok) {
+          throw new Error(
+            await getFetchErrorMessage(
+              response,
+              "알림 해제 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+            ),
+          );
+        }
       }
       showToast("info", "알림 설정이 해제되었습니다.");
     } catch (error) {
       // Rollback
       setIsSubscribed(true);
       console.error("Unsubscribe failed:", error);
+      showToast(
+        "error",
+        error instanceof Error
+          ? error.message
+          : "알림 해제 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+      );
     }
   };
 

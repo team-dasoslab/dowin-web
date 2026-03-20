@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 export type ErrorCode =
   | "UNAUTHORIZED"
   | "FORBIDDEN"
+  | "TEST_ACCOUNT_WRITE_RESTRICTED"
   | "NOT_FOUND"
   | "VALIDATION_ERROR"
   | "INTERNAL_ERROR"
@@ -23,6 +24,8 @@ export type ErrorCode =
 const ERROR_MESSAGES: Record<ErrorCode, string> = {
   UNAUTHORIZED: "로그인이 필요합니다.",
   FORBIDDEN: "해당 리소스에 접근할 권한이 없습니다.",
+  TEST_ACCOUNT_WRITE_RESTRICTED:
+    "테스트 계정에서는 체크 기록과 프로필 아이콘 변경만 사용할 수 있어요.",
   NOT_FOUND: "요청한 리소스를 찾을 수 없습니다.",
   VALIDATION_ERROR: "입력값이 올바르지 않습니다.",
   INTERNAL_ERROR: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
@@ -49,6 +52,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   FUTURE_DATE_NOT_ALLOWED: 400,
   SCOREBOARD_ALREADY_ACTIVE: 400,
   FORBIDDEN: 403,
+  TEST_ACCOUNT_WRITE_RESTRICTED: 403,
   CANNOT_REMOVE_LAST_ADMIN: 403,
   SCOREBOARD_ARCHIVED: 403,
   LEAD_MEASURE_ARCHIVED: 403,

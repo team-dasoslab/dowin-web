@@ -4,6 +4,7 @@ import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { passwordChangeSchema } from "@/domain/auth/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSession } from "@/lib/server/auth";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -17,6 +18,16 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const session = await getSession(db);
   if (!session) {
     return apiError("UNAUTHORIZED");
+  }
+
+  const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+    db,
+    userId: session.userId,
+    env,
+    intent: "general-write",
+  });
+  if (restrictedWriteResponse) {
+    return restrictedWriteResponse;
   }
 
   const body = await request.json();

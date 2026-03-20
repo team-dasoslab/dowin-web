@@ -4,6 +4,7 @@ import { ProfileStorage } from "@/domain/profile/storage/profile.storage";
 import { profileUpdateSchema } from "@/domain/profile/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSession } from "@/lib/server/auth";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -36,6 +37,19 @@ export const PUT = withErrorHandler(async (request: Request) => {
 
   if (!parsed.success) {
     return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+  }
+
+  const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+    db,
+    userId: session.userId,
+    env,
+    intent:
+      parsed.data.nickname === undefined
+        ? "profile-avatar-update"
+        : "general-write",
+  });
+  if (restrictedWriteResponse) {
+    return restrictedWriteResponse;
   }
 
   const profile = await createService(db).updateProfile(session.userId, parsed.data);

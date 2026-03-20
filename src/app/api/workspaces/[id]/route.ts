@@ -8,6 +8,7 @@ import {
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSession } from "@/lib/server/auth";
 import { requireWorkspaceAdminInWorkspace } from "@/lib/server/authz";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -24,6 +25,16 @@ export const PUT = withErrorHandler(
     const session = await getSession(db);
     if (!session) {
       return apiError("UNAUTHORIZED");
+    }
+
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: session.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
     }
 
     const params = await context.params;

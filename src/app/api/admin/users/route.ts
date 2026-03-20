@@ -6,6 +6,7 @@ import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSession } from "@/lib/server/auth";
 import { requireWorkspaceAdmin } from "@/lib/server/authz";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -19,6 +20,16 @@ export const POST = withErrorHandler(async (request: Request) => {
   const session = await getSession(db);
   if (!session) {
     return apiError("UNAUTHORIZED");
+  }
+
+  const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+    db,
+    userId: session.userId,
+    env,
+    intent: "general-write",
+  });
+  if (restrictedWriteResponse) {
+    return restrictedWriteResponse;
   }
 
   const adminMembership = await requireWorkspaceAdmin(db, session.userId);

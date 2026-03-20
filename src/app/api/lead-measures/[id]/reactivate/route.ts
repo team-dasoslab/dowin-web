@@ -7,6 +7,7 @@ import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storag
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSession } from "@/lib/server/auth";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -18,6 +19,16 @@ export const POST = withErrorHandler(
 
     if (!session) {
       return apiError("UNAUTHORIZED");
+    }
+
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: session.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
     }
 
     const params = leadMeasureIdParamSchema.safeParse(await context.params);

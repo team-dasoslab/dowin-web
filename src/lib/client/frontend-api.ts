@@ -42,6 +42,25 @@ export const getApiErrorMessage = (
   return detailMessage || apiError?.message || fallback;
 };
 
+export const getFetchErrorMessage = async (
+  response: Response,
+  fallback: string,
+): Promise<string> => {
+  try {
+    const data = (await response.clone().json()) as {
+      error?: {
+        message?: string;
+        details?: Record<string, string[] | undefined>;
+      };
+    };
+    const detailMessage = getFirstDetailMessage(data.error?.details);
+
+    return detailMessage || data.error?.message || fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export const toNumberId = (
   value: number | string | null | undefined,
 ): number | null => {
