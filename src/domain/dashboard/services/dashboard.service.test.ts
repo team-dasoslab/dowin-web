@@ -232,4 +232,37 @@ describe("DashboardService", () => {
       }),
     ]);
   });
+
+  it("팀 대시보드 멤버 목록은 로그인 사용자를 최상단에 배치한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
+    findMembers.mockResolvedValue([
+      {
+        id: 100,
+        workspaceId: 3,
+        userId: 12,
+        role: "MEMBER",
+        user: { nickname: "민서", avatarKey: null },
+      },
+      {
+        id: 101,
+        workspaceId: 3,
+        userId: 11,
+        role: "ADMIN",
+        user: { nickname: "지훈", avatarKey: "smile.blue" },
+      },
+      {
+        id: 102,
+        workspaceId: 3,
+        userId: 13,
+        role: "MEMBER",
+        user: { nickname: "도윤", avatarKey: "smile.green" },
+      },
+    ]);
+    findActiveScoreboardsByWorkspace.mockResolvedValue([]);
+    findLogsForLeadMeasures.mockResolvedValue([]);
+
+    const result = await service.getTeamDashboard(11, "2026-03-09");
+
+    expect(result.members.map((member) => member.userId)).toEqual([11, 12, 13]);
+  });
 });

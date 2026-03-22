@@ -43,6 +43,18 @@ export type ProductUpdate = {
  */
 export const productUpdates = [
   {
+    id: "2026-03-22-team-dashboard-me-highlight",
+    slug: "team-dashboard-me-highlight",
+    title: "팀 대시보드에서 내 카드를 더 빨리 찾을 수 있어요",
+    summary:
+      "팀원 목록에서 내 카드가 맨 위로 정렬되고, 카드 테두리와 '나' 배지로 한눈에 구분할 수 있습니다.",
+    publishedAt: "2026.03.22",
+    tag: "Dashboard",
+    ctaLabel: "바로 써보기",
+    ctaHref: "/dashboard",
+    isMajor: true,
+  },
+  {
     id: "2026-03-18-dashboard-export",
     slug: "dashboard-export",
     title: "내 기록을 CSV로 내려받을 수 있어요",

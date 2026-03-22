@@ -1,5 +1,6 @@
 "use client";
 
+import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { MemberCard } from "@/app/(protected)/dashboard/_components/MemberCard";
 import { WeeklyTable } from "@/app/(protected)/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/(protected)/dashboard/_hooks/useTeamDashboard";
@@ -12,6 +13,8 @@ import Link from "next/link";
 export default function DashboardPage() {
   const { dashboard, hasNoWorkspace, isLoading, weekDates } =
     useTeamDashboard();
+  const { data: profileResponse } = useGetUsersMe();
+  const myUserId = profileResponse?.status === 200 ? profileResponse.data.id : null;
 
   if (isLoading) {
     return <DashboardLoadingState />;
@@ -84,7 +87,11 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {members.map((member) => (
-                <MemberCard key={member.userId} member={member} />
+                <MemberCard
+                  key={member.userId}
+                  member={member}
+                  isMe={member.userId === myUserId}
+                />
               ))}
             </div>
           )}
@@ -112,6 +119,7 @@ export default function DashboardPage() {
                 key={member.userId}
                 member={member}
                 weekDates={weekDates}
+                isMe={member.userId === myUserId}
               />
             ))
           )}

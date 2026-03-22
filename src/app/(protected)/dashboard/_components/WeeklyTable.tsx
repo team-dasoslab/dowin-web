@@ -7,9 +7,10 @@ const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
 type WeeklyTableProps = {
   member: TeamDashboardMember;
   weekDates: string[];
+  isMe?: boolean;
 };
 
-export function WeeklyTable({ member, weekDates }: WeeklyTableProps) {
+export function WeeklyTable({ member, weekDates, isMe = false }: WeeklyTableProps) {
   if (
     !(member.hasScoreboard ?? false) ||
     (member.leadMeasures?.length ?? 0) === 0
@@ -31,6 +32,11 @@ export function WeeklyTable({ member, weekDates }: WeeklyTableProps) {
         <span className="text-xs font-bold text-text-primary">
           {member.nickname}
         </span>
+        {isMe ? (
+          <span className="rounded border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+            나
+          </span>
+        ) : null}
         <span className="text-xs text-text-secondary">— {member.goalName}</span>
       </div>
 

@@ -7,16 +7,23 @@ import { Target } from "lucide-react";
 
 type MemberCardProps = {
   member: TeamDashboardMember;
+  isMe?: boolean;
 };
 
-export function MemberCard({ member }: MemberCardProps) {
+export function MemberCard({ member, isMe = false }: MemberCardProps) {
   const weeklyAchievementRate =
     member.weeklyAchievementRate ?? member.achievementRate ?? 0;
   const monthlyAchievementRate = member.monthlyAchievementRate ?? 0;
   const hasScoreboard = member.hasScoreboard ?? false;
 
   return (
-    <Card className="bg-white border border-border rounded-lg p-5 space-y-4 hover:border-[rgba(205,207,213,1)] transition-colors">
+    <Card
+      className={`bg-white border rounded-lg p-5 space-y-4 transition-colors ${
+        isMe
+          ? "border-primary/40 ring-1 ring-primary/20"
+          : "border-border hover:border-[rgba(205,207,213,1)]"
+      }`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <UserAvatar
@@ -27,9 +34,16 @@ export function MemberCard({ member }: MemberCardProps) {
             fallbackClassName="rounded-md"
           />
           <div className="min-w-0">
-            <p className="text-sm font-bold text-text-primary truncate">
-              {member.nickname}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-bold text-text-primary truncate">
+                {member.nickname}
+              </p>
+              {isMe ? (
+                <Badge className="rounded border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+                  나
+                </Badge>
+              ) : null}
+            </div>
             <p className="text-xs text-text-secondary truncate">
               {hasScoreboard ? member.goalName : "활성 점수판 없음"}
             </p>

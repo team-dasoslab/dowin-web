@@ -60,6 +60,11 @@ export class DashboardService {
     const monthDates = getMonthDates(normalizedMonthStart);
     const monthEnd = monthDates[monthDates.length - 1];
     const members = await this.workspaceStorage.findMembers(workspace.id);
+    const sortedMembers = [...members].sort((a, b) => {
+      const aPriority = a.userId === userId ? 0 : 1;
+      const bPriority = b.userId === userId ? 0 : 1;
+      return aPriority - bPriority;
+    });
     const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
       workspace.id,
     );
@@ -93,7 +98,7 @@ export class DashboardService {
       workspaceName: workspace.name,
       weekStart: normalizedWeekStart,
       weekEnd,
-      members: members.map((member) => {
+      members: sortedMembers.map((member) => {
         const scoreboard = scoreboardsByUserId.get(member.userId);
 
         if (!scoreboard) {
