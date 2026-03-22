@@ -75,6 +75,7 @@ describe("WeeklyFocusPushService", () => {
         id: 10,
         userId: 1,
         goalName: "흔들리지 않고 실행하기",
+        createdAt: new Date("2026-03-10T00:00:00.000Z"),
       },
     ]);
     findActiveLeadMeasuresByScoreboardIds.mockResolvedValue([
@@ -140,6 +141,7 @@ describe("WeeklyFocusPushService", () => {
         id: 10,
         userId: 1,
         goalName: "흔들리지 않고 실행하기",
+        createdAt: new Date("2026-03-10T00:00:00.000Z"),
       },
     ]);
     findActiveLeadMeasuresByScoreboardIds.mockResolvedValue([
@@ -210,6 +212,7 @@ describe("WeeklyFocusPushService", () => {
         id: 10,
         userId: 1,
         goalName: "흔들리지 않고 실행하기",
+        createdAt: new Date("2026-03-10T00:00:00.000Z"),
       },
     ]);
     findActiveLeadMeasuresByScoreboardIds.mockResolvedValue([
@@ -295,6 +298,7 @@ describe("WeeklyFocusPushService", () => {
         id: 10,
         userId: 1,
         goalName: "흔들리지 않고 실행하기",
+        createdAt: new Date("2026-03-10T00:00:00.000Z"),
       },
     ]);
     findActiveLeadMeasuresByScoreboardIds.mockResolvedValue([]);
@@ -311,5 +315,60 @@ describe("WeeklyFocusPushService", () => {
       aiTieBreaks: 0,
     });
     expect(breakWeeklyFocusTie).not.toHaveBeenCalled();
+  });
+
+  it("uses the most recent active scoreboard when multiple active scoreboards exist", async () => {
+    findAllPushSubscriptions.mockResolvedValue([
+      {
+        userId: "1",
+        endpoint: "https://push.example.com/1",
+        p256dh: "p256dh-1",
+        auth: "auth-1",
+      },
+    ]);
+    findActiveScoreboardsForPush.mockResolvedValue([
+      {
+        id: 10,
+        userId: 1,
+        goalName: "이전 점수판",
+        createdAt: new Date("2026-03-01T00:00:00.000Z"),
+      },
+      {
+        id: 11,
+        userId: 1,
+        goalName: "현재 점수판",
+        createdAt: new Date("2026-03-15T00:00:00.000Z"),
+      },
+    ]);
+    findActiveLeadMeasuresByScoreboardIds.mockResolvedValue([
+      {
+        id: 101,
+        scoreboardId: 10,
+        name: "이전 선행지표",
+        targetValue: 7,
+        period: "DAILY",
+      },
+      {
+        id: 201,
+        scoreboardId: 11,
+        name: "현재 선행지표",
+        targetValue: 7,
+        period: "DAILY",
+      },
+    ]);
+    countTrueLogsForLeadMeasuresInRange.mockResolvedValue({
+      101: 0,
+      201: 0,
+    });
+
+    const result = await createService().buildWeeklyFocusJobs({ now });
+
+    expect(result.jobs).toEqual([
+      expect.objectContaining({
+        scoreboardId: 11,
+        leadMeasureId: 201,
+        body: "오늘은 현재 선행지표 해볼까요?",
+      }),
+    ]);
   });
 });

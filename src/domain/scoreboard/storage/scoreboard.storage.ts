@@ -48,7 +48,7 @@ export class ScoreboardStorage {
   constructor(private db: ScoreboardDbPort) {}
 
   async findActiveScoreboardsForPush(): Promise<
-    Array<Pick<ScoreboardRecord, "id" | "userId" | "goalName">>
+    Array<Pick<ScoreboardRecord, "id" | "userId" | "goalName" | "createdAt">>
   > {
     return (await this.db.query.scoreboards.findMany({
       where: eq(scoreboards.status, "ACTIVE"),
@@ -56,8 +56,12 @@ export class ScoreboardStorage {
         id: true,
         userId: true,
         goalName: true,
+        createdAt: true,
       },
-    })) as Array<Pick<ScoreboardRecord, "id" | "userId" | "goalName">>;
+      orderBy: [desc(scoreboards.createdAt)],
+    })) as Array<
+      Pick<ScoreboardRecord, "id" | "userId" | "goalName" | "createdAt">
+    >;
   }
 
   async findActiveScoreboard(

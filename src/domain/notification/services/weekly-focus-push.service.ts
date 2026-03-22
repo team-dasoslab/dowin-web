@@ -168,7 +168,7 @@ export class WeeklyFocusPushService {
 
     for (const [userId, userSubscriptions] of subscriptionsByUserId) {
       const userScoreboards = scoreboardsByUserId.get(userId) ?? [];
-      const scoreboard = userScoreboards[0];
+      const scoreboard = selectCurrentActiveScoreboard(userScoreboards);
 
       if (!scoreboard) {
         summary.skippedNoActiveScoreboard += userSubscriptions.length;
@@ -370,4 +370,36 @@ function parseUtcDate(dateString: string) {
 
 function formatUtcDate(date: Date) {
   return date.toISOString().slice(0, 10);
+}
+
+function selectCurrentActiveScoreboard(
+  scoreboards: Array<{
+    id: number;
+    userId: number;
+    goalName: string;
+    createdAt: Date | number | string;
+  }>,
+) {
+  if (scoreboards.length === 0) {
+    return undefined;
+  }
+
+  return scoreboards
+    .slice()
+    .sort(
+      (a, b) => getCreatedAtMs(b.createdAt) - getCreatedAtMs(a.createdAt),
+    )[0];
+}
+
+function getCreatedAtMs(createdAt: Date | number | string) {
+  if (createdAt instanceof Date) {
+    return createdAt.getTime();
+  }
+
+  if (typeof createdAt === "number") {
+    return createdAt;
+  }
+
+  const parsed = Date.parse(createdAt);
+  return Number.isNaN(parsed) ? 0 : parsed;
 }
