@@ -233,6 +233,80 @@ describe("DashboardService", () => {
     ]);
   });
 
+  it("팀 대시보드 주간 달성률은 이번 주 로그만 기준으로 계산한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
+    findMembers.mockResolvedValue([
+      {
+        id: 100,
+        workspaceId: 3,
+        userId: 11,
+        role: "ADMIN",
+        user: { nickname: "지훈", avatarKey: "smile.blue" },
+      },
+    ]);
+    findActiveScoreboardsByWorkspace.mockResolvedValue([
+      {
+        id: 21,
+        userId: 11,
+        goalName: "루틴 만들기",
+        lagMeasure: "주간 실행",
+        status: "ACTIVE",
+        leadMeasures: [
+          {
+            id: 31,
+            name: "유산소",
+            targetValue: 4,
+            period: "WEEKLY",
+            status: "ACTIVE",
+          },
+          {
+            id: 32,
+            name: "근력",
+            targetValue: 7,
+            period: "WEEKLY",
+            status: "ACTIVE",
+          },
+        ],
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 31, logDate: "2026-03-02", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-09", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-11", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-09", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-11", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-12", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-13", value: true },
+    ]);
+
+    const result = await service.getTeamDashboard(11, "2026-03-09");
+
+    expect(result.members).toEqual([
+      expect.objectContaining({
+        userId: 11,
+        achieved: 8,
+        total: 11,
+        achievementRate: 73,
+        weeklyAchievementRate: 73,
+        leadMeasures: expect.arrayContaining([
+          expect.objectContaining({
+            id: 31,
+            achieved: 3,
+            achievementRate: 75,
+          }),
+          expect.objectContaining({
+            id: 32,
+            achieved: 5,
+            achievementRate: 71.4,
+          }),
+        ]),
+      }),
+    ]);
+  });
+
   it("팀 대시보드 멤버 목록은 로그인 사용자를 최상단에 배치한다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
     findMembers.mockResolvedValue([

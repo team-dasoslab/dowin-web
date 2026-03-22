@@ -128,12 +128,15 @@ export class DashboardService {
               weekDates.map((date) => [date, null as boolean | null]),
             );
             const measureLogs = logsByLeadMeasure.get(leadMeasure.id) ?? [];
+            const weeklyLogs = measureLogs.filter(
+              (log) => log.logDate >= normalizedWeekStart && log.logDate <= weekEnd,
+            );
 
-            for (const log of measureLogs) {
+            for (const log of weeklyLogs) {
               logMap[log.logDate] = log.value;
             }
 
-            const achieved = measureLogs.filter((log) => log.value).length;
+            const achieved = weeklyLogs.filter((log) => log.value).length;
             const achievementRate = getAchievementRate(
               achieved,
               leadMeasure.targetValue,
