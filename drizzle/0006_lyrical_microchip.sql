@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `workspace_members_user_unique` ON `workspace_members` (`user_id`);

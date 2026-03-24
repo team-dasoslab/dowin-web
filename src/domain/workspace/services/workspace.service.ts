@@ -1,5 +1,6 @@
 import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { customAlphabet } from "nanoid";
 
 type Workspace = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["findUserWorkspace"]>>
@@ -12,6 +13,19 @@ type WorkspaceMemberListItem = {
   isMe: boolean;
   createdAt: Date;
 };
+type WorkspaceInvite = NonNullable<
+  Awaited<ReturnType<WorkspaceStorage["createInvite"]>>
+>;
+
+const generateWorkspaceInviteCode = customAlphabet(
+  "23456789ABCDEFGHJKLMNPQRSTUVWXYZ",
+  10,
+);
+
+const isWorkspaceMembershipUniqueViolation = (error: unknown) =>
+  error instanceof Error &&
+  (error.message.includes("workspace_members.user_id") ||
+    error.message.includes("workspace_members_user_unique"));
 
 export interface WorkspaceStoragePort {
   findWorkspaceById: WorkspaceStorage["findWorkspaceById"];
@@ -23,6 +37,12 @@ export interface WorkspaceStoragePort {
   findMembership: WorkspaceStorage["findMembership"];
   findMembers: WorkspaceStorage["findMembers"];
   removeMemberById: WorkspaceStorage["removeMemberById"];
+  createInvite: WorkspaceStorage["createInvite"];
+  findInviteByCode: WorkspaceStorage["findInviteByCode"];
+  findInviteById: WorkspaceStorage["findInviteById"];
+  listInvites: WorkspaceStorage["listInvites"];
+  updateInviteStatus: WorkspaceStorage["updateInviteStatus"];
+  addMemberByInvite: WorkspaceStorage["addMemberByInvite"];
 }
 
 export class WorkspaceService {
@@ -43,7 +63,14 @@ export class WorkspaceService {
     }
 
     const workspace = await this.storage.createWorkspace(name);
-    await this.storage.addMember(workspace.id, userId, "ADMIN");
+    try {
+      await this.storage.addMember(workspace.id, userId, "ADMIN");
+    } catch (error) {
+      if (isWorkspaceMembershipUniqueViolation(error)) {
+        throw new ConflictError("ALREADY_IN_WORKSPACE");
+      }
+      throw error;
+    }
     return workspace;
   }
 
@@ -67,7 +94,115 @@ export class WorkspaceService {
       throw new ConflictError("ALREADY_IN_WORKSPACE");
     }
 
-    await this.storage.addMember(workspaceId, userId, "MEMBER");
+    const workspace = await this.storage.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    try {
+      await this.storage.addMember(workspaceId, userId, "MEMBER");
+    } catch (error) {
+      if (isWorkspaceMembershipUniqueViolation(error)) {
+        throw new ConflictError("ALREADY_IN_WORKSPACE");
+      }
+      throw error;
+    }
+  }
+
+  async createInvite(
+    workspaceId: number,
+    createdByUserId: number,
+    maxUses: number,
+  ): Promise<WorkspaceInvite> {
+    const workspace = await this.storage.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return await this.storage.createInvite({
+      workspaceId,
+      code: generateWorkspaceInviteCode(),
+      maxUses,
+      createdByUserId,
+    });
+  }
+
+  async listInvites(workspaceId: number): Promise<WorkspaceInvite[]> {
+    return await this.storage.listInvites(workspaceId);
+  }
+
+  async updateInviteStatus(
+    workspaceId: number,
+    inviteId: number,
+    status: "ACTIVE" | "INACTIVE",
+  ): Promise<WorkspaceInvite> {
+    const updated = await this.storage.updateInviteStatus(
+      workspaceId,
+      inviteId,
+      status,
+    );
+
+    if (!updated) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return updated;
+  }
+
+  async joinWorkspaceByInvite(code: string, userId: number): Promise<void> {
+    const normalizedCode = code.trim().toUpperCase();
+    const existing = await this.storage.findUserWorkspace(userId);
+    if (existing) {
+      throw new ConflictError("ALREADY_IN_WORKSPACE");
+    }
+
+    const invite = await this.storage.findInviteByCode(normalizedCode);
+    if (!invite) {
+      throw new NotFoundError("INVALID_INVITE_CODE");
+    }
+
+    if (invite.status !== "ACTIVE") {
+      throw new ConflictError("INVITE_CODE_INACTIVE");
+    }
+
+    if (invite.usedCount >= invite.maxUses) {
+      throw new ConflictError("INVITE_CODE_USAGE_LIMIT_REACHED");
+    }
+
+    let joined = false;
+    try {
+      joined = await this.storage.addMemberByInvite({
+        inviteId: invite.id,
+        workspaceId: invite.workspaceId,
+        userId,
+      });
+    } catch (error) {
+      if (isWorkspaceMembershipUniqueViolation(error)) {
+        throw new ConflictError("ALREADY_IN_WORKSPACE");
+      }
+      throw error;
+    }
+
+    if (!joined) {
+      const latestInvite = await this.storage.findInviteById(
+        invite.workspaceId,
+        invite.id,
+      );
+
+      if (!latestInvite) {
+        throw new NotFoundError("INVALID_INVITE_CODE");
+      }
+
+      if (latestInvite.status !== "ACTIVE") {
+        throw new ConflictError("INVITE_CODE_INACTIVE");
+      }
+
+      if (latestInvite.usedCount >= latestInvite.maxUses) {
+        throw new ConflictError("INVITE_CODE_USAGE_LIMIT_REACHED");
+      }
+
+      throw new ConflictError("INVITE_CODE_USAGE_LIMIT_REACHED");
+    }
   }
 
   async getMembers(

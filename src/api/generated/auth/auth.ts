@@ -19,8 +19,14 @@ import type {
   ErrorResponse,
   PostAuthLogin200,
   PostAuthLoginBody,
+  PostAuthRecoveryCodesVerify200,
+  PostAuthRecoveryCodesVerifyBody,
+  PostAuthSignup201,
+  PostAuthSignupBody,
   PutAuthPassword200,
   PutAuthPasswordBody,
+  PutAuthPasswordByRecoveryCode200,
+  PutAuthPasswordByRecoveryCodeBody,
   UnauthorizedErrorResponse
 } from '../wig.schemas';
 
@@ -124,6 +130,100 @@ export const usePostAuthLogin = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPostAuthLoginMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 회원가입
+ */
+export type postAuthSignupResponse201 = {
+  data: PostAuthSignup201
+  status: 201
+}
+
+export type postAuthSignupResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postAuthSignupResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postAuthSignupResponseSuccess = (postAuthSignupResponse201) & {
+  headers: Headers;
+};
+export type postAuthSignupResponseError = (postAuthSignupResponse409 | postAuthSignupResponse422) & {
+  headers: Headers;
+};
+
+export type postAuthSignupResponse = (postAuthSignupResponseSuccess | postAuthSignupResponseError)
+
+export const getPostAuthSignupUrl = () => {
+
+
+  
+
+  return `/api/auth/signup`
+}
+
+export const postAuthSignup = async (postAuthSignupBody: PostAuthSignupBody, options?: RequestInit): Promise<postAuthSignupResponse> => {
+  
+  return customInstance<postAuthSignupResponse>(getPostAuthSignupUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      postAuthSignupBody,)
+  }
+);}
+  
+
+
+
+export const getPostAuthSignupMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignup>>, TError,{data: PostAuthSignupBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAuthSignup>>, TError,{data: PostAuthSignupBody}, TContext> => {
+
+const mutationKey = ['postAuthSignup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthSignup>>, {data: PostAuthSignupBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postAuthSignup(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAuthSignupMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthSignup>>>
+    export type PostAuthSignupMutationBody = PostAuthSignupBody
+    export type PostAuthSignupMutationError = ErrorResponse
+
+    /**
+ * @summary 회원가입
+ */
+export const usePostAuthSignup = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignup>>, TError,{data: PostAuthSignupBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAuthSignup>>,
+        TError,
+        {data: PostAuthSignupBody},
+        TContext
+      > => {
+      return useMutation(getPostAuthSignupMutationOptions(options), queryClient);
     }
     /**
  * @summary 로그아웃
@@ -311,5 +411,193 @@ export const usePutAuthPassword = <TError = ErrorResponse | UnauthorizedErrorRes
         TContext
       > => {
       return useMutation(getPutAuthPasswordMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 복원코드로 계정 조회
+ */
+export type postAuthRecoveryCodesVerifyResponse200 = {
+  data: PostAuthRecoveryCodesVerify200
+  status: 200
+}
+
+export type postAuthRecoveryCodesVerifyResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postAuthRecoveryCodesVerifyResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postAuthRecoveryCodesVerifyResponseSuccess = (postAuthRecoveryCodesVerifyResponse200) & {
+  headers: Headers;
+};
+export type postAuthRecoveryCodesVerifyResponseError = (postAuthRecoveryCodesVerifyResponse404 | postAuthRecoveryCodesVerifyResponse422) & {
+  headers: Headers;
+};
+
+export type postAuthRecoveryCodesVerifyResponse = (postAuthRecoveryCodesVerifyResponseSuccess | postAuthRecoveryCodesVerifyResponseError)
+
+export const getPostAuthRecoveryCodesVerifyUrl = () => {
+
+
+  
+
+  return `/api/auth/recovery-codes/verify`
+}
+
+export const postAuthRecoveryCodesVerify = async (postAuthRecoveryCodesVerifyBody: PostAuthRecoveryCodesVerifyBody, options?: RequestInit): Promise<postAuthRecoveryCodesVerifyResponse> => {
+  
+  return customInstance<postAuthRecoveryCodesVerifyResponse>(getPostAuthRecoveryCodesVerifyUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      postAuthRecoveryCodesVerifyBody,)
+  }
+);}
+  
+
+
+
+export const getPostAuthRecoveryCodesVerifyMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthRecoveryCodesVerify>>, TError,{data: PostAuthRecoveryCodesVerifyBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAuthRecoveryCodesVerify>>, TError,{data: PostAuthRecoveryCodesVerifyBody}, TContext> => {
+
+const mutationKey = ['postAuthRecoveryCodesVerify'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthRecoveryCodesVerify>>, {data: PostAuthRecoveryCodesVerifyBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postAuthRecoveryCodesVerify(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAuthRecoveryCodesVerifyMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthRecoveryCodesVerify>>>
+    export type PostAuthRecoveryCodesVerifyMutationBody = PostAuthRecoveryCodesVerifyBody
+    export type PostAuthRecoveryCodesVerifyMutationError = ErrorResponse
+
+    /**
+ * @summary 복원코드로 계정 조회
+ */
+export const usePostAuthRecoveryCodesVerify = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthRecoveryCodesVerify>>, TError,{data: PostAuthRecoveryCodesVerifyBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAuthRecoveryCodesVerify>>,
+        TError,
+        {data: PostAuthRecoveryCodesVerifyBody},
+        TContext
+      > => {
+      return useMutation(getPostAuthRecoveryCodesVerifyMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 복원코드로 비밀번호 재설정
+ */
+export type putAuthPasswordByRecoveryCodeResponse200 = {
+  data: PutAuthPasswordByRecoveryCode200
+  status: 200
+}
+
+export type putAuthPasswordByRecoveryCodeResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putAuthPasswordByRecoveryCodeResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type putAuthPasswordByRecoveryCodeResponseSuccess = (putAuthPasswordByRecoveryCodeResponse200) & {
+  headers: Headers;
+};
+export type putAuthPasswordByRecoveryCodeResponseError = (putAuthPasswordByRecoveryCodeResponse404 | putAuthPasswordByRecoveryCodeResponse422) & {
+  headers: Headers;
+};
+
+export type putAuthPasswordByRecoveryCodeResponse = (putAuthPasswordByRecoveryCodeResponseSuccess | putAuthPasswordByRecoveryCodeResponseError)
+
+export const getPutAuthPasswordByRecoveryCodeUrl = () => {
+
+
+  
+
+  return `/api/auth/password/by-recovery-code`
+}
+
+export const putAuthPasswordByRecoveryCode = async (putAuthPasswordByRecoveryCodeBody: PutAuthPasswordByRecoveryCodeBody, options?: RequestInit): Promise<putAuthPasswordByRecoveryCodeResponse> => {
+  
+  return customInstance<putAuthPasswordByRecoveryCodeResponse>(getPutAuthPasswordByRecoveryCodeUrl(),
+  {      
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      putAuthPasswordByRecoveryCodeBody,)
+  }
+);}
+  
+
+
+
+export const getPutAuthPasswordByRecoveryCodeMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAuthPasswordByRecoveryCode>>, TError,{data: PutAuthPasswordByRecoveryCodeBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putAuthPasswordByRecoveryCode>>, TError,{data: PutAuthPasswordByRecoveryCodeBody}, TContext> => {
+
+const mutationKey = ['putAuthPasswordByRecoveryCode'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putAuthPasswordByRecoveryCode>>, {data: PutAuthPasswordByRecoveryCodeBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  putAuthPasswordByRecoveryCode(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutAuthPasswordByRecoveryCodeMutationResult = NonNullable<Awaited<ReturnType<typeof putAuthPasswordByRecoveryCode>>>
+    export type PutAuthPasswordByRecoveryCodeMutationBody = PutAuthPasswordByRecoveryCodeBody
+    export type PutAuthPasswordByRecoveryCodeMutationError = ErrorResponse
+
+    /**
+ * @summary 복원코드로 비밀번호 재설정
+ */
+export const usePutAuthPasswordByRecoveryCode = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAuthPasswordByRecoveryCode>>, TError,{data: PutAuthPasswordByRecoveryCodeBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putAuthPasswordByRecoveryCode>>,
+        TError,
+        {data: PutAuthPasswordByRecoveryCodeBody},
+        TContext
+      > => {
+      return useMutation(getPutAuthPasswordByRecoveryCodeMutationOptions(options), queryClient);
     }
     

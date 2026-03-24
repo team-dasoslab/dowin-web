@@ -6,7 +6,7 @@ import {
   workspaceUpdateSchema,
 } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSession } from "@/lib/server/auth";
+import { getSessionWithRefresh } from "@/lib/server/auth";
 import { requireWorkspaceAdminInWorkspace } from "@/lib/server/authz";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
@@ -22,7 +22,7 @@ export const PUT = withErrorHandler(
     const storage = new WorkspaceStorage(db);
     const service = new WorkspaceService(storage);
 
-    const session = await getSession(db);
+    const session = await getSessionWithRefresh(db);
     if (!session) {
       return apiError("UNAUTHORIZED");
     }

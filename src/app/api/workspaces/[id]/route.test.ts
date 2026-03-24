@@ -3,7 +3,7 @@ import { ForbiddenError } from "@/lib/server/errors";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
-const mockGetSession = vi.fn();
+const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceAdminInWorkspace = vi.fn();
 const mockUpdateWorkspaceName = vi.fn();
 
@@ -16,7 +16,7 @@ vi.mock("@/db", () => ({
 }));
 
 vi.mock("@/lib/server/auth", () => ({
-  getSession: mockGetSession,
+  getSessionWithRefresh: mockGetSessionWithRefresh,
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
@@ -43,7 +43,7 @@ describe("PUT /api/workspaces/[id]", () => {
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
-    mockGetSession.mockResolvedValue(null);
+    mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { PUT } = await import("./route");
     const response = await PUT(
@@ -61,7 +61,7 @@ describe("PUT /api/workspaces/[id]", () => {
   });
 
   it("관리자가 아니면 403을 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockRejectedValue(
       new ForbiddenError("FORBIDDEN"),
     );
@@ -83,7 +83,7 @@ describe("PUT /api/workspaces/[id]", () => {
   });
 
   it("관리자면 워크스페이스 이름을 수정하고 200을 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
       workspaceId: 1,
       role: "ADMIN",

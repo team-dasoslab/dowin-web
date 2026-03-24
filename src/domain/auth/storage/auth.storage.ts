@@ -1,6 +1,6 @@
 import { getDb } from "@/db";
-import { sessions, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { authRecoveryCodes, sessions, users } from "@/db/schema";
+import { and, eq, isNull } from "drizzle-orm";
 
 export class AuthStorage {
   constructor(private db: ReturnType<typeof getDb>) {}
@@ -39,6 +39,43 @@ export class AuthStorage {
 
   async createSession(data: { id: string; userId: number; expiresAt: Date }) {
     await this.db.insert(sessions).values(data);
+  }
+
+  async createRecoveryCodes(
+    data: Array<{
+      userId: number;
+      codeHash: string;
+    }>,
+  ) {
+    await this.db.insert(authRecoveryCodes).values(data);
+  }
+
+  async findRecoveryCodeWithUser(codeHash: string) {
+    return await this.db.query.authRecoveryCodes.findFirst({
+      where: eq(authRecoveryCodes.codeHash, codeHash),
+      with: {
+        user: true,
+      },
+    });
+  }
+
+  async consumeRecoveryCode(codeHash: string): Promise<number | null> {
+    const [consumed] = await this.db
+      .update(authRecoveryCodes)
+      .set({
+        usedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(authRecoveryCodes.codeHash, codeHash),
+          isNull(authRecoveryCodes.usedAt),
+        ),
+      )
+      .returning({
+        userId: authRecoveryCodes.userId,
+      });
+
+    return consumed?.userId ?? null;
   }
 
   async deleteSession(sessionId: string) {

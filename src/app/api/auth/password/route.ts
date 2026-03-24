@@ -3,7 +3,7 @@ import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { passwordChangeSchema } from "@/domain/auth/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSession } from "@/lib/server/auth";
+import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -15,7 +15,7 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const service = new AuthService(storage);
 
   // 1. 세션 확인
-  const session = await getSession(db);
+  const session = await getSessionWithRefresh(db);
   if (!session) {
     return apiError("UNAUTHORIZED");
   }

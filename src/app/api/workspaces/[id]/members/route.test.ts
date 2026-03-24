@@ -3,7 +3,7 @@ import { ForbiddenError } from "@/lib/server/errors";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
-const mockGetSession = vi.fn();
+const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceAdminInWorkspace = vi.fn();
 const mockGetMembers = vi.fn();
 
@@ -16,7 +16,7 @@ vi.mock("@/db", () => ({
 }));
 
 vi.mock("@/lib/server/auth", () => ({
-  getSession: mockGetSession,
+  getSessionWithRefresh: mockGetSessionWithRefresh,
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
@@ -43,7 +43,7 @@ describe("GET /api/workspaces/:id/members", () => {
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
-    mockGetSession.mockResolvedValue(null);
+    mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
     const response = await GET(new Request("http://localhost/api/workspaces/1/members"), {
@@ -54,7 +54,7 @@ describe("GET /api/workspaces/:id/members", () => {
   });
 
   it("해당 워크스페이스 ADMIN이 아니면 403을 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockRejectedValue(
       new ForbiddenError("FORBIDDEN"),
     );
@@ -69,7 +69,7 @@ describe("GET /api/workspaces/:id/members", () => {
   });
 
   it("해당 워크스페이스 ADMIN이면 목록을 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
       workspaceId: 1,
       userId: 1,

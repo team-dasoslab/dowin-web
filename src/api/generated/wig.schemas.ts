@@ -11,6 +11,11 @@ export interface User {
   isFirstLogin?: boolean;
 }
 
+export interface RecoveryAccount {
+  customId: string;
+  nickname: string;
+}
+
 /**
  * @nullable
  */
@@ -167,6 +172,49 @@ export interface WorkspaceMember {
   role?: WorkspaceMemberRole;
   isMe?: boolean;
   createdAt?: string;
+}
+
+export type WorkspaceInviteStatus = typeof WorkspaceInviteStatus[keyof typeof WorkspaceInviteStatus];
+
+
+export const WorkspaceInviteStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+} as const;
+
+export interface WorkspaceInvite {
+  id?: number;
+  workspaceId?: number;
+  code?: string;
+  maxUses?: number;
+  usedCount?: number;
+  status?: WorkspaceInviteStatus;
+  createdByUserId?: number;
+  createdAt?: string;
+}
+
+export interface WorkspaceInviteCreateRequest {
+  /**
+   * @minimum 1
+   * @maximum 999
+   */
+  maxUses: number;
+}
+
+export type WorkspaceInviteStatusUpdateRequestStatus = typeof WorkspaceInviteStatusUpdateRequestStatus[keyof typeof WorkspaceInviteStatusUpdateRequestStatus];
+
+
+export const WorkspaceInviteStatusUpdateRequestStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+} as const;
+
+export interface WorkspaceInviteStatusUpdateRequest {
+  status: WorkspaceInviteStatusUpdateRequestStatus;
+}
+
+export interface WorkspaceJoinByInviteRequest {
+  code: string;
 }
 
 export interface WorkspaceUpdateRequest {
@@ -490,6 +538,22 @@ export type PostAuthLogin200 = {
   user?: User;
 };
 
+export type PostAuthSignupBody = {
+  customId: string;
+  nickname: string;
+  password: string;
+};
+
+export type PostAuthSignup201 = {
+  user: User;
+  /**
+   * 가입 직후 1회 노출되는 복원 코드 목록
+   * @minItems 8
+   * @maxItems 8
+   */
+  recoveryCodes: string[];
+};
+
 export type PutAuthPasswordBody = {
   currentPassword: string;
   newPassword: string;
@@ -497,6 +561,25 @@ export type PutAuthPasswordBody = {
 
 export type PutAuthPassword200 = {
   message?: string;
+};
+
+export type PostAuthRecoveryCodesVerifyBody = {
+  /** 대소문자/하이픈/공백 무시, 10자리 복원코드 */
+  recoveryCode: string;
+};
+
+export type PostAuthRecoveryCodesVerify200 = {
+  user: RecoveryAccount;
+};
+
+export type PutAuthPasswordByRecoveryCodeBody = {
+  /** 대소문자/하이픈/공백 무시, 10자리 복원코드 */
+  recoveryCode: string;
+  newPassword: string;
+};
+
+export type PutAuthPasswordByRecoveryCode200 = {
+  message: string;
 };
 
 export type PostAdminUsersBody = {
@@ -516,6 +599,14 @@ export type PostWorkspacesBody = {
 
 export type PostWorkspacesJoinBody = {
   workspaceId: number;
+};
+
+export type PostWorkspacesJoin200 = {
+  message?: string;
+};
+
+export type PostWorkspacesJoinByInvite200 = {
+  message?: string;
 };
 
 export type PutWorkspacesIdBody = {

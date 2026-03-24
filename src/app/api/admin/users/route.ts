@@ -4,7 +4,7 @@ import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { adminCreateUserSchema } from "@/domain/auth/validation";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSession } from "@/lib/server/auth";
+import { getSessionWithRefresh } from "@/lib/server/auth";
 import { requireWorkspaceAdmin } from "@/lib/server/authz";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
@@ -17,7 +17,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const service = new AuthService(storage);
   const workspaceStorage = new WorkspaceStorage(db);
 
-  const session = await getSession(db);
+  const session = await getSessionWithRefresh(db);
   if (!session) {
     return apiError("UNAUTHORIZED");
   }

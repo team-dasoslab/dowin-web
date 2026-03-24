@@ -4,7 +4,7 @@ import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storag
 import { scoreboardIdParamSchema } from "@/domain/scoreboard/validation";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSession } from "@/lib/server/auth";
+import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -13,7 +13,7 @@ export const POST = withErrorHandler(
   async (_request: Request, context: { params: Promise<{ id: string }> }) => {
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
-    const session = await getSession(db);
+    const session = await getSessionWithRefresh(db);
 
     if (!session) {
       return apiError("UNAUTHORIZED");

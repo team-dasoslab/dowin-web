@@ -8,12 +8,29 @@ export const ID_REGEX = /^[a-zA-Z0-9]{3,20}$/;
  * - 금지 특수문자: ' " ` ; \
  */
 export const PW_REGEX = /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/;
+export const RECOVERY_CODE_REGEX = /^[A-HJ-NP-Z2-9]{10}$/;
 
 export const loginSchema = z.object({
   customId: z
     .string()
     .regex(ID_REGEX, "아이디는 3~20자의 영문 대소문자 및 숫자여야 합니다."),
   password: z.string().min(1, "비밀번호를 입력해주세요."),
+});
+
+export const signupSchema = z.object({
+  customId: z
+    .string()
+    .regex(ID_REGEX, "아이디는 3~20자의 영문 대소문자 및 숫자여야 합니다."),
+  nickname: z
+    .string()
+    .min(1, "닉네임을 입력해주세요.")
+    .max(50, "닉네임은 50자 이하여야 합니다."),
+  password: z
+    .string()
+    .regex(
+      PW_REGEX,
+      "비밀번호는 8자 이상의 영문, 숫자, 허용된 특수문자 조합이어야 합니다.",
+    ),
 });
 
 export const passwordChangeSchema = z.object({
@@ -35,6 +52,29 @@ export const adminCreateUserSchema = z.object({
     .min(1, "닉네임을 입력해주세요.")
     .max(50, "닉네임은 50자 이하여야 합니다."),
   password: z
+    .string()
+    .regex(
+      PW_REGEX,
+      "비밀번호는 8자 이상의 영문, 숫자, 허용된 특수문자 조합이어야 합니다.",
+    ),
+});
+
+const recoveryCodeFieldSchema = z
+  .string()
+  .trim()
+  .transform((value) => value.toUpperCase().replaceAll("-", "").replaceAll(" ", ""))
+  .refine(
+    (value) => RECOVERY_CODE_REGEX.test(value),
+    "복원코드 형식이 올바르지 않습니다.",
+  );
+
+export const recoveryCodeVerifySchema = z.object({
+  recoveryCode: recoveryCodeFieldSchema,
+});
+
+export const passwordResetByRecoveryCodeSchema = z.object({
+  recoveryCode: recoveryCodeFieldSchema,
+  newPassword: z
     .string()
     .regex(
       PW_REGEX,

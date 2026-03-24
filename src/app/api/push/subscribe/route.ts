@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { pushSubscriptions } from "@/db/schema";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSession } from "@/lib/server/auth";
+import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { eq } from "drizzle-orm";
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const { subscription } = body;
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
-    const session = await getSession(db);
+    const session = await getSessionWithRefresh(db);
 
     if (!session) {
       return apiError("UNAUTHORIZED");
@@ -70,7 +70,7 @@ export async function DELETE(req: NextRequest) {
     const { endpoint } = body;
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
-    const session = await getSession(db);
+    const session = await getSessionWithRefresh(db);
 
     if (!session) {
       return apiError("UNAUTHORIZED");

@@ -35,6 +35,7 @@ import {
   LogOut,
   Smartphone,
   Sparkles,
+  Ticket,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -294,8 +295,15 @@ export default function ProfilePage() {
               id: "members",
               icon: <Users className="w-3.5 h-3.5" />,
               title: "멤버 관리",
-              description: "팀원 추가와 멤버 퇴출을 관리합니다.",
+              description: "워크스페이스 멤버 조회와 퇴출을 관리합니다.",
               href: "/profile/members",
+            },
+            {
+              id: "invites",
+              icon: <Ticket className="w-3.5 h-3.5" />,
+              title: "초대코드 관리",
+              description: "초대코드 생성과 활성/비활성 상태를 관리합니다.",
+              href: "/profile/invites",
             },
           ]
         : [],

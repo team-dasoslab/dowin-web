@@ -2,6 +2,7 @@
 
 import { ScoreboardCard } from "@/app/(protected)/scoreboards/_components/ScoreboardCard";
 import { useScoreboardArchive } from "@/app/(protected)/scoreboards/_hooks/useScoreboardArchive";
+import { NoWorkspaceActions } from "@/app/(protected)/_components/NoWorkspaceActions";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Badge } from "@/components/ui/Badge";
@@ -61,12 +62,7 @@ export default function ScoreboardsPage() {
               점수판 보관함은 워크스페이스에 소속된 뒤부터 사용할 수 있습니다.
             </p>
           </div>
-          <Button
-            asChild
-            className="btn-linear-primary w-fit px-5 py-3 text-sm"
-          >
-            <Link href="/workspace/new">워크스페이스 만들기</Link>
-          </Button>
+          <NoWorkspaceActions />
         </div>
       </div>
     );

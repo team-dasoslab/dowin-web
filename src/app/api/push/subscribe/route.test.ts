@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
-const mockGetSession = vi.fn();
+const mockGetSessionWithRefresh = vi.fn();
 const mockInsertValues = vi.fn();
 const mockOnConflictDoUpdate = vi.fn();
 const mockDeleteWhere = vi.fn();
@@ -16,7 +16,7 @@ vi.mock("@/db", () => ({
 }));
 
 vi.mock("@/lib/server/auth", () => ({
-  getSession: mockGetSession,
+  getSessionWithRefresh: mockGetSessionWithRefresh,
 }));
 
 describe("POST /api/push/subscribe", () => {
@@ -40,7 +40,7 @@ describe("POST /api/push/subscribe", () => {
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
-    mockGetSession.mockResolvedValue(null);
+    mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { POST } = await import("./route");
     const response = await POST(
@@ -66,7 +66,7 @@ describe("POST /api/push/subscribe", () => {
   });
 
   it("클라이언트 userId 대신 세션 userId로 구독을 저장한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 7 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 7 });
 
     const { POST } = await import("./route");
     const response = await POST(
@@ -118,7 +118,7 @@ describe("DELETE /api/push/subscribe", () => {
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
-    mockGetSession.mockResolvedValue(null);
+    mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { DELETE } = await import("./route");
     const response = await DELETE(

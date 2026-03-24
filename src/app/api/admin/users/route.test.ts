@@ -3,7 +3,7 @@ import { ForbiddenError } from "@/lib/server/errors";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
-const mockGetSession = vi.fn();
+const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceAdmin = vi.fn();
 const mockCreateUser = vi.fn();
 const mockAddMember = vi.fn();
@@ -17,7 +17,7 @@ vi.mock("@/db", () => ({
 }));
 
 vi.mock("@/lib/server/auth", () => ({
-  getSession: mockGetSession,
+  getSessionWithRefresh: mockGetSessionWithRefresh,
 }));
 
 vi.mock("@/domain/auth/storage/auth.storage", () => ({
@@ -52,7 +52,7 @@ describe("POST /api/admin/users", () => {
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
-    mockGetSession.mockResolvedValue(null);
+    mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { POST } = await import("./route");
     const response = await POST(
@@ -73,7 +73,7 @@ describe("POST /api/admin/users", () => {
   });
 
   it("ADMIN이 아니면 403을 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdmin.mockRejectedValue(new ForbiddenError("FORBIDDEN"));
 
     const { POST } = await import("./route");
@@ -96,7 +96,7 @@ describe("POST /api/admin/users", () => {
   });
 
   it("ADMIN이면 사용자를 생성하고 201을 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdmin.mockResolvedValue({
       workspaceId: 7,
       role: "ADMIN",

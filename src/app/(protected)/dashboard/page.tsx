@@ -5,6 +5,7 @@ import { MemberCard } from "@/app/(protected)/dashboard/_components/MemberCard";
 import { WeeklyTable } from "@/app/(protected)/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/(protected)/dashboard/_hooks/useTeamDashboard";
 import { formatWeekLabel } from "@/app/(protected)/dashboard/_lib/dashboard";
+import { NoWorkspaceActions } from "@/app/(protected)/_components/NoWorkspaceActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Calendar, UserIcon, Users, Zap } from "lucide-react";
@@ -158,9 +159,9 @@ function DashboardNoWorkspaceState() {
           <p className="text-sm text-text-secondary">
             팀 대시보드를 보려면 먼저 워크스페이스에 참가해야 합니다.
           </p>
-          <Button asChild className="btn-linear-primary px-4 py-2 text-sm">
-            <Link href="/workspace/new">워크스페이스 만들기</Link>
-          </Button>
+          <div className="flex justify-center">
+            <NoWorkspaceActions />
+          </div>
         </Card>
       </div>
     </div>

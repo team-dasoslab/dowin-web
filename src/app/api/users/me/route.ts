@@ -3,7 +3,7 @@ import { ProfileService } from "@/domain/profile/services/profile.service";
 import { ProfileStorage } from "@/domain/profile/storage/profile.storage";
 import { profileUpdateSchema } from "@/domain/profile/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSession } from "@/lib/server/auth";
+import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -14,7 +14,7 @@ const createService = (db: ReturnType<typeof getDb>) =>
 export const GET = withErrorHandler(async () => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
-  const session = await getSession(db);
+  const session = await getSessionWithRefresh(db);
 
   if (!session) {
     return apiError("UNAUTHORIZED");
@@ -27,7 +27,7 @@ export const GET = withErrorHandler(async () => {
 export const PUT = withErrorHandler(async (request: Request) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
-  const session = await getSession(db);
+  const session = await getSessionWithRefresh(db);
 
   if (!session) {
     return apiError("UNAUTHORIZED");

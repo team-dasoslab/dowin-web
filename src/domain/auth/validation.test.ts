@@ -2,6 +2,7 @@ import {
   adminCreateUserSchema,
   loginSchema,
   passwordChangeSchema,
+  signupSchema,
   validateCustomId,
   validatePassword,
 } from "@/domain/auth/validation";
@@ -64,6 +65,26 @@ describe("Auth Validation", () => {
         const result = loginSchema.safeParse({
           customId: "jo",
           password: "password123",
+        });
+        expect(result.success).toBe(false);
+      });
+    });
+
+    describe("signupSchema", () => {
+      it("유효한 회원가입 요청은 성공한다", () => {
+        const result = signupSchema.safeParse({
+          customId: "newuser",
+          nickname: "New User",
+          password: "newSecurePass1!",
+        });
+        expect(result.success).toBe(true);
+      });
+
+      it("닉네임 누락 시 실패한다", () => {
+        const result = signupSchema.safeParse({
+          customId: "newuser",
+          nickname: "",
+          password: "newSecurePass1!",
         });
         expect(result.success).toBe(false);
       });

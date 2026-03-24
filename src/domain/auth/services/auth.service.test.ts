@@ -23,6 +23,9 @@ const createMockStorage = (): MockStorage => ({
   createUser: vi.fn(),
   updateUserPassword: vi.fn(),
   createSession: vi.fn(),
+  createRecoveryCodes: vi.fn(),
+  findRecoveryCodeWithUser: vi.fn(),
+  consumeRecoveryCode: vi.fn(),
   deleteSession: vi.fn(),
 });
 
@@ -88,6 +91,57 @@ describe("Auth Service - login", () => {
 
     await expect(service.login("john123", "wrong-pass")).rejects.toThrow(
       "아이디 또는 비밀번호가 올바르지 않습니다",
+    );
+  });
+});
+
+describe("Auth Service - signup", () => {
+  const mockStorage = createMockStorage();
+  const service = new AuthService(mockStorage);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("회원가입 시 사용자를 생성하고 세션을 발급한다", async () => {
+    mockStorage.findUserByCustomId.mockResolvedValue(undefined);
+    mockStorage.createUser.mockResolvedValue({
+      id: 7,
+      customId: "newuser",
+      nickname: "New User",
+      avatarKey: null,
+      passwordHash: "hashed-password",
+      isFirstLogin: true,
+      createdAt: new Date(),
+    });
+
+    const result = await service.signup("newuser", "New User", "newSecurePass1!");
+
+    expect(result.user).toEqual({
+      id: 7,
+      nickname: "New User",
+      isFirstLogin: true,
+    });
+    expect(result.recoveryCodes).toHaveLength(8);
+    expect(result.recoveryCodes.every((code) => typeof code === "string")).toBe(
+      true,
+    );
+    expect(result.sessionId).toBeDefined();
+    expect(mockStorage.createUser).toHaveBeenCalled();
+    expect(mockStorage.createRecoveryCodes).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          userId: 7,
+          codeHash: expect.any(String),
+        }),
+      ]),
+    );
+    expect(mockStorage.createRecoveryCodes.mock.calls[0]?.[0]).toHaveLength(8);
+    expect(mockStorage.createSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: 7,
+        expiresAt: expect.any(Date),
+      }),
     );
   });
 });
@@ -197,5 +251,77 @@ describe("Auth Service - createUser", () => {
     await expect(
       service.createUser("newmember", "New Member", "newSecurePass1!"),
     ).rejects.toThrow("CUSTOM_ID_ALREADY_EXISTS");
+  });
+});
+
+describe("Auth Service - verifyRecoveryCode", () => {
+  const mockStorage = createMockStorage();
+  const service = new AuthService(mockStorage);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("유효한 복원코드면 계정 정보를 반환한다", async () => {
+    mockStorage.findRecoveryCodeWithUser.mockResolvedValue({
+      id: 1,
+      userId: 7,
+      codeHash: "hashed",
+      usedAt: null,
+      createdAt: new Date(),
+      user: {
+        id: 7,
+        customId: "john123",
+        passwordHash: "hashed-password",
+        nickname: "존",
+        avatarKey: null,
+        isFirstLogin: false,
+        createdAt: new Date(),
+      },
+    });
+
+    const result = await service.verifyRecoveryCode("ABCDEFGH23");
+
+    expect(result).toEqual({
+      customId: "john123",
+      nickname: "존",
+    });
+  });
+
+  it("유효하지 않거나 이미 사용된 복원코드면 에러를 던진다", async () => {
+    mockStorage.findRecoveryCodeWithUser.mockResolvedValue(undefined);
+
+    await expect(service.verifyRecoveryCode("INVALID123")).rejects.toThrow(
+      "INVALID_RECOVERY_CODE",
+    );
+  });
+});
+
+describe("Auth Service - resetPasswordByRecoveryCode", () => {
+  const mockStorage = createMockStorage();
+  const service = new AuthService(mockStorage);
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("복원코드가 유효하면 비밀번호를 재설정하고 코드를 소진한다", async () => {
+    mockStorage.consumeRecoveryCode.mockResolvedValue(7);
+
+    await service.resetPasswordByRecoveryCode("ABCDEFGH23", "new-pass-123!");
+
+    expect(mockStorage.consumeRecoveryCode).toHaveBeenCalled();
+    expect(mockStorage.updateUserPassword).toHaveBeenCalledWith(
+      7,
+      expect.any(String),
+    );
+  });
+
+  it("복원코드가 유효하지 않으면 에러를 던진다", async () => {
+    mockStorage.consumeRecoveryCode.mockResolvedValue(null);
+
+    await expect(
+      service.resetPasswordByRecoveryCode("INVALID123", "new-pass-123!"),
+    ).rejects.toThrow("INVALID_RECOVERY_CODE");
   });
 });

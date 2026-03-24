@@ -8,10 +8,13 @@ export type ErrorCode =
   | "VALIDATION_ERROR"
   | "INTERNAL_ERROR"
   | "INVALID_CREDENTIALS"
+  | "INVALID_RECOVERY_CODE"
   | "SESSION_EXPIRED"
   | "WRONG_PASSWORD"
   | "INVALID_INVITE_CODE"
   | "EXPIRED_INVITE_CODE"
+  | "INVITE_CODE_INACTIVE"
+  | "INVITE_CODE_USAGE_LIMIT_REACHED"
   | "CUSTOM_ID_ALREADY_EXISTS"
   | "ALREADY_IN_WORKSPACE"
   | "CANNOT_REMOVE_LAST_ADMIN"
@@ -30,10 +33,14 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   VALIDATION_ERROR: "입력값이 올바르지 않습니다.",
   INTERNAL_ERROR: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
   INVALID_CREDENTIALS: "아이디 또는 비밀번호가 올바르지 않습니다.",
+  INVALID_RECOVERY_CODE: "유효하지 않은 복원코드입니다.",
   SESSION_EXPIRED: "세션이 만료되었습니다. 다시 로그인해주세요.",
   WRONG_PASSWORD: "현재 비밀번호가 올바르지 않습니다.",
   INVALID_INVITE_CODE: "존재하지 않는 초대 코드입니다.",
   EXPIRED_INVITE_CODE: "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
+  INVITE_CODE_INACTIVE: "비활성화된 초대 코드입니다.",
+  INVITE_CODE_USAGE_LIMIT_REACHED:
+    "초대 코드 사용 가능 횟수를 모두 사용했습니다.",
   CUSTOM_ID_ALREADY_EXISTS: "이미 사용 중인 아이디입니다.",
   ALREADY_IN_WORKSPACE: "이미 워크스페이스에 소속되어 있습니다.",
   CANNOT_REMOVE_LAST_ADMIN: "마지막 관리자는 퇴출할 수 없습니다.",
@@ -48,6 +55,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   UNAUTHORIZED: 401,
   SESSION_EXPIRED: 401,
   INVALID_CREDENTIALS: 401,
+  INVALID_RECOVERY_CODE: 404,
   WRONG_PASSWORD: 400,
   FUTURE_DATE_NOT_ALLOWED: 400,
   SCOREBOARD_ALREADY_ACTIVE: 400,
@@ -59,6 +67,8 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   NOT_FOUND: 404,
   INVALID_INVITE_CODE: 404,
   EXPIRED_INVITE_CODE: 410,
+  INVITE_CODE_INACTIVE: 409,
+  INVITE_CODE_USAGE_LIMIT_REACHED: 409,
   CUSTOM_ID_ALREADY_EXISTS: 409,
   ALREADY_IN_WORKSPACE: 409,
   ACTIVE_SCOREBOARD_EXISTS: 409,

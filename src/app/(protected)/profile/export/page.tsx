@@ -4,6 +4,8 @@ import { getAnalyticsExportData } from "@/api/generated/analytics/analytics";
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { EmptyStatePanel } from "@/app/(protected)/_components/EmptyStatePanel";
+import { NoWorkspaceActions } from "@/app/(protected)/_components/NoWorkspaceActions";
 import { getTodayInKst, getWeekDates } from "@/app/(protected)/dashboard/my/_lib/week";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
@@ -15,7 +17,7 @@ import {
   getApiErrorStatus,
   toNumberId,
 } from "@/lib/client/frontend-api";
-import { Download } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -328,23 +330,25 @@ function ExportSkeleton() {
 
 function NoWorkspaceState() {
   return (
-    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
-      <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-            소속된 워크스페이스가 없어요
-          </h1>
-          <p className="text-sm text-text-secondary leading-relaxed">
-            내보내기 전에 워크스페이스에 먼저 참여하거나 생성해주세요.
-          </p>
-        </div>
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+        <header className="flex items-center justify-between">
+          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
+          <p className="text-xs text-text-muted">데이터 내보내기</p>
+          <div className="w-8" />
+        </header>
 
-        <Button
-          asChild
-          className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
-        >
-          <Link href="/workspace/new">새 워크스페이스 만들기</Link>
-        </Button>
+        <EmptyStatePanel
+          title="소속된 워크스페이스가 없어요"
+          description={
+            <>
+              CSV를 내보내기 전에 먼저 워크스페이스를 만들거나
+              <br />
+              초대받은 팀에 참여해주세요.
+            </>
+          }
+          actions={<NoWorkspaceActions />}
+        />
       </div>
     </div>
   );
@@ -352,23 +356,35 @@ function NoWorkspaceState() {
 
 function NoScoreboardState() {
   return (
-    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
-      <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-            아직 점수판이 없어요
-          </h1>
-          <p className="text-sm text-text-secondary leading-relaxed">
-            점수판을 만든 뒤 기간별 데이터를 CSV로 저장할 수 있어요.
-          </p>
-        </div>
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+        <header className="flex items-center justify-between">
+          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
+          <p className="text-xs text-text-muted">데이터 내보내기</p>
+          <div className="w-8" />
+        </header>
 
-        <Button
-          asChild
-          className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
-        >
-          <Link href="/setup?mode=create">새 점수판 만들기</Link>
-        </Button>
+        <EmptyStatePanel
+          title="아직 가중목이 없어요"
+          description={
+            <>
+              먼저 점수판을 만들고 선행지표를 기록하면
+              <br />
+              기간별 데이터를 CSV로 내려받을 수 있어요.
+            </>
+          }
+          actions={
+            <Button
+              asChild
+              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+            >
+              <Link href="/setup?mode=create">
+                <Plus className="w-4 h-4" />
+                새 점수판 만들기
+              </Link>
+            </Button>
+          }
+        />
       </div>
     </div>
   );

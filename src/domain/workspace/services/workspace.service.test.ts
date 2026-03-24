@@ -12,6 +12,12 @@ describe("WorkspaceService", () => {
     findMembership: vi.fn(),
     findMembers: vi.fn(),
     removeMemberById: vi.fn(),
+    createInvite: vi.fn(),
+    findInviteByCode: vi.fn(),
+    findInviteById: vi.fn(),
+    listInvites: vi.fn(),
+    updateInviteStatus: vi.fn(),
+    addMemberByInvite: vi.fn(),
   };
 
   const service = new WorkspaceService(mockStorage);
@@ -48,13 +54,43 @@ describe("WorkspaceService", () => {
       expect(mockStorage.createWorkspace).toHaveBeenCalledWith("New");
       expect(mockStorage.addMember).toHaveBeenCalledWith(1, 123, "ADMIN");
     });
+
+    it("멤버 추가 중 유니크 충돌이 발생하면 409 에러를 던진다", async () => {
+      mockStorage.createWorkspace.mockResolvedValue({ id: 1, name: "New" });
+      mockStorage.addMember.mockRejectedValue(
+        new Error("UNIQUE constraint failed: workspace_members.user_id"),
+      );
+
+      await expect(service.createWorkspace(123, "New")).rejects.toThrow(
+        "ALREADY_IN_WORKSPACE",
+      );
+    });
   });
 
   describe("joinWorkspace", () => {
     it("워크스페이스에 사용자를 MEMBER로 추가한다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.addMember.mockResolvedValue(undefined);
       await service.joinWorkspace(1, 123);
 
       expect(mockStorage.addMember).toHaveBeenCalledWith(1, 123, "MEMBER");
+    });
+
+    it("대상 워크스페이스가 없으면 404 에러를 던진다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue(null);
+
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow("NOT_FOUND");
+    });
+
+    it("동시 요청으로 유니크 충돌이 발생하면 409 에러를 던진다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.addMember.mockRejectedValue(
+        new Error("UNIQUE constraint failed: workspace_members.user_id"),
+      );
+
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
+        "ALREADY_IN_WORKSPACE",
+      );
     });
   });
 
@@ -132,6 +168,102 @@ describe("WorkspaceService", () => {
 
       await expect(service.removeMember(1, 123, 9)).rejects.toThrow(
         "CANNOT_REMOVE_LAST_ADMIN",
+      );
+    });
+  });
+
+  describe("invite", () => {
+    it("ADMIN이 초대코드를 생성한다", async () => {
+      const workspace = { id: 1, name: "팀", createdAt: new Date() };
+      mockStorage.findWorkspaceById.mockResolvedValue(workspace);
+      mockStorage.createInvite.mockResolvedValue({
+        id: 10,
+        workspaceId: 1,
+        code: "ABCDEFG234",
+        maxUses: 3,
+        usedCount: 0,
+        status: "ACTIVE",
+        createdByUserId: 1,
+        createdAt: new Date(),
+      });
+
+      const invite = await service.createInvite(1, 1, 3);
+      expect(invite.code).toBeDefined();
+      expect(mockStorage.createInvite).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workspaceId: 1,
+          maxUses: 3,
+          createdByUserId: 1,
+          code: expect.any(String),
+        }),
+      );
+    });
+
+    it("비활성화된 초대코드는 참가할 수 없다", async () => {
+      mockStorage.findInviteByCode.mockResolvedValue({
+        id: 11,
+        workspaceId: 1,
+        code: "ABCD123456",
+        maxUses: 1,
+        usedCount: 0,
+        status: "INACTIVE",
+      });
+
+      await expect(service.joinWorkspaceByInvite("abcd123456", 7)).rejects.toThrow(
+        "INVITE_CODE_INACTIVE",
+      );
+    });
+
+    it("사용 횟수를 초과한 초대코드는 참가할 수 없다", async () => {
+      mockStorage.findInviteByCode.mockResolvedValue({
+        id: 11,
+        workspaceId: 1,
+        code: "ABCD123456",
+        maxUses: 1,
+        usedCount: 1,
+        status: "ACTIVE",
+      });
+
+      await expect(service.joinWorkspaceByInvite("ABCD123456", 7)).rejects.toThrow(
+        "INVITE_CODE_USAGE_LIMIT_REACHED",
+      );
+    });
+
+    it("유효한 초대코드면 참가 처리한다", async () => {
+      mockStorage.findInviteByCode.mockResolvedValue({
+        id: 11,
+        workspaceId: 1,
+        code: "ABCD123456",
+        maxUses: 3,
+        usedCount: 1,
+        status: "ACTIVE",
+      });
+      mockStorage.addMemberByInvite.mockResolvedValue(true);
+
+      await service.joinWorkspaceByInvite("abcd123456", 7);
+
+      expect(mockStorage.addMemberByInvite).toHaveBeenCalledWith({
+        inviteId: 11,
+        workspaceId: 1,
+        userId: 7,
+      });
+    });
+
+    it("초대코드 참가 중 유니크 충돌이 발생하면 409 에러를 던진다", async () => {
+      mockStorage.findInviteByCode.mockResolvedValue({
+        id: 11,
+        workspaceId: 1,
+        code: "ABCD123456",
+        maxUses: 3,
+        usedCount: 1,
+        status: "ACTIVE",
+      });
+      mockStorage.addMemberByInvite.mockRejectedValue(
+        new Error("UNIQUE constraint failed: workspace_members.user_id"),
+      );
+
+      await expect(service.joinWorkspaceByInvite("ABCD123456", 7)).rejects.toThrow(
+        "ALREADY_IN_WORKSPACE",
       );
     });
   });

@@ -3,7 +3,7 @@ import { ForbiddenError } from "@/lib/server/errors";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
-const mockGetSession = vi.fn();
+const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceAdminInWorkspace = vi.fn();
 const mockRemoveMember = vi.fn();
 
@@ -16,7 +16,7 @@ vi.mock("@/db", () => ({
 }));
 
 vi.mock("@/lib/server/auth", () => ({
-  getSession: mockGetSession,
+  getSessionWithRefresh: mockGetSessionWithRefresh,
 }));
 
 vi.mock("@/lib/server/authz", () => ({
@@ -43,7 +43,7 @@ describe("DELETE /api/workspaces/:id/members/:memberId", () => {
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
-    mockGetSession.mockResolvedValue(null);
+    mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
@@ -55,7 +55,7 @@ describe("DELETE /api/workspaces/:id/members/:memberId", () => {
   });
 
   it("해당 워크스페이스 ADMIN이 아니면 403을 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockRejectedValue(
       new ForbiddenError("FORBIDDEN"),
     );
@@ -71,7 +71,7 @@ describe("DELETE /api/workspaces/:id/members/:memberId", () => {
   });
 
   it("ADMIN이면 멤버를 퇴출하고 204를 반환한다", async () => {
-    mockGetSession.mockResolvedValue({ userId: 1 });
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
       workspaceId: 1,
       userId: 1,

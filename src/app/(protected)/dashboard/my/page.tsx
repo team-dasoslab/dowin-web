@@ -4,6 +4,8 @@ import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { MonthlyMobileCards } from "@/app/(protected)/dashboard/my/_components/MonthlyMobileCards";
 import { WeeklyMobileCards } from "@/app/(protected)/dashboard/my/_components/WeeklyMobileCards";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
+import { EmptyStatePanel } from "@/app/(protected)/_components/EmptyStatePanel";
+import { NoWorkspaceActions } from "@/app/(protected)/_components/NoWorkspaceActions";
 import {
   canPlayCelebration,
   fireDashboardConfetti,
@@ -952,31 +954,20 @@ function MyDashboardSkeleton() {
 
 function NoWorkspaceState() {
   return (
-    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
-      <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
-        <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
-          <Zap className="text-primary w-7 h-7" />
-        </div>
-
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-            소속된 워크스페이스가 없어요
-          </h1>
-          <p className="text-sm text-text-secondary leading-relaxed">
-            팀원들과 함께 목표를 공유하고 성장하기 위해
-            <br />
-            새로운 워크스페이스를 만들거나 초대받으세요.
-          </p>
-        </div>
-
-        <Button
-          asChild
-          className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
-        >
-          <Link href="/workspace/new">
-            <Plus className="w-4 h-4" />새 워크스페이스 만들기
-          </Link>
-        </Button>
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+        <MyDashboardEmptyHeader variant="no-workspace" />
+        <EmptyStatePanel
+          title="소속된 워크스페이스가 없어요"
+          description={
+            <>
+              팀원들과 함께 목표를 공유하고 성장하기 위해
+              <br />
+              새로운 워크스페이스를 만들거나 초대받으세요.
+            </>
+          }
+          actions={<NoWorkspaceActions />}
+        />
       </div>
     </div>
   );
@@ -984,32 +975,87 @@ function NoWorkspaceState() {
 
 function NoScoreboardState() {
   return (
-    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
-      <div className="max-w-[400px] w-full space-y-8 animate-linear-in">
-        <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
-          <Zap className="text-primary w-7 h-7" />
-        </div>
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+        <MyDashboardEmptyHeader variant="no-scoreboard" />
 
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
-            아직 목표가 없어요
-          </h1>
-          <p className="text-sm text-text-secondary leading-relaxed">
-            가장 중요한 단 하나의 목표, 가중목을 설정하고
-            <br />
-            매일의 성장을 기록하기 시작하세요.
-          </p>
-        </div>
-
-        <Button
-          asChild
-          className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
-        >
-          <Link href="/setup?mode=create">
-            <Plus className="w-4 h-4" />새 점수판 만들기
-          </Link>
-        </Button>
+        <EmptyStatePanel
+          title="아직 목표가 없어요"
+          description={
+            <>
+              가장 중요한 단 하나의 목표, 가중목을 설정하고
+              <br />
+              매일의 성장을 기록하기 시작하세요.
+            </>
+          }
+          actions={
+            <Button
+              asChild
+              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+            >
+              <Link href="/setup?mode=create">
+                <Plus className="w-4 h-4" />
+                새 점수판 만들기
+              </Link>
+            </Button>
+          }
+        />
       </div>
     </div>
+  );
+}
+
+function MyDashboardEmptyHeader({
+  variant,
+}: {
+  variant: "no-workspace" | "no-scoreboard";
+}) {
+  const links =
+    variant === "no-workspace"
+      ? DASHBOARD_LINKS.filter(({ href }) => href === "/profile")
+      : DASHBOARD_LINKS.filter(({ href }) => href !== "/setup?mode=update");
+
+  return (
+    <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        {variant === "no-workspace" ? (
+          <>
+            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 text-primary shrink-0">
+              <Zap className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-base font-bold tracking-tight text-text-primary truncate">
+                WIG
+              </h1>
+              <p className="text-[11px] text-text-muted truncate">
+                가장 중요한 목표에 집중하세요.
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="min-w-0">
+            <p className="text-[11px] text-text-muted truncate">대시보드</p>
+            <h1 className="text-sm font-bold text-text-primary truncate">
+              나의 점수판
+            </h1>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {links.map(({ href, icon: Icon, label }) => (
+          <Button
+            key={href}
+            asChild
+            className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
+          >
+            <Link href={href}>
+              <Icon className="w-3.5 h-3.5 text-text-muted shrink-0" />
+              <span>{label}</span>
+            </Link>
+          </Button>
+        ))}
+      </div>
+    </header>
   );
 }

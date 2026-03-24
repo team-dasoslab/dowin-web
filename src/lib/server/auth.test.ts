@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/server/auth";
+import { getSession, getSessionWithRefresh } from "@/lib/server/auth";
 import { cookies } from "next/headers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -68,7 +68,38 @@ describe("getSession", () => {
     expect(session).toEqual(mockSession);
   });
 
-  it("재발급 주기(3일) 이상 지난 세션은 만료를 연장하고 쿠키를 다시 설정한다", async () => {
+  it("읽기 전용 세션 조회는 쿠키를 다시 설정하지 않는다", async () => {
+    const now = new Date("2026-03-20T00:00:00.000Z");
+    const soonExpiredSession = {
+      id: "session-readonly",
+      userId: 1,
+      expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+      createdAt: new Date("2026-03-15T00:00:00.000Z"),
+    };
+
+    const cookieSet = vi.fn();
+    mockCookies.mockResolvedValue({
+      get: vi.fn().mockReturnValue({ value: "session-readonly" }),
+      set: cookieSet,
+    } as never);
+
+    const db = {
+      query: {
+        sessions: {
+          findFirst: vi.fn().mockResolvedValue(soonExpiredSession),
+        },
+      },
+      update: vi.fn(),
+    } as unknown as Parameters<typeof getSession>[0];
+
+    const session = await getSession(db);
+
+    expect(session).toEqual(soonExpiredSession);
+    expect(db.update).not.toHaveBeenCalled();
+    expect(cookieSet).not.toHaveBeenCalled();
+  });
+
+  it("route handler 세션 조회는 재발급 주기(3일) 이상 지난 세션을 연장하고 쿠키를 다시 설정한다", async () => {
     const now = new Date("2026-03-20T00:00:00.000Z");
     const soonExpiredSession = {
       id: "session-rotate",
@@ -93,9 +124,9 @@ describe("getSession", () => {
         },
       },
       update,
-    } as unknown as Parameters<typeof getSession>[0];
+    } as unknown as Parameters<typeof getSessionWithRefresh>[0];
 
-    await getSession(db);
+    await getSessionWithRefresh(db);
 
     expect(update).toHaveBeenCalledTimes(1);
     expect(cookieSet).toHaveBeenCalledTimes(1);
