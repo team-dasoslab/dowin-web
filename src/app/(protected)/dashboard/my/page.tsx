@@ -18,7 +18,6 @@ import {
   DAY_LABELS,
   getMonthCalendarWeeks,
 } from "@/app/(protected)/dashboard/my/_lib/week";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useToast } from "@/context/ToastContext";
@@ -84,7 +83,7 @@ export default function MyDashboardPage() {
     monthlySummary,
     monthLabel,
     movePeriod,
-    pendingLogKey,
+    pendingLogKeys,
     resetToToday,
     selectedDate,
     selectedView,
@@ -220,9 +219,6 @@ export default function MyDashboardPage() {
     <div className="min-h-screen bg-background font-pretendard">
       {canPlayCelebration(celebrationEvent, isLogPending) ? (
         <DashboardCelebrationOverlay level={celebrationEvent.level} />
-      ) : null}
-      {isLogPending ? (
-        <LoadingOverlay message="기록을 반영하는 중입니다." />
       ) : null}
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -705,11 +701,10 @@ export default function MyDashboardPage() {
             <>
               <WeeklyMobileCards
                 activeLeadMeasures={activeLeadMeasures}
-                isLogPending={isLogPending}
                 onBeforeToggle={() => {
                   celebrationWatchRef.current = true;
                 }}
-                pendingLogKey={pendingLogKey}
+                pendingLogKeys={pendingLogKeys}
                 today={today}
                 toggleLog={toggleLog}
                 weekDates={weekDates}
@@ -799,16 +794,13 @@ export default function MyDashboardPage() {
                                     ? null
                                     : `${leadMeasureId}:${date}`;
                                 const isPending =
-                                  pendingLogKey === currentLogKey;
+                                  currentLogKey !== null &&
+                                  pendingLogKeys.has(currentLogKey);
 
                                 return (
                                   <td key={date} className="py-3 text-center">
                                     <Button
-                                      disabled={
-                                        isPending ||
-                                        isLogPending ||
-                                        leadMeasureId === null
-                                      }
+                                      disabled={isPending || leadMeasureId === null}
                                       onClick={() => {
                                         if (leadMeasureId !== null) {
                                           celebrationWatchRef.current = true;
@@ -821,7 +813,7 @@ export default function MyDashboardPage() {
                                           : isToday
                                             ? "bg-primary/5 border-primary/30 text-primary"
                                             : "bg-sub-background border-border text-text-muted"
-                                      } ${isPending || isLogPending ? "cursor-not-allowed opacity-70" : "cursor-pointer"}`}
+                                      } ${isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
                                     >
                                       {currentValue === true ? (
                                         <Check className="w-3.5 h-3.5" />

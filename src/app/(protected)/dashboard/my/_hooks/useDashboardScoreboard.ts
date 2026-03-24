@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  deleteLeadMeasuresLeadMeasureIdLogsDateResponse,
+  deleteLeadMeasuresLeadMeasureIdLogsDate,
   getGetScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetScoreboardsScoreboardIdLogsWeeklyQueryKey,
   getScoreboardsScoreboardIdLogsWeeklyResponse200,
-  putLeadMeasuresLeadMeasureIdLogsDateResponse,
+  putLeadMeasuresLeadMeasureIdLogsDate,
   useDeleteLeadMeasuresLeadMeasureIdLogsDate,
   useGetScoreboardsScoreboardIdLogsMonthly,
   useGetScoreboardsScoreboardIdLogsWeekly,
@@ -45,6 +45,17 @@ type WeeklyLogsQueryData =
   | undefined;
 type DailyLogValue = boolean | null;
 type DashboardView = "week" | "month";
+type ToggleLogContext = {
+  currentLogKey: string;
+  previousWeeklyLogs: WeeklyLogsQueryData;
+  weeklyLogsQueryKey: ReturnType<
+    typeof getGetScoreboardsScoreboardIdLogsWeeklyQueryKey
+  > | null;
+  monthlyLogsQueryKey: ReturnType<
+    typeof getGetScoreboardsScoreboardIdLogsMonthlyQueryKey
+  > | null;
+  dashboardTeamQueryKey: ReturnType<typeof getGetDashboardTeamQueryKey>;
+};
 
 const getNextLogValue = (value: DailyLogValue): DailyLogValue => {
   return value === true ? null : true;
@@ -101,7 +112,9 @@ export const useDashboardScoreboard = () => {
   const router = useRouter();
   const { showToast } = useToast();
   const queryClient = useQueryClient();
-  const [pendingLogKey, setPendingLogKey] = useState<string | null>(null);
+  const [pendingLogKeys, setPendingLogKeys] = useState<Set<string>>(
+    () => new Set(),
+  );
   const today = getTodayInKst();
   const selectedViewParam = searchParams.get("view");
   const selectedView: DashboardView = isDashboardView(selectedViewParam)
@@ -191,9 +204,6 @@ export const useDashboardScoreboard = () => {
       },
     });
 
-  const updateLogMutation = usePutLeadMeasuresLeadMeasureIdLogsDate();
-  const deleteLogMutation = useDeleteLeadMeasuresLeadMeasureIdLogsDate();
-
   const isWorkspace404 = getApiErrorStatus(workspaceError) === 404;
   const isScoreboard404 = getApiErrorStatus(scoreboardError) === 404;
   const workspace =
@@ -250,6 +260,157 @@ export const useDashboardScoreboard = () => {
       ? `${weekDates[0].slice(5).replace("-", ".")} – ${weekDates[6].slice(5).replace("-", ".")}`
       : "";
 
+  const addPendingLogKey = (currentLogKey: string) => {
+    setPendingLogKeys((previous) => {
+      const next = new Set(previous);
+      next.add(currentLogKey);
+      return next;
+    });
+  };
+
+  const removePendingLogKey = (currentLogKey: string) => {
+    setPendingLogKeys((previous) => {
+      const next = new Set(previous);
+      next.delete(currentLogKey);
+      return next;
+    });
+  };
+
+  const invalidateToggleQueries = async (context?: ToggleLogContext) => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: getGetScoreboardsActiveQueryKey(),
+      }),
+      context?.weeklyLogsQueryKey
+        ? queryClient.invalidateQueries({
+            queryKey: context.weeklyLogsQueryKey,
+          })
+        : Promise.resolve(),
+      context?.monthlyLogsQueryKey
+        ? queryClient.invalidateQueries({
+            queryKey: context.monthlyLogsQueryKey,
+          })
+        : Promise.resolve(),
+      queryClient.invalidateQueries({
+        queryKey: context?.dashboardTeamQueryKey ?? dashboardTeamQueryKey,
+      }),
+    ]);
+  };
+
+  const createToggleLogContext = (
+    leadMeasureId: number,
+    date: string,
+    value: DailyLogValue,
+  ): ToggleLogContext => {
+    const currentLogKey = `${leadMeasureId}:${date}`;
+    const previousWeeklyLogs =
+      weeklyLogsQueryKey === null
+        ? undefined
+        : queryClient.getQueryData<WeeklyLogsQueryData>(weeklyLogsQueryKey);
+
+    addPendingLogKey(currentLogKey);
+
+    if (weeklyLogsQueryKey !== null) {
+      queryClient.setQueryData<WeeklyLogsQueryData>(
+        weeklyLogsQueryKey,
+        updateWeeklyLogsCache(previousWeeklyLogs, leadMeasureId, date, value),
+      );
+    }
+
+    return {
+      currentLogKey,
+      previousWeeklyLogs,
+      weeklyLogsQueryKey,
+      monthlyLogsQueryKey,
+      dashboardTeamQueryKey,
+    };
+  };
+
+  const handleToggleLogError = (error: unknown, context?: ToggleLogContext) => {
+    if (context?.weeklyLogsQueryKey !== null && context !== undefined) {
+      queryClient.setQueryData(
+        context.weeklyLogsQueryKey,
+        context.previousWeeklyLogs,
+      );
+    }
+
+    showToast("error", getApiErrorMessage(error, "기록 저장에 실패했습니다."));
+  };
+
+  const handleToggleLogSettled = async (context?: ToggleLogContext) => {
+    await invalidateToggleQueries(context);
+
+    if (context) {
+      removePendingLogKey(context.currentLogKey);
+    }
+  };
+
+  const updateLogMutation = usePutLeadMeasuresLeadMeasureIdLogsDate<
+    unknown,
+    ToggleLogContext
+  >({
+    mutation: {
+      mutationFn: async ({ leadMeasureId, date, data }) => {
+        const response = await putLeadMeasuresLeadMeasureIdLogsDate(
+          leadMeasureId,
+          date,
+          data,
+        );
+
+        if (response.status >= 400) {
+          throw response;
+        }
+
+        return response;
+      },
+      onMutate: async ({ leadMeasureId, date, data }) => {
+        await queryClient.cancelQueries({
+          queryKey: weeklyLogsQueryKey ?? undefined,
+        });
+
+        return createToggleLogContext(leadMeasureId, date, data.value);
+      },
+      onError: (error, _variables, context) => {
+        handleToggleLogError(error, context);
+      },
+      onSettled: async (_data, _error, _variables, context) => {
+        await handleToggleLogSettled(context);
+      },
+    },
+  });
+  const deleteLogMutation = useDeleteLeadMeasuresLeadMeasureIdLogsDate<
+    unknown,
+    ToggleLogContext
+  >({
+    mutation: {
+      mutationFn: async ({ leadMeasureId, date }) => {
+        const response = await deleteLeadMeasuresLeadMeasureIdLogsDate(
+          leadMeasureId,
+          date,
+        );
+
+        if (response.status >= 400) {
+          throw response;
+        }
+
+        return response;
+      },
+      onMutate: async ({ leadMeasureId, date }) => {
+        await queryClient.cancelQueries({
+          queryKey: weeklyLogsQueryKey ?? undefined,
+        });
+
+        return createToggleLogContext(leadMeasureId, date, null);
+      },
+      onError: (error, _variables, context) => {
+        handleToggleLogError(error, context);
+      },
+      onSettled: async (_data, _error, _variables, context) => {
+        await handleToggleLogSettled(context);
+      },
+    },
+  });
+
   const setSelectedView = (view: DashboardView) => {
     setPeriodState(view, rawSelectedDate);
   };
@@ -281,7 +442,7 @@ export const useDashboardScoreboard = () => {
   };
 
   const toggleLog = async (leadMeasureId: number, date: string) => {
-    if (scoreboardId === null || pendingLogKey) {
+    if (scoreboardId === null) {
       return;
     }
 
@@ -289,74 +450,23 @@ export const useDashboardScoreboard = () => {
     const nextValue = getNextLogValue(currentValue);
     const currentLogKey = `${leadMeasureId}:${date}`;
 
-    setPendingLogKey(currentLogKey);
-
-    const previousWeeklyLogs =
-      weeklyLogsQueryKey === null
-        ? undefined
-        : queryClient.getQueryData<WeeklyLogsQueryData>(weeklyLogsQueryKey);
-
-    if (weeklyLogsQueryKey !== null) {
-      queryClient.setQueryData<WeeklyLogsQueryData>(
-        weeklyLogsQueryKey,
-        updateWeeklyLogsCache(
-          previousWeeklyLogs,
-          leadMeasureId,
-          date,
-          nextValue,
-        ),
-      );
+    if (pendingLogKeys.has(currentLogKey)) {
+      return;
     }
 
-    try {
-      const response:
-        | putLeadMeasuresLeadMeasureIdLogsDateResponse
-        | deleteLeadMeasuresLeadMeasureIdLogsDateResponse =
-        nextValue === null
-          ? await deleteLogMutation.mutateAsync({
-              leadMeasureId,
-              date,
-            })
-          : await updateLogMutation.mutateAsync({
-              leadMeasureId,
-              date,
-              data: { value: nextValue },
-            });
-
-      if (response.status >= 400) {
-        throw response;
-      }
-    } catch (error) {
-      if (weeklyLogsQueryKey !== null) {
-        queryClient.setQueryData(weeklyLogsQueryKey, previousWeeklyLogs);
-      }
-
-      showToast(
-        "error",
-        getApiErrorMessage(error, "기록 저장에 실패했습니다."),
-      );
-    } finally {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: getGetScoreboardsActiveQueryKey(),
-        }),
-        weeklyLogsQueryKey !== null
-          ? queryClient.invalidateQueries({
-              queryKey: weeklyLogsQueryKey,
-            })
-          : Promise.resolve(),
-        monthlyLogsQueryKey !== null
-          ? queryClient.invalidateQueries({
-              queryKey: monthlyLogsQueryKey,
-            })
-          : Promise.resolve(),
-        queryClient.invalidateQueries({
-          queryKey: dashboardTeamQueryKey,
-        }),
-      ]);
-
-      setPendingLogKey((value) => (value === currentLogKey ? null : value));
+    if (nextValue === null) {
+      await deleteLogMutation.mutateAsync({
+        leadMeasureId,
+        date,
+      });
+      return;
     }
+
+    await updateLogMutation.mutateAsync({
+      leadMeasureId,
+      date,
+      data: { value: nextValue },
+    });
   };
 
   return {
@@ -366,7 +476,7 @@ export const useDashboardScoreboard = () => {
     hasNoWorkspace: isWorkspace404,
     isLoading: (isWorkspaceLoading || isScoreboardLoading) && !isWorkspace404,
     isLogPending:
-      pendingLogKey !== null ||
+      pendingLogKeys.size > 0 ||
       updateLogMutation.isPending ||
       deleteLogMutation.isPending,
     isMonthlyLogsLoading,
@@ -374,7 +484,7 @@ export const useDashboardScoreboard = () => {
     monthlyLeadMeasures,
     monthlyOverallRate,
     monthlySummary,
-    pendingLogKey,
+    pendingLogKeys,
     scoreboardError,
     selectedDate,
     selectedView,

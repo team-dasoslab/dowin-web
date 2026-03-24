@@ -7,9 +7,8 @@ import { Check } from "lucide-react";
 
 type WeeklyMobileCardsProps = {
   activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
-  isLogPending: boolean;
   onBeforeToggle: () => void;
-  pendingLogKey: string | null;
+  pendingLogKeys: ReturnType<typeof useDashboardScoreboard>["pendingLogKeys"];
   today: string;
   toggleLog: ReturnType<typeof useDashboardScoreboard>["toggleLog"];
   weekDates: string[];
@@ -17,10 +16,9 @@ type WeeklyMobileCardsProps = {
 };
 
 type WeeklyMobileCardProps = {
-  isLogPending: boolean;
   leadMeasure: WeeklyMobileCardsProps["activeLeadMeasures"][number];
   onBeforeToggle: WeeklyMobileCardsProps["onBeforeToggle"];
-  pendingLogKey: string | null;
+  pendingLogKeys: WeeklyMobileCardsProps["pendingLogKeys"];
   today: string;
   toggleLog: WeeklyMobileCardsProps["toggleLog"];
   weekDates: string[];
@@ -44,10 +42,9 @@ export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
 }
 
 function WeeklyMobileCard({
-  isLogPending,
   leadMeasure,
   onBeforeToggle,
-  pendingLogKey,
+  pendingLogKeys,
   today,
   toggleLog,
   weekDates,
@@ -86,10 +83,9 @@ function WeeklyMobileCard({
             key={`${leadMeasure.id}-${date}`}
             date={date}
             dayLabel={DAY_LABELS[index]}
-            isLogPending={isLogPending}
             leadMeasureId={leadMeasureId}
             onBeforeToggle={onBeforeToggle}
-            pendingLogKey={pendingLogKey}
+            pendingLogKeys={pendingLogKeys}
             today={today}
             toggleLog={toggleLog}
             value={weekly?.logs?.[date] === undefined ? null : weekly.logs[date]}
@@ -103,10 +99,9 @@ function WeeklyMobileCard({
 type WeeklyMobileCardDayProps = {
   date: string;
   dayLabel: string;
-  isLogPending: boolean;
   leadMeasureId: number | null;
   onBeforeToggle: WeeklyMobileCardsProps["onBeforeToggle"];
-  pendingLogKey: string | null;
+  pendingLogKeys: WeeklyMobileCardsProps["pendingLogKeys"];
   today: string;
   toggleLog: WeeklyMobileCardsProps["toggleLog"];
   value: boolean | null;
@@ -115,17 +110,16 @@ type WeeklyMobileCardDayProps = {
 function WeeklyMobileCardDay({
   date,
   dayLabel,
-  isLogPending,
   leadMeasureId,
   onBeforeToggle,
-  pendingLogKey,
+  pendingLogKeys,
   today,
   toggleLog,
   value,
 }: WeeklyMobileCardDayProps) {
   const isToday = date === today;
   const currentLogKey = leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
-  const isPending = pendingLogKey === currentLogKey;
+  const isPending = currentLogKey !== null && pendingLogKeys.has(currentLogKey);
 
   return (
     <div className="space-y-1 text-center">
@@ -137,7 +131,7 @@ function WeeklyMobileCardDay({
         {dayLabel}
       </p>
       <Button
-        disabled={isPending || isLogPending || leadMeasureId === null}
+        disabled={isPending || leadMeasureId === null}
         onClick={() => {
           if (leadMeasureId !== null) {
             onBeforeToggle();
@@ -150,11 +144,7 @@ function WeeklyMobileCardDay({
             : isToday
               ? "border-primary/30 bg-primary/5 text-primary"
               : "border-border bg-sub-background text-text-muted"
-        } ${
-          isPending || isLogPending
-            ? "cursor-not-allowed opacity-70"
-            : "cursor-pointer"
-        }`}
+        } ${isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
       >
         {value === true ? (
           <Check className="mx-auto h-3.5 w-3.5" />
