@@ -1,12 +1,13 @@
 "use client";
 
-import { useGetDashboardTeamMemos } from "@/api/generated/dashboard/dashboard";
 import { TeamDashboardMember, TeamDashboardMemberRole } from "@/api/generated/wig.schemas";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import { TeamMemberMemoPanel } from "@/app/(protected)/dashboard/_components/TeamMemberMemoPanel";
+import { useTeamMemos } from "@/app/(protected)/dashboard/_hooks/useTeamMemos";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
-import { getApiErrorStatus, toNumberId } from "@/lib/client/frontend-api";
+import { useToast } from "@/context/ToastContext";
+import { toNumberId } from "@/lib/client/frontend-api";
 
 const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -38,18 +39,26 @@ export function WeeklyTable({
   currentUserRole,
 }: WeeklyTableProps) {
   const memberUserId = toNumberId(member.userId);
-  const { data: memoResponse } = useGetDashboardTeamMemos(
-    { targetUserId: memberUserId ?? 0 },
-    {
-      query: {
-        enabled: memberUserId !== null,
-        staleTime: 30 * 1000,
-        refetchOnWindowFocus: false,
-        retry: (failureCount, queryError) =>
-          getApiErrorStatus(queryError) !== 404 && failureCount < 2,
-      },
+  const { showToast } = useToast();
+  const {
+    memos,
+    isLoading: isMemosLoading,
+    isError: isMemosError,
+    isCreatePending,
+    isResolvePending,
+    isDeletePending,
+    createMemo,
+    resolveMemo,
+    deleteMemo,
+  } = useTeamMemos({
+    targetUserId: memberUserId,
+    enabled: true,
+    currentUser: {
+      id: currentUserId,
+      nickname: currentUserNickname,
+      avatarKey: currentUserAvatarKey,
     },
-  );
+  });
 
   if (
     !(member.hasScoreboard ?? false) ||
@@ -59,9 +68,28 @@ export function WeeklyTable({
   }
 
   const today = new Date().toISOString().split("T")[0];
-  const hasMemos = (memoResponse?.status === 200
-    ? memoResponse.data.memos?.length
-    : 0) > 0;
+  const hasMemos = memos.length > 0;
+
+  const handleComposeClick = () => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+      const content = window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
+
+      if (!content) {
+        return;
+      }
+
+      void (async () => {
+        const isSuccess = await createMemo(content);
+
+        if (isSuccess) {
+          showToast("success", "메모를 추가했습니다.");
+        }
+      })();
+      return;
+    }
+
+    onToggleCompose?.();
+  };
 
   return (
     <div className="relative space-y-2 xl:pr-0">
@@ -104,7 +132,7 @@ export function WeeklyTable({
             ) : null}
             <Button
               type="button"
-              onClick={onToggleCompose}
+              onClick={handleComposeClick}
               className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-bold transition-colors ${
                 memoMode === "compose"
                   ? "border-primary/25 bg-primary/10 text-primary"
@@ -309,9 +337,16 @@ export function WeeklyTable({
         member={member}
         memoMode={memoMode}
         onCloseMemo={onCloseMemo}
+        memos={memos}
+        isMemosLoading={isMemosLoading}
+        isMemosError={isMemosError}
+        isCreatePending={isCreatePending}
+        isResolvePending={isResolvePending}
+        isDeletePending={isDeletePending}
+        createMemo={createMemo}
+        resolveMemo={resolveMemo}
+        deleteMemo={deleteMemo}
         currentUserId={currentUserId}
-        currentUserNickname={currentUserNickname}
-        currentUserAvatarKey={currentUserAvatarKey}
         currentUserRole={currentUserRole}
       />
     </div>
