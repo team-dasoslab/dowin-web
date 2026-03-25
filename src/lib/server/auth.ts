@@ -7,8 +7,10 @@ import {
   SESSION_TTL_MS,
   SESSION_TTL_SECONDS,
 } from "@/domain/auth/constants";
+import { serverRuntimeConfig } from "@/config/server-runtime-config";
 
 export const SESSION_COOKIE = "wig_sid";
+export const SESSION_COOKIE_SECURE = !serverRuntimeConfig.isDevelopment;
 type Db = ReturnType<typeof getDb>;
 type Session = typeof sessions.$inferSelect;
 type CookieStore = Awaited<ReturnType<typeof cookies>>;
@@ -73,7 +75,7 @@ const reissueSession = async (
 
   cookieStore.set(SESSION_COOKIE, session.id, {
     httpOnly: true,
-    secure: true,
+    secure: SESSION_COOKIE_SECURE,
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_TTL_SECONDS,

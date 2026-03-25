@@ -4,6 +4,7 @@ import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { signupSchema } from "@/domain/auth/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { SESSION_COOKIE_SECURE } from "@/lib/server/auth";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies } from "next/headers";
@@ -30,7 +31,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const cookieStore = await cookies();
   cookieStore.set("wig_sid", sessionId, {
     httpOnly: true,
-    secure: true,
+    secure: SESSION_COOKIE_SECURE,
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_TTL_SECONDS,
