@@ -19,6 +19,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   members: many(workspaceMembers),
   scoreboards: many(scoreboards),
   recoveryCodes: many(authRecoveryCodes),
+  authoredTeamMemos: many(teamMemos, { relationName: "teamMemoAuthor" }),
+  targetedTeamMemos: many(teamMemos, { relationName: "teamMemoTarget" }),
+  resolvedTeamMemos: many(teamMemos, { relationName: "teamMemoResolver" }),
 }));
 
 export const authRecoveryCodes = sqliteTable("auth_recovery_codes", {
@@ -74,6 +77,7 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   members: many(workspaceMembers),
   scoreboards: many(scoreboards),
   invites: many(workspaceInvites),
+  teamMemos: many(teamMemos),
 }));
 
 export const workspaceMembers = sqliteTable(
@@ -234,5 +238,48 @@ export const dailyLogsRelations = relations(dailyLogs, ({ one }) => ({
   leadMeasure: one(leadMeasures, {
     fields: [dailyLogs.leadMeasureId],
     references: [leadMeasures.id],
+  }),
+}));
+
+export const teamMemos = sqliteTable("team_memos", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  workspaceId: integer("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  targetUserId: integer("target_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  authorUserId: integer("author_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  content: text("content").notNull(),
+  resolvedAt: integer("resolved_at", { mode: "timestamp" }),
+  resolvedByUserId: integer("resolved_by_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(strftime('%s', 'now'))`),
+});
+
+export const teamMemosRelations = relations(teamMemos, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [teamMemos.workspaceId],
+    references: [workspaces.id],
+  }),
+  targetUser: one(users, {
+    relationName: "teamMemoTarget",
+    fields: [teamMemos.targetUserId],
+    references: [users.id],
+  }),
+  authorUser: one(users, {
+    relationName: "teamMemoAuthor",
+    fields: [teamMemos.authorUserId],
+    references: [users.id],
+  }),
+  resolvedByUser: one(users, {
+    relationName: "teamMemoResolver",
+    fields: [teamMemos.resolvedByUserId],
+    references: [users.id],
   }),
 }));

@@ -43,6 +43,18 @@ export type ProductUpdate = {
  */
 export const productUpdates = [
   {
+    id: "2026-03-25-team-dashboard-memos",
+    slug: "team-dashboard-memos",
+    title: "팀 대시보드에서 회의 메모를 바로 남길 수 있어요",
+    summary:
+      "가중목 회의 중 나온 메모나 확인할 일을 팀원별 주간 점수판 옆에 바로 적어두고 이어서 확인할 수 있습니다.",
+    publishedAt: "2026.03.25",
+    tag: "Dashboard",
+    ctaLabel: "바로 써보기",
+    ctaHref: "/dashboard",
+    isMajor: true,
+  },
+  {
     id: "2026-03-22-team-dashboard-me-highlight",
     slug: "team-dashboard-me-highlight",
     title: "팀 대시보드에서 내 카드를 더 빨리 찾을 수 있어요",

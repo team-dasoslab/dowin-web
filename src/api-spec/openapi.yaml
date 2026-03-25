@@ -1192,6 +1192,130 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
+  /dashboard/team/memos:
+    get:
+      summary: 팀 대시보드 사용자 메모 조회
+      tags: [Dashboard]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: targetUserId
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                { $ref: "#/components/schemas/DashboardTeamMemoListResponse" }
+        "404":
+          description: 워크스페이스 또는 대상 사용자를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    post:
+      summary: 팀 대시보드 사용자 메모 생성
+      tags: [Dashboard]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: "#/components/schemas/DashboardTeamMemoCreateRequest" }
+      responses:
+        "201":
+          description: 생성 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardTeamMemo" }
+        "404":
+          description: 워크스페이스 또는 대상 사용자를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /dashboard/team/memos/{memoId}/resolve:
+    patch:
+      summary: 팀 대시보드 사용자 메모 완료 상태 변경
+      tags: [Dashboard]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: memoId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              { $ref: "#/components/schemas/DashboardTeamMemoResolveRequest" }
+      responses:
+        "200":
+          description: 변경 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DashboardTeamMemo" }
+        "403":
+          description: 메모 완료 상태를 변경할 권한이 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 메모를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /dashboard/team/memos/{memoId}:
+    delete:
+      summary: 팀 대시보드 사용자 메모 삭제
+      tags: [Dashboard]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: memoId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: 삭제 성공
+        "403":
+          description: 메모를 삭제할 권한이 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 메모를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
 components:
   schemas:
     User:
@@ -1586,6 +1710,73 @@ components:
         members:
           type: array
           items: { $ref: "#/components/schemas/TeamDashboardMember" }
+
+    DashboardTeamMemoAuthor:
+      type: object
+      required: [userId, nickname]
+      properties:
+        userId: { type: integer }
+        nickname: { type: string }
+        avatarKey:
+          type: string
+          nullable: true
+
+    DashboardTeamMemo:
+      type: object
+      required:
+        [
+          id,
+          workspaceId,
+          targetUserId,
+          author,
+          content,
+          isResolved,
+          createdAt,
+        ]
+      properties:
+        id: { type: integer }
+        workspaceId: { type: integer }
+        targetUserId: { type: integer }
+        author:
+          $ref: "#/components/schemas/DashboardTeamMemoAuthor"
+        content: { type: string }
+        isResolved: { type: boolean }
+        resolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        resolvedByUserId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    DashboardTeamMemoListResponse:
+      type: object
+      required: [workspaceId, targetUserId, memos]
+      properties:
+        workspaceId: { type: integer }
+        targetUserId: { type: integer }
+        memos:
+          type: array
+          items: { $ref: "#/components/schemas/DashboardTeamMemo" }
+
+    DashboardTeamMemoCreateRequest:
+      type: object
+      required: [targetUserId, content]
+      properties:
+        targetUserId: { type: integer }
+        content:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    DashboardTeamMemoResolveRequest:
+      type: object
+      required: [isResolved]
+      properties:
+        isResolved: { type: boolean }
 
     ScoreboardSummary:
       type: object

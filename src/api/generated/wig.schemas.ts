@@ -465,6 +465,46 @@ export interface TeamDashboardResponse {
   members?: TeamDashboardMember[];
 }
 
+export interface DashboardTeamMemoAuthor {
+  userId: number;
+  nickname: string;
+  /** @nullable */
+  avatarKey?: string | null;
+}
+
+export interface DashboardTeamMemo {
+  id: number;
+  workspaceId: number;
+  targetUserId: number;
+  author: DashboardTeamMemoAuthor;
+  content: string;
+  isResolved: boolean;
+  /** @nullable */
+  resolvedAt?: string | null;
+  /** @nullable */
+  resolvedByUserId?: number | null;
+  createdAt: string;
+}
+
+export interface DashboardTeamMemoListResponse {
+  workspaceId: number;
+  targetUserId: number;
+  memos: DashboardTeamMemo[];
+}
+
+export interface DashboardTeamMemoCreateRequest {
+  targetUserId: number;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
+  content: string;
+}
+
+export interface DashboardTeamMemoResolveRequest {
+  isResolved: boolean;
+}
+
 export type ScoreboardSummaryStatus = typeof ScoreboardSummaryStatus[keyof typeof ScoreboardSummaryStatus];
 
 
@@ -680,5 +720,9 @@ export const GetAnalyticsExportDataView = {
 export type GetDashboardTeamParams = {
 weekStart?: string;
 cursor?: string;
+};
+
+export type GetDashboardTeamMemosParams = {
+targetUserId: number;
 };
 
