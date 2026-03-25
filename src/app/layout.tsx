@@ -30,6 +30,14 @@ export default function RootLayout({
       <head>
         <title>WIG Tracker</title>
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
+        <meta property="og:title" content="WIG Tracker" />
+        <meta property="og:description" content="가장 중요한 목표에 집중하세요." />
+        <meta property="og:image" content="/cover.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="WIG Tracker" />
+        <meta name="twitter:description" content="가장 중요한 목표에 집중하세요." />
+        <meta name="twitter:image" content="/cover.png" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
