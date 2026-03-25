@@ -206,7 +206,7 @@ export default function AccountRecoveryPageClient() {
 
           <div className="text-center">
             <Link
-              href="/"
+              href="/login"
               className="text-xs font-medium text-text-muted hover:text-text-primary underline underline-offset-2"
             >
               로그인으로 돌아가기
