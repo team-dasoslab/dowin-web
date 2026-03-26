@@ -17,6 +17,99 @@ import {
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  Joyride,
+  STATUS,
+  type EventData,
+  type Options,
+  type Step,
+  type Styles,
+} from "react-joyride";
+
+const SETUP_COACHMARK_STORAGE_KEY = "wig.setup.coachmark.v1.dismissed";
+
+const SETUP_COACHMARK_STEPS: Step[] = [
+  {
+    target: '[data-coachmark="setup-goal"]',
+    title: "가중목 (가장 중요한 목표)",
+    content:
+      "좋은 가중목은 '무엇이 가장 중요한가'를 고르는 일입니다. 목표가 많으면 집중이 분산됩니다. 이번 기간에는 딱 1개만 정하세요.",
+    skipBeacon: true,
+  },
+  {
+    target: '[data-coachmark="setup-lag"]',
+    title: "후행지표",
+    content:
+      "후행지표는 최종 결과를 보여주는 수치입니다. 가중목 달성 여부를 측정할 수 있는 지표를 '특정 일까지 X에서 Y로' 형식으로 작성하세요.",
+  },
+  {
+    target: '[data-coachmark="setup-lead"]',
+    title: "선행지표",
+    content:
+      "선행지표는 결과를 바꾸는 행동입니다. 예측 가능하고 내가 직접 통제할 수 있어야 합니다. 매일/매주 반복할 행동으로 적으세요.",
+  },
+];
+
+const SETUP_COACHMARK_OPTIONS: Partial<Options> = {
+  buttons: ["back", "primary", "skip"],
+  primaryColor: "rgba(94, 106, 210, 1)",
+  backgroundColor: "rgba(255, 255, 255, 1)",
+  textColor: "rgba(17, 24, 39, 1)",
+  zIndex: 1100,
+};
+
+const SETUP_COACHMARK_STYLES: Partial<Styles> = {
+  tooltip: {
+    borderRadius: 12,
+  },
+  tooltipContainer: {
+    fontFamily: "var(--font-pretendard)",
+  },
+  tooltipTitle: {
+    fontFamily: "var(--font-pretendard)",
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "rgba(17, 24, 39, 1)",
+  },
+  tooltipContent: {
+    fontFamily: "var(--font-pretendard)",
+    fontSize: "13px",
+    lineHeight: "1.55",
+    color: "rgba(75, 85, 99, 1)",
+  },
+  buttonPrimary: {
+    backgroundColor: "rgba(94, 106, 210, 1)",
+    borderRadius: 8,
+    color: "#fff",
+    fontFamily: "var(--font-pretendard)",
+    fontWeight: 700,
+    fontSize: "12px",
+    lineHeight: "1.2",
+    padding: "8px 12px",
+    minHeight: "32px",
+    minWidth: "auto",
+    border: "1px solid rgba(0, 0, 0, 0.05)",
+  },
+  buttonBack: {
+    color: "rgba(75, 85, 99, 1)",
+    fontFamily: "var(--font-pretendard)",
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "1.2",
+    padding: "8px 10px",
+    minHeight: "32px",
+  },
+  buttonSkip: {
+    color: "rgba(156, 163, 175, 1)",
+    fontFamily: "var(--font-pretendard)",
+    fontWeight: 600,
+    fontSize: "12px",
+    lineHeight: "1.2",
+    padding: "8px 10px",
+    minHeight: "32px",
+  },
+};
 
 function SetupSkeleton() {
   return (
@@ -34,6 +127,7 @@ function SetupSkeleton() {
 
 export default function SetupPage() {
   const router = useRouter();
+  const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const {
     activeTooltip,
     addMeasureRow,
@@ -63,6 +157,21 @@ export default function SetupPage() {
     });
   };
 
+  useEffect(() => {
+    const isDismissed =
+      localStorage.getItem(SETUP_COACHMARK_STORAGE_KEY) === "1";
+    if (!isDismissed) {
+      setIsCoachmarkRunning(true);
+    }
+  }, []);
+
+  const handleCoachmarkEvent = (data: EventData) => {
+    if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
+      localStorage.setItem(SETUP_COACHMARK_STORAGE_KEY, "1");
+      setIsCoachmarkRunning(false);
+    }
+  };
+
   if (isInitializing) {
     return <SetupSkeleton />;
   }
@@ -71,6 +180,21 @@ export default function SetupPage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      <Joyride
+        run={isCoachmarkRunning}
+        steps={SETUP_COACHMARK_STEPS}
+        onEvent={handleCoachmarkEvent}
+        options={SETUP_COACHMARK_OPTIONS}
+        styles={SETUP_COACHMARK_STYLES}
+        continuous
+        locale={{
+          back: "이전",
+          close: "닫기",
+          last: "완료",
+          next: "다음",
+          skip: "건너뛰기",
+        }}
+      />
       {isMutating && (
         <LoadingOverlay
           message={
@@ -98,13 +222,17 @@ export default function SetupPage() {
             {isEditMode ? "현재 목표 수정" : "다음 점수판 정하기"}
           </h1>
           <p className="text-xs text-text-muted leading-relaxed">
-            하나의 목표(WIG) · 성공 척도(후행지표) · 핵심 행동(선행지표)을 설정하세요.
+            하나의 목표(WIG) · 성공 척도(후행지표) · 핵심 행동(선행지표)을
+            설정하세요.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* ── 가중목 ── */}
-          <Card className="border border-border rounded-lg overflow-hidden">
+          <Card
+            className="border border-border rounded-lg overflow-hidden"
+            data-coachmark="setup-goal"
+          >
             <div className="px-5 py-3 bg-sub-background border-b border-border flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-primary" />
               <span className="text-xs font-bold text-text-primary">
@@ -119,7 +247,7 @@ export default function SetupPage() {
                 value={goalName}
                 disabled={isMutating}
                 onChange={(e) => setGoalName(e.target.value)}
-                placeholder="예: 연말까지 영업이익 20% 증대"
+                placeholder="예: 8주 안에 5km 완주하기"
                 className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
                 required
               />
@@ -127,7 +255,10 @@ export default function SetupPage() {
           </Card>
 
           {/* ── 후행지표 ── */}
-          <Card className="border border-border rounded-lg">
+          <Card
+            className="border border-border rounded-lg"
+            data-coachmark="setup-lag"
+          >
             <div className="px-5 py-3 bg-sub-background border-b rounded-t-lg border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-3.5 h-3.5 text-green-600" />
@@ -180,7 +311,7 @@ export default function SetupPage() {
                 value={lagMeasure}
                 disabled={isMutating}
                 onChange={(e) => setLagMeasure(e.target.value)}
-                placeholder="예: 1,000만 원에서 1,200만 원으로"
+                placeholder="예: 5km 기록 35분에서 28분으로"
                 className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
                 required
               />
@@ -188,7 +319,10 @@ export default function SetupPage() {
           </Card>
 
           {/* ── 선행지표 ── */}
-          <Card className="border border-border rounded-lg">
+          <Card
+            className="border border-border rounded-lg"
+            data-coachmark="setup-lead"
+          >
             <div className="px-5 py-3 bg-sub-background border-b rounded-t-lg border-border flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Activity className="w-3.5 h-3.5 text-rose-500" />
@@ -262,7 +396,7 @@ export default function SetupPage() {
                     onChange={(e) =>
                       handleMeasureChange(measure.id, "name", e.target.value)
                     }
-                    placeholder="예: 주 5회 핵심 고객에게 연락"
+                    placeholder="예: 주 4회, 30분 달리기"
                     className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
                     required
                   />
@@ -300,9 +434,7 @@ export default function SetupPage() {
                       <div className="flex items-center rounded-lg border border-border bg-white">
                         <Button
                           type="button"
-                          disabled={
-                            isMutating || measure.targetValue <= 1
-                          }
+                          disabled={isMutating || measure.targetValue <= 1}
                           onClick={() =>
                             handleMeasureChange(
                               measure.id,
@@ -410,7 +542,10 @@ export default function SetupPage() {
                     className="flex-shrink-0 px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ml-4"
                   >
                     {isArchivePending ? (
-                      <InlineSpinner size="sm" className="border-text-secondary/20 border-t-text-secondary" />
+                      <InlineSpinner
+                        size="sm"
+                        className="border-text-secondary/20 border-t-text-secondary"
+                      />
                     ) : (
                       <Archive className="w-3.5 h-3.5" />
                     )}

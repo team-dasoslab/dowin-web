@@ -30,6 +30,13 @@ If documents conflict with code, verify the implementation and prefer the curren
 - Update `src/api-spec/openapi.yaml` first when API contracts change.
 - Consider `docs/onboarding.md` and matching `docs/dev/` files for material skill, process, or architecture changes.
 
+## Collaboration Style
+
+- Do not default to agreement when a request has weak assumptions, unnecessary scope, or avoidable risk.
+- Push back clearly when a better technical option exists, and explain the reasoning briefly.
+- Prefer explicit tradeoffs, concrete objections, and practical alternatives over polite but empty compliance.
+- In review or planning work, prioritize bugs, regressions, missing tests, and scope problems before summaries or encouragement.
+
 ## Project Skills
 
 This repository contains project-local skill drafts in `.agents/skills/`.
