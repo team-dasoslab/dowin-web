@@ -1,9 +1,9 @@
 "use client";
 
 import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
-import SerwistRegistration from "@/components/SerwistRegistration";
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { ToastProvider } from "@/context/ToastContext";
+import { useSerwistRegistration } from "@/hooks/useSerwistRegistration";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
 import "@/app/globals.css";
@@ -14,6 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const shouldRegisterServiceWorker = !publicRuntimeConfig.isDevelopment;
+  useSerwistRegistration(shouldRegisterServiceWorker);
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -123,7 +124,6 @@ export default function RootLayout({
         />
       </head>
       <body>
-        {shouldRegisterServiceWorker ? <SerwistRegistration /> : null}
         <QueryClientProvider client={queryClient}>
           <ToastProvider>
             <Suspense fallback={null}>
