@@ -2,6 +2,7 @@
 
 import {
   deleteLeadMeasuresLeadMeasureIdLogsDate,
+  getScoreboardsScoreboardIdLogsWeekly,
   getGetScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetScoreboardsScoreboardIdLogsWeeklyQueryKey,
   getScoreboardsScoreboardIdLogsWeeklyResponse200,
@@ -37,6 +38,7 @@ import {
   toNumberId,
 } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
@@ -57,12 +59,51 @@ type ToggleLogContext = {
   dashboardTeamQueryKey: ReturnType<typeof getGetDashboardTeamQueryKey>;
 };
 
+type WeeklyTrendPoint = {
+  weekStart: string;
+  label: string;
+  rate: number;
+};
+
 const getNextLogValue = (value: DailyLogValue): DailyLogValue => {
   return value === true ? null : true;
 };
 
 const isDashboardView = (value: string | null): value is DashboardView => {
   return value === "week" || value === "month";
+};
+
+const computeWeeklyRate = (
+  activeLeadMeasures: Array<{
+    id?: string | number;
+    period?: string;
+    targetValue?: number | null;
+  }>,
+  weeklyLeadMeasures: Array<{
+    id?: number;
+    achieved?: number;
+  }>,
+): number => {
+  const weeklyTargetMeasures = activeLeadMeasures.filter(
+    (leadMeasure) => leadMeasure.period !== "MONTHLY",
+  );
+  const weeklyById = new Map(
+    weeklyLeadMeasures.map((leadMeasure) => [leadMeasure.id ?? null, leadMeasure]),
+  );
+
+  const achieved = weeklyTargetMeasures.reduce((accumulator, leadMeasure) => {
+    const targetValue = leadMeasure.targetValue ?? 0;
+    const weekly = weeklyById.get(toNumberId(leadMeasure.id));
+
+    return accumulator + Math.min(weekly?.achieved ?? 0, targetValue);
+  }, 0);
+
+  const totalTarget = weeklyTargetMeasures.reduce(
+    (accumulator, leadMeasure) => accumulator + (leadMeasure.targetValue ?? 0),
+    0,
+  );
+
+  return totalTarget > 0 ? Math.round((achieved / totalTarget) * 100) : 0;
 };
 
 const updateWeeklyLogsCache = (
@@ -168,6 +209,9 @@ export const useDashboardScoreboard = () => {
   const weeklyLogsParams: GetScoreboardsScoreboardIdLogsWeeklyParams = {
     weekStart: selectedWeekStart,
   };
+  const trendWeekStarts = [-21, -14, -7, 0].map((offset) =>
+    addDays(selectedWeekStart, offset),
+  );
   const monthlyLogsParams: GetScoreboardsScoreboardIdLogsMonthlyParams = {
     monthStart: selectedMonthStart,
   };
@@ -203,6 +247,22 @@ export const useDashboardScoreboard = () => {
         enabled: scoreboardId !== null,
       },
     });
+  const weeklyTrendQueries = useQueries({
+    queries: trendWeekStarts.map((weekStart) => ({
+      enabled: scoreboardId !== null,
+      queryFn: () =>
+        getScoreboardsScoreboardIdLogsWeekly(scoreboardId ?? 0, {
+          weekStart,
+        }),
+      queryKey:
+        scoreboardId !== null
+          ? getGetScoreboardsScoreboardIdLogsWeeklyQueryKey(scoreboardId, {
+              weekStart,
+            })
+          : ["dashboard", "weekly-trend", weekStart],
+      staleTime: 60_000,
+    })),
+  });
 
   const isWorkspace404 = getApiErrorStatus(workspaceError) === 404;
   const isScoreboard404 = getApiErrorStatus(scoreboardError) === 404;
@@ -259,6 +319,23 @@ export const useDashboardScoreboard = () => {
     weekDates.length === 7
       ? `${weekDates[0].slice(5).replace("-", ".")} – ${weekDates[6].slice(5).replace("-", ".")}`
       : "";
+  const weeklyTrendPoints: WeeklyTrendPoint[] = trendWeekStarts.map(
+    (weekStart, index) => {
+      const response = weeklyTrendQueries[index]?.data;
+      const weeklyLeadMeasuresForTrend =
+        response?.status === 200 ? (response.data.leadMeasures ?? []) : [];
+      const rate = computeWeeklyRate(
+        activeLeadMeasures,
+        weeklyLeadMeasuresForTrend,
+      );
+
+      return {
+        label: weekStart.slice(5).replace("-", "."),
+        rate,
+        weekStart,
+      };
+    },
+  );
 
   const addPendingLogKey = (currentLogKey: string) => {
     setPendingLogKeys((previous) => {
@@ -480,6 +557,7 @@ export const useDashboardScoreboard = () => {
       updateLogMutation.isPending ||
       deleteLogMutation.isPending,
     isMonthlyLogsLoading,
+    isWeeklyTrendLoading: weeklyTrendQueries.some((query) => query.isLoading),
     isWeeklyLogsLoading,
     monthlyLeadMeasures,
     monthlyOverallRate,
@@ -498,6 +576,7 @@ export const useDashboardScoreboard = () => {
     weekDates,
     weekLabel,
     weeklyOverallRate,
+    weeklyTrendPoints,
     weeklyById,
     workspace,
     workspaceError,

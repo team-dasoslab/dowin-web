@@ -77,6 +77,7 @@ export default function MyDashboardPage() {
     isLoading,
     isLogPending,
     isMonthlyLogsLoading,
+    isWeeklyTrendLoading,
     isWeeklyLogsLoading,
     monthlyLeadMeasures,
     monthlyOverallRate,
@@ -93,6 +94,7 @@ export default function MyDashboardPage() {
     toggleLog,
     weekDates,
     weekLabel,
+    weeklyTrendPoints,
     weeklyOverallRate,
     weeklyById,
     workspace,
@@ -249,66 +251,79 @@ export default function MyDashboardPage() {
           </div>
         </header>
 
-        <Card className="overflow-hidden rounded-lg border border-border">
-          <div className="flex flex-col gap-4 border-b border-border px-4 py-4 sm:px-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-row items-center gap-4">
-              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Zap className="w-4 h-4 text-primary" />
+        <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-2 md:items-stretch">
+          <div className="space-y-3">
+            <Card className="overflow-hidden rounded-lg border border-border">
+              <div className="flex flex-col gap-4 border-b border-border px-4 py-4 sm:px-6">
+                <div className="flex flex-row items-center gap-4">
+                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
+                      가중목
+                    </p>
+                    <h2 className="text-lg font-bold text-text-primary">
+                      {activeScoreboard.goalName}
+                    </h2>
+                  </div>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[10px] font-bold text-primary uppercase tracking-widest">
-                  가중목
-                </p>
-                <h2 className="text-lg font-bold text-text-primary">
-                  {activeScoreboard.goalName}
-                </h2>
-              </div>
-            </div>
 
-            <div className="space-y-1 text-left sm:text-right">
-              <p className="text-[10px] text-text-muted">이번 주 달성률</p>
-              <p
-                className={`text-2xl font-bold font-mono tracking-tight ${
-                  weeklyOverallRate >= 80
-                    ? "text-green-600"
-                    : weeklyOverallRate >= 50
-                      ? "text-amber-600"
-                      : "text-text-primary"
-                }`}
-              >
-                {weeklyOverallRate}%
-              </p>
-              <div className="flex flex-wrap items-center gap-1 text-[10px] text-text-muted sm:justify-end">
-                <span>
-                  이번 달 달성률{monthLabel ? ` (${monthLabel})` : ""}
-                </span>
-                <strong
-                  className={`font-mono ${
-                    monthlyOverallRate >= 80
-                      ? "text-green-600"
-                      : monthlyOverallRate >= 50
-                        ? "text-amber-600"
-                        : "text-text-primary"
-                  }`}
-                >
-                  {monthlyOverallRate}%
-                </strong>
+              <div className="flex items-start gap-3 bg-sub-background px-4 py-3 sm:px-6 sm:items-center">
+                <Target className="w-3.5 h-3.5 text-text-muted" />
+                <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center">
+                  <span className="text-[10px] font-bold text-text-muted tracking-widest sm:mr-3">
+                    후행지표
+                  </span>
+                  <span className="text-sm text-text-primary font-medium break-words">
+                    {activeScoreboard.lagMeasure}
+                  </span>
+                </div>
               </div>
-            </div>
+            </Card>
+
+            <Card className="rounded-lg border border-border bg-white p-4">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-md border border-border bg-sub-background px-3 py-2">
+                  <p className="text-[10px] text-text-muted">이번 주 달성률</p>
+                  <p
+                    className={`text-lg font-bold font-mono ${
+                      weeklyOverallRate >= 80
+                        ? "text-green-600"
+                        : weeklyOverallRate >= 50
+                          ? "text-amber-600"
+                          : "text-text-primary"
+                    }`}
+                  >
+                    {weeklyOverallRate}%
+                  </p>
+                </div>
+                <div className="rounded-md border border-border bg-sub-background px-3 py-2">
+                  <p className="text-[10px] text-text-muted">
+                    이번 달 달성률{monthLabel ? ` (${monthLabel})` : ""}
+                  </p>
+                  <p
+                    className={`text-lg font-bold font-mono ${
+                      monthlyOverallRate >= 80
+                        ? "text-green-600"
+                        : monthlyOverallRate >= 50
+                          ? "text-amber-600"
+                          : "text-text-primary"
+                    }`}
+                  >
+                    {monthlyOverallRate}%
+                  </p>
+                </div>
+              </div>
+            </Card>
           </div>
 
-          <div className="flex items-start gap-3 bg-sub-background px-4 py-3 sm:px-6 sm:items-center">
-            <Target className="w-3.5 h-3.5 text-text-muted" />
-            <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center">
-              <span className="text-[10px] font-bold text-text-muted tracking-widest sm:mr-3">
-                후행지표
-              </span>
-              <span className="text-sm text-text-primary font-medium break-words">
-                {activeScoreboard.lagMeasure}
-              </span>
-            </div>
-          </div>
-        </Card>
+          <DashboardWeeklyTrendSection
+            isLoading={isWeeklyTrendLoading}
+            weeklyTrendPoints={weeklyTrendPoints}
+          />
+        </div>
 
         {latestMajorUpdate && isUpdateCardVisible ? (
           <Card className="overflow-hidden rounded-lg border border-border">
@@ -872,6 +887,62 @@ function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
           level === "all" ? "opacity-100" : "opacity-80"
         }`}
       />
+    </div>
+  );
+}
+
+type WeeklyTrendPoint = {
+  weekStart: string;
+  label: string;
+  rate: number;
+};
+
+function DashboardWeeklyTrendSection({
+  isLoading,
+  weeklyTrendPoints,
+}: {
+  isLoading: boolean;
+  weeklyTrendPoints: WeeklyTrendPoint[];
+}) {
+  return (
+    <Card className="flex h-full min-h-[220px] flex-col overflow-hidden rounded-lg border border-border bg-white p-4">
+      <p className="text-sm font-semibold text-text-primary">최근 4주 달성률</p>
+      {isLoading ? (
+        <div className="mt-auto h-full min-h-[140px] animate-pulse rounded-md bg-sub-background" />
+      ) : (
+        <div className="mt-auto">
+          <WeeklyRateTrendChart points={weeklyTrendPoints} />
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
+  return (
+    <div className="mt-3 flex h-full min-h-[140px] items-end gap-2 overflow-hidden pb-1">
+        {points.map((point, index) => {
+          const isCurrentWeek = index === points.length - 1;
+
+          return (
+            <div key={point.weekStart} className="flex h-full flex-1 flex-col items-center gap-1">
+              <div className="text-[10px] font-mono text-text-muted">{point.rate}%</div>
+              <div className="flex h-full min-h-[72px] w-full items-end">
+                <div
+                  className="w-full rounded-sm bg-primary/70"
+                  style={{ height: `${Math.max(point.rate, 4)}%` }}
+                />
+              </div>
+              <div
+                className={`text-[10px] font-mono ${
+                  isCurrentWeek ? "text-text-primary" : "text-text-muted"
+                }`}
+              >
+                {point.label}
+              </div>
+            </div>
+          );
+        })}
     </div>
   );
 }
