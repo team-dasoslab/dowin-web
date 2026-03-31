@@ -1,6 +1,6 @@
 # WIG Developer Onboarding
 
-최종 확인일: 2026-03-19
+최종 확인일: 2026-03-30
 
 이 문서는 WIG 저장소에 처음 들어온 개발자나 에이전트가 "무엇을 먼저 읽고, 어디를 고치고, 무엇을 조심해야 하는지"를 빠르게 파악하도록 만든 개발자용 시작 문서다. 기존 [`docs/onboarding.md`](/docs/onboarding.md)를 대체하지 않고, 현재 구현 기준으로 더 촘촘한 작업 안내를 보강한다.
 
@@ -8,25 +8,28 @@
 
 WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워크스페이스에 속하고, 활성 점수판을 만들고, 선행지표를 기록하면서 개인/팀 대시보드를 보는 구조다.
 
-현재 구현 중심축은 아래 9개다.
+현재 구현 중심축은 아래 축들이다.
 
-- 인증: 로그인, 로그아웃, 비밀번호 변경, 관리자용 사용자 생성
-- 워크스페이스: 내 워크스페이스 조회, 생성, 참가, 멤버 조회
+- 인증: 공개 회원가입, 로그인, 로그아웃, 비밀번호 변경, 복원코드 기반 계정 복구, 관리자용 사용자 생성
+- 워크스페이스: 내 워크스페이스 조회, 생성, 초대코드 기반 참가, 초대코드 관리, 멤버 조회/퇴출
 - 점수판: 활성 점수판 조회, 생성, 수정, 보관, 재활성화, 보관함 UI
 - 선행지표: 생성, 수정, 삭제, 보관, 재활성화
-- 일일 기록: 주간/월간 조회, 날짜별 기록 토글
-- 대시보드: 개인 뷰, 팀 뷰, 주간/월간 달성률
+- 일일 기록: 주간/월간 조회, 날짜별 기록 토글, 낙관적 업데이트
+- 대시보드: 개인 뷰 기간 탐색, 팀 뷰, 주간/월간 달성률, 팀 메모 레일
 - 프로필: 내 정보 조회, 닉네임 변경, 비밀번호 변경, 푸시 알림 토글
 - 업데이트 허브: `/updates` 인앱 새 기능 모아보기
 - export/analytics: `GET /api/analytics/export-data`와 CSV 다운로드
+- 알림: 매일 밤 9시 리마인드, 매주 목요일 3시 집중 리마인드, PWA Web Push 구독
 
 아직 미완성 또는 후속 범위로 보이는 항목도 분명하다.
 
+- 주간 리뷰/회고 모드
+- 무료 가치 측정용 이벤트 로그와 파일럿 지표 체계
 - 별도 Analytics 대시보드 제품화
 - 차트/시각화 고도화
 - 탈퇴 API
 - 팀 운영 고도화 기능
-- 알림 운영 안정화와 내부 보호 정리
+- 보조 Push API의 OpenAPI/공통 응답 규약 정리
 
 ## 2. 먼저 읽을 순서
 
@@ -98,7 +101,9 @@ yarn preview
 
 ### 앱/화면
 
-- [`src/app/page.tsx`](/src/app/page.tsx): 로그인 진입점
+- [`src/app/page.tsx`](/src/app/page.tsx): 비로그인 랜딩 엔트리
+- [`src/app/login/page.tsx`](/src/app/login/page.tsx): 로그인/회원가입 진입점
+- [`src/app/account-recovery/page.tsx`](/src/app/account-recovery/page.tsx): 복원코드 기반 계정 복구
 - [`src/app/(protected)/layout.tsx`](</src/app/(protected)/layout.tsx>): 보호 라우트 세션 체크
 - [`src/app/(protected)/dashboard/my/page.tsx`](</src/app/(protected)/dashboard/my/page.tsx>): 개인 대시보드
 - [`src/app/(protected)/dashboard/page.tsx`](</src/app/(protected)/dashboard/page.tsx>): 팀 대시보드
@@ -162,15 +167,17 @@ yarn preview
 
 ### Auth
 
-- 로그인 페이지는 세션이 있으면 `/dashboard/my`로 리다이렉트한다.
+- 로그인 페이지는 로그인/회원가입을 함께 제공하고, 세션이 있으면 `/dashboard/my`로 리다이렉트한다.
 - 보호 라우트는 서버에서 세션 없으면 `/`로 돌려보낸다.
 - 세션은 D1 `sessions` 테이블과 `wig_sid` 쿠키를 함께 사용한다.
+- 회원가입 직후 복원코드 8개를 1회 노출하고, 별도 계정 복구 페이지를 제공한다.
 
 ### Workspace
 
 - 사용자는 워크스페이스가 없을 수 있다.
 - 이 경우 개인 대시보드와 보관함은 CTA 화면으로 빠진다.
 - 생성 화면은 `/workspace/new`에 있다.
+- 참가 화면은 `/workspace/join`이며 초대코드를 대문자로 정규화해 전송한다.
 - 관리자는 프로필 하위에서 워크스페이스 이름 수정과 멤버 관리를 수행한다.
 
 ### Scoreboard / Lead Measure
@@ -182,17 +189,19 @@ yarn preview
 
 ### Daily Log / Dashboard
 
-- 개인 대시보드는 `week`와 `month` 쿼리스트링 뷰를 사용한다.
+- 개인 대시보드는 `view`와 `date` 쿼리스트링을 사용해 주간/월간 탐색을 유지한다.
 - 기록 토글은 낙관적 업데이트 후 실패 시 롤백한다.
 - 미래 날짜 기록은 서버 규칙상 금지다.
 - 팀 대시보드는 같은 워크스페이스의 활성 점수판들을 읽기 모델로 집계한다.
+- 팀 대시보드는 사용자별 메모 조회/생성/완료/삭제를 별도 메모 API로 붙인다.
 
 ### Profile / Push
 
 - 프로필은 `GET/PUT /api/users/me`를 사용하며 `avatarKey`도 함께 다룬다.
 - 비밀번호 변경은 Auth API를 재사용한다.
-- 프로필 하위에는 avatar 선택, 멤버 관리, CSV export 화면이 있다.
+- 프로필 하위에는 avatar 선택, 멤버 관리, 초대코드 관리, CSV export 화면이 있다.
 - 푸시 알림은 브라우저 지원, 서비스워커, VAPID 키가 모두 맞아야 동작한다.
+- Push는 `send-daily`와 `send-weekly-focus` 내부 라우트를 함께 사용한다.
 
 ### Analytics / Updates
 
@@ -203,16 +212,16 @@ yarn preview
 
 현재 `src/app/api`와 `openapi.yaml` 기준으로 주요 엔드포인트는 아래 수준까지 구현돼 있다.
 
-- Auth: `/api/auth/login`, `/api/auth/logout`, `/api/auth/password`
+- Auth: `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/password`, `/api/auth/recovery-codes/verify`, `/api/auth/password/by-recovery-code`
 - Admin: `/api/admin/users`
-- Workspace: `/api/workspaces`, `/api/workspaces/me`, `/api/workspaces/:id`, `/api/workspaces/join`, `/api/workspaces/:id/members`, `/api/workspaces/:id/members/:memberId`
+- Workspace: `/api/workspaces`, `/api/workspaces/me`, `/api/workspaces/:id`, `/api/workspaces/join`, `/api/workspaces/join-by-invite`, `/api/workspaces/:id/invites`, `/api/workspaces/:id/invites/:inviteId/status`, `/api/workspaces/:id/members`, `/api/workspaces/:id/members/:memberId`
 - Scoreboard: `/api/scoreboards`, `/api/scoreboards/active`, `/api/scoreboards/:id`, `/api/scoreboards/:id/archive`, `/api/scoreboards/:id/reactivate`
 - Lead Measure: `/api/scoreboards/:id/lead-measures`, `/api/lead-measures/:id`, `/api/lead-measures/:id/archive`, `/api/lead-measures/:id/reactivate`
 - Daily Log: `/api/lead-measures/:id/logs/:date`, `/api/scoreboards/:id/logs/weekly`, `/api/scoreboards/:id/logs/monthly`
-- Dashboard: `/api/dashboard/team`
+- Dashboard: `/api/dashboard/team`, `/api/dashboard/team/memos`, `/api/dashboard/team/memos/:memoId/resolve`, `/api/dashboard/team/memos/:memoId`
 - Profile: `/api/users/me`
 - Analytics: `/api/analytics/export-data`
-- Push: `/api/push/subscribe`, `/api/push/send-daily`
+- Push: `/api/push/subscribe`, `/api/push/send-daily`, `/api/push/send-weekly-focus`
 - OpenAPI: `/api/openapi`
 
 주의할 점도 있다.
