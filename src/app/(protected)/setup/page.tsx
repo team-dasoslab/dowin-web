@@ -1,129 +1,17 @@
 "use client";
 
+import { GoalSection } from "@/app/(protected)/setup/_components/GoalSection";
+import { LagMeasureSection } from "@/app/(protected)/setup/_components/LagMeasureSection";
+import { LeadMeasuresSection } from "@/app/(protected)/setup/_components/LeadMeasuresSection";
+import { SetupCoachmark } from "@/app/(protected)/setup/_components/SetupCoachmark";
+import { SetupManageSection } from "@/app/(protected)/setup/_components/SetupManageSection";
+import { SetupSubmitButton } from "@/app/(protected)/setup/_components/SetupSubmitButton";
 import { useScoreboardSetup } from "@/app/(protected)/setup/_hooks/useScoreboardSetup";
-import { InlineSpinner } from "@/components/InlineSpinner";
+import { SETUP_COACHMARK_STORAGE_KEY } from "@/app/(protected)/setup/_lib/setup-coachmark";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import {
-  Activity,
-  Archive,
-  Minus,
-  Plus,
-  Save,
-  TrendingUp,
-  Zap,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  Joyride,
-  STATUS,
-  type EventData,
-  type Options,
-  type Step,
-  type Styles,
-} from "react-joyride";
-
-const SETUP_COACHMARK_STORAGE_KEY = "wig.setup.coachmark.v1.dismissed";
-
-const SETUP_COACHMARK_STEPS: Step[] = [
-  {
-    target: '[data-coachmark="setup-goal"]',
-    title: "가중목 (가장 중요한 목표)",
-    content:
-      "좋은 가중목은 '무엇이 가장 중요한가'를 고르는 일입니다. 목표가 많으면 집중이 분산됩니다. 이번 기간에는 딱 1개만 정하세요.",
-    skipBeacon: true,
-  },
-  {
-    target: '[data-coachmark="setup-lag"]',
-    title: "후행지표",
-    content:
-      "후행지표는 최종 결과를 보여주는 수치입니다. 가중목 달성 여부를 측정할 수 있는 지표를 '특정 일까지 X에서 Y로' 형식으로 작성하세요.",
-  },
-  {
-    target: '[data-coachmark="setup-lead"]',
-    title: "선행지표",
-    content:
-      "선행지표는 결과를 바꾸는 행동입니다. 예측 가능하고 내가 직접 통제할 수 있어야 합니다. 매일/매주 반복할 행동으로 적으세요.",
-  },
-];
-
-const SETUP_COACHMARK_OPTIONS: Partial<Options> = {
-  buttons: ["back", "primary", "skip"],
-  primaryColor: "rgba(94, 106, 210, 1)",
-  backgroundColor: "rgba(255, 255, 255, 1)",
-  textColor: "rgba(17, 24, 39, 1)",
-  zIndex: 1100,
-};
-
-const SETUP_COACHMARK_STYLES: Partial<Styles> = {
-  tooltip: {
-    borderRadius: 12,
-  },
-  tooltipContainer: {
-    fontFamily: "var(--font-pretendard)",
-  },
-  tooltipTitle: {
-    fontFamily: "var(--font-pretendard)",
-    fontSize: "14px",
-    fontWeight: 700,
-    color: "rgba(17, 24, 39, 1)",
-  },
-  tooltipContent: {
-    fontFamily: "var(--font-pretendard)",
-    fontSize: "13px",
-    lineHeight: "1.55",
-    color: "rgba(75, 85, 99, 1)",
-  },
-  buttonPrimary: {
-    backgroundColor: "rgba(94, 106, 210, 1)",
-    borderRadius: 8,
-    color: "#fff",
-    fontFamily: "var(--font-pretendard)",
-    fontWeight: 700,
-    fontSize: "12px",
-    lineHeight: "1.2",
-    padding: "8px 12px",
-    minHeight: "32px",
-    minWidth: "auto",
-    border: "1px solid rgba(0, 0, 0, 0.05)",
-  },
-  buttonBack: {
-    color: "rgba(75, 85, 99, 1)",
-    fontFamily: "var(--font-pretendard)",
-    fontWeight: 600,
-    fontSize: "12px",
-    lineHeight: "1.2",
-    padding: "8px 10px",
-    minHeight: "32px",
-  },
-  buttonSkip: {
-    color: "rgba(156, 163, 175, 1)",
-    fontFamily: "var(--font-pretendard)",
-    fontWeight: 600,
-    fontSize: "12px",
-    lineHeight: "1.2",
-    padding: "8px 10px",
-    minHeight: "32px",
-  },
-};
-
-function SetupSkeleton() {
-  return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-12 rounded-xl bg-sub-background" />
-        <div className="h-44 rounded-2xl bg-sub-background" />
-        <div className="h-44 rounded-2xl bg-sub-background" />
-        <div className="h-64 rounded-2xl bg-sub-background" />
-      </div>
-    </div>
-  );
-}
 
 export default function SetupPage() {
   const router = useRouter();
@@ -165,13 +53,6 @@ export default function SetupPage() {
     }
   }, []);
 
-  const handleCoachmarkEvent = (data: EventData) => {
-    if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
-      localStorage.setItem(SETUP_COACHMARK_STORAGE_KEY, "1");
-      setIsCoachmarkRunning(false);
-    }
-  };
-
   if (isInitializing) {
     return <SetupSkeleton />;
   }
@@ -180,20 +61,9 @@ export default function SetupPage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
-      <Joyride
-        run={isCoachmarkRunning}
-        steps={SETUP_COACHMARK_STEPS}
-        onEvent={handleCoachmarkEvent}
-        options={SETUP_COACHMARK_OPTIONS}
-        styles={SETUP_COACHMARK_STYLES}
-        continuous
-        locale={{
-          back: "이전",
-          close: "닫기",
-          last: "완료",
-          next: "다음",
-          skip: "건너뛰기",
-        }}
+      <SetupCoachmark
+        isRunning={isCoachmarkRunning}
+        setIsRunning={setIsCoachmarkRunning}
       />
       {isMutating && (
         <LoadingOverlay
@@ -228,334 +98,59 @@ export default function SetupPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* ── 가중목 ── */}
-          <Card
-            className="border border-border rounded-lg overflow-hidden"
-            data-coachmark="setup-goal"
-          >
-            <div className="px-5 py-3 bg-sub-background border-b border-border flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-primary" />
-              <span className="text-xs font-bold text-text-primary">
-                가중목
-              </span>
-            </div>
-            <div className="p-5 space-y-3">
-              <label className="text-xs font-bold text-text-secondary block">
-                가장 중요한 목표는 무엇인가요?
-              </label>
-              <Input
-                value={goalName}
-                disabled={isMutating}
-                onChange={(e) => setGoalName(e.target.value)}
-                placeholder="예: 8주 안에 5km 완주하기"
-                className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
-                required
-              />
-            </div>
-          </Card>
+          <GoalSection
+            goalName={goalName}
+            isMutating={isMutating}
+            setGoalName={setGoalName}
+          />
 
-          {/* ── 후행지표 ── */}
-          <Card
-            className="border border-border rounded-lg"
-            data-coachmark="setup-lag"
-          >
-            <div className="px-5 py-3 bg-sub-background border-b rounded-t-lg border-border flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-3.5 h-3.5 text-green-600" />
-                <span className="text-xs font-bold text-text-primary">
-                  후행지표
-                </span>
-              </div>
-              {/* 툴팁 */}
-              <div className="relative">
-                <Button
-                  type="button"
-                  disabled={isMutating}
-                  onClick={() =>
-                    setActiveTooltip(activeTooltip === "lag" ? null : "lag")
-                  }
-                  className="text-[10px] text-text-muted hover:text-primary transition-colors font-medium flex items-center gap-0.5"
-                >
-                  지표 가이드 ›
-                </Button>
-                {activeTooltip === "lag" && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setActiveTooltip(null)}
-                    />
-                    <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg transition-all z-20">
-                      <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
-                        좋은 후행지표
-                      </p>
-                      <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
-                        <li>
-                          <b className="text-text-primary">측정 가능:</b>{" "}
-                          시작점(X)과 목표점(Y)이 명확한가요?
-                        </li>
-                        <li>
-                          <b className="text-text-primary">결과 중심:</b> 최종
-                          목표 달성 여부를 나타내나요?
-                        </li>
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="p-5 space-y-3">
-              <label className="text-xs font-bold text-text-secondary block">
-                성공을 어떻게 측정할 건가요? (X → Y)
-              </label>
-              <Input
-                value={lagMeasure}
-                disabled={isMutating}
-                onChange={(e) => setLagMeasure(e.target.value)}
-                placeholder="예: 5km 기록 35분에서 28분으로"
-                className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
-                required
-              />
-            </div>
-          </Card>
+          <LagMeasureSection
+            activeTooltip={activeTooltip}
+            isMutating={isMutating}
+            lagMeasure={lagMeasure}
+            setActiveTooltip={setActiveTooltip}
+            setLagMeasure={setLagMeasure}
+          />
 
-          {/* ── 선행지표 ── */}
-          <Card
-            className="border border-border rounded-lg"
-            data-coachmark="setup-lead"
-          >
-            <div className="px-5 py-3 bg-sub-background border-b rounded-t-lg border-border flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Activity className="w-3.5 h-3.5 text-rose-500" />
-                <span className="text-xs font-bold text-text-primary">
-                  선행지표
-                </span>
-                <span className="text-[10px] text-text-muted">
-                  — 후행지표에 직접적 영향을 주는 핵심 행동
-                </span>
-              </div>
-              {/* 툴팁 */}
-              <div className="relative">
-                <Button
-                  type="button"
-                  disabled={isMutating}
-                  onClick={() =>
-                    setActiveTooltip(activeTooltip === "lead" ? null : "lead")
-                  }
-                  className="text-[10px] text-text-muted hover:text-primary transition-colors font-medium flex items-center gap-0.5"
-                >
-                  4DX 가이드 ›
-                </Button>
-                {activeTooltip === "lead" && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setActiveTooltip(null)}
-                    />
-                    <div className="absolute right-0 top-full mt-2 w-56 p-4 bg-white border border-border rounded-lg shadow-lg transition-all z-20">
-                      <p className="text-[10px] font-bold text-text-primary mb-2 uppercase tracking-wider">
-                        좋은 선행지표
-                      </p>
-                      <ul className="space-y-2 text-[11px] text-text-secondary leading-relaxed">
-                        <li>
-                          <b className="text-text-primary">예측성:</b> 이 행동이
-                          후행지표를 움직이나요?
-                        </li>
-                        <li>
-                          <b className="text-text-primary">통제 가능:</b> 직접
-                          실행하고 반복할 수 있나요?
-                        </li>
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+          <LeadMeasuresSection
+            activeTooltip={activeTooltip}
+            addMeasureRow={addMeasureRow}
+            handleMeasureChange={handleMeasureChange}
+            isMutating={isMutating}
+            measures={measures}
+            monthlyTargetMax={monthlyTargetMax}
+            removeMeasureRow={removeMeasureRow}
+            setActiveTooltip={setActiveTooltip}
+          />
 
-            <div className="divide-y divide-border">
-              {measures.map((measure, index) => (
-                <div key={measure.id} className="p-5 space-y-4">
-                  {/* 행동명 */}
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-text-secondary">
-                      핵심 행동 #{index + 1}
-                    </label>
-                    {measures.length > 1 && (
-                      <Button
-                        type="button"
-                        disabled={isMutating}
-                        onClick={() => removeMeasureRow(measure.id)}
-                        className="text-[11px] text-danger font-bold hover:bg-danger/5 px-2 py-0.5 rounded transition-colors"
-                      >
-                        삭제
-                      </Button>
-                    )}
-                  </div>
-                  <Input
-                    value={measure.name}
-                    disabled={isMutating}
-                    onChange={(e) =>
-                      handleMeasureChange(measure.id, "name", e.target.value)
-                    }
-                    placeholder="예: 주 4회, 30분 달리기"
-                    className="w-full text-sm p-3 bg-sub-background border border-border rounded-lg focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
-                    required
-                  />
+          <SetupSubmitButton
+            isEditMode={isEditMode}
+            isMutating={isMutating}
+            isSubmitPending={isSubmitPending}
+          />
 
-                  {/* 주기 + 횟수 */}
-                  <div className="flex items-center gap-3">
-                    {/* 주기 토글 */}
-                    <div className="flex p-0.5 bg-sub-background border border-border rounded-lg gap-0.5 flex-shrink-0">
-                      {(["WEEKLY", "MONTHLY"] as const).map((p) => (
-                        <Button
-                          key={p}
-                          type="button"
-                          disabled={isMutating}
-                          onClick={() => {
-                            handleMeasureChange(measure.id, "period", p);
-                            handleMeasureChange(
-                              measure.id,
-                              "targetValue",
-                              p === "WEEKLY" ? 3 : 1,
-                            );
-                          }}
-                          className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
-                            measure.period === p
-                              ? "bg-white text-primary border border-border shadow-sm"
-                              : "text-text-muted hover:text-text-primary"
-                          }`}
-                        >
-                          {p === "WEEKLY" ? "주 단위" : "월 단위"}
-                        </Button>
-                      ))}
-                    </div>
-
-                    {/* 목표 횟수 */}
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center rounded-lg border border-border bg-white">
-                        <Button
-                          type="button"
-                          disabled={isMutating || measure.targetValue <= 1}
-                          onClick={() =>
-                            handleMeasureChange(
-                              measure.id,
-                              "targetValue",
-                              measure.targetValue - 1,
-                            )
-                          }
-                          className="flex h-10 w-10 items-center justify-center rounded-l-lg text-text-secondary hover:bg-sub-background disabled:opacity-40"
-                          aria-label="횟수 감소"
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <div className="flex h-10 min-w-12 items-center justify-center border-x border-border px-2 text-sm font-bold text-text-primary">
-                          {measure.targetValue}
-                        </div>
-                        <Button
-                          type="button"
-                          disabled={
-                            isMutating ||
-                            measure.targetValue >=
-                              (measure.period === "WEEKLY"
-                                ? 7
-                                : monthlyTargetMax)
-                          }
-                          onClick={() =>
-                            handleMeasureChange(
-                              measure.id,
-                              "targetValue",
-                              measure.targetValue + 1,
-                            )
-                          }
-                          className="flex h-10 w-10 items-center justify-center rounded-r-lg text-text-secondary hover:bg-sub-background disabled:opacity-40"
-                          aria-label="횟수 증가"
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <span className="text-xs text-text-secondary font-medium whitespace-nowrap">
-                        회 / {measure.period === "WEEKLY" ? "주" : "월"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* 핵심 행동 추가 버튼 */}
-            <div className="px-5 py-3 border-t border-dashed border-border">
-              <Button
-                type="button"
-                disabled={isMutating}
-                onClick={addMeasureRow}
-                className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-text-muted hover:text-primary transition-colors py-1"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                핵심 행동 추가
-              </Button>
-            </div>
-          </Card>
-
-          {/* ── 저장 버튼 ── */}
-          <Button
-            type="submit"
-            disabled={isMutating}
-            className={`w-full py-3 flex items-center justify-center gap-2 text-sm font-bold rounded-lg transition-all ${
-              isMutating
-                ? "bg-primary/50 text-white cursor-not-allowed"
-                : "btn-linear-primary"
-            }`}
-          >
-            {isSubmitPending ? (
-              <InlineSpinner />
-            ) : (
-              <>
-                <Save className="w-3.5 h-3.5" />
-                {isEditMode ? "변경사항 저장" : "점수판 생성"}
-              </>
-            )}
-          </Button>
-
-          {/* ── 관리 영역 (수정 모드에서만) ── */}
-          {isEditMode && (
-            <div className="space-y-2 pt-4">
-              <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
-                관리
-              </p>
-              <div className="border border-border rounded-lg overflow-hidden">
-                <div className="px-5 py-4 flex items-center justify-between bg-white">
-                  <div>
-                    <p className="text-sm font-semibold text-text-primary">
-                      점수판 보관
-                    </p>
-                    <p className="text-[11px] text-text-muted mt-0.5">
-                      현재 목표를 종료하고 실행 기록으로 저장합니다.
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    disabled={isMutating}
-                    onClick={() => {
-                      if (confirm("이 점수판을 보관하시겠습니까?")) {
-                        void archive();
-                      }
-                    }}
-                    className="flex-shrink-0 px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ml-4"
-                  >
-                    {isArchivePending ? (
-                      <InlineSpinner
-                        size="sm"
-                        className="border-text-secondary/20 border-t-text-secondary"
-                      />
-                    ) : (
-                      <Archive className="w-3.5 h-3.5" />
-                    )}
-                    {isArchivePending ? "보관 중..." : "보관"}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+          {isEditMode ? (
+            <SetupManageSection
+              archive={archive}
+              isArchivePending={isArchivePending}
+              isMutating={isMutating}
+            />
+          ) : null}
         </form>
+      </div>
+    </div>
+  );
+}
+
+function SetupSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
+        <div className="h-10 rounded-xl bg-sub-background" />
+        <div className="h-12 rounded-xl bg-sub-background" />
+        <div className="h-44 rounded-2xl bg-sub-background" />
+        <div className="h-44 rounded-2xl bg-sub-background" />
+        <div className="h-64 rounded-2xl bg-sub-background" />
       </div>
     </div>
   );

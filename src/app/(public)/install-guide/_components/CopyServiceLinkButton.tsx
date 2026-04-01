@@ -34,7 +34,11 @@ export function CopyServiceLinkButton() {
       }}
       type="button"
     >
-      {isCopied ? <Check className="h-3.5 w-3.5 text-primary" /> : <Copy className="h-3.5 w-3.5 text-text-muted" />}
+      {isCopied ? (
+        <Check className="h-3.5 w-3.5 text-primary" />
+      ) : (
+        <Copy className="h-3.5 w-3.5 text-text-muted" />
+      )}
       {isCopied ? "복사 완료" : "서비스 링크 복사하기"}
     </Button>
   );

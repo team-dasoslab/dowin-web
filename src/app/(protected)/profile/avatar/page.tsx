@@ -1,43 +1,16 @@
 "use client";
 
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
 import type { UserProfileUpdateRequest } from "@/api/generated/wig.schemas";
-import {
-  getGetUsersMeQueryKey,
-  useGetUsersMe,
-  usePutUsersMe,
-} from "@/api/generated/profile/profile";
+import { useProfileAvatar } from "@/app/(protected)/profile/avatar/_hooks/useProfileAvatar";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { useToast } from "@/context/ToastContext";
 import { PROFILE_AVATAR_KEYS } from "@/domain/profile/avatar-options";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
-import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-
-function AvatarPageSkeleton() {
-  return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[560px] animate-pulse space-y-6 p-4 md:p-8">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
-        <div className="h-72 rounded-2xl bg-sub-background" />
-      </div>
-    </div>
-  );
-}
 
 export default function ProfileAvatarPage() {
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-  const [isSaving, setIsSaving] = useState(false);
-  const { data: profileResponse, isLoading } = useGetUsersMe();
-  const updateProfileMutation = usePutUsersMe();
-
-  const user = profileResponse?.status === 200 ? profileResponse.data : null;
+  const { isLoading, isSaving, user, updateAvatar } = useProfileAvatar();
 
   if (isLoading) {
     return <AvatarPageSkeleton />;
@@ -50,46 +23,10 @@ export default function ProfileAvatarPage() {
   const nickname = user.nickname ?? "사용자";
   const avatarKey = user.avatarKey ?? null;
 
-  const handleAvatarSelect = async (
+  const handleAvatarSelect = (
     nextAvatarKey: UserProfileUpdateRequest["avatarKey"],
   ) => {
-    if (avatarKey === nextAvatarKey) {
-      return;
-    }
-
-    if (!confirm("프로필 아이콘을 변경할까요?")) {
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      const response = await updateProfileMutation.mutateAsync({
-        data: {
-          avatarKey: nextAvatarKey,
-        },
-      });
-
-      if (response.status !== 200) {
-        throw response;
-      }
-
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: getGetUsersMeQueryKey(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: getGetDashboardTeamQueryKey(undefined),
-        }),
-      ]);
-      showToast("success", "프로필 아이콘이 변경되었습니다.");
-    } catch (error) {
-      showToast(
-        "error",
-        getApiErrorMessage(error, "프로필 아이콘 변경에 실패했습니다."),
-      );
-    } finally {
-      setIsSaving(false);
-    }
+    return updateAvatar(avatarKey, nextAvatarKey);
   };
 
   return (
@@ -174,6 +111,18 @@ export default function ProfileAvatarPage() {
             ))}
           </div>
         </Card>
+      </div>
+    </div>
+  );
+}
+
+function AvatarPageSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="mx-auto max-w-[560px] animate-pulse space-y-6 p-4 md:p-8">
+        <div className="h-10 rounded-xl bg-sub-background" />
+        <div className="h-24 rounded-2xl bg-sub-background" />
+        <div className="h-72 rounded-2xl bg-sub-background" />
       </div>
     </div>
   );

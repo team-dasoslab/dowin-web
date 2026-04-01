@@ -14,12 +14,18 @@
 - Use `asChild` when `Button` wraps `Link`.
 - Do not introduce new `forwardRef` wrappers by default.
 - Use Lucide icons.
+- When a page owns both local client state and TanStack Query logic, split those concerns into domain hooks instead of keeping them together in the page component.
+- Put form state, input handlers, and client-side validation in a dedicated `use...Form` hook.
+- Put mutations, cache invalidation, toast handling, and navigation side effects in a dedicated domain hook such as `use...Mutation`.
+- Keep page-local skeleton, empty, error, and similar status UIs in the same page/domain file by default.
+- Declare those page-local status helpers near the bottom of the file unless reuse across multiple files justifies extraction.
 - Use Zod for forms.
 - Use generated Orval hooks and TanStack Query for server state.
 - Invalidate related queries after mutations.
 - Treat mobile optimization as a required part of frontend work.
 - Check layout, readability, touch targets, scrolling flow, and primary actions on small screens.
 - Consider mobile layout, empty states, loading states, and failure rollback.
+- Keep page components focused on composition and rendering when form and server-state orchestration becomes non-trivial.
 
 ## Verification Defaults
 

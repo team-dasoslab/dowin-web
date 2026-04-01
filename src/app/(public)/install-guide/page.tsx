@@ -1,5 +1,5 @@
-import { CopyServiceLinkButton } from "@/app/install-guide/_components/CopyServiceLinkButton";
-import { GuideImage } from "@/app/install-guide/_components/GuideImage";
+import { CopyServiceLinkButton } from "@/app/(public)/install-guide/_components/CopyServiceLinkButton";
+import { GuideImage } from "@/app/(public)/install-guide/_components/GuideImage";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";

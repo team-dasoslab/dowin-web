@@ -1,191 +1,49 @@
 "use client";
 
-import { getAnalyticsExportData } from "@/api/generated/analytics/analytics";
-import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { useGetScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
-import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { EmptyStatePanel } from "@/app/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/(protected)/_components/NoWorkspaceActions";
-import { getTodayInKst, getWeekDates } from "@/app/(protected)/dashboard/my/_lib/week";
+import { useProfileExportAction } from "@/app/(protected)/profile/export/_hooks/useProfileExportAction";
+import { useProfileExportData } from "@/app/(protected)/profile/export/_hooks/useProfileExportData";
+import { useProfileExportForm } from "@/app/(protected)/profile/export/_hooks/useProfileExportForm";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { useToast } from "@/context/ToastContext";
-import {
-  getApiErrorMessage,
-  getApiErrorStatus,
-  toNumberId,
-} from "@/lib/client/frontend-api";
 import { Download, Plus } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-
-type LogStatus = "ACHIEVED" | "MISSED" | "NOT_RECORDED";
-
-type CsvData = {
-  periodMeta?: { from?: string; to?: string; dayCount?: number };
-  summary?: {
-    achieved?: number;
-    total?: number;
-    achievementRate?: number;
-    isWinning?: boolean;
-  };
-  leadMeasureBreakdown?: Array<{
-    leadMeasureId: number;
-    name: string;
-    period: "DAILY" | "WEEKLY" | "MONTHLY";
-    achieved: number;
-    total: number;
-    achievementRate: number;
-  }>;
-  dailyRows?: Array<{
-    date: string;
-    leadMeasureId: number;
-    leadMeasureName: string;
-    status: LogStatus;
-  }>;
-};
 
 export default function ProfileExportPage() {
-  const { showToast } = useToast();
-  const [isExporting, setIsExporting] = useState(false);
-  const [splitByWeek, setSplitByWeek] = useState(false);
-  const today = getTodayInKst();
-  const thisWeek = getWeekDates(today);
-
-  const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
   const {
-    data: workspaceResponse,
-    isLoading: isWorkspaceLoading,
-    error: workspaceError,
-  } = useGetWorkspacesMe({
-    query: {
-      retry: (failureCount, error) =>
-        getApiErrorStatus(error) !== 404 && failureCount < 3,
-    },
-  });
+    activeScoreboard,
+    exportMeasureOptions,
+    hasNoScoreboard,
+    hasNoWorkspace,
+    isLoading,
+    user,
+    workspace,
+  } = useProfileExportData();
   const {
-    data: activeScoreboardResponse,
-    isLoading: isScoreboardLoading,
-    error: scoreboardError,
-  } = useGetScoreboardsActive({
-    query: {
-      retry: (failureCount, error) =>
-        getApiErrorStatus(error) !== 404 && failureCount < 1,
-    },
+    exportFrom,
+    exportTo,
+    handleExportFromChange,
+    handleExportToChange,
+    isAllMeasuresSelected,
+    selectedExportMeasureIds,
+    splitByWeek,
+    toggleExportMeasure,
+    toggleSelectAllMeasures,
+    toggleSplitByWeek,
+  } = useProfileExportForm({
+    exportMeasureOptions,
+  });
+  const { exportCsv, isExporting } = useProfileExportAction({
+    exportFrom,
+    exportTo,
+    selectedExportMeasureIds,
+    splitByWeek,
   });
 
-  const user = profileResponse?.status === 200 ? profileResponse.data : null;
-  const workspace = workspaceResponse?.status === 200 ? workspaceResponse.data : null;
-  const activeScoreboard =
-    activeScoreboardResponse?.status === 200
-      ? activeScoreboardResponse.data
-      : null;
-
-  const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
-  const hasNoScoreboard = getApiErrorStatus(scoreboardError) === 404;
-
-  const [exportFrom, setExportFrom] = useState(thisWeek[0] ?? today);
-  const [exportTo, setExportTo] = useState(thisWeek[6] ?? today);
-
-  const exportMeasureOptions = useMemo(
-    () =>
-      (activeScoreboard?.leadMeasures ?? [])
-        .filter((measure) => measure.status === "ACTIVE")
-        .map((measure) => ({
-          id: toNumberId(measure.id),
-          name: measure.name,
-        }))
-        .filter(
-          (measure): measure is { id: number; name: string } =>
-            measure.id !== null,
-        ),
-    [activeScoreboard],
-  );
-
-  const [selectedExportMeasureIds, setSelectedExportMeasureIds] = useState<number[]>(
-    [],
-  );
-
-  useEffect(() => {
-    const nextIds = exportMeasureOptions.map((measure) => measure.id);
-    setSelectedExportMeasureIds((previous) => {
-      if (
-        previous.length === nextIds.length &&
-        previous.every((id, index) => id === nextIds[index])
-      ) {
-        return previous;
-      }
-
-      return nextIds;
-    });
-  }, [exportMeasureOptions]);
-
-  const isAllMeasuresSelected =
-    exportMeasureOptions.length > 0 &&
-    selectedExportMeasureIds.length === exportMeasureOptions.length;
-
-  const toggleExportMeasure = (measureId: number) => {
-    setSelectedExportMeasureIds((previous) =>
-      previous.includes(measureId)
-        ? previous.filter((id) => id !== measureId)
-        : [...previous, measureId],
-    );
-  };
-
-  const toggleSelectAllMeasures = () => {
-    setSelectedExportMeasureIds(
-      isAllMeasuresSelected ? [] : exportMeasureOptions.map((measure) => measure.id),
-    );
-  };
-
-  const handleExportCsv = async () => {
-    const dayCount = getDayCountInclusive(exportFrom, exportTo);
-    if (dayCount === null) {
-      showToast("error", "기간 날짜 형식을 확인해주세요.");
-      return;
-    }
-    if (dayCount <= 0) {
-      showToast("info", "종료일은 시작일 이후여야 합니다.");
-      return;
-    }
-    if (dayCount > 92) {
-      showToast("info", "조회 기간은 최대 92일까지 가능합니다.");
-      return;
-    }
-    if (selectedExportMeasureIds.length === 0) {
-      showToast("info", "최소 1개 이상의 선행지표를 선택해주세요.");
-      return;
-    }
-
-    setIsExporting(true);
-
-    try {
-      const response = await getAnalyticsExportData({
-        from: exportFrom,
-        to: exportTo,
-        leadMeasureIds: selectedExportMeasureIds,
-      });
-      if (response.status !== 200) {
-        showToast("error", "내보내기 데이터를 불러오지 못했습니다.");
-        return;
-      }
-
-      const csv = buildExportCsv(response.data, splitByWeek);
-      downloadCsv(csv, exportFrom, exportTo);
-      showToast("success", "CSV 다운로드를 시작했습니다.");
-    } catch (error) {
-      showToast(
-        "error",
-        getApiErrorMessage(error, "내보내기 데이터를 불러오지 못했습니다."),
-      );
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
-  if (isProfileLoading || isWorkspaceLoading || isScoreboardLoading) {
+  if (isLoading) {
     return <ExportSkeleton />;
   }
 
@@ -200,11 +58,7 @@ export default function ProfileExportPage() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-6 animate-linear-in">
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
-          <p className="text-xs text-text-muted">데이터 내보내기</p>
-          <div className="w-8" />
-        </header>
+        <ProfileExportHeader />
 
         <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
           <UserAvatar
@@ -226,7 +80,9 @@ export default function ProfileExportPage() {
 
         <Card className="border border-border rounded-lg p-4 space-y-4">
           <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">내보내기 조건</h2>
+            <h2 className="text-sm font-bold text-text-primary">
+              내보내기 조건
+            </h2>
             <p className="text-[11px] text-text-muted">
               기간(최대 92일)과 선행지표를 선택해 CSV 파일로 내려받습니다.
             </p>
@@ -238,7 +94,7 @@ export default function ProfileExportPage() {
               <input
                 type="date"
                 value={exportFrom}
-                onChange={(event) => setExportFrom(event.target.value)}
+                onChange={(event) => handleExportFromChange(event.target.value)}
                 className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
               />
             </label>
@@ -247,7 +103,7 @@ export default function ProfileExportPage() {
               <input
                 type="date"
                 value={exportTo}
-                onChange={(event) => setExportTo(event.target.value)}
+                onChange={(event) => handleExportToChange(event.target.value)}
                 className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
               />
             </label>
@@ -255,7 +111,9 @@ export default function ProfileExportPage() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold text-text-muted">선행지표 선택</p>
+              <p className="text-[11px] font-bold text-text-muted">
+                선행지표 선택
+              </p>
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
@@ -290,7 +148,7 @@ export default function ProfileExportPage() {
             <input
               type="checkbox"
               checked={splitByWeek}
-              onChange={(event) => setSplitByWeek(event.target.checked)}
+              onChange={(event) => toggleSplitByWeek(event.target.checked)}
               className="h-3.5 w-3.5"
             />
             <span>주차별로 섹션 분리해서 내보내기</span>
@@ -302,7 +160,7 @@ export default function ProfileExportPage() {
             </p>
             <Button
               type="button"
-              onClick={() => void handleExportCsv()}
+              onClick={() => void exportCsv()}
               disabled={isExporting}
               className="h-9 w-full rounded-lg bg-primary px-4 text-xs font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
@@ -313,6 +171,16 @@ export default function ProfileExportPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function ProfileExportHeader() {
+  return (
+    <header className="flex items-center justify-between">
+      <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
+      <p className="text-xs text-text-muted">데이터 내보내기</p>
+      <div className="w-8" />
+    </header>
   );
 }
 
@@ -332,12 +200,7 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
-          <p className="text-xs text-text-muted">데이터 내보내기</p>
-          <div className="w-8" />
-        </header>
-
+        <ProfileExportHeader />
         <EmptyStatePanel
           title="소속된 워크스페이스가 없어요"
           description={
@@ -358,12 +221,7 @@ function NoScoreboardState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
-          <p className="text-xs text-text-muted">데이터 내보내기</p>
-          <div className="w-8" />
-        </header>
-
+        <ProfileExportHeader />
         <EmptyStatePanel
           title="아직 가중목이 없어요"
           description={
@@ -379,8 +237,7 @@ function NoScoreboardState() {
               className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
               <Link href="/setup?mode=create">
-                <Plus className="w-4 h-4" />
-                새 점수판 만들기
+                <Plus className="w-4 h-4" />새 점수판 만들기
               </Link>
             </Button>
           }
@@ -388,258 +245,4 @@ function NoScoreboardState() {
       </div>
     </div>
   );
-}
-
-function getDayCountInclusive(from: string, to: string) {
-  const fromDate = parseDate(from);
-  const toDate = parseDate(to);
-  if (!fromDate || !toDate) {
-    return null;
-  }
-
-  const dayMs = 86_400_000;
-  return Math.floor((toDate.getTime() - fromDate.getTime()) / dayMs) + 1;
-}
-
-function parseDate(date: string) {
-  const [yearRaw, monthRaw, dayRaw] = date.split("-");
-  const year = Number(yearRaw);
-  const month = Number(monthRaw);
-  const day = Number(dayRaw);
-  if (
-    !Number.isInteger(year) ||
-    !Number.isInteger(month) ||
-    !Number.isInteger(day)
-  ) {
-    return null;
-  }
-
-  const parsed = new Date(Date.UTC(year, month - 1, day));
-  if (
-    parsed.getUTCFullYear() !== year ||
-    parsed.getUTCMonth() !== month - 1 ||
-    parsed.getUTCDate() !== day
-  ) {
-    return null;
-  }
-
-  return parsed;
-}
-
-function escapeCsvCell(value: string | number) {
-  const raw = String(value);
-  if (raw.includes(",") || raw.includes('"') || raw.includes("\n")) {
-    return `"${raw.replaceAll('"', '""')}"`;
-  }
-
-  return raw;
-}
-
-function buildExportCsv(data: CsvData, splitByWeek: boolean) {
-  const periodMeta = data.periodMeta ?? {};
-  const summary = data.summary ?? {};
-  const leadMeasureBreakdown = data.leadMeasureBreakdown ?? [];
-  const dailyRows = data.dailyRows ?? [];
-  const rows: string[] = [];
-
-  const dates = [...new Set(dailyRows.map((row) => row.date))].sort();
-  const weekStarts = [...new Set(dates.map((date) => getWeekStart(date)))].sort();
-  const monthStarts = [...new Set(dates.map((date) => date.slice(0, 7)))].sort();
-  const statusByMeasureDate = new Map<string, LogStatus>(
-    dailyRows.map((row) => [`${row.leadMeasureId}:${row.date}`, row.status]),
-  );
-
-  rows.push(`기간,${periodMeta.from ?? ""} ~ ${periodMeta.to ?? ""}`);
-  rows.push(
-    `전체 달성률,${summary.achieved ?? 0}/${summary.total ?? 0} (${summary.achievementRate ?? 0}%)`,
-  );
-  rows.push("");
-
-  if (splitByWeek && weekStarts.length > 0) {
-    weekStarts.forEach((weekStart, index) => {
-      const sectionDates = dates.filter((date) => getWeekStart(date) === weekStart);
-      if (sectionDates.length === 0) {
-        return;
-      }
-
-      rows.push(
-        `주차,${index + 1}주차 (${sectionDates[0]} ~ ${sectionDates[sectionDates.length - 1]})`,
-      );
-      appendDashboardLikeTable(
-        rows,
-        leadMeasureBreakdown,
-        sectionDates,
-        statusByMeasureDate,
-        dates.length,
-        weekStarts.length,
-        monthStarts.length,
-      );
-      rows.push("");
-    });
-
-    return rows.join("\n");
-  }
-
-  appendDashboardLikeTable(
-    rows,
-    leadMeasureBreakdown,
-    dates,
-    statusByMeasureDate,
-    dates.length,
-    weekStarts.length,
-    monthStarts.length,
-  );
-
-  return rows.join("\n");
-}
-
-function appendDashboardLikeTable(
-  rows: string[],
-  measures: NonNullable<CsvData["leadMeasureBreakdown"]>,
-  dates: string[],
-  statusByMeasureDate: Map<string, LogStatus>,
-  fullDateCount: number,
-  fullWeekCount: number,
-  fullMonthCount: number,
-) {
-  rows.push(
-    [
-      "선행지표",
-      "기간",
-      "목표",
-      ...dates.map((date) => date.slice(5)),
-      "달성",
-      "달성률",
-    ].join(","),
-  );
-
-  for (const measure of measures) {
-    const targetValue = inferTargetValue(measure, fullDateCount, fullWeekCount, fullMonthCount);
-    const unit =
-      measure.period === "DAILY" ? "일" : measure.period === "WEEKLY" ? "주" : "월";
-    const marks = dates.map((date) => {
-      const status = statusByMeasureDate.get(`${measure.leadMeasureId}:${date}`);
-      if (status === "ACHIEVED") {
-        return "O";
-      }
-      if (status === "MISSED") {
-        return "X";
-      }
-      return "";
-    });
-
-    const achieved = calculateAchievedInRange(
-      measure.leadMeasureId,
-      measure.period,
-      dates,
-      targetValue,
-      statusByMeasureDate,
-    );
-    const bucketCount =
-      measure.period === "DAILY"
-        ? dates.length
-        : measure.period === "WEEKLY"
-          ? new Set(dates.map((date) => getWeekStart(date))).size
-          : new Set(dates.map((date) => date.slice(0, 7))).size;
-    const total = bucketCount * targetValue;
-    const rate = total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
-
-    rows.push(
-      [
-        escapeCsvCell(measure.name),
-        getPeriodLabelKo(measure.period),
-        `${targetValue}회/${unit}`,
-        ...marks,
-        `${achieved}/${total}`,
-        `${rate}%`,
-      ].join(","),
-    );
-  }
-}
-
-function inferTargetValue(
-  measure: NonNullable<CsvData["leadMeasureBreakdown"]>[number],
-  fullDateCount: number,
-  fullWeekCount: number,
-  fullMonthCount: number,
-) {
-  if (measure.period === "DAILY") {
-    return fullDateCount > 0 ? Math.round(measure.total / fullDateCount) : 0;
-  }
-  if (measure.period === "WEEKLY") {
-    return fullWeekCount > 0 ? Math.round(measure.total / fullWeekCount) : 0;
-  }
-  return fullMonthCount > 0 ? Math.round(measure.total / fullMonthCount) : 0;
-}
-
-function calculateAchievedInRange(
-  leadMeasureId: number,
-  period: "DAILY" | "WEEKLY" | "MONTHLY",
-  dates: string[],
-  targetValue: number,
-  statusByMeasureDate: Map<string, LogStatus>,
-) {
-  if (targetValue <= 0 || dates.length === 0) {
-    return 0;
-  }
-
-  if (period === "DAILY") {
-    return dates.reduce((sum, date) => {
-      const status = statusByMeasureDate.get(`${leadMeasureId}:${date}`);
-      return status === "ACHIEVED" ? sum + 1 : sum;
-    }, 0);
-  }
-
-  const bucketMap = new Map<string, number>();
-  for (const date of dates) {
-    const status = statusByMeasureDate.get(`${leadMeasureId}:${date}`);
-    if (status !== "ACHIEVED") {
-      continue;
-    }
-
-    const bucket = period === "WEEKLY" ? getWeekStart(date) : date.slice(0, 7);
-    bucketMap.set(bucket, (bucketMap.get(bucket) ?? 0) + 1);
-  }
-
-  let achieved = 0;
-  for (const count of bucketMap.values()) {
-    achieved += Math.min(count, targetValue);
-  }
-
-  return achieved;
-}
-
-function getWeekStart(dateString: string) {
-  const [yearRaw, monthRaw, dayRaw] = dateString.split("-");
-  const year = Number(yearRaw);
-  const month = Number(monthRaw);
-  const day = Number(dayRaw);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  const weekday = date.getUTCDay();
-  const diff = weekday === 0 ? -6 : 1 - weekday;
-  const monday = new Date(date);
-  monday.setUTCDate(date.getUTCDate() + diff);
-  return monday.toISOString().slice(0, 10);
-}
-
-function getPeriodLabelKo(period: "DAILY" | "WEEKLY" | "MONTHLY") {
-  if (period === "DAILY") {
-    return "일간";
-  }
-  if (period === "WEEKLY") {
-    return "주간";
-  }
-  return "월간";
-}
-
-function downloadCsv(csv: string, from: string, to: string) {
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `wig-my-export-${from.replaceAll("-", "")}-${to.replaceAll("-", "")}.csv`;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
 }

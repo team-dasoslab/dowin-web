@@ -1,74 +1,25 @@
 "use client";
 
-import {
-  getGetWorkspacesMeQueryKey,
-  usePostWorkspacesJoinByInvite,
-} from "@/api/generated/workspace/workspace";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { useToast } from "@/context/ToastContext";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
-import { useQueryClient } from "@tanstack/react-query";
+import { useJoinWorkspaceForm } from "@/app/(protected)/workspace/join/_hooks/useJoinWorkspaceForm";
+import { useJoinWorkspaceMutation } from "@/app/(protected)/workspace/join/_hooks/useJoinWorkspaceMutation";
 import { LogIn, Users, Zap } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { z } from "zod";
-
-const joinByInviteSchema = z.object({
-  code: z
-    .string()
-    .trim()
-    .min(6, "초대코드를 입력해주세요.")
-    .max(32, "초대코드는 32자 이하여야 합니다."),
-});
 
 export default function JoinWorkspacePage() {
-  const [inviteCode, setInviteCode] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const { showToast } = useToast();
-
-  const { mutate: joinByInvite, isPending } = usePostWorkspacesJoinByInvite({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: getGetWorkspacesMeQueryKey(),
-        });
-        showToast("success", "워크스페이스에 참가했습니다.");
-        router.push("/dashboard/my");
-      },
-      onError: (joinError) => {
-        const message = getApiErrorMessage(
-          joinError,
-          "워크스페이스 참가 중 오류가 발생했습니다.",
-        );
-        setError(message);
-        showToast("error", message);
-      },
+  const { isPending, submitJoinWorkspace } = useJoinWorkspaceMutation({
+    onError: (message) => {
+      setError(message);
     },
   });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const parsed = joinByInviteSchema.safeParse({ code: inviteCode });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "초대코드를 확인해주세요.");
-      return;
-    }
-
-    setError("");
-    joinByInvite({
-      data: {
-        code: parsed.data.code.toUpperCase(),
-      },
+  const { error, inviteCode, setError, handleInviteCodeChange, handleSubmit } =
+    useJoinWorkspaceForm({
+      onSubmitCode: submitJoinWorkspace,
     });
-  };
 
   return (
     <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
@@ -102,12 +53,7 @@ export default function JoinWorkspacePage() {
               type="text"
               value={inviteCode}
               disabled={isPending}
-              onChange={(e) => {
-                setInviteCode(e.target.value);
-                if (error) {
-                  setError("");
-                }
-              }}
+              onChange={(e) => handleInviteCodeChange(e.target.value)}
               placeholder="예: TEAM-AB12-CD34"
               autoFocus
               className="w-full px-4 py-3 bg-sub-background border border-border rounded-lg text-sm focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"

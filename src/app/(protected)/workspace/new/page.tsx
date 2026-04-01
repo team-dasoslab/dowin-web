@@ -1,51 +1,39 @@
 "use client";
 
-import { usePostWorkspaces } from "@/api/generated/workspace/workspace";
+import { useCreateWorkspaceForm } from "@/app/(protected)/workspace/new/_hooks/useCreateWorkspaceForm";
+import { useCreateWorkspaceMutation } from "@/app/(protected)/workspace/new/_hooks/useCreateWorkspaceMutation";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Plus, Zap } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-
-type WorkspaceCreateError = {
-  data?: {
-    message?: string;
-  };
-};
 
 export default function NewWorkspacePage() {
-  const [name, setName] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
-
-  const { mutate: createWorkspace, isPending } = usePostWorkspaces({
-    mutation: {
-      onSuccess: () => {
-        router.push("/dashboard/my");
-      },
-      onError: (err: WorkspaceCreateError) => {
-        setError(
-          err.data?.message || "워크스페이스 생성 중 오류가 발생했습니다.",
-        );
-      },
+  const { error, getValidatedName, name, setError, handleNameChange } =
+    useCreateWorkspaceForm();
+  const { isPending, submitCreateWorkspace } = useCreateWorkspaceMutation({
+    onError: (message) => {
+      setError(message);
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name.trim()) return;
 
-    createWorkspace({
-      data: { name: name.trim() },
-    });
+    const validatedName = getValidatedName();
+    if (!validatedName) {
+      return;
+    }
+
+    submitCreateWorkspace(validatedName);
   };
 
   return (
     <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
-      {isPending && <LoadingOverlay message="워크스페이스를 만드는 중입니다." />}
+      {isPending && (
+        <LoadingOverlay message="워크스페이스를 만드는 중입니다." />
+      )}
       <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
@@ -80,7 +68,7 @@ export default function NewWorkspacePage() {
               type="text"
               value={name}
               disabled={isPending}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => handleNameChange(e.target.value)}
               placeholder="예: 마케팅 팀, WIG 프로젝트"
               autoFocus
               className="w-full px-4 py-3 bg-sub-background border border-border rounded-lg text-sm focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"

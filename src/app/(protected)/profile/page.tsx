@@ -1,20 +1,8 @@
 "use client";
 
-import {
-  usePostAuthLogout,
-  usePutAuthPassword,
-} from "@/api/generated/auth/auth";
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
-import {
-  getGetUsersMeQueryKey,
-  useGetUsersMe,
-  usePutUsersMe,
-} from "@/api/generated/profile/profile";
-import {
-  getGetWorkspacesMeQueryKey,
-  useGetWorkspacesMe,
-  usePutWorkspacesId,
-} from "@/api/generated/workspace/workspace";
+import { useGetUsersMe } from "@/api/generated/profile/profile";
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { useProfileActions } from "@/app/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
@@ -22,9 +10,6 @@ import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
-import { validatePassword } from "@/domain/auth/validation";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
   ChevronRight,
@@ -39,7 +24,8 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
 
 interface MenuItem {
   id: string;
@@ -52,32 +38,12 @@ interface MenuItem {
   rightElement?: React.ReactNode;
 }
 
-function ProfileSkeleton() {
-  return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
-        <div className="space-y-4">
-          <div className="h-44 rounded-2xl bg-sub-background" />
-          <div className="h-36 rounded-2xl bg-sub-background" />
-          <div className="h-28 rounded-2xl bg-sub-background" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function ProfilePage() {
-  const queryClient = useQueryClient();
+  const router = useRouter();
   const { showToast } = useToast();
-  const [pendingAction, setPendingAction] = useState<string | null>(null);
+  const hasHandledMissingUserRef = useRef(false);
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
-  const updateNicknameMutation = usePutUsersMe();
-  const updateWorkspaceMutation = usePutWorkspacesId();
-  const changePasswordMutation = usePutAuthPassword();
-  const logoutMutation = usePostAuthLogout();
   const { data: workspaceResponse } = useGetWorkspacesMe({
     query: {
       retry: false,
@@ -87,6 +53,31 @@ export default function ProfilePage() {
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+  const nickname = user?.nickname ?? "사용자";
+  const customId = user?.customId ?? "";
+  const avatarKey = user?.avatarKey ?? null;
+  const isWorkspaceAdmin = user?.role === "ADMIN";
+  const {
+    changeNickname,
+    changePassword,
+    changeWorkspaceName,
+    isActionPending,
+    logout,
+    pendingAction,
+  } = useProfileActions({
+    nickname,
+    workspace,
+  });
+
+  useEffect(() => {
+    if (isProfileLoading || user || hasHandledMissingUserRef.current) {
+      return;
+    }
+
+    hasHandledMissingUserRef.current = true;
+    showToast("error", "프로필 정보를 불러오지 못해 홈으로 이동합니다.");
+    router.replace("/dashboard/my");
+  }, [isProfileLoading, router, showToast, user]);
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
@@ -95,30 +86,6 @@ export default function ProfilePage() {
   if (!user) {
     return null;
   }
-
-  const nickname = user.nickname ?? "사용자";
-  const customId = user.customId ?? "";
-  const avatarKey = user.avatarKey ?? null;
-  const isWorkspaceAdmin = user.role === "ADMIN";
-  const isActionPending =
-    pendingAction !== null ||
-    updateNicknameMutation.isPending ||
-    changePasswordMutation.isPending ||
-    logoutMutation.isPending;
-
-  const handleLogout = async () => {
-    try {
-      const response = await logoutMutation.mutateAsync();
-      if (response.status !== 204) {
-        throw response;
-      }
-    } catch {
-      // Continue logout flow even when server-side logout fails.
-    } finally {
-      queryClient.clear();
-      window.location.replace("/login");
-    }
-  };
 
   const menuGroups: { label: string; items: MenuItem[] }[] = [
     {
@@ -137,42 +104,8 @@ export default function ProfilePage() {
           title: "닉네임 변경",
           description: "대시보드에 표시될 이름을 변경합니다.",
           danger: false,
-          onClick: async () => {
-            const next = prompt("새로운 닉네임을 입력하세요:", nickname);
-
-            if (!next) {
-              return;
-            }
-
-            try {
-              setPendingAction("nickname");
-              const response = await updateNicknameMutation.mutateAsync({
-                data: {
-                  nickname: next,
-                },
-              });
-
-              if (response.status !== 200) {
-                throw response;
-              }
-
-              await Promise.all([
-                queryClient.invalidateQueries({
-                  queryKey: getGetUsersMeQueryKey(),
-                }),
-                queryClient.invalidateQueries({
-                  queryKey: getGetDashboardTeamQueryKey(undefined),
-                }),
-              ]);
-              showToast("success", "닉네임이 변경되었습니다.");
-            } catch (error) {
-              showToast(
-                "error",
-                getApiErrorMessage(error, "닉네임 변경에 실패했습니다."),
-              );
-            } finally {
-              setPendingAction(null);
-            }
+          onClick: () => {
+            void changeNickname();
           },
         },
         {
@@ -181,53 +114,8 @@ export default function ProfilePage() {
           title: "비밀번호 변경",
           description: "계정 보안을 위해 비밀번호를 재설정합니다.",
           danger: false,
-          onClick: async () => {
-            const currentPw = prompt("현재 비밀번호를 입력하세요:")?.trim();
-            if (!currentPw) {
-              showToast("error", "현재 비밀번호를 입력해주세요.");
-              return;
-            }
-
-            const newPw = prompt("새로운 비밀번호를 입력하세요:")?.trim();
-            if (!newPw) {
-              showToast("error", "새 비밀번호를 입력해주세요.");
-              return;
-            }
-
-            if (!validatePassword(newPw)) {
-              showToast(
-                "error",
-                "비밀번호는 8자 이상의 영문, 숫자, 허용된 특수문자 조합이어야 합니다.",
-              );
-              return;
-            }
-
-            try {
-              setPendingAction("password");
-              const response = await changePasswordMutation.mutateAsync({
-                data: {
-                  currentPassword: currentPw,
-                  newPassword: newPw,
-                },
-              });
-
-              if (response.status !== 200) {
-                throw response;
-              }
-
-              showToast(
-                "success",
-                response.data.message ||
-                  "비밀번호가 성공적으로 변경되었습니다.",
-              );
-            } catch (error) {
-              showToast(
-                "error",
-                getApiErrorMessage(error, "비밀번호 변경에 실패했습니다."),
-              );
-            } finally {
-              setPendingAction(null);
-            }
+          onClick: () => {
+            void changePassword();
           },
         },
       ],
@@ -241,54 +129,8 @@ export default function ProfilePage() {
               icon: <Edit2 className="w-3.5 h-3.5" />,
               title: "워크스페이스 이름 변경",
               description: "팀 공간 이름을 현재 운영 방식에 맞게 바꿉니다.",
-              onClick: async () => {
-                if (!workspace) {
-                  showToast("error", "수정할 워크스페이스가 없습니다.");
-                  return;
-                }
-
-                const next = prompt(
-                  "새로운 워크스페이스 이름을 입력하세요:",
-                  workspace.name ?? "",
-                )?.trim();
-
-                if (!next || next === workspace.name) {
-                  return;
-                }
-
-                try {
-                  setPendingAction("workspace-name");
-                  const response = await updateWorkspaceMutation.mutateAsync({
-                    id: workspace.id ?? 0,
-                    data: {
-                      name: next,
-                    },
-                  });
-
-                  if (response.status !== 200) {
-                    throw response;
-                  }
-
-                  await Promise.all([
-                    queryClient.invalidateQueries({
-                      queryKey: getGetWorkspacesMeQueryKey(),
-                    }),
-                    queryClient.invalidateQueries({
-                      queryKey: getGetDashboardTeamQueryKey(undefined),
-                    }),
-                  ]);
-                  showToast("success", "워크스페이스 이름이 변경되었습니다.");
-                } catch (error) {
-                  showToast(
-                    "error",
-                    getApiErrorMessage(
-                      error,
-                      "워크스페이스 이름 변경에 실패했습니다.",
-                    ),
-                  );
-                } finally {
-                  setPendingAction(null);
-                }
+              onClick: () => {
+                void changeWorkspaceName();
               },
             },
             {
@@ -363,10 +205,7 @@ export default function ProfilePage() {
           description: "현재 기기에서 세션을 종료합니다.",
           danger: false,
           onClick: () => {
-            if (confirm("로그아웃할까요?")) {
-              setPendingAction("logout");
-              void handleLogout();
-            }
+            void logout();
           },
         },
       ],
@@ -526,6 +365,22 @@ export default function ProfilePage() {
                 </div>
               </div>
             ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileSkeleton() {
+  return (
+    <div className="min-h-screen bg-background font-pretendard">
+      <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
+        <div className="h-10 rounded-xl bg-sub-background" />
+        <div className="h-24 rounded-2xl bg-sub-background" />
+        <div className="space-y-4">
+          <div className="h-44 rounded-2xl bg-sub-background" />
+          <div className="h-36 rounded-2xl bg-sub-background" />
+          <div className="h-28 rounded-2xl bg-sub-background" />
         </div>
       </div>
     </div>
