@@ -67,7 +67,11 @@ export async function GET(req: NextRequest) {
             title: job.title,
             body: job.body,
             icon: "/favicon-192x192.png",
-            data: { url: job.url },
+            data: {
+              url: job.url,
+              pushType: "weekly_focus",
+              campaignId: "weekly_focus_v1",
+            },
           }),
           options: { ttl: 60 },
         },

@@ -12,12 +12,14 @@ import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard
 import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import {
   DailyLogValue,
+  DashboardView,
   getNextLogValue,
   ToggleLogContext,
   WeeklyLogsQueryData,
   updateWeeklyLogsCache,
 } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { trackEvent } from "@/lib/client/gtag";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -27,6 +29,7 @@ type UseDashboardLogMutationParams = {
     typeof getGetScoreboardsScoreboardIdLogsMonthlyQueryKey
   > | null;
   scoreboardId: number | null;
+  selectedView: DashboardView;
   showToast: (type: "success" | "error", message: string) => void;
   weeklyById: Map<number | null, { logs?: Record<string, DailyLogValue> }>;
   weeklyLogsQueryKey: ReturnType<
@@ -38,6 +41,7 @@ export const useDashboardLogMutation = ({
   dashboardTeamQueryKey,
   monthlyLogsQueryKey,
   scoreboardId,
+  selectedView,
   showToast,
   weeklyById,
   weeklyLogsQueryKey,
@@ -217,6 +221,11 @@ export const useDashboardLogMutation = ({
         leadMeasureId,
         date,
       });
+      trackEvent("daily_log_checked", {
+        checked_value: "undone",
+        log_date: date,
+        view_type: selectedView,
+      });
       return;
     }
 
@@ -224,6 +233,11 @@ export const useDashboardLogMutation = ({
       data: { value: nextValue },
       date,
       leadMeasureId,
+    });
+    trackEvent("daily_log_checked", {
+      checked_value: "done",
+      log_date: date,
+      view_type: selectedView,
     });
   };
 

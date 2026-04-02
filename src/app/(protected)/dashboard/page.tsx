@@ -8,9 +8,10 @@ import { formatWeekLabel } from "@/app/(protected)/dashboard/_lib/dashboard";
 import { NoWorkspaceActions } from "@/app/(protected)/_components/NoWorkspaceActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { trackEvent } from "@/lib/client/gtag";
 import { Calendar, UserIcon, Users, Zap } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type ActiveMemoState = {
   memberId: number;
@@ -28,6 +29,28 @@ export default function DashboardPage() {
     profileResponse?.status === 200 ? profileResponse.data.nickname : null;
   const myAvatarKey =
     profileResponse?.status === 200 ? profileResponse.data.avatarKey : null;
+  const hasTrackedViewRef = useRef(false);
+
+  useEffect(() => {
+    if (isLoading || hasNoWorkspace || !dashboard || hasTrackedViewRef.current) {
+      return;
+    }
+
+    const memberCount = dashboard.members?.length ?? 0;
+    const memberCountBucket =
+      memberCount <= 1
+        ? "1"
+        : memberCount <= 5
+          ? "2_5"
+          : memberCount <= 15
+            ? "6_15"
+            : "16_plus";
+
+    trackEvent("dashboard_team_viewed", {
+      member_count_bucket: memberCountBucket,
+    });
+    hasTrackedViewRef.current = true;
+  }, [dashboard, hasNoWorkspace, isLoading]);
 
   if (isLoading) {
     return <DashboardLoadingState />;

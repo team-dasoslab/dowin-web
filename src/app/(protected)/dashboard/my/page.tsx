@@ -16,8 +16,10 @@ import { MY_DASHBOARD_LINKS } from "@/app/(protected)/dashboard/my/_lib/dashboar
 import { getMonthCalendarWeeks } from "@/app/(protected)/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
+import { trackEvent } from "@/lib/client/gtag";
 import { Plus, Zap } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 export default function MyDashboardPage() {
   const { showToast } = useToast();
@@ -80,6 +82,23 @@ export default function MyDashboardPage() {
     weeklyById,
   });
   const monthWeeks = getMonthCalendarWeeks(selectedDate);
+  const lastTrackedViewRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (isLoading || isProfileLoading) {
+      return;
+    }
+
+    if (lastTrackedViewRef.current === selectedView) {
+      return;
+    }
+
+    trackEvent("dashboard_my_viewed", {
+      has_active_scoreboard: Boolean(activeScoreboard),
+      view_type: selectedView,
+    });
+    lastTrackedViewRef.current = selectedView;
+  }, [activeScoreboard, isLoading, isProfileLoading, selectedView]);
 
   if (
     isLoading ||

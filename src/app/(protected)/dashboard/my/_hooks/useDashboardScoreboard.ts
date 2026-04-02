@@ -3,6 +3,7 @@
 import { useDashboardLogMutation } from "@/app/(protected)/dashboard/my/_hooks/useDashboardLogMutation";
 import { useDashboardPeriodState } from "@/app/(protected)/dashboard/my/_hooks/useDashboardPeriodState";
 import { useDashboardScoreboardQueries } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboardQueries";
+import { DashboardView } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { useToast } from "@/context/ToastContext";
 
 export const useDashboardScoreboard = () => {
@@ -54,6 +55,7 @@ export const useDashboardScoreboard = () => {
     dashboardTeamQueryKey,
     monthlyLogsQueryKey,
     scoreboardId,
+    selectedView: selectedView as DashboardView,
     showToast,
     weeklyById,
     weeklyLogsQueryKey,

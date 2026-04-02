@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { trackEvent } from "@/lib/client/gtag";
 import { Check, Copy, LogIn, UserPlus, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -124,6 +125,9 @@ export default function LoginPageClient() {
 
         setRecoveryCodes(response.data.recoveryCodes);
         setIsCopied(false);
+        trackEvent("sign_up_completed", {
+          signup_method: "self_signup",
+        });
       } catch (signupError) {
         setError(getApiErrorMessage(signupError, "회원가입에 실패했습니다."));
       }

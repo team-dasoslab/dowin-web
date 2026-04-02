@@ -15,6 +15,8 @@ type PushMessageData = {
   icon?: string;
   data?: {
     url?: string;
+    pushType?: string;
+    campaignId?: string;
   };
 };
 
@@ -29,6 +31,8 @@ type NotificationClickEventLike = Event & {
   notification: Notification & {
     data: {
       url?: string;
+      pushType?: string;
+      campaignId?: string;
     };
   };
   waitUntil(promise: Promise<unknown>): void;
@@ -37,6 +41,7 @@ type NotificationClickEventLike = Event & {
 type ServiceWorkerClient = {
   url: string;
   focus(): Promise<unknown>;
+  postMessage?(message: unknown): void;
 };
 
 type ServiceWorkerClients = {
@@ -97,7 +102,15 @@ sw.addEventListener("push", (event) => {
 // 알림 클릭 이벤트
 sw.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const urlToOpen = event.notification.data.url;
+  const urlToOpen = event.notification.data.url || "/dashboard/my";
+  const analyticsMessage = {
+    type: "push-notification-clicked",
+    payload: {
+      targetPath: urlToOpen,
+      pushType: event.notification.data.pushType || "unknown",
+      campaignId: event.notification.data.campaignId || "unknown",
+    },
+  };
 
   event.waitUntil(
     sw.clients
@@ -105,11 +118,17 @@ sw.addEventListener("notificationclick", (event) => {
       .then((windowClients: readonly ServiceWorkerClient[]) => {
         for (const client of windowClients) {
           if (client.url === urlToOpen && "focus" in client) {
-            return client.focus();
+            return client.focus().then(() => {
+              client.postMessage?.(analyticsMessage);
+            });
           }
         }
         if (sw.clients.openWindow) {
-          return sw.clients.openWindow(urlToOpen);
+          return sw.clients.openWindow(urlToOpen).then((client) => {
+            if (client && typeof client === "object" && "postMessage" in client) {
+              (client as ServiceWorkerClient).postMessage?.(analyticsMessage);
+            }
+          });
         }
       }),
   );

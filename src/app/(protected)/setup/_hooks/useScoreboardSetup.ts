@@ -21,6 +21,7 @@ import {
   getApiErrorStatus,
   toNumberId,
 } from "@/lib/client/frontend-api";
+import { trackEvent } from "@/lib/client/gtag";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -226,6 +227,9 @@ export const useScoreboardSetup = () => {
         }
 
         await invalidateScoreboardQueries(createdScoreboardId);
+        trackEvent("scoreboard_created", {
+          lead_measure_count: validMeasures.length,
+        });
         showToast("success", "새 점수판을 만들었습니다.");
         return true;
       }

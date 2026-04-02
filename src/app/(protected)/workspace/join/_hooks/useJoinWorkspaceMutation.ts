@@ -6,6 +6,7 @@ import {
 } from "@/api/generated/workspace/workspace";
 import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { trackEvent } from "@/lib/client/gtag";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
@@ -25,6 +26,9 @@ export const useJoinWorkspaceMutation = ({
       onSuccess: async () => {
         await queryClient.invalidateQueries({
           queryKey: getGetWorkspacesMeQueryKey(),
+        });
+        trackEvent("workspace_joined", {
+          join_method: "invite_code",
         });
         showToast("success", "워크스페이스에 참가했습니다.");
         router.push("/dashboard/my");

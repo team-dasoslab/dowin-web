@@ -51,7 +51,11 @@ export async function GET(req: NextRequest) {
             title: "리마인드",
             body: "아직 하루가 끝나지 않았어요! 지금 바로 일어나서 해볼까요?",
             icon: "/favicon-192x192.png",
-            data: { url: "/dashboard/my" },
+            data: {
+              url: "/dashboard/my",
+              pushType: "daily_reminder",
+              campaignId: "daily_reminder_v1",
+            },
           }),
           options: { ttl: 60 },
         },

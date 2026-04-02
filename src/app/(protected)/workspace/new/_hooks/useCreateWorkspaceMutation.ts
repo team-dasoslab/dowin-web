@@ -1,6 +1,7 @@
 "use client";
 
 import { usePostWorkspaces } from "@/api/generated/workspace/workspace";
+import { trackEvent } from "@/lib/client/gtag";
 import { useRouter } from "next/navigation";
 
 type WorkspaceCreateError = {
@@ -21,6 +22,7 @@ export const useCreateWorkspaceMutation = ({
   const { mutate: createWorkspace, isPending } = usePostWorkspaces({
     mutation: {
       onSuccess: () => {
+        trackEvent("workspace_created");
         router.push("/dashboard/my");
       },
       onError: (error: WorkspaceCreateError) => {
