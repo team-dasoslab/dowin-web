@@ -65,7 +65,6 @@ export default function ProfilePage() {
   const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
   const {
     changeNickname,
-    changePassword,
     changeWorkspaceName,
     deleteAccount,
     deleteWorkspace,
@@ -122,10 +121,7 @@ export default function ProfilePage() {
           icon: <Key className="w-3.5 h-3.5" />,
           title: "비밀번호 변경",
           description: "계정 보안을 위해 비밀번호를 재설정합니다.",
-          danger: false,
-          onClick: () => {
-            void changePassword();
-          },
+          href: "/profile/password",
         },
       ],
     },
@@ -273,12 +269,10 @@ export default function ProfilePage() {
                 ? "워크스페이스 이름을 변경하는 중입니다."
                 : pendingAction === "workspace-leave"
                   ? "워크스페이스에서 탈퇴하는 중입니다."
-                : pendingAction === "workspace-delete"
-                  ? "워크스페이스를 삭제하는 중입니다."
+                  : pendingAction === "workspace-delete"
+                    ? "워크스페이스를 삭제하는 중입니다."
                   : pendingAction === "account-delete"
                     ? "계정을 삭제하는 중입니다."
-                : pendingAction === "password"
-                  ? "비밀번호를 변경하는 중입니다."
                   : "로그아웃하는 중입니다."
           }
         />

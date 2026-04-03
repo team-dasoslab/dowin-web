@@ -5,6 +5,7 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { Check, Copy, LogIn, UserPlus, Zap } from "lucide-react";
@@ -314,12 +315,12 @@ export default function LoginPageClient() {
               <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
                 비밀번호
               </label>
-              <Input
-                type="password"
+              <PasswordInput
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 placeholder="••••••••"
-                className="w-full px-4 py-3 bg-sub-background border border-border rounded-xl text-sm focus:border-primary focus:bg-white outline-none transition-colors placeholder:text-text-muted/40 font-medium"
+                className="w-full rounded-xl border border-border bg-sub-background px-4 py-3 pr-20 text-sm font-medium outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary focus:bg-white"
+                toggleClassName="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors hover:text-text-primary"
                 required
               />
             </div>

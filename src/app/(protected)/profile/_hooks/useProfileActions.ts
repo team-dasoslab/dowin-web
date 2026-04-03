@@ -2,7 +2,6 @@
 
 import {
   usePostAuthLogout,
-  usePutAuthPassword,
 } from "@/api/generated/auth/auth";
 import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
 import {
@@ -17,7 +16,6 @@ import {
   usePutWorkspacesId,
 } from "@/api/generated/workspace/workspace";
 import { useToast } from "@/context/ToastContext";
-import { validatePassword } from "@/domain/auth/validation";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -45,7 +43,6 @@ export const useProfileActions = ({
   const updateWorkspaceMutation = usePutWorkspacesId();
   const leaveWorkspaceMutation = useDeleteWorkspacesIdLeave();
   const deleteWorkspaceMutation = useDeleteWorkspacesId();
-  const changePasswordMutation = usePutAuthPassword();
   const logoutMutation = usePostAuthLogout();
 
   const isActionPending =
@@ -54,7 +51,6 @@ export const useProfileActions = ({
     deleteAccountMutation.isPending ||
     leaveWorkspaceMutation.isPending ||
     deleteWorkspaceMutation.isPending ||
-    changePasswordMutation.isPending ||
     logoutMutation.isPending;
 
   const invalidateWorkspaceQueries = async () => {
@@ -100,54 +96,6 @@ export const useProfileActions = ({
       showToast(
         "error",
         getApiErrorMessage(error, "닉네임 변경에 실패했습니다."),
-      );
-    } finally {
-      setPendingAction(null);
-    }
-  };
-
-  const changePassword = async () => {
-    const currentPw = prompt("현재 비밀번호를 입력하세요:")?.trim();
-    if (!currentPw) {
-      showToast("error", "현재 비밀번호를 입력해주세요.");
-      return;
-    }
-
-    const newPw = prompt("새로운 비밀번호를 입력하세요:")?.trim();
-    if (!newPw) {
-      showToast("error", "새 비밀번호를 입력해주세요.");
-      return;
-    }
-
-    if (!validatePassword(newPw)) {
-      showToast(
-        "error",
-        "비밀번호는 8자 이상의 영문, 숫자, 허용된 특수문자 조합이어야 합니다.",
-      );
-      return;
-    }
-
-    try {
-      setPendingAction("password");
-      const response = await changePasswordMutation.mutateAsync({
-        data: {
-          currentPassword: currentPw,
-          newPassword: newPw,
-        },
-      });
-
-      if (response.status !== 200) {
-        throw response;
-      }
-
-      showToast(
-        "success",
-        response.data.message || "비밀번호가 성공적으로 변경되었습니다.",
-      );
-    } catch (error) {
-      showToast(
-        "error",
-        getApiErrorMessage(error, "비밀번호 변경에 실패했습니다."),
       );
     } finally {
       setPendingAction(null);
@@ -230,6 +178,10 @@ export const useProfileActions = ({
         "정말 탈퇴할까요? 계정과 연결된 데이터는 복구할 수 없습니다.",
       )
     ) {
+      return;
+    }
+
+    if (!confirm("이 작업은 되돌릴 수 없습니다. 정말로 서비스에서 탈퇴할까요?")) {
       return;
     }
 
@@ -319,6 +271,10 @@ export const useProfileActions = ({
       return;
     }
 
+    if (!confirm("이 작업은 되돌릴 수 없습니다. 정말로 워크스페이스를 삭제할까요?")) {
+      return;
+    }
+
     try {
       setPendingAction("workspace-delete");
       const response = await deleteWorkspaceMutation.mutateAsync({
@@ -344,7 +300,6 @@ export const useProfileActions = ({
 
   return {
     changeNickname,
-    changePassword,
     changeWorkspaceName,
     deleteAccount,
     deleteWorkspace,
