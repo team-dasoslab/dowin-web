@@ -280,6 +280,35 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: 계정 탈퇴
+      tags: [Profile]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UserDeleteRequest" }
+      responses:
+        "204":
+          description: 탈퇴 성공
+        "400":
+          description: 현재 비밀번호 불일치
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "403":
+          description: 유일한 ADMIN은 계정 탈퇴 불가
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /admin/users:
     post:
@@ -1547,6 +1576,14 @@ components:
             - surprise2.purple
             - surprise2.red
             - surprise2.yellow
+
+    UserDeleteRequest:
+      type: object
+      required: [currentPassword]
+      properties:
+        currentPassword:
+          type: string
+          format: password
 
     Workspace:
       type: object

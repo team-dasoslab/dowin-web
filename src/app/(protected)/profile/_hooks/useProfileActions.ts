@@ -6,6 +6,7 @@ import {
 } from "@/api/generated/auth/auth";
 import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
 import {
+  useDeleteUsersMe,
   getGetUsersMeQueryKey,
   usePutUsersMe,
 } from "@/api/generated/profile/profile";
@@ -40,6 +41,7 @@ export const useProfileActions = ({
   const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   const updateNicknameMutation = usePutUsersMe();
+  const deleteAccountMutation = useDeleteUsersMe();
   const updateWorkspaceMutation = usePutWorkspacesId();
   const leaveWorkspaceMutation = useDeleteWorkspacesIdLeave();
   const deleteWorkspaceMutation = useDeleteWorkspacesId();
@@ -49,6 +51,7 @@ export const useProfileActions = ({
   const isActionPending =
     pendingAction !== null ||
     updateNicknameMutation.isPending ||
+    deleteAccountMutation.isPending ||
     leaveWorkspaceMutation.isPending ||
     deleteWorkspaceMutation.isPending ||
     changePasswordMutation.isPending ||
@@ -215,6 +218,43 @@ export const useProfileActions = ({
     }
   };
 
+  const deleteAccount = async () => {
+    const currentPassword = prompt("현재 비밀번호를 입력하세요:")?.trim();
+    if (!currentPassword) {
+      showToast("error", "현재 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    if (
+      !confirm(
+        "정말 탈퇴할까요? 계정과 연결된 데이터는 복구할 수 없습니다.",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setPendingAction("account-delete");
+      const response = await deleteAccountMutation.mutateAsync({
+        data: { currentPassword },
+      });
+
+      if (response.status !== 204) {
+        throw response;
+      }
+    } catch (error) {
+      showToast(
+        "error",
+        getApiErrorMessage(error, "계정 탈퇴에 실패했습니다."),
+      );
+      setPendingAction(null);
+      return;
+    }
+
+    queryClient.clear();
+    window.location.replace("/login");
+  };
+
   const leaveWorkspace = async () => {
     const workspaceId = workspace?.id ?? 0;
     if (workspaceId <= 0) {
@@ -306,6 +346,7 @@ export const useProfileActions = ({
     changeNickname,
     changePassword,
     changeWorkspaceName,
+    deleteAccount,
     deleteWorkspace,
     isActionPending,
     leaveWorkspace,

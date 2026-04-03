@@ -27,6 +27,7 @@ import type {
 import type {
   ErrorResponse,
   UnauthorizedErrorResponse,
+  UserDeleteRequest,
   UserProfile,
   UserProfileUpdateRequest
 } from '../wig.schemas';
@@ -258,5 +259,109 @@ export const usePutUsersMe = <TError = UnauthorizedErrorResponse | ErrorResponse
         TContext
       > => {
       return useMutation(getPutUsersMeMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 계정 탈퇴
+ */
+export type deleteUsersMeResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteUsersMeResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type deleteUsersMeResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type deleteUsersMeResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteUsersMeResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type deleteUsersMeResponseSuccess = (deleteUsersMeResponse204) & {
+  headers: Headers;
+};
+export type deleteUsersMeResponseError = (deleteUsersMeResponse400 | deleteUsersMeResponse401 | deleteUsersMeResponse403 | deleteUsersMeResponse422) & {
+  headers: Headers;
+};
+
+export type deleteUsersMeResponse = (deleteUsersMeResponseSuccess | deleteUsersMeResponseError)
+
+export const getDeleteUsersMeUrl = () => {
+
+
+  
+
+  return `/api/users/me`
+}
+
+export const deleteUsersMe = async (userDeleteRequest: UserDeleteRequest, options?: RequestInit): Promise<deleteUsersMeResponse> => {
+  
+  return customInstance<deleteUsersMeResponse>(getDeleteUsersMeUrl(),
+  {      
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      userDeleteRequest,)
+  }
+);}
+  
+
+
+
+export const getDeleteUsersMeMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUsersMe>>, TError,{data: UserDeleteRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteUsersMe>>, TError,{data: UserDeleteRequest}, TContext> => {
+
+const mutationKey = ['deleteUsersMe'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUsersMe>>, {data: UserDeleteRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  deleteUsersMe(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteUsersMeMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUsersMe>>>
+    export type DeleteUsersMeMutationBody = UserDeleteRequest
+    export type DeleteUsersMeMutationError = ErrorResponse | UnauthorizedErrorResponse
+
+    /**
+ * @summary 계정 탈퇴
+ */
+export const useDeleteUsersMe = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUsersMe>>, TError,{data: UserDeleteRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteUsersMe>>,
+        TError,
+        {data: UserDeleteRequest},
+        TContext
+      > => {
+      return useMutation(getDeleteUsersMeMutationOptions(options), queryClient);
     }
     

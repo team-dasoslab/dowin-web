@@ -11,6 +11,7 @@ export type ErrorCode =
   | "INVALID_RECOVERY_CODE"
   | "SESSION_EXPIRED"
   | "WRONG_PASSWORD"
+  | "LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN"
   | "INVALID_INVITE_CODE"
   | "EXPIRED_INVITE_CODE"
   | "INVITE_CODE_INACTIVE"
@@ -37,6 +38,8 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   INVALID_RECOVERY_CODE: "유효하지 않은 복원코드입니다.",
   SESSION_EXPIRED: "세션이 만료되었습니다. 다시 로그인해주세요.",
   WRONG_PASSWORD: "현재 비밀번호가 올바르지 않습니다.",
+  LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN:
+    "유일한 관리자는 계정을 탈퇴할 수 없습니다. 권한 이전 또는 워크스페이스 삭제 후 다시 시도해주세요.",
   INVALID_INVITE_CODE: "존재하지 않는 초대 코드입니다.",
   EXPIRED_INVITE_CODE: "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
   INVITE_CODE_INACTIVE: "비활성화된 초대 코드입니다.",
@@ -60,6 +63,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   INVALID_CREDENTIALS: 401,
   INVALID_RECOVERY_CODE: 404,
   WRONG_PASSWORD: 400,
+  LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN: 403,
   FUTURE_DATE_NOT_ALLOWED: 400,
   SCOREBOARD_ALREADY_ACTIVE: 400,
   FORBIDDEN: 403,

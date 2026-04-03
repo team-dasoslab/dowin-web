@@ -150,6 +150,10 @@ export interface UserProfileUpdateRequest {
   avatarKey?: UserProfileUpdateRequestAvatarKey;
 }
 
+export interface UserDeleteRequest {
+  currentPassword: string;
+}
+
 export interface Workspace {
   id?: number;
   name?: string;

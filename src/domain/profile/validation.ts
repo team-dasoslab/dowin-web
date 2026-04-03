@@ -20,3 +20,7 @@ export const profileUpdateSchema = z
       message: "변경할 프로필 정보가 없습니다.",
     },
   );
+
+export const profileDeleteSchema = z.object({
+  currentPassword: z.string().trim().min(1, "현재 비밀번호를 입력해주세요."),
+});

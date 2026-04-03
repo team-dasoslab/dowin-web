@@ -67,6 +67,7 @@ export default function ProfilePage() {
     changeNickname,
     changePassword,
     changeWorkspaceName,
+    deleteAccount,
     deleteWorkspace,
     isActionPending,
     leaveWorkspace,
@@ -243,6 +244,21 @@ export default function ProfilePage() {
         },
       ],
     },
+    {
+      label: "위험 구역",
+      items: [
+        {
+          id: "account-delete",
+          icon: <Trash2 className="w-3.5 h-3.5" />,
+          title: "서비스 탈퇴",
+          description: "계정과 연결된 데이터를 삭제하고 로그인 화면으로 돌아갑니다.",
+          danger: true,
+          onClick: () => {
+            void deleteAccount();
+          },
+        },
+      ],
+    },
   ];
 
   return (
@@ -257,8 +273,10 @@ export default function ProfilePage() {
                 ? "워크스페이스 이름을 변경하는 중입니다."
                 : pendingAction === "workspace-leave"
                   ? "워크스페이스에서 탈퇴하는 중입니다."
-                  : pendingAction === "workspace-delete"
-                    ? "워크스페이스를 삭제하는 중입니다."
+                : pendingAction === "workspace-delete"
+                  ? "워크스페이스를 삭제하는 중입니다."
+                  : pendingAction === "account-delete"
+                    ? "계정을 삭제하는 중입니다."
                 : pendingAction === "password"
                   ? "비밀번호를 변경하는 중입니다."
                   : "로그아웃하는 중입니다."
