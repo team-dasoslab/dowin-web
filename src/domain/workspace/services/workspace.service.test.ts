@@ -12,6 +12,9 @@ describe("WorkspaceService", () => {
     findMembership: vi.fn(),
     findMembers: vi.fn(),
     removeMemberById: vi.fn(),
+    updateMemberRole: vi.fn(),
+    transferAdmin: vi.fn(),
+    deleteWorkspace: vi.fn(),
     createInvite: vi.fn(),
     findInviteByCode: vi.fn(),
     findInviteById: vi.fn(),
@@ -265,6 +268,86 @@ describe("WorkspaceService", () => {
       await expect(service.joinWorkspaceByInvite("ABCD123456", 7)).rejects.toThrow(
         "ALREADY_IN_WORKSPACE",
       );
+    });
+  });
+
+  describe("leaveWorkspace", () => {
+    it("MEMBER는 워크스페이스를 탈퇴할 수 있다", async () => {
+      mockStorage.findMembership.mockResolvedValue({
+        id: 9,
+        workspaceId: 1,
+        userId: 123,
+        role: "MEMBER",
+      });
+
+      await service.leaveWorkspace(1, 123);
+
+      expect(mockStorage.removeMemberById).toHaveBeenCalledWith(1, 9);
+    });
+
+    it("ADMIN은 권한 이전 또는 삭제 없이 탈퇴할 수 없다", async () => {
+      mockStorage.findMembership.mockResolvedValue({
+        id: 9,
+        workspaceId: 1,
+        userId: 123,
+        role: "ADMIN",
+      });
+
+      await expect(service.leaveWorkspace(1, 123)).rejects.toThrow(
+        "ADMIN_TRANSFER_REQUIRED",
+      );
+    });
+  });
+
+  describe("transferAdmin", () => {
+    it("ADMIN 권한을 다른 멤버에게 이전한다", async () => {
+      mockStorage.findMembershipById.mockResolvedValue({
+        id: 11,
+        workspaceId: 1,
+        userId: 456,
+        role: "MEMBER",
+      });
+
+      await service.transferAdmin(1, 123, 11);
+
+      expect(mockStorage.transferAdmin).toHaveBeenCalledWith(1, 123, 456);
+    });
+
+    it("자기 자신에게 권한을 이전할 수 없다", async () => {
+      mockStorage.findMembershipById.mockResolvedValue({
+        id: 11,
+        workspaceId: 1,
+        userId: 123,
+        role: "ADMIN",
+      });
+
+      await expect(service.transferAdmin(1, 123, 11)).rejects.toThrow(
+        "FORBIDDEN",
+      );
+    });
+
+    it("대상 멤버가 없으면 404 에러를 던진다", async () => {
+      mockStorage.findMembershipById.mockResolvedValue(null);
+
+      await expect(service.transferAdmin(1, 123, 11)).rejects.toThrow(
+        "NOT_FOUND",
+      );
+    });
+  });
+
+  describe("deleteWorkspace", () => {
+    it("워크스페이스를 삭제한다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+
+      await service.deleteWorkspace(1);
+
+      expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
+    });
+
+    it("워크스페이스가 없으면 404 에러를 던진다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue(null);
+
+      await expect(service.deleteWorkspace(1)).rejects.toThrow("NOT_FOUND");
     });
   });
 });

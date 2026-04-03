@@ -37,6 +37,9 @@ export interface WorkspaceStoragePort {
   findMembership: WorkspaceStorage["findMembership"];
   findMembers: WorkspaceStorage["findMembers"];
   removeMemberById: WorkspaceStorage["removeMemberById"];
+  updateMemberRole: WorkspaceStorage["updateMemberRole"];
+  transferAdmin: WorkspaceStorage["transferAdmin"];
+  deleteWorkspace: WorkspaceStorage["deleteWorkspace"];
   createInvite: WorkspaceStorage["createInvite"];
   findInviteByCode: WorkspaceStorage["findInviteByCode"];
   findInviteById: WorkspaceStorage["findInviteById"];
@@ -248,5 +251,51 @@ export class WorkspaceService {
     }
 
     await this.storage.removeMemberById(workspaceId, membershipId);
+  }
+
+  async leaveWorkspace(workspaceId: number, userId: number): Promise<void> {
+    const membership = await this.storage.findMembership(workspaceId, userId);
+    if (!membership) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    if (membership.role === "ADMIN") {
+      throw new ConflictError("ADMIN_TRANSFER_REQUIRED");
+    }
+
+    await this.storage.removeMemberById(workspaceId, membership.id);
+  }
+
+  async transferAdmin(
+    workspaceId: number,
+    actorUserId: number,
+    targetMembershipId: number,
+  ): Promise<void> {
+    const targetMembership = await this.storage.findMembershipById(
+      workspaceId,
+      targetMembershipId,
+    );
+    if (!targetMembership) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    if (targetMembership.userId === actorUserId) {
+      throw new ForbiddenError("FORBIDDEN");
+    }
+
+    await this.storage.transferAdmin(
+      workspaceId,
+      actorUserId,
+      targetMembership.userId,
+    );
+  }
+
+  async deleteWorkspace(workspaceId: number): Promise<void> {
+    const workspace = await this.storage.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    await this.storage.deleteWorkspace(workspaceId);
   }
 }

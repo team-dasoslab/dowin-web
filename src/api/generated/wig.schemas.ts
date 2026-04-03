@@ -221,6 +221,11 @@ export interface WorkspaceUpdateRequest {
   name: string;
 }
 
+export interface WorkspaceTransferAdminRequest {
+  /** @minimum 1 */
+  memberId: number;
+}
+
 export type LeadMeasurePeriod = typeof LeadMeasurePeriod[keyof typeof LeadMeasurePeriod];
 
 
@@ -651,6 +656,10 @@ export type PostWorkspacesJoinByInvite200 = {
 
 export type PutWorkspacesIdBody = {
   name: string;
+};
+
+export type PostWorkspacesIdTransferAdmin200 = {
+  message: string;
 };
 
 export type PostScoreboardsIdArchive200Status = typeof PostScoreboardsIdArchive200Status[keyof typeof PostScoreboardsIdArchive200Status];

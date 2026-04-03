@@ -3,7 +3,7 @@ import { WorkspaceService } from "@/domain/workspace/services/workspace.service"
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import {
   workspaceParamsSchema,
-  workspaceUpdateSchema,
+  workspaceTransferAdminSchema,
 } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
@@ -11,9 +11,8 @@ import { requireWorkspaceAdminInWorkspace } from "@/lib/server/authz";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { NextResponse } from "next/server";
 
-export const PUT = withErrorHandler(
+export const POST = withErrorHandler(
   async (
     request: Request,
     context: { params: Promise<{ id: string }> },
@@ -48,56 +47,18 @@ export const PUT = withErrorHandler(
     await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
 
     const body = await request.json();
-    const parsedBody = workspaceUpdateSchema.safeParse(body);
+    const parsedBody = workspaceTransferAdminSchema.safeParse(body);
 
     if (!parsedBody.success) {
       return apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
     }
 
-    const workspace = await service.updateWorkspaceName(
+    await service.transferAdmin(
       parsedParams.data.id,
-      parsedBody.data.name,
+      session.userId,
+      parsedBody.data.memberId,
     );
 
-    return apiSuccess(workspace);
-  },
-);
-
-export const DELETE = withErrorHandler(
-  async (
-    _request: Request,
-    context: { params: Promise<{ id: string }> },
-  ) => {
-    const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const storage = new WorkspaceStorage(db);
-    const service = new WorkspaceService(storage);
-
-    const session = await getSessionWithRefresh(db);
-    if (!session) {
-      return apiError("UNAUTHORIZED");
-    }
-
-    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
-      db,
-      userId: session.userId,
-      env,
-      intent: "general-write",
-    });
-    if (restrictedWriteResponse) {
-      return restrictedWriteResponse;
-    }
-
-    const params = await context.params;
-    const parsedParams = workspaceParamsSchema.safeParse(params);
-
-    if (!parsedParams.success) {
-      return apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
-    }
-
-    await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
-    await service.deleteWorkspace(parsedParams.data.id);
-
-    return new NextResponse(null, { status: 204 });
+    return apiSuccess({ message: "관리자 권한을 이전했습니다." });
   },
 );

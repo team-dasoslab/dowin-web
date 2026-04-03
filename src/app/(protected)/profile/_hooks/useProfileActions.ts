@@ -11,12 +11,15 @@ import {
 } from "@/api/generated/profile/profile";
 import {
   getGetWorkspacesMeQueryKey,
+  useDeleteWorkspacesId,
+  useDeleteWorkspacesIdLeave,
   usePutWorkspacesId,
 } from "@/api/generated/workspace/workspace";
 import { useToast } from "@/context/ToastContext";
 import { validatePassword } from "@/domain/auth/validation";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type UseProfileActionsParams = {
@@ -32,19 +35,38 @@ export const useProfileActions = ({
   workspace,
 }: UseProfileActionsParams) => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { showToast } = useToast();
   const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   const updateNicknameMutation = usePutUsersMe();
   const updateWorkspaceMutation = usePutWorkspacesId();
+  const leaveWorkspaceMutation = useDeleteWorkspacesIdLeave();
+  const deleteWorkspaceMutation = useDeleteWorkspacesId();
   const changePasswordMutation = usePutAuthPassword();
   const logoutMutation = usePostAuthLogout();
 
   const isActionPending =
     pendingAction !== null ||
     updateNicknameMutation.isPending ||
+    leaveWorkspaceMutation.isPending ||
+    deleteWorkspaceMutation.isPending ||
     changePasswordMutation.isPending ||
     logoutMutation.isPending;
+
+  const invalidateWorkspaceQueries = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: getGetUsersMeQueryKey(),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: getGetWorkspacesMeQueryKey(),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: getGetDashboardTeamQueryKey(undefined),
+      }),
+    ]);
+  };
 
   const changeNickname = async () => {
     const next = prompt("새로운 닉네임을 입력하세요:", nickname);
@@ -193,11 +215,100 @@ export const useProfileActions = ({
     }
   };
 
+  const leaveWorkspace = async () => {
+    const workspaceId = workspace?.id ?? 0;
+    if (workspaceId <= 0) {
+      showToast("error", "탈퇴할 워크스페이스가 없습니다.");
+      return;
+    }
+
+    if (!confirm("워크스페이스에서 탈퇴할까요?")) {
+      return;
+    }
+
+    try {
+      setPendingAction("workspace-leave");
+      const response = await leaveWorkspaceMutation.mutateAsync({
+        id: workspaceId,
+      });
+
+      if (response.status !== 204) {
+        throw response;
+      }
+
+      await invalidateWorkspaceQueries();
+      showToast("success", "워크스페이스에서 탈퇴했습니다.");
+      router.replace("/dashboard/my");
+    } catch (error) {
+      showToast(
+        "error",
+        getApiErrorMessage(error, "워크스페이스 탈퇴에 실패했습니다."),
+      );
+    } finally {
+      setPendingAction(null);
+    }
+  };
+
+  const deleteWorkspace = async () => {
+    const workspaceId = workspace?.id ?? 0;
+    const workspaceName = workspace?.name?.trim() ?? "";
+
+    if (workspaceId <= 0) {
+      showToast("error", "삭제할 워크스페이스가 없습니다.");
+      return;
+    }
+
+    const confirmation = prompt(
+      `정말 삭제하려면 워크스페이스 이름을 입력하세요:\n${workspaceName}`,
+    )?.trim();
+
+    if (!confirmation) {
+      return;
+    }
+
+    if (confirmation !== workspaceName) {
+      showToast("error", "워크스페이스 이름이 일치하지 않습니다.");
+      return;
+    }
+
+    if (
+      !confirm(
+        "워크스페이스를 삭제하면 멤버, 점수판, 선행지표, 기록이 모두 삭제됩니다. 계속할까요?",
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setPendingAction("workspace-delete");
+      const response = await deleteWorkspaceMutation.mutateAsync({
+        id: workspaceId,
+      });
+
+      if (response.status !== 204) {
+        throw response;
+      }
+
+      await invalidateWorkspaceQueries();
+      showToast("success", "워크스페이스를 삭제했습니다.");
+      router.replace("/dashboard/my");
+    } catch (error) {
+      showToast(
+        "error",
+        getApiErrorMessage(error, "워크스페이스 삭제에 실패했습니다."),
+      );
+    } finally {
+      setPendingAction(null);
+    }
+  };
+
   return {
     changeNickname,
     changePassword,
     changeWorkspaceName,
+    deleteWorkspace,
     isActionPending,
+    leaveWorkspace,
     logout,
     pendingAction,
   };

@@ -21,6 +21,7 @@ type MockDb = {
   select: ReturnType<typeof vi.fn>;
   from: ReturnType<typeof vi.fn>;
   where: ReturnType<typeof vi.fn>;
+  transaction?: ReturnType<typeof vi.fn>;
 };
 
 describe("WorkspaceStorage", () => {
@@ -190,6 +191,37 @@ describe("WorkspaceStorage", () => {
       await storage.removeMemberById(1, 9);
 
       expect(mockDb.delete).toHaveBeenCalledWith(workspaceMembers);
+      expect(mockDb.where).toHaveBeenCalled();
+    });
+  });
+
+  describe("updateMemberRole", () => {
+    it("특정 멤버의 역할을 변경한다", async () => {
+      await storage.updateMemberRole(1, 123, "ADMIN");
+
+      expect(mockDb.update).toHaveBeenCalledWith(workspaceMembers);
+      expect(mockDb.set).toHaveBeenCalledWith({
+        role: "ADMIN",
+      });
+    });
+  });
+
+  describe("transferAdmin", () => {
+    it("현재 ADMIN을 MEMBER로 내리고 대상 멤버를 ADMIN으로 올린다", async () => {
+      await storage.transferAdmin(1, 100, 200);
+
+      expect(mockDb.update).toHaveBeenCalledWith(workspaceMembers);
+      expect(mockDb.set).toHaveBeenCalledWith({
+        role: "MEMBER",
+      });
+    });
+  });
+
+  describe("deleteWorkspace", () => {
+    it("워크스페이스를 삭제한다", async () => {
+      await storage.deleteWorkspace(1);
+
+      expect(mockDb.delete).toHaveBeenCalledWith(workspaces);
       expect(mockDb.where).toHaveBeenCalled();
     });
   });

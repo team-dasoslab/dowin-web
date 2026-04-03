@@ -606,6 +606,107 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+    delete:
+      summary: "[ADMIN] 워크스페이스 삭제"
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: 삭제 성공
+        "403":
+          description: 해당 워크스페이스 관리자 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/{id}/leave:
+    delete:
+      summary: 워크스페이스 탈퇴
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: 탈퇴 성공
+        "403":
+          description: 해당 워크스페이스 접근 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 대상 워크스페이스 또는 멤버십을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: ADMIN은 권한 이전 또는 삭제 없이 바로 탈퇴할 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/{id}/transfer-admin:
+    post:
+      summary: "[ADMIN] 워크스페이스 관리자 권한 이전"
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceTransferAdminRequest"
+      responses:
+        "200":
+          description: 이전 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message]
+                properties:
+                  message:
+                    type: string
+                    example: 관리자 권한을 이전했습니다.
+        "403":
+          description: 관리자 권한 없음 또는 자기 자신에게 이전 시도
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 대상 멤버를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
 
   /workspaces/{id}/members/{memberId}:
     delete:
@@ -1499,6 +1600,14 @@ components:
       required: [name]
       properties:
         name: { type: string }
+
+    WorkspaceTransferAdminRequest:
+      type: object
+      required: [memberId]
+      properties:
+        memberId:
+          type: integer
+          minimum: 1
 
     LeadMeasure:
       type: object

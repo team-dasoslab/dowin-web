@@ -4,14 +4,16 @@ import type { WorkspaceMember } from "@/api/generated/wig.schemas";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { UserX } from "lucide-react";
+import { Shield, UserX } from "lucide-react";
 
 interface MemberListItemProps {
   member: WorkspaceMember;
   index: number;
   totalCount: number;
   isPendingDelete: boolean;
+  isPendingTransfer: boolean;
   onRemove: (memberId: number, nickname: string) => void;
+  onTransferAdmin: (memberId: number, nickname: string) => void;
 }
 
 export function MemberListItem({
@@ -19,11 +21,15 @@ export function MemberListItem({
   index,
   totalCount,
   isPendingDelete,
+  isPendingTransfer,
   onRemove,
+  onTransferAdmin,
 }: MemberListItemProps) {
   const memberId = member.id ?? 0;
   const nickname = member.nickname ?? "이름 없음";
   const isSelf = member.isMe === true;
+  const canTransferAdmin = !isSelf && member.role !== "ADMIN" && memberId > 0;
+  const canRemove = !isSelf && memberId > 0;
 
   return (
     <div
@@ -61,19 +67,33 @@ export function MemberListItem({
         </div>
       </div>
 
-      <Button
-        type="button"
-        disabled={isSelf || isPendingDelete || memberId <= 0}
-        onClick={() => onRemove(memberId, nickname)}
-        className={`flex min-w-fit items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
-          isSelf
-            ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
-            : "border border-danger/20 bg-danger/5 text-danger hover:bg-danger/10"
-        }`}
-      >
-        <UserX className="h-3.5 w-3.5" />
-        <span>{isPendingDelete ? "처리 중..." : "퇴출"}</span>
-      </Button>
+      <div className="flex items-center gap-2">
+        {canTransferAdmin ? (
+          <Button
+            type="button"
+            disabled={isPendingTransfer || isPendingDelete}
+            onClick={() => onTransferAdmin(memberId, nickname)}
+            className="flex min-w-fit items-center justify-center gap-1.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/10"
+          >
+            <Shield className="h-3.5 w-3.5" />
+            <span>{isPendingTransfer ? "처리 중..." : "권한 이전"}</span>
+          </Button>
+        ) : null}
+
+        <Button
+          type="button"
+          disabled={!canRemove || isPendingDelete || isPendingTransfer}
+          onClick={() => onRemove(memberId, nickname)}
+          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+            canRemove
+              ? "border border-danger/20 bg-danger/5 text-danger hover:bg-danger/10"
+              : "cursor-not-allowed border border-border bg-sub-background text-text-muted"
+          }`}
+        >
+          <UserX className="h-3.5 w-3.5" />
+          <span>{isPendingDelete ? "처리 중..." : "퇴출"}</span>
+        </Button>
+      </div>
     </div>
   );
 }

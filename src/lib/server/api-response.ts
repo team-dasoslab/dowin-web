@@ -17,6 +17,7 @@ export type ErrorCode =
   | "INVITE_CODE_USAGE_LIMIT_REACHED"
   | "CUSTOM_ID_ALREADY_EXISTS"
   | "ALREADY_IN_WORKSPACE"
+  | "ADMIN_TRANSFER_REQUIRED"
   | "CANNOT_REMOVE_LAST_ADMIN"
   | "ACTIVE_SCOREBOARD_EXISTS"
   | "SCOREBOARD_ALREADY_ACTIVE"
@@ -43,6 +44,8 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
     "초대 코드 사용 가능 횟수를 모두 사용했습니다.",
   CUSTOM_ID_ALREADY_EXISTS: "이미 사용 중인 아이디입니다.",
   ALREADY_IN_WORKSPACE: "이미 워크스페이스에 소속되어 있습니다.",
+  ADMIN_TRANSFER_REQUIRED:
+    "관리자는 권한 이전 또는 워크스페이스 삭제 후에만 탈퇴할 수 있습니다.",
   CANNOT_REMOVE_LAST_ADMIN: "마지막 관리자는 퇴출할 수 없습니다.",
   ACTIVE_SCOREBOARD_EXISTS: "이미 활성화된 점수판이 있습니다.",
   SCOREBOARD_ALREADY_ACTIVE: "이미 활성화된 점수판입니다.",
@@ -71,6 +74,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   INVITE_CODE_USAGE_LIMIT_REACHED: 409,
   CUSTOM_ID_ALREADY_EXISTS: 409,
   ALREADY_IN_WORKSPACE: 409,
+  ADMIN_TRANSFER_REQUIRED: 409,
   ACTIVE_SCOREBOARD_EXISTS: 409,
   VALIDATION_ERROR: 422,
   INTERNAL_ERROR: 500,

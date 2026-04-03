@@ -27,6 +27,7 @@ import type {
 import type {
   ErrorResponse,
   PostWorkspacesBody,
+  PostWorkspacesIdTransferAdmin200,
   PostWorkspacesJoin200,
   PostWorkspacesJoinBody,
   PostWorkspacesJoinByInvite200,
@@ -37,7 +38,8 @@ import type {
   WorkspaceInviteCreateRequest,
   WorkspaceInviteStatusUpdateRequest,
   WorkspaceJoinByInviteRequest,
-  WorkspaceMember
+  WorkspaceMember,
+  WorkspaceTransferAdminRequest
 } from '../wig.schemas';
 
 import { customInstance } from '../../mutator';
@@ -1016,6 +1018,312 @@ export const usePutWorkspacesId = <TError = UnauthorizedErrorResponse | ErrorRes
         TContext
       > => {
       return useMutation(getPutWorkspacesIdMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary [ADMIN] 워크스페이스 삭제
+ */
+export type deleteWorkspacesIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteWorkspacesIdResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type deleteWorkspacesIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteWorkspacesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteWorkspacesIdResponseSuccess = (deleteWorkspacesIdResponse204) & {
+  headers: Headers;
+};
+export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | deleteWorkspacesIdResponse403 | deleteWorkspacesIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteWorkspacesIdResponse = (deleteWorkspacesIdResponseSuccess | deleteWorkspacesIdResponseError)
+
+export const getDeleteWorkspacesIdUrl = (id: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}`
+}
+
+export const deleteWorkspacesId = async (id: number, options?: RequestInit): Promise<deleteWorkspacesIdResponse> => {
+  
+  return customInstance<deleteWorkspacesIdResponse>(getDeleteWorkspacesIdUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getDeleteWorkspacesIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteWorkspacesId'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesId>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteWorkspacesId(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkspacesIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesId>>>
+    
+    export type DeleteWorkspacesIdMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary [ADMIN] 워크스페이스 삭제
+ */
+export const useDeleteWorkspacesId = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkspacesId>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteWorkspacesIdMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 워크스페이스 탈퇴
+ */
+export type deleteWorkspacesIdLeaveResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteWorkspacesIdLeaveResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type deleteWorkspacesIdLeaveResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteWorkspacesIdLeaveResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteWorkspacesIdLeaveResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type deleteWorkspacesIdLeaveResponseSuccess = (deleteWorkspacesIdLeaveResponse204) & {
+  headers: Headers;
+};
+export type deleteWorkspacesIdLeaveResponseError = (deleteWorkspacesIdLeaveResponse401 | deleteWorkspacesIdLeaveResponse403 | deleteWorkspacesIdLeaveResponse404 | deleteWorkspacesIdLeaveResponse409) & {
+  headers: Headers;
+};
+
+export type deleteWorkspacesIdLeaveResponse = (deleteWorkspacesIdLeaveResponseSuccess | deleteWorkspacesIdLeaveResponseError)
+
+export const getDeleteWorkspacesIdLeaveUrl = (id: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}/leave`
+}
+
+export const deleteWorkspacesIdLeave = async (id: number, options?: RequestInit): Promise<deleteWorkspacesIdLeaveResponse> => {
+  
+  return customInstance<deleteWorkspacesIdLeaveResponse>(getDeleteWorkspacesIdLeaveUrl(id),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getDeleteWorkspacesIdLeaveMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteWorkspacesIdLeave'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteWorkspacesIdLeave(id,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkspacesIdLeaveMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>>
+    
+    export type DeleteWorkspacesIdLeaveMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 워크스페이스 탈퇴
+ */
+export const useDeleteWorkspacesIdLeave = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteWorkspacesIdLeaveMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary [ADMIN] 워크스페이스 관리자 권한 이전
+ */
+export type postWorkspacesIdTransferAdminResponse200 = {
+  data: PostWorkspacesIdTransferAdmin200
+  status: 200
+}
+
+export type postWorkspacesIdTransferAdminResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postWorkspacesIdTransferAdminResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postWorkspacesIdTransferAdminResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postWorkspacesIdTransferAdminResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postWorkspacesIdTransferAdminResponseSuccess = (postWorkspacesIdTransferAdminResponse200) & {
+  headers: Headers;
+};
+export type postWorkspacesIdTransferAdminResponseError = (postWorkspacesIdTransferAdminResponse401 | postWorkspacesIdTransferAdminResponse403 | postWorkspacesIdTransferAdminResponse404 | postWorkspacesIdTransferAdminResponse422) & {
+  headers: Headers;
+};
+
+export type postWorkspacesIdTransferAdminResponse = (postWorkspacesIdTransferAdminResponseSuccess | postWorkspacesIdTransferAdminResponseError)
+
+export const getPostWorkspacesIdTransferAdminUrl = (id: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}/transfer-admin`
+}
+
+export const postWorkspacesIdTransferAdmin = async (id: number,
+    workspaceTransferAdminRequest: WorkspaceTransferAdminRequest, options?: RequestInit): Promise<postWorkspacesIdTransferAdminResponse> => {
+  
+  return customInstance<postWorkspacesIdTransferAdminResponse>(getPostWorkspacesIdTransferAdminUrl(id),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      workspaceTransferAdminRequest,)
+  }
+);}
+  
+
+
+
+export const getPostWorkspacesIdTransferAdminMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: number;data: WorkspaceTransferAdminRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: number;data: WorkspaceTransferAdminRequest}, TContext> => {
+
+const mutationKey = ['postWorkspacesIdTransferAdmin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, {id: number;data: WorkspaceTransferAdminRequest}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  postWorkspacesIdTransferAdmin(id,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostWorkspacesIdTransferAdminMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>>
+    export type PostWorkspacesIdTransferAdminMutationBody = WorkspaceTransferAdminRequest
+    export type PostWorkspacesIdTransferAdminMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary [ADMIN] 워크스페이스 관리자 권한 이전
+ */
+export const usePostWorkspacesIdTransferAdmin = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: number;data: WorkspaceTransferAdminRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>,
+        TError,
+        {id: number;data: WorkspaceTransferAdminRequest},
+        TContext
+      > => {
+      return useMutation(getPostWorkspacesIdTransferAdminMutationOptions(options), queryClient);
     }
     /**
  * @summary [ADMIN] 워크스페이스 멤버 강제 퇴출

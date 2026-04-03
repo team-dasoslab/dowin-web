@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
+import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import {
   Bell,
   ChevronRight,
@@ -21,6 +22,7 @@ import {
   Smartphone,
   Sparkles,
   Ticket,
+  Trash2,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -44,24 +46,30 @@ export default function ProfilePage() {
   const hasHandledMissingUserRef = useRef(false);
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
-  const { data: workspaceResponse } = useGetWorkspacesMe({
+  const { data: workspaceResponse, error: workspaceError } = useGetWorkspacesMe({
     query: {
       retry: false,
     },
   });
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
+  const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const workspace =
-    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+    !hasNoWorkspace && workspaceResponse?.status === 200
+      ? workspaceResponse.data
+      : null;
   const nickname = user?.nickname ?? "사용자";
   const customId = user?.customId ?? "";
   const avatarKey = user?.avatarKey ?? null;
-  const isWorkspaceAdmin = user?.role === "ADMIN";
+  const hasWorkspace = workspace !== null;
+  const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
   const {
     changeNickname,
     changePassword,
     changeWorkspaceName,
+    deleteWorkspace,
     isActionPending,
+    leaveWorkspace,
     logout,
     pendingAction,
   } = useProfileActions({
@@ -122,32 +130,57 @@ export default function ProfilePage() {
     },
     {
       label: "워크스페이스",
-      items: isWorkspaceAdmin
-        ? [
-            {
-              id: "workspace-name",
-              icon: <Edit2 className="w-3.5 h-3.5" />,
-              title: "워크스페이스 이름 변경",
-              description: "팀 공간 이름을 현재 운영 방식에 맞게 바꿉니다.",
-              onClick: () => {
-                void changeWorkspaceName();
+      items: hasWorkspace
+        ? isWorkspaceAdmin
+          ? [
+              {
+                id: "workspace-name",
+                icon: <Edit2 className="w-3.5 h-3.5" />,
+                title: "워크스페이스 이름 변경",
+                description: "팀 공간 이름을 현재 운영 방식에 맞게 바꿉니다.",
+                onClick: () => {
+                  void changeWorkspaceName();
+                },
               },
-            },
-            {
-              id: "members",
-              icon: <Users className="w-3.5 h-3.5" />,
-              title: "멤버 관리",
-              description: "워크스페이스 멤버 조회와 퇴출을 관리합니다.",
-              href: "/profile/members",
-            },
-            {
-              id: "invites",
-              icon: <Ticket className="w-3.5 h-3.5" />,
-              title: "초대코드 관리",
-              description: "초대코드 생성과 활성/비활성 상태를 관리합니다.",
-              href: "/profile/invites",
-            },
-          ]
+              {
+                id: "members",
+                icon: <Users className="w-3.5 h-3.5" />,
+                title: "멤버 관리",
+                description: "워크스페이스 멤버 조회와 퇴출을 관리합니다.",
+                href: "/profile/members",
+              },
+              {
+                id: "invites",
+                icon: <Ticket className="w-3.5 h-3.5" />,
+                title: "초대코드 관리",
+                description: "초대코드 생성과 활성/비활성 상태를 관리합니다.",
+                href: "/profile/invites",
+              },
+              {
+                id: "workspace-delete",
+                icon: <Trash2 className="w-3.5 h-3.5" />,
+                title: "워크스페이스 삭제",
+                description:
+                  "멤버, 점수판, 선행지표, 기록을 포함한 모든 데이터를 삭제합니다.",
+                danger: true,
+                onClick: () => {
+                  void deleteWorkspace();
+                },
+              },
+            ]
+          : [
+              {
+                id: "workspace-leave",
+                icon: <LogOut className="w-3.5 h-3.5" />,
+                title: "워크스페이스 탈퇴",
+                description:
+                  "현재 워크스페이스에서 나가고 기록 화면으로 돌아갑니다.",
+                danger: true,
+                onClick: () => {
+                  void leaveWorkspace();
+                },
+              },
+            ]
         : [],
     },
     {
@@ -210,23 +243,6 @@ export default function ProfilePage() {
         },
       ],
     },
-    // {
-    //   label: "위험 구역",
-    //   items: [
-    //     {
-    //       id: "delete",
-    //       icon: <Trash2 className="w-3.5 h-3.5 text-danger" />,
-    //       title: "서비스 탈퇴",
-    //       description: "모든 데이터가 삭제되며 복구할 수 없습니다.",
-    //       danger: true,
-    //       onClick: () => {
-    //         if (confirm("정말 탈퇴하시겠습니까? 기록이 모두 사라집니다.")) {
-    //           void handleLogout();
-    //         }
-    //       },
-    //     },
-    //   ],
-    // },
   ];
 
   return (
@@ -239,6 +255,10 @@ export default function ProfilePage() {
               ? "닉네임을 변경하는 중입니다."
               : pendingAction === "workspace-name"
                 ? "워크스페이스 이름을 변경하는 중입니다."
+                : pendingAction === "workspace-leave"
+                  ? "워크스페이스에서 탈퇴하는 중입니다."
+                  : pendingAction === "workspace-delete"
+                    ? "워크스페이스를 삭제하는 중입니다."
                 : pendingAction === "password"
                   ? "비밀번호를 변경하는 중입니다."
                   : "로그아웃하는 중입니다."

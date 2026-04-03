@@ -8,6 +8,7 @@ import {
 import { NoWorkspaceActions } from "@/app/(protected)/_components/NoWorkspaceActions";
 import { MemberListItem } from "@/app/(protected)/profile/members/_components/MemberListItem";
 import { useRemoveWorkspaceMember } from "@/app/(protected)/profile/members/_hooks/useRemoveWorkspaceMember";
+import { useTransferWorkspaceAdmin } from "@/app/(protected)/profile/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
@@ -45,6 +46,9 @@ export default function ProfileMembersPage() {
     });
 
   const { pendingDeleteMemberId, removeMember } = useRemoveWorkspaceMember({
+    workspaceId,
+  });
+  const { pendingTransferMemberId, transferAdmin } = useTransferWorkspaceAdmin({
     workspaceId,
   });
 
@@ -127,8 +131,8 @@ export default function ProfileMembersPage() {
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">현재 멤버</h2>
             <p className="text-[11px] text-text-muted">
-              관리자는 멤버를 퇴출할 수 있지만, 자기 자신이나 마지막 관리자는
-              퇴출할 수 없습니다.
+              관리자는 멤버를 퇴출할 수 있고, 다른 멤버에게 관리자 권한도
+              이전할 수 있습니다.
             </p>
           </div>
 
@@ -148,8 +152,14 @@ export default function ProfileMembersPage() {
                     index={index}
                     totalCount={members.length}
                     isPendingDelete={pendingDeleteMemberId === (member.id ?? 0)}
+                    isPendingTransfer={
+                      pendingTransferMemberId === (member.id ?? 0)
+                    }
                     onRemove={(memberId, memberNickname) => {
                       void removeMember(memberId, memberNickname);
+                    }}
+                    onTransferAdmin={(memberId, memberNickname) => {
+                      void transferAdmin(memberId, memberNickname);
                     }}
                   />
                 );

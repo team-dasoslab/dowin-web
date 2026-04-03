@@ -120,6 +120,35 @@ export class WorkspaceStorage {
       );
   }
 
+  async updateMemberRole(
+    workspaceId: number,
+    userId: number,
+    role: "ADMIN" | "MEMBER",
+  ): Promise<void> {
+    await this.db
+      .update(workspaceMembers)
+      .set({ role })
+      .where(
+        and(
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.userId, userId),
+        ),
+      );
+  }
+
+  async transferAdmin(
+    workspaceId: number,
+    currentAdminUserId: number,
+    nextAdminUserId: number,
+  ): Promise<void> {
+    await this.updateMemberRole(workspaceId, nextAdminUserId, "ADMIN");
+    await this.updateMemberRole(workspaceId, currentAdminUserId, "MEMBER");
+  }
+
+  async deleteWorkspace(workspaceId: number): Promise<void> {
+    await this.db.delete(workspaces).where(eq(workspaces.id, workspaceId));
+  }
+
   async createInvite(input: {
     workspaceId: number;
     code: string;

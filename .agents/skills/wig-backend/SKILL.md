@@ -98,6 +98,19 @@ If browser-based Storybook verification matters, run separately:
 yarn test:storybook --run
 ```
 
+### 6. Commit order
+
+When backend work is committed in multiple steps, prefer this order:
+
+1. API spec
+2. tests
+3. implementation
+4. docs
+
+This does not change the implementation workflow above.
+You should still design and write tests before or alongside implementation when the behavior change warrants it.
+The rule here is about how to split and order commits so review stays clear.
+
 ## Backend Checklist
 
 - If this is a new or changed API, was `src/api-spec/openapi.yaml` updated first?

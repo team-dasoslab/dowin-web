@@ -32,6 +32,10 @@ export const workspaceInviteStatusUpdateSchema = z.object({
   status: z.enum(["ACTIVE", "INACTIVE"]),
 });
 
+export const workspaceTransferAdminSchema = z.object({
+  memberId: z.number().int().positive(),
+});
+
 export const workspaceParamsSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
