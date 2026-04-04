@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { Check, Copy, LogIn, UserPlus, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 
 type AuthMode = "login" | "signup";
@@ -44,7 +45,32 @@ export default function LoginPageClient() {
   const signupMutation = usePostAuthSignup();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showToast } = useToast();
   const isPending = loginMutation.isPending || signupMutation.isPending;
+
+  useEffect(() => {
+    const rawFlashToast = window.sessionStorage.getItem("wig.flash.toast");
+    if (!rawFlashToast) {
+      return;
+    }
+
+    window.sessionStorage.removeItem("wig.flash.toast");
+
+    try {
+      const parsed = JSON.parse(rawFlashToast) as {
+        message?: string;
+        type?: "success" | "error" | "info";
+      };
+
+      if (!parsed.message || !parsed.type) {
+        return;
+      }
+
+      showToast(parsed.type, parsed.message);
+    } catch {
+      // Ignore malformed flash toast payloads.
+    }
+  }, [showToast]);
 
   const resetErrorAndSwitchMode = (nextMode: AuthMode) => {
     setError("");

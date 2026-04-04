@@ -66,7 +66,6 @@ export default function ProfilePage() {
   const {
     changeNickname,
     changeWorkspaceName,
-    deleteAccount,
     deleteWorkspace,
     isActionPending,
     leaveWorkspace,
@@ -122,6 +121,25 @@ export default function ProfilePage() {
           title: "비밀번호 변경",
           description: "계정 보안을 위해 비밀번호를 재설정합니다.",
           href: "/profile/password",
+        },
+        {
+          id: "logout",
+          icon: <LogOut className="w-3.5 h-3.5" />,
+          title: "로그아웃",
+          description: "현재 기기에서 세션을 종료합니다.",
+          danger: false,
+          onClick: () => {
+            void logout();
+          },
+        },
+        {
+          id: "account-delete",
+          icon: <Trash2 className="w-3.5 h-3.5" />,
+          title: "서비스 탈퇴",
+          description:
+            "계정과 연결된 데이터를 삭제하고 로그인 화면으로 돌아갑니다.",
+          danger: true,
+          href: "/profile/delete-account",
         },
       ],
     },
@@ -222,36 +240,6 @@ export default function ProfilePage() {
           title: "iPhone 앱 설치 가이드",
           description: "Safari에서 홈 화면에 추가하는 순서를 안내합니다.",
           href: "/install-guide",
-        },
-      ],
-    },
-    {
-      label: "세션",
-      items: [
-        {
-          id: "logout",
-          icon: <LogOut className="w-3.5 h-3.5" />,
-          title: "로그아웃",
-          description: "현재 기기에서 세션을 종료합니다.",
-          danger: false,
-          onClick: () => {
-            void logout();
-          },
-        },
-      ],
-    },
-    {
-      label: "위험 구역",
-      items: [
-        {
-          id: "account-delete",
-          icon: <Trash2 className="w-3.5 h-3.5" />,
-          title: "서비스 탈퇴",
-          description: "계정과 연결된 데이터를 삭제하고 로그인 화면으로 돌아갑니다.",
-          danger: true,
-          onClick: () => {
-            void deleteAccount();
-          },
         },
       ],
     },
