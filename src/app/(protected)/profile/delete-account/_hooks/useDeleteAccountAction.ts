@@ -38,6 +38,14 @@ export const useDeleteAccountAction = ({
       if (response.status !== 204) {
         throw response;
       }
+
+      window.sessionStorage.setItem(
+        "wig.flash.toast",
+        JSON.stringify({
+          message: "탈퇴를 완료했어요. 다음에 또 만나요.",
+          type: "success",
+        }),
+      );
     } catch (error) {
       showToast(
         "error",
