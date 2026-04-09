@@ -3,6 +3,7 @@
 import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { LeadMeasureGuideTooltip } from "@/app/(protected)/dashboard/my/_components/LeadMeasureGuideTooltip";
+import { isEditableDailyLogDate } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import { Button } from "@/components/ui/Button";
@@ -138,6 +139,7 @@ function WeeklyMobileCardDay({
   value,
 }: WeeklyMobileCardDayProps) {
   const isToday = date === today;
+  const isEditable = isEditableDailyLogDate(date, today);
   const currentLogKey = leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
   const isPending = currentLogKey !== null && pendingLogKeys.has(currentLogKey);
 
@@ -151,9 +153,9 @@ function WeeklyMobileCardDay({
         {dayLabel}
       </p>
       <Button
-        disabled={isPending || leadMeasureId === null}
+        disabled={isPending || !isEditable || leadMeasureId === null}
         onClick={() => {
-          if (leadMeasureId !== null) {
+          if (leadMeasureId !== null && isEditable) {
             onBeforeToggle();
             void toggleLog(leadMeasureId, date);
           }
@@ -164,7 +166,11 @@ function WeeklyMobileCardDay({
             : isToday
               ? "border-primary/30 bg-primary/5 text-primary"
               : "border-border bg-sub-background text-text-muted"
-        } ${isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
+        } ${
+          isPending || !isEditable
+            ? "cursor-not-allowed opacity-50"
+            : "cursor-pointer"
+        }`}
       >
         {value === true ? (
           <Check className="mx-auto h-3.5 w-3.5" />

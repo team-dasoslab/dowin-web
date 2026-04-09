@@ -24,7 +24,8 @@ export type ErrorCode =
   | "SCOREBOARD_ALREADY_ACTIVE"
   | "SCOREBOARD_ARCHIVED"
   | "LEAD_MEASURE_ARCHIVED"
-  | "FUTURE_DATE_NOT_ALLOWED";
+  | "FUTURE_DATE_NOT_ALLOWED"
+  | "PAST_WEEK_LOG_EDIT_NOT_ALLOWED";
 
 const ERROR_MESSAGES: Record<ErrorCode, string> = {
   UNAUTHORIZED: "로그인이 필요합니다.",
@@ -55,6 +56,8 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   SCOREBOARD_ARCHIVED: "보관된 점수판은 수정할 수 없습니다.",
   LEAD_MEASURE_ARCHIVED: "보관된 선행지표에는 기록을 추가할 수 없습니다.",
   FUTURE_DATE_NOT_ALLOWED: "미래 날짜에는 기록할 수 없습니다.",
+  PAST_WEEK_LOG_EDIT_NOT_ALLOWED:
+    "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
 };
 
 const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
@@ -65,6 +68,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   WRONG_PASSWORD: 400,
   LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN: 403,
   FUTURE_DATE_NOT_ALLOWED: 400,
+  PAST_WEEK_LOG_EDIT_NOT_ALLOWED: 403,
   SCOREBOARD_ALREADY_ACTIVE: 400,
   FORBIDDEN: 403,
   TEST_ACCOUNT_WRITE_RESTRICTED: 403,

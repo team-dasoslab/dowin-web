@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DailyLogService } from "@/domain/daily-log/services/daily-log.service";
 
 describe("DailyLogService", () => {
@@ -20,9 +20,31 @@ describe("DailyLogService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-09T12:00:00+09:00"));
   });
 
-  it("미래 날짜도 기록할 수 있다", async () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("이번 주 이전 날짜는 기록할 수 없다", async () => {
+    await expect(service.upsertLog(10, 100, "2026-04-05", true)).rejects.toThrow(
+      "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
+    );
+    expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
+    expect(upsertLog).not.toHaveBeenCalled();
+  });
+
+  it("이번 주 이전 날짜는 삭제할 수 없다", async () => {
+    await expect(service.deleteLog(10, 100, "2026-04-05")).rejects.toThrow(
+      "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
+    );
+    expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
+    expect(deleteLog).not.toHaveBeenCalled();
+  });
+
+  it("이번 주 날짜는 기록할 수 있다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
     findOwnedLeadMeasure.mockResolvedValue({
       id: 10,
@@ -32,17 +54,17 @@ describe("DailyLogService", () => {
     upsertLog.mockResolvedValue({
       id: 1,
       leadMeasureId: 10,
-      logDate: "2999-01-01",
+      logDate: "2026-04-09",
       value: true,
     });
 
-    await expect(service.upsertLog(10, 100, "2999-01-01", true)).resolves.toEqual({
+    await expect(service.upsertLog(10, 100, "2026-04-09", true)).resolves.toEqual({
       id: 1,
       leadMeasureId: 10,
-      logDate: "2999-01-01",
+      logDate: "2026-04-09",
       value: true,
     });
-    expect(upsertLog).toHaveBeenCalledWith(10, "2999-01-01", true);
+    expect(upsertLog).toHaveBeenCalledWith(10, "2026-04-09", true);
   });
 
   it("ARCHIVED 선행지표에는 기록할 수 없다", async () => {
@@ -54,7 +76,7 @@ describe("DailyLogService", () => {
     });
 
     await expect(
-      service.upsertLog(10, 100, "2026-03-15", true),
+      service.upsertLog(10, 100, "2026-04-09", true),
     ).rejects.toThrow("LEAD_MEASURE_ARCHIVED");
   });
 

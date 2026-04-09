@@ -50,6 +50,7 @@ export class DailyLogService {
     date: string,
     value: boolean,
   ): Promise<DailyLogRecord> {
+    assertPastWeekLogEditable(date);
     const measure = await this.getOwnedLeadMeasure(leadMeasureId, userId);
 
     if (measure.status === "ARCHIVED") {
@@ -60,6 +61,7 @@ export class DailyLogService {
   }
 
   async deleteLog(leadMeasureId: number, userId: number, date: string): Promise<void> {
+    assertPastWeekLogEditable(date);
     await this.getOwnedLeadMeasure(leadMeasureId, userId);
     await this.dailyLogStorage.deleteLog(leadMeasureId, date);
   }
@@ -353,12 +355,7 @@ function getWeeklyGuide({
 }
 
 function getCurrentWeekStart() {
-  const today = new Date();
-  const day = today.getDay();
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(today);
-  monday.setDate(diff);
-  return formatDateLocal(monday);
+  return getWeekStart(getTodayInKst());
 }
 
 function getWeekDates(weekStart: string) {
@@ -442,5 +439,18 @@ function pad2(value: number) {
 function formatDateLocal(date: Date) {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(
     date.getDate(),
+  )}`;
+}
+
+function assertPastWeekLogEditable(date: string) {
+  if (date < getCurrentWeekStart()) {
+    throw new ForbiddenError("PAST_WEEK_LOG_EDIT_NOT_ALLOWED");
+  }
+}
+
+function getTodayInKst(referenceDate: Date = new Date()) {
+  const kstDate = new Date(referenceDate.getTime() + 9 * 60 * 60 * 1000);
+  return `${kstDate.getUTCFullYear()}-${pad2(kstDate.getUTCMonth() + 1)}-${pad2(
+    kstDate.getUTCDate(),
   )}`;
 }

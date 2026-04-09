@@ -4,6 +4,7 @@ import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { LeadMeasureGuideTooltip } from "@/app/(protected)/dashboard/my/_components/LeadMeasureGuideTooltip";
 import { WeeklyMobileCards } from "@/app/(protected)/dashboard/my/_components/WeeklyMobileCards";
+import { isEditableDailyLogDate } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
@@ -137,6 +138,7 @@ export function WeeklyBoardSection({
                             ? null
                             : weekly.logs[date];
                         const isToday = date === today;
+                        const isEditable = isEditableDailyLogDate(date, today);
                         const currentLogKey =
                           leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
                         const isPending =
@@ -145,9 +147,11 @@ export function WeeklyBoardSection({
                         return (
                           <td key={date} className="py-3 text-center">
                             <Button
-                              disabled={isPending || leadMeasureId === null}
+                              disabled={
+                                isPending || !isEditable || leadMeasureId === null
+                              }
                               onClick={() => {
-                                if (leadMeasureId !== null) {
+                                if (leadMeasureId !== null && isEditable) {
                                   onBeforeToggle();
                                   void toggleLog(leadMeasureId, date);
                                 }
@@ -158,7 +162,11 @@ export function WeeklyBoardSection({
                                   : isToday
                                     ? "border-primary/30 bg-primary/5 text-primary"
                                     : "border-border bg-sub-background text-text-muted"
-                              } ${isPending ? "cursor-not-allowed" : "cursor-pointer"}`}
+                              } ${
+                                isPending || !isEditable
+                                  ? "cursor-not-allowed opacity-50"
+                                  : "cursor-pointer"
+                              }`}
                             >
                               {currentValue === true ? (
                                 <Check className="h-3.5 w-3.5" />

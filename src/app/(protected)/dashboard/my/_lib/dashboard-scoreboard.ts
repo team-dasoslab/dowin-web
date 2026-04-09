@@ -5,6 +5,7 @@ import {
 } from "@/api/generated/daily-log/daily-log";
 import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
 import { toNumberId } from "@/lib/client/frontend-api";
+import { getWeekDates } from "@/app/(protected)/dashboard/my/_lib/week";
 
 export type WeeklyLogsQueryData =
   | getScoreboardsScoreboardIdLogsWeeklyResponse200
@@ -34,6 +35,16 @@ export type WeeklyTrendPoint = {
 
 export const getNextLogValue = (value: DailyLogValue): DailyLogValue => {
   return value === true ? null : true;
+};
+
+export const isEditableDailyLogDate = (date: string, today: string) => {
+  const currentWeekStart = getWeekDates(today)[0];
+
+  if (!currentWeekStart) {
+    return true;
+  }
+
+  return date >= currentWeekStart;
 };
 
 export const isDashboardView = (
