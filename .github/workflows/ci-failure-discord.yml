@@ -1,0 +1,42 @@
+name: PR CI Failure Discord Notification
+
+on:
+  workflow_run:
+    workflows:
+      - PR CI
+    types:
+      - completed
+
+jobs:
+  notify-discord:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          REPOSITORY: ${{ github.repository }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          BRANCH_NAME: ${{ github.event.workflow_run.head_branch }}
+          ACTOR: ${{ github.event.workflow_run.actor.login }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          jq -n \
+            --arg repository "$REPOSITORY" \
+            --arg workflow "$WORKFLOW_NAME" \
+            --arg branch "$BRANCH_NAME" \
+            --arg actor "$ACTOR" \
+            --arg runUrl "https://github.com/$REPOSITORY/actions/runs/$RUN_ID" \
+            '{
+              content: ("PR CI failed\n"
+                + "repo: " + $repository + "\n"
+                + "workflow: " + $workflow + "\n"
+                + "branch: " + $branch + "\n"
+                + "actor: " + $actor + "\n"
+                + "run: " + $runUrl)
+            }' \
+          | curl -sS -X POST \
+              -H "Content-Type: application/json" \
+              --data @- \
+              "$DISCORD_WEBHOOK_URL"
