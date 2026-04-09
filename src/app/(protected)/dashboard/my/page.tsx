@@ -47,6 +47,7 @@ export default function MyDashboardPage() {
     today,
     toggleLog,
     weekDates,
+    weeklyGuideById,
     weekLabel,
     weeklyTrendPoints,
     weeklyOverallRate,
@@ -178,6 +179,7 @@ export default function MyDashboardPage() {
               today={today}
               toggleLog={toggleLog}
               weekDates={weekDates}
+              weeklyGuideById={weeklyGuideById}
               weeklyById={weeklyById}
             />
           )}

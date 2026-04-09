@@ -1,9 +1,14 @@
+"use client";
+
+import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
+import { LeadMeasureGuideTooltip } from "@/app/(protected)/dashboard/my/_components/LeadMeasureGuideTooltip";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { Check } from "lucide-react";
+import { useState } from "react";
 
 type WeeklyMobileCardsProps = {
   activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
@@ -12,6 +17,7 @@ type WeeklyMobileCardsProps = {
   today: string;
   toggleLog: ReturnType<typeof useDashboardScoreboard>["toggleLog"];
   weekDates: string[];
+  weeklyGuideById: Map<number | null, WeeklyLogGuide | null>;
   weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
 };
 
@@ -22,6 +28,7 @@ type WeeklyMobileCardProps = {
   today: string;
   toggleLog: WeeklyMobileCardsProps["toggleLog"];
   weekDates: string[];
+  weeklyGuideById: WeeklyMobileCardsProps["weeklyGuideById"];
   weeklyById: WeeklyMobileCardsProps["weeklyById"];
 };
 
@@ -48,20 +55,33 @@ function WeeklyMobileCard({
   today,
   toggleLog,
   weekDates,
+  weeklyGuideById,
   weeklyById,
 }: WeeklyMobileCardProps) {
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const leadMeasureId = toNumberId(leadMeasure.id);
   const weekly = weeklyById.get(leadMeasureId);
   const achievedCount = weekly?.achieved ?? 0;
   const targetValue = leadMeasure.targetValue ?? 0;
+  const guide = weeklyGuideById.get(leadMeasureId);
 
   return (
     <div className="rounded-lg border border-border bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-text-primary">
-            {leadMeasure.name}
-          </p>
+          <div className="flex items-center gap-1">
+            <p className="min-w-0 truncate text-sm font-semibold text-text-primary">
+              {leadMeasure.name}
+            </p>
+            {guide ? (
+              <LeadMeasureGuideTooltip
+                active={isGuideOpen}
+                guide={guide}
+                onClose={() => setIsGuideOpen(false)}
+                onToggle={() => setIsGuideOpen((open) => !open)}
+              />
+            ) : null}
+          </div>
           <p className="text-[11px] text-text-muted">
             목표 {targetValue}회 /{" "}
             {leadMeasure.period === "DAILY"

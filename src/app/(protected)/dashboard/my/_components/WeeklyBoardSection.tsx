@@ -1,9 +1,14 @@
+"use client";
+
+import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
+import { LeadMeasureGuideTooltip } from "@/app/(protected)/dashboard/my/_components/LeadMeasureGuideTooltip";
 import { WeeklyMobileCards } from "@/app/(protected)/dashboard/my/_components/WeeklyMobileCards";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { Check } from "lucide-react";
+import { useState } from "react";
 
 interface WeeklyBoardSectionProps {
   activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
@@ -12,6 +17,7 @@ interface WeeklyBoardSectionProps {
   today: string;
   toggleLog: ReturnType<typeof useDashboardScoreboard>["toggleLog"];
   weekDates: string[];
+  weeklyGuideById: Map<number | null, WeeklyLogGuide | null>;
   weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
 }
 
@@ -22,8 +28,11 @@ export function WeeklyBoardSection({
   today,
   toggleLog,
   weekDates,
+  weeklyGuideById,
   weeklyById,
 }: WeeklyBoardSectionProps) {
+  const [activeGuideId, setActiveGuideId] = useState<number | null>(null);
+
   return (
     <>
       <WeeklyMobileCards
@@ -33,10 +42,11 @@ export function WeeklyBoardSection({
         today={today}
         toggleLog={toggleLog}
         weekDates={weekDates}
+        weeklyGuideById={weeklyGuideById}
         weeklyById={weeklyById}
       />
 
-      <div className="hidden overflow-hidden rounded-lg border border-border md:block">
+      <div className="relative hidden overflow-hidden rounded-lg border border-border md:block">
         <div className="overflow-x-auto">
           <div className="min-w-[600px]">
             <div className="border-b border-border bg-sub-background">
@@ -83,6 +93,7 @@ export function WeeklyBoardSection({
                 {activeLeadMeasures.map((leadMeasure) => {
                   const leadMeasureId = toNumberId(leadMeasure.id);
                   const weekly = weeklyById.get(leadMeasureId);
+                  const guide = weeklyGuideById.get(leadMeasureId);
                   const achievedCount = weekly?.achieved ?? 0;
                   const targetValue = leadMeasure.targetValue ?? 0;
                   const rate =
@@ -93,9 +104,23 @@ export function WeeklyBoardSection({
                   return (
                     <tr key={leadMeasure.id} className="bg-white">
                       <td className="px-5 py-4">
-                        <p className="block truncate text-sm font-semibold text-text-primary">
-                          {leadMeasure.name}
-                        </p>
+                        <div className="flex items-center gap-1">
+                          <p className="block min-w-0 truncate text-sm font-semibold text-text-primary">
+                            {leadMeasure.name}
+                          </p>
+                          {guide && leadMeasureId !== null ? (
+                            <LeadMeasureGuideTooltip
+                              active={activeGuideId === leadMeasureId}
+                              guide={guide}
+                              onClose={() => setActiveGuideId(null)}
+                              onToggle={() =>
+                                setActiveGuideId((currentId) =>
+                                  currentId === leadMeasureId ? null : leadMeasureId,
+                                )
+                              }
+                            />
+                          ) : null}
+                        </div>
                         <span className="text-[10px] text-text-muted">
                           목표 {targetValue}회 /{" "}
                           {leadMeasure.period === "DAILY"

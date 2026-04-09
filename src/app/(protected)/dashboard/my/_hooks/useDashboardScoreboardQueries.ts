@@ -194,6 +194,9 @@ export const useDashboardScoreboardQueries = ({
       };
     },
   );
+  const weeklyGuideById = new Map(
+    weeklyLeadMeasures.map((leadMeasure) => [toNumberId(leadMeasure.id), leadMeasure.guide ?? null]),
+  );
 
   return {
     activeLeadMeasures,
@@ -212,6 +215,7 @@ export const useDashboardScoreboardQueries = ({
     monthlySummary,
     scoreboardError,
     scoreboardId,
+    weeklyGuideById,
     weeklyById,
     weeklyLogsQueryKey,
     weeklyOverallRate,

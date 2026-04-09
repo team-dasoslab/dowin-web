@@ -314,10 +314,24 @@ export interface DailyLogUpsertRequest {
 
 export type WeeklyLogItemLogs = {[key: string]: boolean | null};
 
+export type WeeklyLogGuideKind = typeof WeeklyLogGuideKind[keyof typeof WeeklyLogGuideKind];
+
+
+export const WeeklyLogGuideKind = {
+  adjust: 'adjust',
+  change: 'change',
+} as const;
+
+export interface WeeklyLogGuide {
+  kind: WeeklyLogGuideKind;
+  description: string;
+}
+
 export interface WeeklyLogItem {
   id?: number;
   name?: string;
   targetValue?: number;
+  guide?: WeeklyLogGuide | null;
   logs?: WeeklyLogItemLogs;
   achieved?: number;
   achievementRate?: number;

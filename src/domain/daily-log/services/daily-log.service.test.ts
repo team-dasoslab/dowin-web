@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DailyLogService } from "@/domain/daily-log/services/daily-log.service";
 
 describe("DailyLogService", () => {
+  const oldCreatedAt = new Date("2026-02-20T00:00:00.000Z");
   const findUserWorkspace = vi.fn();
   const findOwnedScoreboard = vi.fn();
   const findOwnedLeadMeasure = vi.fn();
@@ -61,7 +62,13 @@ describe("DailyLogService", () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
-      { id: 10, name: "매일 물 2L", targetValue: 7, status: "ACTIVE" },
+      {
+        id: 10,
+        name: "매일 물 2L",
+        targetValue: 7,
+        status: "ACTIVE",
+        createdAt: oldCreatedAt,
+      },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
       { leadMeasureId: 10, logDate: "2026-03-09", value: true },
@@ -93,6 +100,7 @@ describe("DailyLogService", () => {
         targetValue: 3,
         period: "WEEKLY",
         status: "ACTIVE",
+        createdAt: oldCreatedAt,
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
@@ -114,6 +122,127 @@ describe("DailyLogService", () => {
     ]);
   });
 
+  it("주간 기록 조회 시 2주 연속 0회면 선행지표 변경 제안을 반환한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 3회 유산소",
+        targetValue: 3,
+        period: "WEEKLY",
+        status: "ACTIVE",
+        createdAt: oldCreatedAt,
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([]);
+
+    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+
+    expect(result.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        guide: {
+          kind: "change",
+          description:
+            "2주 연속 기록이 없어요. 이 선행지표는 다른 행동으로 바꿔보세요.",
+        },
+      }),
+    ]);
+    expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
+      [10],
+      "2026-03-02",
+      "2026-03-15",
+    );
+  });
+
+  it("주간 기록 조회 시 2주 연속 50% 미만이면 횟수 조정 제안을 반환한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 4회 독서",
+        targetValue: 4,
+        period: "WEEKLY",
+        status: "ACTIVE",
+        createdAt: oldCreatedAt,
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-10", value: true },
+    ]);
+
+    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+
+    expect(result.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        guide: {
+          kind: "adjust",
+          description:
+            "2주 연속 50% 미만이에요. 이 선행지표는 횟수를 조금 낮춰보세요.",
+        },
+      }),
+    ]);
+  });
+
+  it("주간 기록 조회 시 2주 연속 50% 이상이면 가이드를 반환하지 않는다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 4회 독서",
+        targetValue: 4,
+        period: "WEEKLY",
+        status: "ACTIVE",
+        createdAt: oldCreatedAt,
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-04", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-11", value: true },
+    ]);
+
+    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+
+    expect(result.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        guide: null,
+      }),
+    ]);
+  });
+
+  it("직전 주 시작 이후에 생성된 지표에는 가이드를 붙이지 않는다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 3회 유산소",
+        targetValue: 3,
+        period: "WEEKLY",
+        status: "ACTIVE",
+        createdAt: new Date("2026-03-05T00:00:00.000Z"),
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([]);
+
+    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+
+    expect(result.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        guide: null,
+      }),
+    ]);
+  });
+
   it("월간 기록 조회 시 WEEKLY와 MONTHLY 지표를 모두 반환한다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
@@ -124,6 +253,7 @@ describe("DailyLogService", () => {
         targetValue: 3,
         period: "WEEKLY",
         status: "ACTIVE",
+        createdAt: oldCreatedAt,
       },
       {
         id: 11,
@@ -131,6 +261,7 @@ describe("DailyLogService", () => {
         targetValue: 12,
         period: "MONTHLY",
         status: "ACTIVE",
+        createdAt: oldCreatedAt,
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
@@ -198,6 +329,7 @@ describe("DailyLogService", () => {
         targetValue: 3,
         period: "WEEKLY",
         status: "ACTIVE",
+        createdAt: oldCreatedAt,
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([

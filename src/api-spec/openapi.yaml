@@ -1711,6 +1711,10 @@ components:
         id: { type: integer }
         name: { type: string }
         targetValue: { type: integer }
+        guide:
+          allOf:
+            - $ref: "#/components/schemas/WeeklyLogGuide"
+          nullable: true
         logs:
           type: object
           additionalProperties:
@@ -1718,6 +1722,16 @@ components:
             nullable: true
         achieved: { type: integer }
         achievementRate: { type: number }
+
+    WeeklyLogGuide:
+      type: object
+      required: [kind, description]
+      properties:
+        kind:
+          type: string
+          enum: [adjust, change]
+        description:
+          type: string
 
     WeeklyLogsResponse:
       type: object

@@ -67,7 +67,7 @@ export class DailyLogService {
   async getWeeklyLogs(
     scoreboardId: number,
     userId: number,
-    weekStart?: string,
+  weekStart?: string,
   ): Promise<{
     weekStart: string;
     weekEnd: string;
@@ -79,6 +79,10 @@ export class DailyLogService {
       logs: Record<string, boolean | null>;
       achieved: number;
       achievementRate: number;
+      guide: {
+        kind: "adjust" | "change";
+        description: string;
+      } | null;
     }>;
   }> {
     const scoreboard = await this.getOwnedScoreboard(scoreboardId, userId);
@@ -89,13 +93,14 @@ export class DailyLogService {
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     const weekDates = getWeekDates(normalizedWeekStart);
     const weekEnd = weekDates[6];
+    const previousWeekStart = addDays(normalizedWeekStart, -7);
     const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       "active",
     );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
-      normalizedWeekStart,
+      previousWeekStart,
       weekEnd,
     );
 
@@ -109,10 +114,19 @@ export class DailyLogService {
         );
 
         for (const log of measureLogs) {
-          logMap[log.logDate] = log.value;
+          if (log.logDate in logMap) {
+            logMap[log.logDate] = log.value;
+          }
         }
 
-        const achieved = measureLogs.filter((log) => log.value).length;
+        const currentWeekLogs = measureLogs.filter(
+          (log) => log.logDate >= normalizedWeekStart && log.logDate <= weekEnd,
+        );
+        const previousWeekLogs = measureLogs.filter(
+          (log) =>
+            log.logDate >= previousWeekStart && log.logDate < normalizedWeekStart,
+        );
+        const achieved = currentWeekLogs.filter((log) => log.value).length;
         return {
           id: measure.id,
           name: measure.name,
@@ -121,6 +135,14 @@ export class DailyLogService {
           logs: logMap,
           achieved,
           achievementRate: getAchievementRate(achieved, measure.targetValue),
+          guide: getWeeklyGuide({
+            createdAt: measure.createdAt,
+            currentAchieved: achieved,
+            period: measure.period,
+            previousAchieved: previousWeekLogs.filter((log) => log.value).length,
+            previousWeekStart,
+            targetValue: measure.targetValue,
+          }),
         };
       }),
     };
@@ -285,6 +307,51 @@ function getAchievementRate(achieved: number, targetValue: number) {
   return Number(((Math.min(achieved, targetValue) / targetValue) * 100).toFixed(1));
 }
 
+function getWeeklyGuide({
+  createdAt,
+  currentAchieved,
+  period,
+  previousAchieved,
+  previousWeekStart,
+  targetValue,
+}: {
+  createdAt: Date;
+  currentAchieved: number;
+  period: LeadMeasureRecord["period"];
+  previousAchieved: number;
+  previousWeekStart: string;
+  targetValue: number;
+}) {
+  if (period === "MONTHLY" || targetValue <= 0) {
+    return null;
+  }
+
+  if (formatDateLocal(createdAt) > previousWeekStart) {
+    return null;
+  }
+
+  if (currentAchieved === 0 && previousAchieved === 0) {
+    return {
+      kind: "change" as const,
+      description:
+        "2주 연속 기록이 없어요. 이 선행지표는 다른 행동으로 바꿔보세요.",
+    };
+  }
+
+  const currentRate = getAchievementRate(currentAchieved, targetValue);
+  const previousRate = getAchievementRate(previousAchieved, targetValue);
+
+  if (currentRate < 50 && previousRate < 50) {
+    return {
+      kind: "adjust" as const,
+      description:
+        "2주 연속 50% 미만이에요. 이 선행지표는 횟수를 조금 낮춰보세요.",
+    };
+  }
+
+  return null;
+}
+
 function getCurrentWeekStart() {
   const today = new Date();
   const day = today.getDay();
@@ -301,6 +368,12 @@ function getWeekDates(weekStart: string) {
     date.setDate(base.getDate() + index);
     return formatDateLocal(date);
   });
+}
+
+function addDays(dateString: string, amount: number) {
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + amount);
+  return formatDateLocal(date);
 }
 
 function getCurrentMonthStart() {
