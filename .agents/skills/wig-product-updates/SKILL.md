@@ -30,6 +30,7 @@ Start with:
 - Do not add per-user read state in this skill.
 - The `NEW` badge logic is fixed by helper code: published within 14 days.
 - Dashboard dismiss behavior is local only and keyed by update `id`; do not convert it into read tracking unless requested.
+- When creating commits for update content or related UI, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `docs`, `feat`, or `fix` based on the actual change.
 
 ## Workflow
 

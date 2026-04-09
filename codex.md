@@ -5,7 +5,7 @@
 이 문서는 WIG 저장소에서 Codex를 사용할 때의 작업 기준, 명령 규칙, 검증 루틴, 문서 우선순위를 고정하기 위한 운영 계획이다.  
 Claude Code에 익숙한 흐름을 최대한 유지하되, 이 저장소의 실제 구현 상태와 Codex의 작업 습관에 맞게 표준화한다.
 
-> 참고: 요청에 적힌 `.agnets/workflows` 경로는 실제로는 `.agents/workflows`이다.
+> 참고: 이 저장소의 에이전트 운영 가이드는 `.agents/workflows/*`가 아니라 `.agents/skills/*/SKILL.md`에 정리되어 있다.
 
 ---
 
@@ -61,14 +61,14 @@ Codex는 아래 순서로 사실상 Source of Truth를 판단한다.
 
 #### 기획/설계
 
-- `.agents/workflows/planning.md`를 따른다.
+- `.agents/skills/wig-planning/SKILL.md`를 따른다.
 - 새 문서를 파편적으로 늘리지 않고, 가능하면 기존 핵심 문서를 갱신한다.
 - 문서 상단 frontmatter를 유지한다.
 - 기획 완료 전 개발로 성급히 넘어가지 않는다.
 
 #### 프론트엔드
 
-- `.agents/workflows/frontend.md`를 따른다.
+- `.agents/skills/wig-frontend/SKILL.md`를 따른다.
 - `src/components/ui` 공통 컴포넌트를 우선 사용한다.
 - `Button` 안에 `Link`를 넣을 때는 `asChild`를 사용한다.
 - React 19 기준으로 `forwardRef`를 새로 도입하지 않는다.
@@ -78,7 +78,7 @@ Codex는 아래 순서로 사실상 Source of Truth를 판단한다.
 
 #### 백엔드
 
-- `.agents/workflows/backend-tdd.md`를 따른다.
+- `.agents/skills/wig-backend/SKILL.md`를 따른다.
 - 기본 순서는 Red -> Green -> Refactor다.
 - Route Handler는 실제 구현 파일인 `src/lib/with-error-handler.ts` 패턴을 사용한다.
 - 입력 검증은 Zod로 처리한다.
@@ -132,7 +132,7 @@ Codex에게 이 저장소에서 기대하는 기본 행동:
 - 아키텍처 변경: `docs/onboarding.md`, 관련 `docs/dev/common/*`
 - 도메인 API 추가/변경: `src/api-spec/openapi.yaml`, 관련 도메인 문서
 - 공통 유틸 변경: `docs/dev/common/2026.03.14-common-utilities.md`
-- 새 개발 표준 도입: `.agents/workflows/*` 또는 `docs/onboarding.md`
+- 새 개발 표준 도입: `.agents/skills/*/SKILL.md` 또는 `docs/onboarding.md`
 
 ### Phase 4. 문서 충돌 정리 백로그 생성
 
@@ -250,6 +250,16 @@ Claude Code처럼 포괄적으로 요청해도 되지만, Codex에는 아래 형
   - 기획 문서 작성, 범위 조정, 온보딩 문서 정리, 구현 전 액션 아이템 정리
 - `wig-quality-check`
   - 테스트 실행, 품질 게이트 점검, 회귀 위험 검토, 배포 전 검증
+- `wig-security-check`
+  - 앱 코드의 auth, 인가, ownership, validation 보안 검토
+- `wig-harness-security-check`
+  - AGENTS.md, codex.md, 로컬 스킬/프롬프트의 하네스 보안 검토
+
+검증 규칙:
+
+- 일반 기능 변경은 `wig-quality-check`를 기본으로 본다.
+- 앱 코드의 auth/인가/ownership/validation이 바뀌면 `wig-security-check`를 추가한다.
+- `AGENTS.md`, `codex.md`, `.agents/skills/**` 같은 하네스 파일이 바뀌면 완료 전에 `wig-harness-security-check`를 추가한다.
 
 ---
 

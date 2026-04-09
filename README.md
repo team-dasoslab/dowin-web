@@ -147,4 +147,4 @@ yarn wrangler secret put <KEY_NAME>
 - 온보딩: `docs/onboarding.md`
 - 개발자 시작 문서: `docs/dev/README.md`
 - 도메인 개요: `docs/dev/common/2026.03.12-domain-overview.md`
-- 스킬: `.agents/skills/wig-frontend/SKILL.md`, `.agents/skills/wig-backend/SKILL.md`, `.agents/skills/wig-planning/SKILL.md`, `.agents/skills/wig-quality-check/SKILL.md`, `.agents/skills/wig-product-updates/SKILL.md`
+- 스킬: `.agents/skills/wig-frontend/SKILL.md`, `.agents/skills/wig-backend/SKILL.md`, `.agents/skills/wig-planning/SKILL.md`, `.agents/skills/wig-quality-check/SKILL.md`, `.agents/skills/wig-security-check/SKILL.md`, `.agents/skills/wig-harness-security-check/SKILL.md`, `.agents/skills/wig-product-updates/SKILL.md`

@@ -43,6 +43,9 @@ WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워
    - 프론트: [`.agents/skills/wig-frontend/SKILL.md`](/.agents/skills/wig-frontend/SKILL.md)
    - 백엔드: [`.agents/skills/wig-backend/SKILL.md`](/.agents/skills/wig-backend/SKILL.md)
    - 품질 점검: [`.agents/skills/wig-quality-check/SKILL.md`](/.agents/skills/wig-quality-check/SKILL.md)
+   - 성능 점검: [`.agents/skills/wig-performance-check/SKILL.md`](/.agents/skills/wig-performance-check/SKILL.md)
+   - 보안 점검: [`.agents/skills/wig-security-check/SKILL.md`](/.agents/skills/wig-security-check/SKILL.md)
+   - 하네스 보안 점검: [`.agents/skills/wig-harness-security-check/SKILL.md`](/.agents/skills/wig-harness-security-check/SKILL.md)
    - 제품 업데이트: [`.agents/skills/wig-product-updates/SKILL.md`](/.agents/skills/wig-product-updates/SKILL.md)
 5. 공통 설계 문서
    - [`docs/dev/common/2026.03.12-domain-overview.md`](/docs/dev/common/2026.03.12-domain-overview.md)

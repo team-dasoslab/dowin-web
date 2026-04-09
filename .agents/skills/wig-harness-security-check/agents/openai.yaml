@@ -1,0 +1,7 @@
+interface:
+  display_name: "WIG Harness Security Check"
+  short_description: "WIG AI harness and prompt security review"
+  default_prompt: "Use $wig-harness-security-check to review WIG's agent harness, prompt files, and local AI tooling guidance for secret exposure, unsafe permissions, and risky automation."
+
+policy:
+  allow_implicit_invocation: true

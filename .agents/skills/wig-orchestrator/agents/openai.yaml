@@ -1,0 +1,7 @@
+interface:
+  display_name: "WIG Orchestrator"
+  short_description: "WIG top-level workflow router"
+  default_prompt: "Use $wig-orchestrator to classify a WIG request, choose the right skill workflow, and coordinate planning, implementation, and review handoffs."
+
+policy:
+  allow_implicit_invocation: true

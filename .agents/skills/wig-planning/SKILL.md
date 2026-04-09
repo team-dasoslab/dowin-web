@@ -28,6 +28,7 @@ Read implementation only when feasibility or current status matters.
 - Planning should produce concrete action items, not only abstract ideas.
 - Respect the 4DX framing already used across WIG documents.
 - Keep `docs/onboarding.md` current enough that another agent can start work quickly.
+- When creating commits for planning/doc changes, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `docs: <변경 요약>` unless the change is clearly another type.
 
 For detailed file paths and planning priorities, read `references/planning-rules.md`.
 
@@ -79,6 +80,37 @@ A good planning update should leave behind:
 - Does the plan align with existing domain rules and 4DX terminology?
 - Should `docs/onboarding.md` also be updated?
 
+## Output Contract
+
+When finishing planning work, report with this shape by default:
+
+```text
+stage: planning
+status: pass|needs_revision|fail
+summary: 한두 문장 요약
+findings:
+- ...
+failure_categories:
+- ...
+return_to: planning|none
+next_step: 다음 단계 또는 후속 작업
+```
+
+Use these planning-oriented categories when relevant:
+
+- `scope_gap`
+- `mvp_boundary_gap`
+- `doc_impl_drift`
+
+Return rules:
+
+- `pass`
+  - scope, boundaries, and next actions are clear enough for implementation
+- `needs_revision`
+  - planning is directionally correct, but scope or success criteria need tightening
+- `fail`
+  - planning is not usable yet and should stay in `planning`
+
 ## When To Escalate To Engineering Docs
 
 If planning decisions harden into implementation constraints, update or create the matching docs in:
@@ -86,3 +118,7 @@ If planning decisions harden into implementation constraints, update or create t
 - `docs/dev/common/`
 - `docs/dev/<domain>/`
 - `docs/onboarding.md`
+
+## Next Step
+
+After planning scope and action items are concrete, move to `wig-backend` for the backend implementation phase.

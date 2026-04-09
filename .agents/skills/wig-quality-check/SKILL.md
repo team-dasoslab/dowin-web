@@ -26,6 +26,7 @@ If the quality doc conflicts with current implementation, verify the code and us
 - Frontend verification should include loading, empty, error, responsive, and rollback behavior where relevant.
 - Current auth implementation uses the `wig_sid` session cookie pattern.
 - Treat repository-wide `tsc` and `lint` results as potentially noisy until the known baseline issues are fixed.
+- When recommending follow-up commits, follow `docs/planning/2026.04.09-commit-convention.md`.
 
 For detailed gates, command sets, and domain-specific checks, read `references/quality-rules.md`.
 
@@ -76,3 +77,40 @@ When reviewing or validating, report:
 - Were type and lint checks run when appropriate?
 - Were responsive or UI state checks included for frontend work?
 - If this is release-facing, were manual checks considered?
+
+## Output Contract
+
+When finishing quality review, report with this shape by default:
+
+```text
+stage: quality
+status: pass|needs_revision|fail
+summary: 한두 문장 요약
+findings:
+- ...
+failure_categories:
+- ...
+return_to: planning|backend|frontend|none
+next_step: 다음 수정 단계 또는 추가 검증
+```
+
+Use these quality-oriented categories when relevant:
+
+- `api_contract_mismatch`
+- `missing_test`
+- `state_handling_gap`
+- `rollback_gap`
+- `doc_impl_drift`
+
+Return rules:
+
+- `pass`
+  - the checked path is safe to move to the next gate or completion
+- `needs_revision`
+  - issues are actionable and should return to the nearest implementation stage
+- `fail`
+  - the current result should not proceed; explicitly choose `planning`, `backend`, or `frontend` based on the real source of the regression
+
+## Next Step
+
+After quality review passes, continue to `wig-performance-check` or `wig-security-check` when those gates still apply.

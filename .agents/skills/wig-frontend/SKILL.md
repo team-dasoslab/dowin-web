@@ -38,6 +38,7 @@ If current code and docs differ, verify the implementation and preserve establis
 - Do not introduce `useSearchParams()` in a page path unless it is wrapped by a `Suspense` boundary. If the value can be resolved on the server, prefer reading the page `searchParams` prop and passing it down instead.
 - Treat date display and date-key generation in the UI as KST-based unless the current feature explicitly requires another timezone.
 - Keep mobile behavior in scope, especially dashboard and scoreboard flows.
+- When creating commits, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `feat|fix|docs|chore|refactor|style` with the format `<type>: <변경 요약>`.
 
 For detailed file paths and doc priorities, read `references/frontend-rules.md`.
 
@@ -95,6 +96,17 @@ yarn test
 yarn test:storybook --run
 ```
 
+### 6. Commit order
+
+When frontend work is committed in multiple steps, prefer this order:
+
+1. `gen:api`
+2. UI
+3. API integration
+4. docs
+
+Apply `gen:api` only when the API contract actually changed. If there is no contract change, start from UI or API integration as appropriate.
+
 ## Frontend Checklist
 
 - Is this in the correct layer and directory?
@@ -109,6 +121,39 @@ yarn test:storybook --run
 - If shared UI changed, was Storybook updated?
 - Was mobile layout considered?
 
+## Output Contract
+
+When finishing frontend work, report with this shape by default:
+
+```text
+stage: frontend
+status: pass|needs_revision|fail
+summary: 한두 문장 요약
+findings:
+- ...
+failure_categories:
+- ...
+return_to: planning|backend|frontend|none
+next_step: 다음 단계 또는 검증
+```
+
+Use these frontend-oriented categories when relevant:
+
+- `api_contract_mismatch`
+- `state_handling_gap`
+- `rollback_gap`
+- `missing_test`
+- `doc_impl_drift`
+
+Return rules:
+
+- `pass`
+  - UI integration, state handling, and relevant verification are ready for review
+- `needs_revision`
+  - frontend fixes are needed, but the task should stay in `frontend`
+- `fail`
+  - return to `backend` when the blocking issue is contract or API behavior; return to `planning` when the scope itself is wrong; otherwise return to `frontend`
+
 ## When To Update Docs
 
 Update docs when frontend conventions or user-facing flows change materially:
@@ -116,3 +161,7 @@ Update docs when frontend conventions or user-facing flows change materially:
 - relevant domain doc in `docs/dev/`
 - `docs/onboarding.md`
 - this skill or `references/frontend-rules.md` if the frontend standard itself changed
+
+## Next Step
+
+After frontend integration is finished, run `wig-security-check` on the final changed path before treating the work as complete.
