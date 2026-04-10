@@ -93,15 +93,15 @@ describe("DailyLogService", () => {
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
-      { leadMeasureId: 10, logDate: "2026-03-09", value: true },
-      { leadMeasureId: 10, logDate: "2026-03-10", value: false },
+      { leadMeasureId: 10, logDate: "2026-04-06", value: true },
+      { leadMeasureId: 10, logDate: "2026-04-07", value: false },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
 
     expect(result).toEqual({
-      weekStart: "2026-03-09",
-      weekEnd: "2026-03-15",
+      weekStart: "2026-04-06",
+      weekEnd: "2026-04-12",
       leadMeasures: [
         expect.objectContaining({
           id: 10,
@@ -126,14 +126,14 @@ describe("DailyLogService", () => {
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
-      { leadMeasureId: 10, logDate: "2026-03-09", value: true },
-      { leadMeasureId: 10, logDate: "2026-03-10", value: true },
-      { leadMeasureId: 10, logDate: "2026-03-11", value: true },
-      { leadMeasureId: 10, logDate: "2026-03-12", value: true },
-      { leadMeasureId: 10, logDate: "2026-03-13", value: true },
+      { leadMeasureId: 10, logDate: "2026-04-06", value: true },
+      { leadMeasureId: 10, logDate: "2026-04-07", value: true },
+      { leadMeasureId: 10, logDate: "2026-04-08", value: true },
+      { leadMeasureId: 10, logDate: "2026-04-09", value: true },
+      { leadMeasureId: 10, logDate: "2026-04-10", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -159,7 +159,7 @@ describe("DailyLogService", () => {
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -173,8 +173,8 @@ describe("DailyLogService", () => {
     ]);
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [10],
-      "2026-03-02",
-      "2026-03-15",
+      "2026-03-30",
+      "2026-04-12",
     );
   });
 
@@ -192,11 +192,11 @@ describe("DailyLogService", () => {
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
-      { leadMeasureId: 10, logDate: "2026-03-03", value: true },
-      { leadMeasureId: 10, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-31", value: true },
+      { leadMeasureId: 10, logDate: "2026-04-08", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -258,6 +258,38 @@ describe("DailyLogService", () => {
     const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
 
     expect(result.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        guide: null,
+      }),
+    ]);
+  });
+
+  it("이번 주가 아닌 주간 조회에는 가이드를 반환하지 않는다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 3회 유산소",
+        targetValue: 3,
+        period: "WEEKLY",
+        status: "ACTIVE",
+        createdAt: oldCreatedAt,
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([]);
+
+    const lastWeekResult = await service.getWeeklyLogs(2, 100, "2026-03-30");
+    const nextWeekResult = await service.getWeeklyLogs(2, 100, "2026-04-13");
+
+    expect(lastWeekResult.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        guide: null,
+      }),
+    ]);
+    expect(nextWeekResult.leadMeasures).toEqual([
       expect.objectContaining({
         id: 10,
         guide: null,

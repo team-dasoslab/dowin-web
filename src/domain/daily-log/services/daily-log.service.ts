@@ -96,6 +96,7 @@ export class DailyLogService {
     const weekDates = getWeekDates(normalizedWeekStart);
     const weekEnd = weekDates[6];
     const previousWeekStart = addDays(normalizedWeekStart, -7);
+    const shouldIncludeGuide = normalizedWeekStart === getCurrentWeekStart();
     const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       "active",
@@ -137,14 +138,16 @@ export class DailyLogService {
           logs: logMap,
           achieved,
           achievementRate: getAchievementRate(achieved, measure.targetValue),
-          guide: getWeeklyGuide({
-            createdAt: measure.createdAt,
-            currentAchieved: achieved,
-            period: measure.period,
-            previousAchieved: previousWeekLogs.filter((log) => log.value).length,
-            previousWeekStart,
-            targetValue: measure.targetValue,
-          }),
+          guide: shouldIncludeGuide
+            ? getWeeklyGuide({
+                createdAt: measure.createdAt,
+                currentAchieved: achieved,
+                period: measure.period,
+                previousAchieved: previousWeekLogs.filter((log) => log.value).length,
+                previousWeekStart,
+                targetValue: measure.targetValue,
+              })
+            : null,
         };
       }),
     };
