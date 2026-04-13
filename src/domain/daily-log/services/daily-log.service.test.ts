@@ -88,8 +88,10 @@ describe("DailyLogService", () => {
         id: 10,
         name: "매일 물 2L",
         targetValue: 7,
+        period: "WEEKLY",
         status: "ACTIVE",
         createdAt: oldCreatedAt,
+        tags: [{ id: 1, name: "건강" }],
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
@@ -105,6 +107,7 @@ describe("DailyLogService", () => {
       leadMeasures: [
         expect.objectContaining({
           id: 10,
+          tags: [{ id: 1, name: "건강" }],
           achieved: 1,
           achievementRate: expect.any(Number),
         }),
@@ -123,6 +126,7 @@ describe("DailyLogService", () => {
         period: "WEEKLY",
         status: "ACTIVE",
         createdAt: oldCreatedAt,
+        tags: [{ id: 1, name: "운동" }],
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
@@ -138,6 +142,7 @@ describe("DailyLogService", () => {
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
         id: 10,
+        tags: [{ id: 1, name: "운동" }],
         achieved: 5,
         achievementRate: 100,
       }),
@@ -155,6 +160,7 @@ describe("DailyLogService", () => {
         period: "WEEKLY",
         status: "ACTIVE",
         createdAt: oldCreatedAt,
+        tags: [],
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
@@ -189,6 +195,7 @@ describe("DailyLogService", () => {
         period: "WEEKLY",
         status: "ACTIVE",
         createdAt: oldCreatedAt,
+        tags: [],
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
@@ -221,6 +228,7 @@ describe("DailyLogService", () => {
         period: "WEEKLY",
         status: "ACTIVE",
         createdAt: oldCreatedAt,
+        tags: [],
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
@@ -251,6 +259,7 @@ describe("DailyLogService", () => {
         period: "WEEKLY",
         status: "ACTIVE",
         createdAt: new Date("2026-03-05T00:00:00.000Z"),
+        tags: [],
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);

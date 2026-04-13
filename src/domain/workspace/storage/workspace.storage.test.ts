@@ -1,4 +1,4 @@
-import { workspaceMembers, workspaces } from "@/db/schema";
+import { workspaceMembers, workspaceTags, workspaces } from "@/db/schema";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -8,6 +8,10 @@ type MockDb = {
       findFirst: ReturnType<typeof vi.fn>;
     };
     workspaceMembers: {
+      findFirst: ReturnType<typeof vi.fn>;
+      findMany: ReturnType<typeof vi.fn>;
+    };
+    workspaceTags: {
       findFirst: ReturnType<typeof vi.fn>;
       findMany: ReturnType<typeof vi.fn>;
     };
@@ -31,6 +35,10 @@ describe("WorkspaceStorage", () => {
         findFirst: vi.fn(),
       },
       workspaceMembers: {
+        findFirst: vi.fn(),
+        findMany: vi.fn(),
+      },
+      workspaceTags: {
         findFirst: vi.fn(),
         findMany: vi.fn(),
       },
@@ -63,6 +71,10 @@ describe("WorkspaceStorage", () => {
         },
         workspaceMembers: {
           findFirst: vi.fn().mockResolvedValue({ workspace: mockWorkspace }),
+          findMany: vi.fn(),
+        },
+        workspaceTags: {
+          findFirst: vi.fn(),
           findMany: vi.fn(),
         },
       };
@@ -223,6 +235,43 @@ describe("WorkspaceStorage", () => {
 
       expect(mockDb.delete).toHaveBeenCalledWith(workspaces);
       expect(mockDb.where).toHaveBeenCalled();
+    });
+  });
+
+  describe("tags", () => {
+    it("워크스페이스 태그 목록을 반환한다", async () => {
+      const mockTags = [{ id: 1, workspaceId: 1, name: "운동" }];
+      mockDb.query.workspaceTags.findMany.mockResolvedValue(mockTags);
+
+      const result = await storage.listTags(1);
+
+      expect(result).toEqual(mockTags);
+      expect(mockDb.query.workspaceTags.findMany).toHaveBeenCalled();
+    });
+
+    it("워크스페이스와 태그 id로 태그를 조회한다", async () => {
+      const mockTag = { id: 5, workspaceId: 1, name: "건강" };
+      mockDb.query.workspaceTags.findFirst.mockResolvedValue(mockTag);
+
+      const result = await storage.findTagById(1, 5);
+
+      expect(result).toEqual(mockTag);
+      expect(mockDb.query.workspaceTags.findFirst).toHaveBeenCalled();
+    });
+
+    it("태그를 생성한다", async () => {
+      const mockTag = { id: 5, workspaceId: 1, name: "건강" };
+      mockDb.returning.mockResolvedValue([mockTag]);
+
+      const result = await storage.createTag({
+        workspaceId: 1,
+        name: "건강",
+        normalizedName: "건강",
+        createdByUserId: 9,
+      });
+
+      expect(result).toEqual(mockTag);
+      expect(mockDb.insert).toHaveBeenCalledWith(workspaceTags);
     });
   });
 });

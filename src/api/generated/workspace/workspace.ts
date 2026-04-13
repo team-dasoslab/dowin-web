@@ -39,6 +39,9 @@ import type {
   WorkspaceInviteStatusUpdateRequest,
   WorkspaceJoinByInviteRequest,
   WorkspaceMember,
+  WorkspaceTag,
+  WorkspaceTagCreateRequest,
+  WorkspaceTagUpdateRequest,
   WorkspaceTransferAdminRequest
 } from '../wig.schemas';
 
@@ -591,6 +594,445 @@ export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getW
 
 
 /**
+ * @summary 워크스페이스 태그 목록 조회
+ */
+export type getWorkspacesIdTagsResponse200 = {
+  data: WorkspaceTag[]
+  status: 200
+}
+
+export type getWorkspacesIdTagsResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type getWorkspacesIdTagsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getWorkspacesIdTagsResponseSuccess = (getWorkspacesIdTagsResponse200) & {
+  headers: Headers;
+};
+export type getWorkspacesIdTagsResponseError = (getWorkspacesIdTagsResponse401 | getWorkspacesIdTagsResponse403) & {
+  headers: Headers;
+};
+
+export type getWorkspacesIdTagsResponse = (getWorkspacesIdTagsResponseSuccess | getWorkspacesIdTagsResponseError)
+
+export const getGetWorkspacesIdTagsUrl = (id: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}/tags`
+}
+
+export const getWorkspacesIdTags = async (id: number, options?: RequestInit): Promise<getWorkspacesIdTagsResponse> => {
+  
+  return customInstance<getWorkspacesIdTagsResponse>(getGetWorkspacesIdTagsUrl(id),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
+
+
+
+
+export const getGetWorkspacesIdTagsQueryKey = (id: number,) => {
+    return [
+    `/api/workspaces/${id}/tags`
+    ] as const;
+    }
+
+    
+export const getGetWorkspacesIdTagsQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesIdTagsQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesIdTags>>> = ({ signal }) => getWorkspacesIdTags(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetWorkspacesIdTagsQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesIdTags>>>
+export type GetWorkspacesIdTagsQueryError = UnauthorizedErrorResponse | ErrorResponse
+
+
+export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesIdTags>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesIdTags>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesIdTags>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesIdTags>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 워크스페이스 태그 목록 조회
+ */
+
+export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetWorkspacesIdTagsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * @summary 워크스페이스 태그 생성
+ */
+export type postWorkspacesIdTagsResponse201 = {
+  data: WorkspaceTag
+  status: 201
+}
+
+export type postWorkspacesIdTagsResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postWorkspacesIdTagsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postWorkspacesIdTagsResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postWorkspacesIdTagsResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postWorkspacesIdTagsResponseSuccess = (postWorkspacesIdTagsResponse201) & {
+  headers: Headers;
+};
+export type postWorkspacesIdTagsResponseError = (postWorkspacesIdTagsResponse401 | postWorkspacesIdTagsResponse403 | postWorkspacesIdTagsResponse409 | postWorkspacesIdTagsResponse422) & {
+  headers: Headers;
+};
+
+export type postWorkspacesIdTagsResponse = (postWorkspacesIdTagsResponseSuccess | postWorkspacesIdTagsResponseError)
+
+export const getPostWorkspacesIdTagsUrl = (id: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}/tags`
+}
+
+export const postWorkspacesIdTags = async (id: number,
+    workspaceTagCreateRequest: WorkspaceTagCreateRequest, options?: RequestInit): Promise<postWorkspacesIdTagsResponse> => {
+  
+  return customInstance<postWorkspacesIdTagsResponse>(getPostWorkspacesIdTagsUrl(id),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      workspaceTagCreateRequest,)
+  }
+);}
+  
+
+
+
+export const getPostWorkspacesIdTagsMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: number;data: WorkspaceTagCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: number;data: WorkspaceTagCreateRequest}, TContext> => {
+
+const mutationKey = ['postWorkspacesIdTags'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTags>>, {id: number;data: WorkspaceTagCreateRequest}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  postWorkspacesIdTags(id,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostWorkspacesIdTagsMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesIdTags>>>
+    export type PostWorkspacesIdTagsMutationBody = WorkspaceTagCreateRequest
+    export type PostWorkspacesIdTagsMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 워크스페이스 태그 생성
+ */
+export const usePostWorkspacesIdTags = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: number;data: WorkspaceTagCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postWorkspacesIdTags>>,
+        TError,
+        {id: number;data: WorkspaceTagCreateRequest},
+        TContext
+      > => {
+      return useMutation(getPostWorkspacesIdTagsMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 워크스페이스 태그 이름 수정
+ */
+export type putWorkspacesIdTagsTagIdResponse200 = {
+  data: WorkspaceTag
+  status: 200
+}
+
+export type putWorkspacesIdTagsTagIdResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type putWorkspacesIdTagsTagIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putWorkspacesIdTagsTagIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putWorkspacesIdTagsTagIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type putWorkspacesIdTagsTagIdResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type putWorkspacesIdTagsTagIdResponseSuccess = (putWorkspacesIdTagsTagIdResponse200) & {
+  headers: Headers;
+};
+export type putWorkspacesIdTagsTagIdResponseError = (putWorkspacesIdTagsTagIdResponse401 | putWorkspacesIdTagsTagIdResponse403 | putWorkspacesIdTagsTagIdResponse404 | putWorkspacesIdTagsTagIdResponse409 | putWorkspacesIdTagsTagIdResponse422) & {
+  headers: Headers;
+};
+
+export type putWorkspacesIdTagsTagIdResponse = (putWorkspacesIdTagsTagIdResponseSuccess | putWorkspacesIdTagsTagIdResponseError)
+
+export const getPutWorkspacesIdTagsTagIdUrl = (id: number,
+    tagId: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}/tags/${tagId}`
+}
+
+export const putWorkspacesIdTagsTagId = async (id: number,
+    tagId: number,
+    workspaceTagUpdateRequest: WorkspaceTagUpdateRequest, options?: RequestInit): Promise<putWorkspacesIdTagsTagIdResponse> => {
+  
+  return customInstance<putWorkspacesIdTagsTagIdResponse>(getPutWorkspacesIdTagsTagIdUrl(id,tagId),
+  {      
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      workspaceTagUpdateRequest,)
+  }
+);}
+  
+
+
+
+export const getPutWorkspacesIdTagsTagIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number;data: WorkspaceTagUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number;data: WorkspaceTagUpdateRequest}, TContext> => {
+
+const mutationKey = ['putWorkspacesIdTagsTagId'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, {id: number;tagId: number;data: WorkspaceTagUpdateRequest}> = (props) => {
+          const {id,tagId,data} = props ?? {};
+
+          return  putWorkspacesIdTagsTagId(id,tagId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutWorkspacesIdTagsTagIdMutationResult = NonNullable<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>>
+    export type PutWorkspacesIdTagsTagIdMutationBody = WorkspaceTagUpdateRequest
+    export type PutWorkspacesIdTagsTagIdMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 워크스페이스 태그 이름 수정
+ */
+export const usePutWorkspacesIdTagsTagId = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number;data: WorkspaceTagUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>,
+        TError,
+        {id: number;tagId: number;data: WorkspaceTagUpdateRequest},
+        TContext
+      > => {
+      return useMutation(getPutWorkspacesIdTagsTagIdMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 워크스페이스 태그 삭제
+ */
+export type deleteWorkspacesIdTagsTagIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteWorkspacesIdTagsTagIdResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type deleteWorkspacesIdTagsTagIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteWorkspacesIdTagsTagIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteWorkspacesIdTagsTagIdResponseSuccess = (deleteWorkspacesIdTagsTagIdResponse204) & {
+  headers: Headers;
+};
+export type deleteWorkspacesIdTagsTagIdResponseError = (deleteWorkspacesIdTagsTagIdResponse401 | deleteWorkspacesIdTagsTagIdResponse403 | deleteWorkspacesIdTagsTagIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteWorkspacesIdTagsTagIdResponse = (deleteWorkspacesIdTagsTagIdResponseSuccess | deleteWorkspacesIdTagsTagIdResponseError)
+
+export const getDeleteWorkspacesIdTagsTagIdUrl = (id: number,
+    tagId: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}/tags/${tagId}`
+}
+
+export const deleteWorkspacesIdTagsTagId = async (id: number,
+    tagId: number, options?: RequestInit): Promise<deleteWorkspacesIdTagsTagIdResponse> => {
+  
+  return customInstance<deleteWorkspacesIdTagsTagIdResponse>(getDeleteWorkspacesIdTagsTagIdUrl(id,tagId),
+  {      
+    ...options,
+    method: 'DELETE'
+    
+    
+  }
+);}
+  
+
+
+
+export const getDeleteWorkspacesIdTagsTagIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number}, TContext> => {
+
+const mutationKey = ['deleteWorkspacesIdTagsTagId'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, {id: number;tagId: number}> = (props) => {
+          const {id,tagId} = props ?? {};
+
+          return  deleteWorkspacesIdTagsTagId(id,tagId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkspacesIdTagsTagIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>>
+    
+    export type DeleteWorkspacesIdTagsTagIdMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 워크스페이스 태그 삭제
+ */
+export const useDeleteWorkspacesIdTagsTagId = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>,
+        TError,
+        {id: number;tagId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteWorkspacesIdTagsTagIdMutationOptions(options), queryClient);
+    }
+    /**
  * @summary [ADMIN] 워크스페이스 초대코드 목록 조회
  */
 export type getWorkspacesIdInvitesResponse200 = {

@@ -1,7 +1,9 @@
 import {
+  normalizeWorkspaceTagName,
   workspaceInviteCreateSchema,
   workspaceInviteStatusUpdateSchema,
   workspaceJoinByInviteSchema,
+  workspaceTagCreateSchema,
 } from "@/domain/workspace/validation";
 import { describe, expect, it } from "vitest";
 
@@ -38,6 +40,26 @@ describe("Workspace validation", () => {
       expect(
         workspaceInviteStatusUpdateSchema.safeParse({ status: "INACTIVE" }).success,
       ).toBe(true);
+    });
+  });
+
+  describe("workspaceTagCreateSchema", () => {
+    it("16자 이하 태그 이름을 허용한다", () => {
+      const result = workspaceTagCreateSchema.safeParse({ name: "깊은 일" });
+      expect(result.success).toBe(true);
+    });
+
+    it("17자 이상 태그 이름을 거부한다", () => {
+      const result = workspaceTagCreateSchema.safeParse({
+        name: "12345678901234567",
+      });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe("normalizeWorkspaceTagName", () => {
+    it("공백 축약과 소문자 변환을 적용한다", () => {
+      expect(normalizeWorkspaceTagName(" Deep   Work ")).toBe("deep work");
     });
   });
 });

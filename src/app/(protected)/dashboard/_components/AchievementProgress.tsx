@@ -1,5 +1,6 @@
 type AchievementProgressProps = {
   achievedCount: number;
+  periodLabel?: string;
   targetValue: number;
   trackBackgroundClassName?: string;
   valueTextSizeClassName?: string;
@@ -7,6 +8,7 @@ type AchievementProgressProps = {
 
 export function AchievementProgress({
   achievedCount,
+  periodLabel,
   targetValue,
   trackBackgroundClassName = "bg-sub-background",
   valueTextSizeClassName = "text-sm",
@@ -17,7 +19,7 @@ export function AchievementProgress({
 
   return (
     <div className="shrink-0 text-right">
-      <p className="text-[10px] text-text-muted">달성</p>
+      <p className="text-[10px] text-text-muted">{periodLabel ?? "달성"}</p>
       <div className="mt-1 flex flex-row items-center justify-end gap-1.5">
         <div
           className={`h-1 w-12 overflow-hidden rounded-full border border-border ${trackBackgroundClassName}`}

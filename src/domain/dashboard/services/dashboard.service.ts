@@ -23,6 +23,7 @@ type TeamScoreboard = {
     targetValue: number;
     period: "DAILY" | "WEEKLY" | "MONTHLY";
     status: "ACTIVE" | "ARCHIVED";
+    tags: Array<{ id: number; name: string }>;
   }>;
 };
 
@@ -147,6 +148,7 @@ export class DashboardService {
               name: leadMeasure.name,
               targetValue: leadMeasure.targetValue,
               period: leadMeasure.period,
+              tags: leadMeasure.tags,
               achieved,
               achievementRate,
               logs: logMap,
@@ -224,6 +226,7 @@ export class DashboardService {
             name: leadMeasure.name,
             period: leadMeasure.period,
             targetValue: leadMeasure.targetValue,
+            tags: leadMeasure.tags,
             achieved: leadMeasure.achieved,
             achievementRate: leadMeasure.achievementRate,
             logs: leadMeasure.logs,

@@ -1,5 +1,10 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -19,6 +24,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   members: many(workspaceMembers),
   scoreboards: many(scoreboards),
   recoveryCodes: many(authRecoveryCodes),
+  createdWorkspaceTags: many(workspaceTags),
   authoredTeamMemos: many(teamMemos, { relationName: "teamMemoAuthor" }),
   targetedTeamMemos: many(teamMemos, { relationName: "teamMemoTarget" }),
   resolvedTeamMemos: many(teamMemos, { relationName: "teamMemoResolver" }),
@@ -36,12 +42,15 @@ export const authRecoveryCodes = sqliteTable("auth_recovery_codes", {
     .default(sql`(strftime('%s', 'now'))`),
 });
 
-export const authRecoveryCodesRelations = relations(authRecoveryCodes, ({ one }) => ({
-  user: one(users, {
-    fields: [authRecoveryCodes.userId],
-    references: [users.id],
+export const authRecoveryCodesRelations = relations(
+  authRecoveryCodes,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [authRecoveryCodes.userId],
+      references: [users.id],
+    }),
   }),
-}));
+);
 
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(), // nanoid
@@ -76,6 +85,7 @@ export const workspaces = sqliteTable("workspaces", {
 export const workspacesRelations = relations(workspaces, ({ many }) => ({
   members: many(workspaceMembers),
   scoreboards: many(scoreboards),
+  tags: many(workspaceTags),
   invites: many(workspaceInvites),
   teamMemos: many(teamMemos),
 }));
@@ -105,16 +115,19 @@ export const workspaceMembers = sqliteTable(
   (table) => [uniqueIndex("workspace_members_user_unique").on(table.userId)],
 );
 
-export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
-  user: one(users, {
-    fields: [workspaceMembers.userId],
-    references: [users.id],
+export const workspaceMembersRelations = relations(
+  workspaceMembers,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [workspaceMembers.userId],
+      references: [users.id],
+    }),
+    workspace: one(workspaces, {
+      fields: [workspaceMembers.workspaceId],
+      references: [workspaces.id],
+    }),
   }),
-  workspace: one(workspaces, {
-    fields: [workspaceMembers.workspaceId],
-    references: [workspaces.id],
-  }),
-}));
+);
 
 export const workspaceInvites = sqliteTable("workspace_invites", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -135,16 +148,58 @@ export const workspaceInvites = sqliteTable("workspace_invites", {
     .default(sql`(strftime('%s', 'now'))`),
 });
 
-export const workspaceInvitesRelations = relations(workspaceInvites, ({ one }) => ({
-  workspace: one(workspaces, {
-    fields: [workspaceInvites.workspaceId],
-    references: [workspaces.id],
+export const workspaceInvitesRelations = relations(
+  workspaceInvites,
+  ({ one }) => ({
+    workspace: one(workspaces, {
+      fields: [workspaceInvites.workspaceId],
+      references: [workspaces.id],
+    }),
+    createdByUser: one(users, {
+      fields: [workspaceInvites.createdByUserId],
+      references: [users.id],
+    }),
   }),
-  createdByUser: one(users, {
-    fields: [workspaceInvites.createdByUserId],
-    references: [users.id],
+);
+
+export const workspaceTags = sqliteTable(
+  "workspace_tags",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    normalizedName: text("normalized_name").notNull(),
+    createdByUserId: integer("created_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("workspace_tags_workspace_normalized_name_unique").on(
+      table.workspaceId,
+      table.normalizedName,
+    ),
+  ],
+);
+
+export const workspaceTagsRelations = relations(
+  workspaceTags,
+  ({ one, many }) => ({
+    workspace: one(workspaces, {
+      fields: [workspaceTags.workspaceId],
+      references: [workspaces.id],
+    }),
+    createdByUser: one(users, {
+      fields: [workspaceTags.createdByUserId],
+      references: [users.id],
+    }),
+    leadMeasureTags: many(leadMeasureTags),
   }),
-}));
+);
 
 export const scoreboards = sqliteTable(
   "scoreboards",
@@ -205,13 +260,53 @@ export const leadMeasures = sqliteTable("lead_measures", {
   archivedAt: integer("archived_at", { mode: "timestamp" }),
 });
 
-export const leadMeasuresRelations = relations(leadMeasures, ({ one, many }) => ({
-  scoreboard: one(scoreboards, {
-    fields: [leadMeasures.scoreboardId],
-    references: [scoreboards.id],
+export const leadMeasuresRelations = relations(
+  leadMeasures,
+  ({ one, many }) => ({
+    scoreboard: one(scoreboards, {
+      fields: [leadMeasures.scoreboardId],
+      references: [scoreboards.id],
+    }),
+    dailyLogs: many(dailyLogs),
+    tags: many(leadMeasureTags),
   }),
-  dailyLogs: many(dailyLogs),
-}));
+);
+
+export const leadMeasureTags = sqliteTable(
+  "lead_measure_tags",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    leadMeasureId: integer("lead_measure_id")
+      .notNull()
+      .references(() => leadMeasures.id, { onDelete: "cascade" }),
+    tagId: integer("tag_id")
+      .notNull()
+      .references(() => workspaceTags.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("lead_measure_tags_measure_tag_unique").on(
+      table.leadMeasureId,
+      table.tagId,
+    ),
+  ],
+);
+
+export const leadMeasureTagsRelations = relations(
+  leadMeasureTags,
+  ({ one }) => ({
+    leadMeasure: one(leadMeasures, {
+      fields: [leadMeasureTags.leadMeasureId],
+      references: [leadMeasures.id],
+    }),
+    tag: one(workspaceTags, {
+      fields: [leadMeasureTags.tagId],
+      references: [workspaceTags.id],
+    }),
+  }),
+);
 
 export const dailyLogs = sqliteTable(
   "daily_logs",

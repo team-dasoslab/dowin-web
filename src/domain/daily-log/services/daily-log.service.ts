@@ -4,7 +4,11 @@ import {
 } from "@/lib/server/errors";
 import { WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
 import { DailyLogRecord, DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
-import { LeadMeasureRecord } from "@/domain/lead-measure/storage/lead-measure.storage";
+import {
+  LeadMeasureRecord,
+  LeadMeasureRecordWithTags,
+  LeadMeasureTagRecord,
+} from "@/domain/lead-measure/storage/lead-measure.storage";
 
 type ScoreboardStoragePort = {
   findOwnedScoreboard(
@@ -28,7 +32,7 @@ type LeadMeasureStoragePort = {
   findLeadMeasuresByScoreboard(
     scoreboardId: number,
     status: "active" | "all",
-  ): Promise<LeadMeasureRecord[]>;
+  ): Promise<LeadMeasureRecordWithTags[]>;
 };
 
 type DailyLogStoragePort = Pick<
@@ -73,14 +77,15 @@ export class DailyLogService {
   ): Promise<{
     weekStart: string;
     weekEnd: string;
-    leadMeasures: Array<{
-      id: number;
-      name: string;
-      period: "WEEKLY" | "MONTHLY";
-      targetValue: number;
-      logs: Record<string, boolean | null>;
-      achieved: number;
-      achievementRate: number;
+      leadMeasures: Array<{
+        id: number;
+        name: string;
+        period: "WEEKLY" | "MONTHLY";
+        targetValue: number;
+        tags: LeadMeasureTagRecord[];
+        logs: Record<string, boolean | null>;
+        achieved: number;
+        achievementRate: number;
       guide: {
         kind: "adjust" | "change";
         description: string;
@@ -135,6 +140,7 @@ export class DailyLogService {
           name: measure.name,
           period: measure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
           targetValue: measure.targetValue,
+          tags: measure.tags ?? [],
           logs: logMap,
           achieved,
           achievementRate: getAchievementRate(achieved, measure.targetValue),
@@ -172,6 +178,7 @@ export class DailyLogService {
       name: string;
       period: "WEEKLY" | "MONTHLY";
       targetValue: number;
+      tags: LeadMeasureTagRecord[];
       logs: Record<string, boolean | null>;
       achieved: number;
       achievementRate: number;
@@ -193,7 +200,7 @@ export class DailyLogService {
     ).filter(
       (
         measure,
-      ): measure is LeadMeasureRecord & { period: "WEEKLY" | "MONTHLY" } =>
+      ): measure is LeadMeasureRecordWithTags & { period: "WEEKLY" | "MONTHLY" } =>
         measure.period === "WEEKLY" || measure.period === "MONTHLY",
     );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
@@ -219,6 +226,7 @@ export class DailyLogService {
         name: measure.name,
         period: measure.period,
         targetValue: measure.targetValue,
+        tags: measure.tags ?? [],
         logs: logMap,
         achieved,
         achievementRate: getAchievementRate(achieved, measure.targetValue),

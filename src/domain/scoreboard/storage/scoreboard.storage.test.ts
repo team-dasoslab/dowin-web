@@ -55,11 +55,29 @@ describe("ScoreboardStorage", () => {
   });
 
   it("활성 점수판을 조회한다", async () => {
-    findFirst.mockResolvedValue({ id: 1 });
+    findFirst.mockResolvedValue({
+      id: 1,
+      leadMeasures: [
+        {
+          id: 10,
+          name: "주 3회 운동",
+          tags: [{ tag: { id: 3, name: "운동" } }],
+        },
+      ],
+    });
 
     const result = await storage.findActiveScoreboard(1, 2);
 
-    expect(result).toEqual({ id: 1 });
+    expect(result).toEqual({
+      id: 1,
+      leadMeasures: [
+        {
+          id: 10,
+          name: "주 3회 운동",
+          tags: [{ id: 3, name: "운동" }],
+        },
+      ],
+    });
     expect(findFirst).toHaveBeenCalled();
   });
 

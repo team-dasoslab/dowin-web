@@ -19,21 +19,27 @@ export default function SetupPage() {
   const {
     activeTooltip,
     addMeasureRow,
+    availableTags,
     archive,
+    createTag,
+    deleteTag,
     goalName,
     handleMeasureChange,
     isArchivePending,
     isInitializing,
     isEditMode,
+    isTagMutationPending,
     lagMeasure,
     measures,
     monthlyTargetMax,
+    renameTag,
     removeMeasureRow,
     setActiveTooltip,
     setGoalName,
     setLagMeasure,
     isSubmitPending,
     submit,
+    toggleMeasureTag,
   } = useScoreboardSetup();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -115,12 +121,18 @@ export default function SetupPage() {
           <LeadMeasuresSection
             activeTooltip={activeTooltip}
             addMeasureRow={addMeasureRow}
+            availableTags={availableTags}
+            createTag={createTag}
+            deleteTag={deleteTag}
             handleMeasureChange={handleMeasureChange}
             isMutating={isMutating}
+            isTagMutationPending={isTagMutationPending}
             measures={measures}
             monthlyTargetMax={monthlyTargetMax}
+            renameTag={renameTag}
             removeMeasureRow={removeMeasureRow}
             setActiveTooltip={setActiveTooltip}
+            toggleMeasureTag={toggleMeasureTag}
           />
 
           <SetupSubmitButton

@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+const workspaceTagNameSchema = z
+  .string()
+  .trim()
+  .min(1, "태그 이름을 입력해주세요.")
+  .max(16, "태그 이름은 16자 이하여야 합니다.");
+
 export const workspaceCreateSchema = z.object({
   name: z.string().min(1, "워크스페이스 이름을 입력해주세요."),
 });
@@ -49,3 +55,19 @@ export const workspaceInviteParamsSchema = z.object({
   id: z.coerce.number().int().positive(),
   inviteId: z.coerce.number().int().positive(),
 });
+
+export const workspaceTagCreateSchema = z.object({
+  name: workspaceTagNameSchema,
+});
+
+export const workspaceTagUpdateSchema = z.object({
+  name: workspaceTagNameSchema,
+});
+
+export const workspaceTagParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+  tagId: z.coerce.number().int().positive(),
+});
+
+export const normalizeWorkspaceTagName = (value: string) =>
+  value.trim().replace(/\s+/g, " ").toLowerCase();

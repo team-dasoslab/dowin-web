@@ -164,6 +164,7 @@ export default function MyDashboardPage() {
             </div>
           ) : selectedView === "month" ? (
             <MonthlyBoardSection
+              activeLeadMeasures={activeLeadMeasures}
               monthLabel={monthLabel}
               monthWeeks={monthWeeks}
               monthlyLeadMeasures={monthlyLeadMeasures}
