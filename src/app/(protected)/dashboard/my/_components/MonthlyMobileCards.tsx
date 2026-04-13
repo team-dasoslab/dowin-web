@@ -1,4 +1,6 @@
+import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
+import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import {
   DAY_LABELS,
@@ -92,6 +94,7 @@ function MonthlyMobileMeasureCard({
   weekDatesInMonth,
 }: MonthlyMobileMeasureCardProps) {
   const targetValue = leadMeasure.targetValue ?? 0;
+  const tags = getMockLeadMeasureTags(leadMeasure.name);
   const visibleAchievedCount = weekDatesInMonth.reduce((count, date) => {
     if (!date) {
       return count;
@@ -103,16 +106,10 @@ function MonthlyMobileMeasureCard({
   return (
     <div className="rounded-lg border border-border bg-sub-background/40 p-3">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-text-primary">
-            {leadMeasure.name}
-          </p>
-          <p className="text-[11px] text-text-muted">
-            목표 {targetValue}회 / {leadMeasure.period === "WEEKLY" ? "주" : "월"}
-          </p>
-        </div>
+        <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
         <AchievementProgress
           achievedCount={visibleAchievedCount}
+          periodLabel={leadMeasure.period === "WEEKLY" ? "주간" : "월간"}
           targetValue={targetValue}
           trackBackgroundClassName="bg-white"
           valueTextSizeClassName="text-xs"

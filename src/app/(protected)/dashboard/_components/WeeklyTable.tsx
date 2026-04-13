@@ -2,8 +2,10 @@
 
 import { TeamDashboardMember, TeamDashboardMemberRole } from "@/api/generated/wig.schemas";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
+import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { TeamMemberMemoPanel } from "@/app/(protected)/dashboard/_components/TeamMemberMemoPanel";
 import { useTeamMemos } from "@/app/(protected)/dashboard/_hooks/useTeamMemos";
+import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
@@ -150,6 +152,7 @@ export function WeeklyTable({
           {member.leadMeasures?.map((leadMeasure) => {
             const achievedCount = leadMeasure.achieved ?? 0;
             const targetValue = leadMeasure.targetValue ?? 0;
+            const tags = getMockLeadMeasureTags(leadMeasure.name);
 
             return (
               <div
@@ -157,21 +160,10 @@ export function WeeklyTable({
                 className="rounded-lg border border-border bg-white p-4"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-text-primary">
-                      {leadMeasure.name}
-                    </p>
-                    <p className="text-[11px] text-text-muted">
-                      목표 {targetValue}회 /{" "}
-                      {leadMeasure.period === "DAILY"
-                        ? "일"
-                        : leadMeasure.period === "WEEKLY"
-                          ? "주"
-                          : "월"}
-                    </p>
-                  </div>
+                  <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
                   <AchievementProgress
                     achievedCount={achievedCount}
+                    periodLabel={leadMeasure.period === "MONTHLY" ? "월간" : "주간"}
                     targetValue={targetValue}
                   />
                 </div>
@@ -263,6 +255,7 @@ export function WeeklyTable({
                   {member.leadMeasures?.map((leadMeasure) => {
                     const achievedCount = leadMeasure.achieved ?? 0;
                     const targetValue = leadMeasure.targetValue ?? 0;
+                    const tags = getMockLeadMeasureTags(leadMeasure.name);
                     const rate =
                       targetValue > 0
                         ? Math.round((achievedCount / targetValue) * 100)
@@ -271,17 +264,11 @@ export function WeeklyTable({
                     return (
                       <tr key={leadMeasure.id} className="bg-white">
                         <td className="py-4 px-5">
-                          <p className="block truncate text-sm font-semibold text-text-primary">
-                            {leadMeasure.name}
-                          </p>
-                          <span className="text-[10px] text-text-muted">
-                            목표 {targetValue}회 /{" "}
-                            {leadMeasure.period === "DAILY"
-                              ? "일"
-                              : leadMeasure.period === "WEEKLY"
-                                ? "주"
-                                : "월"}
-                          </span>
+                          <LeadMeasureSummary
+                            name={leadMeasure.name}
+                            nameClassName="block text-sm font-semibold text-text-primary"
+                            tags={tags}
+                          />
                         </td>
                         {weekDates.map((date) => {
                           const value = leadMeasure.logs?.[date] ?? null;
@@ -304,6 +291,9 @@ export function WeeklyTable({
                         })}
                         <td className="py-4 px-3 text-center">
                           <div className="flex flex-col items-center gap-1.5">
+                            <span className="text-[10px] text-text-muted">
+                              {leadMeasure.period === "MONTHLY" ? "월간" : "주간"}
+                            </span>
                             <div className="h-1 w-10 overflow-hidden rounded-full border border-border bg-sub-background">
                               <div
                                 className={`h-full rounded-full transition-all duration-500 ${

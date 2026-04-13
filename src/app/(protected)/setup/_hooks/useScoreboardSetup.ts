@@ -25,11 +25,18 @@ import { trackEvent } from "@/lib/client/gtag";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { MeasureInput } from "@/app/(protected)/setup/_lib/measure";
+import type {
+  MeasureInput,
+  SetupTag,
+} from "@/app/(protected)/setup/_lib/measure";
 import {
   clampMeasureTargetValue,
   createEmptyMeasure,
   getDaysInMonthFromIsoDate,
+  MAX_MEASURE_TAGS,
+  MAX_TAG_NAME_LENGTH,
+  MOCK_SETUP_TAGS,
+  normalizeTagName,
 } from "@/app/(protected)/setup/_lib/measure";
 
 export const useScoreboardSetup = () => {
@@ -41,6 +48,7 @@ export const useScoreboardSetup = () => {
   const [goalName, setGoalName] = useState("");
   const [lagMeasure, setLagMeasure] = useState("");
   const [measures, setMeasures] = useState<MeasureInput[]>([]);
+  const [availableTags, setAvailableTags] = useState<SetupTag[]>(MOCK_SETUP_TAGS);
   const [activeTooltip, setActiveTooltip] = useState<"lag" | "lead" | null>(
     null,
   );
@@ -100,6 +108,7 @@ export const useScoreboardSetup = () => {
             leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
             monthlyTargetMax,
           ),
+          tags: [],
         })),
       );
       return;
@@ -162,6 +171,98 @@ export const useScoreboardSetup = () => {
     if (measures.length > 1) {
       setMeasures((previous) => previous.filter((measure) => measure.id !== id));
     }
+  };
+
+  const toggleMeasureTag = (measureId: string, tag: SetupTag) => {
+    let limitReached = false;
+
+    setMeasures((previous) =>
+      previous.map((measure) => {
+        if (measure.id !== measureId) {
+          return measure;
+        }
+
+        const hasTag = measure.tags.some((item) => item.id === tag.id);
+
+        if (hasTag) {
+          return {
+            ...measure,
+            tags: measure.tags.filter((item) => item.id !== tag.id),
+          };
+        }
+
+        if (measure.tags.length >= MAX_MEASURE_TAGS) {
+          limitReached = true;
+          return measure;
+        }
+
+        return {
+          ...measure,
+          tags: [...measure.tags, tag],
+        };
+      }),
+    );
+
+    if (limitReached) {
+      showToast("info", `태그는 최대 ${MAX_MEASURE_TAGS}개까지 선택할 수 있어요.`);
+    }
+  };
+
+  const createTag = (measureId: string, rawName: string) => {
+    const nextName = rawName.trim().replace(/\s+/g, " ");
+    const normalizedName = normalizeTagName(rawName);
+
+    if (!nextName) {
+      showToast("info", "태그 이름을 입력해주세요.");
+      return false;
+    }
+
+    if (nextName.length > MAX_TAG_NAME_LENGTH) {
+      showToast("info", `태그 이름은 ${MAX_TAG_NAME_LENGTH}자 이하여야 해요.`);
+      return false;
+    }
+
+    const existingTag = availableTags.find(
+      (tag) => normalizeTagName(tag.name) === normalizedName,
+    );
+
+    if (existingTag) {
+      toggleMeasureTag(measureId, existingTag);
+      return true;
+    }
+
+    const createdTag: SetupTag = {
+      id: Date.now(),
+      name: nextName,
+    };
+
+    let limitReached = false;
+
+    setMeasures((previous) =>
+      previous.map((measure) => {
+        if (measure.id !== measureId) {
+          return measure;
+        }
+
+        if (measure.tags.length >= MAX_MEASURE_TAGS) {
+          limitReached = true;
+          return measure;
+        }
+
+        return {
+          ...measure,
+          tags: [...measure.tags, createdTag],
+        };
+      }),
+    );
+
+    if (limitReached) {
+      showToast("info", `태그는 최대 ${MAX_MEASURE_TAGS}개까지 선택할 수 있어요.`);
+      return false;
+    }
+
+    setAvailableTags((previous) => [...previous, createdTag]);
+    return true;
   };
 
   const invalidateScoreboardQueries = async (targetScoreboardId: number | null) => {
@@ -328,7 +429,9 @@ export const useScoreboardSetup = () => {
   return {
     activeTooltip,
     addMeasureRow,
+    availableTags,
     archive,
+    createTag,
     goalName,
     handleMeasureChange,
     isInitializing:
@@ -349,5 +452,6 @@ export const useScoreboardSetup = () => {
     setGoalName,
     setLagMeasure,
     submit,
+    toggleMeasureTag,
   };
 };

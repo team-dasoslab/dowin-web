@@ -1,12 +1,21 @@
-import type { MeasureInput } from "@/app/(protected)/setup/_lib/measure";
+import {
+  MAX_MEASURE_TAGS,
+  MAX_TAG_NAME_LENGTH,
+  type MeasureInput,
+  type SetupTag,
+} from "@/app/(protected)/setup/_lib/measure";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Activity, Minus, Plus } from "lucide-react";
+import { Activity, Minus, Plus, Tag } from "lucide-react";
+import { useState } from "react";
 
 interface LeadMeasuresSectionProps {
   activeTooltip: "lag" | "lead" | null;
   addMeasureRow: () => void;
+  availableTags: SetupTag[];
+  createTag: (measureId: string, rawName: string) => boolean;
   handleMeasureChange: (
     id: string,
     field: keyof MeasureInput,
@@ -17,17 +26,21 @@ interface LeadMeasuresSectionProps {
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
   setActiveTooltip: (value: "lag" | "lead" | null) => void;
+  toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }
 
 export function LeadMeasuresSection({
   activeTooltip,
   addMeasureRow,
+  availableTags,
+  createTag,
   handleMeasureChange,
   isMutating,
   measures,
   monthlyTargetMax,
   removeMeasureRow,
   setActiveTooltip,
+  toggleMeasureTag,
 }: LeadMeasuresSectionProps) {
   return (
     <Card
@@ -63,6 +76,9 @@ export function LeadMeasuresSection({
             measuresCount={measures.length}
             monthlyTargetMax={monthlyTargetMax}
             removeMeasureRow={removeMeasureRow}
+            availableTags={availableTags}
+            createTag={createTag}
+            toggleMeasureTag={toggleMeasureTag}
           />
         ))}
       </div>
@@ -135,6 +151,9 @@ function LeadMeasureRow({
   measuresCount,
   monthlyTargetMax,
   removeMeasureRow,
+  availableTags,
+  createTag,
+  toggleMeasureTag,
 }: {
   handleMeasureChange: LeadMeasuresSectionProps["handleMeasureChange"];
   index: number;
@@ -143,7 +162,13 @@ function LeadMeasureRow({
   measuresCount: number;
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
+  availableTags: SetupTag[];
+  createTag: (measureId: string, rawName: string) => boolean;
+  toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }) {
+  const [draftTagName, setDraftTagName] = useState("");
+  const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
+
   return (
     <div className="space-y-4 p-5">
       <div className="flex items-center justify-between">
@@ -243,6 +268,115 @@ function LeadMeasureRow({
             회 / {measure.period === "WEEKLY" ? "주" : "월"}
           </span>
         </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-sub-background/60">
+        <div className="flex items-start justify-between gap-3 px-3 py-2.5">
+          <div className="flex min-w-0 flex-1 items-start gap-2">
+            <Tag className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <p className="text-[11px] font-bold text-text-secondary">태그</p>
+              {measure.tags.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {measure.tags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      className="inline-flex items-center rounded-full border border-primary/20 bg-primary px-2.5 py-1 text-[11px] font-semibold text-white"
+                    >
+                      #{tag.name}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[11px] leading-relaxed text-text-muted">
+                  아직 태그가 없습니다.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            disabled={isMutating}
+            onClick={() => setIsTagEditorOpen((previous) => !previous)}
+            className="shrink-0 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-text-secondary transition-colors hover:bg-sub-background hover:text-text-primary"
+          >
+            {isTagEditorOpen ? "완료" : "선택"}
+          </Button>
+        </div>
+
+        {isTagEditorOpen ? (
+          <div className="space-y-3 border-t border-border px-3 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] text-text-muted">
+                분류용 태그를 최대 {MAX_MEASURE_TAGS}개까지 붙일 수 있어요.
+              </p>
+              <span className="text-[11px] text-text-muted">
+                {measure.tags.length}/{MAX_MEASURE_TAGS}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => {
+                const isSelected = measure.tags.some((item) => item.id === tag.id);
+
+                return (
+                  <Button
+                    key={tag.id}
+                    type="button"
+                    disabled={
+                      isMutating ||
+                      (!isSelected && measure.tags.length >= MAX_MEASURE_TAGS)
+                    }
+                    onClick={() => toggleMeasureTag(measure.id, tag)}
+                    className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors ${
+                      isSelected
+                        ? "border-primary bg-primary text-white shadow-sm"
+                        : "border-border bg-white text-text-secondary hover:border-primary/20 hover:text-text-primary"
+                    }`}
+                  >
+                    #{tag.name}
+                  </Button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
+                value={draftTagName}
+                disabled={isMutating}
+                maxLength={MAX_TAG_NAME_LENGTH}
+                onChange={(e) => setDraftTagName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter") {
+                    return;
+                  }
+
+                  e.preventDefault();
+                  const isCreated = createTag(measure.id, draftTagName);
+                  if (isCreated) {
+                    setDraftTagName("");
+                  }
+                }}
+                placeholder={`새 태그 추가 예: 아침루틴 (최대 ${MAX_TAG_NAME_LENGTH}자)`}
+                className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary"
+              />
+              <Button
+                type="button"
+                disabled={isMutating}
+                onClick={() => {
+                  const isCreated = createTag(measure.id, draftTagName);
+                  if (isCreated) {
+                    setDraftTagName("");
+                  }
+                }}
+                className="rounded-lg border border-border bg-white px-4 py-2 text-xs font-bold text-text-primary transition-colors hover:bg-sub-background sm:shrink-0"
+              >
+                태그 추가
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

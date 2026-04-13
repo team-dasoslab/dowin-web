@@ -1,5 +1,7 @@
+import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { MonthlyMobileCards } from "@/app/(protected)/dashboard/my/_components/MonthlyMobileCards";
+import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { DAY_LABELS, getMonthCalendarWeeks } from "@/app/(protected)/dashboard/my/_lib/week";
 import { Check } from "lucide-react";
 
@@ -131,6 +133,7 @@ export function MonthlyBoardSection({
                       <tbody className="divide-y divide-border">
                         {monthlyLeadMeasures.map((leadMeasure) => {
                           const targetValue = leadMeasure.targetValue ?? 0;
+                          const tags = getMockLeadMeasureTags(leadMeasure.name);
                           const visibleAchievedCount = weekDatesInMonth.reduce(
                             (count, date) => {
                               if (!date) {
@@ -154,13 +157,7 @@ export function MonthlyBoardSection({
                               className="bg-white"
                             >
                               <td className="px-5 py-4">
-                                <p className="truncate text-sm font-semibold text-text-primary">
-                                  {leadMeasure.name}
-                                </p>
-                                <p className="text-[10px] text-text-muted">
-                                  목표 {targetValue}회 /{" "}
-                                  {leadMeasure.period === "WEEKLY" ? "주" : "월"}
-                                </p>
+                                <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
                               </td>
 
                               {weekDatesInMonth.map((date, dayIndex) => {
