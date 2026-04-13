@@ -22,14 +22,17 @@ export default function SetupPage() {
     availableTags,
     archive,
     createTag,
+    deleteTag,
     goalName,
     handleMeasureChange,
     isArchivePending,
     isInitializing,
     isEditMode,
+    isTagMutationPending,
     lagMeasure,
     measures,
     monthlyTargetMax,
+    renameTag,
     removeMeasureRow,
     setActiveTooltip,
     setGoalName,
@@ -120,10 +123,13 @@ export default function SetupPage() {
             addMeasureRow={addMeasureRow}
             availableTags={availableTags}
             createTag={createTag}
+            deleteTag={deleteTag}
             handleMeasureChange={handleMeasureChange}
             isMutating={isMutating}
+            isTagMutationPending={isTagMutationPending}
             measures={measures}
             monthlyTargetMax={monthlyTargetMax}
+            renameTag={renameTag}
             removeMeasureRow={removeMeasureRow}
             setActiveTooltip={setActiveTooltip}
             toggleMeasureTag={toggleMeasureTag}

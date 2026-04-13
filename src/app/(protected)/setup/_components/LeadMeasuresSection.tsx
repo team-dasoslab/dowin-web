@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Activity, Minus, Plus, Tag, X } from "lucide-react";
+import { Activity, Ellipsis, Minus, Plus, Tag, X } from "lucide-react";
 import { useState } from "react";
 
 interface LeadMeasuresSectionProps {
@@ -15,14 +15,17 @@ interface LeadMeasuresSectionProps {
   addMeasureRow: () => void;
   availableTags: SetupTag[];
   createTag: (measureId: string, rawName: string) => Promise<boolean>;
+  deleteTag: (tagId: number) => Promise<boolean>;
   handleMeasureChange: (
     id: string,
     field: keyof MeasureInput,
     value: string | number | "WEEKLY" | "MONTHLY" | null,
   ) => void;
   isMutating: boolean;
+  isTagMutationPending: boolean;
   measures: MeasureInput[];
   monthlyTargetMax: number;
+  renameTag: (tagId: number, rawName: string) => Promise<boolean>;
   removeMeasureRow: (id: string) => void;
   setActiveTooltip: (value: "lag" | "lead" | null) => void;
   toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
@@ -33,10 +36,13 @@ export function LeadMeasuresSection({
   addMeasureRow,
   availableTags,
   createTag,
+  deleteTag,
   handleMeasureChange,
   isMutating,
+  isTagMutationPending,
   measures,
   monthlyTargetMax,
+  renameTag,
   removeMeasureRow,
   setActiveTooltip,
   toggleMeasureTag,
@@ -77,7 +83,10 @@ export function LeadMeasuresSection({
             removeMeasureRow={removeMeasureRow}
             availableTags={availableTags}
             createTag={createTag}
+            deleteTag={deleteTag}
             toggleMeasureTag={toggleMeasureTag}
+            isTagMutationPending={isTagMutationPending}
+            renameTag={renameTag}
           />
         ))}
       </div>
@@ -152,7 +161,10 @@ function LeadMeasureRow({
   removeMeasureRow,
   availableTags,
   createTag,
+  deleteTag,
   toggleMeasureTag,
+  isTagMutationPending,
+  renameTag,
 }: {
   handleMeasureChange: LeadMeasuresSectionProps["handleMeasureChange"];
   index: number;
@@ -163,10 +175,16 @@ function LeadMeasureRow({
   removeMeasureRow: (id: string) => void;
   availableTags: SetupTag[];
   createTag: (measureId: string, rawName: string) => Promise<boolean>;
+  deleteTag: (tagId: number) => Promise<boolean>;
+  isTagMutationPending: boolean;
+  renameTag: (tagId: number, rawName: string) => Promise<boolean>;
   toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }) {
   const [draftTagName, setDraftTagName] = useState("");
   const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
+  const [editingTagId, setEditingTagId] = useState<number | null>(null);
+  const [editingTagName, setEditingTagName] = useState("");
+  const [openActionTagId, setOpenActionTagId] = useState<number | null>(null);
 
   return (
     <div className="space-y-4 p-5">
@@ -279,11 +297,11 @@ function LeadMeasureRow({
                 <div className="flex flex-wrap gap-1.5">
                   {measure.tags.map((tag) => (
                     <Button
-                      key={tag.id}
-                      type="button"
-                      disabled={isMutating}
-                      onClick={() => toggleMeasureTag(measure.id, tag)}
-                      className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary px-2.5 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
+                    key={tag.id}
+                    type="button"
+                    disabled={isMutating}
+                    onClick={() => toggleMeasureTag(measure.id, tag)}
+                    className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary px-2.5 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
                     >
                       #{tag.name}
                       <X className="h-3 w-3" />
@@ -328,20 +346,134 @@ function LeadMeasureRow({
                 }
 
                 return (
-                  <Button
+                  <div
                     key={tag.id}
-                    type="button"
-                    disabled={
-                      isMutating ||
-                      measure.tags.length >= MAX_MEASURE_TAGS
-                    }
-                    onClick={() => toggleMeasureTag(measure.id, tag)}
-                    className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors ${
-                      "border-border bg-white text-text-secondary hover:border-primary/20 hover:text-text-primary"
-                    }`}
+                    className="relative flex items-center gap-1 rounded-full border border-border bg-white pr-1"
                   >
-                    #{tag.name}
-                  </Button>
+                    {editingTagId === tag.id ? (
+                      <>
+                        <Input
+                          value={editingTagName}
+                          disabled={isMutating || isTagMutationPending}
+                          maxLength={MAX_TAG_NAME_LENGTH}
+                          onChange={(e) => setEditingTagName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              void renameTag(tag.id, editingTagName).then((isRenamed) => {
+                                if (isRenamed) {
+                                  setEditingTagId(null);
+                                  setEditingTagName("");
+                                }
+                              });
+                            }
+
+                            if (e.key === "Escape") {
+                              setEditingTagId(null);
+                              setEditingTagName("");
+                              setOpenActionTagId(null);
+                            }
+                          }}
+                          className="h-8 min-w-24 border-0 bg-transparent px-3 py-0 text-[11px] font-semibold text-text-primary outline-none"
+                        />
+                        <Button
+                          type="button"
+                          disabled={isMutating || isTagMutationPending}
+                          onClick={() => {
+                            void renameTag(tag.id, editingTagName).then((isRenamed) => {
+                              if (isRenamed) {
+                                setEditingTagId(null);
+                                setEditingTagName("");
+                                setOpenActionTagId(null);
+                              }
+                            });
+                          }}
+                          className="rounded-full px-2 py-1 text-[10px] font-bold text-primary"
+                        >
+                          저장
+                        </Button>
+                        <Button
+                          type="button"
+                          disabled={isMutating || isTagMutationPending}
+                          onClick={() => {
+                            setEditingTagId(null);
+                            setEditingTagName("");
+                            setOpenActionTagId(null);
+                          }}
+                          className="rounded-full px-2 py-1 text-[10px] font-bold text-text-muted"
+                        >
+                          취소
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          type="button"
+                          disabled={isMutating || measure.tags.length >= MAX_MEASURE_TAGS}
+                          onClick={() => toggleMeasureTag(measure.id, tag)}
+                          className="rounded-full px-3 py-1.5 text-[11px] font-semibold text-text-secondary transition-colors hover:text-text-primary"
+                        >
+                          #{tag.name}
+                        </Button>
+                        <Button
+                          type="button"
+                          disabled={isMutating || isTagMutationPending}
+                          onClick={() => {
+                            setOpenActionTagId((currentId) =>
+                              currentId === tag.id ? null : tag.id,
+                            );
+                          }}
+                          className="rounded-full p-1 text-text-muted hover:text-text-primary"
+                          aria-label="태그 작업 열기"
+                        >
+                          <Ellipsis className="h-3 w-3" />
+                        </Button>
+                        {openActionTagId === tag.id ? (
+                          <>
+                            <div
+                              className="fixed inset-0 z-10"
+                              onClick={() => setOpenActionTagId(null)}
+                            />
+                            <div className="absolute right-0 top-full z-20 mt-2 min-w-28 rounded-xl border border-border bg-white p-1.5 shadow-lg">
+                              <Button
+                                type="button"
+                                disabled={isMutating || isTagMutationPending}
+                                onClick={() => {
+                                  setEditingTagId(tag.id);
+                                  setEditingTagName(tag.name);
+                                  setOpenActionTagId(null);
+                                }}
+                                className="flex w-full items-center justify-start rounded-lg px-3 py-2 text-[11px] font-semibold text-text-primary hover:bg-sub-background"
+                              >
+                                수정
+                              </Button>
+                              <Button
+                                type="button"
+                                disabled={isMutating || isTagMutationPending}
+                                onClick={() => {
+                                  const shouldDelete = window.confirm(
+                                    "이 태그를 삭제할까요? 연결된 선행지표에서도 함께 빠집니다.",
+                                  );
+
+                                  if (!shouldDelete) {
+                                    setOpenActionTagId(null);
+                                    return;
+                                  }
+
+                                  void deleteTag(tag.id).then(() => {
+                                    setOpenActionTagId(null);
+                                  });
+                                }}
+                                className="flex w-full items-center justify-start rounded-lg px-3 py-2 text-[11px] font-semibold text-danger hover:bg-danger/5"
+                              >
+                                삭제
+                              </Button>
+                            </div>
+                          </>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
                 );
               })}
             </div>
