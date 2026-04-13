@@ -2,6 +2,7 @@ import type { EventData, Options, Step, Styles } from "react-joyride";
 import { STATUS } from "react-joyride";
 
 export const SETUP_COACHMARK_STORAGE_KEY = "wig.setup.coachmark.v1.dismissed";
+export const SETUP_COACHMARK_LEAD_TAGS_QUERY = "lead-measure-tags";
 
 export const SETUP_COACHMARK_STEPS: Step[] = [
   {
@@ -22,6 +23,16 @@ export const SETUP_COACHMARK_STEPS: Step[] = [
     title: "선행지표",
     content:
       "선행지표는 결과를 바꾸는 행동입니다. 예측 가능하고 내가 직접 통제할 수 있어야 합니다. 매일/매주 반복할 행동으로 적으세요.",
+  },
+];
+
+export const SETUP_LEAD_TAGS_COACHMARK_STEPS: Step[] = [
+  {
+    target: '[data-coachmark="setup-lead-tags"]',
+    title: "선행지표 태그",
+    content:
+      "여기서 태그를 만들고 붙이면 비슷한 행동을 같은 카테고리로 묶어 관리할 수 있습니다. 설정한 태그는 내 대시보드에서도 함께 보여요.",
+    skipBeacon: true,
   },
 ];
 
@@ -88,9 +99,14 @@ export const SETUP_COACHMARK_STYLES: Partial<Styles> = {
 export function handleSetupCoachmarkEvent(
   data: EventData,
   setIsCoachmarkRunning: (value: boolean) => void,
+  options?: {
+    persistDismissed?: boolean;
+  },
 ) {
   if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
-    localStorage.setItem(SETUP_COACHMARK_STORAGE_KEY, "1");
+    if (options?.persistDismissed ?? true) {
+      localStorage.setItem(SETUP_COACHMARK_STORAGE_KEY, "1");
+    }
     setIsCoachmarkRunning(false);
   }
 }

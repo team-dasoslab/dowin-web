@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Activity, Ellipsis, Minus, Plus, Tag, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface LeadMeasuresSectionProps {
   activeTooltip: "lag" | "lead" | null;
   addMeasureRow: () => void;
   availableTags: SetupTag[];
+  coachmarkTarget?: "lead-measure-tags" | null;
   createTag: (measureId: string, rawName: string) => Promise<boolean>;
   deleteTag: (tagId: number) => Promise<boolean>;
   handleMeasureChange: (
@@ -35,6 +36,7 @@ export function LeadMeasuresSection({
   activeTooltip,
   addMeasureRow,
   availableTags,
+  coachmarkTarget,
   createTag,
   deleteTag,
   handleMeasureChange,
@@ -82,6 +84,9 @@ export function LeadMeasuresSection({
             monthlyTargetMax={monthlyTargetMax}
             removeMeasureRow={removeMeasureRow}
             availableTags={availableTags}
+            isTagCoachmarkTarget={
+              coachmarkTarget === "lead-measure-tags" && index === 0
+            }
             createTag={createTag}
             deleteTag={deleteTag}
             toggleMeasureTag={toggleMeasureTag}
@@ -160,6 +165,7 @@ function LeadMeasureRow({
   monthlyTargetMax,
   removeMeasureRow,
   availableTags,
+  isTagCoachmarkTarget,
   createTag,
   deleteTag,
   toggleMeasureTag,
@@ -174,6 +180,7 @@ function LeadMeasureRow({
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
   availableTags: SetupTag[];
+  isTagCoachmarkTarget: boolean;
   createTag: (measureId: string, rawName: string) => Promise<boolean>;
   deleteTag: (tagId: number) => Promise<boolean>;
   isTagMutationPending: boolean;
@@ -185,6 +192,12 @@ function LeadMeasureRow({
   const [editingTagId, setEditingTagId] = useState<number | null>(null);
   const [editingTagName, setEditingTagName] = useState("");
   const [openActionTagId, setOpenActionTagId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (isTagCoachmarkTarget) {
+      setIsTagEditorOpen(true);
+    }
+  }, [isTagCoachmarkTarget]);
 
   return (
     <div className="space-y-4 p-5">
@@ -287,7 +300,10 @@ function LeadMeasureRow({
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-sub-background/60">
+      <div
+        className="rounded-xl border border-border bg-sub-background/60"
+        data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
+      >
         <div className="flex items-start justify-between gap-3 px-3 py-2.5">
           <div className="flex min-w-0 flex-1 items-start gap-2">
             <Tag className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
