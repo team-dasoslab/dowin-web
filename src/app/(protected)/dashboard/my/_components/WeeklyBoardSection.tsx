@@ -4,7 +4,6 @@ import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
 import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { WeeklyMobileCards } from "@/app/(protected)/dashboard/my/_components/WeeklyMobileCards";
-import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { isEditableDailyLogDate } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
@@ -98,7 +97,6 @@ export function WeeklyBoardSection({
                   const guide = weeklyGuideById.get(leadMeasureId);
                   const achievedCount = weekly?.achieved ?? 0;
                   const targetValue = leadMeasure.targetValue ?? 0;
-                  const tags = getMockLeadMeasureTags(leadMeasure.name);
                   const rate =
                     targetValue > 0
                       ? Math.round((achievedCount / targetValue) * 100)
@@ -118,7 +116,7 @@ export function WeeklyBoardSection({
                               currentId === leadMeasureId ? null : leadMeasureId,
                             )
                           }
-                          tags={tags}
+                          tags={leadMeasure.tags ?? []}
                         />
                       </td>
 

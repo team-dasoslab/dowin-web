@@ -11,7 +11,7 @@ type LeadMeasureSummaryProps = {
   nameClassName?: string;
   onGuideClose?: () => void;
   onGuideToggle?: () => void;
-  tags?: string[];
+  tags?: Array<{ id?: number | null; name?: string | null }>;
 };
 
 export function LeadMeasureSummary({
@@ -40,12 +40,12 @@ export function LeadMeasureSummary({
       </div>
       {tags.length > 0 ? (
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {tags.map((tag) => (
+          {tags.map((tag, index) => (
             <Badge
-              key={tag}
+              key={tag.id ?? `${tag.name ?? "tag"}-${index}`}
               className="inline-flex items-center rounded-full border border-primary/15 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
             >
-              #{tag}
+              #{tag.name}
             </Badge>
           ))}
         </div>

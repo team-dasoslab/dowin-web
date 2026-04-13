@@ -3,7 +3,6 @@
 import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
 import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
-import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { isEditableDailyLogDate } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
@@ -66,8 +65,6 @@ function WeeklyMobileCard({
   const achievedCount = weekly?.achieved ?? 0;
   const targetValue = leadMeasure.targetValue ?? 0;
   const guide = weeklyGuideById.get(leadMeasureId);
-  const tags = getMockLeadMeasureTags(leadMeasure.name);
-
   return (
     <div className="rounded-lg border border-border bg-white p-4">
       <div className="flex items-start justify-between gap-3">
@@ -78,7 +75,7 @@ function WeeklyMobileCard({
             name={leadMeasure.name}
             onGuideClose={() => setIsGuideOpen(false)}
             onGuideToggle={() => setIsGuideOpen((open) => !open)}
-            tags={tags}
+            tags={leadMeasure.tags ?? []}
           />
         </div>
         <AchievementProgress

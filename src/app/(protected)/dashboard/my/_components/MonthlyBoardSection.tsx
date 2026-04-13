@@ -1,11 +1,11 @@
 import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { MonthlyMobileCards } from "@/app/(protected)/dashboard/my/_components/MonthlyMobileCards";
-import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { DAY_LABELS, getMonthCalendarWeeks } from "@/app/(protected)/dashboard/my/_lib/week";
 import { Check } from "lucide-react";
 
 interface MonthlyBoardSectionProps {
+  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
   monthLabel?: string;
   monthWeeks: ReturnType<typeof getMonthCalendarWeeks>;
   monthlyLeadMeasures: ReturnType<typeof useDashboardScoreboard>["monthlyLeadMeasures"];
@@ -15,6 +15,7 @@ interface MonthlyBoardSectionProps {
 }
 
 export function MonthlyBoardSection({
+  activeLeadMeasures,
   monthLabel,
   monthWeeks,
   monthlyLeadMeasures,
@@ -22,6 +23,13 @@ export function MonthlyBoardSection({
   monthlySummary,
   today,
 }: MonthlyBoardSectionProps) {
+  const tagsByMeasureId = new Map(
+    activeLeadMeasures.map((leadMeasure) => [
+      leadMeasure.id ?? null,
+      leadMeasure.tags ?? [],
+    ]),
+  );
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-border bg-white px-5 py-3">
@@ -46,6 +54,7 @@ export function MonthlyBoardSection({
       ) : (
         <>
           <MonthlyMobileCards
+            activeLeadMeasures={activeLeadMeasures}
             monthLabel={monthLabel}
             monthWeeks={monthWeeks}
             monthlyLeadMeasures={monthlyLeadMeasures}
@@ -133,7 +142,7 @@ export function MonthlyBoardSection({
                       <tbody className="divide-y divide-border">
                         {monthlyLeadMeasures.map((leadMeasure) => {
                           const targetValue = leadMeasure.targetValue ?? 0;
-                          const tags = getMockLeadMeasureTags(leadMeasure.name);
+                          const tags = tagsByMeasureId.get(leadMeasure.id ?? null) ?? [];
                           const visibleAchievedCount = weekDatesInMonth.reduce(
                             (count, date) => {
                               if (!date) {

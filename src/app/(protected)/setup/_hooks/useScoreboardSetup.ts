@@ -15,6 +15,12 @@ import {
   usePostScoreboardsScoreboardIdLeadMeasures,
   usePutLeadMeasuresId,
 } from "@/api/generated/lead-measure/lead-measure";
+import {
+  getGetWorkspacesIdTagsQueryKey,
+  useGetWorkspacesIdTags,
+  useGetWorkspacesMe,
+  usePostWorkspacesIdTags,
+} from "@/api/generated/workspace/workspace";
 import { useToast } from "@/context/ToastContext";
 import {
   getApiErrorMessage,
@@ -35,7 +41,6 @@ import {
   getDaysInMonthFromIsoDate,
   MAX_MEASURE_TAGS,
   MAX_TAG_NAME_LENGTH,
-  MOCK_SETUP_TAGS,
   normalizeTagName,
 } from "@/app/(protected)/setup/_lib/measure";
 
@@ -48,10 +53,27 @@ export const useScoreboardSetup = () => {
   const [goalName, setGoalName] = useState("");
   const [lagMeasure, setLagMeasure] = useState("");
   const [measures, setMeasures] = useState<MeasureInput[]>([]);
-  const [availableTags, setAvailableTags] = useState<SetupTag[]>(MOCK_SETUP_TAGS);
   const [activeTooltip, setActiveTooltip] = useState<"lag" | "lead" | null>(
     null,
   );
+  const { data: workspaceResponse, isLoading: isWorkspaceLoading } =
+    useGetWorkspacesMe({
+      query: {
+        retry: false,
+      },
+    });
+  const workspace =
+    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+  const workspaceId = toNumberId(workspace?.id);
+  const { data: workspaceTagsResponse, isLoading: isWorkspaceTagsLoading } =
+    useGetWorkspacesIdTags(workspaceId ?? 0, {
+      query: {
+        enabled: workspaceId !== null,
+        retry: false,
+      },
+    });
+  const availableTags: SetupTag[] =
+    workspaceTagsResponse?.status === 200 ? workspaceTagsResponse.data : [];
 
   const {
     data: activeScoreboardResponse,
@@ -90,6 +112,7 @@ export const useScoreboardSetup = () => {
   const createLeadMeasureMutation = usePostScoreboardsScoreboardIdLeadMeasures();
   const updateLeadMeasureMutation = usePutLeadMeasuresId();
   const deleteLeadMeasureMutation = useDeleteLeadMeasuresId();
+  const createWorkspaceTagMutation = usePostWorkspacesIdTags();
 
   useEffect(() => {
     if (isEditMode && activeScoreboard && leadMeasuresResponse?.status === 200) {
@@ -108,7 +131,11 @@ export const useScoreboardSetup = () => {
             leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
             monthlyTargetMax,
           ),
-          tags: [],
+          tags:
+            leadMeasure.tags?.map((tag) => ({
+              id: tag.id,
+              name: tag.name,
+            })) ?? [],
         })),
       );
       return;
@@ -208,7 +235,7 @@ export const useScoreboardSetup = () => {
     }
   };
 
-  const createTag = (measureId: string, rawName: string) => {
+  const createTag = async (measureId: string, rawName: string) => {
     const nextName = rawName.trim().replace(/\s+/g, " ");
     const normalizedName = normalizeTagName(rawName);
 
@@ -231,12 +258,21 @@ export const useScoreboardSetup = () => {
       return true;
     }
 
-    const createdTag: SetupTag = {
-      id: Date.now(),
+    const currentMeasure = measures.find((measure) => measure.id === measureId);
+    if ((currentMeasure?.tags.length ?? 0) >= MAX_MEASURE_TAGS) {
+      showToast("info", `태그는 최대 ${MAX_MEASURE_TAGS}개까지 선택할 수 있어요.`);
+      return false;
+    }
+
+    if (workspaceId === null) {
+      showToast("error", "워크스페이스 정보를 확인할 수 없습니다.");
+      return false;
+    }
+
+    const optimisticTag: SetupTag = {
+      id: -Date.now(),
       name: nextName,
     };
-
-    let limitReached = false;
 
     setMeasures((previous) =>
       previous.map((measure) => {
@@ -244,25 +280,66 @@ export const useScoreboardSetup = () => {
           return measure;
         }
 
-        if (measure.tags.length >= MAX_MEASURE_TAGS) {
-          limitReached = true;
-          return measure;
-        }
-
         return {
           ...measure,
-          tags: [...measure.tags, createdTag],
+          tags: [...measure.tags, optimisticTag],
         };
       }),
     );
 
-    if (limitReached) {
-      showToast("info", `태그는 최대 ${MAX_MEASURE_TAGS}개까지 선택할 수 있어요.`);
+    try {
+      const createdTagResponse = await createWorkspaceTagMutation.mutateAsync({
+        id: workspaceId,
+        data: {
+          name: nextName,
+        },
+      });
+
+      if (createdTagResponse.status !== 201) {
+        throw new Error("태그 생성에 실패했습니다.");
+      }
+
+      const createdTag: SetupTag = {
+        id: createdTagResponse.data.id,
+        name: createdTagResponse.data.name,
+      };
+
+      setMeasures((previous) =>
+        previous.map((measure) => {
+          if (measure.id !== measureId) {
+            return measure;
+          }
+
+          return {
+            ...measure,
+            tags: measure.tags.map((tag) =>
+              tag.id === optimisticTag.id ? createdTag : tag,
+            ),
+          };
+        }),
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: getGetWorkspacesIdTagsQueryKey(workspaceId),
+      });
+
+      return true;
+    } catch (error) {
+      setMeasures((previous) =>
+        previous.map((measure) => {
+          if (measure.id !== measureId) {
+            return measure;
+          }
+
+          return {
+            ...measure,
+            tags: measure.tags.filter((tag) => tag.id !== optimisticTag.id),
+          };
+        }),
+      );
+      showToast("error", getApiErrorMessage(error, "태그 생성에 실패했습니다."));
       return false;
     }
-
-    setAvailableTags((previous) => [...previous, createdTag]);
-    return true;
   };
 
   const invalidateScoreboardQueries = async (targetScoreboardId: number | null) => {
@@ -323,6 +400,7 @@ export const useScoreboardSetup = () => {
               name: measure.name,
               targetValue: measure.targetValue,
               period: measure.period,
+              tagIds: measure.tags.map((tag) => tag.id),
             },
           });
         }
@@ -355,6 +433,7 @@ export const useScoreboardSetup = () => {
                 name: measure.name,
                 targetValue: measure.targetValue,
                 period: measure.period,
+                tagIds: measure.tags.map((tag) => tag.id),
               },
             });
             continue;
@@ -366,6 +445,7 @@ export const useScoreboardSetup = () => {
               name: measure.name,
               targetValue: measure.targetValue,
               period: measure.period,
+              tagIds: measure.tags.map((tag) => tag.id),
             },
           });
 
@@ -435,7 +515,10 @@ export const useScoreboardSetup = () => {
     goalName,
     handleMeasureChange,
     isInitializing:
-      isActiveScoreboardLoading || (scoreboardId !== null && isLeadMeasuresLoading),
+      isWorkspaceLoading ||
+      (workspaceId !== null && isWorkspaceTagsLoading) ||
+      isActiveScoreboardLoading ||
+      (scoreboardId !== null && isLeadMeasuresLoading),
     isSubmitPending:
       createScoreboardMutation.isPending ||
       updateScoreboardMutation.isPending ||

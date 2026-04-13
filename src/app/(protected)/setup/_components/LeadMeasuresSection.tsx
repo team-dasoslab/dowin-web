@@ -15,7 +15,7 @@ interface LeadMeasuresSectionProps {
   activeTooltip: "lag" | "lead" | null;
   addMeasureRow: () => void;
   availableTags: SetupTag[];
-  createTag: (measureId: string, rawName: string) => boolean;
+  createTag: (measureId: string, rawName: string) => Promise<boolean>;
   handleMeasureChange: (
     id: string,
     field: keyof MeasureInput,
@@ -163,7 +163,7 @@ function LeadMeasureRow({
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
   availableTags: SetupTag[];
-  createTag: (measureId: string, rawName: string) => boolean;
+  createTag: (measureId: string, rawName: string) => Promise<boolean>;
   toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }) {
   const [draftTagName, setDraftTagName] = useState("");
@@ -353,10 +353,11 @@ function LeadMeasureRow({
                   }
 
                   e.preventDefault();
-                  const isCreated = createTag(measure.id, draftTagName);
-                  if (isCreated) {
-                    setDraftTagName("");
-                  }
+                  void createTag(measure.id, draftTagName).then((isCreated) => {
+                    if (isCreated) {
+                      setDraftTagName("");
+                    }
+                  });
                 }}
                 placeholder={`새 태그 추가 예: 아침루틴 (최대 ${MAX_TAG_NAME_LENGTH}자)`}
                 className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary"
@@ -365,10 +366,11 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating}
                 onClick={() => {
-                  const isCreated = createTag(measure.id, draftTagName);
-                  if (isCreated) {
-                    setDraftTagName("");
-                  }
+                  void createTag(measure.id, draftTagName).then((isCreated) => {
+                    if (isCreated) {
+                      setDraftTagName("");
+                    }
+                  });
                 }}
                 className="rounded-lg border border-border bg-white px-4 py-2 text-xs font-bold text-text-primary transition-colors hover:bg-sub-background sm:shrink-0"
               >

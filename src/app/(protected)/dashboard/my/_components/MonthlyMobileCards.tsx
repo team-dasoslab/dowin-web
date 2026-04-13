@@ -1,6 +1,5 @@
 import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
-import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import {
   DAY_LABELS,
@@ -13,6 +12,7 @@ type MonthlyLeadMeasure = NonNullable<
 >[number];
 
 type MonthlyMobileCardsProps = {
+  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
   monthWeeks: ReturnType<typeof getMonthCalendarWeeks>;
   monthLabel?: string;
   monthlyLeadMeasures: MonthlyLeadMeasure[];
@@ -22,13 +22,21 @@ type MonthlyMobileCardsProps = {
 type MonthlyMobileWeekCardProps = {
   monthLabel?: string;
   monthlyLeadMeasures: MonthlyLeadMeasure[];
+  tagsByMeasureId: Map<number | null, Array<{ id?: number | null; name?: string | null }>>;
   today: string;
   weekDatesInMonth: ReturnType<typeof getMonthCalendarWeeks>[number];
   weekIndex: number;
 };
 
 export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
-  const { monthLabel, monthWeeks, monthlyLeadMeasures, today } = props;
+  const { activeLeadMeasures, monthLabel, monthWeeks, monthlyLeadMeasures, today } =
+    props;
+  const tagsByMeasureId = new Map(
+    activeLeadMeasures.map((leadMeasure) => [
+      leadMeasure.id ?? null,
+      leadMeasure.tags ?? [],
+    ]),
+  );
 
   return (
     <div className="space-y-3 md:hidden">
@@ -37,6 +45,7 @@ export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
           key={`${monthLabel}-mobile-week-${weekIndex + 1}`}
           monthLabel={monthLabel}
           monthlyLeadMeasures={monthlyLeadMeasures}
+          tagsByMeasureId={tagsByMeasureId}
           today={today}
           weekDatesInMonth={weekDatesInMonth}
           weekIndex={weekIndex}
@@ -49,6 +58,7 @@ export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
 function MonthlyMobileWeekCard({
   monthLabel,
   monthlyLeadMeasures,
+  tagsByMeasureId,
   today,
   weekDatesInMonth,
   weekIndex,
@@ -73,6 +83,7 @@ function MonthlyMobileWeekCard({
           <MonthlyMobileMeasureCard
             key={`${monthLabel}-${weekIndex}-${leadMeasure.id}-mobile`}
             leadMeasure={leadMeasure}
+            tags={tagsByMeasureId.get(leadMeasure.id ?? null) ?? []}
             today={today}
             weekDatesInMonth={weekDatesInMonth}
           />
@@ -84,17 +95,18 @@ function MonthlyMobileWeekCard({
 
 type MonthlyMobileMeasureCardProps = {
   leadMeasure: MonthlyLeadMeasure;
+  tags: Array<{ id?: number | null; name?: string | null }>;
   today: string;
   weekDatesInMonth: ReturnType<typeof getMonthCalendarWeeks>[number];
 };
 
 function MonthlyMobileMeasureCard({
   leadMeasure,
+  tags,
   today,
   weekDatesInMonth,
 }: MonthlyMobileMeasureCardProps) {
   const targetValue = leadMeasure.targetValue ?? 0;
-  const tags = getMockLeadMeasureTags(leadMeasure.name);
   const visibleAchievedCount = weekDatesInMonth.reduce((count, date) => {
     if (!date) {
       return count;

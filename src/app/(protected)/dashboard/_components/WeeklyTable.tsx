@@ -5,7 +5,6 @@ import { AchievementProgress } from "@/app/(protected)/dashboard/_components/Ach
 import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { TeamMemberMemoPanel } from "@/app/(protected)/dashboard/_components/TeamMemberMemoPanel";
 import { useTeamMemos } from "@/app/(protected)/dashboard/_hooks/useTeamMemos";
-import { getMockLeadMeasureTags } from "@/app/(protected)/dashboard/my/_lib/mock-tags";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
@@ -152,7 +151,6 @@ export function WeeklyTable({
           {member.leadMeasures?.map((leadMeasure) => {
             const achievedCount = leadMeasure.achieved ?? 0;
             const targetValue = leadMeasure.targetValue ?? 0;
-            const tags = getMockLeadMeasureTags(leadMeasure.name);
 
             return (
               <div
@@ -160,7 +158,7 @@ export function WeeklyTable({
                 className="rounded-lg border border-border bg-white p-4"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
+                  <LeadMeasureSummary name={leadMeasure.name} />
                   <AchievementProgress
                     achievedCount={achievedCount}
                     periodLabel={leadMeasure.period === "MONTHLY" ? "월간" : "주간"}
@@ -255,7 +253,6 @@ export function WeeklyTable({
                   {member.leadMeasures?.map((leadMeasure) => {
                     const achievedCount = leadMeasure.achieved ?? 0;
                     const targetValue = leadMeasure.targetValue ?? 0;
-                    const tags = getMockLeadMeasureTags(leadMeasure.name);
                     const rate =
                       targetValue > 0
                         ? Math.round((achievedCount / targetValue) * 100)
@@ -267,7 +264,6 @@ export function WeeklyTable({
                           <LeadMeasureSummary
                             name={leadMeasure.name}
                             nameClassName="block text-sm font-semibold text-text-primary"
-                            tags={tags}
                           />
                         </td>
                         {weekDates.map((date) => {
