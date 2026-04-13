@@ -331,6 +331,22 @@ describe("WorkspaceService", () => {
       ).rejects.toThrow("WORKSPACE_TAG_ALREADY_EXISTS");
     });
 
+    it("D1 cause에 유니크 충돌이 들어와도 409 에러를 던진다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      const wrappedError = new Error("Failed query");
+      wrappedError.cause = new Error(
+        "UNIQUE constraint failed: workspace_tags.workspace_id, workspace_tags.normalized_name: SQLITE_CONSTRAINT",
+      );
+      mockStorage.createTag.mockRejectedValue(wrappedError);
+
+      await expect(
+        service.createTag(1, 7, {
+          name: "운동",
+          normalizedName: "운동",
+        }),
+      ).rejects.toThrow("WORKSPACE_TAG_ALREADY_EXISTS");
+    });
+
     it("태그 이름을 수정한다", async () => {
       mockStorage.findTagById.mockResolvedValue({
         id: 10,
