@@ -247,6 +247,11 @@ export const LeadMeasureStatus = {
   ARCHIVED: 'ARCHIVED',
 } as const;
 
+export interface LeadMeasureTag {
+  id: number;
+  name: string;
+}
+
 export interface LeadMeasure {
   id?: number;
   scoreboardId?: number;
@@ -254,6 +259,7 @@ export interface LeadMeasure {
   targetValue?: number;
   period?: LeadMeasurePeriod;
   status?: LeadMeasureStatus;
+  tags?: LeadMeasureTag[];
   createdAt?: string;
   /** @nullable */
   archivedAt?: string | null;
@@ -282,6 +288,8 @@ export interface LeadMeasureCreateRequest {
   /** @minimum 1 */
   targetValue: number;
   period: LeadMeasureCreateRequestPeriod;
+  /** @maxItems 3 */
+  tagIds?: number[];
 }
 
 export type LeadMeasureUpdateRequestPeriod = typeof LeadMeasureUpdateRequestPeriod[keyof typeof LeadMeasureUpdateRequestPeriod];
@@ -298,6 +306,27 @@ export interface LeadMeasureUpdateRequest {
   /** @minimum 1 */
   targetValue?: number;
   period?: LeadMeasureUpdateRequestPeriod;
+  /** @maxItems 3 */
+  tagIds?: number[];
+}
+
+export interface WorkspaceTag {
+  id: number;
+  workspaceId: number;
+  name: string;
+  /** @nullable */
+  createdByUserId?: number | null;
+  createdAt: string;
+}
+
+export interface WorkspaceTagCreateRequest {
+  /** @maxLength 16 */
+  name: string;
+}
+
+export interface WorkspaceTagUpdateRequest {
+  /** @maxLength 16 */
+  name: string;
 }
 
 export interface DailyLog {

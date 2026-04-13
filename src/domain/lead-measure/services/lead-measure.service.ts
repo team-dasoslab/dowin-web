@@ -2,7 +2,8 @@ import { BadRequestError, ForbiddenError, NotFoundError } from "@/lib/server/err
 import { ScoreboardStoragePort, WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
 import {
   CreateLeadMeasureInput,
-  LeadMeasureRecord,
+  LeadMeasureRecordWithTags,
+  LeadMeasureTagRecord,
   LeadMeasureStorage,
   LeadMeasureWithScoreboard,
   UpdateLeadMeasureInput,
@@ -26,6 +27,7 @@ type LeadMeasureStoragePort = Pick<
   | "archiveLeadMeasure"
   | "reactivateLeadMeasure"
   | "deleteLeadMeasure"
+  | "findTagsByIdsInWorkspace"
 >;
 
 export class LeadMeasureService {
@@ -40,7 +42,7 @@ export class LeadMeasureService {
     scoreboardId: number,
     userId: number,
     status: "active" | "all",
-  ): Promise<Array<LeadMeasureRecord & { weeklyAchievement: { achieved: number; total: number } }>> {
+  ): Promise<Array<LeadMeasureRecordWithTags & { weeklyAchievement: { achieved: number; total: number } }>> {
     await this.getOwnedScoreboard(scoreboardId, userId);
     const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
@@ -66,7 +68,7 @@ export class LeadMeasureService {
     scoreboardId: number,
     userId: number,
     input: Omit<CreateLeadMeasureInput, "scoreboardId">,
-  ): Promise<LeadMeasureRecord> {
+  ): Promise<LeadMeasureRecordWithTags> {
     const scoreboard = await this.getOwnedScoreboard(scoreboardId, userId);
 
     if (scoreboard.status === "ARCHIVED") {
@@ -74,6 +76,7 @@ export class LeadMeasureService {
     }
 
     validateTargetValue(input.targetValue, input.period, scoreboard.startDate);
+    await this.assertWorkspaceTagOwnership(scoreboard.workspaceId, input.tagIds ?? []);
 
     return await this.leadMeasureStorage.createLeadMeasure({
       ...input,
@@ -85,7 +88,7 @@ export class LeadMeasureService {
     id: number,
     userId: number,
     input: UpdateLeadMeasureInput,
-  ): Promise<LeadMeasureRecord> {
+  ): Promise<LeadMeasureRecordWithTags> {
     const measure = await this.getOwnedLeadMeasure(id, userId);
 
     if (measure.status === "ARCHIVED") {
@@ -97,16 +100,21 @@ export class LeadMeasureService {
       input.period ?? measure.period,
       measure.scoreboard.startDate,
     );
+    await this.assertWorkspaceTagOwnership(
+      measure.scoreboard.workspaceId,
+      input.tagIds ?? [],
+      input.tagIds !== undefined,
+    );
 
     return await this.leadMeasureStorage.updateLeadMeasure(id, input);
   }
 
-  async archiveLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecord> {
+  async archiveLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
     await this.getOwnedLeadMeasure(id, userId);
     return await this.leadMeasureStorage.archiveLeadMeasure(id);
   }
 
-  async reactivateLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecord> {
+  async reactivateLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
     await this.getOwnedLeadMeasure(id, userId);
     return await this.leadMeasureStorage.reactivateLeadMeasure(id);
   }
@@ -167,6 +175,32 @@ export class LeadMeasureService {
     }
 
     return measure;
+  }
+
+  private async assertWorkspaceTagOwnership(
+    workspaceId: number,
+    tagIds: number[],
+    shouldValidateEmpty = true,
+  ): Promise<LeadMeasureTagRecord[]> {
+    if (!shouldValidateEmpty && tagIds.length === 0) {
+      return [];
+    }
+
+    if (tagIds.length === 0) {
+      return [];
+    }
+
+    const uniqueTagIds = Array.from(new Set(tagIds));
+    const tags = await this.leadMeasureStorage.findTagsByIdsInWorkspace(
+      workspaceId,
+      uniqueTagIds,
+    );
+
+    if (tags.length !== uniqueTagIds.length) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return tags;
   }
 }
 

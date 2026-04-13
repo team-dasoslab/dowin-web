@@ -16,6 +16,7 @@ type WorkspaceMemberListItem = {
 type WorkspaceInvite = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["createInvite"]>>
 >;
+type WorkspaceTag = NonNullable<Awaited<ReturnType<WorkspaceStorage["createTag"]>>>;
 
 const generateWorkspaceInviteCode = customAlphabet(
   "23456789ABCDEFGHJKLMNPQRSTUVWXYZ",
@@ -26,6 +27,11 @@ const isWorkspaceMembershipUniqueViolation = (error: unknown) =>
   error instanceof Error &&
   (error.message.includes("workspace_members.user_id") ||
     error.message.includes("workspace_members_user_unique"));
+
+const isWorkspaceTagUniqueViolation = (error: unknown) =>
+  error instanceof Error &&
+  (error.message.includes("workspace_tags_workspace_normalized_name_unique") ||
+    error.message.includes("workspace_tags.workspace_id, workspace_tags.normalized_name"));
 
 export interface WorkspaceStoragePort {
   findWorkspaceById: WorkspaceStorage["findWorkspaceById"];
@@ -46,6 +52,12 @@ export interface WorkspaceStoragePort {
   listInvites: WorkspaceStorage["listInvites"];
   updateInviteStatus: WorkspaceStorage["updateInviteStatus"];
   addMemberByInvite: WorkspaceStorage["addMemberByInvite"];
+  listTags: WorkspaceStorage["listTags"];
+  findTagById: WorkspaceStorage["findTagById"];
+  findTagsByIds: WorkspaceStorage["findTagsByIds"];
+  createTag: WorkspaceStorage["createTag"];
+  updateTag: WorkspaceStorage["updateTag"];
+  deleteTag: WorkspaceStorage["deleteTag"];
 }
 
 export class WorkspaceService {
@@ -150,6 +162,68 @@ export class WorkspaceService {
     }
 
     return updated;
+  }
+
+  async listTags(workspaceId: number): Promise<WorkspaceTag[]> {
+    return await this.storage.listTags(workspaceId);
+  }
+
+  async createTag(
+    workspaceId: number,
+    userId: number,
+    input: { name: string; normalizedName: string },
+  ): Promise<WorkspaceTag> {
+    const workspace = await this.storage.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    try {
+      return await this.storage.createTag({
+        workspaceId,
+        name: input.name,
+        normalizedName: input.normalizedName,
+        createdByUserId: userId,
+      });
+    } catch (error) {
+      if (isWorkspaceTagUniqueViolation(error)) {
+        throw new ConflictError("WORKSPACE_TAG_ALREADY_EXISTS");
+      }
+      throw error;
+    }
+  }
+
+  async updateTag(
+    workspaceId: number,
+    tagId: number,
+    input: { name: string; normalizedName: string },
+  ): Promise<WorkspaceTag> {
+    const existingTag = await this.storage.findTagById(workspaceId, tagId);
+    if (!existingTag) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    try {
+      const updated = await this.storage.updateTag(workspaceId, tagId, input);
+      if (!updated) {
+        throw new NotFoundError("NOT_FOUND");
+      }
+      return updated;
+    } catch (error) {
+      if (isWorkspaceTagUniqueViolation(error)) {
+        throw new ConflictError("WORKSPACE_TAG_ALREADY_EXISTS");
+      }
+      throw error;
+    }
+  }
+
+  async deleteTag(workspaceId: number, tagId: number): Promise<void> {
+    const existingTag = await this.storage.findTagById(workspaceId, tagId);
+    if (!existingTag) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    await this.storage.deleteTag(workspaceId, tagId);
   }
 
   async joinWorkspaceByInvite(code: string, userId: number): Promise<void> {

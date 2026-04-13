@@ -1,9 +1,14 @@
-import { leadMeasures, scoreboards } from "@/db/schema";
+import { leadMeasureTags, leadMeasures, scoreboards, workspaceTags } from "@/db/schema";
 import { and, asc, eq, inArray } from "drizzle-orm";
 
 export type LeadMeasureRecord = typeof leadMeasures.$inferSelect;
+export type LeadMeasureTagRecord = Pick<typeof workspaceTags.$inferSelect, "id" | "name">;
+export type LeadMeasureRecordWithTags = LeadMeasureRecord & {
+  tags: LeadMeasureTagRecord[];
+};
 export type LeadMeasureWithScoreboard = LeadMeasureRecord & {
   scoreboard: typeof scoreboards.$inferSelect;
+  tags: LeadMeasureTagRecord[];
 };
 export type LeadMeasureForPushRecord = Pick<
   LeadMeasureRecord,
@@ -15,6 +20,7 @@ export type CreateLeadMeasureInput = {
   name: string;
   targetValue: number;
   period: "DAILY" | "WEEKLY" | "MONTHLY";
+  tagIds?: number[];
 };
 
 export type UpdateLeadMeasureInput = Partial<
@@ -26,6 +32,9 @@ export interface LeadMeasureDbPort {
     leadMeasures: {
       findMany(args: unknown): Promise<unknown>;
       findFirst(args: unknown): Promise<unknown>;
+    };
+    workspaceTags: {
+      findMany(args: unknown): Promise<unknown>;
     };
   };
   insert(table: unknown): {
@@ -47,6 +56,21 @@ export interface LeadMeasureDbPort {
 
 export class LeadMeasureStorage {
   constructor(private db: LeadMeasureDbPort) {}
+
+  private mapLeadMeasureRecord(
+    raw: LeadMeasureRecord & {
+      tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+    },
+  ): LeadMeasureRecordWithTags {
+    return {
+      ...raw,
+      tags:
+        raw.tags
+          ?.map((item) => item.tag)
+          .filter((tag): tag is typeof workspaceTags.$inferSelect => Boolean(tag))
+          .map((tag) => ({ id: tag.id, name: tag.name })) ?? [],
+    };
+  }
 
   async findActiveLeadMeasuresByScoreboardIds(
     scoreboardIds: number[],
@@ -74,8 +98,8 @@ export class LeadMeasureStorage {
   async findLeadMeasuresByScoreboard(
     scoreboardId: number,
     status: "active" | "all",
-  ): Promise<LeadMeasureRecord[]> {
-    return (await this.db.query.leadMeasures.findMany({
+  ): Promise<LeadMeasureRecordWithTags[]> {
+    const rows = (await this.db.query.leadMeasures.findMany({
       where:
         status === "active"
           ? and(
@@ -83,19 +107,42 @@ export class LeadMeasureStorage {
               eq(leadMeasures.status, "ACTIVE"),
             )
           : eq(leadMeasures.scoreboardId, scoreboardId),
+      with: {
+        tags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
       orderBy: [asc(leadMeasures.createdAt)],
-    })) as LeadMeasureRecord[];
+    })) as Array<
+      LeadMeasureRecord & {
+        tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+      }
+    >;
+
+    return rows.map((row) => this.mapLeadMeasureRecord(row));
   }
 
   async createLeadMeasure(
     input: CreateLeadMeasureInput,
-  ): Promise<LeadMeasureRecord> {
+  ): Promise<LeadMeasureRecordWithTags> {
+    const { tagIds = [], ...measureInput } = input;
     const [created] = (await this.db
       .insert(leadMeasures)
-      .values(input)
+      .values(measureInput)
       .returning()) as LeadMeasureRecord[];
 
-    return created;
+    if (tagIds.length > 0) {
+      await this.db.insert(leadMeasureTags).values(
+        tagIds.map((tagId) => ({
+          leadMeasureId: created.id,
+          tagId,
+        })),
+      );
+    }
+
+    return (await this.findLeadMeasureById(created.id)) as LeadMeasureRecordWithTags;
   }
 
   async findOwnedLeadMeasure(
@@ -103,7 +150,7 @@ export class LeadMeasureStorage {
     userId: number,
     workspaceId: number,
   ): Promise<LeadMeasureWithScoreboard | undefined> {
-    return (await this.db.query.leadMeasures.findFirst({
+    const row = (await this.db.query.leadMeasures.findFirst({
       where: eq(leadMeasures.id, id),
       with: {
         scoreboard: {
@@ -112,50 +159,121 @@ export class LeadMeasureStorage {
             eq(scoreboards.workspaceId, workspaceId),
           ),
         },
+        tags: {
+          with: {
+            tag: true,
+          },
+        },
       },
-    })) as LeadMeasureWithScoreboard | undefined;
+    })) as
+      | (LeadMeasureRecord & {
+          scoreboard: typeof scoreboards.$inferSelect;
+          tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+        })
+      | undefined;
+
+    if (!row) {
+      return undefined;
+    }
+
+    return this.mapLeadMeasureRecord(row) as LeadMeasureWithScoreboard;
   }
 
   async updateLeadMeasure(
     id: number,
     input: UpdateLeadMeasureInput,
-  ): Promise<LeadMeasureRecord> {
-    const [updated] = (await this.db
-      .update(leadMeasures)
-      .set(input)
-      .where(eq(leadMeasures.id, id))
-      .returning()) as LeadMeasureRecord[];
+  ): Promise<LeadMeasureRecordWithTags> {
+    const { tagIds, ...measureInput } = input;
 
-    return updated;
+    if (Object.keys(measureInput).length > 0) {
+      await this.db
+      .update(leadMeasures)
+      .set(measureInput)
+      .where(eq(leadMeasures.id, id))
+      .returning();
+    }
+
+    if (tagIds) {
+      await this.db.delete(leadMeasureTags).where(eq(leadMeasureTags.leadMeasureId, id));
+      if (tagIds.length > 0) {
+        await this.db.insert(leadMeasureTags).values(
+          tagIds.map((tagId) => ({
+            leadMeasureId: id,
+            tagId,
+          })),
+        );
+      }
+    }
+
+    return (await this.findLeadMeasureById(id)) as LeadMeasureRecordWithTags;
   }
 
-  async archiveLeadMeasure(id: number): Promise<LeadMeasureRecord> {
-    const [archived] = (await this.db
+  async archiveLeadMeasure(id: number): Promise<LeadMeasureRecordWithTags> {
+    await this.db
       .update(leadMeasures)
       .set({
         status: "ARCHIVED",
         archivedAt: new Date(),
       })
       .where(eq(leadMeasures.id, id))
-      .returning()) as LeadMeasureRecord[];
+      .returning();
 
-    return archived;
+    return (await this.findLeadMeasureById(id)) as LeadMeasureRecordWithTags;
   }
 
-  async reactivateLeadMeasure(id: number): Promise<LeadMeasureRecord> {
-    const [reactivated] = (await this.db
+  async reactivateLeadMeasure(id: number): Promise<LeadMeasureRecordWithTags> {
+    await this.db
       .update(leadMeasures)
       .set({
         status: "ACTIVE",
         archivedAt: null,
       })
       .where(eq(leadMeasures.id, id))
-      .returning()) as LeadMeasureRecord[];
+      .returning();
 
-    return reactivated;
+    return (await this.findLeadMeasureById(id)) as LeadMeasureRecordWithTags;
   }
 
   async deleteLeadMeasure(id: number): Promise<void> {
     await this.db.delete(leadMeasures).where(eq(leadMeasures.id, id));
+  }
+
+  async findTagsByIdsInWorkspace(
+    workspaceId: number,
+    tagIds: number[],
+  ): Promise<LeadMeasureTagRecord[]> {
+    if (tagIds.length === 0) {
+      return [];
+    }
+
+    return (await this.db.query.workspaceTags.findMany({
+      where: and(
+        eq(workspaceTags.workspaceId, workspaceId),
+        inArray(workspaceTags.id, tagIds),
+      ),
+      columns: {
+        id: true,
+        name: true,
+      },
+    })) as LeadMeasureTagRecord[];
+  }
+
+  private async findLeadMeasureById(id: number): Promise<LeadMeasureRecordWithTags | undefined> {
+    const row = (await this.db.query.leadMeasures.findFirst({
+      where: eq(leadMeasures.id, id),
+      with: {
+        tags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    })) as
+      | (LeadMeasureRecord & {
+          tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+        })
+      | undefined;
+
+    return row ? this.mapLeadMeasureRecord(row) : undefined;
   }
 }
