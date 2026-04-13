@@ -28,10 +28,34 @@ const isWorkspaceMembershipUniqueViolation = (error: unknown) =>
   (error.message.includes("workspace_members.user_id") ||
     error.message.includes("workspace_members_user_unique"));
 
-const isWorkspaceTagUniqueViolation = (error: unknown) =>
-  error instanceof Error &&
-  (error.message.includes("workspace_tags_workspace_normalized_name_unique") ||
-    error.message.includes("workspace_tags.workspace_id, workspace_tags.normalized_name"));
+const collectErrorMessages = (error: unknown): string[] => {
+  if (!(error instanceof Error)) {
+    return [];
+  }
+
+  const messages = [error.message];
+  const cause = "cause" in error ? error.cause : undefined;
+
+  if (cause instanceof Error) {
+    messages.push(...collectErrorMessages(cause));
+  }
+
+  return messages;
+};
+
+const isWorkspaceTagUniqueViolation = (error: unknown) => {
+  const messages = collectErrorMessages(error);
+
+  return messages.some(
+    (message) =>
+      message.includes("workspace_tags_workspace_normalized_name_unique") ||
+      message.includes(
+        "workspace_tags.workspace_id, workspace_tags.normalized_name",
+      ) ||
+      message.includes("workspace_tags.normalized_name") ||
+      message.includes("workspace_tags.workspace_id"),
+  );
+};
 
 export interface WorkspaceStoragePort {
   findWorkspaceById: WorkspaceStorage["findWorkspaceById"];
