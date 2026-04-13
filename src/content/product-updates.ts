@@ -43,6 +43,18 @@ export type ProductUpdate = {
  */
 export const productUpdates = [
   {
+    id: "2026-04-14-lead-measure-tags",
+    slug: "lead-measure-tags",
+    title: "선행지표를 태그로 더 체계적으로 정리할 수 있어요",
+    summary:
+      "설정 화면에서 태그를 만들고 선행지표에 붙여서, 내 대시보드에서도 행동 카테고리를 더 쉽게 구분할 수 있습니다.",
+    publishedAt: "2026.04.14",
+    tag: "Setup",
+    ctaLabel: "바로 써보기",
+    ctaHref: "/setup?coachmark=lead-measure-tags",
+    isMajor: true,
+  },
+  {
     id: "2026-03-25-team-dashboard-memos",
     slug: "team-dashboard-memos",
     title: "팀 대시보드에서 회의 메모를 바로 남길 수 있어요",

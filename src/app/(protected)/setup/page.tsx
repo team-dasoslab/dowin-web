@@ -7,7 +7,10 @@ import { SetupCoachmark } from "@/app/(protected)/setup/_components/SetupCoachma
 import { SetupManageSection } from "@/app/(protected)/setup/_components/SetupManageSection";
 import { SetupSubmitButton } from "@/app/(protected)/setup/_components/SetupSubmitButton";
 import { useScoreboardSetup } from "@/app/(protected)/setup/_hooks/useScoreboardSetup";
-import { SETUP_COACHMARK_STORAGE_KEY } from "@/app/(protected)/setup/_lib/setup-coachmark";
+import {
+  SETUP_COACHMARK_LEAD_TAGS_QUERY,
+  SETUP_COACHMARK_STORAGE_KEY,
+} from "@/app/(protected)/setup/_lib/setup-coachmark";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useRouter } from "next/navigation";
@@ -16,6 +19,9 @@ import { useEffect, useState } from "react";
 export default function SetupPage() {
   const router = useRouter();
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
+  const [coachmarkMode, setCoachmarkMode] = useState<
+    "default" | typeof SETUP_COACHMARK_LEAD_TAGS_QUERY
+  >("default");
   const {
     activeTooltip,
     addMeasureRow,
@@ -52,9 +58,25 @@ export default function SetupPage() {
   };
 
   useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+    const coachmark = currentUrl.searchParams.get("coachmark");
+
+    if (coachmark === SETUP_COACHMARK_LEAD_TAGS_QUERY) {
+      setCoachmarkMode(SETUP_COACHMARK_LEAD_TAGS_QUERY);
+      setIsCoachmarkRunning(true);
+      currentUrl.searchParams.delete("coachmark");
+      window.history.replaceState(
+        {},
+        "",
+        currentUrl.pathname + currentUrl.search,
+      );
+      return;
+    }
+
     const isDismissed =
       localStorage.getItem(SETUP_COACHMARK_STORAGE_KEY) === "1";
     if (!isDismissed) {
+      setCoachmarkMode("default");
       setIsCoachmarkRunning(true);
     }
   }, []);
@@ -69,6 +91,7 @@ export default function SetupPage() {
     <div className="min-h-screen bg-background font-pretendard">
       <SetupCoachmark
         isRunning={isCoachmarkRunning}
+        mode={coachmarkMode}
         setIsRunning={setIsCoachmarkRunning}
       />
       {isMutating && (
@@ -122,6 +145,12 @@ export default function SetupPage() {
             activeTooltip={activeTooltip}
             addMeasureRow={addMeasureRow}
             availableTags={availableTags}
+            coachmarkTarget={
+              coachmarkMode === SETUP_COACHMARK_LEAD_TAGS_QUERY &&
+              isCoachmarkRunning
+                ? SETUP_COACHMARK_LEAD_TAGS_QUERY
+                : null
+            }
             createTag={createTag}
             deleteTag={deleteTag}
             handleMeasureChange={handleMeasureChange}
