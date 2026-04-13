@@ -18,6 +18,9 @@ describe("LeadMeasureStorage", () => {
         findMany: (args) => findMany(args),
         findFirst: (args) => findFirst(args),
       },
+      workspaceTags: {
+        findMany: vi.fn(),
+      },
     },
     insert: (table) => {
       insert(table);
