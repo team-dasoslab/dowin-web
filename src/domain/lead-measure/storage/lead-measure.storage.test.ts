@@ -68,12 +68,13 @@ describe("LeadMeasureStorage", () => {
 
     const result = await storage.findLeadMeasuresByScoreboard(2, "active");
 
-    expect(result).toEqual([{ id: 1 }]);
+    expect(result).toEqual([{ id: 1, tags: [] }]);
     expect(findMany).toHaveBeenCalled();
   });
 
   it("선행지표를 생성한다", async () => {
     returning.mockResolvedValue([{ id: 1 }]);
+    findFirst.mockResolvedValue({ id: 1 });
 
     const result = await storage.createLeadMeasure({
       scoreboardId: 2,
@@ -82,6 +83,6 @@ describe("LeadMeasureStorage", () => {
       period: "DAILY",
     });
 
-    expect(result).toEqual({ id: 1 });
+    expect(result).toEqual({ id: 1, tags: [] });
   });
 });
