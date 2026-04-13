@@ -1894,6 +1894,9 @@ components:
         id: { type: integer }
         name: { type: string }
         targetValue: { type: integer }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/LeadMeasureTag" }
         guide:
           allOf:
             - $ref: "#/components/schemas/WeeklyLogGuide"
@@ -1932,6 +1935,9 @@ components:
         name: { type: string }
         period: { type: string, enum: [WEEKLY, MONTHLY] }
         targetValue: { type: integer }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/LeadMeasureTag" }
         logs:
           type: object
           additionalProperties:
@@ -2012,6 +2018,9 @@ components:
         name: { type: string }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
         targetValue: { type: integer }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/LeadMeasureTag" }
         achieved: { type: integer }
         achievementRate: { type: number }
         logs:

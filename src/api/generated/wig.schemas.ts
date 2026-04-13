@@ -360,6 +360,7 @@ export interface WeeklyLogItem {
   id?: number;
   name?: string;
   targetValue?: number;
+  tags?: LeadMeasureTag[];
   guide?: WeeklyLogGuide | null;
   logs?: WeeklyLogItemLogs;
   achieved?: number;
@@ -387,6 +388,7 @@ export interface MonthlyLogItem {
   name?: string;
   period?: MonthlyLogItemPeriod;
   targetValue?: number;
+  tags?: LeadMeasureTag[];
   logs?: MonthlyLogItemLogs;
   achieved?: number;
   achievementRate?: number;
@@ -474,6 +476,7 @@ export interface TeamDashboardMemberMeasure {
   name?: string;
   period?: TeamDashboardMemberMeasurePeriod;
   targetValue?: number;
+  tags?: LeadMeasureTag[];
   achieved?: number;
   achievementRate?: number;
   logs?: TeamDashboardMemberMeasureLogs;
