@@ -4,11 +4,10 @@ import {
   type MeasureInput,
   type SetupTag,
 } from "@/app/(protected)/setup/_lib/measure";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Activity, Minus, Plus, Tag } from "lucide-react";
+import { Activity, Minus, Plus, Tag, X } from "lucide-react";
 import { useState } from "react";
 
 interface LeadMeasuresSectionProps {
@@ -279,12 +278,16 @@ function LeadMeasureRow({
               {measure.tags.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {measure.tags.map((tag) => (
-                    <Badge
+                    <Button
                       key={tag.id}
-                      className="inline-flex items-center rounded-full border border-primary/20 bg-primary px-2.5 py-1 text-[11px] font-semibold text-white"
+                      type="button"
+                      disabled={isMutating}
+                      onClick={() => toggleMeasureTag(measure.id, tag)}
+                      className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary px-2.5 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
                     >
                       #{tag.name}
-                    </Badge>
+                      <X className="h-3 w-3" />
+                    </Button>
                   ))}
                 </div>
               ) : (
@@ -320,19 +323,21 @@ function LeadMeasureRow({
               {availableTags.map((tag) => {
                 const isSelected = measure.tags.some((item) => item.id === tag.id);
 
+                if (isSelected) {
+                  return null;
+                }
+
                 return (
                   <Button
                     key={tag.id}
                     type="button"
                     disabled={
                       isMutating ||
-                      (!isSelected && measure.tags.length >= MAX_MEASURE_TAGS)
+                      measure.tags.length >= MAX_MEASURE_TAGS
                     }
                     onClick={() => toggleMeasureTag(measure.id, tag)}
                     className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors ${
-                      isSelected
-                        ? "border-primary bg-primary text-white shadow-sm"
-                        : "border-border bg-white text-text-secondary hover:border-primary/20 hover:text-text-primary"
+                      "border-border bg-white text-text-secondary hover:border-primary/20 hover:text-text-primary"
                     }`}
                   >
                     #{tag.name}

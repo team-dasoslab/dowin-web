@@ -253,15 +253,23 @@ export const useScoreboardSetup = () => {
       (tag) => normalizeTagName(tag.name) === normalizedName,
     );
 
-    if (existingTag) {
-      toggleMeasureTag(measureId, existingTag);
-      return true;
-    }
-
     const currentMeasure = measures.find((measure) => measure.id === measureId);
     if ((currentMeasure?.tags.length ?? 0) >= MAX_MEASURE_TAGS) {
       showToast("info", `태그는 최대 ${MAX_MEASURE_TAGS}개까지 선택할 수 있어요.`);
       return false;
+    }
+
+    if (existingTag) {
+      const isAlreadySelected = currentMeasure
+        ?.tags.some((tag) => tag.id === existingTag.id);
+
+      if (isAlreadySelected) {
+        showToast("info", "이미 선택한 태그예요.");
+        return false;
+      }
+
+      toggleMeasureTag(measureId, existingTag);
+      return true;
     }
 
     if (workspaceId === null) {
