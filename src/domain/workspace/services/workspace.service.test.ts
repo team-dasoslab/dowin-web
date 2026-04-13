@@ -21,6 +21,12 @@ describe("WorkspaceService", () => {
     listInvites: vi.fn(),
     updateInviteStatus: vi.fn(),
     addMemberByInvite: vi.fn(),
+    listTags: vi.fn(),
+    findTagById: vi.fn(),
+    findTagsByIds: vi.fn(),
+    createTag: vi.fn(),
+    updateTag: vi.fn(),
+    deleteTag: vi.fn(),
   };
 
   const service = new WorkspaceService(mockStorage);
@@ -268,6 +274,116 @@ describe("WorkspaceService", () => {
       await expect(service.joinWorkspaceByInvite("ABCD123456", 7)).rejects.toThrow(
         "ALREADY_IN_WORKSPACE",
       );
+    });
+  });
+
+  describe("tags", () => {
+    it("워크스페이스 태그 목록을 반환한다", async () => {
+      const tags = [
+        { id: 1, workspaceId: 1, name: "운동", normalizedName: "운동" },
+        { id: 2, workspaceId: 1, name: "건강", normalizedName: "건강" },
+      ];
+      mockStorage.listTags.mockResolvedValue(tags);
+
+      const result = await service.listTags(1);
+
+      expect(result).toEqual(tags);
+      expect(mockStorage.listTags).toHaveBeenCalledWith(1);
+    });
+
+    it("태그를 생성한다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.createTag.mockResolvedValue({
+        id: 10,
+        workspaceId: 1,
+        name: "운동",
+        normalizedName: "운동",
+        createdByUserId: 7,
+      });
+
+      const result = await service.createTag(1, 7, {
+        name: "운동",
+        normalizedName: "운동",
+      });
+
+      expect(result.name).toBe("운동");
+      expect(mockStorage.createTag).toHaveBeenCalledWith({
+        workspaceId: 1,
+        name: "운동",
+        normalizedName: "운동",
+        createdByUserId: 7,
+      });
+    });
+
+    it("같은 이름의 태그가 이미 있으면 409 에러를 던진다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.createTag.mockRejectedValue(
+        new Error(
+          "UNIQUE constraint failed: workspace_tags_workspace_normalized_name_unique",
+        ),
+      );
+
+      await expect(
+        service.createTag(1, 7, {
+          name: "운동",
+          normalizedName: "운동",
+        }),
+      ).rejects.toThrow("WORKSPACE_TAG_ALREADY_EXISTS");
+    });
+
+    it("D1 cause에 유니크 충돌이 들어와도 409 에러를 던진다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      const wrappedError = new Error("Failed query");
+      wrappedError.cause = new Error(
+        "UNIQUE constraint failed: workspace_tags.workspace_id, workspace_tags.normalized_name: SQLITE_CONSTRAINT",
+      );
+      mockStorage.createTag.mockRejectedValue(wrappedError);
+
+      await expect(
+        service.createTag(1, 7, {
+          name: "운동",
+          normalizedName: "운동",
+        }),
+      ).rejects.toThrow("WORKSPACE_TAG_ALREADY_EXISTS");
+    });
+
+    it("태그 이름을 수정한다", async () => {
+      mockStorage.findTagById.mockResolvedValue({
+        id: 10,
+        workspaceId: 1,
+        name: "운동",
+        normalizedName: "운동",
+      });
+      mockStorage.updateTag.mockResolvedValue({
+        id: 10,
+        workspaceId: 1,
+        name: "깊은 일",
+        normalizedName: "깊은 일",
+      });
+
+      const result = await service.updateTag(1, 10, {
+        name: "깊은 일",
+        normalizedName: "깊은 일",
+      });
+
+      expect(result.name).toBe("깊은 일");
+      expect(mockStorage.updateTag).toHaveBeenCalledWith(1, 10, {
+        name: "깊은 일",
+        normalizedName: "깊은 일",
+      });
+    });
+
+    it("태그를 삭제한다", async () => {
+      mockStorage.findTagById.mockResolvedValue({
+        id: 10,
+        workspaceId: 1,
+        name: "운동",
+        normalizedName: "운동",
+      });
+
+      await service.deleteTag(1, 10);
+
+      expect(mockStorage.deleteTag).toHaveBeenCalledWith(1, 10);
     });
   });
 

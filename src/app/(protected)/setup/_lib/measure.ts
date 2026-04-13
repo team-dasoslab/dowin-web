@@ -4,7 +4,28 @@ export type MeasureInput = {
   name: string;
   period: "WEEKLY" | "MONTHLY";
   targetValue: number;
+  tags: SetupTag[];
 };
+
+export type SetupTag = {
+  id: number;
+  name: string;
+};
+
+export const MOCK_SETUP_TAGS: SetupTag[] = [
+  { id: 1, name: "운동" },
+  { id: 2, name: "건강" },
+  { id: 3, name: "집중" },
+  { id: 4, name: "루틴" },
+  { id: 5, name: "회고" },
+  { id: 6, name: "독서" },
+];
+
+export const MAX_MEASURE_TAGS = 3;
+export const MAX_TAG_NAME_LENGTH = 16;
+
+export const normalizeTagName = (value: string) =>
+  value.trim().replace(/\s+/g, " ").toLowerCase();
 
 export const WEEKLY_TARGET_MAX = 7;
 
@@ -40,4 +61,5 @@ export const createEmptyMeasure = (): MeasureInput => ({
   name: "",
   period: "WEEKLY",
   targetValue: 3,
+  tags: [],
 });

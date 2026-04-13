@@ -1,33 +1,51 @@
-import type { MeasureInput } from "@/app/(protected)/setup/_lib/measure";
+import {
+  MAX_MEASURE_TAGS,
+  MAX_TAG_NAME_LENGTH,
+  type MeasureInput,
+  type SetupTag,
+} from "@/app/(protected)/setup/_lib/measure";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Activity, Minus, Plus } from "lucide-react";
+import { Activity, Ellipsis, Minus, Plus, Tag, X } from "lucide-react";
+import { useState } from "react";
 
 interface LeadMeasuresSectionProps {
   activeTooltip: "lag" | "lead" | null;
   addMeasureRow: () => void;
+  availableTags: SetupTag[];
+  createTag: (measureId: string, rawName: string) => Promise<boolean>;
+  deleteTag: (tagId: number) => Promise<boolean>;
   handleMeasureChange: (
     id: string,
     field: keyof MeasureInput,
     value: string | number | "WEEKLY" | "MONTHLY" | null,
   ) => void;
   isMutating: boolean;
+  isTagMutationPending: boolean;
   measures: MeasureInput[];
   monthlyTargetMax: number;
+  renameTag: (tagId: number, rawName: string) => Promise<boolean>;
   removeMeasureRow: (id: string) => void;
   setActiveTooltip: (value: "lag" | "lead" | null) => void;
+  toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }
 
 export function LeadMeasuresSection({
   activeTooltip,
   addMeasureRow,
+  availableTags,
+  createTag,
+  deleteTag,
   handleMeasureChange,
   isMutating,
+  isTagMutationPending,
   measures,
   monthlyTargetMax,
+  renameTag,
   removeMeasureRow,
   setActiveTooltip,
+  toggleMeasureTag,
 }: LeadMeasuresSectionProps) {
   return (
     <Card
@@ -63,6 +81,12 @@ export function LeadMeasuresSection({
             measuresCount={measures.length}
             monthlyTargetMax={monthlyTargetMax}
             removeMeasureRow={removeMeasureRow}
+            availableTags={availableTags}
+            createTag={createTag}
+            deleteTag={deleteTag}
+            toggleMeasureTag={toggleMeasureTag}
+            isTagMutationPending={isTagMutationPending}
+            renameTag={renameTag}
           />
         ))}
       </div>
@@ -135,6 +159,12 @@ function LeadMeasureRow({
   measuresCount,
   monthlyTargetMax,
   removeMeasureRow,
+  availableTags,
+  createTag,
+  deleteTag,
+  toggleMeasureTag,
+  isTagMutationPending,
+  renameTag,
 }: {
   handleMeasureChange: LeadMeasuresSectionProps["handleMeasureChange"];
   index: number;
@@ -143,7 +173,19 @@ function LeadMeasureRow({
   measuresCount: number;
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
+  availableTags: SetupTag[];
+  createTag: (measureId: string, rawName: string) => Promise<boolean>;
+  deleteTag: (tagId: number) => Promise<boolean>;
+  isTagMutationPending: boolean;
+  renameTag: (tagId: number, rawName: string) => Promise<boolean>;
+  toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }) {
+  const [draftTagName, setDraftTagName] = useState("");
+  const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
+  const [editingTagId, setEditingTagId] = useState<number | null>(null);
+  const [editingTagName, setEditingTagName] = useState("");
+  const [openActionTagId, setOpenActionTagId] = useState<number | null>(null);
+
   return (
     <div className="space-y-4 p-5">
       <div className="flex items-center justify-between">
@@ -243,6 +285,237 @@ function LeadMeasureRow({
             회 / {measure.period === "WEEKLY" ? "주" : "월"}
           </span>
         </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-sub-background/60">
+        <div className="flex items-start justify-between gap-3 px-3 py-2.5">
+          <div className="flex min-w-0 flex-1 items-start gap-2">
+            <Tag className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <p className="text-[11px] font-bold text-text-secondary">태그</p>
+              {measure.tags.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {measure.tags.map((tag) => (
+                    <Button
+                    key={tag.id}
+                    type="button"
+                    disabled={isMutating}
+                    onClick={() => toggleMeasureTag(measure.id, tag)}
+                    className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary px-2.5 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
+                    >
+                      #{tag.name}
+                      <X className="h-3 w-3" />
+                    </Button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-[11px] leading-relaxed text-text-muted">
+                  아직 태그가 없습니다.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            disabled={isMutating}
+            onClick={() => setIsTagEditorOpen((previous) => !previous)}
+            className="shrink-0 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-text-secondary transition-colors hover:bg-sub-background hover:text-text-primary"
+          >
+            {isTagEditorOpen ? "완료" : "선택"}
+          </Button>
+        </div>
+
+        {isTagEditorOpen ? (
+          <div className="space-y-3 border-t border-border px-3 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] text-text-muted">
+                분류용 태그를 최대 {MAX_MEASURE_TAGS}개까지 붙일 수 있어요.
+              </p>
+              <span className="text-[11px] text-text-muted">
+                {measure.tags.length}/{MAX_MEASURE_TAGS}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => {
+                const isSelected = measure.tags.some((item) => item.id === tag.id);
+
+                if (isSelected) {
+                  return null;
+                }
+
+                return (
+                  <div
+                    key={tag.id}
+                    className="relative flex items-center gap-1 rounded-full border border-border bg-white pr-1"
+                  >
+                    {editingTagId === tag.id ? (
+                      <>
+                        <Input
+                          value={editingTagName}
+                          disabled={isMutating || isTagMutationPending}
+                          maxLength={MAX_TAG_NAME_LENGTH}
+                          onChange={(e) => setEditingTagName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              void renameTag(tag.id, editingTagName).then((isRenamed) => {
+                                if (isRenamed) {
+                                  setEditingTagId(null);
+                                  setEditingTagName("");
+                                }
+                              });
+                            }
+
+                            if (e.key === "Escape") {
+                              setEditingTagId(null);
+                              setEditingTagName("");
+                              setOpenActionTagId(null);
+                            }
+                          }}
+                          className="h-8 min-w-24 border-0 bg-transparent px-3 py-0 text-[11px] font-semibold text-text-primary outline-none"
+                        />
+                        <Button
+                          type="button"
+                          disabled={isMutating || isTagMutationPending}
+                          onClick={() => {
+                            void renameTag(tag.id, editingTagName).then((isRenamed) => {
+                              if (isRenamed) {
+                                setEditingTagId(null);
+                                setEditingTagName("");
+                                setOpenActionTagId(null);
+                              }
+                            });
+                          }}
+                          className="rounded-full px-2 py-1 text-[10px] font-bold text-primary"
+                        >
+                          저장
+                        </Button>
+                        <Button
+                          type="button"
+                          disabled={isMutating || isTagMutationPending}
+                          onClick={() => {
+                            setEditingTagId(null);
+                            setEditingTagName("");
+                            setOpenActionTagId(null);
+                          }}
+                          className="rounded-full px-2 py-1 text-[10px] font-bold text-text-muted"
+                        >
+                          취소
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          type="button"
+                          disabled={isMutating || measure.tags.length >= MAX_MEASURE_TAGS}
+                          onClick={() => toggleMeasureTag(measure.id, tag)}
+                          className="rounded-full px-3 py-1.5 text-[11px] font-semibold text-text-secondary transition-colors hover:text-text-primary"
+                        >
+                          #{tag.name}
+                        </Button>
+                        <Button
+                          type="button"
+                          disabled={isMutating || isTagMutationPending}
+                          onClick={() => {
+                            setOpenActionTagId((currentId) =>
+                              currentId === tag.id ? null : tag.id,
+                            );
+                          }}
+                          className="rounded-full p-1 text-text-muted hover:text-text-primary"
+                          aria-label="태그 작업 열기"
+                        >
+                          <Ellipsis className="h-3 w-3" />
+                        </Button>
+                        {openActionTagId === tag.id ? (
+                          <>
+                            <div
+                              className="fixed inset-0 z-10"
+                              onClick={() => setOpenActionTagId(null)}
+                            />
+                            <div className="absolute right-0 top-full z-20 mt-2 min-w-28 rounded-xl border border-border bg-white p-1.5 shadow-lg">
+                              <Button
+                                type="button"
+                                disabled={isMutating || isTagMutationPending}
+                                onClick={() => {
+                                  setEditingTagId(tag.id);
+                                  setEditingTagName(tag.name);
+                                  setOpenActionTagId(null);
+                                }}
+                                className="flex w-full items-center justify-start rounded-lg px-3 py-2 text-[11px] font-semibold text-text-primary hover:bg-sub-background"
+                              >
+                                수정
+                              </Button>
+                              <Button
+                                type="button"
+                                disabled={isMutating || isTagMutationPending}
+                                onClick={() => {
+                                  const shouldDelete = window.confirm(
+                                    "이 태그를 삭제할까요? 연결된 선행지표에서도 함께 빠집니다.",
+                                  );
+
+                                  if (!shouldDelete) {
+                                    setOpenActionTagId(null);
+                                    return;
+                                  }
+
+                                  void deleteTag(tag.id).then(() => {
+                                    setOpenActionTagId(null);
+                                  });
+                                }}
+                                className="flex w-full items-center justify-start rounded-lg px-3 py-2 text-[11px] font-semibold text-danger hover:bg-danger/5"
+                              >
+                                삭제
+                              </Button>
+                            </div>
+                          </>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
+                value={draftTagName}
+                disabled={isMutating}
+                maxLength={MAX_TAG_NAME_LENGTH}
+                onChange={(e) => setDraftTagName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter") {
+                    return;
+                  }
+
+                  e.preventDefault();
+                  void createTag(measure.id, draftTagName).then((isCreated) => {
+                    if (isCreated) {
+                      setDraftTagName("");
+                    }
+                  });
+                }}
+                placeholder={`새 태그 추가 예: 아침루틴 (최대 ${MAX_TAG_NAME_LENGTH}자)`}
+                className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary"
+              />
+              <Button
+                type="button"
+                disabled={isMutating}
+                onClick={() => {
+                  void createTag(measure.id, draftTagName).then((isCreated) => {
+                    if (isCreated) {
+                      setDraftTagName("");
+                    }
+                  });
+                }}
+                className="rounded-lg border border-border bg-white px-4 py-2 text-xs font-bold text-text-primary transition-colors hover:bg-sub-background sm:shrink-0"
+              >
+                태그 추가
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

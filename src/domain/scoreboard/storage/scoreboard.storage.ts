@@ -1,4 +1,4 @@
-import { leadMeasures, scoreboards } from "@/db/schema";
+import { leadMeasures, scoreboards, workspaceTags } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 
 export type CreateScoreboardInput = {
@@ -19,8 +19,12 @@ export type UpdateScoreboardInput = Partial<
 
 export type ScoreboardRecord = typeof scoreboards.$inferSelect;
 export type LeadMeasureRecord = typeof leadMeasures.$inferSelect;
+export type LeadMeasureTagRecord = Pick<typeof workspaceTags.$inferSelect, "id" | "name">;
+export type LeadMeasureRecordWithTags = LeadMeasureRecord & {
+  tags: LeadMeasureTagRecord[];
+};
 export type ScoreboardWithLeadMeasures = ScoreboardRecord & {
-  leadMeasures: LeadMeasureRecord[];
+  leadMeasures: LeadMeasureRecordWithTags[];
 };
 
 export interface ScoreboardDbPort {
@@ -47,6 +51,38 @@ export interface ScoreboardDbPort {
 export class ScoreboardStorage {
   constructor(private db: ScoreboardDbPort) {}
 
+  private mapLeadMeasureRecord(
+    raw: LeadMeasureRecord & {
+      tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+    },
+  ): LeadMeasureRecordWithTags {
+    return {
+      ...raw,
+      tags:
+        raw.tags
+          ?.map((item) => item.tag)
+          .filter((tag): tag is typeof workspaceTags.$inferSelect => Boolean(tag))
+          .map((tag) => ({ id: tag.id, name: tag.name })) ?? [],
+    };
+  }
+
+  private mapScoreboardWithLeadMeasures(
+    raw: ScoreboardRecord & {
+      leadMeasures: Array<
+        LeadMeasureRecord & {
+          tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+        }
+      >;
+    },
+  ): ScoreboardWithLeadMeasures {
+    return {
+      ...raw,
+      leadMeasures: raw.leadMeasures.map((leadMeasure) =>
+        this.mapLeadMeasureRecord(leadMeasure),
+      ),
+    };
+  }
+
   async findActiveScoreboardsForPush(): Promise<
     Array<Pick<ScoreboardRecord, "id" | "userId" | "goalName" | "createdAt">>
   > {
@@ -68,16 +104,34 @@ export class ScoreboardStorage {
     userId: number,
     workspaceId: number,
   ): Promise<ScoreboardWithLeadMeasures | undefined> {
-    return (await this.db.query.scoreboards.findFirst({
+    const row = (await this.db.query.scoreboards.findFirst({
       where: and(
         eq(scoreboards.userId, userId),
         eq(scoreboards.workspaceId, workspaceId),
         eq(scoreboards.status, "ACTIVE"),
       ),
       with: {
-        leadMeasures: true,
+        leadMeasures: {
+          with: {
+            tags: {
+              with: {
+                tag: true,
+              },
+            },
+          },
+        },
       },
-    })) as ScoreboardWithLeadMeasures | undefined;
+    })) as
+      | (ScoreboardRecord & {
+          leadMeasures: Array<
+            LeadMeasureRecord & {
+              tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+            }
+          >;
+        })
+      | undefined;
+
+    return row ? this.mapScoreboardWithLeadMeasures(row) : undefined;
   }
 
   async createScoreboard(
@@ -95,31 +149,67 @@ export class ScoreboardStorage {
     userId: number,
     workspaceId: number,
   ): Promise<ScoreboardWithLeadMeasures | undefined> {
-    return (await this.db.query.scoreboards.findFirst({
+    const row = (await this.db.query.scoreboards.findFirst({
       where: and(
         eq(scoreboards.id, id),
         eq(scoreboards.userId, userId),
         eq(scoreboards.workspaceId, workspaceId),
       ),
       with: {
-        leadMeasures: true,
+        leadMeasures: {
+          with: {
+            tags: {
+              with: {
+                tag: true,
+              },
+            },
+          },
+        },
       },
-    })) as ScoreboardWithLeadMeasures | undefined;
+    })) as
+      | (ScoreboardRecord & {
+          leadMeasures: Array<
+            LeadMeasureRecord & {
+              tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+            }
+          >;
+        })
+      | undefined;
+
+    return row ? this.mapScoreboardWithLeadMeasures(row) : undefined;
   }
 
   async findActiveScoreboardsByWorkspace(
     workspaceId: number,
   ): Promise<ScoreboardWithLeadMeasures[]> {
-    return (await this.db.query.scoreboards.findMany({
+    const rows = (await this.db.query.scoreboards.findMany({
       where: and(
         eq(scoreboards.workspaceId, workspaceId),
         eq(scoreboards.status, "ACTIVE"),
       ),
       with: {
-        leadMeasures: true,
+        leadMeasures: {
+          with: {
+            tags: {
+              with: {
+                tag: true,
+              },
+            },
+          },
+        },
       },
       orderBy: [desc(scoreboards.createdAt)],
-    })) as ScoreboardWithLeadMeasures[];
+    })) as Array<
+      ScoreboardRecord & {
+        leadMeasures: Array<
+          LeadMeasureRecord & {
+            tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
+          }
+        >;
+      }
+    >;
+
+    return rows.map((row) => this.mapScoreboardWithLeadMeasures(row));
   }
 
   async updateScoreboard(

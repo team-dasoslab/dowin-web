@@ -15,6 +15,15 @@ import {
   usePostScoreboardsScoreboardIdLeadMeasures,
   usePutLeadMeasuresId,
 } from "@/api/generated/lead-measure/lead-measure";
+import {
+  getGetWorkspacesIdTagsQueryKey,
+  type GetWorkspacesIdTagsQueryResult,
+  useDeleteWorkspacesIdTagsTagId,
+  useGetWorkspacesIdTags,
+  useGetWorkspacesMe,
+  usePostWorkspacesIdTags,
+  usePutWorkspacesIdTagsTagId,
+} from "@/api/generated/workspace/workspace";
 import { useToast } from "@/context/ToastContext";
 import {
   getApiErrorMessage,
@@ -25,11 +34,17 @@ import { trackEvent } from "@/lib/client/gtag";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { MeasureInput } from "@/app/(protected)/setup/_lib/measure";
+import type {
+  MeasureInput,
+  SetupTag,
+} from "@/app/(protected)/setup/_lib/measure";
 import {
   clampMeasureTargetValue,
   createEmptyMeasure,
   getDaysInMonthFromIsoDate,
+  MAX_MEASURE_TAGS,
+  MAX_TAG_NAME_LENGTH,
+  normalizeTagName,
 } from "@/app/(protected)/setup/_lib/measure";
 
 export const useScoreboardSetup = () => {
@@ -44,6 +59,26 @@ export const useScoreboardSetup = () => {
   const [activeTooltip, setActiveTooltip] = useState<"lag" | "lead" | null>(
     null,
   );
+  const { data: workspaceResponse, isLoading: isWorkspaceLoading } =
+    useGetWorkspacesMe({
+      query: {
+        retry: false,
+      },
+    });
+  const workspace =
+    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+  const workspaceId = toNumberId(workspace?.id);
+  const { data: workspaceTagsResponse, isLoading: isWorkspaceTagsLoading } =
+    useGetWorkspacesIdTags(workspaceId ?? 0, {
+      query: {
+        enabled: workspaceId !== null,
+        retry: false,
+      },
+    });
+  const availableTags: SetupTag[] =
+    workspaceTagsResponse?.status === 200 ? workspaceTagsResponse.data : [];
+  const workspaceTagsQueryKey =
+    workspaceId !== null ? getGetWorkspacesIdTagsQueryKey(workspaceId) : null;
 
   const {
     data: activeScoreboardResponse,
@@ -82,6 +117,9 @@ export const useScoreboardSetup = () => {
   const createLeadMeasureMutation = usePostScoreboardsScoreboardIdLeadMeasures();
   const updateLeadMeasureMutation = usePutLeadMeasuresId();
   const deleteLeadMeasureMutation = useDeleteLeadMeasuresId();
+  const createWorkspaceTagMutation = usePostWorkspacesIdTags();
+  const updateWorkspaceTagMutation = usePutWorkspacesIdTagsTagId();
+  const deleteWorkspaceTagMutation = useDeleteWorkspacesIdTagsTagId();
 
   useEffect(() => {
     if (isEditMode && activeScoreboard && leadMeasuresResponse?.status === 200) {
@@ -100,6 +138,11 @@ export const useScoreboardSetup = () => {
             leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
             monthlyTargetMax,
           ),
+          tags:
+            leadMeasure.tags?.map((tag) => ({
+              id: tag.id,
+              name: tag.name,
+            })) ?? [],
         })),
       );
       return;
@@ -164,6 +207,300 @@ export const useScoreboardSetup = () => {
     }
   };
 
+  const toggleMeasureTag = (measureId: string, tag: SetupTag) => {
+    let limitReached = false;
+
+    setMeasures((previous) =>
+      previous.map((measure) => {
+        if (measure.id !== measureId) {
+          return measure;
+        }
+
+        const hasTag = measure.tags.some((item) => item.id === tag.id);
+
+        if (hasTag) {
+          return {
+            ...measure,
+            tags: measure.tags.filter((item) => item.id !== tag.id),
+          };
+        }
+
+        if (measure.tags.length >= MAX_MEASURE_TAGS) {
+          limitReached = true;
+          return measure;
+        }
+
+        return {
+          ...measure,
+          tags: [...measure.tags, tag],
+        };
+      }),
+    );
+
+    if (limitReached) {
+      showToast("info", `태그는 최대 ${MAX_MEASURE_TAGS}개까지 선택할 수 있어요.`);
+    }
+  };
+
+  const createTag = async (measureId: string, rawName: string) => {
+    const nextName = rawName.trim().replace(/\s+/g, " ");
+    const normalizedName = normalizeTagName(rawName);
+
+    if (!nextName) {
+      showToast("info", "태그 이름을 입력해주세요.");
+      return false;
+    }
+
+    if (nextName.length > MAX_TAG_NAME_LENGTH) {
+      showToast("info", `태그 이름은 ${MAX_TAG_NAME_LENGTH}자 이하여야 해요.`);
+      return false;
+    }
+
+    const existingTag = availableTags.find(
+      (tag) => normalizeTagName(tag.name) === normalizedName,
+    );
+
+    const currentMeasure = measures.find((measure) => measure.id === measureId);
+    if ((currentMeasure?.tags.length ?? 0) >= MAX_MEASURE_TAGS) {
+      showToast("info", `태그는 최대 ${MAX_MEASURE_TAGS}개까지 선택할 수 있어요.`);
+      return false;
+    }
+
+    if (existingTag) {
+      const isAlreadySelected = currentMeasure
+        ?.tags.some((tag) => tag.id === existingTag.id);
+
+      if (isAlreadySelected) {
+        showToast("info", "이미 선택한 태그예요.");
+        return false;
+      }
+
+      toggleMeasureTag(measureId, existingTag);
+      return true;
+    }
+
+    if (workspaceId === null) {
+      showToast("error", "워크스페이스 정보를 확인할 수 없습니다.");
+      return false;
+    }
+
+    const optimisticTag: SetupTag = {
+      id: -Date.now(),
+      name: nextName,
+    };
+
+    setMeasures((previous) =>
+      previous.map((measure) => {
+        if (measure.id !== measureId) {
+          return measure;
+        }
+
+        return {
+          ...measure,
+          tags: [...measure.tags, optimisticTag],
+        };
+      }),
+    );
+
+    try {
+      const createdTagResponse = await createWorkspaceTagMutation.mutateAsync({
+        id: workspaceId,
+        data: {
+          name: nextName,
+        },
+      });
+
+      if (createdTagResponse.status !== 201) {
+        throw new Error("태그 생성에 실패했습니다.");
+      }
+
+      const createdTag: SetupTag = {
+        id: createdTagResponse.data.id,
+        name: createdTagResponse.data.name,
+      };
+
+      setMeasures((previous) =>
+        previous.map((measure) => {
+          if (measure.id !== measureId) {
+            return measure;
+          }
+
+          return {
+            ...measure,
+            tags: measure.tags.map((tag) =>
+              tag.id === optimisticTag.id ? createdTag : tag,
+            ),
+          };
+        }),
+      );
+
+      await queryClient.invalidateQueries({
+        queryKey: getGetWorkspacesIdTagsQueryKey(workspaceId),
+      });
+
+      return true;
+    } catch (error) {
+      setMeasures((previous) =>
+        previous.map((measure) => {
+          if (measure.id !== measureId) {
+            return measure;
+          }
+
+          return {
+            ...measure,
+            tags: measure.tags.filter((tag) => tag.id !== optimisticTag.id),
+          };
+        }),
+      );
+      showToast("error", getApiErrorMessage(error, "태그 생성에 실패했습니다."));
+      return false;
+    }
+  };
+
+  const renameTag = async (tagId: number, rawName: string) => {
+    const nextName = rawName.trim().replace(/\s+/g, " ");
+    const normalizedName = normalizeTagName(rawName);
+
+    if (!nextName) {
+      showToast("info", "태그 이름을 입력해주세요.");
+      return false;
+    }
+
+    if (nextName.length > MAX_TAG_NAME_LENGTH) {
+      showToast("info", `태그 이름은 ${MAX_TAG_NAME_LENGTH}자 이하여야 해요.`);
+      return false;
+    }
+
+    const duplicatedTag = availableTags.find(
+      (tag) => tag.id !== tagId && normalizeTagName(tag.name) === normalizedName,
+    );
+
+    if (duplicatedTag) {
+      showToast("info", "같은 이름의 태그가 이미 있어요.");
+      return false;
+    }
+
+    if (workspaceId === null) {
+      showToast("error", "워크스페이스 정보를 확인할 수 없습니다.");
+      return false;
+    }
+
+    const previousName =
+      availableTags.find((tag) => tag.id === tagId)?.name ?? nextName;
+    const previousTagsResponse = workspaceTagsQueryKey
+      ? queryClient.getQueryData<GetWorkspacesIdTagsQueryResult>(workspaceTagsQueryKey)
+      : undefined;
+
+    setMeasures((previous) =>
+      previous.map((measure) => ({
+        ...measure,
+        tags: measure.tags.map((tag) =>
+          tag.id === tagId ? { ...tag, name: nextName } : tag,
+        ),
+      })),
+    );
+    if (workspaceTagsQueryKey) {
+      queryClient.setQueryData<GetWorkspacesIdTagsQueryResult>(
+        workspaceTagsQueryKey,
+        (previous) => {
+          if (!previous || previous.status !== 200) {
+            return previous;
+          }
+
+          return {
+            ...previous,
+            data: previous.data.map((tag) =>
+              tag.id === tagId ? { ...tag, name: nextName } : tag,
+            ),
+          };
+        },
+      );
+    }
+
+    try {
+      await updateWorkspaceTagMutation.mutateAsync({
+        id: workspaceId,
+        tagId,
+        data: {
+          name: nextName,
+        },
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: getGetWorkspacesIdTagsQueryKey(workspaceId),
+      });
+
+      return true;
+    } catch (error) {
+      setMeasures((previous) =>
+        previous.map((measure) => ({
+          ...measure,
+          tags: measure.tags.map((tag) =>
+            tag.id === tagId ? { ...tag, name: previousName } : tag,
+          ),
+        })),
+      );
+      if (workspaceTagsQueryKey && previousTagsResponse) {
+        queryClient.setQueryData(workspaceTagsQueryKey, previousTagsResponse);
+      }
+      showToast("error", getApiErrorMessage(error, "태그 이름 수정에 실패했습니다."));
+      return false;
+    }
+  };
+
+  const deleteTag = async (tagId: number) => {
+    if (workspaceId === null) {
+      showToast("error", "워크스페이스 정보를 확인할 수 없습니다.");
+      return false;
+    }
+
+    const previousMeasures = measures;
+    const previousTagsResponse = workspaceTagsQueryKey
+      ? queryClient.getQueryData<GetWorkspacesIdTagsQueryResult>(workspaceTagsQueryKey)
+      : undefined;
+    setMeasures((previous) =>
+      previous.map((measure) => ({
+        ...measure,
+        tags: measure.tags.filter((tag) => tag.id !== tagId),
+      })),
+    );
+    if (workspaceTagsQueryKey) {
+      queryClient.setQueryData<GetWorkspacesIdTagsQueryResult>(
+        workspaceTagsQueryKey,
+        (previous) => {
+          if (!previous || previous.status !== 200) {
+            return previous;
+          }
+
+          return {
+            ...previous,
+            data: previous.data.filter((tag) => tag.id !== tagId),
+          };
+        },
+      );
+    }
+
+    try {
+      await deleteWorkspaceTagMutation.mutateAsync({
+        id: workspaceId,
+        tagId,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: getGetWorkspacesIdTagsQueryKey(workspaceId),
+      });
+
+      return true;
+    } catch (error) {
+      setMeasures(previousMeasures);
+      if (workspaceTagsQueryKey && previousTagsResponse) {
+        queryClient.setQueryData(workspaceTagsQueryKey, previousTagsResponse);
+      }
+      showToast("error", getApiErrorMessage(error, "태그 삭제에 실패했습니다."));
+      return false;
+    }
+  };
+
   const invalidateScoreboardQueries = async (targetScoreboardId: number | null) => {
     await queryClient.invalidateQueries({
       queryKey: getGetScoreboardsActiveQueryKey(),
@@ -222,6 +559,7 @@ export const useScoreboardSetup = () => {
               name: measure.name,
               targetValue: measure.targetValue,
               period: measure.period,
+              tagIds: measure.tags.map((tag) => tag.id),
             },
           });
         }
@@ -254,6 +592,7 @@ export const useScoreboardSetup = () => {
                 name: measure.name,
                 targetValue: measure.targetValue,
                 period: measure.period,
+                tagIds: measure.tags.map((tag) => tag.id),
               },
             });
             continue;
@@ -265,6 +604,7 @@ export const useScoreboardSetup = () => {
               name: measure.name,
               targetValue: measure.targetValue,
               period: measure.period,
+              tagIds: measure.tags.map((tag) => tag.id),
             },
           });
 
@@ -328,26 +668,38 @@ export const useScoreboardSetup = () => {
   return {
     activeTooltip,
     addMeasureRow,
+    availableTags,
     archive,
+    createTag,
     goalName,
     handleMeasureChange,
     isInitializing:
-      isActiveScoreboardLoading || (scoreboardId !== null && isLeadMeasuresLoading),
+      isWorkspaceLoading ||
+      (workspaceId !== null && isWorkspaceTagsLoading) ||
+      isActiveScoreboardLoading ||
+      (scoreboardId !== null && isLeadMeasuresLoading),
     isSubmitPending:
       createScoreboardMutation.isPending ||
       updateScoreboardMutation.isPending ||
       createLeadMeasureMutation.isPending ||
       updateLeadMeasureMutation.isPending ||
       deleteLeadMeasureMutation.isPending,
+    isTagMutationPending:
+      createWorkspaceTagMutation.isPending ||
+      updateWorkspaceTagMutation.isPending ||
+      deleteWorkspaceTagMutation.isPending,
     isArchivePending: archiveScoreboardMutation.isPending,
     isEditMode,
     lagMeasure,
     measures,
     monthlyTargetMax,
+    renameTag,
     removeMeasureRow,
     setActiveTooltip,
     setGoalName,
     setLagMeasure,
     submit,
+    deleteTag,
+    toggleMeasureTag,
   };
 };

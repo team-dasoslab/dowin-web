@@ -1,8 +1,8 @@
 "use client";
 
 import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
+import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
-import { LeadMeasureGuideTooltip } from "@/app/(protected)/dashboard/my/_components/LeadMeasureGuideTooltip";
 import { WeeklyMobileCards } from "@/app/(protected)/dashboard/my/_components/WeeklyMobileCards";
 import { isEditableDailyLogDate } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { DAY_LABELS } from "@/app/(protected)/dashboard/my/_lib/week";
@@ -105,31 +105,19 @@ export function WeeklyBoardSection({
                   return (
                     <tr key={leadMeasure.id} className="bg-white">
                       <td className="px-5 py-4">
-                        <div className="flex items-center gap-1">
-                          <p className="block min-w-0 truncate text-sm font-semibold text-text-primary">
-                            {leadMeasure.name}
-                          </p>
-                          {guide && leadMeasureId !== null ? (
-                            <LeadMeasureGuideTooltip
-                              active={activeGuideId === leadMeasureId}
-                              guide={guide}
-                              onClose={() => setActiveGuideId(null)}
-                              onToggle={() =>
-                                setActiveGuideId((currentId) =>
-                                  currentId === leadMeasureId ? null : leadMeasureId,
-                                )
-                              }
-                            />
-                          ) : null}
-                        </div>
-                        <span className="text-[10px] text-text-muted">
-                          목표 {targetValue}회 /{" "}
-                          {leadMeasure.period === "DAILY"
-                            ? "일"
-                            : leadMeasure.period === "WEEKLY"
-                              ? "주"
-                              : "월"}
-                        </span>
+                        <LeadMeasureSummary
+                          guide={guide}
+                          guideActive={activeGuideId === leadMeasureId}
+                          name={leadMeasure.name}
+                          nameClassName="block text-sm font-semibold text-text-primary"
+                          onGuideClose={() => setActiveGuideId(null)}
+                          onGuideToggle={() =>
+                            setActiveGuideId((currentId) =>
+                              currentId === leadMeasureId ? null : leadMeasureId,
+                            )
+                          }
+                          tags={leadMeasure.tags ?? []}
+                        />
                       </td>
 
                       {weekDates.map((date) => {
@@ -178,6 +166,9 @@ export function WeeklyBoardSection({
 
                       <td className="px-3 py-4 text-center">
                         <div className="flex flex-col items-center gap-1.5">
+                          <span className="text-[10px] text-text-muted">
+                            {leadMeasure.period === "MONTHLY" ? "월간" : "주간"}
+                          </span>
                           <div className="h-1 w-10 overflow-hidden rounded-full border border-border bg-sub-background">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${

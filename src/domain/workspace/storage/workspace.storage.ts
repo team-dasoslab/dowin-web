@@ -1,11 +1,18 @@
 import { getDb } from "@/db";
-import { users, workspaceInvites, workspaceMembers, workspaces } from "@/db/schema";
-import { and, eq, gt, lt, sql } from "drizzle-orm";
+import {
+  users,
+  workspaceInvites,
+  workspaceMembers,
+  workspaceTags,
+  workspaces,
+} from "@/db/schema";
+import { and, eq, gt, inArray, lt, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 type Workspace = typeof workspaces.$inferSelect;
 type WorkspaceMember = typeof workspaceMembers.$inferSelect;
 type WorkspaceInvite = typeof workspaceInvites.$inferSelect;
+type WorkspaceTag = typeof workspaceTags.$inferSelect;
 type WorkspaceMemberWithUser = WorkspaceMember & {
   user: typeof users.$inferSelect;
 };
@@ -189,6 +196,77 @@ export class WorkspaceStorage {
       where: eq(workspaceInvites.workspaceId, workspaceId),
       orderBy: (invites, { desc }) => [desc(invites.id)],
     });
+  }
+
+  async listTags(workspaceId: number): Promise<WorkspaceTag[]> {
+    return await this.db.query.workspaceTags.findMany({
+      where: eq(workspaceTags.workspaceId, workspaceId),
+      orderBy: (tags, { asc }) => [asc(tags.name)],
+    });
+  }
+
+  async findTagById(workspaceId: number, tagId: number): Promise<WorkspaceTag | null> {
+    return (
+      (await this.db.query.workspaceTags.findFirst({
+        where: and(
+          eq(workspaceTags.workspaceId, workspaceId),
+          eq(workspaceTags.id, tagId),
+        ),
+      })) ?? null
+    );
+  }
+
+  async findTagsByIds(workspaceId: number, tagIds: number[]): Promise<WorkspaceTag[]> {
+    if (tagIds.length === 0) {
+      return [];
+    }
+
+    return await this.db.query.workspaceTags.findMany({
+      where: and(
+        eq(workspaceTags.workspaceId, workspaceId),
+        inArray(workspaceTags.id, tagIds),
+      ),
+    });
+  }
+
+  async createTag(input: {
+    workspaceId: number;
+    name: string;
+    normalizedName: string;
+    createdByUserId: number;
+  }): Promise<WorkspaceTag> {
+    const [tag] = await this.db.insert(workspaceTags).values(input).returning();
+    return tag;
+  }
+
+  async updateTag(
+    workspaceId: number,
+    tagId: number,
+    input: { name: string; normalizedName: string },
+  ): Promise<WorkspaceTag | null> {
+    const [tag] = await this.db
+      .update(workspaceTags)
+      .set(input)
+      .where(
+        and(
+          eq(workspaceTags.workspaceId, workspaceId),
+          eq(workspaceTags.id, tagId),
+        ),
+      )
+      .returning();
+
+    return tag ?? null;
+  }
+
+  async deleteTag(workspaceId: number, tagId: number): Promise<void> {
+    await this.db
+      .delete(workspaceTags)
+      .where(
+        and(
+          eq(workspaceTags.workspaceId, workspaceId),
+          eq(workspaceTags.id, tagId),
+        ),
+      );
   }
 
   async updateInviteStatus(

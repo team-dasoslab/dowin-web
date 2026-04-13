@@ -1,3 +1,4 @@
+import { LeadMeasureSummary } from "@/app/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { AchievementProgress } from "@/app/(protected)/dashboard/_components/AchievementProgress";
 import {
@@ -11,6 +12,7 @@ type MonthlyLeadMeasure = NonNullable<
 >[number];
 
 type MonthlyMobileCardsProps = {
+  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
   monthWeeks: ReturnType<typeof getMonthCalendarWeeks>;
   monthLabel?: string;
   monthlyLeadMeasures: MonthlyLeadMeasure[];
@@ -20,13 +22,21 @@ type MonthlyMobileCardsProps = {
 type MonthlyMobileWeekCardProps = {
   monthLabel?: string;
   monthlyLeadMeasures: MonthlyLeadMeasure[];
+  tagsByMeasureId: Map<number | null, Array<{ id?: number | null; name?: string | null }>>;
   today: string;
   weekDatesInMonth: ReturnType<typeof getMonthCalendarWeeks>[number];
   weekIndex: number;
 };
 
 export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
-  const { monthLabel, monthWeeks, monthlyLeadMeasures, today } = props;
+  const { activeLeadMeasures, monthLabel, monthWeeks, monthlyLeadMeasures, today } =
+    props;
+  const tagsByMeasureId = new Map(
+    activeLeadMeasures.map((leadMeasure) => [
+      leadMeasure.id ?? null,
+      leadMeasure.tags ?? [],
+    ]),
+  );
 
   return (
     <div className="space-y-3 md:hidden">
@@ -35,6 +45,7 @@ export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
           key={`${monthLabel}-mobile-week-${weekIndex + 1}`}
           monthLabel={monthLabel}
           monthlyLeadMeasures={monthlyLeadMeasures}
+          tagsByMeasureId={tagsByMeasureId}
           today={today}
           weekDatesInMonth={weekDatesInMonth}
           weekIndex={weekIndex}
@@ -47,6 +58,7 @@ export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
 function MonthlyMobileWeekCard({
   monthLabel,
   monthlyLeadMeasures,
+  tagsByMeasureId,
   today,
   weekDatesInMonth,
   weekIndex,
@@ -71,6 +83,7 @@ function MonthlyMobileWeekCard({
           <MonthlyMobileMeasureCard
             key={`${monthLabel}-${weekIndex}-${leadMeasure.id}-mobile`}
             leadMeasure={leadMeasure}
+            tags={tagsByMeasureId.get(leadMeasure.id ?? null) ?? []}
             today={today}
             weekDatesInMonth={weekDatesInMonth}
           />
@@ -82,12 +95,14 @@ function MonthlyMobileWeekCard({
 
 type MonthlyMobileMeasureCardProps = {
   leadMeasure: MonthlyLeadMeasure;
+  tags: Array<{ id?: number | null; name?: string | null }>;
   today: string;
   weekDatesInMonth: ReturnType<typeof getMonthCalendarWeeks>[number];
 };
 
 function MonthlyMobileMeasureCard({
   leadMeasure,
+  tags,
   today,
   weekDatesInMonth,
 }: MonthlyMobileMeasureCardProps) {
@@ -103,16 +118,10 @@ function MonthlyMobileMeasureCard({
   return (
     <div className="rounded-lg border border-border bg-sub-background/40 p-3">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-text-primary">
-            {leadMeasure.name}
-          </p>
-          <p className="text-[11px] text-text-muted">
-            목표 {targetValue}회 / {leadMeasure.period === "WEEKLY" ? "주" : "월"}
-          </p>
-        </div>
+        <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
         <AchievementProgress
           achievedCount={visibleAchievedCount}
+          periodLabel={leadMeasure.period === "WEEKLY" ? "주간" : "월간"}
           targetValue={targetValue}
           trackBackgroundClassName="bg-white"
           valueTextSizeClassName="text-xs"

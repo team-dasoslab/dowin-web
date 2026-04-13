@@ -60,6 +60,28 @@ describe("LeadMeasure Validation", () => {
     expect(result.success).toBe(false);
   });
 
+  it("태그는 최대 3개까지 허용한다", () => {
+    const result = leadMeasureCreateSchema.safeParse({
+      name: "주 3회 운동",
+      targetValue: 3,
+      period: "WEEKLY",
+      tagIds: [1, 2, 3, 4],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("태그 중복 선택은 실패한다", () => {
+    const result = leadMeasureCreateSchema.safeParse({
+      name: "주 3회 운동",
+      targetValue: 3,
+      period: "WEEKLY",
+      tagIds: [1, 1],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it("status 쿼리는 active/all만 허용한다", () => {
     expect(
       leadMeasureStatusQuerySchema.safeParse({ status: "active" }).success,

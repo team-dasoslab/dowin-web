@@ -55,6 +55,7 @@ describe("DashboardService", () => {
             targetValue: 5,
             period: "WEEKLY",
             status: "ACTIVE",
+            tags: [{ id: 1, name: "운동" }],
           },
           {
             id: 32,
@@ -62,6 +63,7 @@ describe("DashboardService", () => {
             targetValue: 2,
             period: "MONTHLY",
             status: "ACTIVE",
+            tags: [{ id: 2, name: "회고" }],
           },
         ],
       },
@@ -104,6 +106,7 @@ describe("DashboardService", () => {
               name: "아침 러닝",
               period: "WEEKLY",
               targetValue: 5,
+              tags: [{ id: 1, name: "운동" }],
               achieved: 2,
               achievementRate: 40,
               logs: {
@@ -121,6 +124,7 @@ describe("DashboardService", () => {
               name: "주간 회고",
               period: "MONTHLY",
               targetValue: 2,
+              tags: [{ id: 2, name: "회고" }],
               achieved: 3,
               achievementRate: 100,
               logs: {
@@ -187,6 +191,7 @@ describe("DashboardService", () => {
             targetValue: 3,
             period: "WEEKLY",
             status: "ACTIVE",
+            tags: [],
           },
           {
             id: 32,
@@ -194,6 +199,7 @@ describe("DashboardService", () => {
             targetValue: 5,
             period: "WEEKLY",
             status: "ACTIVE",
+            tags: [],
           },
         ],
       },
@@ -258,6 +264,7 @@ describe("DashboardService", () => {
             targetValue: 4,
             period: "WEEKLY",
             status: "ACTIVE",
+            tags: [],
           },
           {
             id: 32,
