@@ -219,9 +219,6 @@ export function TeamMemberMemoPanel({
                     avatarSeed={member.nickname}
                     alt={`${member.nickname ?? "사용자"} 아바타`}
                     size={28}
-                    className="rounded-md"
-                    fallbackClassName="rounded-md"
-                    imageClassName="rounded-md"
                   />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-bold text-text-primary">
@@ -357,9 +354,6 @@ function MemoCard({
             avatarSeed={memo.author.nickname}
             alt={`${memo.author.nickname} 아바타`}
             size={24}
-            className="rounded-md"
-            fallbackClassName="rounded-md"
-            imageClassName="rounded-md"
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">

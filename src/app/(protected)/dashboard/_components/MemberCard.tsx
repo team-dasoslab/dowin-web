@@ -32,7 +32,6 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
             alt={`${member.nickname ?? "사용자"} 아바타`}
             size={32}
             className="flex-shrink-0"
-            fallbackClassName="rounded-md"
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">

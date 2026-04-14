@@ -67,7 +67,6 @@ export default function ProfileExportPage() {
             alt={`${user?.nickname ?? "사용자"} 아바타`}
             size={44}
             className="flex-shrink-0"
-            fallbackClassName="rounded-lg"
           />
           <div className="min-w-0">
             <h1 className="text-lg font-bold text-text-primary tracking-tight">

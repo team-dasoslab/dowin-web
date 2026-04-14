@@ -43,7 +43,6 @@ export function MemberListItem({
           avatarSeed={member.nickname}
           alt={`${nickname} 아바타`}
           size={40}
-          fallbackClassName="rounded-lg"
         />
         <div className="min-w-0">
           <div className="flex items-center gap-2">
