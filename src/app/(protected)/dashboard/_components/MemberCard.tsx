@@ -28,6 +28,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
         <div className="flex items-center gap-3 min-w-0">
           <UserAvatar
             avatarKey={member.avatarKey}
+            avatarSeed={member.nickname}
             alt={`${member.nickname ?? "사용자"} 아바타`}
             size={32}
             className="flex-shrink-0"

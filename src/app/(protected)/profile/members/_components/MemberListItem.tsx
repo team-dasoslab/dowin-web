@@ -40,6 +40,7 @@ export function MemberListItem({
       <div className="flex min-w-0 items-center gap-3">
         <UserAvatar
           avatarKey={member.avatarKey}
+          avatarSeed={member.nickname}
           alt={`${nickname} 아바타`}
           size={40}
           fallbackClassName="rounded-lg"

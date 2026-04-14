@@ -216,6 +216,7 @@ export function TeamMemberMemoPanel({
                 <div className="flex min-w-0 items-center gap-3">
                   <UserAvatar
                     avatarKey={member.avatarKey}
+                    avatarSeed={member.nickname}
                     alt={`${member.nickname ?? "사용자"} 아바타`}
                     size={28}
                     className="rounded-md"
@@ -353,6 +354,7 @@ function MemoCard({
         <div className="flex min-w-0 items-center gap-2">
           <UserAvatar
             avatarKey={memo.author.avatarKey}
+            avatarSeed={memo.author.nickname}
             alt={`${memo.author.nickname} 아바타`}
             size={24}
             className="rounded-md"

@@ -1,11 +1,17 @@
 "use client";
 
-import { getProfileAvatarSrc, type ProfileAvatarKey } from "@/domain/profile/avatar-options";
+import {
+  getDiceBearGlassAvatarSrc,
+  getProfileAvatarSrc,
+  type ProfileAvatarKey,
+} from "@/domain/profile/avatar-options";
 import { User as UserIcon } from "lucide-react";
 import Image from "next/image";
+import { useRef } from "react";
 
 type UserAvatarProps = {
   avatarKey?: ProfileAvatarKey | string | null;
+  avatarSeed?: string | null;
   alt: string;
   size?: number;
   className?: string;
@@ -15,15 +21,25 @@ type UserAvatarProps = {
 
 export function UserAvatar({
   avatarKey,
+  avatarSeed,
   alt,
   size = 40,
   className,
   fallbackClassName,
   imageClassName,
 }: UserAvatarProps) {
-  const wrapperClassName = className ?? "";
+  const wrapperClassName = className
+    ? `rounded-full ${className}`
+    : "rounded-full";
+  const randomSeedRef = useRef(`wig-avatar-${Math.random().toString(36).slice(2, 10)}`);
+  const resolvedSeed = avatarSeed?.trim() || randomSeedRef.current;
+  const resolvedSrc = resolvedSeed
+    ? getDiceBearGlassAvatarSrc(resolvedSeed)
+    : avatarKey
+      ? getProfileAvatarSrc(avatarKey)
+      : null;
 
-  if (!avatarKey) {
+  if (!resolvedSrc) {
     return (
       <div
         className={wrapperClassName}
@@ -49,11 +65,14 @@ export function UserAvatar({
       style={{ width: size, height: size }}
     >
       <Image
-        src={getProfileAvatarSrc(avatarKey)}
+        src={resolvedSrc}
         alt={alt}
         width={size}
         height={size}
-        className={`h-full w-full object-contain ${imageClassName ?? ""}`}
+        className={`h-full w-full rounded-full object-contain ${imageClassName ?? ""}`}
+        unoptimized
+        loader={({ src }) => src}
+        loading="lazy"
       />
     </div>
   );

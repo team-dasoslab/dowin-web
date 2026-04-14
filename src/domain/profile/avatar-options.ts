@@ -43,6 +43,10 @@ export const PROFILE_AVATAR_KEYS = [
 
 export type ProfileAvatarKey = (typeof PROFILE_AVATAR_KEYS)[number];
 
+export function getDiceBearGlassAvatarSrc(seed: string) {
+  return `https://api.dicebear.com/9.x/glass/svg?seed=${encodeURIComponent(seed)}`;
+}
+
 export function getProfileAvatarSrc(avatarKey: string) {
-  return `/assets/avatars/${avatarKey}.png`;
+  return getDiceBearGlassAvatarSrc(avatarKey);
 }
