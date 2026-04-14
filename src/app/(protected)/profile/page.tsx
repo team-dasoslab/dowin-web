@@ -226,9 +226,7 @@ export default function ProfilePage() {
           id: "push-notification",
           icon: <Bell className="w-3.5 h-3.5" />,
           title: "개인 기록 리마인드",
-          description: isPushSubscribed
-            ? `현재 ${dailySettings?.dailyReminderTime ?? "21:00"} 발송`
-            : "브라우저 푸시를 켜고 원하는 시간을 선택하세요.",
+          description: "매일 정해진 시간에 기록 리마인드 푸시 알림을 받습니다.",
           rightElement: (
             <NotificationSettingControl
               isSubscribed={isPushSubscribed}
