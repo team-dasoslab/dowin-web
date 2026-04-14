@@ -1,98 +1,101 @@
 import { getDb } from "@/db";
-import { pushSubscriptions } from "@/db/schema";
+import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
+import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { eq } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
 
-interface PushSubscription {
-  endpoint: string;
-  keys: {
-    p256dh: string;
-    auth: string;
-  };
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const body = (await req.json()) as {
-      subscription: PushSubscription;
+type PushSubscriptionPayload = {
+  subscription: {
+    endpoint: string;
+    keys: {
+      p256dh: string;
+      auth: string;
     };
-    const { subscription } = body;
-    const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
+  };
+};
 
-    if (!session) {
-      return apiError("UNAUTHORIZED");
-    }
+export const POST = withErrorHandler(async (request: Request) => {
+  const { env } = getCloudflareContext();
+  const db = getDb(env.DB);
+  const session = await getSessionWithRefresh(db);
 
-    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
-      db,
-      userId: session.userId,
-      env,
-      intent: "general-write",
-    });
-    if (restrictedWriteResponse) {
-      return restrictedWriteResponse;
-    }
-
-    // Save or update subscription
-    await db
-      .insert(pushSubscriptions)
-      .values({
-        userId: String(session.userId),
-        endpoint: subscription.endpoint,
-        p256dh: subscription.keys.p256dh,
-        auth: subscription.keys.auth,
-      })
-      .onConflictDoUpdate({
-        target: pushSubscriptions.endpoint,
-        set: {
-          userId: String(session.userId),
-          p256dh: subscription.keys.p256dh,
-          auth: subscription.keys.auth,
-        },
-      });
-
-    return apiSuccess({ success: true });
-  } catch (error) {
-    console.error("Subscription error:", error);
-    return NextResponse.json({ error: "Failed to subscribe" }, { status: 500 });
+  if (!session) {
+    return apiError("UNAUTHORIZED");
   }
-}
 
-export async function DELETE(req: NextRequest) {
-  try {
-    const body = (await req.json()) as { endpoint: string };
-    const { endpoint } = body;
-    const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return apiError("UNAUTHORIZED");
-    }
-
-    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
-      db,
-      userId: session.userId,
-      env,
-      intent: "general-write",
-    });
-    if (restrictedWriteResponse) {
-      return restrictedWriteResponse;
-    }
-
-    await db
-      .delete(pushSubscriptions)
-      .where(eq(pushSubscriptions.endpoint, endpoint));
-
-    return apiSuccess({ success: true });
-  } catch (error) {
-    console.error("Unsubscribe error:", error);
-    return NextResponse.json({ error: "Failed to unsubscribe" }, { status: 500 });
+  const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+    db,
+    userId: session.userId,
+    env,
+    intent: "general-write",
+  });
+  if (restrictedWriteResponse) {
+    return restrictedWriteResponse;
   }
-}
+
+  const body = (await request.json()) as PushSubscriptionPayload;
+  if (
+    !body.subscription?.endpoint ||
+    !body.subscription?.keys?.p256dh ||
+    !body.subscription?.keys?.auth
+  ) {
+    return apiError("VALIDATION_ERROR", {
+      subscription: ["유효한 푸시 구독 정보가 필요합니다."],
+    });
+  }
+
+  const storage = new NotificationStorage(db);
+
+  await storage.upsertPushSubscription({
+    userId: session.userId,
+    endpoint: body.subscription.endpoint,
+    p256dh: body.subscription.keys.p256dh,
+    auth: body.subscription.keys.auth,
+  });
+
+  const currentSettings = await storage.findUserNotificationSettings(session.userId);
+  if (!currentSettings) {
+    await storage.upsertUserNotificationSettings({
+      userId: session.userId,
+      dailyReminderEnabled: true,
+      dailyReminderHour: 21,
+      dailyReminderMinute: 0,
+      timezone: "Asia/Seoul",
+    });
+  }
+
+  return apiSuccess({ success: true });
+});
+
+export const DELETE = withErrorHandler(async (request: Request) => {
+  const { env } = getCloudflareContext();
+  const db = getDb(env.DB);
+  const session = await getSessionWithRefresh(db);
+
+  if (!session) {
+    return apiError("UNAUTHORIZED");
+  }
+
+  const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+    db,
+    userId: session.userId,
+    env,
+    intent: "general-write",
+  });
+  if (restrictedWriteResponse) {
+    return restrictedWriteResponse;
+  }
+
+  const body = (await request.json()) as { endpoint?: string };
+  if (!body.endpoint) {
+    return apiError("VALIDATION_ERROR", {
+      endpoint: ["삭제할 endpoint가 필요합니다."],
+    });
+  }
+
+  await new NotificationStorage(db).deletePushSubscriptionByEndpoint(body.endpoint);
+
+  return apiSuccess({ success: true });
+});
