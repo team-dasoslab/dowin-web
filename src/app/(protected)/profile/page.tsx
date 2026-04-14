@@ -21,7 +21,6 @@ import {
   ChevronRight,
   Download,
   Edit2,
-  Image as ImageIcon,
   Key,
   LogOut,
   Smartphone,
@@ -125,13 +124,6 @@ export default function ProfilePage() {
     {
       label: "계정 설정",
       items: [
-        {
-          id: "avatar",
-          icon: <ImageIcon className="w-3.5 h-3.5" />,
-          title: "프로필 아이콘 변경",
-          description: "마음에 드는 아이콘을 선택해 내 프로필에 적용합니다.",
-          href: "/profile/avatar",
-        },
         {
           id: "nickname",
           icon: <Edit2 className="w-3.5 h-3.5" />,
@@ -322,6 +314,7 @@ export default function ProfilePage() {
         <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
           <UserAvatar
             avatarKey={avatarKey}
+            avatarSeed={nickname}
             alt={`${nickname} 아바타`}
             size={44}
             className="flex-shrink-0"

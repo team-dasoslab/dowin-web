@@ -63,6 +63,7 @@ export default function ProfileExportPage() {
         <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
           <UserAvatar
             avatarKey={user?.avatarKey}
+            avatarSeed={user?.nickname}
             alt={`${user?.nickname ?? "사용자"} 아바타`}
             size={44}
             className="flex-shrink-0"

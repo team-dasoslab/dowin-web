@@ -99,6 +99,7 @@ export function WeeklyTable({
           <div className="flex min-w-0 items-center gap-2">
             <UserAvatar
               avatarKey={member.avatarKey}
+              avatarSeed={member.nickname}
               alt={`${member.nickname ?? "사용자"} 아바타`}
               size={20}
               className="rounded-md"
