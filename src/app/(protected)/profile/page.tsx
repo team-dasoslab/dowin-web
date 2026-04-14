@@ -1,6 +1,10 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
+import {
+  ProfileCoachmark,
+  PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
+} from "@/app/(protected)/profile/_components/ProfileCoachmark";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { NotificationSettingControl } from "@/app/(protected)/profile/_components/NotificationSettingControl";
 import { TIME_OPTIONS, useNotificationSettings } from "@/app/(protected)/profile/_hooks/useNotificationSettings";
@@ -59,6 +63,7 @@ export default function ProfilePage() {
     !hasNoWorkspace && workspaceResponse?.status === 200
       ? workspaceResponse.data
       : null;
+  const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const nickname = user?.nickname ?? "사용자";
   const customId = user?.customId ?? "";
   const avatarKey = user?.avatarKey ?? null;
@@ -94,6 +99,19 @@ export default function ProfilePage() {
     showToast("error", "프로필 정보를 불러오지 못해 홈으로 이동합니다.");
     router.replace("/dashboard/my");
   }, [isProfileLoading, router, showToast, user]);
+
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+    const coachmark = currentUrl.searchParams.get("coachmark");
+
+    if (coachmark !== PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY) {
+      return;
+    }
+
+    setIsCoachmarkRunning(true);
+    currentUrl.searchParams.delete("coachmark");
+    window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+  }, []);
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
@@ -270,6 +288,10 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      <ProfileCoachmark
+        isRunning={isCoachmarkRunning}
+        setIsRunning={setIsCoachmarkRunning}
+      />
       {isActionPending && (
         <LoadingOverlay
           variant="ios"

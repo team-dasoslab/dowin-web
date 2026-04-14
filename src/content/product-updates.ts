@@ -43,6 +43,18 @@ export type ProductUpdate = {
  */
 export const productUpdates = [
   {
+    id: "2026-04-14-personal-reminder-schedule",
+    slug: "personal-reminder-schedule",
+    title: "개인 기록 리마인드 시간을 직접 정할 수 있어요",
+    summary:
+      "프로필 알림 설정에서 내 생활 리듬에 맞는 시간으로 매일 기록 리마인드 푸시를 받을 수 있습니다.",
+    publishedAt: "2026.04.14",
+    tag: "Profile",
+    ctaLabel: "바로 써보기",
+    ctaHref: "/profile?coachmark=personal-reminder",
+    isMajor: true,
+  },
+  {
     id: "2026-04-14-lead-measure-tags",
     slug: "lead-measure-tags",
     title: "선행지표를 태그로 더 체계적으로 정리할 수 있어요",

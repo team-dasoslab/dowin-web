@@ -20,7 +20,10 @@ export function NotificationSettingControl({
   timeOptions,
 }: NotificationSettingControlProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className="flex items-center gap-2"
+      data-coachmark="profile-personal-reminder"
+    >
       <select
         value={dailyReminderTime}
         disabled={disabled || !isSubscribed}
