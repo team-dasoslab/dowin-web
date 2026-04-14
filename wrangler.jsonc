@@ -36,8 +36,8 @@
     {
       "binding": "DB",
       "database_name": "wig-db",
-      "database_id": "0e1bfd28-d223-447c-ad6b-1f83f0038bfe",
-      "migrations_dir": "drizzle"
+      "database_id": "102e8afb-0dc8-4bcb-aec5-75a8f6c5b5fe",
+      "migrations_dir": "drizzle",
     },
   ],
   /**
