@@ -2,9 +2,10 @@
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { NotificationSettingControl } from "@/app/(protected)/profile/_components/NotificationSettingControl";
+import { TIME_OPTIONS, useNotificationSettings } from "@/app/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
@@ -27,7 +28,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface MenuItem {
   id: string;
@@ -61,8 +62,16 @@ export default function ProfilePage() {
   const nickname = user?.nickname ?? "사용자";
   const customId = user?.customId ?? "";
   const avatarKey = user?.avatarKey ?? null;
+  const [isPushSubscribed, setIsPushSubscribed] = useState(false);
   const hasWorkspace = workspace !== null;
   const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
+  const {
+    dailySettings,
+    isDailyLoading,
+    isUpdatingDaily,
+    refreshSettings,
+    updateDailySettings,
+  } = useNotificationSettings();
   const {
     changeNickname,
     changeWorkspaceName,
@@ -216,11 +225,27 @@ export default function ProfilePage() {
         {
           id: "push-notification",
           icon: <Bell className="w-3.5 h-3.5" />,
-          title: "매일 밤 9시 알림",
-          description: "리드 지표 기록을 잊지 않도록 푸시 알림을 보냅니다.",
-          rightElement: user ? (
-            <PushSubscriptionManager variant="toggle" />
-          ) : null,
+          title: "개인 기록 리마인드",
+          description: isPushSubscribed
+            ? `현재 ${dailySettings?.dailyReminderTime ?? "21:00"} 발송`
+            : "브라우저 푸시를 켜고 원하는 시간을 선택하세요.",
+          rightElement: (
+            <NotificationSettingControl
+              isSubscribed={isPushSubscribed}
+              dailyReminderTime={dailySettings?.dailyReminderTime ?? "21:00"}
+              disabled={isDailyLoading || isUpdatingDaily}
+              timeOptions={TIME_OPTIONS}
+              onSubscriptionChange={(next) => {
+                setIsPushSubscribed(next);
+                if (next) {
+                  void refreshSettings();
+                }
+              }}
+              onDailyReminderTimeChange={(time) => {
+                void updateDailySettings(time);
+              }}
+            />
+          ),
         },
       ],
     },
