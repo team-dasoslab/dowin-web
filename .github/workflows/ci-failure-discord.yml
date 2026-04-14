@@ -22,6 +22,22 @@ jobs:
           ACTOR: ${{ github.event.workflow_run.actor.login }}
           RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
+          WEBHOOK_URL="$(printf '%s' "$DISCORD_WEBHOOK_URL" | tr -d '\r\n')"
+          echo "::add-mask::$WEBHOOK_URL"
+
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "Discord webhook secret is unavailable"
+            exit 1
+          fi
+
+          case "$WEBHOOK_URL" in
+            https://discord.com/api/webhooks/*|https://discordapp.com/api/webhooks/*) ;;
+            *)
+              echo "Discord webhook secret format is invalid"
+              exit 1
+              ;;
+          esac
+
           jq -n \
             --arg repository "$REPOSITORY" \
             --arg workflow "$WORKFLOW_NAME" \
@@ -38,5 +54,6 @@ jobs:
             }' \
           | curl -sS -X POST \
               -H "Content-Type: application/json" \
+              --fail-with-body \
               --data @- \
-              "$DISCORD_WEBHOOK_URL"
+              "$WEBHOOK_URL"
