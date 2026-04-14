@@ -5,7 +5,9 @@ const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockInsertValues = vi.fn();
 const mockOnConflictDoUpdate = vi.fn();
+const mockReturning = vi.fn();
 const mockDeleteWhere = vi.fn();
+const mockFindUserNotificationSettings = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -24,11 +26,23 @@ describe("POST /api/push/subscribe", () => {
     vi.clearAllMocks();
 
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
-    mockOnConflictDoUpdate.mockResolvedValue(undefined);
+    mockReturning.mockResolvedValue([
+      {
+        userId: 7,
+        dailyReminderEnabled: true,
+        dailyReminderHour: 21,
+        dailyReminderMinute: 0,
+        timezone: "Asia/Seoul",
+      },
+    ]);
+    mockOnConflictDoUpdate.mockImplementation(() => ({
+      returning: mockReturning,
+    }));
     mockInsertValues.mockReturnValue({
       onConflictDoUpdate: mockOnConflictDoUpdate,
     });
     mockDeleteWhere.mockResolvedValue(undefined);
+    mockFindUserNotificationSettings.mockResolvedValue(null);
     mockGetDb.mockReturnValue({
       insert: vi.fn(() => ({
         values: mockInsertValues,
@@ -36,6 +50,11 @@ describe("POST /api/push/subscribe", () => {
       delete: vi.fn(() => ({
         where: mockDeleteWhere,
       })),
+      query: {
+        userNotificationSettings: {
+          findFirst: mockFindUserNotificationSettings,
+        },
+      },
     });
   });
 
@@ -102,6 +121,7 @@ describe("POST /api/push/subscribe", () => {
         }),
       }),
     );
+    expect(mockFindUserNotificationSettings).toHaveBeenCalled();
   });
 });
 

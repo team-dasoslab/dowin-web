@@ -310,6 +310,43 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /push/settings:
+    get:
+      summary: 내 일일 알림 설정 조회
+      tags: [Notification]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserNotificationSettings" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+    put:
+      summary: 내 일일 알림 설정 변경
+      tags: [Notification]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserNotificationSettingsUpdateRequest"
+      responses:
+        "200":
+          description: 변경 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserNotificationSettings" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /admin/users:
     post:
       summary: "[ADMIN] 새 멤버 추가"
@@ -1730,6 +1767,28 @@ components:
         id: { type: integer }
         name: { type: string }
         createdAt: { type: string, format: date-time }
+
+    UserNotificationSettings:
+      type: object
+      required: [dailyReminderEnabled, dailyReminderTime, timezone]
+      properties:
+        dailyReminderEnabled: { type: boolean }
+        dailyReminderTime:
+          type: string
+          example: "21:00"
+        timezone:
+          type: string
+          example: Asia/Seoul
+
+    UserNotificationSettingsUpdateRequest:
+      type: object
+      required: [dailyReminderEnabled, dailyReminderTime]
+      properties:
+        dailyReminderEnabled: { type: boolean }
+        dailyReminderTime:
+          type: string
+          pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
+          example: "20:30"
 
     WorkspaceMember:
       type: object

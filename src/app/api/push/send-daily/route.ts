@@ -1,9 +1,10 @@
 import { getDb } from "@/db";
-import { pushSubscriptions } from "@/db/schema";
-import {
-  buildPushPayload,
-  type PushSubscription,
-} from "@block65/webcrypto-web-push";
+import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
+import { LeadMeasureStorage } from "@/domain/lead-measure/storage/lead-measure.storage";
+import { DailyReminderPushService } from "@/domain/notification/services/daily-reminder-push.service";
+import { sendWebPushMessages } from "@/domain/notification/services/web-push";
+import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
+import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,9 +16,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const db = getDb(env.DB);
-  const subscriptions = await db.select().from(pushSubscriptions);
-
   const vapidPublicKey = env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const vapidPrivateKey = env.VAPID_PRIVATE_KEY;
 
@@ -28,59 +26,30 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const vapidKeys = {
-    subject: "mailto:ixio0330@gmail.com",
-    publicKey: vapidPublicKey,
-    privateKey: vapidPrivateKey,
-  };
-
-  const results = await Promise.allSettled(
-    subscriptions.map(async (sub) => {
-      const subscription: PushSubscription = {
-        endpoint: sub.endpoint,
-        keys: {
-          p256dh: sub.p256dh,
-          auth: sub.auth,
-        },
-        expirationTime: null,
-      };
-
-      const payload = await buildPushPayload(
-        {
-          data: JSON.stringify({
-            title: "리마인드",
-            body: "아직 하루가 끝나지 않았어요! 지금 바로 일어나서 해볼까요?",
-            icon: "/favicon-192x192.png",
-            data: {
-              url: "/dashboard/my",
-              pushType: "daily_reminder",
-              campaignId: "daily_reminder_v1",
-            },
-          }),
-          options: { ttl: 60 },
-        },
-        subscription,
-        vapidKeys,
-      );
-
-      const response = await fetch(
-        new Request(sub.endpoint, {
-          method: payload.method,
-          headers: payload.headers,
-          body: payload.body as unknown as ArrayBuffer,
-        }),
-      );
-
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`${response.status} - ${text}`);
-      }
-    }),
+  const db = getDb(env.DB);
+  const service = new DailyReminderPushService(
+    new NotificationStorage(db),
+    new ScoreboardStorage(db),
+    new LeadMeasureStorage(db),
+    new DailyLogStorage(db),
+  );
+  const result = await service.buildDailyReminderJobs();
+  const delivery = await sendWebPushMessages(
+    result.jobs.map((job) => ({
+      ...job,
+      pushType: "daily_reminder",
+      campaignId: "daily_reminder_v2",
+    })),
+    {
+      subject: "mailto:ixio0330@gmail.com",
+      publicKey: vapidPublicKey,
+      privateKey: vapidPrivateKey,
+    },
   );
 
   return NextResponse.json({
-    total: subscriptions.length,
-    success: results.filter((r) => r.status === "fulfilled").length,
-    failed: results.filter((r) => r.status === "rejected").length,
+    ...result.summary,
+    success: delivery.success,
+    failed: delivery.failed,
   });
 }

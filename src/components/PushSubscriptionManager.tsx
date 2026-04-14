@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 interface PushSubscriptionManagerProps {
   variant?: "button" | "toggle";
+  onSubscriptionChange?: (isSubscribed: boolean) => void;
 }
 
 const checkiOSSupport = () => {
@@ -34,36 +35,38 @@ const checkiOSSupport = () => {
 
 export default function PushSubscriptionManager({
   variant = "button",
+  onSubscriptionChange,
 }: PushSubscriptionManagerProps) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { showToast } = useToast();
 
   useEffect(() => {
-    checkSubscription();
-  }, []);
+    const checkSubscription = async () => {
+      if (
+        typeof window === "undefined" ||
+        !("serviceWorker" in navigator) ||
+        !("PushManager" in window) ||
+        !("Notification" in window)
+      ) {
+        setIsInitialLoading(false);
+        return;
+      }
 
-  const checkSubscription = async () => {
-    if (
-      typeof window === "undefined" ||
-      !("serviceWorker" in navigator) ||
-      !("PushManager" in window) ||
-      !("Notification" in window)
-    ) {
-      setIsInitialLoading(false);
-      return;
-    }
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        setIsSubscribed(!!subscription);
+        onSubscriptionChange?.(!!subscription);
+      } catch (error) {
+        console.error("Check subscription failed:", error);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
 
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      setIsSubscribed(!!subscription);
-    } catch (error) {
-      console.error("Check subscription failed:", error);
-    } finally {
-      setIsInitialLoading(false);
-    }
-  };
+    void checkSubscription();
+  }, [onSubscriptionChange]);
 
   const subscribe = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -128,7 +131,8 @@ export default function PushSubscriptionManager({
         );
       }
 
-      showToast("success", "매일 밤 9시 알림이 설정되었습니다.");
+      onSubscriptionChange?.(true);
+      showToast("success", "푸시 알림이 설정되었습니다.");
     } catch (error) {
       // Rollback
       setIsSubscribed(false);
@@ -189,6 +193,7 @@ export default function PushSubscriptionManager({
           );
         }
       }
+      onSubscriptionChange?.(false);
       showToast("info", "알림 설정이 해제되었습니다.");
     } catch (error) {
       // Rollback
@@ -239,7 +244,7 @@ export default function PushSubscriptionManager({
       }`}
     >
       {isSubscribed ? <BellOff size={16} /> : <Bell size={16} />}
-      {isSubscribed ? "9시 알림 해제" : "매일 9시 알림 받기"}
+      {isSubscribed ? "알림 해제" : "알림 받기"}
     </button>
   );
 }

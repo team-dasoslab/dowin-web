@@ -160,6 +160,18 @@ export interface Workspace {
   createdAt?: string;
 }
 
+export interface UserNotificationSettings {
+  dailyReminderEnabled: boolean;
+  dailyReminderTime: string;
+  timezone: string;
+}
+
+export interface UserNotificationSettingsUpdateRequest {
+  dailyReminderEnabled: boolean;
+  /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
+  dailyReminderTime: string;
+}
+
 export type WorkspaceMemberRole = typeof WorkspaceMemberRole[keyof typeof WorkspaceMemberRole];
 
 

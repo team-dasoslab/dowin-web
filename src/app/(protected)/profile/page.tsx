@@ -1,10 +1,15 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
+import {
+  ProfileCoachmark,
+  PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
+} from "@/app/(protected)/profile/_components/ProfileCoachmark";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { NotificationSettingControl } from "@/app/(protected)/profile/_components/NotificationSettingControl";
+import { TIME_OPTIONS, useNotificationSettings } from "@/app/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import PushSubscriptionManager from "@/components/PushSubscriptionManager";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
@@ -27,7 +32,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface MenuItem {
   id: string;
@@ -58,11 +63,20 @@ export default function ProfilePage() {
     !hasNoWorkspace && workspaceResponse?.status === 200
       ? workspaceResponse.data
       : null;
+  const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const nickname = user?.nickname ?? "사용자";
   const customId = user?.customId ?? "";
   const avatarKey = user?.avatarKey ?? null;
+  const [isPushSubscribed, setIsPushSubscribed] = useState(false);
   const hasWorkspace = workspace !== null;
   const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
+  const {
+    dailySettings,
+    isDailyLoading,
+    isUpdatingDaily,
+    refreshSettings,
+    updateDailySettings,
+  } = useNotificationSettings();
   const {
     changeNickname,
     changeWorkspaceName,
@@ -85,6 +99,19 @@ export default function ProfilePage() {
     showToast("error", "프로필 정보를 불러오지 못해 홈으로 이동합니다.");
     router.replace("/dashboard/my");
   }, [isProfileLoading, router, showToast, user]);
+
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+    const coachmark = currentUrl.searchParams.get("coachmark");
+
+    if (coachmark !== PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY) {
+      return;
+    }
+
+    setIsCoachmarkRunning(true);
+    currentUrl.searchParams.delete("coachmark");
+    window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+  }, []);
 
   if (isProfileLoading) {
     return <ProfileSkeleton />;
@@ -216,11 +243,25 @@ export default function ProfilePage() {
         {
           id: "push-notification",
           icon: <Bell className="w-3.5 h-3.5" />,
-          title: "매일 밤 9시 알림",
-          description: "리드 지표 기록을 잊지 않도록 푸시 알림을 보냅니다.",
-          rightElement: user ? (
-            <PushSubscriptionManager variant="toggle" />
-          ) : null,
+          title: "개인 기록 리마인드",
+          description: "매일 정해진 시간에 기록 리마인드 푸시 알림을 받습니다.",
+          rightElement: (
+            <NotificationSettingControl
+              isSubscribed={isPushSubscribed}
+              dailyReminderTime={dailySettings?.dailyReminderTime ?? "21:00"}
+              disabled={isDailyLoading || isUpdatingDaily}
+              timeOptions={TIME_OPTIONS}
+              onSubscriptionChange={(next) => {
+                setIsPushSubscribed(next);
+                if (next) {
+                  void refreshSettings();
+                }
+              }}
+              onDailyReminderTimeChange={(time) => {
+                void updateDailySettings(time);
+              }}
+            />
+          ),
         },
       ],
     },
@@ -247,6 +288,10 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard">
+      <ProfileCoachmark
+        isRunning={isCoachmarkRunning}
+        setIsRunning={setIsCoachmarkRunning}
+      />
       {isActionPending && (
         <LoadingOverlay
           variant="ios"
