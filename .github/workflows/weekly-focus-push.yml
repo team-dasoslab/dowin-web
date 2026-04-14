@@ -10,6 +10,8 @@ jobs:
   send-request:
     runs-on: ubuntu-latest
     environment: production
+    env:
+      APP_BASE_URL: ${{ vars.APP_BASE_URL }}
     steps:
       - name: Send request to /api/push/send-weekly-focus
         run: |
@@ -17,4 +19,4 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
             -d '{}' \
-            "https://wig.ixio0330.workers.dev/api/push/send-weekly-focus"
+            "${APP_BASE_URL}/api/push/send-weekly-focus"
