@@ -9,14 +9,15 @@ import { User as UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
 
+type UserAvatarShape = "circle" | "rounded";
+
 type UserAvatarProps = {
   avatarKey?: ProfileAvatarKey | string | null;
   avatarSeed?: string | null;
   alt: string;
   size?: number;
   className?: string;
-  fallbackClassName?: string;
-  imageClassName?: string;
+  shape?: UserAvatarShape;
 };
 
 export function UserAvatar({
@@ -25,12 +26,12 @@ export function UserAvatar({
   alt,
   size = 40,
   className,
-  fallbackClassName,
-  imageClassName,
+  shape = "circle",
 }: UserAvatarProps) {
+  const radiusClassName = shape === "circle" ? "rounded-full" : "rounded-lg";
   const wrapperClassName = className
-    ? `rounded-full ${className}`
-    : "rounded-full";
+    ? `${className} ${radiusClassName}`
+    : radiusClassName;
   const randomSeedRef = useRef(`wig-avatar-${Math.random().toString(36).slice(2, 10)}`);
   const resolvedSeed = avatarSeed?.trim() || randomSeedRef.current;
   const resolvedSrc = resolvedSeed
@@ -47,7 +48,7 @@ export function UserAvatar({
         aria-hidden="true"
       >
         <div
-          className={`flex h-full w-full items-center justify-center rounded-full bg-primary/10 text-primary ${fallbackClassName ?? ""}`}
+          className={`flex h-full w-full items-center justify-center bg-primary/10 text-primary ${radiusClassName}`}
         >
           <UserIcon
             className="h-1/2 w-1/2"
@@ -69,7 +70,7 @@ export function UserAvatar({
         alt={alt}
         width={size}
         height={size}
-        className={`h-full w-full rounded-full object-contain ${imageClassName ?? ""}`}
+        className={`h-full w-full object-contain ${radiusClassName}`}
         unoptimized
         loader={({ src }) => src}
         loading="lazy"

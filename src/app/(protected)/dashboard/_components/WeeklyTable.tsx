@@ -102,9 +102,6 @@ export function WeeklyTable({
               avatarSeed={member.nickname}
               alt={`${member.nickname ?? "사용자"} 아바타`}
               size={20}
-              className="rounded-md"
-              fallbackClassName="rounded-md"
-              imageClassName="rounded-md"
             />
             <span className="truncate text-xs font-bold text-text-primary">
               {member.nickname}

@@ -318,7 +318,6 @@ export default function ProfilePage() {
             alt={`${nickname} 아바타`}
             size={44}
             className="flex-shrink-0"
-            fallbackClassName="rounded-lg"
           />
           <div className="min-w-0">
             <div className="flex items-center gap-2">
