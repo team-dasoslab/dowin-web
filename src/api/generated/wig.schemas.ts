@@ -154,25 +154,9 @@ export interface UserDeleteRequest {
   currentPassword: string;
 }
 
-export type WorkspacePlanCode = typeof WorkspacePlanCode[keyof typeof WorkspacePlanCode];
-
-
-export const WorkspacePlanCode = {
-  FREE: 'FREE',
-  STANDARD: 'STANDARD',
-} as const;
-
 export interface Workspace {
   id?: number;
   name?: string;
-  planCode?: WorkspacePlanCode;
-  memberCount?: number;
-  /** @nullable */
-  memberLimit?: number | null;
-  /** @nullable */
-  leaderReminderWeeklyLimit?: number | null;
-  /** @nullable */
-  reportHistoryWeeks?: number | null;
   createdAt?: string;
 }
 
@@ -186,67 +170,6 @@ export interface UserNotificationSettingsUpdateRequest {
   dailyReminderEnabled: boolean;
   /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
   dailyReminderTime: string;
-}
-
-export type LeaderNotificationSettingsWorkspacePlanCode = typeof LeaderNotificationSettingsWorkspacePlanCode[keyof typeof LeaderNotificationSettingsWorkspacePlanCode];
-
-
-export const LeaderNotificationSettingsWorkspacePlanCode = {
-  FREE: 'FREE',
-  STANDARD: 'STANDARD',
-} as const;
-
-export interface LeaderNotificationSettings {
-  leaderWeeklyReportEnabled: boolean;
-  /**
-   * @minimum 1
-   * @maximum 7
-   */
-  leaderWeeklyReportDayOfWeek: number;
-  leaderWeeklyReportTime: string;
-  timezone: string;
-  workspacePlanCode: LeaderNotificationSettingsWorkspacePlanCode;
-  reminderUsageThisWeek: number;
-  /** @nullable */
-  reminderWeeklyLimit?: number | null;
-}
-
-export interface LeaderNotificationSettingsUpdateRequest {
-  leaderWeeklyReportEnabled: boolean;
-  /**
-   * @minimum 1
-   * @maximum 7
-   */
-  leaderWeeklyReportDayOfWeek: number;
-  /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
-  leaderWeeklyReportTime: string;
-}
-
-export type LeaderReminderSendRequestTemplateKey = typeof LeaderReminderSendRequestTemplateKey[keyof typeof LeaderReminderSendRequestTemplateKey];
-
-
-export const LeaderReminderSendRequestTemplateKey = {
-  check_progress: 'check_progress',
-  focus_this_week: 'focus_this_week',
-  one_more_check: 'one_more_check',
-} as const;
-
-export interface LeaderReminderSendRequest {
-  targetUserId: number;
-  leadMeasureId: number;
-  templateKey: LeaderReminderSendRequestTemplateKey;
-  /**
-   * @maxLength 80
-   * @nullable
-   */
-  customMessage?: string | null;
-}
-
-export interface LeaderReminderSendResponse {
-  deliveredCount: number;
-  /** @nullable */
-  failedCount?: number | null;
-  message: string;
 }
 
 export type WorkspaceMemberRole = typeof WorkspaceMemberRole[keyof typeof WorkspaceMemberRole];

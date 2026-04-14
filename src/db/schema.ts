@@ -28,6 +28,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   authoredTeamMemos: many(teamMemos, { relationName: "teamMemoAuthor" }),
   targetedTeamMemos: many(teamMemos, { relationName: "teamMemoTarget" }),
   resolvedTeamMemos: many(teamMemos, { relationName: "teamMemoResolver" }),
+  notificationSettings: many(userNotificationSettings),
 }));
 
 export const authRecoveryCodes = sqliteTable("auth_recovery_codes", {
@@ -89,6 +90,43 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   invites: many(workspaceInvites),
   teamMemos: many(teamMemos),
 }));
+
+export const userNotificationSettings = sqliteTable(
+  "user_notification_settings",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    dailyReminderEnabled: integer("daily_reminder_enabled", {
+      mode: "boolean",
+    })
+      .notNull()
+      .default(false),
+    dailyReminderHour: integer("daily_reminder_hour").notNull().default(21),
+    dailyReminderMinute: integer("daily_reminder_minute").notNull().default(0),
+    timezone: text("timezone").notNull().default("Asia/Seoul"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("user_notification_settings_user_unique").on(table.userId),
+  ],
+);
+
+export const userNotificationSettingsRelations = relations(
+  userNotificationSettings,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [userNotificationSettings.userId],
+      references: [users.id],
+    }),
+  }),
+);
 
 export const workspaceMembers = sqliteTable(
   "workspace_members",
