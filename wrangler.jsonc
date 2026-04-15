@@ -9,12 +9,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "wig",
-  "main": ".open-next/worker.js",
+  "main": "worker.js",
   "compatibility_date": "2025-09-27",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "binding": "ASSETS",
     "directory": ".open-next/assets",
+  },
+  "triggers": {
+    "crons": ["0 * * * *"],
   },
   "images": {
     // Enable image optimization
