@@ -16,6 +16,6 @@ export default {
       ctx.waitUntil(runDailyReminder(env));
     }
   },
-} satisfies ExportedHandler<CloudflareEnv>;
+};
 
 export { BucketCachePurge, DOQueueHandler, DOShardedTagCache };
