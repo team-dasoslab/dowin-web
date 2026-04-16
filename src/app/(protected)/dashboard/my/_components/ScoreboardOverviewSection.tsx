@@ -1,6 +1,7 @@
+import { HistoryLimitOverlay } from "@/app/(protected)/dashboard/my/_components/HistoryLimitOverlay";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { Card } from "@/components/ui/Card";
-import { Target, Zap } from "lucide-react";
+import { Lock, Target, Zap } from "lucide-react";
 
 type WeeklyTrendPoint = {
   weekStart: string;
@@ -11,6 +12,8 @@ type WeeklyTrendPoint = {
 interface ScoreboardOverviewSectionProps {
   activeScoreboard: NonNullable<ReturnType<typeof useDashboardScoreboard>["activeScoreboard"]>;
   isWeeklyTrendLoading: boolean;
+  isHistoryLimited: boolean;
+  isTrendLimited: boolean;
   monthLabel?: string;
   monthlyOverallRate: number;
   weeklyOverallRate: number;
@@ -20,6 +23,8 @@ interface ScoreboardOverviewSectionProps {
 export function ScoreboardOverviewSection({
   activeScoreboard,
   isWeeklyTrendLoading,
+  isHistoryLimited,
+  isTrendLimited,
   monthLabel,
   monthlyOverallRate,
   weeklyOverallRate,
@@ -71,6 +76,7 @@ export function ScoreboardOverviewSection({
 
       <DashboardWeeklyTrendSection
         isLoading={isWeeklyTrendLoading}
+        isHistoryLimited={isTrendLimited}
         weeklyTrendPoints={weeklyTrendPoints}
       />
     </div>
@@ -104,9 +110,11 @@ function DashboardRateCard({
 
 function DashboardWeeklyTrendSection({
   isLoading,
+  isHistoryLimited,
   weeklyTrendPoints,
 }: {
   isLoading: boolean;
+  isHistoryLimited: boolean;
   weeklyTrendPoints: WeeklyTrendPoint[];
 }) {
   return (
@@ -114,6 +122,13 @@ function DashboardWeeklyTrendSection({
       <p className="text-sm font-semibold text-text-primary">최근 4주 달성률</p>
       {isLoading ? (
         <div className="mt-auto h-full min-h-[140px] animate-pulse rounded-md bg-sub-background" />
+      ) : isHistoryLimited ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-2">
+          <div className="rounded-full bg-sub-background p-2">
+            <Lock className="h-4 w-4 text-text-muted" />
+          </div>
+          <p className="text-[11px] text-text-muted">6개월 이전 데이터는 비공개입니다.</p>
+        </div>
       ) : (
         <div className="mt-auto">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />
