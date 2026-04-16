@@ -1,0 +1,1 @@
+ALTER TABLE `workspaces` ADD `plan_code` text DEFAULT 'FREE' NOT NULL;
