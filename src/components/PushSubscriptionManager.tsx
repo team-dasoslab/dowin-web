@@ -4,7 +4,7 @@ import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useToast } from "@/context/ToastContext";
 import { getFetchErrorMessage } from "@/lib/client/frontend-api";
 import { Bell, BellOff } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 interface PushSubscriptionManagerProps {
   variant?: "button" | "toggle";
@@ -40,6 +40,15 @@ export default function PushSubscriptionManager({
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { showToast } = useToast();
+  const lastReportedSubscriptionRef = useRef<boolean | null>(null);
+  const notifySubscriptionChange = useEffectEvent((next: boolean) => {
+    if (lastReportedSubscriptionRef.current === next) {
+      return;
+    }
+
+    lastReportedSubscriptionRef.current = next;
+    onSubscriptionChange?.(next);
+  });
 
   useEffect(() => {
     const checkSubscription = async () => {
@@ -57,7 +66,7 @@ export default function PushSubscriptionManager({
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.getSubscription();
         setIsSubscribed(!!subscription);
-        onSubscriptionChange?.(!!subscription);
+        notifySubscriptionChange(!!subscription);
       } catch (error) {
         console.error("Check subscription failed:", error);
       } finally {
@@ -66,7 +75,7 @@ export default function PushSubscriptionManager({
     };
 
     void checkSubscription();
-  }, [onSubscriptionChange]);
+  }, [notifySubscriptionChange]);
 
   const subscribe = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -131,7 +140,7 @@ export default function PushSubscriptionManager({
         );
       }
 
-      onSubscriptionChange?.(true);
+      notifySubscriptionChange(true);
       showToast("success", "푸시 알림이 설정되었습니다.");
     } catch (error) {
       // Rollback
@@ -193,7 +202,7 @@ export default function PushSubscriptionManager({
           );
         }
       }
-      onSubscriptionChange?.(false);
+      notifySubscriptionChange(false);
       showToast("info", "알림 설정이 해제되었습니다.");
     } catch (error) {
       // Rollback
