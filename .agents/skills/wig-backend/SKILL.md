@@ -33,6 +33,10 @@ If docs conflict with code, verify the implementation and trust the current code
 - Auth-required routes should use `getSession`.
 - SQL must use Prepared Statement patterns through Drizzle or binding.
 - Keep backend date storage and API-facing canonical date values in UTC unless a domain doc explicitly says otherwise.
+- Schema or persisted-data changes should use repository scripts, not ad-hoc Drizzle commands.
+  - Local schema migration flow: `yarn mig:local`
+  - Remote apply flow when explicitly needed: `yarn mig:remote`
+  - Do not run `drizzle-kit generate` directly unless the repository instructions are changed
 - Backend changes that add heavy aggregation, repeated scans, or broader DB reads should include `wig-performance-check` before completion.
 - When creating commits, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `feat|fix|docs|chore|refactor|style` with the format `<type>: <변경 요약>`.
 
@@ -67,6 +71,14 @@ Schema design here includes:
 - unique constraints and indexes
 - foreign keys and cascade behavior
 - ownership and workspace boundaries implied by the data model
+
+If the schema changes, reflect it in `src/db/schema.ts` first and then use:
+
+```bash
+yarn mig:local
+```
+
+Use `yarn mig:remote` only when the task explicitly requires applying the migration remotely.
 
 ### 3. Start with tests when the change is backend behavior
 
@@ -117,6 +129,12 @@ If the task changes API contracts, also update:
 
 ```bash
 yarn gen:api
+```
+
+If the task changes the DB schema, use:
+
+```bash
+yarn mig:local
 ```
 
 If browser-based Storybook verification matters, run separately:

@@ -11,6 +11,7 @@ describe("WorkspaceService", () => {
     findMembershipById: vi.fn(),
     findMembership: vi.fn(),
     findMembers: vi.fn(),
+    countMembers: vi.fn(),
     removeMemberById: vi.fn(),
     updateMemberRole: vi.fn(),
     transferAdmin: vi.fn(),
@@ -37,7 +38,7 @@ describe("WorkspaceService", () => {
 
   describe("getMyWorkspace", () => {
     it("사용자가 속한 워크스페이스가 있으면 이를 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "Workspace" };
+      const mockWorkspace = { id: 1, name: "Workspace", planCode: "FREE" };
       mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
 
       const result = await service.getMyWorkspace(123);
@@ -54,7 +55,7 @@ describe("WorkspaceService", () => {
 
   describe("createWorkspace", () => {
     it("새 워크스페이스를 생성하고 생성자를 ADMIN으로 추가한다", async () => {
-      const mockWorkspace = { id: 1, name: "New" };
+      const mockWorkspace = { id: 1, name: "New", planCode: "FREE" };
       mockStorage.createWorkspace.mockResolvedValue(mockWorkspace);
 
       const result = await service.createWorkspace(123, "New");
@@ -65,7 +66,11 @@ describe("WorkspaceService", () => {
     });
 
     it("멤버 추가 중 유니크 충돌이 발생하면 409 에러를 던진다", async () => {
-      mockStorage.createWorkspace.mockResolvedValue({ id: 1, name: "New" });
+      mockStorage.createWorkspace.mockResolvedValue({
+        id: 1,
+        name: "New",
+        planCode: "FREE",
+      });
       mockStorage.addMember.mockRejectedValue(
         new Error("UNIQUE constraint failed: workspace_members.user_id"),
       );
@@ -78,7 +83,12 @@ describe("WorkspaceService", () => {
 
   describe("joinWorkspace", () => {
     it("워크스페이스에 사용자를 MEMBER로 추가한다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMember.mockResolvedValue(undefined);
       await service.joinWorkspace(1, 123);
 
@@ -92,7 +102,12 @@ describe("WorkspaceService", () => {
     });
 
     it("동시 요청으로 유니크 충돌이 발생하면 409 에러를 던진다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMember.mockRejectedValue(
         new Error("UNIQUE constraint failed: workspace_members.user_id"),
       );
@@ -101,6 +116,20 @@ describe("WorkspaceService", () => {
         "ALREADY_IN_WORKSPACE",
       );
     });
+
+    it("FREE 플랜 멤버 수 제한에 도달하면 409 에러를 던진다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(10);
+
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
+        "WORKSPACE_MEMBER_LIMIT_REACHED",
+      );
+      expect(mockStorage.addMember).not.toHaveBeenCalled();
+    });
   });
 
   describe("updateWorkspaceName", () => {
@@ -108,6 +137,7 @@ describe("WorkspaceService", () => {
       const mockWorkspace = {
         id: 1,
         name: "기존 이름",
+        planCode: "FREE",
         createdAt: new Date("2026-03-18T00:00:00.000Z"),
       };
       const updatedWorkspace = {
@@ -183,7 +213,12 @@ describe("WorkspaceService", () => {
 
   describe("invite", () => {
     it("ADMIN이 초대코드를 생성한다", async () => {
-      const workspace = { id: 1, name: "팀", createdAt: new Date() };
+      const workspace = {
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+        createdAt: new Date(),
+      };
       mockStorage.findWorkspaceById.mockResolvedValue(workspace);
       mockStorage.createInvite.mockResolvedValue({
         id: 10,
@@ -247,6 +282,12 @@ describe("WorkspaceService", () => {
         usedCount: 1,
         status: "ACTIVE",
       });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMemberByInvite.mockResolvedValue(true);
 
       await service.joinWorkspaceByInvite("abcd123456", 7);
@@ -267,6 +308,12 @@ describe("WorkspaceService", () => {
         usedCount: 1,
         status: "ACTIVE",
       });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMemberByInvite.mockRejectedValue(
         new Error("UNIQUE constraint failed: workspace_members.user_id"),
       );
@@ -274,6 +321,28 @@ describe("WorkspaceService", () => {
       await expect(service.joinWorkspaceByInvite("ABCD123456", 7)).rejects.toThrow(
         "ALREADY_IN_WORKSPACE",
       );
+    });
+
+    it("FREE 플랜 멤버 수 제한에 도달하면 초대코드 참가를 막는다", async () => {
+      mockStorage.findInviteByCode.mockResolvedValue({
+        id: 11,
+        workspaceId: 1,
+        code: "ABCD123456",
+        maxUses: 3,
+        usedCount: 1,
+        status: "ACTIVE",
+      });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(10);
+
+      await expect(service.joinWorkspaceByInvite("ABCD123456", 7)).rejects.toThrow(
+        "WORKSPACE_MEMBER_LIMIT_REACHED",
+      );
+      expect(mockStorage.addMemberByInvite).not.toHaveBeenCalled();
     });
   });
 
@@ -292,7 +361,11 @@ describe("WorkspaceService", () => {
     });
 
     it("태그를 생성한다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
       mockStorage.createTag.mockResolvedValue({
         id: 10,
         workspaceId: 1,
@@ -316,7 +389,11 @@ describe("WorkspaceService", () => {
     });
 
     it("같은 이름의 태그가 이미 있으면 409 에러를 던진다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
       mockStorage.createTag.mockRejectedValue(
         new Error(
           "UNIQUE constraint failed: workspace_tags_workspace_normalized_name_unique",
@@ -332,7 +409,11 @@ describe("WorkspaceService", () => {
     });
 
     it("D1 cause에 유니크 충돌이 들어와도 409 에러를 던진다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
       const wrappedError = new Error("Failed query");
       wrappedError.cause = new Error(
         "UNIQUE constraint failed: workspace_tags.workspace_id, workspace_tags.normalized_name: SQLITE_CONSTRAINT",
@@ -453,7 +534,11 @@ describe("WorkspaceService", () => {
 
   describe("deleteWorkspace", () => {
     it("워크스페이스를 삭제한다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({ id: 1, name: "팀" });
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
 
       await service.deleteWorkspace(1);
 

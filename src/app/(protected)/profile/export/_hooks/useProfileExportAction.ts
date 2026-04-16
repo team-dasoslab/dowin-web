@@ -7,7 +7,10 @@ import {
   getDayCountInclusive,
 } from "@/app/(protected)/profile/export/_lib/export-csv";
 import { useToast } from "@/context/ToastContext";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import {
+  getApiErrorCode,
+  getApiErrorMessage,
+} from "@/lib/client/frontend-api";
 import { useState } from "react";
 
 type UseProfileExportActionParams = {
@@ -62,6 +65,11 @@ export const useProfileExportAction = ({
       downloadCsv(csv, exportFrom, exportTo);
       showToast("success", "CSV 다운로드를 시작했습니다.");
     } catch (error) {
+      if (getApiErrorCode(error) === "STANDARD_PLAN_REQUIRED") {
+        showToast("info", "CSV 다운로드는 STANDARD 플랜에서 사용할 수 있어요.");
+        return;
+      }
+
       showToast(
         "error",
         getApiErrorMessage(error, "내보내기 데이터를 불러오지 못했습니다."),

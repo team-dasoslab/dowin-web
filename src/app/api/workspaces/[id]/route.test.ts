@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ForbiddenError } from "@/lib/server/errors";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -93,6 +93,7 @@ describe("PUT /api/workspaces/[id]", () => {
     mockUpdateWorkspaceName.mockResolvedValue({
       id: 1,
       name: "새 이름",
+      planCode: "FREE",
       createdAt: new Date("2026-03-18T00:00:00.000Z"),
     });
 

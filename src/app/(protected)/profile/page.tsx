@@ -62,6 +62,7 @@ export default function ProfilePage() {
     !hasNoWorkspace && workspaceResponse?.status === 200
       ? workspaceResponse.data
       : null;
+  const workspacePlanCode = workspace?.planCode ?? "FREE";
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const nickname = user?.nickname ?? "사용자";
   const customId = user?.customId ?? "";
@@ -219,15 +220,18 @@ export default function ProfilePage() {
     },
     {
       label: "데이터",
-      items: [
-        {
-          id: "export",
-          icon: <Download className="w-3.5 h-3.5" />,
-          title: "CSV 다운로드",
-          description: "기간/지표를 선택해 내 기록을 CSV로 저장합니다.",
-          href: "/profile/export",
-        },
-      ],
+      items:
+        workspacePlanCode === "STANDARD"
+          ? [
+              {
+                id: "export",
+                icon: <Download className="w-3.5 h-3.5" />,
+                title: "CSV 다운로드",
+                description: "기간/지표를 선택해 내 기록을 CSV로 저장합니다.",
+                href: "/profile/export",
+              },
+            ]
+          : [],
     },
     {
       label: "알림 설정",
@@ -325,7 +329,10 @@ export default function ProfilePage() {
                 {nickname}
               </h1>
             </div>
-            <p className="text-xs text-text-muted mt-0.5">@{customId}</p>
+            <p className="text-xs text-text-muted mt-0.5">
+              @{customId}
+              {workspace ? ` · ${workspace.name}` : ""}
+            </p>
           </div>
         </Card>
 
@@ -339,6 +346,28 @@ export default function ProfilePage() {
                 <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
                   {group.label}
                 </p>
+
+                {group.label === "워크스페이스" && workspace ? (
+                  <div className="flex items-center justify-between rounded-lg border border-border bg-white px-5 py-4">
+                    <div className="flex flex-col min-w-0 text-left">
+                      <p className="text-sm font-semibold text-text-primary truncate">
+                        {workspace.name}
+                      </p>
+                      <p className="text-[11px] text-text-muted mt-0.5">
+                        {isWorkspaceAdmin ? "워크스페이스 관리자" : "워크스페이스 멤버"}
+                      </p>
+                    </div>
+                    <span
+                      className={`inline-flex items-center h-6 rounded px-2 text-[10px] font-bold tracking-wide border ${
+                        workspacePlanCode === "STANDARD"
+                          ? "border-primary/20 bg-primary/5 text-primary"
+                          : "border-border bg-sub-background text-text-secondary"
+                      }`}
+                    >
+                      {workspacePlanCode}
+                    </span>
+                  </div>
+                ) : null}
 
                 {/* 아이템 목록 */}
                 <div className="border border-border rounded-lg overflow-hidden">

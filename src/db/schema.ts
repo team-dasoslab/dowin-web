@@ -78,6 +78,9 @@ export const pushSubscriptions = sqliteTable("push_subscriptions", {
 export const workspaces = sqliteTable("workspaces", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
+  planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
+    .notNull()
+    .default("FREE"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
