@@ -12,8 +12,23 @@ export default {
     return openNextWorker.fetch(request, env, ctx);
   },
   async scheduled(controller, env, ctx) {
-    if (controller.cron === DAILY_REMINDER_CRON) {
-      ctx.waitUntil(runDailyReminder(env));
+    console.log(
+      `Cron triggered: ${controller.cron}, Time: ${new Date().toISOString()}`,
+    );
+    if (
+      controller.cron === DAILY_REMINDER_CRON ||
+      controller.cron === "0 * * * *"
+    ) {
+      ctx.waitUntil(
+        runDailyReminder(env)
+          .then((res) =>
+            console.log(
+              "Daily reminder run successfully:",
+              JSON.stringify(res),
+            ),
+          )
+          .catch((err) => console.error("Daily reminder run failed:", err)),
+      );
     }
   },
 };
