@@ -28,7 +28,8 @@ export type ErrorCode =
   | "SCOREBOARD_ARCHIVED"
   | "LEAD_MEASURE_ARCHIVED"
   | "FUTURE_DATE_NOT_ALLOWED"
-  | "PAST_WEEK_LOG_EDIT_NOT_ALLOWED";
+  | "PAST_WEEK_LOG_EDIT_NOT_ALLOWED"
+  | "FREE_PLAN_HISTORY_LIMIT_REACHED";
 
 const ERROR_MESSAGES: Record<ErrorCode, string> = {
   UNAUTHORIZED: "로그인이 필요합니다.",
@@ -66,6 +67,8 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   FUTURE_DATE_NOT_ALLOWED: "미래 날짜에는 기록할 수 없습니다.",
   PAST_WEEK_LOG_EDIT_NOT_ALLOWED:
     "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
+  FREE_PLAN_HISTORY_LIMIT_REACHED:
+    "Free 플랜에서는 최근 6개월 기록까지 확인할 수 있어요. 더 이전의 기록을 보시려면 STANDARD 플랜으로 변경해주세요.",
 };
 
 const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
@@ -77,6 +80,7 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN: 403,
   FUTURE_DATE_NOT_ALLOWED: 400,
   PAST_WEEK_LOG_EDIT_NOT_ALLOWED: 403,
+  FREE_PLAN_HISTORY_LIMIT_REACHED: 403,
   SCOREBOARD_ALREADY_ACTIVE: 400,
   FORBIDDEN: 403,
   TEST_ACCOUNT_WRITE_RESTRICTED: 403,
