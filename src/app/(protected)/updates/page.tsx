@@ -1,16 +1,15 @@
 "use client";
 
+import { ProductUpdateCard } from "@/app/(protected)/updates/_components/ProductUpdateCard";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { ProductUpdateCard } from "@/app/(protected)/updates/_components/ProductUpdateCard";
 import { productUpdates } from "@/content/product-updates";
 import {
   getLatestMajorProductUpdate,
   getProductUpdates,
 } from "@/lib/product-updates";
-import { Calendar } from "lucide-react";
 import Link from "next/link";
 
 export default function UpdatesPage() {
@@ -37,6 +36,11 @@ export default function UpdatesPage() {
                 <Badge className="w-fit rounded-md border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
                   추천 기능
                 </Badge>
+                {latestMajorUpdate.plan === "STANDARD" && (
+                  <Badge className="ml-2 w-fit rounded-md border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold text-primary">
+                    STANDARD
+                  </Badge>
+                )}
               </div>
               <div className="space-y-1.5">
                 <h1 className="text-xl font-bold tracking-tight text-text-primary">
@@ -47,7 +51,6 @@ export default function UpdatesPage() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none text-text-muted">
-                <Calendar className="h-3 w-3" />
                 <span>{latestMajorUpdate.publishedAt}</span>
                 <span className="text-border">•</span>
                 <span>{latestMajorUpdate.tag}</span>
