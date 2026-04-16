@@ -28,7 +28,7 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
             ) : null}
             {item.plan === "STANDARD" ? (
               <Badge className="rounded-md border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
-                STANDARD
+                STANDARD Only
               </Badge>
             ) : null}
           </div>
