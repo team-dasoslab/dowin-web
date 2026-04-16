@@ -13,6 +13,7 @@ import {
 
 type WorkspaceSummary = {
   id: number;
+  planCode?: string;
 };
 
 export interface WorkspaceLookupPort {

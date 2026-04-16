@@ -3,6 +3,7 @@ type ApiErrorShape = {
     status?: number;
     data?: {
       error?: {
+        code?: string;
         message?: string;
         details?: Record<string, string[] | undefined>;
       };
@@ -30,6 +31,10 @@ const getFirstDetailMessage = (
 
 export const getApiErrorStatus = (error: unknown): number | undefined => {
   return (error as ApiErrorShape)?.response?.status;
+};
+
+export const getApiErrorCode = (error: unknown): string | undefined => {
+  return (error as ApiErrorShape)?.response?.data?.error?.code;
 };
 
 export const getApiErrorMessage = (

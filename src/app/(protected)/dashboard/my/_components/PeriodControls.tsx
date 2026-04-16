@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { Calendar, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
 
 interface PeriodControlsProps {
@@ -13,6 +13,9 @@ interface PeriodControlsProps {
   movePeriod: (direction: -1 | 1) => void;
   weekLabel: string;
   weeklyGoalCount: number;
+  historyLimitDate?: string;
+  isPreviousDisabled?: boolean;
+  isPeriodLoading?: boolean;
 }
 
 export function PeriodControls({
@@ -26,6 +29,9 @@ export function PeriodControls({
   setSelectedView,
   weekLabel,
   weeklyGoalCount,
+  historyLimitDate,
+  isPreviousDisabled,
+  isPeriodLoading,
 }: PeriodControlsProps) {
   return (
     <>
@@ -40,8 +46,11 @@ export function PeriodControls({
                   key={view}
                   type="button"
                   onClick={() => setSelectedView(view)}
-                  className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
-                    isActive ? "bg-white text-primary shadow-sm" : "text-text-secondary"
+                  disabled={isPeriodLoading}
+                  className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors disabled:opacity-50 ${
+                    isActive
+                      ? "bg-white text-primary shadow-sm"
+                      : "text-text-secondary"
                   }`}
                 >
                   {view === "week" ? "주간" : "월간"}
@@ -55,23 +64,26 @@ export function PeriodControls({
               <Button
                 type="button"
                 onClick={() => movePeriod(-1)}
-                className="h-9 w-9 rounded-lg border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                disabled={isPreviousDisabled || isPeriodLoading}
+                className="h-9 w-9 rounded-lg border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="mx-auto h-4 w-4" />
               </Button>
               <label className="flex h-9 min-w-0 items-center gap-2 rounded-lg border border-border bg-white px-3 text-xs text-text-secondary">
-                <Calendar className="h-3.5 w-3.5 shrink-0 text-text-muted" />
                 <input
                   type="date"
                   value={selectedDate}
+                  min={historyLimitDate}
+                  disabled={isPeriodLoading}
                   onChange={(event) => setSelectedDate(event.target.value)}
-                  className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
+                  className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none disabled:opacity-50"
                 />
               </label>
               <Button
                 type="button"
                 onClick={() => movePeriod(1)}
-                className="h-9 w-9 rounded-lg border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                disabled={isPeriodLoading}
+                className="h-9 w-9 rounded-lg border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 <ChevronRight className="mx-auto h-4 w-4" />
               </Button>
@@ -79,7 +91,8 @@ export function PeriodControls({
             <Button
               type="button"
               onClick={resetToToday}
-              className="h-9 w-full rounded-lg border border-border bg-white px-3 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary sm:w-auto"
+              disabled={isPeriodLoading}
+              className="h-9 w-full rounded-lg border border-border bg-white px-3 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed sm:w-auto"
             >
               오늘로 돌아가기
             </Button>

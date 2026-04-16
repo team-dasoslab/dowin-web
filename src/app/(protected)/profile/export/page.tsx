@@ -22,6 +22,7 @@ export default function ProfileExportPage() {
     user,
     workspace,
   } = useProfileExportData();
+  const isStandardPlan = workspace?.planCode === "STANDARD";
   const {
     exportFrom,
     exportTo,
@@ -72,11 +73,32 @@ export default function ProfileExportPage() {
             <h1 className="text-lg font-bold text-text-primary tracking-tight">
               {user?.nickname ?? "사용자"}님의 CSV 다운로드
             </h1>
-            <p className="text-xs text-text-muted mt-0.5 truncate">
-              {workspace?.name}
-            </p>
+            <div className="mt-0.5 flex items-center gap-2 text-xs text-text-muted">
+              <span className="truncate">{workspace?.name}</span>
+              <span
+                className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-bold ${
+                  isStandardPlan
+                    ? "bg-primary/10 text-primary"
+                    : "bg-sub-background text-text-secondary"
+                }`}
+              >
+                {workspace?.planCode ?? "FREE"}
+              </span>
+            </div>
           </div>
         </Card>
+
+        {!isStandardPlan ? (
+          <Card className="border border-border rounded-lg p-4 space-y-2 bg-sub-background">
+            <p className="text-sm font-bold text-text-primary">
+              CSV 다운로드는 STANDARD 플랜 기능입니다.
+            </p>
+            <p className="text-[11px] leading-relaxed text-text-muted">
+              현재 워크스페이스는 FREE 플랜이라 내보내기 기능이 잠겨 있습니다.
+              이번 단계에서는 앱 안에서 기록과 조회는 계속 사용할 수 있어요.
+            </p>
+          </Card>
+        ) : null}
 
         <Card className="border border-border rounded-lg p-4 space-y-4">
           <div className="space-y-1">
@@ -161,11 +183,15 @@ export default function ProfileExportPage() {
             <Button
               type="button"
               onClick={() => void exportCsv()}
-              disabled={isExporting}
+              disabled={isExporting || !isStandardPlan}
               className="h-9 w-full rounded-lg bg-primary px-4 text-xs font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
-              {isExporting ? "CSV 생성 중..." : "CSV 다운로드"}
+              {isStandardPlan
+                ? isExporting
+                  ? "CSV 생성 중..."
+                  : "CSV 다운로드"
+                : "STANDARD 플랜 전용"}
             </Button>
           </div>
         </Card>

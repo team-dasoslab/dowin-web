@@ -129,10 +129,19 @@ export default function ProfileMembersPage() {
 
         <Card className="space-y-4 rounded-lg border border-border p-4">
           <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">현재 멤버</h2>
+            <h2 className="text-sm font-bold text-text-primary">
+              현재 멤버
+              <span
+                className={`ml-2 text-xs font-semibold ${workspace.planCode !== "STANDARD" && members.length >= 10 ? "text-danger" : "text-text-secondary"}`}
+              >
+                {workspace.planCode === "STANDARD"
+                  ? members.length
+                  : `${members.length} / 10`}
+              </span>
+            </h2>
             <p className="text-[11px] text-text-muted">
-              관리자는 멤버를 퇴출할 수 있고, 다른 멤버에게 관리자 권한도
-              이전할 수 있습니다.
+              관리자는 멤버를 퇴출할 수 있고, 다른 멤버에게 관리자 권한도 이전할
+              수 있습니다.
             </p>
           </div>
 

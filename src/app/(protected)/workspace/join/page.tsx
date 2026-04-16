@@ -1,12 +1,12 @@
 "use client";
 
+import { useJoinWorkspaceForm } from "@/app/(protected)/workspace/join/_hooks/useJoinWorkspaceForm";
+import { useJoinWorkspaceMutation } from "@/app/(protected)/workspace/join/_hooks/useJoinWorkspaceMutation";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { useJoinWorkspaceForm } from "@/app/(protected)/workspace/join/_hooks/useJoinWorkspaceForm";
-import { useJoinWorkspaceMutation } from "@/app/(protected)/workspace/join/_hooks/useJoinWorkspaceMutation";
 import { LogIn, Users, Zap } from "lucide-react";
 import Link from "next/link";
 
@@ -23,7 +23,9 @@ export default function JoinWorkspacePage() {
 
   return (
     <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
-      {isPending && <LoadingOverlay message="워크스페이스에 참가하는 중입니다." />}
+      {isPending && (
+        <LoadingOverlay message="워크스페이스에 참가하는 중입니다." />
+      )}
       <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
         <div className="flex items-center gap-3">
           <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0" />
@@ -40,6 +42,9 @@ export default function JoinWorkspacePage() {
             </h1>
             <p className="text-xs text-text-muted leading-relaxed">
               팀 관리자에게 전달받은 초대코드를 입력하세요.
+            </p>
+            <p className="text-[11px] text-text-muted leading-relaxed">
+              FREE 플랜 워크스페이스는 최대 10명까지 참여할 수 있습니다.
             </p>
           </div>
         </div>
@@ -63,7 +68,9 @@ export default function JoinWorkspacePage() {
 
           {error && (
             <div className="p-3 bg-danger/5 border border-danger/20 rounded-lg">
-              <p className="text-danger text-[11px] font-bold text-center">{error}</p>
+              <p className="text-danger text-[11px] font-bold text-center">
+                {error}
+              </p>
             </div>
           )}
 
@@ -73,7 +80,10 @@ export default function JoinWorkspacePage() {
               disabled={isPending}
               className="w-full rounded-lg border border-border bg-white py-3 text-sm font-bold text-text-primary hover:border-[rgba(205,207,213,1)]"
             >
-              <Link href="/workspace/new" className="flex items-center justify-center gap-2">
+              <Link
+                href="/workspace/new"
+                className="flex items-center justify-center gap-2"
+              >
                 <Users className="w-4 h-4" />
                 새로 만들기
               </Link>

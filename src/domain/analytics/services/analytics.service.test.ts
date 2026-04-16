@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AnalyticsService } from "@/domain/analytics/services/analytics.service";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("AnalyticsService", () => {
   const findUserWorkspace = vi.fn();
@@ -25,7 +25,7 @@ describe("AnalyticsService", () => {
   });
 
   it("활성 점수판이 없으면 404 에러를 던진다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3 });
+    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "STANDARD" });
     findActiveScoreboard.mockResolvedValue(undefined);
 
     await expect(
@@ -33,8 +33,16 @@ describe("AnalyticsService", () => {
     ).rejects.toThrow("NOT_FOUND");
   });
 
+  it("FREE 플랜에서는 export 데이터를 조회할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "FREE" });
+
+    await expect(
+      service.getExportData(11, { from: "2026-03-01", to: "2026-03-31" }),
+    ).rejects.toThrow("STANDARD_PLAN_REQUIRED");
+  });
+
   it("기간/지표 기준 export 데이터를 집계해 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3 });
+    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "STANDARD" });
     findActiveScoreboard.mockResolvedValue({
       id: 21,
       leadMeasures: [
@@ -142,7 +150,7 @@ describe("AnalyticsService", () => {
   });
 
   it("선택 지표만 필터링해 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3 });
+    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "STANDARD" });
     findActiveScoreboard.mockResolvedValue({
       id: 21,
       leadMeasures: [

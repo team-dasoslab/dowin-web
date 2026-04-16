@@ -1,5 +1,9 @@
-import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+} from "@/lib/server/errors";
 import { customAlphabet } from "nanoid";
 
 type Workspace = NonNullable<
@@ -16,7 +20,9 @@ type WorkspaceMemberListItem = {
 type WorkspaceInvite = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["createInvite"]>>
 >;
-type WorkspaceTag = NonNullable<Awaited<ReturnType<WorkspaceStorage["createTag"]>>>;
+type WorkspaceTag = NonNullable<
+  Awaited<ReturnType<WorkspaceStorage["createTag"]>>
+>;
 
 const generateWorkspaceInviteCode = customAlphabet(
   "23456789ABCDEFGHJKLMNPQRSTUVWXYZ",
@@ -66,6 +72,7 @@ export interface WorkspaceStoragePort {
   findMembershipById: WorkspaceStorage["findMembershipById"];
   findMembership: WorkspaceStorage["findMembership"];
   findMembers: WorkspaceStorage["findMembers"];
+  countMembers: WorkspaceStorage["countMembers"];
   removeMemberById: WorkspaceStorage["removeMemberById"];
   updateMemberRole: WorkspaceStorage["updateMemberRole"];
   transferAdmin: WorkspaceStorage["transferAdmin"];
@@ -85,6 +92,8 @@ export interface WorkspaceStoragePort {
 }
 
 export class WorkspaceService {
+  private static readonly FREE_PLAN_MEMBER_LIMIT = 10;
+
   constructor(private storage: WorkspaceStoragePort) {}
 
   async getMyWorkspace(userId: number): Promise<Workspace> {
@@ -113,13 +122,19 @@ export class WorkspaceService {
     return workspace;
   }
 
-  async updateWorkspaceName(workspaceId: number, name: string): Promise<Workspace> {
+  async updateWorkspaceName(
+    workspaceId: number,
+    name: string,
+  ): Promise<Workspace> {
     const workspace = await this.storage.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const updatedWorkspace = await this.storage.updateWorkspaceName(workspaceId, name);
+    const updatedWorkspace = await this.storage.updateWorkspaceName(
+      workspaceId,
+      name,
+    );
     if (!updatedWorkspace) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -137,6 +152,8 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
+
+    await this.ensureWorkspaceHasMemberCapacity(workspace);
 
     try {
       await this.storage.addMember(workspaceId, userId, "MEMBER");
@@ -270,6 +287,13 @@ export class WorkspaceService {
       throw new ConflictError("INVITE_CODE_USAGE_LIMIT_REACHED");
     }
 
+    const workspace = await this.storage.findWorkspaceById(invite.workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    await this.ensureWorkspaceHasMemberCapacity(workspace);
+
     let joined = false;
     try {
       joined = await this.storage.addMemberByInvite({
@@ -303,6 +327,17 @@ export class WorkspaceService {
       }
 
       throw new ConflictError("INVITE_CODE_USAGE_LIMIT_REACHED");
+    }
+  }
+
+  private async ensureWorkspaceHasMemberCapacity(workspace: Workspace) {
+    if (workspace.planCode !== "FREE") {
+      return;
+    }
+
+    const memberCount = await this.storage.countMembers(workspace.id);
+    if (memberCount >= WorkspaceService.FREE_PLAN_MEMBER_LIMIT) {
+      throw new ConflictError("WORKSPACE_MEMBER_LIMIT_REACHED");
     }
   }
 
@@ -341,7 +376,9 @@ export class WorkspaceService {
 
     if (targetMembership.role === "ADMIN") {
       const members = await this.storage.findMembers(workspaceId);
-      const adminCount = members.filter((member) => member.role === "ADMIN").length;
+      const adminCount = members.filter(
+        (member) => member.role === "ADMIN",
+      ).length;
 
       if (adminCount <= 1) {
         throw new ForbiddenError("CANNOT_REMOVE_LAST_ADMIN");

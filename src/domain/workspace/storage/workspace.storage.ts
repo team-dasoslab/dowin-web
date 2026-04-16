@@ -71,7 +71,9 @@ export class WorkspaceStorage {
     });
   }
 
-  async findMembershipByUserId(userId: number): Promise<WorkspaceMember | null> {
+  async findMembershipByUserId(
+    userId: number,
+  ): Promise<WorkspaceMember | null> {
     return (
       (await this.db.query.workspaceMembers.findFirst({
         where: eq(workspaceMembers.userId, userId),
@@ -116,7 +118,19 @@ export class WorkspaceStorage {
     });
   }
 
-  async removeMemberById(workspaceId: number, membershipId: number): Promise<void> {
+  async countMembers(workspaceId: number): Promise<number> {
+    const [result] = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(workspaceMembers)
+      .where(eq(workspaceMembers.workspaceId, workspaceId));
+
+    return Number(result?.count ?? 0);
+  }
+
+  async removeMemberById(
+    workspaceId: number,
+    membershipId: number,
+  ): Promise<void> {
     await this.db
       .delete(workspaceMembers)
       .where(
@@ -205,7 +219,10 @@ export class WorkspaceStorage {
     });
   }
 
-  async findTagById(workspaceId: number, tagId: number): Promise<WorkspaceTag | null> {
+  async findTagById(
+    workspaceId: number,
+    tagId: number,
+  ): Promise<WorkspaceTag | null> {
     return (
       (await this.db.query.workspaceTags.findFirst({
         where: and(
@@ -216,7 +233,10 @@ export class WorkspaceStorage {
     );
   }
 
-  async findTagsByIds(workspaceId: number, tagIds: number[]): Promise<WorkspaceTag[]> {
+  async findTagsByIds(
+    workspaceId: number,
+    tagIds: number[],
+  ): Promise<WorkspaceTag[]> {
     if (tagIds.length === 0) {
       return [];
     }

@@ -18,6 +18,7 @@ export type ProductUpdate = {
   ctaLabel: "바로 써보기";
   ctaHref: string;
   isMajor: boolean;
+  plan?: "FREE" | "STANDARD";
 };
 
 /**
@@ -101,18 +102,7 @@ export const productUpdates = [
     ctaLabel: "바로 써보기",
     ctaHref: "/profile/export",
     isMajor: true,
-  },
-  {
-    id: "2026-03-18-profile-avatar",
-    slug: "profile-avatar",
-    title: "프로필 아이콘을 직접 고를 수 있어요",
-    summary:
-      "준비된 아바타 중 하나를 선택해 팀 대시보드에서 더 쉽게 구분할 수 있습니다.",
-    publishedAt: "2026.03.18",
-    tag: "Profile",
-    ctaLabel: "바로 써보기",
-    ctaHref: "/profile/avatar",
-    isMajor: true,
+    plan: "STANDARD",
   },
   {
     id: "2026-03-16-dashboard-period-navigation",

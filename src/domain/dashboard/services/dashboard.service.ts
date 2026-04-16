@@ -1,7 +1,7 @@
-import { NotFoundError } from "@/lib/server/errors";
+import { NotFoundError, ForbiddenError } from "@/lib/server/errors";
 
 type WorkspaceLookupPort = {
-  findUserWorkspace(userId: number): Promise<{ id: number; name: string } | null>;
+  findUserWorkspace(userId: number): Promise<{ id: number; name: string; planCode?: string } | null>;
   findMembers(workspaceId: number): Promise<
     Array<{
       userId: number;
@@ -55,6 +55,8 @@ export class DashboardService {
     }
 
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
+    assertHistoryLimit(workspace.planCode ?? "FREE", normalizedWeekStart);
+
     const weekDates = getWeekDates(normalizedWeekStart);
     const weekEnd = weekDates[6];
     const normalizedMonthStart = normalizeMonthStart(normalizedWeekStart);
@@ -247,11 +249,31 @@ function getAchievementRate(achieved: number, targetValue: number) {
 
 function getCurrentWeekStart() {
   const today = new Date();
-  const day = today.getDay();
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(today);
-  monday.setDate(diff);
+  const kstToday = new Date(today.getTime() + 9 * 60 * 60 * 1000);
+  const day = kstToday.getUTCDay();
+  const diff = kstToday.getUTCDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(kstToday);
+  monday.setUTCDate(diff);
   return monday.toISOString().slice(0, 10);
+}
+
+function assertHistoryLimit(planCode: string, requestedDate: string) {
+  if (planCode !== "FREE") return;
+
+  const now = new Date();
+  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  
+  const limitDate = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth() - 5, 1));
+  const limitDateString = `${limitDate.getUTCFullYear()}-${String(limitDate.getUTCMonth() + 1).padStart(2, '0')}-01`;
+
+  // 주간 보기일 수 있으므로(주로 월요일 시작), 요청된 날짜로부터 6일 뒤(해당 주의 끝)가 제한일 이후인지 봅니다.
+  const checkDate = new Date(parseDate(requestedDate));
+  checkDate.setUTCDate(checkDate.getUTCDate() + 6);
+  const checkDateString = formatDate(checkDate);
+
+  if (checkDateString < limitDateString) {
+    throw new ForbiddenError("FREE_PLAN_HISTORY_LIMIT_REACHED");
+  }
 }
 
 function getWeekDates(weekStart: string) {

@@ -1,9 +1,9 @@
 "use client";
 
 import {
-  getScoreboardsScoreboardIdLogsWeekly,
   getGetScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetScoreboardsScoreboardIdLogsWeeklyQueryKey,
+  getScoreboardsScoreboardIdLogsWeekly,
   useGetScoreboardsScoreboardIdLogsMonthly,
   useGetScoreboardsScoreboardIdLogsWeekly,
 } from "@/api/generated/daily-log/daily-log";
@@ -93,18 +93,38 @@ export const useDashboardScoreboardQueries = ({
       : undefined,
   );
 
-  const { data: weeklyLogsResponse, isLoading: isWeeklyLogsLoading } =
-    useGetScoreboardsScoreboardIdLogsWeekly(scoreboardId ?? 0, weeklyLogsParams, {
+  const {
+    data: weeklyLogsResponse,
+    isLoading: isWeeklyLogsLoading,
+    isFetching: isWeeklyLogsFetching,
+    error: weeklyLogsError,
+  } = useGetScoreboardsScoreboardIdLogsWeekly(
+    scoreboardId ?? 0,
+    weeklyLogsParams,
+    {
       query: {
         enabled: scoreboardId !== null,
+        retry: (failureCount, error) =>
+          getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
-    });
-  const { data: monthlyLogsResponse, isLoading: isMonthlyLogsLoading } =
-    useGetScoreboardsScoreboardIdLogsMonthly(scoreboardId ?? 0, monthlyLogsParams, {
+    },
+  );
+  const {
+    data: monthlyLogsResponse,
+    isLoading: isMonthlyLogsLoading,
+    isFetching: isMonthlyLogsFetching,
+    error: monthlyLogsError,
+  } = useGetScoreboardsScoreboardIdLogsMonthly(
+    scoreboardId ?? 0,
+    monthlyLogsParams,
+    {
       query: {
         enabled: scoreboardId !== null,
+        retry: (failureCount, error) =>
+          getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
-    });
+    },
+  );
   const weeklyTrendQueries = useQueries({
     queries: trendWeekStarts.map((weekStart) => ({
       enabled: scoreboardId !== null,
@@ -119,6 +139,7 @@ export const useDashboardScoreboardQueries = ({
             })
           : ["dashboard", "weekly-trend", weekStart],
       staleTime: 60_000,
+      retry: 0,
     })),
   });
 
@@ -195,7 +216,10 @@ export const useDashboardScoreboardQueries = ({
     },
   );
   const weeklyGuideById = new Map(
-    weeklyLeadMeasures.map((leadMeasure) => [toNumberId(leadMeasure.id), leadMeasure.guide ?? null]),
+    weeklyLeadMeasures.map((leadMeasure) => [
+      toNumberId(leadMeasure.id),
+      leadMeasure.guide ?? null,
+    ]),
   );
 
   return {
@@ -207,9 +231,12 @@ export const useDashboardScoreboardQueries = ({
     isLoading: (isWorkspaceLoading || isScoreboardLoading) && !isWorkspace404,
     isMonthlyLogsLoading,
     isWeeklyLogsLoading,
+    isMonthlyLogsFetching,
+    isWeeklyLogsFetching,
     isWeeklyTrendLoading: weeklyTrendQueries.some((query) => query.isLoading),
     monthLabel,
     monthlyLeadMeasures,
+    monthlyLogsError,
     monthlyLogsQueryKey,
     monthlyOverallRate,
     monthlySummary,
@@ -217,6 +244,7 @@ export const useDashboardScoreboardQueries = ({
     scoreboardId,
     weeklyGuideById,
     weeklyById,
+    weeklyLogsError,
     weeklyLogsQueryKey,
     weeklyOverallRate,
     weeklyTrendPoints,

@@ -64,7 +64,7 @@ describe("WorkspaceStorage", () => {
 
   describe("findUserWorkspace", () => {
     it("사용자가 소속된 워크스페이스 정보를 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "Test Workspace" };
+      const mockWorkspace = { id: 1, name: "Test Workspace", planCode: "FREE" };
       mockDb.query = {
         workspaces: {
           findFirst: vi.fn(),
@@ -88,7 +88,7 @@ describe("WorkspaceStorage", () => {
 
   describe("findWorkspaceById", () => {
     it("워크스페이스 id로 조회한다", async () => {
-      const mockWorkspace = { id: 1, name: "Test Workspace" };
+      const mockWorkspace = { id: 1, name: "Test Workspace", planCode: "FREE" };
       mockDb.query.workspaces.findFirst.mockResolvedValue(mockWorkspace);
 
       const result = await storage.findWorkspaceById(1);
@@ -100,7 +100,7 @@ describe("WorkspaceStorage", () => {
 
   describe("createWorkspace", () => {
     it("새 워크스페이스를 생성하고 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "New Workspace" };
+      const mockWorkspace = { id: 1, name: "New Workspace", planCode: "FREE" };
       mockDb.returning.mockResolvedValue([mockWorkspace]);
 
       const result = await storage.createWorkspace("New Workspace");
@@ -125,7 +125,7 @@ describe("WorkspaceStorage", () => {
 
   describe("updateWorkspaceName", () => {
     it("워크스페이스 이름을 수정하고 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "새 이름" };
+      const mockWorkspace = { id: 1, name: "새 이름", planCode: "FREE" };
       mockDb.returning.mockResolvedValue([mockWorkspace]);
 
       const result = await storage.updateWorkspaceName(1, "새 이름");
@@ -150,6 +150,18 @@ describe("WorkspaceStorage", () => {
 
       expect(result).toEqual(mockMembers);
       expect(mockDb.query.workspaceMembers.findMany).toHaveBeenCalled();
+    });
+  });
+
+  describe("countMembers", () => {
+    it("워크스페이스 멤버 수를 반환한다", async () => {
+      mockDb.where.mockResolvedValue([{ count: 10 }]);
+
+      const result = await storage.countMembers(1);
+
+      expect(result).toBe(10);
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(mockDb.from).toHaveBeenCalledWith(workspaceMembers);
     });
   });
 
@@ -185,7 +197,12 @@ describe("WorkspaceStorage", () => {
 
   describe("findMembershipById", () => {
     it("특정 멤버십 id를 조회한다", async () => {
-      const mockMembership = { id: 9, workspaceId: 1, userId: 123, role: "MEMBER" };
+      const mockMembership = {
+        id: 9,
+        workspaceId: 1,
+        userId: 123,
+        role: "MEMBER",
+      };
       mockDb.query.workspaceMembers = {
         findFirst: vi.fn().mockResolvedValue(mockMembership),
         findMany: vi.fn(),

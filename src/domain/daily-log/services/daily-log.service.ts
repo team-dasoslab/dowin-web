@@ -92,12 +92,14 @@ export class DailyLogService {
       } | null;
     }>;
   }> {
-    const scoreboard = await this.getOwnedScoreboard(scoreboardId, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(scoreboardId, userId);
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
 
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
+    assertHistoryLimit(workspace.planCode ?? "FREE", normalizedWeekStart);
+
     const weekDates = getWeekDates(normalizedWeekStart);
     const weekEnd = weekDates[6];
     const previousWeekStart = addDays(normalizedWeekStart, -7);
@@ -184,12 +186,14 @@ export class DailyLogService {
       achievementRate: number;
     }>;
   }> {
-    const scoreboard = await this.getOwnedScoreboard(scoreboardId, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(scoreboardId, userId);
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
 
     const normalizedMonthStart = normalizeMonthStart(monthStart);
+    assertHistoryLimit(workspace.planCode ?? "FREE", normalizedMonthStart);
+
     const monthDates = getMonthDates(normalizedMonthStart);
     const monthEnd = monthDates[monthDates.length - 1];
     const measures = (
@@ -280,17 +284,18 @@ export class DailyLogService {
     };
   }
 
-  private async getOwnedScoreboard(scoreboardId: number, userId: number) {
+  private async getOwnedScoreboardWithWorkspace(scoreboardId: number, userId: number) {
     const workspace = await this.workspaceStorage.findUserWorkspace(userId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return await this.scoreboardStorage.findOwnedScoreboard(
+    const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       scoreboardId,
       userId,
       workspace.id,
     );
+    return { scoreboard, workspace };
   }
 
   private async getOwnedLeadMeasure(leadMeasureId: number, userId: number) {
@@ -456,6 +461,24 @@ function formatDateLocal(date: Date) {
 function assertPastWeekLogEditable(date: string) {
   if (date < getCurrentWeekStart()) {
     throw new ForbiddenError("PAST_WEEK_LOG_EDIT_NOT_ALLOWED");
+  }
+}
+
+function assertHistoryLimit(planCode: string, requestedDate: string) {
+  if (planCode !== "FREE") return;
+
+  const now = new Date();
+  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  
+  const limitDate = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth() - 5, 1));
+  const limitDateString = `${limitDate.getUTCFullYear()}-${String(limitDate.getUTCMonth() + 1).padStart(2, '0')}-01`;
+
+  // 주간 보기일 수 있으므로(주로 월요일 시작), 요청된 날짜로부터 6일 뒤(해당 주의 끝)가 제한일 이후인지 봅니다.
+  const checkBase = new Date(requestedDate);
+  const checkDateString = formatDateLocal(new Date(checkBase.getTime() + 6 * 24 * 60 * 60 * 1000));
+
+  if (checkDateString < limitDateString) {
+    throw new ForbiddenError("FREE_PLAN_HISTORY_LIMIT_REACHED");
   }
 }
 
