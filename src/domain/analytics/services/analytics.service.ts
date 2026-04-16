@@ -1,9 +1,11 @@
-import { NotFoundError } from "@/lib/server/errors";
+import { ForbiddenError, NotFoundError } from "@/lib/server/errors";
 
 const MS_PER_DAY = 86_400_000;
 
 type WorkspacePort = {
-  findUserWorkspace(userId: number): Promise<{ id: number } | null>;
+  findUserWorkspace(
+    userId: number,
+  ): Promise<{ id: number; planCode: "FREE" | "STANDARD" } | null>;
 };
 
 type ActiveLeadMeasure = {
@@ -73,6 +75,10 @@ export class AnalyticsService {
       throw new NotFoundError("NOT_FOUND");
     }
 
+    if (workspace.planCode !== "STANDARD") {
+      throw new ForbiddenError("STANDARD_PLAN_REQUIRED");
+    }
+
     const scoreboard = await this.scoreboardStorage.findActiveScoreboard(
       userId,
       workspace.id,
@@ -105,7 +111,10 @@ export class AnalyticsService {
     const trueCountByMeasureBucket = new Map<string, number>();
 
     for (const log of logs) {
-      logsByMeasureDate.set(getMeasureDateKey(log.leadMeasureId, log.logDate), log.value);
+      logsByMeasureDate.set(
+        getMeasureDateKey(log.leadMeasureId, log.logDate),
+        log.value,
+      );
       if (!log.value) {
         continue;
       }
@@ -117,7 +126,10 @@ export class AnalyticsService {
 
       const bucket = getBucketKey(measure.period, log.logDate);
       const key = getMeasureBucketKey(measure.id, bucket);
-      trueCountByMeasureBucket.set(key, (trueCountByMeasureBucket.get(key) ?? 0) + 1);
+      trueCountByMeasureBucket.set(
+        key,
+        (trueCountByMeasureBucket.get(key) ?? 0) + 1,
+      );
     }
 
     const leadMeasureBreakdown = measures.map((measure) => {
@@ -142,9 +154,15 @@ export class AnalyticsService {
     const dailyRows: ExportRow[] = [];
     for (const date of dateRange) {
       for (const measure of measures) {
-        const value = logsByMeasureDate.get(getMeasureDateKey(measure.id, date));
+        const value = logsByMeasureDate.get(
+          getMeasureDateKey(measure.id, date),
+        );
         const status: ExportStatus =
-          value === true ? "ACHIEVED" : value === false ? "MISSED" : "NOT_RECORDED";
+          value === true
+            ? "ACHIEVED"
+            : value === false
+              ? "MISSED"
+              : "NOT_RECORDED";
 
         dailyRows.push({
           date,

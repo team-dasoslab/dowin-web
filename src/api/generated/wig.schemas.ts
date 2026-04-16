@@ -154,9 +154,18 @@ export interface UserDeleteRequest {
   currentPassword: string;
 }
 
+export type WorkspacePlanCode = typeof WorkspacePlanCode[keyof typeof WorkspacePlanCode];
+
+
+export const WorkspacePlanCode = {
+  FREE: 'FREE',
+  STANDARD: 'STANDARD',
+} as const;
+
 export interface Workspace {
   id?: number;
   name?: string;
+  planCode?: WorkspacePlanCode;
   createdAt?: string;
 }
 

@@ -233,8 +233,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PutPushSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof putPushSettings>>>
-export type PutPushSettingsMutationBody = UserNotificationSettingsUpdateRequest
-export type PutPushSettingsMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PutPushSettingsMutationBody = UserNotificationSettingsUpdateRequest
+    export type PutPushSettingsMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 내 일일 알림 설정 변경
