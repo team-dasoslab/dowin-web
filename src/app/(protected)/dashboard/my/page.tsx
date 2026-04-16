@@ -137,7 +137,6 @@ export default function MyDashboardPage() {
         <ScoreboardOverviewSection
           activeScoreboard={activeScoreboard}
           isWeeklyTrendLoading={isWeeklyTrendLoading}
-          isHistoryLimited={isHistoryLimited}
           isTrendLimited={isTrendLimited}
           monthLabel={monthLabel}
           monthlyOverallRate={monthlyOverallRate}

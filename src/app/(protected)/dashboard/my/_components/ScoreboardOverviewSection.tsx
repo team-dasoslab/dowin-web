@@ -1,4 +1,3 @@
-import { HistoryLimitOverlay } from "@/app/(protected)/dashboard/my/_components/HistoryLimitOverlay";
 import { useDashboardScoreboard } from "@/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { Card } from "@/components/ui/Card";
 import { Lock, Target, Zap } from "lucide-react";
@@ -10,9 +9,10 @@ type WeeklyTrendPoint = {
 };
 
 interface ScoreboardOverviewSectionProps {
-  activeScoreboard: NonNullable<ReturnType<typeof useDashboardScoreboard>["activeScoreboard"]>;
+  activeScoreboard: NonNullable<
+    ReturnType<typeof useDashboardScoreboard>["activeScoreboard"]
+  >;
   isWeeklyTrendLoading: boolean;
-  isHistoryLimited: boolean;
   isTrendLimited: boolean;
   monthLabel?: string;
   monthlyOverallRate: number;
@@ -23,7 +23,6 @@ interface ScoreboardOverviewSectionProps {
 export function ScoreboardOverviewSection({
   activeScoreboard,
   isWeeklyTrendLoading,
-  isHistoryLimited,
   isTrendLimited,
   monthLabel,
   monthlyOverallRate,
@@ -65,7 +64,10 @@ export function ScoreboardOverviewSection({
 
         <Card className="rounded-lg border border-border bg-white p-4">
           <div className="grid grid-cols-2 gap-2">
-            <DashboardRateCard label="이번 주 달성률" rate={weeklyOverallRate} />
+            <DashboardRateCard
+              label="이번 주 달성률"
+              rate={weeklyOverallRate}
+            />
             <DashboardRateCard
               label={`이번 달 달성률${monthLabel ? ` (${monthLabel})` : ""}`}
               rate={monthlyOverallRate}
@@ -83,13 +85,7 @@ export function ScoreboardOverviewSection({
   );
 }
 
-function DashboardRateCard({
-  label,
-  rate,
-}: {
-  label: string;
-  rate: number;
-}) {
+function DashboardRateCard({ label, rate }: { label: string; rate: number }) {
   return (
     <div className="rounded-md border border-border bg-sub-background px-3 py-2">
       <p className="text-[10px] text-text-muted">{label}</p>
@@ -127,7 +123,9 @@ function DashboardWeeklyTrendSection({
           <div className="rounded-full bg-sub-background p-2">
             <Lock className="h-4 w-4 text-text-muted" />
           </div>
-          <p className="text-[11px] text-text-muted">6개월 이전 데이터는 비공개입니다.</p>
+          <p className="text-[11px] text-text-muted">
+            6개월 이전 데이터는 비공개입니다.
+          </p>
         </div>
       ) : (
         <div className="mt-auto">

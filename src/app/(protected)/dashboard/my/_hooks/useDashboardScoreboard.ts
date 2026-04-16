@@ -6,8 +6,8 @@ import { useDashboardScoreboardQueries } from "@/app/(protected)/dashboard/my/_h
 import { DashboardView } from "@/app/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { addDays, addMonths } from "@/app/(protected)/dashboard/my/_lib/week";
 import { useToast } from "@/context/ToastContext";
-import { getApiErrorCode, getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
-import { useEffect, useMemo, useTransition } from "react";
+import { getApiErrorCode, getApiErrorStatus } from "@/lib/client/frontend-api";
+import { useCallback, useMemo, useTransition } from "react";
 
 export const useDashboardScoreboard = () => {
   const { showToast } = useToast();
@@ -71,11 +71,14 @@ export const useDashboardScoreboard = () => {
     return limitDate.toISOString().slice(0, 10);
   }, [today]);
 
-  const checkHistoryLimit = (date: string, view: "week" | "month") => {
-    if (!isFreePlan) return true;
-    const checkDate = view === "week" ? addDays(date, 6) : date;
-    return checkDate >= historyLimitDate;
-  };
+  const checkHistoryLimit = useCallback(
+    (date: string, view: "week" | "month") => {
+      if (!isFreePlan) return true;
+      const checkDate = view === "week" ? addDays(date, 6) : date;
+      return checkDate >= historyLimitDate;
+    },
+    [isFreePlan, historyLimitDate],
+  );
 
   const handleMovePeriod = (direction: -1 | 1) => {
     const nextDate =
@@ -83,7 +86,10 @@ export const useDashboardScoreboard = () => {
         ? addMonths(selectedDate, direction)
         : addDays(selectedWeekStart, direction * 7);
 
-    if (direction === -1 && !checkHistoryLimit(nextDate, selectedView as "week" | "month")) {
+    if (
+      direction === -1 &&
+      !checkHistoryLimit(nextDate, selectedView as "week" | "month")
+    ) {
       // 선제 방어로 막을 때는 조용히 리턴 (오버레이가 보일 것이므로)
       return;
     }
@@ -112,11 +118,21 @@ export const useDashboardScoreboard = () => {
         ? addMonths(selectedDate, -1)
         : addDays(selectedWeekStart, -7);
     return !checkHistoryLimit(nextDate, selectedView as "week" | "month");
-  }, [isFreePlan, selectedDate, selectedView, selectedWeekStart, historyLimitDate]);
+  }, [
+    isFreePlan,
+    selectedDate,
+    selectedView,
+    selectedWeekStart,
+    checkHistoryLimit,
+  ]);
 
   const isHistoryLimited = useMemo(() => {
     const error = weeklyLogsError ?? monthlyLogsError;
-    return !!(error && getApiErrorStatus(error) === 403 && getApiErrorCode(error) === "FREE_PLAN_HISTORY_LIMIT_REACHED");
+    return !!(
+      error &&
+      getApiErrorStatus(error) === 403 &&
+      getApiErrorCode(error) === "FREE_PLAN_HISTORY_LIMIT_REACHED"
+    );
   }, [weeklyLogsError, monthlyLogsError]);
 
   const isTrendLimited = useMemo(() => {
@@ -124,7 +140,7 @@ export const useDashboardScoreboard = () => {
     // 3주 전의 월요일을 계산합니다. (차트의 가장 왼쪽 바)
     const threeWeeksAgo = addDays(selectedWeekStart, -21);
     return !checkHistoryLimit(threeWeeksAgo, "week");
-  }, [isFreePlan, selectedWeekStart, historyLimitDate]);
+  }, [isFreePlan, selectedWeekStart, checkHistoryLimit]);
 
   const { isLogPending, pendingLogKeys, toggleLog } = useDashboardLogMutation({
     dashboardTeamQueryKey,
@@ -135,8 +151,6 @@ export const useDashboardScoreboard = () => {
     weeklyById,
     weeklyLogsQueryKey,
   });
-
-
 
   return {
     activeLeadMeasures,
