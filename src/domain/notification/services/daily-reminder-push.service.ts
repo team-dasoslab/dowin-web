@@ -1,7 +1,7 @@
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { LeadMeasureStorage } from "@/domain/lead-measure/storage/lead-measure.storage";
-import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 import { getKstNowParts } from "@/domain/notification/services/notification-schedule";
+import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 
 type PushSubscriptionLookupPort = Pick<
@@ -9,7 +9,10 @@ type PushSubscriptionLookupPort = Pick<
   "findAllPushSubscriptions" | "findUserNotificationSettingsByUserIds"
 >;
 
-type ScoreboardLookupPort = Pick<ScoreboardStorage, "findActiveScoreboardsForPush">;
+type ScoreboardLookupPort = Pick<
+  ScoreboardStorage,
+  "findActiveScoreboardsForPush"
+>;
 type LeadMeasureLookupPort = Pick<
   LeadMeasureStorage,
   "findActiveLeadMeasuresByScoreboardIds"
@@ -35,9 +38,11 @@ export class DailyReminderPushService {
 
   async buildDailyReminderJobs(input?: { now?: Date }) {
     const now = input?.now ?? new Date();
-    const subscriptions = await this.notificationStorage.findAllPushSubscriptions();
-    const subscribedUserIds = [...new Set(subscriptions.map((item) => Number(item.userId)))]
-      .filter((userId) => Number.isInteger(userId));
+    const subscriptions =
+      await this.notificationStorage.findAllPushSubscriptions();
+    const subscribedUserIds = [
+      ...new Set(subscriptions.map((item) => Number(item.userId))),
+    ].filter((userId) => Number.isInteger(userId));
     const settings =
       await this.notificationStorage.findUserNotificationSettingsByUserIds(
         subscribedUserIds,
@@ -49,8 +54,7 @@ export class DailyReminderPushService {
           (setting) =>
             setting.dailyReminderEnabled &&
             setting.timezone === "Asia/Seoul" &&
-            setting.dailyReminderHour === kstNow.hour &&
-            setting.dailyReminderMinute === kstNow.minute,
+            setting.dailyReminderHour === kstNow.hour,
         )
         .map((setting) => setting.userId),
     );
@@ -68,7 +72,8 @@ export class DailyReminderPushService {
       };
     }
 
-    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsForPush();
+    const scoreboards =
+      await this.scoreboardStorage.findActiveScoreboardsForPush();
     const eligibleScoreboards = scoreboards.filter((scoreboard) =>
       eligibleUserIds.has(scoreboard.userId),
     );
@@ -109,13 +114,16 @@ export class DailyReminderPushService {
     let skippedCompletedToday = 0;
 
     for (const userId of eligibleUserIds) {
-      const scoreboard = eligibleScoreboards.find((item) => item.userId === userId);
+      const scoreboard = eligibleScoreboards.find(
+        (item) => item.userId === userId,
+      );
       if (!scoreboard) {
         skippedNoActiveScoreboard += 1;
         continue;
       }
 
-      const scoreboardLeadMeasures = leadMeasuresByScoreboardId.get(scoreboard.id) ?? [];
+      const scoreboardLeadMeasures =
+        leadMeasuresByScoreboardId.get(scoreboard.id) ?? [];
       const remainingLeadMeasures = scoreboardLeadMeasures.filter(
         (leadMeasure) => !loggedLeadMeasureIds.has(leadMeasure.id),
       );
