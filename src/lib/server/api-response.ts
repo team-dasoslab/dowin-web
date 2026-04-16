@@ -18,6 +18,8 @@ export type ErrorCode =
   | "INVITE_CODE_USAGE_LIMIT_REACHED"
   | "CUSTOM_ID_ALREADY_EXISTS"
   | "ALREADY_IN_WORKSPACE"
+  | "WORKSPACE_MEMBER_LIMIT_REACHED"
+  | "STANDARD_PLAN_REQUIRED"
   | "WORKSPACE_TAG_ALREADY_EXISTS"
   | "ADMIN_TRANSFER_REQUIRED"
   | "CANNOT_REMOVE_LAST_ADMIN"
@@ -43,12 +45,16 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN:
     "유일한 관리자는 계정을 탈퇴할 수 없습니다. 권한 이전 또는 워크스페이스 삭제 후 다시 시도해주세요.",
   INVALID_INVITE_CODE: "존재하지 않는 초대 코드입니다.",
-  EXPIRED_INVITE_CODE: "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
+  EXPIRED_INVITE_CODE:
+    "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
   INVITE_CODE_INACTIVE: "비활성화된 초대 코드입니다.",
   INVITE_CODE_USAGE_LIMIT_REACHED:
-    "초대 코드 사용 가능 횟수를 모두 사용했습니다.",
+    "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
   CUSTOM_ID_ALREADY_EXISTS: "이미 사용 중인 아이디입니다.",
   ALREADY_IN_WORKSPACE: "이미 워크스페이스에 소속되어 있습니다.",
+  WORKSPACE_MEMBER_LIMIT_REACHED:
+    "현재 워크스페이스에 참여할 수 없어요. 관리자에게 문의하세요.",
+  STANDARD_PLAN_REQUIRED: "이 기능은 STANDARD 플랜에서 사용할 수 있습니다.",
   WORKSPACE_TAG_ALREADY_EXISTS: "같은 이름의 태그가 이미 존재합니다.",
   ADMIN_TRANSFER_REQUIRED:
     "관리자는 권한 이전 또는 워크스페이스 삭제 후에만 탈퇴할 수 있습니다.",
@@ -84,6 +90,8 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   INVITE_CODE_USAGE_LIMIT_REACHED: 409,
   CUSTOM_ID_ALREADY_EXISTS: 409,
   ALREADY_IN_WORKSPACE: 409,
+  WORKSPACE_MEMBER_LIMIT_REACHED: 409,
+  STANDARD_PLAN_REQUIRED: 403,
   WORKSPACE_TAG_ALREADY_EXISTS: 409,
   ADMIN_TRANSFER_REQUIRED: 409,
   ACTIVE_SCOREBOARD_EXISTS: 409,
@@ -105,5 +113,9 @@ export const apiError = (code: ErrorCode, details?: unknown) => {
   );
 };
 
-export const apiSuccess = <T>(data: T, status = 200) =>
-  NextResponse.json(data, { status });
+export const apiSuccess = <T>(data: T, status = 200) => {
+  if (status === 204) {
+    return new NextResponse(null, { status });
+  }
+  return NextResponse.json(data, { status });
+};
