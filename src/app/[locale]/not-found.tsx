@@ -1,10 +1,15 @@
+"use client";
+
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Home } from "lucide-react";
 import { Link } from "@/i18n/routing";
+import { Home } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function NotFound() {
+  const t = useTranslations("NotFound");
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-background font-pretendard">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(94,106,210,0.14),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(132,204,22,0.14),transparent_24%)]" />
@@ -14,7 +19,7 @@ export default function NotFound() {
           <div className="space-y-6">
             <div className="flex items-center justify-between gap-3">
               <Badge className="rounded-md border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
-                404 Not Found
+                {t("badge")}
               </Badge>
             </div>
 
@@ -23,11 +28,10 @@ export default function NotFound() {
                 WIG
               </p>
               <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
-                찾으시는 페이지가 없어요
+                {t("title")}
               </h1>
               <p className="max-w-md text-sm leading-6 text-text-secondary sm:text-base">
-                주소가 바뀌었거나 삭제된 페이지일 수 있습니다. 홈으로 돌아가거나
-                내 점수판으로 이동해서 다시 시작하세요.
+                {t("description")}
               </p>
             </div>
 
@@ -37,13 +41,12 @@ export default function NotFound() {
             >
               <Link href="/">
                 <Home className="h-4 w-4" />
-                홈으로 가기
+                {t("goHome")}
               </Link>
             </Button>
 
             <div className="rounded-2xl border border-dashed border-border bg-sub-background/80 px-4 py-3 text-xs leading-5 text-text-muted">
-              입력한 URL을 다시 확인해 주세요. 보호된 경로라면 로그인 상태에
-              따라 홈으로 이동할 수도 있습니다.
+              {t("info")}
             </div>
           </div>
         </Card>
