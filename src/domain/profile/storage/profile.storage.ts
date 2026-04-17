@@ -1,5 +1,5 @@
 import { getDb } from "@/db";
-import { users, workspaceMembers } from "@/db/schema";
+import { users, workspaceMembers, workspaces } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export type ProfileRecord = {
@@ -34,32 +34,7 @@ export class ProfileStorage {
   constructor(private db: ReturnType<typeof getDb>) {}
 
   async findProfileByUserId(userId: number): Promise<ProfileRecord | null> {
-    const user = await this.db.query.users.findFirst({
-      where: eq(users.id, userId),
-    });
-
-    if (!user) {
-      return null;
-    }
-
-    const membership = await this.db.query.workspaceMembers.findFirst({
-      where: eq(workspaceMembers.userId, userId),
-      with: {
-        workspace: true,
-      },
-    });
-
-    return {
-      id: user.id,
-      customId: user.customId,
-      nickname: user.nickname,
-      avatarKey: user.avatarKey,
-      locale: user.locale,
-      role: membership?.role ?? null,
-      workspaceId: membership?.workspaceId ?? null,
-      workspaceName: membership?.workspace?.name ?? null,
-      createdAt: user.createdAt,
-    };
+    return this.findProfileRowByUserId(userId);
   }
 
   async updateProfile(
@@ -76,24 +51,7 @@ export class ProfileStorage {
       return null;
     }
 
-    const membership = await this.db.query.workspaceMembers.findFirst({
-      where: eq(workspaceMembers.userId, userId),
-      with: {
-        workspace: true,
-      },
-    });
-
-    return {
-      id: updated.id,
-      customId: updated.customId,
-      nickname: updated.nickname,
-      avatarKey: updated.avatarKey,
-      locale: updated.locale,
-      role: membership?.role ?? null,
-      workspaceId: membership?.workspaceId ?? null,
-      workspaceName: membership?.workspace?.name ?? null,
-      createdAt: updated.createdAt,
-    };
+    return this.findProfileRowByUserId(userId);
   }
 
   async findDeletionContextByUserId(
@@ -134,5 +92,29 @@ export class ProfileStorage {
 
   async deleteUser(userId: number): Promise<void> {
     await this.db.delete(users).where(eq(users.id, userId));
+  }
+
+  private async findProfileRowByUserId(
+    userId: number,
+  ): Promise<ProfileRecord | null> {
+    const [profile] = await this.db
+      .select({
+        id: users.id,
+        customId: users.customId,
+        nickname: users.nickname,
+        avatarKey: users.avatarKey,
+        locale: users.locale,
+        role: workspaceMembers.role,
+        workspaceId: workspaceMembers.workspaceId,
+        workspaceName: workspaces.name,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .leftJoin(workspaceMembers, eq(workspaceMembers.userId, users.id))
+      .leftJoin(workspaces, eq(workspaces.id, workspaceMembers.workspaceId))
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    return profile ?? null;
   }
 }

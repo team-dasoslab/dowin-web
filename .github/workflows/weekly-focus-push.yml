@@ -1,9 +1,9 @@
 name: Weekly Focus Push Notification Cron
 
 on:
-  schedule:
-    # Thursday 15:00 KST is Thursday 06:00 UTC
-    - cron: "0 6 * * 4"
+  # schedule:
+  # Thursday 15:00 KST is Thursday 06:00 UTC
+  # - cron: "0 6 * * 4"
   workflow_dispatch:
 
 jobs:

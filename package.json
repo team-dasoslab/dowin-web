@@ -21,7 +21,9 @@
     "mig:local": "npx drizzle-kit generate && npx wrangler d1 migrations apply wig-db --local",
     "mig:remote": "drizzle-kit generate && wrangler d1 migrations apply wig-db --remote",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "perf:api": "node scripts/perf-api.mjs",
+    "perf:log:tail": "tail -f tmp/perf-api.ndjson"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.33",
