@@ -1,37 +1,37 @@
-"use client";
-
-import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
-import { ToastProvider } from "@/context/ToastContext";
-import { usePushNotificationAnalytics } from "@/hooks/usePushNotificationAnalytics";
-import { useSerwistRegistration } from "@/hooks/useSerwistRegistration";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Script from "next/script";
-import { Suspense, useState } from "react";
 import "@/app/globals.css";
+import { Providers } from "@/components/Providers";
+import { getMessages, setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
 
-export default function RootLayout({
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function RootLayout({
   children,
-}: Readonly<{
+  params,
+}: {
   children: React.ReactNode;
-}>) {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  // Ensure that the incoming `locale` is valid
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+
+  // Enable static rendering
+  setRequestLocale(locale);
+
   const gaId = publicRuntimeConfig.nextPublicGaId;
-  const shouldRegisterServiceWorker = !publicRuntimeConfig.isDevelopment;
-  useSerwistRegistration(shouldRegisterServiceWorker);
-  usePushNotificationAnalytics(gaId.length > 0);
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnWindowFocus: false,
-          },
-        },
-      }),
-  );
+  const messages = await getMessages();
 
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <title>WIG Tracker</title>
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
@@ -145,14 +145,9 @@ export default function RootLayout({
             </Script>
           </>
         ) : null}
-        <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <Suspense fallback={null}>
-              <NavigationHistoryTracker />
-            </Suspense>
-            {children}
-          </ToastProvider>
-        </QueryClientProvider>
+        <Providers locale={locale} messages={messages}>
+          {children}
+        </Providers>
       </body>
     </html>
   );
