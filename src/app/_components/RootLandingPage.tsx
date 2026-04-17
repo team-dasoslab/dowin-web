@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/Button";
+import { Link } from "@/i18n/routing";
 import {
   Activity,
   AlignLeft,
@@ -12,9 +13,6 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { Link } from "@/i18n/routing";
-import { LandingPricingSection } from "./LandingPricingSection";
-
 
 export function RootLandingPage() {
   return (
@@ -549,7 +547,8 @@ export function RootLandingPage() {
         </div>
       </section>
 
-      <LandingPricingSection />
+      {/* FIXME */}
+      {/* <LandingPricingSection /> */}
 
       {/* 7. Footer CTA */}
       <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
