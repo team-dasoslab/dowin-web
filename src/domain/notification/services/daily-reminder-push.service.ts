@@ -1,10 +1,15 @@
 import { getKstNowParts } from "@/domain/notification/services/notification-schedule";
 import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
+import en from "@/messages/en.json";
+import ko from "@/messages/ko.json";
 
 type PushSubscriptionLookupPort = Pick<
   NotificationStorage,
   "findAllPushSubscriptions" | "findUserNotificationSettingsByUserIds"
 >;
+
+const messages = { ko, en } as const;
+type Locale = keyof typeof messages;
 
 export type DailyReminderPushJob = {
   endpoint: string;
@@ -25,21 +30,43 @@ export class DailyReminderPushService {
     const subscribedUserIds = [
       ...new Set(subscriptions.map((item) => Number(item.userId))),
     ].filter((userId) => Number.isInteger(userId));
+
+    // result includes { user: { locale: string } }
     const settings =
-      await this.notificationStorage.findUserNotificationSettingsByUserIds(
+      (await this.notificationStorage.findUserNotificationSettingsByUserIds(
         subscribedUserIds,
-      );
-    const kstNow = getKstNowParts(now);
-    const eligibleUserIds = new Set(
-      settings
-        .filter(
-          (setting) =>
-            setting.dailyReminderEnabled &&
-            setting.timezone === "Asia/Seoul" &&
-            setting.dailyReminderHour === kstNow.hour,
-        )
-        .map((setting) => setting.userId),
-    );
+      )) as any[];
+
+    const eligibleUserIds = new Set<number>();
+    const timezoneHours = new Map<string, number>();
+
+    for (const setting of settings) {
+      if (!setting.dailyReminderEnabled) continue;
+
+      const tz = setting.timezone || "Asia/Seoul";
+      let currentHour = timezoneHours.get(tz);
+
+      if (currentHour === undefined) {
+        try {
+          const parts = new Intl.DateTimeFormat("en-US", {
+            hour: "numeric",
+            hour12: false,
+            timeZone: tz,
+          }).formatToParts(now);
+          const hourPart = parts.find((p) => p.type === "hour");
+          currentHour = hourPart ? parseInt(hourPart.value, 10) % 24 : -1;
+          timezoneHours.set(tz, currentHour);
+        } catch (e) {
+          // Fallback if timezone is invalid
+          currentHour = getKstNowParts(now).hour;
+          timezoneHours.set(tz, currentHour);
+        }
+      }
+
+      if (setting.dailyReminderHour === currentHour) {
+        eligibleUserIds.add(setting.userId);
+      }
+    }
 
     if (eligibleUserIds.size === 0) {
       return {
@@ -66,19 +93,24 @@ export class DailyReminderPushService {
       return map;
     }, new Map());
 
+    const localeMap = new Map<number, Locale>(
+      settings.map((s) => [s.userId, (s.user?.locale as Locale) ?? "ko"]),
+    );
+
     const jobs: DailyReminderPushJob[] = [];
-    const body = "오늘의 선행지표를 기록했나요? 지금 바로 체크해보세요!";
 
     for (const userId of eligibleUserIds) {
       const subscriptionsForUser = subscriptionsByUserId.get(userId) ?? [];
+      const userLocale = localeMap.get(userId) ?? "ko";
+      const t = messages[userLocale] ?? messages.ko;
 
       for (const subscription of subscriptionsForUser) {
         jobs.push({
           endpoint: subscription.endpoint,
           p256dh: subscription.p256dh,
           auth: subscription.auth,
-          title: "리마인드",
-          body,
+          title: t.Notification.dailyReminderTitle,
+          body: t.Notification.dailyReminderBody,
           url: "/dashboard/my",
         });
       }

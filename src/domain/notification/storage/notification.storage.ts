@@ -74,15 +74,20 @@ export class NotificationStorage {
     );
   }
 
-  async findUserNotificationSettingsByUserIds(
-    userIds: number[],
-  ): Promise<UserNotificationSettingsRecord[]> {
+  async findUserNotificationSettingsByUserIds(userIds: number[]) {
     if (userIds.length === 0) {
       return [];
     }
 
     return await this.db.query.userNotificationSettings.findMany({
       where: inArray(userNotificationSettings.userId, userIds),
+      with: {
+        user: {
+          columns: {
+            locale: true,
+          },
+        },
+      },
     });
   }
 

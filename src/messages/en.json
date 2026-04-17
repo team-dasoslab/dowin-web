@@ -663,5 +663,9 @@
     "description": "The page you are looking for might have been moved or deleted. Please return to the home page or go to your scoreboard to start again.",
     "goHome": "Go Home",
     "info": "Please double-check the URL you entered. If it's a protected path, you may be redirected to the home page depending on your login status."
+  },
+  "Notification": {
+    "dailyReminderTitle": "Remind",
+    "dailyReminderBody": "Did you record your lead measures today? Check them now!"
   }
 }

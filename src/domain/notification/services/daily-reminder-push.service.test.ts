@@ -1,12 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DailyReminderPushService } from "@/domain/notification/services/daily-reminder-push.service";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("DailyReminderPushService", () => {
   const findAllPushSubscriptions = vi.fn();
   const findUserNotificationSettingsByUserIds = vi.fn();
-  const findActiveScoreboardsForPush = vi.fn();
-  const findActiveLeadMeasuresByScoreboardIds = vi.fn();
-  const findLogsForLeadMeasures = vi.fn();
 
   const createService = () =>
     new DailyReminderPushService({
@@ -18,7 +15,7 @@ describe("DailyReminderPushService", () => {
     vi.clearAllMocks();
   });
 
-  it("현재 KST 시각과 설정 시간이 맞으면 발송 작업을 만든다", async () => {
+  it("현재 KST 시각과 설정 시간이 맞으면 발송 작업을 만든다 (다국어 지원)", async () => {
     findAllPushSubscriptions.mockResolvedValue([
       {
         userId: "1",
@@ -40,18 +37,19 @@ describe("DailyReminderPushService", () => {
         dailyReminderHour: 21,
         dailyReminderMinute: 0,
         timezone: "Asia/Seoul",
+        user: { locale: "ko" },
       },
       {
         userId: 2,
         dailyReminderEnabled: true,
-        dailyReminderHour: 21,
-        dailyReminderMinute: 0,
-        timezone: "Asia/Seoul",
+        dailyReminderHour: 12, // 12:00 in UTC (which is 21:00 KST)
+        timezone: "UTC",
+        user: { locale: "en" },
       },
     ]);
 
     const result = await createService().buildDailyReminderJobs({
-      now: new Date("2026-04-14T12:00:00.000Z"),
+      now: new Date("2026-04-14T12:00:00.000Z"), // 21:00 KST, 12:00 UTC
     });
 
     expect(result.jobs).toEqual([
@@ -67,8 +65,8 @@ describe("DailyReminderPushService", () => {
         endpoint: "https://push.example.com/2",
         p256dh: "p256dh-2",
         auth: "auth-2",
-        title: "리마인드",
-        body: "오늘의 선행지표를 기록했나요? 지금 바로 체크해보세요!",
+        title: "Remind",
+        body: "Did you record your lead measures today? Check them now!",
         url: "/dashboard/my",
       },
     ]);
