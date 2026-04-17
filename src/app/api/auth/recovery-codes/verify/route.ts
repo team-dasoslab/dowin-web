@@ -15,7 +15,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const body = await request.json();
   const parsed = recoveryCodeVerifySchema.safeParse(body);
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const user = await service.verifyRecoveryCode(parsed.data.recoveryCode);

@@ -1,8 +1,9 @@
 "use client";
 
 import { Button, type ButtonProps } from "@/components/ui/Button";
+import { useRouter } from "@/i18n/routing";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const PREVIOUS_PATH_KEY = "wig.previousPath";
 
@@ -19,6 +20,7 @@ export function SmartBackButton({
   type = "button",
   ...props
 }: SmartBackButtonProps) {
+  const t = useTranslations("Common");
   const router = useRouter();
   const ariaLabel = props["aria-label"];
 
@@ -35,7 +37,7 @@ export function SmartBackButton({
 
   return (
     <Button
-      aria-label={ariaLabel ?? "뒤로 가기"}
+      aria-label={ariaLabel ?? t("back")}
       className={className}
       disabled={disabled}
       onClick={handleClick}

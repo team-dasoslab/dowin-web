@@ -56,8 +56,8 @@ export async function guardRestrictedTestAccountWrite({
     return null;
   }
 
-  return restrictedTestAccountForbiddenResponse();
+  return await restrictedTestAccountForbiddenResponse();
 }
 
-export const restrictedTestAccountForbiddenResponse = () =>
-  apiError("TEST_ACCOUNT_WRITE_RESTRICTED");
+export const restrictedTestAccountForbiddenResponse = async () =>
+  await apiError("TEST_ACCOUNT_WRITE_RESTRICTED");

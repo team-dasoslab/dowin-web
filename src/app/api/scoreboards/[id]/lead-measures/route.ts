@@ -30,7 +30,7 @@ export const GET = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const routeParams = await context.params;
@@ -42,7 +42,7 @@ export const GET = withErrorHandler(
     );
 
     if (!params.success || !query.success) {
-      return apiError("VALIDATION_ERROR", {
+      return await apiError("VALIDATION_ERROR", {
         ...(params.success ? {} : params.error.flatten().fieldErrors),
         ...(query.success ? {} : query.error.flatten().fieldErrors),
       });
@@ -65,7 +65,7 @@ export const POST = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -83,13 +83,13 @@ export const POST = withErrorHandler(
       scoreboardId: routeParams.id,
     });
     if (!params.success) {
-      return apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
     }
 
     const body = await request.json();
     const parsed = leadMeasureCreateSchema.safeParse(body);
     if (!parsed.success) {
-      return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
     const measure = await createService(db).createLeadMeasure(

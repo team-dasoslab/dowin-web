@@ -28,8 +28,8 @@ export interface AuthStoragePort {
 export class AuthService {
   constructor(private storage: AuthStoragePort) {}
 
-  async signup(customId: string, nickname: string, password: string) {
-    const user = await this.createUser(customId, nickname, password);
+  async signup(customId: string, nickname: string, password: string, locale: string = "ko") {
+    const user = await this.createUser(customId, nickname, password, locale);
     const recoveryCodes = Array.from(
       { length: RECOVERY_CODE_COUNT },
       () => generateRecoveryCode(),
@@ -56,6 +56,7 @@ export class AuthService {
         id: user.id,
         nickname: user.nickname,
         isFirstLogin: user.isFirstLogin,
+        locale: user.locale,
       },
       recoveryCodes,
       sessionId,
@@ -91,6 +92,7 @@ export class AuthService {
         id: user.id,
         nickname: user.nickname,
         isFirstLogin: user.isFirstLogin,
+        locale: user.locale,
       },
       sessionId,
     };
@@ -146,7 +148,7 @@ export class AuthService {
     await this.storage.updateUserPassword(userId, newPasswordHash);
   }
 
-  async createUser(customId: string, nickname: string, password: string) {
+  async createUser(customId: string, nickname: string, password: string, locale: string = "ko") {
     const existing = await this.storage.findUserByCustomId(customId);
     if (existing) {
       throw new ConflictError("CUSTOM_ID_ALREADY_EXISTS");
@@ -160,6 +162,7 @@ export class AuthService {
         nickname,
         passwordHash,
         isFirstLogin: true,
+        locale,
       });
 
       return newUser;

@@ -1,34 +1,10 @@
-"use client";
-
-import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
-import { publicRuntimeConfig } from "@/config/public-runtime-config";
-import { ToastProvider } from "@/context/ToastContext";
-import { usePushNotificationAnalytics } from "@/hooks/usePushNotificationAnalytics";
-import { useSerwistRegistration } from "@/hooks/useSerwistRegistration";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "./globals.css";
+import { ReactNode } from "react";
 import Script from "next/script";
-import { Suspense, useState } from "react";
-import "@/app/globals.css";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
-  const shouldRegisterServiceWorker = !publicRuntimeConfig.isDevelopment;
-  useSerwistRegistration(shouldRegisterServiceWorker);
-  usePushNotificationAnalytics(gaId.length > 0);
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            refetchOnWindowFocus: false,
-          },
-        },
-      }),
-  );
 
   return (
     <html lang="ko" suppressHydrationWarning>
@@ -36,12 +12,18 @@ export default function RootLayout({
         <title>WIG Tracker</title>
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
         <meta property="og:title" content="WIG Tracker" />
-        <meta property="og:description" content="가장 중요한 목표에 집중하세요." />
+        <meta
+          property="og:description"
+          content="가장 중요한 목표에 집중하세요."
+        />
         <meta property="og:image" content="/cover.png" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="WIG Tracker" />
-        <meta name="twitter:description" content="가장 중요한 목표에 집중하세요." />
+        <meta
+          name="twitter:description"
+          content="가장 중요한 목표에 집중하세요."
+        />
         <meta name="twitter:image" content="/cover.png" />
         <meta
           name="viewport"
@@ -55,8 +37,6 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/favicon-192x192.png" />
 
-        {/* splash start */}
-        {/* ===== iPad ===== */}
         <link
           rel="apple-touch-startup-image"
           href="/splash/apple-splash-2048-2732.jpg"
@@ -78,7 +58,6 @@ export default function RootLayout({
           media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
         />
 
-        {/* ===== iPhone ===== */}
         <link
           rel="apple-touch-startup-image"
           href="/splash/apple-splash-1320-2868.jpg"
@@ -119,7 +98,6 @@ export default function RootLayout({
           href="/splash/apple-splash-750-1334.jpg"
           media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
         />
-        {/* splash end */}
 
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
@@ -145,14 +123,7 @@ export default function RootLayout({
             </Script>
           </>
         ) : null}
-        <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <Suspense fallback={null}>
-              <NavigationHistoryTracker />
-            </Suspense>
-            {children}
-          </ToastProvider>
-        </QueryClientProvider>
+        {children}
       </body>
     </html>
   );

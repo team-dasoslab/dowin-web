@@ -1,17 +1,11 @@
-import { RootLandingPage } from "@/app/_components/RootLandingPage";
-import { getDb } from "@/db";
-import { getSession } from "@/lib/server/auth";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { redirect } from "next/navigation";
 
-export default async function HomePage() {
-  const { env } = await getCloudflareContext({ async: true });
-  const db = getDb(env.DB);
-  const session = await getSession(db);
-
-  if (session) {
-    redirect("/dashboard/my");
-  }
-
-  return <RootLandingPage />;
+/**
+ * Root page redirect to default locale or detected locale.
+ * Usually handled by middleware, but this acts as a fallback or explicit entry point.
+ */
+export default function RootPage() {
+  // If the request reaches here, it means the middleware didn't redirect.
+  // We'll redirect to the default locale.
+  redirect("/en");
 }

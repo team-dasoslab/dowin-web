@@ -14,11 +14,11 @@ export function withErrorHandler<TArgs extends unknown[]>(
       return await handler(...args);
     } catch (error) {
       if (error instanceof PlatformError) {
-        return apiError(error.code, error.details);
+        return await apiError(error.code, error.details);
       }
 
       console.error("[Unhandled Error]", error);
-      return apiError("INTERNAL_ERROR");
+      return await apiError("INTERNAL_ERROR");
     }
   };
 }

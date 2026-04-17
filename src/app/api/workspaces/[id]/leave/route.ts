@@ -21,7 +21,7 @@ export const DELETE = withErrorHandler(
 
     const session = await getSessionWithRefresh(db);
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -38,7 +38,7 @@ export const DELETE = withErrorHandler(
     const parsedParams = workspaceParamsSchema.safeParse(params);
 
     if (!parsedParams.success) {
-      return apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
     await service.leaveWorkspace(parsedParams.data.id, session.userId);

@@ -20,12 +20,12 @@ export const GET = withErrorHandler(
     const service = new WorkspaceService(storage);
     const session = await getSessionWithRefresh(db);
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const parsedParams = workspaceParamsSchema.safeParse({ id });
     if (!parsedParams.success) {
-      return apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
     const workspaceId = parsedParams.data.id;

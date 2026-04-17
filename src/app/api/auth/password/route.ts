@@ -17,7 +17,7 @@ export const PUT = withErrorHandler(async (request: Request) => {
   // 1. 세션 확인
   const session = await getSessionWithRefresh(db);
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -34,7 +34,7 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const parsed = passwordChangeSchema.safeParse(body);
 
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   try {
@@ -49,7 +49,7 @@ export const PUT = withErrorHandler(async (request: Request) => {
       error instanceof Error &&
       error.message === "현재 비밀번호가 올바르지 않습니다"
     ) {
-      return apiError("WRONG_PASSWORD");
+      return await apiError("WRONG_PASSWORD");
     }
     throw error;
   }

@@ -8,9 +8,10 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Link } from "@/i18n/routing";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { KeyRound } from "lucide-react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -22,6 +23,7 @@ const passwordSchema = z
   );
 
 export default function AccountRecoveryPageClient() {
+  const t = useTranslations("Auth");
   const [recoveryCode, setRecoveryCode] = useState("");
   const [recoveryAccount, setRecoveryAccount] = useState<{
     customId: string;
@@ -31,7 +33,8 @@ export default function AccountRecoveryPageClient() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const verifyRecoveryCodeMutation = usePostAuthRecoveryCodesVerify();
-  const resetPasswordByRecoveryCodeMutation = usePutAuthPasswordByRecoveryCode();
+  const resetPasswordByRecoveryCodeMutation =
+    usePutAuthPasswordByRecoveryCode();
   const isPending =
     verifyRecoveryCodeMutation.isPending ||
     resetPasswordByRecoveryCodeMutation.isPending;
@@ -50,21 +53,21 @@ export default function AccountRecoveryPageClient() {
         });
 
         if (response.status !== 200 || !response.data.user) {
-          setError("복원코드를 확인해주세요.");
+          setError(t("recoveryPage.errors.checkCode"));
           return;
         }
 
         setRecoveryAccount(response.data.user);
         return;
       } catch (verifyError) {
-        setError(getApiErrorMessage(verifyError, "복원코드를 확인해주세요."));
+        setError(getApiErrorMessage(verifyError, t("recoveryPage.errors.checkCode")));
         return;
       }
     }
 
     const parsedPassword = passwordSchema.safeParse(newPassword);
     if (!parsedPassword.success) {
-      setError("비밀번호는 8자 이상의 영문/숫자/허용 특수문자 조합이어야 합니다.");
+      setError(t("errors.invalidPassword"));
       return;
     }
 
@@ -77,16 +80,18 @@ export default function AccountRecoveryPageClient() {
       });
 
       if (response.status !== 200) {
-        setError("비밀번호 재설정에 실패했습니다.");
+        setError(t("recoveryPage.errors.resetFailed"));
         return;
       }
 
-      setNotice("비밀번호를 재설정했습니다. 로그인 화면으로 이동해주세요.");
+      setNotice(t("recoveryPage.resetSuccess"));
       setRecoveryAccount(null);
       setRecoveryCode("");
       setNewPassword("");
     } catch (resetError) {
-      setError(getApiErrorMessage(resetError, "비밀번호 재설정에 실패했습니다."));
+      setError(
+        getApiErrorMessage(resetError, t("recoveryPage.errors.resetFailed")),
+      );
     }
   };
 
@@ -99,19 +104,19 @@ export default function AccountRecoveryPageClient() {
           </div>
           <div className="space-y-1.5">
             <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-              계정 복구
+              {t("recoveryPage.title")}
             </h1>
             <p className="text-[13px] text-text-muted">
-              복원코드로 계정을 조회하고 비밀번호를 재설정합니다.
+              {t("recoveryPage.description")}
             </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
-              복원코드
-            </label>
+              <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
+                {t("recoveryPage.codeLabel")}
+              </label>
             <Input
               type="text"
               value={recoveryCode}
@@ -122,17 +127,17 @@ export default function AccountRecoveryPageClient() {
               disabled={isPending || Boolean(recoveryAccount)}
             />
             <p className="text-[11px] text-text-muted">
-              대소문자/하이픈/공백은 자동으로 정리됩니다.
+              {t("recoveryPage.codeHint")}
             </p>
           </div>
 
           {recoveryAccount && (
             <>
               <div className="rounded-xl border border-border bg-sub-background p-3">
-                <p className="text-[11px] text-text-muted">조회된 계정</p>
+                <p className="text-[11px] text-text-muted">{t("recoveryPage.accountFound")}</p>
                 <div className="mt-2 space-y-2">
                   <div className="space-y-1">
-                    <p className="text-[11px] text-text-muted">닉네임</p>
+                    <p className="text-[11px] text-text-muted">{t("nickname")}</p>
                     <Input
                       value={recoveryAccount.nickname}
                       readOnly
@@ -141,7 +146,7 @@ export default function AccountRecoveryPageClient() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[11px] text-text-muted">아이디</p>
+                    <p className="text-[11px] text-text-muted">{t("id")}</p>
                     <Input
                       value={recoveryAccount.customId}
                       readOnly
@@ -154,7 +159,7 @@ export default function AccountRecoveryPageClient() {
 
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
-                  새 비밀번호
+                  {t("recoveryPage.newPassword")}
                 </label>
                 <Input
                   type="password"
@@ -200,7 +205,7 @@ export default function AccountRecoveryPageClient() {
             {isPending ? (
               <InlineSpinner />
             ) : (
-              <span>{recoveryAccount ? "비밀번호 재설정" : "계정 조회"}</span>
+              <span>{recoveryAccount ? t("recoveryPage.resetButton") : t("recoveryPage.findButton")}</span>
             )}
           </Button>
 
@@ -209,7 +214,7 @@ export default function AccountRecoveryPageClient() {
               href="/login"
               className="text-xs font-medium text-text-muted hover:text-text-primary underline underline-offset-2"
             >
-              로그인으로 돌아가기
+              {t("recoveryPage.backToLogin")}
             </Link>
           </div>
         </form>

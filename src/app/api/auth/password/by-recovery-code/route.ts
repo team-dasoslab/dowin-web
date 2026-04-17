@@ -15,7 +15,7 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const body = await request.json();
   const parsed = passwordResetByRecoveryCodeSchema.safeParse(body);
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   await service.resetPasswordByRecoveryCode(

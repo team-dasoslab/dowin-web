@@ -16,7 +16,7 @@ export const POST = withErrorHandler(async (request: Request) => {
 
   const session = await getSessionWithRefresh(db);
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -33,7 +33,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const parsed = workspaceJoinByInviteSchema.safeParse(body);
 
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   await service.joinWorkspaceByInvite(parsed.data.code, session.userId);

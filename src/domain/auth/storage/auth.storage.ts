@@ -22,6 +22,7 @@ export class AuthStorage {
     nickname: string;
     passwordHash: string;
     isFirstLogin: boolean;
+    locale: string;
   }) {
     const [newUser] = await this.db.insert(users).values(data).returning();
     return newUser;
