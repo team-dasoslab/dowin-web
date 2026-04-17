@@ -482,5 +482,41 @@
     "FUTURE_DATE_NOT_ALLOWED": "Cannot record data for future dates.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
     "FREE_PLAN_HISTORY_LIMIT_REACHED": "Free plan users can view up to 6 months of history. Upgrade to STANDARD to view older data."
+  },
+  "Landing": {
+    "Pricing": {
+      "header": "From light team adoption\nto enterprise-wide expansion.",
+      "description": "We've completely removed the barrier to entry. Start building your core execution flow with the Free plan, and expand reasonably when your team's management needs grow.",
+      "cadence": "/ mo",
+      "ctaFree": "Get Started for Free",
+      "ctaStandard": "Get Notified",
+      "standardOnly": "STANDARD Only",
+      "plans": {
+        "FREE": {
+          "eyebrow": "Available Now",
+          "description": "Optimized for seeing if this methodology really works for your team as you run a single small team.",
+          "price": "$0",
+          "features": [
+            "Up to 10 members, enough for a small team",
+            "Last 6 months of history to look back at the past half-year",
+            "Last 4 weeks of reports to quickly see this month's focus",
+            "Full access to the core loop: set goals, record, and weekly reviews",
+            "Check team flow together, not just individual logs"
+          ]
+        },
+        "STANDARD": {
+          "eyebrow": "Coming Soon",
+          "description": "The plan for leaders who want to directly intervene and drive team execution density beyond just viewing records.",
+          "price": "Coming Soon",
+          "features": [
+            "Direct reminders sent from leaders to team members",
+            "CSV export for meeting materials or reporting",
+            "Longer history for records and reports than free",
+            "Extended analysis for operational decision-making",
+            "Operational upgrades for tighter team execution management"
+          ]
+        }
+      }
+    }
   }
 }
