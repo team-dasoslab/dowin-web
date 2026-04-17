@@ -42,7 +42,7 @@ describe("dashboard celebration", () => {
         level: "single",
         measureName: "물 2L 마시기",
       }),
-    ).toBe("이번주 물 2L 마시기 100% 달성!");
+    ).toEqual({ key: "singleSuccess", measureName: "물 2L 마시기" });
   });
 
   it("builds an all-clear toast message", () => {
@@ -51,7 +51,7 @@ describe("dashboard celebration", () => {
         id: 1,
         level: "all",
       }),
-    ).toBe("이번주 선행지표 100% 달성!");
+    ).toEqual({ key: "allSuccess" });
   });
 
   it("returns a single celebration event with the newly completed measure", () => {

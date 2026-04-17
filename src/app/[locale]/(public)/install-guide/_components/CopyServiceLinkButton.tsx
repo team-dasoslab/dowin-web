@@ -3,9 +3,12 @@
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { Check, Copy } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function CopyServiceLinkButton() {
+  const t = useTranslations();
+  const tPage = useTranslations("InstallGuidePage");
   const { showToast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
 
@@ -16,13 +19,13 @@ export function CopyServiceLinkButton() {
     try {
       await navigator.clipboard.writeText(targetUrl);
       setIsCopied(true);
-      showToast("success", "서비스 링크를 복사했어요.");
+      showToast("success", tPage("copyLinkSuccess"));
 
       window.setTimeout(() => {
         setIsCopied(false);
       }, 2000);
     } catch {
-      showToast("error", "링크 복사에 실패했어요. 다시 시도해주세요.");
+      showToast("error", tPage("copyLinkError"));
     }
   };
 
@@ -39,7 +42,7 @@ export function CopyServiceLinkButton() {
       ) : (
         <Copy className="h-3.5 w-3.5 text-text-muted" />
       )}
-      {isCopied ? "복사 완료" : "서비스 링크 복사하기"}
+      {isCopied ? t("Common.copyDone") : tPage("copyLinkButton")}
     </Button>
   );
 }

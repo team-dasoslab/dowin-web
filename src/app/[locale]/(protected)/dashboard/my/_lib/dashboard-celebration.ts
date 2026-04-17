@@ -143,10 +143,13 @@ export function getNextCelebrationEvent({
 
 export function getCelebrationToastMessage(event: CelebrationEvent) {
   if (event.level === "all") {
-    return "이번주 선행지표 100% 달성!";
+    return { key: "allSuccess" } as const;
   }
 
-  return `이번주 ${event.measureName ?? "선행지표"} 100% 달성!`;
+  return {
+    key: "singleSuccess",
+    measureName: event.measureName,
+  } as const;
 }
 
 export function canPlayCelebration(

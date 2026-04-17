@@ -3,6 +3,7 @@
 import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/wig.schemas";
 import { Button } from "@/components/ui/Button";
 import { CircleAlert, Compass, SlidersHorizontal } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 type LeadMeasureGuideTooltipProps = {
@@ -66,6 +67,8 @@ export function LeadMeasureGuideTooltip({
     };
   }, [active]);
 
+  const t = useTranslations("Dashboard.My.Guide");
+
   return (
     <div className="relative">
       <Button
@@ -73,7 +76,7 @@ export function LeadMeasureGuideTooltip({
         type="button"
         onClick={onToggle}
         className={`inline-flex h-4 w-4 items-center justify-center transition-colors ${style.triggerClassName}`}
-        aria-label="선행지표 가이드 보기"
+        aria-label={t("ariaLabel")}
       >
         <CircleAlert className={`h-3 w-3 ${style.iconClassName}`} />
       </Button>
@@ -96,8 +99,8 @@ export function LeadMeasureGuideTooltip({
               <Icon className={`h-3.5 w-3.5 ${style.iconClassName}`} />
               <p className="text-[10px] font-bold text-text-primary">
                 {guide.kind === WeeklyLogGuideKind.change
-                  ? "선행지표 변경 제안"
-                  : "횟수 조정 제안"}
+                  ? t("changeProposal")
+                  : t("adjustProposal")}
               </p>
             </div>
             <p className="text-[11px] leading-5 text-text-secondary">

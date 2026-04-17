@@ -21,6 +21,7 @@ import {
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseDashboardLogMutationParams = {
@@ -46,6 +47,7 @@ export const useDashboardLogMutation = ({
   weeklyById,
   weeklyLogsQueryKey,
 }: UseDashboardLogMutationParams) => {
+  const t = useTranslations("Dashboard.My");
   const queryClient = useQueryClient();
   const [pendingLogKeys, setPendingLogKeys] = useState<Set<string>>(
     () => new Set(),
@@ -125,7 +127,7 @@ export const useDashboardLogMutation = ({
       );
     }
 
-    showToast("error", getApiErrorMessage(error, "기록 저장에 실패했습니다."));
+    showToast("error", getApiErrorMessage(error, t("logSaveFailed")));
   };
 
   const handleToggleLogSettled = async (context?: ToggleLogContext) => {

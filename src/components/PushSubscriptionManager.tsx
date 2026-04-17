@@ -4,6 +4,7 @@ import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useToast } from "@/context/ToastContext";
 import { getFetchErrorMessage } from "@/lib/client/frontend-api";
 import { Bell, BellOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 interface PushSubscriptionManagerProps {
@@ -37,6 +38,7 @@ export default function PushSubscriptionManager({
   variant = "button",
   onSubscriptionChange,
 }: PushSubscriptionManagerProps) {
+  const t = useTranslations("PushNotification");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const { showToast } = useToast();
@@ -81,7 +83,7 @@ export default function PushSubscriptionManager({
     e.stopPropagation();
 
     if (!checkiOSSupport()) {
-      showToast("error", "iOS 16.4 이상에서만 알림을 지원합니다.");
+      showToast("error", t("unsupportedIos"));
       return;
     }
 
@@ -94,10 +96,7 @@ export default function PushSubscriptionManager({
       if (!("Notification" in window)) {
         // Rollback
         setIsSubscribed(false);
-        showToast(
-          "error",
-          "이 브라우저는 알림 기능을 지원하지 않습니다. 아이폰을 사용 중이시라면 '홈 화면에 추가'를 통해 앱을 설치한 후 다시 시도해 주세요.",
-        );
+        showToast("error", t("unsupportedBrowser"));
         return;
       }
 
@@ -106,10 +105,7 @@ export default function PushSubscriptionManager({
       if (permission !== "granted") {
         // Rollback
         setIsSubscribed(false);
-        showToast(
-          "error",
-          "알림 권한이 거부되었습니다. 원활한 사용을 위해 브라우저 설정에서 알림을 허용해 주세요.",
-        );
+        showToast("error", t("permissionDenied"));
         return;
       }
 
@@ -141,37 +137,26 @@ export default function PushSubscriptionManager({
       }
 
       notifySubscriptionChange(true);
-      showToast("success", "푸시 알림이 설정되었습니다.");
+      showToast("success", t("subscribeSuccess"));
     } catch (error) {
       // Rollback
       setIsSubscribed(false);
       console.error("Push subscription technical error:", error);
 
       if (error instanceof Error && error.message.includes("permission")) {
-        showToast(
-          "error",
-          "브라우저의 알림 권한이 차단되어 있습니다. 설정에서 권한을 허용해 주세요.",
-        );
+        showToast("error", t("permissionBlocked"));
       } else if (error instanceof Error && error.message.includes("VAPID")) {
-        showToast(
-          "error",
-          "알림 서비스 설정에 문제가 발생했습니다. 관리자에게 문의해 주세요.",
-        );
+        showToast("error", t("vapidConfigError"));
       } else if (
         publicRuntimeConfig.isDevelopment &&
         error instanceof Error &&
         error.message.includes("service worker")
       ) {
-        showToast(
-          "error",
-          "PWA 서비스 워커가 등록되지 않았습니다. 빌드 후 프리뷰(yarn preview)에서 테스트해주세요.",
-        );
+        showToast("error", t("serviceWorkerError"));
       } else {
         showToast(
           "error",
-          error instanceof Error
-            ? error.message
-            : "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+          error instanceof Error ? error.message : t("subscribeError"),
         );
       }
     }
@@ -195,24 +180,19 @@ export default function PushSubscriptionManager({
 
         if (!response.ok) {
           throw new Error(
-            await getFetchErrorMessage(
-              response,
-              "알림 해제 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
-            ),
+            await getFetchErrorMessage(response, t("unsubscribeError")),
           );
         }
       }
       notifySubscriptionChange(false);
-      showToast("info", "알림 설정이 해제되었습니다.");
+      showToast("info", t("unsubscribeSuccess"));
     } catch (error) {
       // Rollback
       setIsSubscribed(true);
       console.error("Unsubscribe failed:", error);
       showToast(
         "error",
-        error instanceof Error
-          ? error.message
-          : "알림 해제 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+        error instanceof Error ? error.message : t("unsubscribeError"),
       );
     }
   };
@@ -253,7 +233,7 @@ export default function PushSubscriptionManager({
       }`}
     >
       {isSubscribed ? <BellOff size={16} /> : <Bell size={16} />}
-      {isSubscribed ? "알림 해제" : "알림 받기"}
+      {isSubscribed ? t("buttonUnsubscribe") : t("buttonSubscribe")}
     </button>
   );
 }

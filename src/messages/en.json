@@ -20,7 +20,8 @@
     "myProfile": "My Profile",
     "back": "Back",
     "show": "Show",
-    "hide": "Hide"
+    "hide": "Hide",
+    "copyDone": "Copied"
   },
   "Dashboard": {
     "teamStatus": "Team Status",
@@ -89,7 +90,25 @@
     "sat": "Sat",
     "sun": "Sun",
     "dismissUpdate": "Dismiss this update",
-    "newFeatureNotice": "What's New"
+    "newFeatureNotice": "What's New",
+    "My": {
+      "logSaveFailed": "Failed to save log.",
+      "Celebration": {
+        "allSuccess": "100% Achieved for all lead measures this week!",
+        "singleSuccess": "100% Achieved for {measureName} this week!",
+        "singleSuccessFallback": "100% Achieved for lead measure this week!"
+      },
+      "Guide": {
+        "ariaLabel": "View lead measure guide",
+        "changeProposal": "Proposal for lead measure change",
+        "adjustProposal": "Proposal for target adjustment"
+      }
+    },
+    "Team": {
+      "memoCreateFailed": "Failed to add memo.",
+      "memoStatusChangeFailed": "Failed to change memo status.",
+      "memoDeleteFailed": "Failed to delete memo."
+    }
   },
   "Scoreboard": {
     "archiveTitle": "Scoreboard Archive",
@@ -213,7 +232,11 @@
       "archiveFailed": "Failed to archive scoreboard.",
       "duplicatedTag": "A tag with the same name already exists.",
       "leadMeasureCreateFailed": "Failed to create lead measure.",
-      "scoreboardIdNotFound": "Could not identify scoreboard ID."
+      "scoreboardIdNotFound": "Could not identify scoreboard ID.",
+      "archiveSuccess": "Scoreboard archived successfully.",
+      "archiveFailed": "Failed to archive scoreboard.",
+      "reactivateSuccess": "Scoreboard reactivated successfully.",
+      "reactivateFailed": "Failed to reactivate scoreboard."
     }
   },
   "ProfilePassword": {
@@ -233,14 +256,18 @@
   "ProfileDeleteAccount": {
     "header": "Delete Account",
     "cardTitle": "Delete Account",
-    "cardDesc": "Check your current password and delete all associated data.",
-    "warningText": "Account data cannot be recovered after deletion. You cannot delete your account if you are the last admin of a workspace.",
+    "cardDesc": "Deleting your account will remove all data and cannot be recovered. Please decide carefully.",
     "currentPasswordLabel": "Current Password",
-    "currentPasswordPlaceholder": "Enter current password",
     "confirmationTextLabel": "Confirmation Text",
+    "confirmationTextDescription": "Type the text below exactly:",
     "confirmationTextPlaceholder": "Delete my account",
-    "confirmationTextHint": "Enter 'Delete my account' to proceed.",
-    "submitButton": "Delete Account",
+    "button": "Delete Account",
+    "deleteSuccess": "Account deleted successfully. We hope to see you again.",
+    "deleteFailed": "Failed to delete account.",
+    "errors": {
+      "passwordRequired": "Please enter your current password.",
+      "confirmationMismatch": "Please enter the confirmation text exactly."
+    },
     "submittingButton": "Deleting..."
   },
   "ProfileMembers": {
@@ -410,6 +437,19 @@
       "last": "Done",
       "next": "Next",
       "skip": "Skip"
+    },
+    "Export": {
+      "invalidDate": "Please check the date format.",
+      "invalidRange": "End date must be after start date.",
+      "rangeLimit": "Search period can be up to 92 days.",
+      "emptyMeasures": "Please select at least one lead measure.",
+      "fetchFailed": "Failed to load export data.",
+      "downloadStarted": "CSV download started.",
+      "standardRequired": "CSV download is only available on STANDARD plan."
+    },
+    "Notification": {
+      "timeChanged": "Daily reminder time has been changed.",
+      "timeChangeFailed": "Failed to change daily reminder time."
     }
   },
   "ProductUpdates": {
@@ -547,7 +587,9 @@
       "placeholder": "e.g. TEAM-AB12-CD34",
       "button": "Join",
       "createButton": "Create New",
-      "loading": "Joining workspace..."
+      "loading": "Joining workspace...",
+      "joinSuccess": "Joined workspace successfully.",
+      "joinFailed": "An error occurred while joining the workspace."
     }
   },
   "Landing": {
@@ -667,5 +709,24 @@
   "Notification": {
     "dailyReminderTitle": "Remind",
     "dailyReminderBody": "Did you record your lead measures today? Check them now!"
+  },
+  "PushNotification": {
+    "unsupportedIos": "Push notifications are only supported on iOS 16.4 or later.",
+    "unsupportedBrowser": "This browser does not support push notifications. If you are on an iPhone, please add to home screen and try again.",
+    "permissionDenied": "Notification permission denied. Please allow notifications in browser settings for the best experience.",
+    "permissionBlocked": "Browser notification permission is blocked. Please allow permissions in settings.",
+    "vapidConfigError": "Problem setting up notification service. Please contact admin.",
+    "serviceWorkerError": "PWA service worker not registered. Please test in preview build.",
+    "subscribeSuccess": "Push notifications enabled.",
+    "subscribeError": "Problem setting up notifications. Please try again later.",
+    "unsubscribeSuccess": "Notifications disabled.",
+    "unsubscribeError": "Problem disabling notifications. Please try again later.",
+    "buttonSubscribe": "Subscribe",
+    "buttonUnsubscribe": "Unsubscribe"
+  },
+  "InstallGuidePage": {
+    "copyLinkSuccess": "Service link copied.",
+    "copyLinkError": "Failed to copy link. Please try again.",
+    "copyLinkButton": "Copy Service Link"
   }
 }

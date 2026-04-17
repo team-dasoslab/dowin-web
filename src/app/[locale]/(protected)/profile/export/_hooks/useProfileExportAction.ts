@@ -11,6 +11,7 @@ import {
   getApiErrorCode,
   getApiErrorMessage,
 } from "@/lib/client/frontend-api";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseProfileExportActionParams = {
@@ -26,25 +27,26 @@ export const useProfileExportAction = ({
   selectedExportMeasureIds,
   splitByWeek,
 }: UseProfileExportActionParams) => {
+  const t = useTranslations("Profile.Export");
   const { showToast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
 
   const exportCsv = async () => {
     const dayCount = getDayCountInclusive(exportFrom, exportTo);
     if (dayCount === null) {
-      showToast("error", "기간 날짜 형식을 확인해주세요.");
+      showToast("error", t("invalidDate"));
       return;
     }
     if (dayCount <= 0) {
-      showToast("info", "종료일은 시작일 이후여야 합니다.");
+      showToast("info", t("invalidRange"));
       return;
     }
     if (dayCount > 92) {
-      showToast("info", "조회 기간은 최대 92일까지 가능합니다.");
+      showToast("info", t("rangeLimit"));
       return;
     }
     if (selectedExportMeasureIds.length === 0) {
-      showToast("info", "최소 1개 이상의 선행지표를 선택해주세요.");
+      showToast("info", t("emptyMeasures"));
       return;
     }
 
@@ -57,23 +59,20 @@ export const useProfileExportAction = ({
         leadMeasureIds: selectedExportMeasureIds,
       });
       if (response.status !== 200) {
-        showToast("error", "내보내기 데이터를 불러오지 못했습니다.");
+        showToast("error", t("fetchFailed"));
         return;
       }
 
       const csv = buildExportCsv(response.data, splitByWeek);
       downloadCsv(csv, exportFrom, exportTo);
-      showToast("success", "CSV 다운로드를 시작했습니다.");
+      showToast("success", t("downloadStarted"));
     } catch (error) {
       if (getApiErrorCode(error) === "STANDARD_PLAN_REQUIRED") {
-        showToast("info", "CSV 다운로드는 STANDARD 플랜에서 사용할 수 있어요.");
+        showToast("info", t("standardRequired"));
         return;
       }
 
-      showToast(
-        "error",
-        getApiErrorMessage(error, "내보내기 데이터를 불러오지 못했습니다."),
-      );
+      showToast("error", getApiErrorMessage(error, t("fetchFailed")));
     } finally {
       setIsExporting(false);
     }

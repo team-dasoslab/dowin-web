@@ -19,6 +19,7 @@ import {
   isProductUpdateDismissed,
   readDismissedProductUpdate,
 } from "@/lib/product-updates";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 type UseMyDashboardPageStateParams = {
@@ -114,13 +115,20 @@ export const useMyDashboardPageState = ({
     weeklyCelebrationSnapshot,
   ]);
 
+  const t = useTranslations("Dashboard.My.Celebration");
+
   useEffect(() => {
     if (!canPlayCelebration(celebrationEvent, isLogPending)) {
       return;
     }
 
     void fireDashboardConfetti(celebrationEvent.level);
-    showToast("success", getCelebrationToastMessage(celebrationEvent));
+
+    const toast = getCelebrationToastMessage(celebrationEvent);
+    showToast(
+      "success",
+      t(toast.key, { measureName: toast.measureName ?? "" }),
+    );
 
     const timeout = window.setTimeout(() => {
       setCelebrationEvent((current) =>
@@ -131,7 +139,7 @@ export const useMyDashboardPageState = ({
     return () => {
       window.clearTimeout(timeout);
     };
-  }, [celebrationEvent, isLogPending, showToast]);
+  }, [celebrationEvent, isLogPending, showToast, t]);
 
   return {
     celebrationLevel: canPlayCelebration(celebrationEvent, isLogPending)
