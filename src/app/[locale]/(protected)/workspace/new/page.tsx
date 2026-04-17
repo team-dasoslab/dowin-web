@@ -7,9 +7,12 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
+import { useTranslations } from "next-intl";
 import { Plus, Zap } from "lucide-react";
 
 export default function NewWorkspacePage() {
+  const t = useTranslations("Workspace.new");
+  const tCommon = useTranslations("Common");
   const { error, getValidatedName, name, setError, handleNameChange } =
     useCreateWorkspaceForm();
   const { isPending, submitCreateWorkspace } = useCreateWorkspaceMutation({
@@ -32,13 +35,13 @@ export default function NewWorkspacePage() {
   return (
     <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
       {isPending && (
-        <LoadingOverlay message="워크스페이스를 만드는 중입니다." />
+        <LoadingOverlay message={t("loading")} />
       )}
       <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
           <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0" />
-          <span className="text-xs font-bold text-text-muted">뒤로 가기</span>
+          <span className="text-xs font-bold text-text-muted">{tCommon("back")}</span>
         </div>
 
         {/* 헤더 */}
@@ -48,12 +51,10 @@ export default function NewWorkspacePage() {
           </div>
           <div className="space-y-1">
             <h1 className="text-xl font-bold text-text-primary tracking-tight">
-              새 워크스페이스 만들기
+              {t("title")}
             </h1>
-            <p className="text-xs text-text-muted leading-relaxed">
-              워크스페이스는 팀의 목표를 함께 관리하는 공간입니다.
-              <br />
-              멋진 이름을 지어주세요.
+            <p className="text-xs text-text-muted leading-relaxed whitespace-pre-line">
+              {t("description")}
             </p>
           </div>
         </div>
@@ -62,14 +63,14 @@ export default function NewWorkspacePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-3">
             <label className="text-[11px] block font-bold text-text-secondary ml-0.5">
-              워크스페이스 이름
+              {t("label")}
             </label>
             <Input
               type="text"
               value={name}
               disabled={isPending}
               onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="예: 마케팅 팀, WIG 프로젝트"
+              placeholder={t("placeholder")}
               autoFocus
               className="w-full px-4 py-3 bg-sub-background border border-border rounded-lg text-sm focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
               required
@@ -101,7 +102,7 @@ export default function NewWorkspacePage() {
             ) : (
               <>
                 <Plus className="w-4 h-4" />
-                <span>워크스페이스 생성하기</span>
+                <span>{t("button")}</span>
               </>
             )}
           </Button>

@@ -530,6 +530,26 @@
       }
     }
   },
+  "Workspace": {
+    "new": {
+      "title": "Create New Workspace",
+      "description": "A workspace is a space where your team manages goals together.\nPlease give it a great name.",
+      "label": "Workspace Name",
+      "placeholder": "e.g. Marketing Team, WIG Project",
+      "button": "Create Workspace",
+      "loading": "Creating workspace..."
+    },
+    "join": {
+      "title": "Join with Invite Code",
+      "description": "Enter the invitation code received from your team admin.",
+      "planInfo": "FREE plan workspaces can have up to 10 members.",
+      "label": "Invite Code",
+      "placeholder": "e.g. TEAM-AB12-CD34",
+      "button": "Join",
+      "createButton": "Create New",
+      "loading": "Joining workspace..."
+    }
+  },
   "Landing": {
     "Navigation": {
       "login": "Log in",

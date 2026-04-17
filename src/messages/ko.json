@@ -531,6 +531,26 @@
       }
     }
   },
+  "Workspace": {
+    "new": {
+      "title": "새 워크스페이스 만들기",
+      "description": "워크스페이스는 팀의 목표를 함께 관리하는 공간입니다.\n멋진 이름을 지어주세요.",
+      "label": "워크스페이스 이름",
+      "placeholder": "예: 마케팅 팀, WIG 프로젝트",
+      "button": "워크스페이스 생성하기",
+      "loading": "워크스페이스를 만드는 중입니다."
+    },
+    "join": {
+      "title": "초대코드로 참가하기",
+      "description": "팀 관리자에게 전달받은 초대코드를 입력하세요.",
+      "planInfo": "FREE 플랜 워크스페이스는 최대 10명까지 참여할 수 있습니다.",
+      "label": "초대코드",
+      "placeholder": "예: TEAM-AB12-CD34",
+      "button": "참가하기",
+      "createButton": "새로 만들기",
+      "loading": "워크스페이스에 참가하는 중입니다."
+    }
+  },
   "Landing": {
     "Navigation": {
       "login": "로그인",

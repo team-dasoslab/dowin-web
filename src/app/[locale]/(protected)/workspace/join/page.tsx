@@ -7,10 +7,13 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
+import { useTranslations } from "next-intl";
 import { LogIn, Users, Zap } from "lucide-react";
 import { Link } from "@/i18n/routing";
 
 export default function JoinWorkspacePage() {
+  const t = useTranslations("Workspace.join");
+  const tCommon = useTranslations("Common");
   const { isPending, submitJoinWorkspace } = useJoinWorkspaceMutation({
     onError: (message) => {
       setError(message);
@@ -24,12 +27,12 @@ export default function JoinWorkspacePage() {
   return (
     <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
       {isPending && (
-        <LoadingOverlay message="워크스페이스에 참가하는 중입니다." />
+        <LoadingOverlay message={t("loading")} />
       )}
       <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
         <div className="flex items-center gap-3">
           <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0" />
-          <span className="text-xs font-bold text-text-muted">뒤로 가기</span>
+          <span className="text-xs font-bold text-text-muted">{tCommon("back")}</span>
         </div>
 
         <div className="space-y-4">
@@ -38,13 +41,13 @@ export default function JoinWorkspacePage() {
           </div>
           <div className="space-y-1">
             <h1 className="text-xl font-bold text-text-primary tracking-tight">
-              초대코드로 참가하기
+              {t("title")}
             </h1>
             <p className="text-xs text-text-muted leading-relaxed">
-              팀 관리자에게 전달받은 초대코드를 입력하세요.
+              {t("description")}
             </p>
             <p className="text-[11px] text-text-muted leading-relaxed">
-              FREE 플랜 워크스페이스는 최대 10명까지 참여할 수 있습니다.
+              {t("planInfo")}
             </p>
           </div>
         </div>
@@ -52,14 +55,14 @@ export default function JoinWorkspacePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-3">
             <label className="text-[11px] block font-bold text-text-secondary ml-0.5">
-              초대코드
+              {t("label")}
             </label>
             <Input
               type="text"
               value={inviteCode}
               disabled={isPending}
               onChange={(e) => handleInviteCodeChange(e.target.value)}
-              placeholder="예: TEAM-AB12-CD34"
+              placeholder={t("placeholder")}
               autoFocus
               className="w-full px-4 py-3 bg-sub-background border border-border rounded-lg text-sm focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
               required
@@ -85,7 +88,7 @@ export default function JoinWorkspacePage() {
                 className="flex items-center justify-center gap-2"
               >
                 <Users className="w-4 h-4" />
-                새로 만들기
+                {t("createButton")}
               </Link>
             </Button>
 
@@ -103,7 +106,7 @@ export default function JoinWorkspacePage() {
               ) : (
                 <>
                   <LogIn className="w-4 h-4" />
-                  참가하기
+                  {t("button")}
                 </>
               )}
             </Button>
