@@ -28,7 +28,7 @@ export function SmartBackButton({
     const previousPath = sessionStorage.getItem(PREVIOUS_PATH_KEY);
 
     if (previousPath) {
-      router.push(previousPath);
+      router.back();
       return;
     }
 
