@@ -30,7 +30,7 @@ export function DashboardHeader({
 
       <div className="flex flex-wrap items-center gap-2">
         {MY_DASHBOARD_LINKS.map(
-          ({ href, icon: Icon, label, translationKey }) => (
+          ({ href, icon: Icon, translationKey }) => (
             <Button
               key={href}
               asChild

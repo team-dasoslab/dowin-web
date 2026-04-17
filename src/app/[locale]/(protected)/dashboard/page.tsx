@@ -211,7 +211,6 @@ export default function DashboardPage() {
 }
 
 function DashboardLoadingState() {
-  const t = useTranslations("Dashboard");
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">

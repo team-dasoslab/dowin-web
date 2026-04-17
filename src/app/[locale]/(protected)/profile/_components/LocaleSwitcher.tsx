@@ -3,10 +3,9 @@
 import { usePutUsersMe } from "@/api/generated/profile/profile";
 import { useToast } from "@/context/ToastContext";
 import { usePathname, useRouter } from "@/i18n/routing";
-import { useLocale, useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 export function LocaleSwitcher() {
-  const t = useTranslations("Profile");
   const locale = useLocale() as "ko" | "en";
   const router = useRouter();
   const pathname = usePathname();

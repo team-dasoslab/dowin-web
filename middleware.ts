@@ -16,7 +16,7 @@ const isPublicPath = (pathname: string) => {
   const pathWithoutLocale = "/" + segments.slice(2).join("/");
 
   // if segments[1] is a locale, check pathWithoutLocale
-  if (routing.locales.includes(segments[1] as any)) {
+  if ((routing.locales as readonly string[]).includes(segments[1])) {
     return PUBLIC_PATHS.has(pathWithoutLocale);
   }
 
@@ -34,7 +34,7 @@ export function middleware(request: NextRequest) {
 
   // Identify internal locale for redirects
   const segments = pathname.split("/");
-  let locale = routing.locales.includes(segments[1] as any)
+  let locale = (routing.locales as readonly string[]).includes(segments[1])
     ? (segments[1] as string)
     : null;
 
