@@ -33,10 +33,14 @@ export function middleware(request: NextRequest) {
   // 2. Handle auth
   const hasSessionCookie = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
 
+  const nextLocaleCookie = request.cookies.get("NEXT_LOCALE")?.value;
+
   // Identify internal locale for redirects
   const segments = pathname.split("/");
   const locale = isSupportedLocale(segments[1])
     ? segments[1]
+    : isSupportedLocale(nextLocaleCookie)
+    ? nextLocaleCookie
     : detectLocale({
         customLocale: request.headers.get("x-wig-locale"),
         acceptLanguage: request.headers.get("accept-language"),

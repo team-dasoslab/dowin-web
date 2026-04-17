@@ -36,6 +36,14 @@ export const POST = withErrorHandler(async (request: Request) => {
       path: "/",
       maxAge: SESSION_TTL_SECONDS,
     });
+    
+    // Sync DB locale to browser cookie
+    if (user.locale) {
+      cookieStore.set("NEXT_LOCALE", user.locale, {
+        path: "/",
+        maxAge: 31536000, // 1 year
+      });
+    }
 
     return apiSuccess({ user });
   } catch (error: unknown) {

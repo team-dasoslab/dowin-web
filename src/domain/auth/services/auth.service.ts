@@ -56,6 +56,7 @@ export class AuthService {
         id: user.id,
         nickname: user.nickname,
         isFirstLogin: user.isFirstLogin,
+        locale: user.locale,
       },
       recoveryCodes,
       sessionId,
@@ -91,6 +92,7 @@ export class AuthService {
         id: user.id,
         nickname: user.nickname,
         isFirstLogin: user.isFirstLogin,
+        locale: user.locale,
       },
       sessionId,
     };

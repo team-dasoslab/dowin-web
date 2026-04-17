@@ -1,8 +1,8 @@
+import { SESSION_TTL_MS } from "@/domain/auth/constants";
 import {
   AuthService,
   type AuthStoragePort,
 } from "@/domain/auth/services/auth.service";
-import { SESSION_TTL_MS } from "@/domain/auth/constants";
 import bcrypt from "bcryptjs";
 import {
   beforeEach,
@@ -118,12 +118,17 @@ describe("Auth Service - signup", () => {
       createdAt: new Date(),
     });
 
-    const result = await service.signup("newuser", "New User", "newSecurePass1!");
+    const result = await service.signup(
+      "newuser",
+      "New User",
+      "newSecurePass1!",
+    );
 
     expect(result.user).toEqual({
       id: 7,
       nickname: "New User",
       isFirstLogin: true,
+      locale: "ko",
     });
     expect(result.recoveryCodes).toHaveLength(8);
     expect(result.recoveryCodes.every((code) => typeof code === "string")).toBe(
