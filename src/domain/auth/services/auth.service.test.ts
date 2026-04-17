@@ -45,6 +45,7 @@ describe("Auth Service - login", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     };
 
@@ -85,6 +86,7 @@ describe("Auth Service - login", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     };
     mockStorage.findUserByCustomId.mockResolvedValue(mockUser);
@@ -112,6 +114,7 @@ describe("Auth Service - signup", () => {
       avatarKey: null,
       passwordHash: "hashed-password",
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     });
 
@@ -173,6 +176,7 @@ describe("Auth Service - changePassword", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: false,
+      locale: "ko",
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
 
@@ -190,6 +194,7 @@ describe("Auth Service - changePassword", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: false,
+      locale: "ko",
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
 
@@ -215,6 +220,7 @@ describe("Auth Service - createUser", () => {
       avatarKey: null,
       passwordHash: "hashed-password",
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     };
     mockStorage.createUser.mockResolvedValue(mockCreatedUser);
@@ -245,6 +251,7 @@ describe("Auth Service - createUser", () => {
       avatarKey: null,
       passwordHash: "hashed-password",
       isFirstLogin: false,
+      locale: "ko",
       createdAt: new Date(),
     });
 
@@ -276,6 +283,7 @@ describe("Auth Service - verifyRecoveryCode", () => {
         nickname: "존",
         avatarKey: null,
         isFirstLogin: false,
+        locale: "ko",
         createdAt: new Date(),
       },
     });

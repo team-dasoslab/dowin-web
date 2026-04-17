@@ -10,8 +10,9 @@ import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { Check, Copy, LogIn, UserPlus, Zap } from "lucide-react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Link } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing"
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 

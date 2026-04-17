@@ -24,7 +24,7 @@ export const POST = withErrorHandler(
 
     const session = await getSessionWithRefresh(db);
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -41,7 +41,7 @@ export const POST = withErrorHandler(
     const parsedParams = workspaceParamsSchema.safeParse(params);
 
     if (!parsedParams.success) {
-      return apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
     await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
@@ -50,7 +50,7 @@ export const POST = withErrorHandler(
     const parsedBody = workspaceTransferAdminSchema.safeParse(body);
 
     if (!parsedBody.success) {
-      return apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
     }
 
     await service.transferAdmin(

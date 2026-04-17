@@ -14,7 +14,7 @@ export const GET = withErrorHandler(async () => {
 
   const session = await getSessionWithRefresh(db);
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const workspace = await service.getMyWorkspace(session.userId);

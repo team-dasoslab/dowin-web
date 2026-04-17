@@ -21,7 +21,7 @@ export const PATCH = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const { memoId } = await context.params;
@@ -29,13 +29,13 @@ export const PATCH = withErrorHandler(
     const parsed = dashboardTeamMemoResolveSchema.safeParse(await request.json());
 
     if (!Number.isInteger(memoIdValue) || memoIdValue <= 0) {
-      return apiError("VALIDATION_ERROR", {
+      return await apiError("VALIDATION_ERROR", {
         memoId: ["유효한 메모 ID를 입력해주세요."],
       });
     }
 
     if (!parsed.success) {
-      return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
     const result = await createService(db).resolveTeamMemo(

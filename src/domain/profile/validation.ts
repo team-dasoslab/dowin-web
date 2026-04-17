@@ -13,9 +13,13 @@ export const profileUpdateSchema = z
       .regex(NICKNAME_REGEX, "닉네임에는 특수문자를 사용할 수 없습니다.")
       .optional(),
     avatarKey: z.enum(PROFILE_AVATAR_KEYS).nullable().optional(),
+    locale: z.enum(["ko", "en"]).optional(),
   })
   .refine(
-    (value) => value.nickname !== undefined || value.avatarKey !== undefined,
+    (value) =>
+      value.nickname !== undefined ||
+      value.avatarKey !== undefined ||
+      value.locale !== undefined,
     {
       message: "변경할 프로필 정보가 없습니다.",
     },

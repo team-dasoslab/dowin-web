@@ -8,9 +8,9 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Link } from "@/i18n/routing";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { KeyRound } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -31,7 +31,8 @@ export default function AccountRecoveryPageClient() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const verifyRecoveryCodeMutation = usePostAuthRecoveryCodesVerify();
-  const resetPasswordByRecoveryCodeMutation = usePutAuthPasswordByRecoveryCode();
+  const resetPasswordByRecoveryCodeMutation =
+    usePutAuthPasswordByRecoveryCode();
   const isPending =
     verifyRecoveryCodeMutation.isPending ||
     resetPasswordByRecoveryCodeMutation.isPending;
@@ -64,7 +65,9 @@ export default function AccountRecoveryPageClient() {
 
     const parsedPassword = passwordSchema.safeParse(newPassword);
     if (!parsedPassword.success) {
-      setError("비밀번호는 8자 이상의 영문/숫자/허용 특수문자 조합이어야 합니다.");
+      setError(
+        "비밀번호는 8자 이상의 영문/숫자/허용 특수문자 조합이어야 합니다.",
+      );
       return;
     }
 
@@ -86,7 +89,9 @@ export default function AccountRecoveryPageClient() {
       setRecoveryCode("");
       setNewPassword("");
     } catch (resetError) {
-      setError(getApiErrorMessage(resetError, "비밀번호 재설정에 실패했습니다."));
+      setError(
+        getApiErrorMessage(resetError, "비밀번호 재설정에 실패했습니다."),
+      );
     }
   };
 

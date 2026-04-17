@@ -19,7 +19,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const parsed = loginSchema.safeParse(body);
 
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   try {
@@ -43,7 +43,7 @@ export const POST = withErrorHandler(async (request: Request) => {
       error instanceof Error &&
       error.message === "아이디 또는 비밀번호가 올바르지 않습니다"
     ) {
-      return apiError("INVALID_CREDENTIALS");
+      return await apiError("INVALID_CREDENTIALS");
     }
     throw error;
   }

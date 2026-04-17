@@ -1,4 +1,7 @@
+import { getLocale, type Locale } from "@/lib/server/locale";
 import { NextResponse } from "next/server";
+import ko from "@/messages/ko.json";
+import en from "@/messages/en.json";
 
 export type ErrorCode =
   | "UNAUTHORIZED"
@@ -31,44 +34,9 @@ export type ErrorCode =
   | "PAST_WEEK_LOG_EDIT_NOT_ALLOWED"
   | "FREE_PLAN_HISTORY_LIMIT_REACHED";
 
-const ERROR_MESSAGES: Record<ErrorCode, string> = {
-  UNAUTHORIZED: "로그인이 필요합니다.",
-  FORBIDDEN: "해당 리소스에 접근할 권한이 없습니다.",
-  TEST_ACCOUNT_WRITE_RESTRICTED:
-    "테스트 계정에서는 체크 기록과 프로필 아이콘 변경만 사용할 수 있어요.",
-  NOT_FOUND: "요청한 리소스를 찾을 수 없습니다.",
-  VALIDATION_ERROR: "입력값이 올바르지 않습니다.",
-  INTERNAL_ERROR: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-  INVALID_CREDENTIALS: "아이디 또는 비밀번호가 올바르지 않습니다.",
-  INVALID_RECOVERY_CODE: "유효하지 않은 복원코드입니다.",
-  SESSION_EXPIRED: "세션이 만료되었습니다. 다시 로그인해주세요.",
-  WRONG_PASSWORD: "현재 비밀번호가 올바르지 않습니다.",
-  LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN:
-    "유일한 관리자는 계정을 탈퇴할 수 없습니다. 권한 이전 또는 워크스페이스 삭제 후 다시 시도해주세요.",
-  INVALID_INVITE_CODE: "존재하지 않는 초대 코드입니다.",
-  EXPIRED_INVITE_CODE:
-    "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
-  INVITE_CODE_INACTIVE: "비활성화된 초대 코드입니다.",
-  INVITE_CODE_USAGE_LIMIT_REACHED:
-    "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
-  CUSTOM_ID_ALREADY_EXISTS: "이미 사용 중인 아이디입니다.",
-  ALREADY_IN_WORKSPACE: "이미 워크스페이스에 소속되어 있습니다.",
-  WORKSPACE_MEMBER_LIMIT_REACHED:
-    "현재 워크스페이스에 참여할 수 없어요. 관리자에게 문의하세요.",
-  STANDARD_PLAN_REQUIRED: "이 기능은 STANDARD 플랜에서 사용할 수 있습니다.",
-  WORKSPACE_TAG_ALREADY_EXISTS: "같은 이름의 태그가 이미 존재합니다.",
-  ADMIN_TRANSFER_REQUIRED:
-    "관리자는 권한 이전 또는 워크스페이스 삭제 후에만 탈퇴할 수 있습니다.",
-  CANNOT_REMOVE_LAST_ADMIN: "마지막 관리자는 퇴출할 수 없습니다.",
-  ACTIVE_SCOREBOARD_EXISTS: "이미 활성화된 점수판이 있습니다.",
-  SCOREBOARD_ALREADY_ACTIVE: "이미 활성화된 점수판입니다.",
-  SCOREBOARD_ARCHIVED: "보관된 점수판은 수정할 수 없습니다.",
-  LEAD_MEASURE_ARCHIVED: "보관된 선행지표에는 기록을 추가할 수 없습니다.",
-  FUTURE_DATE_NOT_ALLOWED: "미래 날짜에는 기록할 수 없습니다.",
-  PAST_WEEK_LOG_EDIT_NOT_ALLOWED:
-    "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
-  FREE_PLAN_HISTORY_LIMIT_REACHED:
-    "Free 플랜에서는 최근 6개월 기록까지 확인할 수 있어요. 더 이전의 기록을 보시려면 STANDARD 플랜으로 변경해주세요.",
+const ERROR_MESSAGES: Record<Locale, Record<ErrorCode, string>> = {
+  ko: ko.ApiError as Record<ErrorCode, string>,
+  en: en.ApiError as Record<ErrorCode, string>,
 };
 
 const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
@@ -103,13 +71,14 @@ const ERROR_STATUS: Partial<Record<ErrorCode, number>> = {
   INTERNAL_ERROR: 500,
 };
 
-export const apiError = (code: ErrorCode, details?: unknown) => {
+export const apiError = async (code: ErrorCode, details?: unknown) => {
+  const locale = await getLocale();
   const status = ERROR_STATUS[code] ?? 400;
   return NextResponse.json(
     {
       error: {
         code,
-        message: ERROR_MESSAGES[code],
+        message: ERROR_MESSAGES[locale][code],
         ...(details ? { details } : {}),
       },
     },

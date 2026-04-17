@@ -19,7 +19,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const parsed = signupSchema.safeParse(body);
 
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const { user, recoveryCodes, sessionId } = await service.signup(

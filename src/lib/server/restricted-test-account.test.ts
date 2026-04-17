@@ -24,7 +24,7 @@ describe("guardRestrictedTestAccountWrite", () => {
       intent: "general-write",
     });
 
-    expect(response?.status).toBe(restrictedTestAccountForbiddenResponse().status);
+    expect(response?.status).toBe((await restrictedTestAccountForbiddenResponse()).status);
     await expect(response?.json()).resolves.toMatchObject({
       error: {
         code: "TEST_ACCOUNT_WRITE_RESTRICTED",

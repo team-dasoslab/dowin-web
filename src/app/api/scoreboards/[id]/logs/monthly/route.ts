@@ -20,7 +20,7 @@ export const GET = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const routeParams = await context.params;
@@ -32,7 +32,7 @@ export const GET = withErrorHandler(
     );
 
     if (!params.success || !query.success) {
-      return apiError("VALIDATION_ERROR", {
+      return await apiError("VALIDATION_ERROR", {
         ...(params.success ? {} : params.error.flatten().fieldErrors),
         ...(query.success ? {} : query.error.flatten().fieldErrors),
       });

@@ -33,7 +33,7 @@ export const PUT = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -52,12 +52,12 @@ export const PUT = withErrorHandler(
       date: routeParams.date,
     });
     if (!params.success) {
-      return apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
     }
 
     const parsed = dailyLogUpsertSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
     const result = await createService(db).upsertLog(
@@ -80,7 +80,7 @@ export const DELETE = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -99,7 +99,7 @@ export const DELETE = withErrorHandler(
       date: routeParams.date,
     });
     if (!params.success) {
-      return apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
     }
 
     await createService(db).deleteLog(
