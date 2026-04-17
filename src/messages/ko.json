@@ -18,7 +18,9 @@
     "scoreboardArchive": "점수판 보관함",
     "manageScoreboard": "점수판 관리",
     "myProfile": "내 프로필",
-    "back": "뒤로 가기"
+    "back": "뒤로 가기",
+    "show": "보기",
+    "hide": "숨기기"
   },
   "Dashboard": {
     "teamStatus": "팀 전체 현황",

@@ -18,7 +18,9 @@
     "scoreboardArchive": "Scoreboard Archive",
     "manageScoreboard": "Manage Scoreboard",
     "myProfile": "My Profile",
-    "back": "Back"
+    "back": "Back",
+    "show": "Show",
+    "hide": "Hide"
   },
   "Dashboard": {
     "teamStatus": "Team Status",
