@@ -1,5 +1,5 @@
-import { headers } from "next/headers";
 import { detectLocale, type Locale } from "@/i18n/detect-locale";
+import { headers } from "next/headers";
 export type { Locale } from "@/i18n/detect-locale";
 
 /**

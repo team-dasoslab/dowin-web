@@ -239,6 +239,7 @@ describe("Auth Service - createUser", () => {
         nickname: "New Member",
         isFirstLogin: true,
         passwordHash: expect.any(String),
+        locale: "ko",
       }),
     );
   });
