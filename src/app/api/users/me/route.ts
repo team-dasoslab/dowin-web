@@ -7,7 +7,7 @@ import {
 } from "@/domain/profile/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { SESSION_COOKIE } from "@/lib/server/auth";
-import { getSessionWithRefresh } from "@/lib/server/auth";
+import { getSession, getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -20,7 +20,7 @@ const createService = (db: ReturnType<typeof getDb>) =>
 export const GET = withErrorHandler(async () => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
-  const session = await getSessionWithRefresh(db);
+  const session = await getSession(db);
 
   if (!session) {
     return await apiError("UNAUTHORIZED");
