@@ -6,8 +6,11 @@ import {
   profileUpdateSchema,
 } from "@/domain/profile/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { SESSION_COOKIE } from "@/lib/server/auth";
-import { getSession, getSessionWithRefresh } from "@/lib/server/auth";
+import {
+  getSession,
+  getSessionWithRefresh,
+  SESSION_COOKIE,
+} from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -27,7 +30,8 @@ export const GET = withErrorHandler(async () => {
   }
 
   const profile = await createService(db).getMyProfile(session.userId);
-  return apiSuccess(profile);
+  const response = apiSuccess(profile);
+  return response;
 });
 
 export const PUT = withErrorHandler(async (request: Request) => {
@@ -42,7 +46,10 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const parsed = profileUpdateSchema.safeParse(await request.json());
 
   if (!parsed.success) {
-    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError(
+      "VALIDATION_ERROR",
+      parsed.error.flatten().fieldErrors,
+    );
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -58,7 +65,10 @@ export const PUT = withErrorHandler(async (request: Request) => {
     return restrictedWriteResponse;
   }
 
-  const profile = await createService(db).updateProfile(session.userId, parsed.data);
+  const profile = await createService(db).updateProfile(
+    session.userId,
+    parsed.data,
+  );
 
   return apiSuccess(profile);
 });
@@ -75,7 +85,10 @@ export const DELETE = withErrorHandler(async (request: Request) => {
   const parsed = profileDeleteSchema.safeParse(await request.json());
 
   if (!parsed.success) {
-    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError(
+      "VALIDATION_ERROR",
+      parsed.error.flatten().fieldErrors,
+    );
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({

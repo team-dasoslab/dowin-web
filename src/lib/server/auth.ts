@@ -1,5 +1,4 @@
-import { cookies } from "next/headers";
-import { eq, and, gt } from "drizzle-orm";
+import { serverRuntimeConfig } from "@/config/server-runtime-config";
 import { getDb } from "@/db";
 import { sessions } from "@/db/schema";
 import {
@@ -7,23 +6,28 @@ import {
   SESSION_TTL_MS,
   SESSION_TTL_SECONDS,
 } from "@/domain/auth/constants";
-import { serverRuntimeConfig } from "@/config/server-runtime-config";
+import { and, eq, gt } from "drizzle-orm";
+import { cookies } from "next/headers";
 
 export const SESSION_COOKIE = "wig_sid";
 export const SESSION_COOKIE_SECURE = !serverRuntimeConfig.isDevelopment;
 type Db = ReturnType<typeof getDb>;
-type Session = typeof sessions.$inferSelect;
+type AuthSession = Pick<
+  typeof sessions.$inferSelect,
+  "id" | "userId" | "expiresAt"
+>;
 type CookieStore = Awaited<ReturnType<typeof cookies>>;
 
-export const getSession = async (db: Db): Promise<Session | null> => {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
+export const getSession = async (db: Db): Promise<AuthSession | null> => {
+  const sessionId = await getSessionIdFromCookies();
   if (!sessionId) return null;
 
   return findValidSession(db, sessionId);
 };
 
-export const getSessionWithRefresh = async (db: Db): Promise<Session | null> => {
+export const getSessionWithRefresh = async (
+  db: Db,
+): Promise<AuthSession | null> => {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
   if (!sessionId) return null;
@@ -51,19 +55,21 @@ const shouldReissueSession = (expiresAt: Date): boolean => {
 const findValidSession = async (
   db: Db,
   sessionId: string,
-): Promise<Session | null> =>
+): Promise<AuthSession | null> =>
   (await db.query.sessions.findFirst({
-    where: and(
-      eq(sessions.id, sessionId),
-      gt(sessions.expiresAt, new Date()),
-    ),
+    columns: {
+      id: true,
+      userId: true,
+      expiresAt: true,
+    },
+    where: and(eq(sessions.id, sessionId), gt(sessions.expiresAt, new Date())),
   })) ?? null;
 
 const reissueSession = async (
   db: Db,
   cookieStore: CookieStore,
-  session: Session,
-): Promise<Session> => {
+  session: AuthSession,
+): Promise<AuthSession> => {
   const nextExpiresAt = new Date(Date.now() + SESSION_TTL_MS);
 
   await db
@@ -86,3 +92,8 @@ const reissueSession = async (
     expiresAt: nextExpiresAt,
   };
 };
+
+async function getSessionIdFromCookies() {
+  const cookieStore = await cookies();
+  return cookieStore.get(SESSION_COOKIE)?.value;
+}
