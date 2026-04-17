@@ -483,6 +483,51 @@
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
     "FREE_PLAN_HISTORY_LIMIT_REACHED": "Free plan users can view up to 6 months of history. Upgrade to STANDARD to view older data."
   },
+  "Auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "id": "ID",
+    "nickname": "Nickname",
+    "password": "Password",
+    "subtitle": "Focus on what matters most.",
+    "forgotPassword": "Forgot your ID or Password?",
+    "continue": "Continue",
+    "recovery": {
+      "title": "Save your recovery codes",
+      "description": "Needed for account recovery if lost. This is the only time you can see them.",
+      "copy": "Copy codes",
+      "copied": "Copied",
+      "saveTxt": "Save .txt",
+      "failedToCopy": "Failed to copy recovery codes. Please save them manually.",
+      "txtHeader": "WIG Recovery Codes",
+      "txtDescription": "The codes below are used for account recovery. Keep them in a safe place."
+    },
+    "errors": {
+      "invalidId": "ID must be 3-20 characters long (alphabets/numbers).",
+      "nicknameRequired": "Please enter a nickname.",
+      "nicknameTooLong": "Nickname must be 50 characters or less.",
+      "invalidPassword": "Password must be 8+ characters (mix of letters/numbers/special chars).",
+      "checkInputs": "Please check your inputs.",
+      "signupFailed": "Failed to sign up.",
+      "loginFailed": "Invalid ID or password."
+    },
+    "recoveryPage": {
+      "title": "Account Recovery",
+      "description": "Find your account with a recovery code and reset your password.",
+      "codeLabel": "Recovery Code",
+      "codeHint": "Case, hyphens, and spaces are handled automatically.",
+      "accountFound": "Account Found",
+      "newPassword": "New Password",
+      "resetSuccess": "Password reset successful. Please proceed to login.",
+      "findButton": "Find Account",
+      "resetButton": "Reset Password",
+      "backToLogin": "Back to Login",
+      "errors": {
+        "checkCode": "Please check your recovery code.",
+        "resetFailed": "Failed to reset password."
+      }
+    }
+  },
   "Landing": {
     "Navigation": {
       "login": "Log in",

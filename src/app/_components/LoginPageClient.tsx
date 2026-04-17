@@ -13,6 +13,7 @@ import { Check, Copy, LogIn, UserPlus, Zap } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 
@@ -35,6 +36,7 @@ const signupFormSchema = z.object({
 });
 
 export default function LoginPageClient() {
+  const t = useTranslations("Auth");
   const [mode, setMode] = useState<AuthMode>("login");
   const [id, setId] = useState("");
   const [nickname, setNickname] = useState("");
@@ -87,7 +89,7 @@ export default function LoginPageClient() {
       await navigator.clipboard.writeText(recoveryCodes.join(", "));
       setIsCopied(true);
     } catch {
-      setError("복원코드 복사에 실패했습니다. 수동으로 저장해주세요.");
+      setError(t("recovery.failedToCopy"));
     }
   };
 
@@ -97,9 +99,9 @@ export default function LoginPageClient() {
     }
 
     const content = [
-      "WIG 복원코드",
+      t("recovery.txtHeader"),
       "",
-      "아래 코드는 계정 복구에 사용됩니다. 안전한 곳에 보관하세요.",
+      t("recovery.txtDescription"),
       "",
       recoveryCodes.join(", "),
       "",
@@ -125,10 +127,16 @@ export default function LoginPageClient() {
       });
 
       if (!parsed.success) {
-        const firstError = Object.values(parsed.error.flatten().fieldErrors)
-          .flat()
-          .find((message) => typeof message === "string");
-        setError(firstError ?? "입력값을 확인해주세요.");
+        const fieldErrors = parsed.error.flatten().fieldErrors;
+        if (fieldErrors.customId) {
+          setError(t("errors.invalidId"));
+        } else if (fieldErrors.nickname) {
+          setError(t("errors.nicknameRequired"));
+        } else if (fieldErrors.password) {
+          setError(t("errors.invalidPassword"));
+        } else {
+          setError(t("errors.checkInputs"));
+        }
         return;
       }
 
@@ -147,7 +155,7 @@ export default function LoginPageClient() {
           !Array.isArray(response.data.recoveryCodes) ||
           response.data.recoveryCodes.length === 0
         ) {
-          setError("회원가입에 실패했습니다.");
+          setError(t("errors.signupFailed"));
           return;
         }
 
@@ -157,7 +165,7 @@ export default function LoginPageClient() {
           signup_method: "self_signup",
         });
       } catch (signupError) {
-        setError(getApiErrorMessage(signupError, "회원가입에 실패했습니다."));
+        setError(getApiErrorMessage(signupError, t("errors.signupFailed")));
       }
 
       return;
@@ -172,7 +180,7 @@ export default function LoginPageClient() {
       });
 
       if (response.status !== 200 || !response.data.user) {
-        setError("아이디 또는 비밀번호가 올바르지 않습니다.");
+        setError(t("errors.loginFailed"));
         return;
       }
 
@@ -182,7 +190,7 @@ export default function LoginPageClient() {
       setError(
         getApiErrorMessage(
           loginError,
-          "아이디 또는 비밀번호가 올바르지 않습니다.",
+          t("errors.loginFailed"),
         ),
       );
     }
@@ -194,11 +202,10 @@ export default function LoginPageClient() {
         <Card className="w-full max-w-[520px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
           <div className="space-y-2 text-center">
             <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-              복원코드를 저장해주세요
+              {t("recovery.title")}
             </h1>
             <p className="text-sm text-text-muted">
-              분실 시 계정 복구에 필요하며, 지금 이 화면에서만 확인할 수
-              있습니다.
+              {t("recovery.description")}
             </p>
           </div>
 
@@ -232,12 +239,12 @@ export default function LoginPageClient() {
               {isCopied ? (
                 <span className="inline-flex items-center gap-2">
                   <Check className="h-4 w-4" />
-                  복사 완료
+                  {t("recovery.copied")}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
                   <Copy className="h-4 w-4" />
-                  복원코드 복사
+                  {t("recovery.copy")}
                 </span>
               )}
             </Button>
@@ -246,7 +253,7 @@ export default function LoginPageClient() {
               onClick={handleDownloadRecoveryCodes}
               className="w-full rounded-xl py-3 text-sm font-semibold border border-border bg-white text-text-primary hover:bg-sub-background"
             >
-              txt 저장
+              {t("recovery.saveTxt")}
             </Button>
             <Button
               type="button"
@@ -256,7 +263,7 @@ export default function LoginPageClient() {
               }}
               className="w-full rounded-xl py-3 text-sm font-semibold btn-linear-primary text-white"
             >
-              계속하기
+              {t("continue")}
             </Button>
           </div>
         </Card>
@@ -276,7 +283,7 @@ export default function LoginPageClient() {
               WIG
             </h1>
             <p className="text-[13px] text-text-muted">
-              가장 중요한 목표에 집중하세요.
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -292,7 +299,7 @@ export default function LoginPageClient() {
                   : "text-text-muted hover:text-text-primary"
               }`}
             >
-              로그인
+              {t("login")}
             </Button>
             <Button
               type="button"
@@ -303,14 +310,14 @@ export default function LoginPageClient() {
                   : "text-text-muted hover:text-text-primary"
               }`}
             >
-              회원가입
+              {t("signup")}
             </Button>
           </div>
 
           <div className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
-                아이디
+                {t("id")}
               </label>
               <Input
                 type="text"
@@ -325,13 +332,13 @@ export default function LoginPageClient() {
             {mode === "signup" && (
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
-                  닉네임
+                  {t("nickname")}
                 </label>
                 <Input
                   type="text"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
-                  placeholder="홍길동"
+                  placeholder={mode === "signup" ? (t("nickname") === "Nickname" ? "John Doe" : "홍길동") : ""}
                   className="w-full px-4 py-3 bg-sub-background border border-border rounded-xl text-sm focus:border-primary focus:bg-white outline-none transition-colors placeholder:text-text-muted/40 font-medium"
                   required
                 />
@@ -340,7 +347,7 @@ export default function LoginPageClient() {
 
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
-                비밀번호
+                {t("password")}
               </label>
               <PasswordInput
                 value={pw}
@@ -380,12 +387,12 @@ export default function LoginPageClient() {
                 {mode === "login" ? (
                   <>
                     <LogIn className="w-4 h-4" />
-                    <span>로그인</span>
+                    <span>{t("login")}</span>
                   </>
                 ) : (
                   <>
                     <UserPlus className="w-4 h-4" />
-                    <span>회원가입</span>
+                    <span>{t("signup")}</span>
                   </>
                 )}
               </>
@@ -398,7 +405,7 @@ export default function LoginPageClient() {
                 href="/account-recovery"
                 className="text-xs font-medium text-text-muted hover:text-text-primary underline underline-offset-2"
               >
-                아이디 혹은 비밀번호를 잃어버리셨나요?
+                {t("forgotPassword")}
               </Link>
             </div>
           )}
