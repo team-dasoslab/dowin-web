@@ -13,8 +13,11 @@ import {
   Users,
   Zap,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
+  const t = useTranslations("Landing");
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-white font-pretendard text-slate-900 selection:bg-primary/20 selection:text-slate-900">
       {/* Background Grid Pattern & Ambient Glow */}
@@ -39,13 +42,13 @@ export function RootLandingPage() {
             href="/login"
             className="hidden sm:block text-[15px] font-bold text-slate-500 transition-colors"
           >
-            로그인
+            {t("Navigation.login")}
           </Link>
           <Button
             asChild
             className="inline-flex items-center justify-center h-10 rounded-full bg-slate-900 px-6 text-[15px] font-bold text-white transition-all"
           >
-            <Link href="/login">시작하기</Link>
+            <Link href="/login">{t("Navigation.start")}</Link>
           </Button>
         </div>
       </header>
@@ -59,23 +62,16 @@ export function RootLandingPage() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
               <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
             </span>
-            성과를 만드는 팀의 실행 리듬
+            {t("Hero.badge")}
           </div>
 
           {/* Headline - Editorial Tight typography */}
-          <h1 className="font-pretendard text-[42px] leading-[1.15] font-black tracking-tight text-slate-900 md:text-[72px] md:tracking-[-0.03em] break-keep animate-fade-in-up [animation-delay:100ms]">
-            매일 바쁘게 쳐내는데,
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">
-              왜 성과는 제자리일까요?
-            </span>
+          <h1 className="font-pretendard text-[42px] leading-[1.15] font-black tracking-tight text-slate-900 md:text-[72px] md:tracking-[-0.03em] break-keep animate-fade-in-up [animation-delay:100ms] whitespace-pre-line">
+            {t("Hero.headline")}
           </h1>
 
-          <p className="max-w-[700px] text-[17px] leading-[1.6] text-slate-500 md:text-[20px] break-keep font-medium tracking-tight animate-fade-in-up [animation-delay:200ms]">
-            당장 눈앞의 불 끄느라 바빠 정작 중요한 목표를 놓치고 있는 팀을 위해.
-            <br className="hidden md:block" />
-            팀의 판도를 단번에 바꿀 &apos;단 하나의 목표&apos;에 압도적으로
-            집중하게 해드립니다.
+          <p className="max-w-[700px] text-[17px] leading-[1.6] text-slate-500 md:text-[20px] break-keep font-medium tracking-tight animate-fade-in-up [animation-delay:200ms] whitespace-pre-line">
+            {t("Hero.description")}
           </p>
 
           <div className="pt-4 flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up [animation-delay:300ms]">
@@ -83,7 +79,7 @@ export function RootLandingPage() {
               asChild
               className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white transition-all w-full sm:w-auto"
             >
-              <Link href="/login">지금 바로 시작하기</Link>
+              <Link href="/login">{t("Hero.cta")}</Link>
             </Button>
           </div>
         </div>
@@ -109,7 +105,7 @@ export function RootLandingPage() {
                 <div className="w-full h-10 rounded-xl bg-primary/10 mb-6 flex lg:px-4 items-center justify-center lg:justify-start gap-3">
                   <Zap className="w-5 h-5 text-primary" />
                   <span className="hidden lg:block font-bold text-primary text-sm">
-                    Our Workspace
+                    {t("Mockup.workspace")}
                   </span>
                 </div>
                 <div className="space-y-2">
@@ -133,11 +129,11 @@ export function RootLandingPage() {
                 <div className="flex flex-wrap gap-4">
                   <div className="w-full lg:w-1/3 bg-white border border-slate-200 rounded-[24px] p-6">
                     <p className="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-2 gap-2 flex items-center">
-                      <Target className="w-4 h-4" /> 최우선 목표
+                      <Target className="w-4 h-4" />{" "}
+                      {t("Mockup.stats.wigTitle")}
                     </p>
-                    <h3 className="text-xl font-bold text-slate-800 tracking-tight leading-snug mb-5">
-                      리텐션 40% 방어 및<br />
-                      신규 파이프라인 구축
+                    <h3 className="text-xl font-bold text-slate-800 tracking-tight leading-snug mb-5 whitespace-pre-line">
+                      {t("Mockup.stats.wigGoal")}
                     </h3>
                     <div className="flex items-end justify-between">
                       <span className="text-[32px] font-outfit font-black text-primary leading-none">
@@ -156,16 +152,17 @@ export function RootLandingPage() {
                   <div className="flex-1 bg-white border border-slate-200 rounded-[24px] p-6 min-w-[300px]">
                     <div className="flex justify-between items-center mb-6">
                       <p className="text-[13px] font-bold text-slate-400 uppercase tracking-wider gap-2 flex items-center">
-                        <Activity className="w-4 h-4" /> 선행지표: 이번 주 액션
+                        <Activity className="w-4 h-4" />{" "}
+                        {t("Mockup.stats.leadTitle")}
                       </p>
                       <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-bold">
-                        Week 4
+                        {t("Mockup.stats.week")}
                       </span>
                     </div>
                     <div className="space-y-3">
                       {[
-                        { t: "이탈 징후 고객 10명 통화", p: 4, out: 5 },
-                        { t: "온보딩 UX A/B 테스트 배포", p: 1, out: 1 },
+                        { t: t("Mockup.stats.action1"), p: 4, out: 5 },
+                        { t: t("Mockup.stats.action2"), p: 1, out: 1 },
                       ].map((item, i) => (
                         <div key={i} className="flex items-center gap-4">
                           <div className="flex-1">
@@ -195,7 +192,7 @@ export function RootLandingPage() {
                 {/* Bottom Weekly List */}
                 <div className="flex-1 bg-white border border-slate-200 rounded-[24px] p-6 overflow-hidden relative">
                   <p className="text-[14px] font-bold text-slate-800 mb-6">
-                    팀원별 투명한 성과 현황
+                    {t("Mockup.teamStatus")}
                   </p>
                   <div className="space-y-4">
                     {[1, 2, 3].map((i) => (
@@ -224,10 +221,8 @@ export function RootLandingPage() {
       {/* 2. Asymmetrical Metric Band */}
       <section className="bg-[#f8fafc] py-16 md:py-24 border-b border-slate-100">
         <div className="mx-auto max-w-[1200px] px-6 md:px-12">
-          <h2 className="text-[28px] md:text-[40px] font-black tracking-[-0.03em] text-slate-900 leading-[1.2] mb-10 text-center md:text-left break-keep">
-            진짜 일하는 방식을
-            <br />
-            숫자로 증명합니다.
+          <h2 className="text-[28px] md:text-[40px] font-black tracking-[-0.03em] text-slate-900 leading-[1.2] mb-10 text-center md:text-left break-keep whitespace-pre-line">
+            {t("MetricBand.title")}
           </h2>
 
           {/* Breaking the 3-grid: One large panel containing dynamic layout */}
@@ -238,37 +233,33 @@ export function RootLandingPage() {
             <div className="relative z-10 grid md:grid-cols-12 gap-10 md:gap-8 items-center">
               <div className="md:col-span-6 space-y-2">
                 <p className="text-[17px] font-bold text-primary mb-2">
-                  우리가 집중할 단 하나
+                  {t("MetricBand.oneTitle")}
                 </p>
                 <h3 className="text-[48px] md:text-[64px] font-outfit font-black tracking-tighter text-slate-900 leading-none">
                   ONE
                 </h3>
                 <p className="text-[16px] text-slate-500 font-medium leading-[1.6] max-w-[340px] pt-4 break-keep">
-                  이것저것 다 욕심내다가 이도 저도 안 된 경험, 꽤 익숙하시죠?
-                  자잘한 건 과감히 버려두세요. 우리 팀이 다음 단계로 도약할 수
-                  있는 단 하나의 목표에만 올인합니다.
+                  {t("MetricBand.oneDesc")}
                 </p>
               </div>
 
               <div className="md:col-span-6 flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100 transition-colors">
                   <p className="text-[36px] md:text-[42px] font-outfit font-black text-primary leading-none mb-3 tracking-tighter">
-                    80<span className="text-[20px]">%</span>
+                    {t("MetricBand.stat1Value")}
+                    <span className="text-[20px]">%</span>
                   </p>
-                  <p className="text-[14px] font-bold text-slate-600 break-keep">
-                    선행지표 액션에
-                    <br />
-                    투자하는 우리 팀의 에너지
+                  <p className="text-[14px] font-bold text-slate-600 break-keep whitespace-pre-line">
+                    {t("MetricBand.stat1Desc")}
                   </p>
                 </div>
                 <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100 transition-colors">
                   <p className="text-[36px] md:text-[42px] font-outfit font-black text-emerald-500 leading-none mb-3 tracking-tighter">
-                    10<span className="text-[20px]">m</span>
+                    {t("MetricBand.stat2Value")}
+                    <span className="text-[20px]">m</span>
                   </p>
-                  <p className="text-[14px] font-bold text-slate-600 break-keep">
-                    길어질 필요 없는
-                    <br />
-                    압도적으로 짧은 매주 점검
+                  <p className="text-[14px] font-bold text-slate-600 break-keep whitespace-pre-line">
+                    {t("MetricBand.stat2Desc")}
                   </p>
                 </div>
               </div>
@@ -281,18 +272,11 @@ export function RootLandingPage() {
       <section className="py-24 md:py-32 bg-white overflow-hidden">
         <div className="mx-auto max-w-[1200px] px-6 md:px-12">
           <div className="text-center md:text-left mb-20 max-w-[700px]">
-            <h2 className="font-pretendard text-[32px] leading-[1.2] font-black tracking-[-0.03em] text-slate-900 md:text-[48px] break-keep">
-              팀의 목표를 달성하는
-              <br />
-              가장 확실하고 주도적인 흐름
+            <h2 className="font-pretendard text-[32px] leading-[1.2] font-black tracking-[-0.03em] text-slate-900 md:text-[48px] break-keep whitespace-pre-line">
+              {t("WhyWig.header")}
             </h2>
-            <p className="text-[18px] leading-[1.6] text-slate-500 mt-5 break-keep font-medium">
-              결과 지표는 이미 일어난 과거이기에 우리가 곧바로 바꿀 수는
-              없습니다.
-              <br className="hidden lg:block" />
-              하지만 결과를 만들어낼 <strong>&apos;오늘의 행동&apos;</strong>은
-              우리 스스로 계획하고 100% 통제할 수 있습니다. 막연한 불안감을 넘어
-              주도적인 팀의 실행력을 갖춰보세요.
+            <p className="text-[18px] leading-[1.6] text-slate-500 mt-5 break-keep font-medium whitespace-pre-line">
+              {t("WhyWig.description")}
             </p>
           </div>
 
@@ -303,17 +287,13 @@ export function RootLandingPage() {
                 <div
                   className={`inline-flex h-10 items-center px-4 rounded-[12px] bg-blue-50 text-blue-600 font-bold text-[13px]`}
                 >
-                  가장 중요한 단 하나
+                  {t("WhyWig.item1Badge")}
                 </div>
-                <h3 className="text-[28px] font-black tracking-[-0.02em] text-slate-900 leading-tight">
-                  팀의 마일스톤,
-                  <br />
-                  최우선 목표 (WIG)
+                <h3 className="text-[28px] font-black tracking-[-0.02em] text-slate-900 leading-tight whitespace-pre-line">
+                  {t("WhyWig.item1Title")}
                 </h3>
                 <p className="text-[16px] leading-[1.7] text-slate-500 font-medium break-keep">
-                  수많은 업무 사이에서 길을 잃지 않도록 지표가 되어 드릴게요. 팀
-                  전체의 판도를 바꿀 수 있는 가장 중요하고 임팩트 있는 단 하나의
-                  목표에 집중해보세요.
+                  {t("WhyWig.item1Desc")}
                 </p>
               </div>
               <div className="relative">
@@ -322,10 +302,10 @@ export function RootLandingPage() {
                   <div className="h-48 w-full bg-slate-50 rounded-[20px] border border-slate-100 flex flex-col items-center justify-center text-center px-6">
                     <Target className="w-10 h-10 text-blue-500 mb-4" />
                     <p className="text-[20px] font-bold text-slate-800">
-                      연말까지 월 매출 1억 달성
+                      {t("WhyWig.item1VisualGoal")}
                     </p>
                     <p className="text-[13px] font-bold text-slate-400 mt-2">
-                      이 목표 외의 업무는 후순위로 미뤄집니다.
+                      {t("WhyWig.item1VisualDesc")}
                     </p>
                   </div>
                 </div>
@@ -340,14 +320,14 @@ export function RootLandingPage() {
                   <div className="h-40 w-full bg-slate-50 rounded-[16px] border border-slate-100 p-6 flex flex-col justify-center">
                     <p className="font-bold text-slate-600 mb-4 flex items-center gap-2 text-[14px]">
                       <Activity className="w-5 h-5 text-emerald-500" />
-                      오늘 수행할 핵심 선행지표
+                      {t("WhyWig.item2VisualTitle")}
                     </p>
                     <div className="bg-white rounded-xl h-14 border border-slate-200 flex items-center px-4 gap-4">
                       <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
                         <Check className="w-4 h-4" />
                       </div>
                       <p className="font-bold text-slate-800 text-[14px]">
-                        고가치 고객 5명 심층 인터뷰
+                        {t("WhyWig.item2VisualAction")}
                       </p>
                     </div>
                   </div>
@@ -357,17 +337,13 @@ export function RootLandingPage() {
                 <div
                   className={`inline-flex h-10 items-center px-4 rounded-[12px] bg-emerald-50 text-emerald-600 font-bold text-[13px]`}
                 >
-                  유일하게 통제 가능한 행동
+                  {t("WhyWig.item2Badge")}
                 </div>
-                <h3 className="text-[28px] font-black tracking-[-0.02em] text-slate-900 leading-tight">
-                  행동을 바꾸는
-                  <br />
-                  선행지표
+                <h3 className="text-[28px] font-black tracking-[-0.02em] text-slate-900 leading-tight whitespace-pre-line">
+                  {t("WhyWig.item2Title")}
                 </h3>
                 <p className="text-[16px] leading-[1.7] text-slate-500 font-medium break-keep">
-                  이미 다 끝나버린 결과 지표만 노려본다고 숫자가 바뀔 리 없죠.
-                  결과가 아니라, 확고하게 지표를 견인할 수 있는 구체적인
-                  &apos;행동&apos;을 매일매일 쌓아 올리는 데 집착하세요.
+                  {t("WhyWig.item2Desc")}
                 </p>
               </div>
             </div>
@@ -385,14 +361,11 @@ export function RootLandingPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(79,70,229,0.2),transparent_60%)] pointer-events-none" />
 
         <div className="mx-auto max-w-[1200px] px-6 text-center md:px-12 mb-20 md:mb-24 relative z-10">
-          <h2 className="font-pretendard text-[36px] leading-[1.2] font-black tracking-[-0.03em] md:text-[48px] mb-5 break-keep">
-            복잡함을 걷어낸
-            <br />단 3단계의 실행 흐름.
+          <h2 className="font-pretendard text-[36px] leading-[1.2] font-black tracking-[-0.03em] md:text-[48px] mb-5 break-keep whitespace-pre-line">
+            {t("ExecutionLoop.title")}
           </h2>
-          <p className="text-[17px] text-slate-400 leading-[1.7] max-w-[600px] mx-auto break-keep font-medium">
-            입력이 부담스러운 복잡한 템플릿 대신,
-            <br /> 팀원 모두가 편안하고 투명하게 바라볼 수 있는 가장 직관적인
-            흐름을 제안합니다.
+          <p className="text-[17px] text-slate-400 leading-[1.7] max-w-[600px] mx-auto break-keep font-medium whitespace-pre-line">
+            {t("ExecutionLoop.description")}
           </p>
         </div>
 
@@ -409,11 +382,10 @@ export function RootLandingPage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-[24px] md:text-[32px] font-black tracking-tight text-white mb-3 break-keep">
-                  단 하나의 목표 정조준
+                  {t("ExecutionLoop.step1Title")}
                 </h3>
                 <p className="text-[16px] text-slate-300 leading-[1.7] break-keep font-medium">
-                  이번 주 우리가 달성해야 할 WIG를 최상단에 고정합니다. 흔들리지
-                  않고 한 곳을 바라봅니다.
+                  {t("ExecutionLoop.step1Desc")}
                 </p>
               </div>
               <div className="flex-1 w-full bg-white/5 border border-white/10 rounded-[20px] p-6 backdrop-blur-md rotate-1 transition-transform">
@@ -435,12 +407,10 @@ export function RootLandingPage() {
               </div>
               <div className="flex-1 md:order-2">
                 <h3 className="text-[24px] md:text-[32px] font-black tracking-tight text-white mb-3 break-keep">
-                  매일매일 행동 누적
+                  {t("ExecutionLoop.step2Title")}
                 </h3>
                 <p className="text-[16px] text-slate-300 leading-[1.7] break-keep font-medium">
-                  거창한 회의실 대신 눈앞의 대시보드에서 행동 지표 데일리 빙고를
-                  채워나갑니다. 도장 깨기 하듯 매일의 성취감이 쌓이며 실행의
-                  관성이 붙습니다.
+                  {t("ExecutionLoop.step2Desc")}
                 </p>
               </div>
               <div className="flex-1 w-full md:order-1 bg-white/5 border border-white/10 rounded-[20px] p-6 backdrop-blur-md -rotate-1 transition-transform text-center">
@@ -467,11 +437,10 @@ export function RootLandingPage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-[24px] md:text-[32px] font-black tracking-tight text-white mb-3 break-keep">
-                  핑계 없는 점수판, 주간 회고
+                  {t("ExecutionLoop.step3Title")}
                 </h3>
                 <p className="text-[16px] text-slate-300 leading-[1.7] break-keep font-medium">
-                  한 달을 묵묵히 기다릴 필요 없습니다. 주 단위로 달성 현황을
-                  점검하고, 막힌 부분은 빠르게 보완하며 팀의 리듬을 맞춰갑니다.
+                  {t("ExecutionLoop.step3Desc")}
                 </p>
               </div>
               <div className="flex-1 w-full bg-white/5 border border-white/10 rounded-[20px] p-6 backdrop-blur-md rotate-1 transition-transform">
@@ -491,19 +460,17 @@ export function RootLandingPage() {
       {/* 5. Features Bento Grid */}
       <section className="py-20 md:py-32 bg-slate-50">
         <div className="mx-auto max-w-[1200px] px-6 md:px-12">
-          <h3 className="text-[32px] md:text-[44px] font-black tracking-[-0.03em] text-slate-900 mb-12 text-center lg:text-left leading-tight break-keep">
-            불필요한 관리는 없애고,
-            <br className="hidden lg:block" /> 투명한 실행만 남깁니다.
+          <h3 className="text-[32px] md:text-[44px] font-black tracking-[-0.03em] text-slate-900 mb-12 text-center lg:text-left leading-tight break-keep whitespace-pre-line">
+            {t("Features.title")}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5 auto-rows-[220px]">
             <div className="md:col-span-8 bg-white rounded-[24px] border border-slate-200 p-8 transition-all overflow-hidden relative">
               <div className="relative z-10 max-w-[300px]">
                 <h4 className="text-[20px] font-black text-slate-900 mb-3 tracking-tight">
-                  팀 전체의 점수판
+                  {t("Features.item1Title")}
                 </h4>
                 <p className="text-[15px] text-slate-500 leading-relaxed break-keep font-medium">
-                  워크스페이스 투명하게 공유되어 우리가 지고 있는지 이기고
-                  있는지 시각적으로 확인합니다.
+                  {t("Features.item1Desc")}
                 </p>
               </div>
               <div className="absolute right-0 bottom-0 top-0 w-[50%] bg-gradient-to-l from-primary/5 to-transparent flex items-center justify-end pr-8">
@@ -514,20 +481,21 @@ export function RootLandingPage() {
             <div className="md:col-span-4 bg-primary rounded-[24px] p-8 text-white relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl transition-transform" />
               <LayoutDashboard className="w-8 h-8 mb-6" />
-              <h4 className="text-[20px] font-black mb-2">개인 대시보드</h4>
+              <h4 className="text-[20px] font-black mb-2">
+                {t("Features.item2Title")}
+              </h4>
               <p className="text-[14px] opacity-80 leading-relaxed font-medium break-keep">
-                매일 출근 직후 접속해 내 행동의 흐름만을 가볍게 기록합니다.
+                {t("Features.item2Desc")}
               </p>
             </div>
 
             <div className="md:col-span-5 bg-white rounded-[24px] border border-slate-200 p-8 transition-all overflow-hidden relative">
               <CalendarDays className="w-8 h-8 text-slate-300 transition-colors mb-6" />
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
-                정기 주간 회고
+                {t("Features.item3Title")}
               </h4>
               <p className="text-[15px] text-slate-500 leading-relaxed font-medium break-keep">
-                매주 잘한 점과 막힌 점을 회고하며 불필요한 미팅 시간을
-                극단적으로 줄입니다.
+                {t("Features.item3Desc")}
               </p>
             </div>
 
@@ -536,42 +504,33 @@ export function RootLandingPage() {
                 <Target className="w-16 h-16 text-slate-100 transition-all" />
               </div>
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
-                선행지표 쌓아가기
+                {t("Features.item4Title")}
               </h4>
               <p className="text-[15px] text-slate-500 leading-relaxed font-medium max-w-[300px] break-keep">
-                쳐다보기 싫은 딱딱한 테이블 뷰는 버리세요. 빙고판을 채우듯
-                재미있게 오늘의 남은 액션을 클리어하세요.
+                {t("Features.item4Desc")}
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FIXME */}
-      {/* <LandingPricingSection /> */}
-
       {/* 7. Footer CTA */}
       <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
         <div className="flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-primary to-primary-light mb-10 transition-transform">
           <Zap className="h-8 w-8 text-white fill-white" />
         </div>
-        <h2 className="font-pretendard text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep">
-          진짜 실행의 흐름,
-          <br />
-          지금 바로 시작해볼까요?
+        <h2 className="font-pretendard text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
+          {t("Footer.headline")}
         </h2>
-        <p className="text-[18px] text-slate-500 mb-10 max-w-[600px] leading-[1.6] break-keep font-medium">
-          초기 세팅에 들어가는 고민과 시간은 덜어냈습니다.{" "}
-          <br className="hidden sm:block" />
-          이제 팀원들과 함께 즐겁게 목표를 향해 달려보세요.
+        <p className="text-[18px] text-slate-500 mb-10 max-w-[600px] leading-[1.6] break-keep font-medium whitespace-pre-line">
+          {t("Footer.description")}
         </p>
         <Button
           asChild
           className="inline-flex h-[60px] items-center justify-center rounded-2xl bg-slate-900 px-10 text-[18px] font-bold text-white transition-all"
         >
           <Link href="/login">
-            WIG 무료로 시작하기{" "}
-            <ArrowRight className="ml-3 h-5 w-5 opacity-70" />
+            {t("Footer.cta")} <ArrowRight className="ml-3 h-5 w-5 opacity-70" />
           </Link>
         </Button>
         <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider uppercase">

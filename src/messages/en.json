@@ -484,6 +484,72 @@
     "FREE_PLAN_HISTORY_LIMIT_REACHED": "Free plan users can view up to 6 months of history. Upgrade to STANDARD to view older data."
   },
   "Landing": {
+    "Navigation": {
+      "login": "Log in",
+      "start": "Get Started"
+    },
+    "Hero": {
+      "badge": "Execution rhythm for high-performing teams",
+      "headline": "Busy with tasks,\nbut stuck on results?",
+      "description": "Stop drowning in daily fire-fighting. Focus overwhelmingly on the one wildly important goal that truly matters.",
+      "cta": "Get Started Now"
+    },
+    "Mockup": {
+      "workspace": "Our Workspace",
+      "stats": {
+        "wigTitle": "Wildly Important Goal",
+        "wigGoal": "Retain 40% of customers &\nBuild new pipeline",
+        "leadTitle": "Lead Measure: Actions this week",
+        "week": "Week 4",
+        "action1": "Call 10 customers showing churn signs",
+        "action2": "Deploy Onboarding UX A/B test"
+      },
+      "teamStatus": "Transparent team achievement status"
+    },
+    "MetricBand": {
+      "title": "Proving how we work\nthrough numbers.",
+      "oneTitle": "The only one to focus on",
+      "oneDesc": "Familiar with greedily trying everything but achieving nothing? Boldly drop the trivial. We go all-in on the single goal that can take our team to the next level.",
+      "stat1Value": "80",
+      "stat1Desc": "Team energy invested in\nlead measure actions",
+      "stat2Value": "10",
+      "stat2Desc": "Overwhelmingly short\nweekly reviews"
+    },
+    "WhyWig": {
+      "header": "The most reliable and proactive flow\nto achieve team goals",
+      "description": "Outcome metrics are already in the past; we can't change them immediately.\nBut the 'actions of today' that create those results are planned and 100% controlled by us. Move beyond vague anxiety and gain proactive execution power.",
+      "item1Badge": "The most important one",
+      "item1Title": "Team Milestone,\nWildly Important Goal (WIG)",
+      "item1Desc": "We'll be your compass so you don't get lost among countless tasks. Focus on the single most important and impactful goal that can change the game for your team.",
+      "item1VisualGoal": "Reach $100k monthly revenue by EO-year",
+      "item1VisualDesc": "Tasks other than this goal will be deprioritized.",
+      "item2Badge": "The only controllable action",
+      "item2Title": "Lead Measures\nthat change behavior",
+      "item2Desc": "Outcome metrics won't change just by staring at them. Be obsessed with daily 'actions' that firmly drive those metrics instead of just looking at results.",
+      "item2VisualTitle": "Core lead measures to perform today",
+      "item2VisualAction": "5 depth interviews with high-value customers"
+    },
+    "ExecutionLoop": {
+      "title": "The execution flow in 3 stages,\nstripped of complexity.",
+      "description": "Instead of complex templates that make input a burden,\nwe propose a most intuitive flow that all team members can look at comfortably and transparently.",
+      "step1Title": "Zero in on the one goal",
+      "step1Desc": "Fix the WIG we need to achieve this week at the very top. Look in one direction without being shaken.",
+      "step2Title": "Accumulate actions daily",
+      "step2Desc": "Instead of a formal meeting room, fill out your behavior bingo on your dashboard. Achievement builds up daily like breaking seals, creating momentum for execution.",
+      "step3Title": "The scoreboard of no excuses, weekly review",
+      "step3Desc": "No need to wait silently for a month. Review achievement status weekly, quickly supplement blocked parts, and keep the team's rhythm."
+    },
+    "Features": {
+      "title": "Eliminate unnecessary management,\nleave only transparent execution.",
+      "item1Title": "Teamwide Scoreboard",
+      "item1Desc": "Shared transparently across the workspace so you can visually see if we are winning or losing.",
+      "item2Title": "Personal Dashboard",
+      "item2Desc": "Record your flow of actions lightly right after arriving at work every day.",
+      "item3Title": "Regular Weekly Review",
+      "item3Desc": "Review what went well and what was blocked each week, drastically reducing unnecessary meeting time.",
+      "item4Title": "Building Lead Measures",
+      "item4Desc": "Ditch the stiff table views you hate to look at. Clear your remaining actions for today funly, like filling out a bingo card."
+    },
     "Pricing": {
       "header": "From light team adoption\nto enterprise-wide expansion.",
       "description": "We've completely removed the barrier to entry. Start building your core execution flow with the Free plan, and expand reasonably when your team's management needs grow.",
@@ -517,6 +583,11 @@
           ]
         }
       }
+    },
+    "Footer": {
+      "headline": "The real flow of execution,\nshall we start now?",
+      "description": "We've removed the worry and time spent on initial setup.\nNow run towards your goals happily with your team members.",
+      "cta": "Start WIG for Free"
     }
   }
 }
