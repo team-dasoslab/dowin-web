@@ -1,5 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
+import { NextResponse, type NextRequest } from "next/server";
 import { routing } from "./src/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -34,13 +34,27 @@ export function middleware(request: NextRequest) {
 
   // Identify internal locale for redirects
   const segments = pathname.split("/");
-  const locale = routing.locales.includes(segments[1] as any)
-    ? segments[1]
-    : routing.defaultLocale;
+  let locale = routing.locales.includes(segments[1] as any)
+    ? (segments[1] as string)
+    : null;
+
+  // Fallback locale detection for root or non-locale paths
+  if (!locale) {
+    const acceptLanguage = request.headers.get("accept-language");
+    locale = acceptLanguage?.toLowerCase().startsWith("en") ? "en" : "ko";
+  }
 
   if (hasSessionCookie && isPublicPath(pathname)) {
-    const target = new URL(`/${locale}${DEFAULT_AUTHENTICATED_ROUTE}`, request.url);
+    const target = new URL(
+      `/${locale}${DEFAULT_AUTHENTICATED_ROUTE}`,
+      request.url,
+    );
     return NextResponse.redirect(target);
+  }
+
+  // Handle root path redirect for public users explicitly if intlMiddleware didn't
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL(`/${locale}`, request.url));
   }
 
   if (!hasSessionCookie && !isPublicPath(pathname)) {
