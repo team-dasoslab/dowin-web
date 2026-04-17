@@ -1,5 +1,5 @@
 import { serverRuntimeConfig } from "@/config/server-runtime-config";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { SwaggerDocsClient } from "./SwaggerDocsClient";
 
