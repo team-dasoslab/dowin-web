@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "@/i18n/routing"
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 const PREVIOUS_PATH_KEY = "wig.previousPath";
