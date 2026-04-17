@@ -59,7 +59,7 @@ describe("DailyReminderPushService", () => {
         auth: "auth-1",
         title: "리마인드",
         body: "오늘의 선행지표를 기록했나요? 지금 바로 체크해보세요!",
-        url: "/dashboard/my",
+        url: "/ko/dashboard/my",
       },
       {
         endpoint: "https://push.example.com/2",
@@ -67,7 +67,7 @@ describe("DailyReminderPushService", () => {
         auth: "auth-2",
         title: "Remind",
         body: "Did you record your lead measures today? Check them now!",
-        url: "/dashboard/my",
+        url: "/en/dashboard/my",
       },
     ]);
     expect(result.summary).toMatchObject({

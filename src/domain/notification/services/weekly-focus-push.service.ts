@@ -7,18 +7,21 @@ import {
   breakWeeklyFocusTie as breakWeeklyFocusTieWithAi,
   createWeeklyFocusAiConfig,
 } from "@/domain/notification/services/weekly-focus-ai";
+import { getLocalizedDashboardPath } from "@/domain/notification/services/push-url";
 import {
   chooseWeeklyFocusCandidate,
   computeWeeklyExecutionRate,
   type WeeklyFocusCandidate,
 } from "@/domain/notification/services/weekly-focus-selector";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
+import type { Locale } from "@/i18n/detect-locale";
 
 export type WeeklyFocusPushSubscription = {
   userId: string;
   endpoint: string;
   p256dh: string;
   auth: string;
+  locale?: string | null;
 };
 
 export type WeeklyFocusPushJob = {
@@ -30,7 +33,7 @@ export type WeeklyFocusPushJob = {
   auth: string;
   title: string;
   body: string;
-  url: "/dashboard/my";
+  url: `/${Locale}/dashboard/my`;
 };
 
 export type WeeklyFocusJobsResult = {
@@ -218,7 +221,7 @@ export class WeeklyFocusPushService {
           auth: subscription.auth,
           title: PUSH_TITLE,
           body: `오늘은 ${selectedCandidate.name} 해볼까요?`,
-          url: "/dashboard/my",
+          url: getLocalizedDashboardPath(subscription.locale),
         });
         summary.totalJobs += 1;
       }

@@ -1,4 +1,5 @@
 import { getKstNowParts } from "@/domain/notification/services/notification-schedule";
+import { getLocalizedDashboardPath } from "@/domain/notification/services/push-url";
 import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 import en from "@/messages/en.json";
 import ko from "@/messages/ko.json";
@@ -17,7 +18,7 @@ export type DailyReminderPushJob = {
   auth: string;
   title: string;
   body: string;
-  url: "/dashboard/my";
+  url: `/${Locale}/dashboard/my`;
 };
 
 export class DailyReminderPushService {
@@ -110,7 +111,7 @@ export class DailyReminderPushService {
           auth: subscription.auth,
           title: t.Notification.dailyReminderTitle,
           body: t.Notification.dailyReminderBody,
-          url: "/dashboard/my",
+          url: getLocalizedDashboardPath(userLocale),
         });
       }
     }

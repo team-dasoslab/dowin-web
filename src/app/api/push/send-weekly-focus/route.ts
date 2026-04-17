@@ -1,9 +1,10 @@
 import { getDb } from "@/db";
-import { pushSubscriptions } from "@/db/schema";
+import { pushSubscriptions, users } from "@/db/schema";
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { LeadMeasureStorage } from "@/domain/lead-measure/storage/lead-measure.storage";
 import { WeeklyFocusPushService } from "@/domain/notification/services/weekly-focus-push.service";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
+import { eq } from "drizzle-orm";
 import {
   buildPushPayload,
   type PushSubscription,
@@ -33,7 +34,16 @@ export async function GET(req: NextRequest) {
   const service = new WeeklyFocusPushService(
     {
       findAllPushSubscriptions: async () =>
-        await db.select().from(pushSubscriptions),
+        await db
+          .select({
+            userId: pushSubscriptions.userId,
+            endpoint: pushSubscriptions.endpoint,
+            p256dh: pushSubscriptions.p256dh,
+            auth: pushSubscriptions.auth,
+            locale: users.locale,
+          })
+          .from(pushSubscriptions)
+          .leftJoin(users, eq(users.id, pushSubscriptions.userId)),
     },
     new ScoreboardStorage(db),
     new LeadMeasureStorage(db),
