@@ -5,6 +5,7 @@ import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseDeleteAccountActionParams = {
@@ -21,6 +22,8 @@ export const useDeleteAccountAction = ({
   const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const deleteAccountMutation = useDeleteUsersMe();
+
+  const t = useTranslations("ProfileDeleteAccount");
 
   const submit = async () => {
     const errorMessage = validate();
@@ -42,15 +45,12 @@ export const useDeleteAccountAction = ({
       window.sessionStorage.setItem(
         "wig.flash.toast",
         JSON.stringify({
-          message: "탈퇴를 완료했어요. 다음에 또 만나요.",
+          message: t("deleteSuccess"),
           type: "success",
         }),
       );
     } catch (error) {
-      showToast(
-        "error",
-        getApiErrorMessage(error, "계정 탈퇴에 실패했습니다."),
-      );
+      showToast("error", getApiErrorMessage(error, t("deleteFailed")));
       setIsSubmitting(false);
       return;
     }

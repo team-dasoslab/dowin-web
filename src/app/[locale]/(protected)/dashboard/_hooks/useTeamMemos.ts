@@ -11,6 +11,7 @@ import { DashboardTeamMemo } from "@/api/generated/wig.schemas";
 import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 type UseTeamMemosParams = {
   targetUserId: number | null;
@@ -53,6 +54,8 @@ export const useTeamMemos = ({
   enabled,
   currentUser,
 }: UseTeamMemosParams) => {
+  const t = useTranslations("Dashboard.Team");
+  const tCommon = useTranslations("Common");
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const queryKey = getGetDashboardTeamMemosQueryKey(
@@ -92,7 +95,7 @@ export const useTeamMemos = ({
       targetUserId,
       author: {
         userId: currentUser.id,
-        nickname: currentUser.nickname ?? "나",
+        nickname: currentUser.nickname ?? tCommon("me"),
         avatarKey: currentUser.avatarKey ?? null,
       },
       content,
@@ -123,7 +126,7 @@ export const useTeamMemos = ({
 
       if (response.status !== 201) {
         queryClient.setQueryData(queryKey, previous);
-        showToast("error", "메모를 등록하지 못했습니다.");
+        showToast("error", t("memoCreateFailed"));
         return false;
       }
 
@@ -146,7 +149,7 @@ export const useTeamMemos = ({
       return true;
     } catch (error) {
       queryClient.setQueryData(queryKey, previous);
-      showToast("error", getApiErrorMessage(error, "메모를 등록하지 못했습니다."));
+      showToast("error", getApiErrorMessage(error, t("memoCreateFailed")));
       return false;
     }
   };
@@ -187,7 +190,7 @@ export const useTeamMemos = ({
 
       if (response.status !== 200) {
         queryClient.setQueryData(queryKey, previous);
-        showToast("error", "메모 상태를 변경하지 못했습니다.");
+        showToast("error", t("memoStatusChangeFailed"));
         return false;
       }
 
@@ -211,7 +214,7 @@ export const useTeamMemos = ({
       queryClient.setQueryData(queryKey, previous);
       showToast(
         "error",
-        getApiErrorMessage(error, "메모 상태를 변경하지 못했습니다."),
+        getApiErrorMessage(error, t("memoStatusChangeFailed")),
       );
       return false;
     }
@@ -241,7 +244,7 @@ export const useTeamMemos = ({
 
       if (response.status !== 204) {
         queryClient.setQueryData(queryKey, previous);
-        showToast("error", "메모를 삭제하지 못했습니다.");
+        showToast("error", t("memoDeleteFailed"));
         return false;
       }
 
@@ -249,7 +252,7 @@ export const useTeamMemos = ({
       return true;
     } catch (error) {
       queryClient.setQueryData(queryKey, previous);
-      showToast("error", getApiErrorMessage(error, "메모를 삭제하지 못했습니다."));
+      showToast("error", getApiErrorMessage(error, t("memoDeleteFailed")));
       return false;
     }
   };

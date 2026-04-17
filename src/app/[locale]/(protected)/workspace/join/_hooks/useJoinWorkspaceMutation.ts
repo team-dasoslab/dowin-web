@@ -9,6 +9,7 @@ import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 type UseJoinWorkspaceMutationParams = {
   onError: (message: string) => void;
@@ -17,6 +18,7 @@ type UseJoinWorkspaceMutationParams = {
 export const useJoinWorkspaceMutation = ({
   onError,
 }: UseJoinWorkspaceMutationParams) => {
+  const t = useTranslations("Workspace.join");
   const router = useRouter();
   const queryClient = useQueryClient();
   const { showToast } = useToast();
@@ -30,14 +32,11 @@ export const useJoinWorkspaceMutation = ({
         trackEvent("workspace_joined", {
           join_method: "invite_code",
         });
-        showToast("success", "워크스페이스에 참가했습니다.");
+        showToast("success", t("joinSuccess"));
         router.push("/dashboard/my");
       },
       onError: (error) => {
-        const message = getApiErrorMessage(
-          error,
-          "워크스페이스 참가 중 오류가 발생했습니다.",
-        );
+        const message = getApiErrorMessage(error, t("joinFailed"));
         onError(message);
       },
     },

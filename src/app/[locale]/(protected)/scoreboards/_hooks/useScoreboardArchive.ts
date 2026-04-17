@@ -16,9 +16,11 @@ import {
   toNumberId,
 } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export const useScoreboardArchive = () => {
+  const t = useTranslations("Setup.Toast");
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const [pendingActionId, setPendingActionId] = useState<number | null>(null);
@@ -83,13 +85,10 @@ export const useScoreboardArchive = () => {
     try {
       await archiveMutation.mutateAsync({ id });
       await invalidateQueries();
-      showToast("success", "점수판을 보관했습니다.");
+      showToast("success", t("archiveSuccess"));
       return true;
     } catch (error) {
-      showToast(
-        "error",
-        getApiErrorMessage(error, "점수판 보관에 실패했습니다."),
-      );
+      showToast("error", getApiErrorMessage(error, t("archiveFailed")));
       return false;
     } finally {
       setPendingActionId(null);
@@ -102,13 +101,10 @@ export const useScoreboardArchive = () => {
     try {
       await reactivateMutation.mutateAsync({ id });
       await invalidateQueries();
-      showToast("success", "점수판을 다시 활성화했습니다.");
+      showToast("success", t("reactivateSuccess"));
       return true;
     } catch (error) {
-      showToast(
-        "error",
-        getApiErrorMessage(error, "점수판 활성화에 실패했습니다."),
-      );
+      showToast("error", getApiErrorMessage(error, t("reactivateFailed")));
       return false;
     } finally {
       setPendingActionId(null);

@@ -20,7 +20,8 @@
     "myProfile": "내 프로필",
     "back": "뒤로 가기",
     "show": "보기",
-    "hide": "숨기기"
+    "hide": "숨기기",
+    "copyDone": "복사 완료"
   },
   "Dashboard": {
     "teamStatus": "팀 전체 현황",
@@ -89,7 +90,25 @@
     "sat": "토",
     "sun": "일",
     "dismissUpdate": "이 업데이트 잠시 숨기기",
-    "newFeatureNotice": "새로운 기능 안내"
+    "newFeatureNotice": "새로운 기능 안내",
+    "My": {
+      "logSaveFailed": "기록 저장에 실패했습니다.",
+      "Celebration": {
+        "allSuccess": "이번주 선행지표 100% 달성!",
+        "singleSuccess": "이번주 {measureName} 100% 달성!",
+        "singleSuccessFallback": "이번주 선행지표 100% 달성!"
+      },
+      "Guide": {
+        "ariaLabel": "선행지표 가이드 보기",
+        "changeProposal": "선행지표 변경 제안",
+        "adjustProposal": "횟수 조정 제안"
+      }
+    },
+    "Team": {
+      "memoCreateFailed": "메모를 등록하지 못했습니다.",
+      "memoStatusChangeFailed": "메모 상태를 변경하지 못했습니다.",
+      "memoDeleteFailed": "메모를 삭제하지 못했습니다."
+    }
   },
   "Scoreboard": {
     "archiveTitle": "점수판 보관함",
@@ -213,7 +232,11 @@
       "archiveFailed": "점수판 보관에 실패했습니다.",
       "duplicatedTag": "같은 이름의 태그가 이미 있어요.",
       "leadMeasureCreateFailed": "선행지표 생성에 실패했습니다.",
-      "scoreboardIdNotFound": "점수판 ID를 확인할 수 없습니다."
+      "scoreboardIdNotFound": "점수판 ID를 확인할 수 없습니다.",
+      "archiveSuccess": "점수판을 보관했습니다.",
+      "archiveFailed": "점수판 보관에 실패했습니다.",
+      "reactivateSuccess": "점수판을 다시 활성화했습니다.",
+      "reactivateFailed": "점수판 활성화에 실패했습니다."
     }
   },
   "ProfilePassword": {
@@ -232,15 +255,19 @@
   },
   "ProfileDeleteAccount": {
     "header": "서비스 탈퇴",
-    "cardTitle": "서비스 탈퇴",
-    "cardDesc": "현재 비밀번호를 확인한 뒤 계정과 연결된 데이터를 삭제합니다.",
-    "warningText": "탈퇴하면 계정과 연결된 데이터는 복구할 수 없습니다. 워크스페이스의 마지막 관리자라면 탈퇴할 수 없습니다.",
+    "cardTitle": "탈퇴하기",
+    "cardDesc": "계정을 탈퇴하면 모든 데이터가 삭제되며 복구할 수 없습니다. 신중히 결정해 주세요.",
     "currentPasswordLabel": "현재 비밀번호",
-    "currentPasswordPlaceholder": "현재 비밀번호를 입력하세요",
-    "confirmationTextLabel": "확인 문구",
+    "confirmationTextLabel": "탈퇴 확인 문구",
+    "confirmationTextDescription": "아래 문구를 똑같이 입력해 주세요:",
     "confirmationTextPlaceholder": "탈퇴합니다",
-    "confirmationTextHint": "탈퇴를 진행하려면 '탈퇴합니다'를 그대로 입력하세요.",
-    "submitButton": "서비스 탈퇴",
+    "button": "계정 탈퇴",
+    "deleteSuccess": "탈퇴를 완료했어요. 다음에 또 만나요.",
+    "deleteFailed": "계정 탈퇴에 실패했습니다.",
+    "errors": {
+      "passwordRequired": "현재 비밀번호를 입력해주세요.",
+      "confirmationMismatch": "확인 문구를 정확히 입력해주세요."
+    },
     "submittingButton": "탈퇴 처리 중..."
   },
   "ProfileMembers": {
@@ -411,6 +438,19 @@
       "last": "완료",
       "next": "다음",
       "skip": "건너뛰기"
+    },
+    "Export": {
+      "invalidDate": "기간 날짜 형식을 확인해주세요.",
+      "invalidRange": "종료일은 시작일 이후여야 합니다.",
+      "rangeLimit": "조회 기간은 최대 92일까지 가능합니다.",
+      "emptyMeasures": "최소 1개 이상의 선행지표를 선택해주세요.",
+      "fetchFailed": "내보내기 데이터를 불러오지 못했습니다.",
+      "downloadStarted": "CSV 다운로드를 시작했습니다.",
+      "standardRequired": "CSV 다운로드는 STANDARD 플랜에서 사용할 수 있어요."
+    },
+    "Notification": {
+      "timeChanged": "일일 리마인드 시간이 변경되었습니다.",
+      "timeChangeFailed": "일일 리마인드 시간 변경에 실패했습니다."
     }
   },
   "ProductUpdates": {
@@ -548,7 +588,9 @@
       "placeholder": "예: TEAM-AB12-CD34",
       "button": "참가하기",
       "createButton": "새로 만들기",
-      "loading": "워크스페이스에 참가하는 중입니다."
+      "loading": "워크스페이스에 참가하는 중입니다.",
+      "joinSuccess": "워크스페이스에 참가했습니다.",
+      "joinFailed": "워크스페이스 참가 중 오류가 발생했습니다."
     }
   },
   "Landing": {
@@ -668,5 +710,24 @@
   "Notification": {
     "dailyReminderTitle": "리마인드",
     "dailyReminderBody": "오늘의 선행지표를 기록했나요? 지금 바로 체크해보세요!"
+  },
+  "PushNotification": {
+    "unsupportedIos": "iOS 16.4 이상에서만 알림을 지원합니다.",
+    "unsupportedBrowser": "이 브라우저는 알림 기능을 지원하지 않습니다. 아이폰을 사용 중이시라면 '홈 화면에 추가'를 통해 앱을 설치한 후 다시 시도해 주세요.",
+    "permissionDenied": "알림 권한이 거부되었습니다. 원활한 사용을 위해 브라우저 설정에서 알림을 허용해 주세요.",
+    "permissionBlocked": "브라우저의 알림 권한이 차단되어 있습니다. 설정에서 권한을 허용해 주세요.",
+    "vapidConfigError": "알림 서비스 설정에 문제가 발생했습니다. 관리자에게 문의해 주세요.",
+    "serviceWorkerError": "PWA 서비스 워커가 등록되지 않았습니다. 빌드 후 프리뷰(yarn preview)에서 테스트해주세요.",
+    "subscribeSuccess": "푸시 알림이 설정되었습니다.",
+    "subscribeError": "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+    "unsubscribeSuccess": "알림 설정이 해제되었습니다.",
+    "unsubscribeError": "알림 해제 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+    "buttonSubscribe": "알림 받기",
+    "buttonUnsubscribe": "알림 해제"
+  },
+  "InstallGuidePage": {
+    "copyLinkSuccess": "서비스 링크를 복사했어요.",
+    "copyLinkError": "링크 복사에 실패했어요. 다시 시도해주세요.",
+    "copyLinkButton": "서비스 링크 복사하기"
   }
 }

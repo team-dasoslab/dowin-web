@@ -8,6 +8,7 @@ import {
 import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 export const TIME_OPTIONS = Array.from({ length: 18 }, (_, index) => {
   const hour = index + 6;
@@ -15,9 +16,11 @@ export const TIME_OPTIONS = Array.from({ length: 18 }, (_, index) => {
 });
 
 export const useNotificationSettings = () => {
+  const t = useTranslations("Profile.Notification");
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const { data: dailyResponse, isLoading: isDailyLoading } = useGetPushSettings();
+  const { data: dailyResponse, isLoading: isDailyLoading } =
+    useGetPushSettings();
   const updateDailyMutation = usePutPushSettings();
 
   const dailySettings =
@@ -45,12 +48,9 @@ export const useNotificationSettings = () => {
       await queryClient.invalidateQueries({
         queryKey: getGetPushSettingsQueryKey(),
       });
-      showToast("success", "일일 리마인드 시간이 변경되었습니다.");
+      showToast("success", t("timeChanged"));
     } catch (error) {
-      showToast(
-        "error",
-        getApiErrorMessage(error, "일일 리마인드 시간 변경에 실패했습니다."),
-      );
+      showToast("error", getApiErrorMessage(error, t("timeChangeFailed")));
     }
   };
 
