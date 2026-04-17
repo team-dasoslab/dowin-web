@@ -4,6 +4,7 @@ import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { ToastProvider } from "@/context/ToastContext";
 import { usePushNotificationAnalytics } from "@/hooks/usePushNotificationAnalytics";
 import { useSerwistRegistration } from "@/hooks/useSerwistRegistration";
+import { DEFAULT_TIME_ZONE } from "@/i18n/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useEffect, useState } from "react";
 import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
@@ -40,7 +41,11 @@ export function Providers({
   );
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    <NextIntlClientProvider
+      locale={locale}
+      messages={messages}
+      timeZone={DEFAULT_TIME_ZONE}
+    >
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
           <Suspense fallback={null}>
