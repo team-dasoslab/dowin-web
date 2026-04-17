@@ -31,11 +31,10 @@ export class DailyReminderPushService {
       ...new Set(subscriptions.map((item) => Number(item.userId))),
     ].filter((userId) => Number.isInteger(userId));
 
-    // result includes { user: { locale: string } }
     const settings =
-      (await this.notificationStorage.findUserNotificationSettingsByUserIds(
+      await this.notificationStorage.findUserNotificationSettingsByUserIds(
         subscribedUserIds,
-      )) as any[];
+      );
 
     const eligibleUserIds = new Set<number>();
     const timezoneHours = new Map<string, number>();
@@ -56,7 +55,7 @@ export class DailyReminderPushService {
           const hourPart = parts.find((p) => p.type === "hour");
           currentHour = hourPart ? parseInt(hourPart.value, 10) % 24 : -1;
           timezoneHours.set(tz, currentHour);
-        } catch (e) {
+        } catch {
           // Fallback if timezone is invalid
           currentHour = getKstNowParts(now).hour;
           timezoneHours.set(tz, currentHour);
