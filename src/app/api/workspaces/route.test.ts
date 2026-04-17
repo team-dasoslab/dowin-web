@@ -8,6 +8,7 @@ vi.mock("@opennextjs/cloudflare", () => ({
 
 vi.mock("next/headers", () => ({
   cookies: vi.fn(),
+  headers: vi.fn(async () => new Map()),
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service");

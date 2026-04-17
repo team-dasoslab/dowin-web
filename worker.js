@@ -7,7 +7,7 @@ import openNextWorker, {
 
 const DAILY_REMINDER_CRON = "0 * * * *";
 
-export default {
+const worker = {
   fetch(request, env, ctx) {
     return openNextWorker.fetch(request, env, ctx);
   },
@@ -32,5 +32,7 @@ export default {
     }
   },
 };
+
+export default worker;
 
 export { BucketCachePurge, DOQueueHandler, DOShardedTagCache };

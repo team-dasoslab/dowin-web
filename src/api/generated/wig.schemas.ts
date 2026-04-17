@@ -5,10 +5,19 @@
  * WIG(가중목) 서비스 API 명세서
  * OpenAPI spec version: 0.1.0
  */
+export type UserLocale = typeof UserLocale[keyof typeof UserLocale];
+
+
+export const UserLocale = {
+  ko: 'ko',
+  en: 'en',
+} as const;
+
 export interface User {
   id?: number;
   nickname?: string;
   isFirstLogin?: boolean;
+  locale?: UserLocale;
 }
 
 export interface RecoveryAccount {
@@ -76,6 +85,14 @@ export const UserProfileRole = {
   MEMBER: 'MEMBER',
 } as const;
 
+export type UserProfileLocale = typeof UserProfileLocale[keyof typeof UserProfileLocale];
+
+
+export const UserProfileLocale = {
+  ko: 'ko',
+  en: 'en',
+} as const;
+
 export interface UserProfile {
   id?: number;
   customId?: string;
@@ -88,6 +105,7 @@ export interface UserProfile {
   workspaceId?: number | null;
   /** @nullable */
   workspaceName?: string | null;
+  locale?: UserProfileLocale;
   createdAt?: string;
 }
 
@@ -140,6 +158,14 @@ export const UserProfileUpdateRequestAvatarKey = {
   surprise2yellow: 'surprise2.yellow',
 } as const;
 
+export type UserProfileUpdateRequestLocale = typeof UserProfileUpdateRequestLocale[keyof typeof UserProfileUpdateRequestLocale];
+
+
+export const UserProfileUpdateRequestLocale = {
+  ko: 'ko',
+  en: 'en',
+} as const;
+
 export interface UserProfileUpdateRequest {
   /**
    * @minLength 2
@@ -148,6 +174,7 @@ export interface UserProfileUpdateRequest {
   nickname?: string;
   /** @nullable */
   avatarKey?: UserProfileUpdateRequestAvatarKey;
+  locale?: UserProfileUpdateRequestLocale;
 }
 
 export interface UserDeleteRequest {

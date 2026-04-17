@@ -1,5 +1,6 @@
 import { Input, type InputProps } from "@/components/ui/Input";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type PasswordInputProps = Omit<InputProps, "type"> & {
@@ -15,6 +16,7 @@ export const PasswordInput = ({
   wrapperClassName,
   ...props
 }: PasswordInputProps) => {
+  const t = useTranslations("Common");
   const [isVisible, setIsVisible] = useState(false);
 
   return (
@@ -36,7 +38,7 @@ export const PasswordInput = ({
             <Eye className="h-3.5 w-3.5" />
           )}
           <span className={toggleLabelClassName}>
-            {isVisible ? "숨기기" : "보기"}
+            {isVisible ? t("hide") : t("show")}
           </span>
         </button>
       </div>

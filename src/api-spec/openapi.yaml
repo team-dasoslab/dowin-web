@@ -1630,6 +1630,7 @@ components:
         id: { type: integer }
         nickname: { type: string }
         isFirstLogin: { type: boolean }
+        locale: { type: string, enum: [ko, en] }
 
     RecoveryAccount:
       type: object
@@ -1698,6 +1699,7 @@ components:
         workspaceName:
           type: string
           nullable: true
+        locale: { type: string, enum: [ko, en] }
         createdAt: { type: string, format: date-time }
 
     UserProfileUpdateRequest:
@@ -1752,6 +1754,9 @@ components:
             - surprise2.purple
             - surprise2.red
             - surprise2.yellow
+        locale:
+          type: string
+          enum: [ko, en]
 
     UserDeleteRequest:
       type: object

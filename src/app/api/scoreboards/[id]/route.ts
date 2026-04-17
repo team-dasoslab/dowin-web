@@ -22,7 +22,7 @@ export const PUT = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -37,14 +37,14 @@ export const PUT = withErrorHandler(
 
     const params = scoreboardIdParamSchema.safeParse(await context.params);
     if (!params.success) {
-      return apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
     }
 
     const body = await request.json();
     const parsed = scoreboardUpdateSchema.safeParse(body);
 
     if (!parsed.success) {
-      return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
     const service = new ScoreboardService(

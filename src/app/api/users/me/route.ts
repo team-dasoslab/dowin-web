@@ -23,7 +23,7 @@ export const GET = withErrorHandler(async () => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const profile = await createService(db).getMyProfile(session.userId);
@@ -36,13 +36,13 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const parsed = profileUpdateSchema.safeParse(await request.json());
 
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -69,13 +69,13 @@ export const DELETE = withErrorHandler(async (request: Request) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const parsed = profileDeleteSchema.safeParse(await request.json());
 
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({

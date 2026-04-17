@@ -13,6 +13,12 @@ type Db = ReturnType<typeof getDb>;
 export type PushSubscriptionRecord = typeof pushSubscriptions.$inferSelect;
 export type UserNotificationSettingsRecord =
   typeof userNotificationSettings.$inferSelect;
+export type UserNotificationSettingsWithLocale =
+  UserNotificationSettingsRecord & {
+    user: {
+      locale: string;
+    };
+  };
 
 export class NotificationStorage {
   constructor(private db: Db) {}
@@ -76,14 +82,21 @@ export class NotificationStorage {
 
   async findUserNotificationSettingsByUserIds(
     userIds: number[],
-  ): Promise<UserNotificationSettingsRecord[]> {
+  ): Promise<UserNotificationSettingsWithLocale[]> {
     if (userIds.length === 0) {
       return [];
     }
 
-    return await this.db.query.userNotificationSettings.findMany({
+    return (await this.db.query.userNotificationSettings.findMany({
       where: inArray(userNotificationSettings.userId, userIds),
-    });
+      with: {
+        user: {
+          columns: {
+            locale: true,
+          },
+        },
+      },
+    })) as UserNotificationSettingsWithLocale[];
   }
 
   async upsertUserNotificationSettings(input: {

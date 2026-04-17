@@ -24,7 +24,7 @@ export const GET = withErrorHandler(async () => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   return apiSuccess(await createService(db).getMySettings(session.userId));
@@ -36,12 +36,12 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const parsed = userNotificationSettingsUpdateSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -56,7 +56,7 @@ export const PUT = withErrorHandler(async (request: Request) => {
 
   const time = parseTimeString(parsed.data.dailyReminderTime);
   if (!time) {
-    return apiError("VALIDATION_ERROR", {
+    return await apiError("VALIDATION_ERROR", {
       dailyReminderTime: ["시간은 HH:mm 형식이어야 합니다."],
     });
   }

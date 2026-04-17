@@ -22,7 +22,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -41,7 +41,7 @@ export const POST = withErrorHandler(async (request: Request) => {
     !body.subscription?.keys?.p256dh ||
     !body.subscription?.keys?.auth
   ) {
-    return apiError("VALIDATION_ERROR", {
+    return await apiError("VALIDATION_ERROR", {
       subscription: ["유효한 푸시 구독 정보가 필요합니다."],
     });
   }
@@ -75,7 +75,7 @@ export const DELETE = withErrorHandler(async (request: Request) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -90,7 +90,7 @@ export const DELETE = withErrorHandler(async (request: Request) => {
 
   const body = (await request.json()) as { endpoint?: string };
   if (!body.endpoint) {
-    return apiError("VALIDATION_ERROR", {
+    return await apiError("VALIDATION_ERROR", {
       endpoint: ["삭제할 endpoint가 필요합니다."],
     });
   }

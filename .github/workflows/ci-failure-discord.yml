@@ -22,6 +22,8 @@ jobs:
           BRANCH_NAME: ${{ github.event.workflow_run.head_branch }}
           ACTOR: ${{ github.event.workflow_run.actor.login }}
           RUN_ID: ${{ github.event.workflow_run.id }}
+          COMMIT_SHA: ${{ github.event.workflow_run.head_sha }}
+          COMMIT_MESSAGE: ${{ github.event.workflow_run.head_commit.message }}
         run: |
           WEBHOOK_URL="$(printf '%s' "$DISCORD_WEBHOOK_URL" | tr -d '\r\n')"
           echo "::add-mask::$WEBHOOK_URL"
@@ -40,18 +42,55 @@ jobs:
           esac
 
           jq -n \
-            --arg repository "$REPOSITORY" \
+            --arg repo "$REPOSITORY" \
             --arg workflow "$WORKFLOW_NAME" \
             --arg branch "$BRANCH_NAME" \
             --arg actor "$ACTOR" \
+            --arg commitMsg "$COMMIT_MESSAGE" \
+            --arg commitSha "$COMMIT_SHA" \
             --arg runUrl "https://github.com/$REPOSITORY/actions/runs/$RUN_ID" \
+            --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
             '{
-              content: ("PR CI failed\n"
-                + "repo: " + $repository + "\n"
-                + "workflow: " + $workflow + "\n"
-                + "branch: " + $branch + "\n"
-                + "actor: " + $actor + "\n"
-                + "run: " + $runUrl)
+              embeds: [
+                {
+                  title: "❌ | " + $repo,
+                  description: ("PR CI workflow (" + $workflow + ") failed"),
+                  url: $runUrl,
+                  color: 15548997,
+                  fields: [
+                    {
+                      name: "상태",
+                      value: "**FAILURE**",
+                      inline: true
+                    },
+                    {
+                      name: "브랜치",
+                      value: ("`" + $branch + "`"),
+                      inline: true
+                    },
+                    {
+                      name: "작성자",
+                      value: $actor,
+                      inline: true
+                    },
+                    {
+                      name: "커밋 메시지",
+                      value: (if $commitMsg == "" or $commitMsg == null then "메시지 없음" else $commitMsg end),
+                      inline: false
+                    },
+                    {
+                      name: "커밋 SHA",
+                      value: ("`" + ($commitSha | .[0:7]) + "`"),
+                      inline: false
+                    }
+                  ],
+                  footer: {
+                    text: "GitHub Actions",
+                    icon_url: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                  },
+                  timestamp: $timestamp
+                }
+              ]
             }' \
           | curl -sS -X POST \
               -H "Content-Type: application/json" \

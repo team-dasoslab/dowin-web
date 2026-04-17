@@ -30,6 +30,7 @@ vi.mock("next/headers", () => ({
   cookies: vi.fn().mockResolvedValue({
     delete: mockCookieDelete,
   }),
+  headers: vi.fn(async () => new Map()),
 }));
 
 vi.mock("@/domain/profile/storage/profile.storage", () => ({

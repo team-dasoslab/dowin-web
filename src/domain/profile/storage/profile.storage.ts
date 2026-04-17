@@ -7,6 +7,7 @@ export type ProfileRecord = {
   customId: string;
   nickname: string;
   avatarKey: string | null;
+  locale: string;
   role: "ADMIN" | "MEMBER" | null;
   workspaceId: number | null;
   workspaceName: string | null;
@@ -16,6 +17,7 @@ export type ProfileRecord = {
 export type UpdateProfileInput = {
   nickname?: string;
   avatarKey?: string | null;
+  locale?: "ko" | "en";
 };
 
 export type ProfileDeletionContext = {
@@ -52,6 +54,7 @@ export class ProfileStorage {
       customId: user.customId,
       nickname: user.nickname,
       avatarKey: user.avatarKey,
+      locale: user.locale,
       role: membership?.role ?? null,
       workspaceId: membership?.workspaceId ?? null,
       workspaceName: membership?.workspace?.name ?? null,
@@ -85,6 +88,7 @@ export class ProfileStorage {
       customId: updated.customId,
       nickname: updated.nickname,
       avatarKey: updated.avatarKey,
+      locale: updated.locale,
       role: membership?.role ?? null,
       workspaceId: membership?.workspaceId ?? null,
       workspaceName: membership?.workspace?.name ?? null,

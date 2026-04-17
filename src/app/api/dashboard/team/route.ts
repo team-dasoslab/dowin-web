@@ -15,7 +15,7 @@ export const GET = withErrorHandler(async (request: Request) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
-    return apiError("UNAUTHORIZED");
+    return await apiError("UNAUTHORIZED");
   }
 
   const query = dashboardTeamQuerySchema.safeParse(
@@ -23,7 +23,7 @@ export const GET = withErrorHandler(async (request: Request) => {
   );
 
   if (!query.success) {
-    return apiError("VALIDATION_ERROR", query.error.flatten().fieldErrors);
+    return await apiError("VALIDATION_ERROR", query.error.flatten().fieldErrors);
   }
 
   const service = new DashboardService(

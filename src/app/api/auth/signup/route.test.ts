@@ -17,6 +17,7 @@ vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
     set: mockCookieSet,
   })),
+  headers: vi.fn(async () => new Map()),
 }));
 
 vi.mock("@/domain/auth/storage/auth.storage", () => ({
@@ -85,7 +86,7 @@ describe("POST /api/auth/signup", () => {
     );
 
     expect(response.status).toBe(201);
-    expect(mockSignup).toHaveBeenCalledWith("john123", "존", "newSecurePass1!");
+    expect(mockSignup).toHaveBeenCalledWith("john123", "존", "newSecurePass1!", "ko");
     expect(mockCookieSet).toHaveBeenCalledTimes(1);
     await expect(response.json()).resolves.toEqual({
       user: {

@@ -15,6 +15,7 @@ export const users = sqliteTable("users", {
   isFirstLogin: integer("is_first_login", { mode: "boolean" })
     .notNull()
     .default(true),
+  locale: text("locale").notNull().default("ko"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),

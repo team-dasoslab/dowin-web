@@ -25,7 +25,7 @@ export const PUT = withErrorHandler(
 
     const session = await getSessionWithRefresh(db);
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -42,7 +42,7 @@ export const PUT = withErrorHandler(
     const parsedParams = workspaceParamsSchema.safeParse(params);
 
     if (!parsedParams.success) {
-      return apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
     await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
@@ -51,7 +51,7 @@ export const PUT = withErrorHandler(
     const parsedBody = workspaceUpdateSchema.safeParse(body);
 
     if (!parsedBody.success) {
-      return apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
     }
 
     const workspace = await service.updateWorkspaceName(
@@ -75,7 +75,7 @@ export const DELETE = withErrorHandler(
 
     const session = await getSessionWithRefresh(db);
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -92,7 +92,7 @@ export const DELETE = withErrorHandler(
     const parsedParams = workspaceParamsSchema.safeParse(params);
 
     if (!parsedParams.success) {
-      return apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
     await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);

@@ -16,7 +16,7 @@ export const POST = withErrorHandler(
     const session = await getSessionWithRefresh(db);
 
     if (!session) {
-      return apiError("UNAUTHORIZED");
+      return await apiError("UNAUTHORIZED");
     }
 
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -31,7 +31,7 @@ export const POST = withErrorHandler(
 
     const params = scoreboardIdParamSchema.safeParse(await context.params);
     if (!params.success) {
-      return apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
+      return await apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
     }
 
     const service = new ScoreboardService(

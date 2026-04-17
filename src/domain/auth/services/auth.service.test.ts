@@ -1,8 +1,8 @@
+import { SESSION_TTL_MS } from "@/domain/auth/constants";
 import {
   AuthService,
   type AuthStoragePort,
 } from "@/domain/auth/services/auth.service";
-import { SESSION_TTL_MS } from "@/domain/auth/constants";
 import bcrypt from "bcryptjs";
 import {
   beforeEach,
@@ -45,6 +45,7 @@ describe("Auth Service - login", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     };
 
@@ -85,6 +86,7 @@ describe("Auth Service - login", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     };
     mockStorage.findUserByCustomId.mockResolvedValue(mockUser);
@@ -112,15 +114,21 @@ describe("Auth Service - signup", () => {
       avatarKey: null,
       passwordHash: "hashed-password",
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     });
 
-    const result = await service.signup("newuser", "New User", "newSecurePass1!");
+    const result = await service.signup(
+      "newuser",
+      "New User",
+      "newSecurePass1!",
+    );
 
     expect(result.user).toEqual({
       id: 7,
       nickname: "New User",
       isFirstLogin: true,
+      locale: "ko",
     });
     expect(result.recoveryCodes).toHaveLength(8);
     expect(result.recoveryCodes.every((code) => typeof code === "string")).toBe(
@@ -173,6 +181,7 @@ describe("Auth Service - changePassword", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: false,
+      locale: "ko",
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
 
@@ -190,6 +199,7 @@ describe("Auth Service - changePassword", () => {
       nickname: "John",
       avatarKey: null,
       isFirstLogin: false,
+      locale: "ko",
     };
     mockStorage.findUserById.mockResolvedValue(mockUser);
 
@@ -215,6 +225,7 @@ describe("Auth Service - createUser", () => {
       avatarKey: null,
       passwordHash: "hashed-password",
       isFirstLogin: true,
+      locale: "ko",
       createdAt: new Date(),
     };
     mockStorage.createUser.mockResolvedValue(mockCreatedUser);
@@ -233,6 +244,7 @@ describe("Auth Service - createUser", () => {
         nickname: "New Member",
         isFirstLogin: true,
         passwordHash: expect.any(String),
+        locale: "ko",
       }),
     );
   });
@@ -245,6 +257,7 @@ describe("Auth Service - createUser", () => {
       avatarKey: null,
       passwordHash: "hashed-password",
       isFirstLogin: false,
+      locale: "ko",
       createdAt: new Date(),
     });
 
@@ -276,6 +289,7 @@ describe("Auth Service - verifyRecoveryCode", () => {
         nickname: "존",
         avatarKey: null,
         isFirstLogin: false,
+        locale: "ko",
         createdAt: new Date(),
       },
     });
