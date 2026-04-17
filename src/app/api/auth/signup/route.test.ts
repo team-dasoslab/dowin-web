@@ -17,6 +17,7 @@ vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
     set: mockCookieSet,
   })),
+  headers: vi.fn(async () => new Map()),
 }));
 
 vi.mock("@/domain/auth/storage/auth.storage", () => ({
