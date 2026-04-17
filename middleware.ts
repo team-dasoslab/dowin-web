@@ -1,5 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
+import { detectLocale, isSupportedLocale } from "./src/i18n/detect-locale";
 import { routing } from "./src/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -34,15 +35,12 @@ export function middleware(request: NextRequest) {
 
   // Identify internal locale for redirects
   const segments = pathname.split("/");
-  let locale = (routing.locales as readonly string[]).includes(segments[1])
-    ? (segments[1] as string)
-    : null;
-
-  // Fallback locale detection for root or non-locale paths
-  if (!locale) {
-    const acceptLanguage = request.headers.get("accept-language");
-    locale = acceptLanguage?.toLowerCase().startsWith("en") ? "en" : "ko";
-  }
+  const locale = isSupportedLocale(segments[1])
+    ? segments[1]
+    : detectLocale({
+        customLocale: request.headers.get("x-wig-locale"),
+        acceptLanguage: request.headers.get("accept-language"),
+      });
 
   if (hasSessionCookie && isPublicPath(pathname)) {
     const target = new URL(
