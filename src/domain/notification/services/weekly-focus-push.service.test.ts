@@ -40,6 +40,7 @@ describe("WeeklyFocusPushService", () => {
         endpoint: "https://push.example.com/1",
         p256dh: "p256dh-1",
         auth: "auth-1",
+        locale: "ko",
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([]);
@@ -111,7 +112,7 @@ describe("WeeklyFocusPushService", () => {
         auth: "auth-1",
         title: "리마인드",
         body: "오늘은 매일 물 2L 해볼까요?",
-        url: "/dashboard/my",
+        url: "/ko/dashboard/my",
       },
     ]);
     expect(result.summary).toMatchObject({
@@ -134,6 +135,7 @@ describe("WeeklyFocusPushService", () => {
         endpoint: "https://push.example.com/1",
         p256dh: "p256dh-1",
         auth: "auth-1",
+        locale: "ko",
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -199,12 +201,14 @@ describe("WeeklyFocusPushService", () => {
         endpoint: "https://push.example.com/1",
         p256dh: "p256dh-1",
         auth: "auth-1",
+        locale: "en",
       },
       {
         userId: "1",
         endpoint: "https://push.example.com/2",
         p256dh: "p256dh-2",
         auth: "auth-2",
+        locale: "en",
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -291,6 +295,7 @@ describe("WeeklyFocusPushService", () => {
         endpoint: "https://push.example.com/1",
         p256dh: "p256dh-1",
         auth: "auth-1",
+        locale: "ko",
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -324,6 +329,7 @@ describe("WeeklyFocusPushService", () => {
         endpoint: "https://push.example.com/1",
         p256dh: "p256dh-1",
         auth: "auth-1",
+        locale: "ko",
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
