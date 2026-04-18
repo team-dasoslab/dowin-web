@@ -1,10 +1,15 @@
 "use client";
 
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
+import { markPushFollowupContext } from "@/lib/client/push-followup";
 import { useEffect } from "react";
 
 type PushNotificationClickMessage = {
-  type: "push-notification-clicked";
+  type:
+    | "push-notification-shown"
+    | "push-notification-clicked"
+    | "push-notification-opened-target";
   payload?: {
     targetPath?: string;
     pushType?: string;
@@ -21,13 +26,19 @@ const isPushNotificationClickMessage = (
 
   return (
     "type" in data &&
-    data.type === "push-notification-clicked"
+    (data.type === "push-notification-shown" ||
+      data.type === "push-notification-clicked" ||
+      data.type === "push-notification-opened-target")
   );
 };
 
 export function usePushNotificationAnalytics(enabled: boolean) {
   useEffect(() => {
-    if (!enabled || typeof window === "undefined" || !("serviceWorker" in navigator)) {
+    if (
+      !enabled ||
+      typeof window === "undefined" ||
+      !("serviceWorker" in navigator)
+    ) {
       return;
     }
 
@@ -36,11 +47,26 @@ export function usePushNotificationAnalytics(enabled: boolean) {
         return;
       }
 
-      trackEvent("push_notification_clicked", {
-        campaign_id: event.data.payload?.campaignId ?? "unknown",
+      const eventName =
+        event.data.type === "push-notification-shown"
+          ? "push_notification_shown"
+          : event.data.type === "push-notification-opened-target"
+            ? "push_notification_opened_target"
+            : "push_notification_clicked";
+
+      trackEvent(eventName, {
+        campaign_id: hashId(event.data.payload?.campaignId),
         push_type: event.data.payload?.pushType ?? "unknown",
         target_path: event.data.payload?.targetPath ?? "/dashboard/my",
       });
+
+      // 푸시 클릭 후 daily_log_checked 24시간 추적을 위해 컨텍스트 저장
+      if (event.data.type === "push-notification-opened-target") {
+        markPushFollowupContext(
+          event.data.payload?.pushType ?? "unknown",
+          event.data.payload?.campaignId ?? "unknown",
+        );
+      }
     };
 
     navigator.serviceWorker.addEventListener("message", handleMessage);

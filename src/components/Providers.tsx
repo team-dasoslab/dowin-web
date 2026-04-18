@@ -8,6 +8,7 @@ import { DEFAULT_TIME_ZONE } from "@/i18n/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, useEffect, useState } from "react";
 import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
+import { CampaignAttribution } from "@/components/CampaignAttribution";
 import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 
 export function Providers({
@@ -50,6 +51,7 @@ export function Providers({
         <ToastProvider>
           <Suspense fallback={null}>
             <NavigationHistoryTracker />
+            <CampaignAttribution />
           </Suspense>
           {children}
         </ToastProvider>

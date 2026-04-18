@@ -3,6 +3,7 @@
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useToast } from "@/context/ToastContext";
 import { getFetchErrorMessage } from "@/lib/client/frontend-api";
+import { trackEvent } from "@/lib/client/gtag";
 import { Bell, BellOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
@@ -101,13 +102,16 @@ export default function PushSubscriptionManager({
       }
 
       // Request permission
+      trackEvent("notification_permission_requested");
       const permission = await window.Notification.requestPermission();
       if (permission !== "granted") {
+        trackEvent("notification_permission_denied");
         // Rollback
         setIsSubscribed(false);
         showToast("error", t("permissionDenied"));
         return;
       }
+      trackEvent("notification_permission_granted");
 
       const vapidPublicKey = publicRuntimeConfig.nextPublicVapidPublicKey;
       if (!vapidPublicKey) {
