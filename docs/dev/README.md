@@ -56,6 +56,7 @@ WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워
    - [`docs/dev/common/2026.03.09-database-schema.md`](/docs/dev/common/2026.03.09-database-schema.md)
 6. 운영 문서
    - [`docs/dev/operations/README.md`](/docs/dev/operations/README.md)
+   - [`docs/dev/common/2026.04.19-production-deployment-flow.md`](/docs/dev/common/2026.04.19-production-deployment-flow.md)
 7. 작업 도메인 문서
 8. 마지막으로 실제 구현 파일
 
