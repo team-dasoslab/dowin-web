@@ -23,6 +23,7 @@ If documents conflict with code, verify the implementation and prefer the curren
 - For backend changes, follow `.agents/skills/wig-backend/SKILL.md`.
 - For frontend changes, follow `.agents/skills/wig-frontend/SKILL.md`.
 - For planning and documentation work, follow `.agents/skills/wig-planning/SKILL.md`.
+- For production operations, runbooks, incident response, restore/rollback guidance, or release-operability docs, follow `.agents/skills/wig-operations/SKILL.md`.
 - Reuse existing patterns before introducing new structure.
 - Use Zod for input validation.
 - Use `apiSuccess`, `apiError`, and `withErrorHandler` patterns for API work.
@@ -47,6 +48,7 @@ Available local skills:
 - `wig-backend`
 - `wig-frontend`
 - `wig-planning`
+- `wig-operations`
 - `wig-quality-check`
 - `wig-performance-check`
 - `wig-security-check`
@@ -59,6 +61,7 @@ Skill file locations:
 - `.agents/skills/wig-backend/SKILL.md`
 - `.agents/skills/wig-frontend/SKILL.md`
 - `.agents/skills/wig-planning/SKILL.md`
+- `.agents/skills/wig-operations/SKILL.md`
 - `.agents/skills/wig-quality-check/SKILL.md`
 - `.agents/skills/wig-performance-check/SKILL.md`
 - `.agents/skills/wig-security-check/SKILL.md`
@@ -89,6 +92,10 @@ Trigger examples:
   - "새 기능 기획안 문서 만들어줘"
   - "온보딩 문서 최신 상태로 정리해줘"
   - "MVP와 Post-MVP 범위 다시 나눠줘"
+- `wig-operations`
+  - "운영 장애 대응 문서 만들어줘"
+  - "DB 복구 런북 정리해줘"
+  - "배포 롤백이나 Cloudflare 장애 대응 절차 문서화해줘"
 - `wig-quality-check`
   - "이번 변경 배포 전에 품질 체크해줘"
   - "이 PR 기준으로 회귀 위험 검토해줘"
