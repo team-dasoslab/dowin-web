@@ -29,6 +29,7 @@ import {
   Key,
   Languages,
   LogOut,
+  MessageCircle,
   Smartphone,
   Sparkles,
   Ticket,
@@ -304,6 +305,15 @@ export default function ProfilePage() {
           title: t("installGuideIos"),
           description: t("installGuideIosDesc"),
           href: "/install-guide",
+        },
+        {
+          id: "contact",
+          icon: <MessageCircle className="w-3.5 h-3.5" />,
+          title: t("contactUs"),
+          description: t("contactUsDesc"),
+          onClick: () => {
+            window.open("https://tally.so/r/2ExbKb", "_blank");
+          },
         },
       ],
     },
