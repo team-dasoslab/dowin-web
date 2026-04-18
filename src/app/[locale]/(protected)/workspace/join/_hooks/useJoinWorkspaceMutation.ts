@@ -26,7 +26,7 @@ export const useJoinWorkspaceMutation = ({
 
   const { mutate: joinWorkspace, isPending } = usePostWorkspacesJoinByInvite({
     mutation: {
-      onSuccess: async (response) => {
+      onSuccess: async (_response) => {
         await queryClient.invalidateQueries({
           queryKey: getGetWorkspacesMeQueryKey(),
         });
