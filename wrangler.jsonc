@@ -42,6 +42,12 @@
       "database_id": "102e8afb-0dc8-4bcb-aec5-75a8f6c5b5fe",
       "migrations_dir": "drizzle",
     },
+    {
+      "binding": "DB_MIGRATION_CHECK",
+      "database_name": "wig-db-migration-check",
+      "database_id": "9c1342d5-14ae-4504-a562-95cd9541d4bd",
+      "migrations_dir": "drizzle",
+    },
   ],
   /**
    * Smart Placement
