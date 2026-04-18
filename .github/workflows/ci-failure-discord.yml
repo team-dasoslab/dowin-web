@@ -4,6 +4,8 @@ on:
   workflow_run:
     workflows:
       - PR CI
+      - Production DB Migration
+      - Production DB Migration Check
     types:
       - completed
 
@@ -54,7 +56,7 @@ jobs:
               embeds: [
                 {
                   title: "❌ | " + $repo,
-                  description: ("PR CI workflow (" + $workflow + ") failed"),
+                  description: ($workflow + " workflow failed"),
                   url: $runUrl,
                   color: 15548997,
                   fields: [

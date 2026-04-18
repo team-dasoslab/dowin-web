@@ -12,8 +12,9 @@
 3. [Audit Logs MVP Schema Plan](/docs/planning/2026.04.20-audit-logs-mvp-schema-plan.md)
 4. [DB Restore Runbook](/docs/dev/operations/2026.04.19-db-restore-runbook.md)
 5. [Deployment Rollback Runbook](/docs/dev/operations/2026.04.19-deployment-rollback-runbook.md)
-6. [Incident Communication Template](/docs/dev/operations/2026.04.19-incident-communication-template.md)
-7. [Partial Data Recovery Guide](/docs/dev/operations/2026.04.20-partial-data-recovery-guide.md)
+6. [Production Deployment Flow](/docs/dev/common/2026.04.19-production-deployment-flow.md)
+7. [Incident Communication Template](/docs/dev/operations/2026.04.19-incident-communication-template.md)
+8. [Partial Data Recovery Guide](/docs/dev/operations/2026.04.20-partial-data-recovery-guide.md)
 
 ## 2. 문서 역할
 
@@ -21,6 +22,8 @@
   - D1 데이터 손실 또는 심각한 데이터 손상 시 restore 판단과 실행 절차
 - [2026.04.19-deployment-rollback-runbook.md](/docs/dev/operations/2026.04.19-deployment-rollback-runbook.md)
   - 최근 배포로 서비스가 깨졌을 때 Worker rollback 판단과 실행 절차
+- [2026.04.19-production-deployment-flow.md](/docs/dev/common/2026.04.19-production-deployment-flow.md)
+  - `production` 브랜치 배포 이유, Cloudflare Git integration, GitHub Actions D1 migration 구성
 - [2026.04.19-incident-communication-template.md](/docs/dev/operations/2026.04.19-incident-communication-template.md)
   - 내부 공유, 외부 공지, 복구 공지, 사후 공유 템플릿
 - [2026.04.20-partial-data-recovery-guide.md](/docs/dev/operations/2026.04.20-partial-data-recovery-guide.md)
