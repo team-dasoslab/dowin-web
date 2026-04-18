@@ -55,7 +55,7 @@ jobs:
             '{
               embeds: [
                 {
-                  title: "❌ | " + $repo,
+                  title: ("❌ | " + $repo),
                   description: ($workflow + " workflow failed"),
                   url: $runUrl,
                   color: 15548997,
