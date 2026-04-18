@@ -110,7 +110,7 @@ export default function MyDashboardPage() {
       workspace_id_hash: hashId(workspace?.id),
     });
     lastTrackedViewRef.current = selectedView;
-  }, [activeScoreboard, isLoading, isProfileLoading, selectedView]);
+  }, [activeScoreboard, isLoading, isProfileLoading, selectedView, workspace?.id]);
 
   if (
     isLoading ||
