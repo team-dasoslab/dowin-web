@@ -30,10 +30,9 @@ export const useJoinWorkspaceMutation = ({
         await queryClient.invalidateQueries({
           queryKey: getGetWorkspacesMeQueryKey(),
         });
-        const workspaceId = response.status === 200 ? response.data.id : undefined;
         trackEvent("workspace_joined", {
           join_method: "invite_code",
-          workspace_id_hash: hashId(workspaceId),
+          workspace_id_hash: hashId(undefined),
         });
         showToast("success", t("joinSuccess"));
         router.push("/dashboard/my");
