@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { Plus, Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef } from "react";
@@ -104,10 +105,12 @@ export default function MyDashboardPage() {
 
     trackEvent("dashboard_my_viewed", {
       has_active_scoreboard: Boolean(activeScoreboard),
+      scoreboard_id_hash: hashId(activeScoreboard?.id),
       view_type: selectedView,
+      workspace_id_hash: hashId(workspace?.id),
     });
     lastTrackedViewRef.current = selectedView;
-  }, [activeScoreboard, isLoading, isProfileLoading, selectedView]);
+  }, [activeScoreboard, isLoading, isProfileLoading, selectedView, workspace?.id]);
 
   if (
     isLoading ||

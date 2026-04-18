@@ -7,6 +7,7 @@ import {
 import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -25,12 +26,13 @@ export const useJoinWorkspaceMutation = ({
 
   const { mutate: joinWorkspace, isPending } = usePostWorkspacesJoinByInvite({
     mutation: {
-      onSuccess: async () => {
+      onSuccess: async (_response) => {
         await queryClient.invalidateQueries({
           queryKey: getGetWorkspacesMeQueryKey(),
         });
         trackEvent("workspace_joined", {
           join_method: "invite_code",
+          workspace_id_hash: hashId(undefined),
         });
         showToast("success", t("joinSuccess"));
         router.push("/dashboard/my");

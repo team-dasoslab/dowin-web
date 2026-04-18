@@ -20,6 +20,18 @@ type PushMessageData = {
   };
 };
 
+type PushAnalyticsMessage = {
+  type:
+    | "push-notification-shown"
+    | "push-notification-clicked"
+    | "push-notification-opened-target";
+  payload: {
+    targetPath: string;
+    pushType: string;
+    campaignId: string;
+  };
+};
+
 type PushEventLike = Event & {
   data?: {
     json(): PushMessageData;
@@ -78,22 +90,49 @@ const serwist = new Serwist({
 
 const sw = self;
 
+const broadcastAnalyticsMessage = async (message: PushAnalyticsMessage) => {
+  const clients = await sw.clients.matchAll({
+    type: "window",
+    includeUncontrolled: true,
+  });
+
+  for (const client of clients) {
+    client.postMessage?.(message);
+  }
+};
+
 // 푸시 알림 수신 이벤트
 sw.addEventListener("push", (event) => {
   if (!event.data) return;
 
   try {
     const data = event.data.json();
+    const targetPath = data.data?.url || "/";
+    const pushType = data.data?.pushType || "unknown";
+    const campaignId = data.data?.campaignId || "unknown";
     const options = {
       body: data.body,
       icon: data.icon || "/favicon-192x192.png",
       badge: "/favicon-192x192.png",
       data: {
-        url: data.data?.url || "/",
+        url: targetPath,
+        pushType,
+        campaignId,
       },
     };
 
-    event.waitUntil(sw.registration.showNotification(data.title, options));
+    event.waitUntil(
+      sw.registration.showNotification(data.title, options).then(async () => {
+        await broadcastAnalyticsMessage({
+          type: "push-notification-shown",
+          payload: {
+            targetPath,
+            pushType,
+            campaignId,
+          },
+        });
+      }),
+    );
   } catch (err) {
     console.error("Push event error:", err);
   }
@@ -103,8 +142,16 @@ sw.addEventListener("push", (event) => {
 sw.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const urlToOpen = event.notification.data.url || "/dashboard/my";
-  const analyticsMessage = {
+  const clickedMessage: PushAnalyticsMessage = {
     type: "push-notification-clicked",
+    payload: {
+      targetPath: urlToOpen,
+      pushType: event.notification.data.pushType || "unknown",
+      campaignId: event.notification.data.campaignId || "unknown",
+    },
+  };
+  const openedTargetMessage: PushAnalyticsMessage = {
+    type: "push-notification-opened-target",
     payload: {
       targetPath: urlToOpen,
       pushType: event.notification.data.pushType || "unknown",
@@ -119,14 +166,18 @@ sw.addEventListener("notificationclick", (event) => {
         for (const client of windowClients) {
           if (client.url === urlToOpen && "focus" in client) {
             return client.focus().then(() => {
-              client.postMessage?.(analyticsMessage);
+              client.postMessage?.(clickedMessage);
+              client.postMessage?.(openedTargetMessage);
             });
           }
         }
         if (sw.clients.openWindow) {
           return sw.clients.openWindow(urlToOpen).then((client) => {
             if (client && typeof client === "object" && "postMessage" in client) {
-              (client as ServiceWorkerClient).postMessage?.(analyticsMessage);
+              (client as ServiceWorkerClient).postMessage?.(clickedMessage);
+              (client as ServiceWorkerClient).postMessage?.(
+                openedTargetMessage,
+              );
             }
           });
         }

@@ -9,6 +9,7 @@ import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWor
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { Calendar, UserIcon, Users, Zap } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useEffect, useRef, useState } from "react";
@@ -50,6 +51,7 @@ export default function DashboardPage() {
 
     trackEvent("dashboard_team_viewed", {
       member_count_bucket: memberCountBucket,
+      workspace_id_hash: hashId(dashboard.workspaceId),
     });
     hasTrackedViewRef.current = true;
   }, [dashboard, hasNoWorkspace, isLoading]);

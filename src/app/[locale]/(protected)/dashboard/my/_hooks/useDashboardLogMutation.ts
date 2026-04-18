@@ -20,6 +20,8 @@ import {
 } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
+import { consumePushFollowupContext } from "@/lib/client/push-followup";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -225,7 +227,9 @@ export const useDashboardLogMutation = ({
       });
       trackEvent("daily_log_checked", {
         checked_value: "undone",
+        lead_measure_id_hash: hashId(leadMeasureId),
         log_date: date,
+        scoreboard_id_hash: hashId(scoreboardId),
         view_type: selectedView,
       });
       return;
@@ -238,9 +242,20 @@ export const useDashboardLogMutation = ({
     });
     trackEvent("daily_log_checked", {
       checked_value: "done",
+      lead_measure_id_hash: hashId(leadMeasureId),
       log_date: date,
+      scoreboard_id_hash: hashId(scoreboardId),
       view_type: selectedView,
     });
+
+    // 푸시 알림 클릭 후 24시간 내 첫 기록 전환 추적 (BigQuery 없이 GA4 Data API로 집계하기 위한 별도 이벤트)
+    const pushContext = consumePushFollowupContext();
+    if (pushContext) {
+      trackEvent("push_followup_log_checked", {
+        campaign_id: hashId(pushContext.campaignId),
+        push_type: pushContext.pushType,
+      });
+    }
   };
 
   return {
