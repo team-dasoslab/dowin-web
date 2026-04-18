@@ -43,6 +43,7 @@ import {
   toNumberId,
 } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -566,8 +567,9 @@ export const useScoreboardSetup = () => {
           throw new Error(t("scoreboardIdNotFound"));
         }
 
+        const createdMeasureIds: number[] = [];
         for (const measure of validMeasures) {
-          await createLeadMeasureMutation.mutateAsync({
+          const result = await createLeadMeasureMutation.mutateAsync({
             scoreboardId: createdScoreboardId,
             data: {
               name: measure.name,
@@ -576,12 +578,26 @@ export const useScoreboardSetup = () => {
               tagIds: measure.tags.map((tag) => tag.id),
             },
           });
+          if (result.status === 201) {
+            createdMeasureIds.push(toNumberId(result.data.id) ?? 0);
+          }
         }
 
         await invalidateScoreboardQueries(createdScoreboardId);
         trackEvent("scoreboard_created", {
           lead_measure_count: validMeasures.length,
+          scoreboard_id_hash: hashId(createdScoreboardId),
+          workspace_id_hash: hashId(workspaceId),
         });
+
+        validMeasures.forEach((measure, index) => {
+          trackEvent("lead_measure_created", {
+            lead_measure_id_hash: hashId(createdMeasureIds[index]),
+            period_type: measure.period,
+            scoreboard_id_hash: hashId(createdScoreboardId),
+          });
+        });
+
         showToast("success", t("createSuccess"));
         return true;
       }
@@ -631,6 +647,11 @@ export const useScoreboardSetup = () => {
 
           if (createdLeadMeasureId !== null) {
             nextExistingIds.add(createdLeadMeasureId);
+            trackEvent("lead_measure_created", {
+              lead_measure_id_hash: hashId(createdLeadMeasureId),
+              period_type: measure.period,
+              scoreboard_id_hash: hashId(scoreboardId),
+            });
           }
         }
 

@@ -9,6 +9,7 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { Check, Copy, LogIn, UserPlus, Zap } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "@/i18n/routing"
@@ -163,6 +164,7 @@ export default function LoginPageClient() {
         setIsCopied(false);
         trackEvent("sign_up_completed", {
           signup_method: "self_signup",
+          user_id_hash: hashId(response.data.user.id),
         });
       } catch (signupError) {
         setError(getApiErrorMessage(signupError, t("errors.signupFailed")));

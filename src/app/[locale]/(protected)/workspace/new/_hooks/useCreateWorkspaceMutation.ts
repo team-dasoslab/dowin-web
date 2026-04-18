@@ -2,6 +2,7 @@
 
 import { usePostWorkspaces } from "@/api/generated/workspace/workspace";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { useRouter } from "@/i18n/routing";
 
 type WorkspaceCreateError = {
@@ -21,8 +22,11 @@ export const useCreateWorkspaceMutation = ({
 
   const { mutate: createWorkspace, isPending } = usePostWorkspaces({
     mutation: {
-      onSuccess: () => {
-        trackEvent("workspace_created");
+      onSuccess: (response) => {
+        const workspaceId = response.status === 201 ? response.data.id : undefined;
+        trackEvent("workspace_created", {
+          workspace_id_hash: hashId(workspaceId),
+        });
         router.push("/dashboard/my");
       },
       onError: (error: WorkspaceCreateError) => {
