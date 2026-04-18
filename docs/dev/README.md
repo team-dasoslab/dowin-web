@@ -40,6 +40,7 @@ WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워
 3. 백엔드 첫 진입 시: [`docs/dev/backend/2026.03.18-backend-onboarding.md`](/docs/dev/backend/2026.03.18-backend-onboarding.md)
 4. 작업 유형별 스킬
    - 문서/기획: [`.agents/skills/wig-planning/SKILL.md`](/.agents/skills/wig-planning/SKILL.md)
+   - 운영/장애 대응: [`.agents/skills/wig-operations/SKILL.md`](/.agents/skills/wig-operations/SKILL.md)
    - 프론트: [`.agents/skills/wig-frontend/SKILL.md`](/.agents/skills/wig-frontend/SKILL.md)
    - 백엔드: [`.agents/skills/wig-backend/SKILL.md`](/.agents/skills/wig-backend/SKILL.md)
    - 품질 점검: [`.agents/skills/wig-quality-check/SKILL.md`](/.agents/skills/wig-quality-check/SKILL.md)
@@ -53,8 +54,10 @@ WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워
    - [`docs/dev/common/2026.03.14-common-utilities.md`](/docs/dev/common/2026.03.14-common-utilities.md)
    - [`docs/dev/common/2026.03.12-security.md`](/docs/dev/common/2026.03.12-security.md)
    - [`docs/dev/common/2026.03.09-database-schema.md`](/docs/dev/common/2026.03.09-database-schema.md)
-6. 작업 도메인 문서
-7. 마지막으로 실제 구현 파일
+6. 운영 문서
+   - [`docs/dev/operations/README.md`](/docs/dev/operations/README.md)
+7. 작업 도메인 문서
+8. 마지막으로 실제 구현 파일
 
 문서와 코드가 다르면 코드가 우선이다.
 
