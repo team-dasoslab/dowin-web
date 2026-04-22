@@ -4,6 +4,8 @@ import { DailyLogService } from "@/domain/daily-log/services/daily-log.service";
 describe("DailyLogService", () => {
   const oldCreatedAt = new Date("2026-02-20T00:00:00.000Z");
   const findUserWorkspace = vi.fn();
+  const countMembers = vi.fn();
+  const findPlanLimit = vi.fn();
   const findOwnedScoreboard = vi.fn();
   const findOwnedLeadMeasure = vi.fn();
   const upsertLog = vi.fn();
@@ -12,7 +14,7 @@ describe("DailyLogService", () => {
   const findLeadMeasuresByScoreboard = vi.fn();
 
   const service = new DailyLogService(
-    { findUserWorkspace },
+    { findUserWorkspace, countMembers, findPlanLimit },
     { findOwnedScoreboard },
     { findOwnedLeadMeasure, findLeadMeasuresByScoreboard },
     { upsertLog, deleteLog, findLogsForLeadMeasures },
@@ -20,6 +22,8 @@ describe("DailyLogService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    countMembers.mockResolvedValue(1);
+    findPlanLimit.mockResolvedValue({ memberLimit: 10 });
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-04-09T12:00:00+09:00"));
   });
@@ -65,6 +69,21 @@ describe("DailyLogService", () => {
       value: true,
     });
     expect(upsertLog).toHaveBeenCalledWith(10, "2026-04-09", true);
+  });
+
+  it("FREE 플랜 멤버 한도 초과 상태에서는 기록할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1, planCode: "FREE" });
+    countMembers.mockResolvedValue(11);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+
+    await expect(
+      service.upsertLog(10, 100, "2026-04-09", true),
+    ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+    expect(upsertLog).not.toHaveBeenCalled();
   });
 
   it("ARCHIVED 선행지표에는 기록할 수 없다", async () => {

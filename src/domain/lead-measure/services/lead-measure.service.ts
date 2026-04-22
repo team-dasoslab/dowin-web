@@ -1,5 +1,6 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { ScoreboardStoragePort, WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
+import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
 import {
   CreateLeadMeasureInput,
   LeadMeasureRecordWithTags,
@@ -70,6 +71,8 @@ export class LeadMeasureService {
     input: Omit<CreateLeadMeasureInput, "scoreboardId">,
   ): Promise<LeadMeasureRecordWithTags> {
     const scoreboard = await this.getOwnedScoreboard(scoreboardId, userId);
+    const workspace = await this.getWorkspace(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
       throw new ForbiddenError("SCOREBOARD_ARCHIVED");
@@ -90,6 +93,8 @@ export class LeadMeasureService {
     input: UpdateLeadMeasureInput,
   ): Promise<LeadMeasureRecordWithTags> {
     const measure = await this.getOwnedLeadMeasure(id, userId);
+    const workspace = await this.getWorkspace(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -111,11 +116,15 @@ export class LeadMeasureService {
 
   async archiveLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
     await this.getOwnedLeadMeasure(id, userId);
+    const workspace = await this.getWorkspace(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
     return await this.leadMeasureStorage.archiveLeadMeasure(id);
   }
 
   async reactivateLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
     await this.getOwnedLeadMeasure(id, userId);
+    const workspace = await this.getWorkspace(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
     return await this.leadMeasureStorage.reactivateLeadMeasure(id);
   }
 
@@ -124,6 +133,8 @@ export class LeadMeasureService {
     userId: number,
   ): Promise<{ warning: string; deleted: boolean }> {
     const measure = await this.getOwnedLeadMeasure(id, userId);
+    const workspace = await this.getWorkspace(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -154,6 +165,15 @@ export class LeadMeasureService {
     }
 
     return scoreboard;
+  }
+
+  private async getWorkspace(userId: number) {
+    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return workspace;
   }
 
   private async getOwnedLeadMeasure(

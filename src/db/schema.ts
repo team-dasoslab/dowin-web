@@ -30,6 +30,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   targetedTeamMemos: many(teamMemos, { relationName: "teamMemoTarget" }),
   resolvedTeamMemos: many(teamMemos, { relationName: "teamMemoResolver" }),
   notificationSettings: many(userNotificationSettings),
+  ownedWorkspaceBillingStates: many(workspaceBillingState, {
+    relationName: "workspaceBillingOwner",
+  }),
+  requestedBillingCheckoutEvents: many(billingCheckoutEvents),
 }));
 
 export const authRecoveryCodes = sqliteTable("auth_recovery_codes", {
@@ -82,6 +86,11 @@ export const workspaces = sqliteTable("workspaces", {
   planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
     .notNull()
     .default("FREE"),
+  billingCustomerExternalRef: text("billing_customer_external_ref"),
+  billingOwnerUserId: integer("billing_owner_user_id").references(
+    () => users.id,
+    { onDelete: "set null" },
+  ),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
@@ -93,7 +102,189 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   tags: many(workspaceTags),
   invites: many(workspaceInvites),
   teamMemos: many(teamMemos),
+  billingEvents: many(billingEvents),
+  billingCheckoutEvents: many(billingCheckoutEvents),
+  billingStates: many(workspaceBillingState),
 }));
+
+export const billingProviderProducts = sqliteTable(
+  "billing_provider_products",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    provider: text("provider", { enum: ["POLAR"] }).notNull(),
+    environment: text("environment", {
+      enum: ["sandbox", "production"],
+    }).notNull(),
+    planCode: text("plan_code", { enum: ["STANDARD"] }).notNull(),
+    providerProductId: text("provider_product_id").notNull(),
+    isActive: integer("is_active", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("billing_provider_products_provider_env_plan_unique").on(
+      table.provider,
+      table.environment,
+      table.planCode,
+    ),
+  ],
+);
+
+export const billingPlanLimits = sqliteTable("billing_plan_limits", {
+  planCode: text("plan_code", { enum: ["FREE", "STANDARD"] }).primaryKey(),
+  memberLimit: integer("member_limit").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(strftime('%s', 'now'))`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(strftime('%s', 'now'))`),
+});
+
+export const billingEvents = sqliteTable(
+  "billing_events",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    provider: text("provider", { enum: ["POLAR"] }).notNull(),
+    providerEventId: text("provider_event_id"),
+    eventType: text("event_type").notNull(),
+    subscriptionKey: text("subscription_key"),
+    customerKey: text("customer_key"),
+    occurredAt: integer("occurred_at", { mode: "timestamp" }).notNull(),
+    recordedAt: integer("recorded_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    payloadJson: text("payload_json"),
+    status: text("status", { enum: ["ACCEPTED", "IGNORED", "FAILED"] })
+      .notNull()
+      .default("ACCEPTED"),
+    failureReason: text("failure_reason"),
+    source: text("source", {
+      enum: ["WEBHOOK", "RECONCILIATION", "MANUAL_CORRECTION"],
+    })
+      .notNull()
+      .default("WEBHOOK"),
+  },
+  (table) => [
+    uniqueIndex("billing_events_provider_event_unique").on(
+      table.provider,
+      table.providerEventId,
+    ),
+  ],
+);
+
+export const billingEventsRelations = relations(billingEvents, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [billingEvents.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const billingCheckoutEvents = sqliteTable(
+  "billing_checkout_events",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    requestedByUserId: integer("requested_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    requestId: text("request_id").notNull(),
+    targetPlanCode: text("target_plan_code", {
+      enum: ["FREE", "STANDARD"],
+    }).notNull(),
+    provider: text("provider", { enum: ["POLAR"] }).notNull(),
+    providerCheckoutId: text("provider_checkout_id"),
+    eventType: text("event_type").notNull(),
+    occurredAt: integer("occurred_at", { mode: "timestamp" }).notNull(),
+    recordedAt: integer("recorded_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    payloadJson: text("payload_json"),
+  },
+  (table) => [
+    uniqueIndex("billing_checkout_events_workspace_request_event_unique").on(
+      table.workspaceId,
+      table.requestId,
+      table.eventType,
+    ),
+  ],
+);
+
+export const billingCheckoutEventsRelations = relations(
+  billingCheckoutEvents,
+  ({ one }) => ({
+    workspace: one(workspaces, {
+      fields: [billingCheckoutEvents.workspaceId],
+      references: [workspaces.id],
+    }),
+    requestedByUser: one(users, {
+      fields: [billingCheckoutEvents.requestedByUserId],
+      references: [users.id],
+    }),
+  }),
+);
+
+export const workspaceBillingState = sqliteTable("workspace_billing_state", {
+  workspaceId: integer("workspace_id")
+    .primaryKey()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  provider: text("provider", { enum: ["POLAR"] }).notNull(),
+  billingStatus: text("billing_status", {
+    enum: ["NONE", "ACTIVE", "CANCELED", "EXPIRED", "REVOKED"],
+  })
+    .notNull()
+    .default("NONE"),
+  planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
+    .notNull()
+    .default("FREE"),
+  customerKey: text("customer_key"),
+  subscriptionKey: text("subscription_key"),
+  currentPeriodEnd: integer("current_period_end", { mode: "timestamp" }),
+  cancelAtPeriodEnd: integer("cancel_at_period_end", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  billingOwnerUserId: integer("billing_owner_user_id").references(
+    () => users.id,
+    { onDelete: "set null" },
+  ),
+  lastEventId: integer("last_event_id").references(() => billingEvents.id, {
+    onDelete: "set null",
+  }),
+  lastEventOccurredAt: integer("last_event_occurred_at", { mode: "timestamp" }),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(strftime('%s', 'now'))`),
+});
+
+export const workspaceBillingStateRelations = relations(
+  workspaceBillingState,
+  ({ one }) => ({
+    workspace: one(workspaces, {
+      fields: [workspaceBillingState.workspaceId],
+      references: [workspaces.id],
+    }),
+    billingOwnerUser: one(users, {
+      relationName: "workspaceBillingOwner",
+      fields: [workspaceBillingState.billingOwnerUserId],
+      references: [users.id],
+    }),
+    lastEvent: one(billingEvents, {
+      fields: [workspaceBillingState.lastEventId],
+      references: [billingEvents.id],
+    }),
+  }),
+);
 
 export const userNotificationSettings = sqliteTable(
   "user_notification_settings",

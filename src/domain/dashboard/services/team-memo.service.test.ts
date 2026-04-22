@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 describe("TeamMemoService", () => {
   const findUserWorkspace = vi.fn();
   const findMembership = vi.fn();
+  const countMembers = vi.fn();
+  const findPlanLimit = vi.fn();
   const listByWorkspaceAndTarget = vi.fn();
   const create = vi.fn();
   const findById = vi.fn();
@@ -11,12 +13,14 @@ describe("TeamMemoService", () => {
   const deleteById = vi.fn();
 
   const service = new TeamMemoService(
-    { findUserWorkspace, findMembership },
+    { findUserWorkspace, findMembership, countMembers, findPlanLimit },
     { listByWorkspaceAndTarget, create, findById, updateResolved, deleteById },
   );
 
   beforeEach(() => {
     vi.clearAllMocks();
+    countMembers.mockResolvedValue(1);
+    findPlanLimit.mockResolvedValue({ memberLimit: 10 });
   });
 
   it("대상 사용자 메모 목록을 반환한다", async () => {
@@ -101,6 +105,23 @@ describe("TeamMemoService", () => {
         content: "다음 액션 정리",
       }),
     );
+  });
+
+  it("FREE 플랜 멤버 한도 초과 상태에서는 메모를 생성할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({
+      id: 3,
+      name: "러닝 크루",
+      planCode: "FREE",
+    });
+    countMembers.mockResolvedValue(11);
+
+    await expect(
+      service.createTeamMemo(11, {
+        targetUserId: 12,
+        content: "다음 액션 정리",
+      }),
+    ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+    expect(create).not.toHaveBeenCalled();
   });
 
   it("작성자 또는 ADMIN은 메모 완료 상태를 변경할 수 있다", async () => {
