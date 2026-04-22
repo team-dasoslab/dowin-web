@@ -1,5 +1,6 @@
 import { getDb } from "@/db";
 import {
+  billingPlanLimits,
   users,
   workspaceInvites,
   workspaceMembers,
@@ -125,6 +126,14 @@ export class WorkspaceStorage {
       .where(eq(workspaceMembers.workspaceId, workspaceId));
 
     return Number(result?.count ?? 0);
+  }
+
+  async findPlanLimit(planCode: "FREE" | "STANDARD") {
+    return (
+      (await this.db.query.billingPlanLimits.findFirst({
+        where: eq(billingPlanLimits.planCode, planCode),
+      })) ?? null
+    );
   }
 
   async removeMemberById(

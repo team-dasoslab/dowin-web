@@ -193,7 +193,65 @@ export interface Workspace {
   id?: number;
   name?: string;
   planCode?: WorkspacePlanCode;
+  /** @minimum 0 */
+  memberCount?: number;
+  /** @minimum 1 */
+  freeMemberLimit?: number;
+  isOverFreeMemberLimit?: boolean;
   createdAt?: string;
+}
+
+export type BillingOverviewPlanCode = typeof BillingOverviewPlanCode[keyof typeof BillingOverviewPlanCode];
+
+
+export const BillingOverviewPlanCode = {
+  FREE: 'FREE',
+  STANDARD: 'STANDARD',
+} as const;
+
+export type BillingOverviewBillingStatus = typeof BillingOverviewBillingStatus[keyof typeof BillingOverviewBillingStatus];
+
+
+export const BillingOverviewBillingStatus = {
+  NONE: 'NONE',
+  ACTIVE: 'ACTIVE',
+  CANCELED: 'CANCELED',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type BillingOverviewProvider = typeof BillingOverviewProvider[keyof typeof BillingOverviewProvider] | null;
+
+
+export const BillingOverviewProvider = {
+  POLAR: 'POLAR',
+} as const;
+
+export interface BillingOverview {
+  workspaceId: number;
+  workspaceName: string;
+  planCode: BillingOverviewPlanCode;
+  billingStatus: BillingOverviewBillingStatus;
+  /** @nullable */
+  provider?: BillingOverviewProvider;
+  /** @nullable */
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd: boolean;
+  /** @nullable */
+  billingOwnerUserId?: number | null;
+  /** @minimum 0 */
+  recentRefundCount: number;
+  /** @minimum 0 */
+  recentRevokedCount: number;
+  requiresManualReview: boolean;
+  canManageBilling: boolean;
+}
+
+export interface BillingCheckoutResponse {
+  checkoutUrl: string;
 }
 
 export interface UserNotificationSettings {
@@ -823,6 +881,22 @@ export const GetAnalyticsExportDataView = {
   week: 'week',
   month: 'month',
 } as const;
+
+/**
+ * checkout 복귀 후 다시 진입할 앱 locale
+ */
+export type PostBillingCheckoutBodyLocale = typeof PostBillingCheckoutBodyLocale[keyof typeof PostBillingCheckoutBodyLocale];
+
+
+export const PostBillingCheckoutBodyLocale = {
+  ko: 'ko',
+  en: 'en',
+} as const;
+
+export type PostBillingCheckoutBody = {
+  /** checkout 복귀 후 다시 진입할 앱 locale */
+  locale: PostBillingCheckoutBodyLocale;
+};
 
 export type GetDashboardTeamParams = {
 weekStart?: string;

@@ -15,6 +15,11 @@ declare namespace Cloudflare {
     CRON_SECRET: string;
     GEMINI_API_KEY: string;
     NEXT_PUBLIC_GA_ID: string;
+    POLAR_ENV: string;
+    POLAR_CHECKOUT_TOKEN: string;
+    POLAR_ACCESS_TOKEN: string;
+    POLAR_WEBHOOK_SECRET: string;
+    APP_BASE_URL: string;
     WORKER_SELF_REFERENCE: Service<typeof import("./worker").default>;
   }
 }
@@ -34,6 +39,11 @@ declare namespace NodeJS {
       | "CRON_SECRET"
       | "GEMINI_API_KEY"
       | "NEXT_PUBLIC_GA_ID"
+      | "POLAR_ENV"
+      | "POLAR_CHECKOUT_TOKEN"
+      | "POLAR_ACCESS_TOKEN"
+      | "POLAR_WEBHOOK_SECRET"
+      | "APP_BASE_URL"
     >
   > {}
 }

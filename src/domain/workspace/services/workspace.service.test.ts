@@ -12,6 +12,7 @@ describe("WorkspaceService", () => {
     findMembership: vi.fn(),
     findMembers: vi.fn(),
     countMembers: vi.fn(),
+    findPlanLimit: vi.fn(),
     removeMemberById: vi.fn(),
     updateMemberRole: vi.fn(),
     transferAdmin: vi.fn(),
@@ -34,6 +35,8 @@ describe("WorkspaceService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockStorage.countMembers.mockResolvedValue(1);
+    mockStorage.findPlanLimit.mockResolvedValue({ memberLimit: 10 });
   });
 
   describe("getMyWorkspace", () => {
@@ -43,7 +46,27 @@ describe("WorkspaceService", () => {
 
       const result = await service.getMyWorkspace(123);
 
-      expect(result).toEqual(mockWorkspace);
+      expect(result).toEqual({
+        ...mockWorkspace,
+        freeMemberLimit: 10,
+        isOverFreeMemberLimit: false,
+        memberCount: 1,
+      });
+    });
+
+    it("FREE 플랜 멤버 한도 초과 상태를 함께 반환한다", async () => {
+      const mockWorkspace = { id: 1, name: "Workspace", planCode: "FREE" };
+      mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
+      mockStorage.countMembers.mockResolvedValue(11);
+
+      const result = await service.getMyWorkspace(123);
+
+      expect(result).toEqual({
+        ...mockWorkspace,
+        freeMemberLimit: 10,
+        isOverFreeMemberLimit: true,
+        memberCount: 11,
+      });
     });
 
     it("사용자가 속한 워크스페이스가 없으면 404 에러를 던진다", async () => {
@@ -243,6 +266,20 @@ describe("WorkspaceService", () => {
       );
     });
 
+    it("FREE 플랜 멤버 한도 초과 상태에서는 초대코드를 생성할 수 없다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(11);
+
+      await expect(service.createInvite(1, 1, 3)).rejects.toThrow(
+        "FREE_PLAN_MEMBER_LIMIT_EXCEEDED",
+      );
+      expect(mockStorage.createInvite).not.toHaveBeenCalled();
+    });
+
     it("비활성화된 초대코드는 참가할 수 없다", async () => {
       mockStorage.findInviteByCode.mockResolvedValue({
         id: 11,
@@ -386,6 +423,23 @@ describe("WorkspaceService", () => {
         normalizedName: "운동",
         createdByUserId: 7,
       });
+    });
+
+    it("FREE 플랜 멤버 한도 초과 상태에서는 태그를 생성할 수 없다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.countMembers.mockResolvedValue(11);
+
+      await expect(
+        service.createTag(1, 7, {
+          name: "운동",
+          normalizedName: "운동",
+        }),
+      ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+      expect(mockStorage.createTag).not.toHaveBeenCalled();
     });
 
     it("같은 이름의 태그가 이미 있으면 409 에러를 던진다", async () => {

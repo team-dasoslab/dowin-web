@@ -6,6 +6,7 @@ import {
   useGetWorkspacesMe,
 } from "@/api/generated/workspace/workspace";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { useInviteActions } from "@/app/[locale]/(protected)/profile/invites/_hooks/useInviteActions";
 import { useInviteForm } from "@/app/[locale]/(protected)/profile/invites/_hooks/useInviteForm";
 import { Badge } from "@/components/ui/Badge";
@@ -85,6 +86,7 @@ export default function ProfileInvitesPage() {
   const activeInviteCount = invites.filter(
     (invite) => invite.status === "ACTIVE",
   ).length;
+  const isOverFreeMemberLimit = Boolean(workspace?.isOverFreeMemberLimit);
 
   const handleCreateInvite = async () => {
     const maxUses = getValidatedMaxUses();
@@ -133,6 +135,14 @@ export default function ProfileInvitesPage() {
           </div>
         </Card>
 
+        {isOverFreeMemberLimit ? (
+          <WorkspaceOverLimitBanner
+            freeMemberLimit={workspace.freeMemberLimit}
+            isAdmin={isWorkspaceAdmin}
+            memberCount={workspace.memberCount}
+          />
+        ) : null}
+
         <Card className="space-y-4 rounded-lg border border-border p-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
@@ -174,9 +184,9 @@ export default function ProfileInvitesPage() {
               <Button
                 type="button"
                 onClick={() => void handleCreateInvite()}
-                disabled={isCreatingInvite}
+                disabled={isCreatingInvite || isOverFreeMemberLimit}
                 className={`h-11 rounded-lg px-4 text-xs font-bold ${
-                  isCreatingInvite
+                  isCreatingInvite || isOverFreeMemberLimit
                     ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
                     : "btn-linear-primary"
                 }`}
@@ -205,6 +215,11 @@ export default function ProfileInvitesPage() {
             {formError ? (
               <p className="text-[11px] text-danger">{formError}</p>
             ) : null}
+            {isOverFreeMemberLimit ? (
+              <p className="text-[11px] leading-relaxed text-danger">
+                {t("overLimitInviteDisabled")}
+              </p>
+            ) : null}
           </div>
         </Card>
 
@@ -229,6 +244,8 @@ export default function ProfileInvitesPage() {
                 const isPendingToggle = pendingToggleInviteId === inviteId;
                 const isCopied = copiedInviteId === inviteId;
                 const usageLabel = `${invite.usedCount ?? 0} / ${invite.maxUses ?? 0}`;
+                const isActivationBlocked =
+                  isOverFreeMemberLimit && !isActive;
 
                 return (
                   <div
@@ -273,7 +290,11 @@ export default function ProfileInvitesPage() {
 
                         <button
                           type="button"
-                          disabled={inviteId <= 0 || isPendingToggle}
+                          disabled={
+                            inviteId <= 0 ||
+                            isPendingToggle ||
+                            isActivationBlocked
+                          }
                           aria-label={isActive ? t("inactive") : t("active")}
                           onClick={() =>
                             void toggleInviteStatus(
@@ -284,6 +305,8 @@ export default function ProfileInvitesPage() {
                           className={`relative inline-flex h-[22px] w-[42px] flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out ${
                             inviteId <= 0 || isPendingToggle
                               ? "cursor-not-allowed opacity-60"
+                              : isActivationBlocked
+                                ? "cursor-not-allowed opacity-60"
                               : "cursor-pointer"
                           } ${isActive ? "bg-primary" : "bg-border"}`}
                         >
@@ -300,6 +323,11 @@ export default function ProfileInvitesPage() {
                       <span className="text-[10px] font-bold tracking-wide text-text-muted">
                         {t("usageLabel", { usage: usageLabel })}
                       </span>
+                      {isActive && isOverFreeMemberLimit ? (
+                        <span className="text-[10px] font-semibold text-danger">
+                          {t("activeInviteOverLimit")}
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                 );
