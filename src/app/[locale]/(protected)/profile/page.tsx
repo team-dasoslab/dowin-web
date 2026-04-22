@@ -4,6 +4,7 @@ import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
+import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import {
   PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
   ProfileCoachmark,
@@ -30,6 +31,7 @@ import {
   Languages,
   LogOut,
   MessageCircle,
+  CreditCard,
   Smartphone,
   Sparkles,
   Ticket,
@@ -195,6 +197,13 @@ export default function ProfilePage() {
       items: hasWorkspace
         ? isWorkspaceAdmin
           ? [
+              {
+                id: "billing",
+                icon: <CreditCard className="w-3.5 h-3.5" />,
+                title: t("billingTitle"),
+                description: t("billingDesc"),
+                href: "/profile/billing",
+              },
               {
                 id: "workspace-name",
                 icon: <Edit2 className="w-3.5 h-3.5" />,
@@ -372,6 +381,14 @@ export default function ProfilePage() {
             </p>
           </div>
         </Card>
+
+        {workspace?.isOverFreeMemberLimit ? (
+          <WorkspaceOverLimitBanner
+            freeMemberLimit={workspace.freeMemberLimit}
+            isAdmin={isWorkspaceAdmin}
+            memberCount={workspace.memberCount}
+          />
+        ) : null}
 
         {/* ── 메뉴 그룹 ── */}
         <div className="space-y-6">

@@ -4,6 +4,7 @@ import {
 } from "@/lib/server/errors";
 import { WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
 import { DailyLogRecord, DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
+import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
 import {
   LeadMeasureRecord,
   LeadMeasureRecordWithTags,
@@ -55,7 +56,11 @@ export class DailyLogService {
     value: boolean,
   ): Promise<DailyLogRecord> {
     assertPastWeekLogEditable(date);
-    const measure = await this.getOwnedLeadMeasure(leadMeasureId, userId);
+    const { measure, workspace } = await this.getOwnedLeadMeasureWithWorkspace(
+      leadMeasureId,
+      userId,
+    );
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -66,7 +71,11 @@ export class DailyLogService {
 
   async deleteLog(leadMeasureId: number, userId: number, date: string): Promise<void> {
     assertPastWeekLogEditable(date);
-    await this.getOwnedLeadMeasure(leadMeasureId, userId);
+    const { workspace } = await this.getOwnedLeadMeasureWithWorkspace(
+      leadMeasureId,
+      userId,
+    );
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
     await this.dailyLogStorage.deleteLog(leadMeasureId, date);
   }
 
@@ -285,10 +294,7 @@ export class DailyLogService {
   }
 
   private async getOwnedScoreboardWithWorkspace(scoreboardId: number, userId: number) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
+    const workspace = await this.getWorkspace(userId);
 
     const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       scoreboardId,
@@ -298,11 +304,11 @@ export class DailyLogService {
     return { scoreboard, workspace };
   }
 
-  private async getOwnedLeadMeasure(leadMeasureId: number, userId: number) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
+  private async getOwnedLeadMeasureWithWorkspace(
+    leadMeasureId: number,
+    userId: number,
+  ) {
+    const workspace = await this.getWorkspace(userId);
 
     const measure = await this.leadMeasureStorage.findOwnedLeadMeasure(
       leadMeasureId,
@@ -313,7 +319,16 @@ export class DailyLogService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return measure;
+    return { measure, workspace };
+  }
+
+  private async getWorkspace(userId: number) {
+    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return workspace;
   }
 }
 

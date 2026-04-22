@@ -1,12 +1,19 @@
 import { ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { TeamMemoRecord } from "@/domain/dashboard/storage/team-memo.storage";
+import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
 
 type WorkspacePort = {
-  findUserWorkspace(userId: number): Promise<{ id: number; name: string } | null>;
+  findUserWorkspace(
+    userId: number,
+  ): Promise<{ id: number; name: string; planCode?: string | null } | null>;
   findMembership(
     workspaceId: number,
     userId: number,
   ): Promise<{ userId: number; role: "ADMIN" | "MEMBER" } | null>;
+  countMembers(workspaceId: number): Promise<number>;
+  findPlanLimit(
+    planCode: "FREE" | "STANDARD",
+  ): Promise<{ memberLimit: number } | null>;
 };
 
 type TeamMemoPort = {
@@ -56,6 +63,7 @@ export class TeamMemoService {
     input: { targetUserId: number; content: string },
   ) {
     const workspace = await this.getWorkspaceOrThrow(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
     await this.requireWorkspaceMember(workspace.id, input.targetUserId);
 
     const memo = await this.teamMemoStorage.create({
@@ -74,6 +82,7 @@ export class TeamMemoService {
     isResolved: boolean,
   ) {
     const workspace = await this.getWorkspaceOrThrow(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
     const actorMembership = await this.requireWorkspaceMember(workspace.id, userId);
     const memo = await this.teamMemoStorage.findById(memoId);
 
@@ -100,6 +109,7 @@ export class TeamMemoService {
 
   async deleteTeamMemo(userId: number, memoId: number) {
     const workspace = await this.getWorkspaceOrThrow(userId);
+    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
     await this.requireWorkspaceMember(workspace.id, userId);
     const memo = await this.teamMemoStorage.findById(memoId);
 

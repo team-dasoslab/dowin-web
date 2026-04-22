@@ -153,7 +153,7 @@ export const useProfileActions = ({
       // Continue logout flow even when server-side logout fails.
     } finally {
       queryClient.clear();
-      window.location.replace("/login");
+      router.replace("/login");
     }
   };
 
