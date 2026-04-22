@@ -202,6 +202,49 @@ describe("BillingService", () => {
     expect(createCheckoutSession).not.toHaveBeenCalled();
   });
 
+  it("workspace planCode가 STANDARD여도 billing projection이 EXPIRED면 checkout을 다시 시작할 수 있다", async () => {
+    const createCheckoutSession = vi.fn().mockResolvedValue({
+      checkoutUrl: "https://polar.sh/checkout",
+    });
+    const service = new BillingService(
+      {
+        findUserWorkspace: vi.fn().mockResolvedValue({
+          id: 1,
+          name: "WIG",
+          planCode: "STANDARD",
+          billingCustomerExternalRef: "workspace:1",
+        }),
+        findMembershipByUserId: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          billingStatus: "EXPIRED",
+        }),
+        findActiveProviderProduct: vi.fn().mockResolvedValue({
+          providerProductId: "prod_standard",
+        }),
+        getRecentBillingRiskSummary: vi.fn().mockResolvedValue({
+          recentRefundCount: 0,
+          recentRevokedCount: 0,
+        }),
+        findCheckoutSessionCreatedEvent: vi.fn().mockResolvedValue(null),
+        appendCheckoutEvent: vi.fn().mockResolvedValue(null),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession,
+        createCustomerSession: vi.fn(),
+      },
+    );
+
+    await expect(service.prepareCheckout(7, "k2", "ko")).resolves.toEqual({
+      checkoutUrl: "https://polar.sh/checkout",
+    });
+    expect(createCheckoutSession).toHaveBeenCalled();
+  });
+
   it("활성 Polar product 매핑이 없으면 checkout을 시작할 수 없다", async () => {
     const service = new BillingService(
       {

@@ -113,7 +113,7 @@ export class BillingService {
       throw new ForbiddenError("FORBIDDEN");
     }
 
-    if (!this.polarClient || workspace.planCode === "STANDARD") {
+    if (!this.polarClient) {
       throw new ConflictError("BILLING_NOT_READY");
     }
 

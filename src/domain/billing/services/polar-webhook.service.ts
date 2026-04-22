@@ -138,7 +138,12 @@ function resolveProjection(
       asBoolean(activeSubscription.cancel_at_period_end) ?? false;
 
     return {
-      billingStatus: cancelAtPeriodEnd ? "CANCELED" : "ACTIVE",
+      billingStatus:
+        cancelAtPeriodEnd && currentPeriodEnd && currentPeriodEnd <= now
+          ? "EXPIRED"
+          : cancelAtPeriodEnd
+            ? "CANCELED"
+            : "ACTIVE",
       planCode:
         cancelAtPeriodEnd && currentPeriodEnd && currentPeriodEnd <= now
           ? "FREE"

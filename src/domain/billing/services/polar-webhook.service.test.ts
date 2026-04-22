@@ -146,6 +146,59 @@ describe("PolarWebhookService", () => {
     });
   });
 
+  it("customer.state_changed의 기간말 해지가 이미 끝났으면 EXPIRED로 반영한다", async () => {
+    const appendBillingEvent = vi.fn().mockResolvedValue({ id: 22 });
+    const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+    const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
+    const service = new PolarWebhookService({
+      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 6,
+        planCode: "STANDARD",
+        billingCustomerExternalRef: "workspace:6",
+        billingOwnerUserId: 10,
+      }),
+      findWorkspaceByCustomerExternalRef: vi.fn(),
+      appendBillingEvent,
+      upsertWorkspaceBillingState,
+      updateWorkspaceBillingProjection,
+    } as never);
+
+    await service.handleWebhook({
+      providerEventId: "msg_state_expired",
+      payloadJson: JSON.stringify({
+        type: "customer.state_changed",
+        timestamp: "2026-04-21T00:00:00.000Z",
+        data: {
+          id: "cus_6",
+          external_id: "workspace:6",
+          active_subscriptions: [
+            {
+              id: "sub_6",
+              current_period_end: "2026-04-20T00:00:00.000Z",
+              cancel_at_period_end: true,
+            },
+          ],
+        },
+      }),
+      now: new Date("2026-04-21T00:00:00.000Z"),
+    });
+
+    expect(appendBillingEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "customer.state_changed",
+        status: "ACCEPTED",
+      }),
+    );
+    expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: 6,
+        billingStatus: "EXPIRED",
+        planCode: "FREE",
+      }),
+    );
+  });
+
   it("subscription.ended를 EXPIRED projection으로 반영한다", async () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 31 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
