@@ -84,7 +84,7 @@ export class BillingStorage {
         recentRefundCount:
           sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'order.refunded' then 1 else 0 end), 0)`,
         recentRevokedCount:
-          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' then 1 else 0 end), 0)`,
+          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
       })
       .from(billingEvents)
       .where(

@@ -30,6 +30,22 @@ type BillingProjection = {
   billingOwnerUserId: number | null;
 };
 
+function getRiskReviewFailureReason(input: {
+  eventType: string;
+  currentPeriodEnd: Date | null;
+  occurredAt: Date;
+}): string | null {
+  if (input.eventType !== "subscription.revoked") {
+    return null;
+  }
+
+  if (!input.currentPeriodEnd || input.currentPeriodEnd > input.occurredAt) {
+    return "RISK_REVIEW_SIGNAL";
+  }
+
+  return null;
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return null;
@@ -187,6 +203,17 @@ function resolveProjection(
         cancelAtPeriodEnd: true,
         billingOwnerUserId,
       };
+    case "subscription.uncanceled":
+      return {
+        billingStatus: "ACTIVE",
+        planCode: "STANDARD",
+        customerKey,
+        customerExternalRef,
+        subscriptionKey,
+        currentPeriodEnd,
+        cancelAtPeriodEnd: false,
+        billingOwnerUserId,
+      };
     case "subscription.ended":
       return {
         billingStatus: "EXPIRED",
@@ -223,6 +250,19 @@ function resolveProjection(
           customerExternalRef,
           subscriptionKey,
           currentPeriodEnd: endedAt,
+          cancelAtPeriodEnd,
+          billingOwnerUserId,
+        };
+      }
+
+      if (rawStatus === "past_due") {
+        return {
+          billingStatus: "ACTIVE",
+          planCode: "STANDARD",
+          customerKey,
+          customerExternalRef,
+          subscriptionKey,
+          currentPeriodEnd,
           cancelAtPeriodEnd,
           billingOwnerUserId,
         };
@@ -352,6 +392,11 @@ export class PolarWebhookService {
       occurredAt,
       payloadJson: input.payloadJson,
       status: projection ? "ACCEPTED" : "IGNORED",
+      failureReason: getRiskReviewFailureReason({
+        eventType: payload.type,
+        currentPeriodEnd: projection?.currentPeriodEnd ?? null,
+        occurredAt,
+      }),
     });
 
     if (!projection) {
