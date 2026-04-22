@@ -14,6 +14,8 @@ describe("ScoreboardService", () => {
   const reactivateScoreboard = vi.fn();
   const findArchivedScoreboards = vi.fn();
   const findUserWorkspace = vi.fn();
+  const countMembers = vi.fn();
+  const findPlanLimit = vi.fn();
 
   const mockScoreboardStorage: ScoreboardStoragePort = {
     findActiveScoreboard,
@@ -27,6 +29,8 @@ describe("ScoreboardService", () => {
 
   const mockWorkspaceStorage: WorkspaceLookupPort = {
     findUserWorkspace,
+    countMembers,
+    findPlanLimit,
   };
 
   const service = new ScoreboardService(
@@ -36,6 +40,8 @@ describe("ScoreboardService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    countMembers.mockResolvedValue(1);
+    findPlanLimit.mockResolvedValue({ memberLimit: 10 });
   });
 
   describe("getActiveScoreboard", () => {
@@ -98,6 +104,21 @@ describe("ScoreboardService", () => {
           endDate: null,
         }),
       ).rejects.toThrow("ACTIVE_SCOREBOARD_EXISTS");
+    });
+
+    it("FREE 플랜 멤버 한도 초과 상태에서는 새 점수판을 생성할 수 없다", async () => {
+      findUserWorkspace.mockResolvedValue({ id: 3, planCode: "FREE" });
+      countMembers.mockResolvedValue(11);
+
+      await expect(
+        service.createScoreboard(1, {
+          goalName: "체중을 감량한다",
+          lagMeasure: "80kg에서 75kg까지 달성",
+          startDate: "2026-03-15",
+          endDate: null,
+        }),
+      ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+      expect(createScoreboard).not.toHaveBeenCalled();
     });
   });
 

@@ -3,6 +3,8 @@ import { LeadMeasureService } from "@/domain/lead-measure/services/lead-measure.
 
 describe("LeadMeasureService", () => {
   const findUserWorkspace = vi.fn();
+  const countMembers = vi.fn();
+  const findPlanLimit = vi.fn();
   const findOwnedScoreboard = vi.fn();
   const findLeadMeasuresByScoreboard = vi.fn();
   const createLeadMeasure = vi.fn();
@@ -16,7 +18,7 @@ describe("LeadMeasureService", () => {
   const countTrueLogsByLeadMeasures = vi.fn();
 
   const service = new LeadMeasureService(
-    { findUserWorkspace },
+    { findUserWorkspace, countMembers, findPlanLimit },
     { findOwnedScoreboard },
     {
       findLeadMeasuresByScoreboard,
@@ -33,6 +35,8 @@ describe("LeadMeasureService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    countMembers.mockResolvedValue(1);
+    findPlanLimit.mockResolvedValue({ memberLimit: 10 });
   });
 
   it("점수판의 활성 선행지표 목록을 주간 달성 수와 함께 반환한다", async () => {
@@ -105,6 +109,26 @@ describe("LeadMeasureService", () => {
       tagIds: [3],
     });
     expect(result.tags).toEqual([{ id: 3, name: "운동" }]);
+  });
+
+  it("FREE 플랜 멤버 한도 초과 상태에서는 선행지표를 생성할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1, planCode: "FREE" });
+    countMembers.mockResolvedValue(11);
+    findOwnedScoreboard.mockResolvedValue({
+      id: 2,
+      workspaceId: 1,
+      status: "ACTIVE",
+      startDate: "2026-03-01",
+    });
+
+    await expect(
+      service.createLeadMeasure(2, 100, {
+        name: "주 3회 운동",
+        targetValue: 3,
+        period: "WEEKLY",
+      }),
+    ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+    expect(createLeadMeasure).not.toHaveBeenCalled();
   });
 
   it("다른 워크스페이스 태그를 연결하려 하면 404 에러를 던진다", async () => {
