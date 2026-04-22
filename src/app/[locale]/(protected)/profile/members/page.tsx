@@ -6,6 +6,7 @@ import {
   useGetWorkspacesMe,
 } from "@/api/generated/workspace/workspace";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { MemberListItem } from "@/app/[locale]/(protected)/profile/members/_components/MemberListItem";
 import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/profile/members/_hooks/useRemoveWorkspaceMember";
 import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/profile/members/_hooks/useTransferWorkspaceAdmin";
@@ -111,6 +112,14 @@ export default function ProfileMembersPage() {
             </p>
           </div>
         </Card>
+
+        {workspace.isOverFreeMemberLimit ? (
+          <WorkspaceOverLimitBanner
+            freeMemberLimit={workspace.freeMemberLimit}
+            isAdmin={isWorkspaceAdmin}
+            memberCount={workspace.memberCount ?? members.length}
+          />
+        ) : null}
 
         <Card className="flex items-center justify-between gap-3 rounded-lg border border-border p-4">
           <div className="space-y-1">

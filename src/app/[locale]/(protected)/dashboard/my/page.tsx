@@ -3,6 +3,7 @@
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { DashboardHeader } from "@/app/[locale]/(protected)/dashboard/my/_components/DashboardHeader";
 import { HistoryLimitOverlay } from "@/app/[locale]/(protected)/dashboard/my/_components/HistoryLimitOverlay";
 import { MonthlyBoardSection } from "@/app/[locale]/(protected)/dashboard/my/_components/MonthlyBoardSection";
@@ -72,6 +73,8 @@ export default function MyDashboardPage() {
     profileResponse?.status === 200
       ? (profileResponse.data.nickname ?? null)
       : null;
+  const isWorkspaceAdmin =
+    profileResponse?.status === 200 && profileResponse.data.role === "ADMIN";
   const weeklyGoalCount = activeLeadMeasures.filter(
     (leadMeasure) => leadMeasure.period === "WEEKLY",
   ).length;
@@ -138,6 +141,14 @@ export default function MyDashboardPage() {
       ) : null}
       <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
         <DashboardHeader nickname={nickname} workspaceName={workspace?.name} />
+
+        {workspace?.isOverFreeMemberLimit ? (
+          <WorkspaceOverLimitBanner
+            freeMemberLimit={workspace.freeMemberLimit}
+            isAdmin={isWorkspaceAdmin}
+            memberCount={workspace.memberCount}
+          />
+        ) : null}
 
         <ScoreboardOverviewSection
           activeScoreboard={activeScoreboard}
