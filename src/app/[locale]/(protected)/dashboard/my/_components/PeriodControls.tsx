@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Add20Regular, ChevronLeft20Regular, ChevronRight20Regular } from "@fluentui/react-icons";
+import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
@@ -71,7 +72,7 @@ export function PeriodControls({
                 disabled={isPreviousDisabled || isPeriodLoading}
                 className="h-9 w-9 rounded-button border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <ChevronLeft className="mx-auto h-4 w-4" />
+                <ChevronLeft20Regular className="mx-auto h-4 w-4" />
               </Button>
               <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
                 <input
@@ -89,7 +90,7 @@ export function PeriodControls({
                 disabled={isPeriodLoading}
                 className="h-9 w-9 rounded-button border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <ChevronRight className="mx-auto h-4 w-4" />
+                <ChevronRight20Regular className="mx-auto h-4 w-4" />
               </Button>
             </div>
             <Button
@@ -128,15 +129,19 @@ export function PeriodControls({
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <span className="inline-flex w-fit rounded border border-zinc-200 bg-zinc-100/80 px-2 py-1 font-mono text-[11px] font-bold text-zinc-600">
-            {selectedView === "week" ? weekLabel : monthLabel}
-          </span>
+          <PeriodBadge
+            label={
+              selectedView === "week"
+                ? weekLabel
+                : (monthLabel ?? tc("unsetTitle"))
+            }
+          />
           <Button
             asChild
             className="flex items-center justify-center gap-1 rounded-button border border-border bg-white px-2.5 py-1.5 text-[11px] font-bold text-text-secondary transition-colors hover:border-[rgba(205,207,213,1)] hover:text-primary"
           >
             <Link href="/setup?mode=addMeasure">
-              <Plus className="h-3 w-3" />
+              <Add20Regular className="h-3 w-3" />
               {t("addMeasure")}
             </Link>
           </Button>

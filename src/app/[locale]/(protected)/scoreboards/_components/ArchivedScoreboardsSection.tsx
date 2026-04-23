@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { RotateCcw } from "lucide-react";
+import { ArrowCounterclockwise20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 type ArchivedScoreboardItem = {
@@ -32,19 +32,6 @@ export function ArchivedScoreboardsSection({
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between px-0.5">
-        <div>
-          <h2 className="text-sm font-bold text-text-primary">
-            {t("archivedScoreboards")}
-          </h2>
-          <p className="text-[11px] text-text-muted">
-            {t("archivedScoreboardsDesc")}
-          </p>
-        </div>
-        <Badge className="px-2 py-1 rounded-md border border-border bg-sub-background text-[11px] font-bold text-text-secondary">
-          {t("totalCount", { count: archivedScoreboards.length })}
-        </Badge>
-      </div>
 
       {archivedScoreboards.length === 0 ? (
         <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center text-sm text-text-muted">
@@ -81,7 +68,7 @@ export function ArchivedScoreboardsSection({
                         className="border-text-secondary/20 border-t-text-secondary"
                       />
                     ) : (
-                      <RotateCcw className="w-3.5 h-3.5" />
+                      <ArrowCounterclockwise20Regular className="w-3.5 h-3.5" />
                     )}
                     {pendingActionId === scoreboardId
                       ? t("reactivating")

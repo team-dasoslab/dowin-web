@@ -4,7 +4,7 @@ import { ScoreboardCard } from "@/app/[locale]/(protected)/scoreboards/_componen
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Archive, Plus, Zap } from "lucide-react";
+import { Archive20Regular, Add20Regular, Flash20Filled } from "@fluentui/react-icons";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
@@ -32,16 +32,6 @@ export function ActiveScoreboardSection({
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between px-0.5">
-        <div>
-          <h2 className="text-sm font-bold text-text-primary">
-            {t("currentActive")}
-          </h2>
-          <p className="text-[11px] text-text-muted">
-            {t("onlyOneActiveDesc")}
-          </p>
-        </div>
-      </div>
 
       {activeScoreboard && activeScoreboardId ? (
         <ScoreboardCard
@@ -66,7 +56,7 @@ export function ActiveScoreboardSection({
                   className="border-text-secondary/20 border-t-text-secondary"
                 />
               ) : (
-                <Archive className="w-3.5 h-3.5" />
+                <Archive20Regular className="w-3.5 h-3.5" />
               )}
               {pendingActionId === activeScoreboardId
                 ? t("archiving")
@@ -87,7 +77,7 @@ function EmptyActiveScoreboardCard() {
   return (
     <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center space-y-4">
       <div className="w-12 h-12 bg-primary/10 rounded-content  mx-auto flex items-center justify-center">
-        <Zap className="text-primary w-6 h-6" />
+        <Flash20Filled className="text-primary w-6 h-6" />
       </div>
       <div className="space-y-1">
         <p className="text-sm font-semibold text-text-primary">
@@ -101,7 +91,7 @@ function EmptyActiveScoreboardCard() {
           className="btn-linear-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5"
         >
           <Link href="/setup?mode=create">
-            <Plus className="w-3.5 h-3.5" />
+            <Add20Regular className="w-3.5 h-3.5" />
             {td("createScoreboard")}
           </Link>
         </Button>

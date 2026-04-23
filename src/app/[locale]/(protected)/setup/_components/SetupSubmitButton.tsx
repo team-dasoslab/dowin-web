@@ -1,6 +1,6 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
-import { Save } from "lucide-react";
+import { Save20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 interface SetupSubmitButtonProps {
@@ -33,7 +33,7 @@ export function SetupSubmitButton({
         <InlineSpinner />
       ) : (
         <>
-          <Save className="h-3.5 w-3.5" />
+          <Save20Regular className="h-3.5 w-3.5" />
           {isEditMode ? t("saveChanges") : t("createScoreboard")}
         </>
       )}

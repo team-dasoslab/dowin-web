@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { KeyRound } from "lucide-react";
+import { Key20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 export default function ProfilePasswordPage() {
@@ -36,7 +36,7 @@ export default function ProfilePasswordPage() {
 
         <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <KeyRound className="h-5 w-5" />
+            <Key20Regular className="h-5 w-5" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-text-primary">

@@ -3,7 +3,7 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
-import { ImageOff } from "lucide-react";
+import { ImageOff24Regular } from "@fluentui/react-icons";
 import { useState } from "react";
 
 interface GuideImageProps {
@@ -19,7 +19,7 @@ export function GuideImage({ alt, src }: GuideImageProps) {
       <Card className="mx-auto flex w-full max-w-[326px] items-center justify-center rounded-[1.75rem] border border-dashed border-border bg-sub-background/70 p-6 text-center">
         <div className="space-y-3">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-text-muted shadow-sm">
-            <ImageOff className="h-5 w-5" />
+            <ImageOff24Regular className="h-5 w-5" />
           </div>
           <div className="space-y-1">
             <p className="text-sm font-semibold text-text-primary">

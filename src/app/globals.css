@@ -21,8 +21,8 @@
     "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
   --font-inter: "Inter", sans-serif;
 
-  --radius-content: 1rem;
-  --radius-button: 0.5rem;
+  --radius-content: 0.5rem;
+  --radius-button: 0.375rem;
 }
 
 .rounded-button {

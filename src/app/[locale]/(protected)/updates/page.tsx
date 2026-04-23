@@ -28,7 +28,7 @@ export default function UpdatesPage() {
     <ProtectedPageContainer spacing="compact" topPadding="compact">
       <ProtectedPageHeader title={t("header")} />
 
-      <div className="rounded-content border border-border bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-6 py-5">
+      <div className="rounded-content border border-border bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-4 py-4">
         <div className="max-w-[720px] space-y-3">
           <div>
             <Badge className="w-fit rounded-button border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">

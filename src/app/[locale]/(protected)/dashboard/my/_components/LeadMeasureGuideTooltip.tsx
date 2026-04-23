@@ -2,7 +2,7 @@
 
 import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/wig.schemas";
 import { Button } from "@/components/ui/Button";
-import { CircleAlert, Compass, SlidersHorizontal } from "lucide-react";
+import { Info20Regular, Navigation20Regular, Settings20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -15,12 +15,12 @@ type LeadMeasureGuideTooltipProps = {
 
 const guideStyles = {
   [WeeklyLogGuideKind.change]: {
-    icon: Compass,
+    icon: Navigation20Regular,
     iconClassName: "text-rose-600",
     triggerClassName: "text-rose-600 hover:text-rose-700",
   },
   [WeeklyLogGuideKind.adjust]: {
-    icon: SlidersHorizontal,
+    icon: Settings20Regular,
     iconClassName: "text-amber-500",
     triggerClassName: "text-amber-500 hover:text-amber-600",
   },
@@ -59,11 +59,12 @@ export function LeadMeasureGuideTooltip({
 
     updatePosition();
     window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    const container = document.getElementById("main-scroll-container");
+    container?.addEventListener("scroll", updatePosition, true);
 
     return () => {
       window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
+      container?.removeEventListener("scroll", updatePosition, true);
     };
   }, [active]);
 
@@ -78,7 +79,7 @@ export function LeadMeasureGuideTooltip({
         className={`inline-flex h-4 w-4 items-center justify-center transition-colors ${style.triggerClassName}`}
         aria-label={t("ariaLabel")}
       >
-        <CircleAlert className={`h-3 w-3 ${style.iconClassName}`} />
+        <Info20Regular className={`h-3 w-3 ${style.iconClassName}`} />
       </Button>
 
       {active ? (

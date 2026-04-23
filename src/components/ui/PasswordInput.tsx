@@ -1,5 +1,5 @@
 import { Input, type InputProps } from "@/components/ui/Input";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye20Regular, EyeOff20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -33,9 +33,9 @@ export const PasswordInput = ({
           className={toggleClassName}
         >
           {isVisible ? (
-            <EyeOff className="h-3.5 w-3.5" />
+            <EyeOff20Regular className="h-3.5 w-3.5" />
           ) : (
-            <Eye className="h-3.5 w-3.5" />
+            <Eye20Regular className="h-3.5 w-3.5" />
           )}
           <span className={toggleLabelClassName}>
             {isVisible ? t("hide") : t("show")}

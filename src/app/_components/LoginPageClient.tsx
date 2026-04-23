@@ -10,7 +10,13 @@ import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { Check, Copy, LogIn, UserPlus, Zap } from "lucide-react";
+import {
+  ArrowEnter20Regular,
+  Checkmark20Regular,
+  Copy20Regular,
+  Flash20Regular,
+  PersonAdd20Regular,
+} from "@fluentui/react-icons";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation";
@@ -240,12 +246,12 @@ export default function LoginPageClient() {
             >
               {isCopied ? (
                 <span className="inline-flex items-center gap-2">
-                  <Check className="h-4 w-4" />
+                  <Checkmark20Regular className="h-4 w-4" />
                   {t("recovery.copied")}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
-                  <Copy className="h-4 w-4" />
+                  <Copy20Regular className="h-4 w-4" />
                   {t("recovery.copy")}
                 </span>
               )}
@@ -278,7 +284,7 @@ export default function LoginPageClient() {
       <Card className="w-full max-w-[380px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
         <div className="flex flex-col items-center text-center space-y-4 mb-10">
           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-            <Zap className="text-primary w-6 h-6" />
+            <Flash20Regular className="text-primary w-6 h-6" />
           </div>
           <div className="space-y-1.5">
             <h1 className="text-2xl font-bold tracking-tight text-text-primary">
@@ -388,12 +394,12 @@ export default function LoginPageClient() {
               <>
                 {mode === "login" ? (
                   <>
-                    <LogIn className="w-4 h-4" />
+                    <ArrowEnter20Regular className="w-4 h-4" />
                     <span>{t("login")}</span>
                   </>
                 ) : (
                   <>
-                    <UserPlus className="w-4 h-4" />
+                    <PersonAdd20Regular className="w-4 h-4" />
                     <span>{t("signup")}</span>
                   </>
                 )}

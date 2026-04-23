@@ -4,7 +4,7 @@ import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useToast } from "@/context/ToastContext";
 import { getFetchErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
-import { Bell, BellOff } from "lucide-react";
+import { Alert16Regular, AlertOff16Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
@@ -236,7 +236,7 @@ export default function PushSubscriptionManager({
           : "bg-primary text-white hover:opacity-90 shadow-md shadow-primary/10 animate-linear-in"
       }`}
     >
-      {isSubscribed ? <BellOff size={16} /> : <Bell size={16} />}
+      {isSubscribed ? <AlertOff16Regular /> : <Alert16Regular />}
       {isSubscribed ? t("buttonUnsubscribe") : t("buttonSubscribe")}
     </button>
   );

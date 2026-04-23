@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
-import { Check, Copy } from "lucide-react";
+import { Checkmark20Regular, Copy20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -38,9 +38,9 @@ export function CopyServiceLinkButton() {
       type="button"
     >
       {isCopied ? (
-        <Check className="h-3.5 w-3.5 text-primary" />
+        <Checkmark20Regular className="h-3.5 w-3.5 text-primary" />
       ) : (
-        <Copy className="h-3.5 w-3.5 text-text-muted" />
+        <Copy20Regular className="h-3.5 w-3.5 text-text-muted" />
       )}
       {isCopied ? t("Common.copyDone") : tPage("copyLinkButton")}
     </Button>

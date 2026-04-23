@@ -2,13 +2,15 @@
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
-import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
-import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
-import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { SubPageLayout } from "@/app/[locale]/(protected)/_components/SubPageLayout";
+import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
+import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
+import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
 import {
   PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
   ProfileCoachmark,
@@ -25,21 +27,20 @@ import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import {
-  Bell,
-  ChevronRight,
-  Download,
-  Edit2,
-  Key,
-  Languages,
-  LogOut,
-  MessageCircle,
-  CreditCard,
-  Smartphone,
-  Sparkles,
-  Ticket,
-  Trash2,
-  Users,
-} from "lucide-react";
+  Alert20Regular,
+  ArrowDownload20Regular,
+  Chat20Regular,
+  ChevronRight20Regular,
+  Delete20Regular,
+  Edit20Regular,
+  Key20Regular,
+  LocalLanguage20Regular,
+  Payment20Regular,
+  People20Regular,
+  Premium20Regular,
+  SignOut20Regular,
+  TicketDiagonal20Regular,
+} from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -123,7 +124,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "language",
-          icon: <Languages className="w-3.5 h-3.5" />,
+          icon: <LocalLanguage20Regular className="w-4 h-4" />,
           title: t("languageTitle"),
           description: t("languageDesc"),
           rightElement: <LocaleSwitcher />,
@@ -136,7 +137,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "nickname",
-          icon: <Edit2 className="w-3.5 h-3.5" />,
+          icon: <Edit20Regular className="w-4 h-4" />,
           title: t("nicknameChangeTitle"),
           description: t("nicknameChangeDesc"),
           danger: false,
@@ -146,14 +147,14 @@ export default function ProfilePage() {
         },
         {
           id: "password",
-          icon: <Key className="w-3.5 h-3.5" />,
+          icon: <Key20Regular className="w-4 h-4" />,
           title: t("passwordChangeTitle"),
           description: t("passwordChangeDesc"),
           href: "/profile/password",
         },
         {
           id: "logout",
-          icon: <LogOut className="w-3.5 h-3.5" />,
+          icon: <SignOut20Regular className="w-4 h-4" />,
           title: t("logoutTitle"),
           description: t("logoutDesc"),
           danger: false,
@@ -163,7 +164,7 @@ export default function ProfilePage() {
         },
         {
           id: "account-delete",
-          icon: <Trash2 className="w-3.5 h-3.5" />,
+          icon: <Delete20Regular className="w-4 h-4" />,
           title: t("deleteAccountTitle"),
           description: t("deleteAccountDesc"),
           danger: true,
@@ -179,14 +180,14 @@ export default function ProfilePage() {
           ? [
               {
                 id: "billing",
-                icon: <CreditCard className="w-3.5 h-3.5" />,
+                icon: <Payment20Regular className="w-4 h-4" />,
                 title: t("billingTitle"),
                 description: t("billingDesc"),
                 href: "/profile/billing",
               },
               {
                 id: "workspace-name",
-                icon: <Edit2 className="w-3.5 h-3.5" />,
+                icon: <Edit20Regular className="w-4 h-4" />,
                 title: t("changeWorkspaceName"),
                 description: t("changeWorkspaceNameDesc"),
                 onClick: () => {
@@ -195,21 +196,21 @@ export default function ProfilePage() {
               },
               {
                 id: "members",
-                icon: <Users className="w-3.5 h-3.5" />,
+                icon: <People20Regular className="w-4 h-4" />,
                 title: t("manageMembers"),
                 description: t("manageMembersDesc"),
                 href: "/profile/members",
               },
               {
                 id: "invites",
-                icon: <Ticket className="w-3.5 h-3.5" />,
+                icon: <TicketDiagonal20Regular className="w-4 h-4" />,
                 title: t("manageInvites"),
                 description: t("manageInvitesDesc"),
                 href: "/profile/invites",
               },
               {
                 id: "workspace-delete",
-                icon: <Trash2 className="w-3.5 h-3.5" />,
+                icon: <Delete20Regular className="w-4 h-4" />,
                 title: t("workspaceDelete"),
                 description: t("workspaceDeleteDescFull"),
                 danger: true,
@@ -221,7 +222,7 @@ export default function ProfilePage() {
           : [
               {
                 id: "workspace-leave",
-                icon: <LogOut className="w-3.5 h-3.5" />,
+                icon: <SignOut20Regular className="w-4 h-4" />,
                 title: t("workspaceLeave"),
                 description: t("workspaceLeaveDescFull"),
                 danger: true,
@@ -240,7 +241,7 @@ export default function ProfilePage() {
           ? [
               {
                 id: "export",
-                icon: <Download className="w-3.5 h-3.5" />,
+                icon: <ArrowDownload20Regular className="w-4 h-4" />,
                 title: t("csvDownload"),
                 description: t("csvDownloadDesc"),
                 href: "/profile/export",
@@ -254,7 +255,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "push-notification",
-          icon: <Bell className="w-3.5 h-3.5" />,
+          icon: <Alert20Regular className="w-4 h-4" />,
           title: t("pushReminder"),
           description: t("pushReminderDesc"),
           rightElement: (
@@ -283,21 +284,21 @@ export default function ProfilePage() {
       items: [
         {
           id: "updates",
-          icon: <Sparkles className="w-3.5 h-3.5" />,
+          icon: <Premium20Regular className="w-4 h-4" />,
           title: t("newFeatures"),
           description: t("newFeaturesDesc"),
           href: "/updates",
         },
-        {
+        /* {
           id: "install-guide-ios",
-          icon: <Smartphone className="w-3.5 h-3.5" />,
+          icon: <Smartphone20Regular className="w-4 h-4" />,
           title: t("installGuideIos"),
           description: t("installGuideIosDesc"),
           href: "/install-guide",
-        },
+        }, */
         {
           id: "contact",
-          icon: <MessageCircle className="w-3.5 h-3.5" />,
+          icon: <Chat20Regular className="w-4 h-4" />,
           title: t("contactUs"),
           description: t("contactUsDesc"),
           onClick: () => {
@@ -310,8 +311,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const handleScroll = () => {
+      const container = document.getElementById("main-scroll-container");
+      if (!container) return;
+
       // 현재 스크롤 위치에 따른 섹션 감지
-      const scrollPosition = window.scrollY + 150; // 헤더 높이 등을 고려한 오프셋
+      const scrollPosition = container.scrollTop + 150; // 헤더 높이 등을 고려한 오프셋
 
       let currentSectionId = activeSection;
       const sortedSections = Object.entries(sectionRefs.current)
@@ -329,12 +333,13 @@ export default function ProfilePage() {
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const container = document.getElementById("main-scroll-container");
+    container?.addEventListener("scroll", handleScroll, { passive: true });
     // 초기 로드 시 한 번 실행
     handleScroll();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      container?.removeEventListener("scroll", handleScroll);
     };
   }, [activeSection]);
 
@@ -363,7 +368,6 @@ export default function ProfilePage() {
     return null;
   }
 
-
   return (
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <ProfileCoachmark
@@ -383,12 +387,15 @@ export default function ProfilePage() {
           }
         />
       )}
-      <ProtectedPageContainer className="space-y-8 lg:space-y-12">
-        <ProtectedPageHeader title={t("title")} description={t("description")} />
+      <ProtectedPageContainer className="space-y-6 lg:space-y-12">
+        <ProtectedPageHeader
+          title={t("title")}
+          description={t("description")}
+        />
 
-        <div className="flex flex-col gap-8 lg:flex-row lg:gap-12 items-start">
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 사이드바 내비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-6 flex w-[calc(100%+3rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-6 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             {menuGroups
               .filter((group) => group.items.length > 0)
               .map((group) => {
@@ -398,25 +405,30 @@ export default function ProfilePage() {
                     key={group.id}
                     onClick={() => {
                       const element = document.getElementById(group.id);
-                      if (element) {
-                        const headerOffset = 100;
-                        const elementPosition = element.getBoundingClientRect().top;
-                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-                        window.scrollTo({
-                          top: offsetPosition,
-                          behavior: "smooth"
-                        });
-                      }
+                        const container = document.getElementById("main-scroll-container");
+                        if (container && element) {
+                          const headerOffset = 100;
+                          const elementPosition = element.offsetTop;
+                          const offsetPosition = elementPosition - headerOffset;
+                          container.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth",
+                          });
+                        }
                     }}
                     className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
-                      isActive 
-                        ? "text-primary" 
+                      isActive
+                        ? "text-primary"
                         : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      {isActive && <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />}
-                      <span className={isActive ? "" : "lg:pl-4"}>{group.label}</span>
+                      {isActive && (
+                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
+                      )}
+                      <span className={isActive ? "" : "lg:pl-4"}>
+                        {group.label}
+                      </span>
                     </div>
                   </button>
                 );
@@ -427,12 +439,12 @@ export default function ProfilePage() {
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
             {/* 프로필 요약 카드 */}
             <div className="space-y-4">
-              <Card className="border border-zinc-200 rounded-content px-5 py-5 flex items-center gap-4 bg-white sm:px-8 sm:py-8 sm:gap-6">
+              <Card className="border border-zinc-200 rounded-content px-4 py-4 flex items-center gap-4 bg-white sm:px-8 sm:py-8 sm:gap-6">
                 <UserAvatar
                   avatarKey={avatarKey}
                   avatarSeed={nickname}
                   alt={t("avatarAlt", { name: nickname })}
-                  size={64}
+                  size={52}
                   className="flex-shrink-0"
                 />
                 <div className="min-w-0">
@@ -455,31 +467,30 @@ export default function ProfilePage() {
             </div>
 
             {/* 설정 그룹들 */}
-            <div className="space-y-10 pb-24 lg:space-y-16 lg:pb-[60vh]">
+            <div className="space-y-8 pb-24 lg:space-y-16 lg:pb-[60vh]">
               {menuGroups
                 .filter((group) => group.items.length > 0)
                 .map((group) => (
-                  <section 
-                    key={group.id} 
-                    id={group.id} 
-                    ref={(el) => { sectionRefs.current[group.id] = el; }}
+                  <section
+                    key={group.id}
+                    id={group.id}
+                    ref={(el) => {
+                      sectionRefs.current[group.id] = el;
+                    }}
                     className="space-y-5 scroll-mt-28"
                   >
-                    <div className="flex items-center gap-4 px-1">
-                      <h3 className="text-[13px] font-black text-zinc-400 uppercase tracking-wider">
-                        {group.label}
-                      </h3>
-                      <div className="h-px flex-1 bg-zinc-200/60" />
-                    </div>
+                    <SectionHeader title={group.label} className="mb-4" />
 
                     {group.id === "workspace" && workspace && (
-                      <div className="mb-4 rounded-content border border-zinc-200 bg-white px-5 py-5 flex items-center justify-between gap-3 sm:px-8 sm:py-7">
+                      <div className="mb-4 rounded-content border border-zinc-200 bg-white px-4 py-4 flex items-center justify-between gap-3 sm:px-8 sm:py-7">
                         <div className="flex flex-col min-w-0 text-left">
                           <p className="text-lg font-bold text-zinc-900 truncate tracking-tight">
                             {workspace.name}
                           </p>
                           <p className="text-xs font-medium text-zinc-500 mt-1">
-                            {isWorkspaceAdmin ? t("workspaceAdmin") : t("workspaceMember")}
+                            {isWorkspaceAdmin
+                              ? t("workspaceAdmin")
+                              : t("workspaceMember")}
                           </p>
                         </div>
                         <span
@@ -526,10 +537,10 @@ function MenuItemRow({
   const itemWrapperClassName = isLast ? "" : "border-b border-zinc-100";
 
   const Content = (
-    <div className="flex w-full flex-col gap-3 px-4 py-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
-      <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
+    <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
+      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <div
-          className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0 ${
+          className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 ${
             item.danger
               ? "border-red-100 bg-red-50 text-red-500"
               : "border-zinc-100 bg-zinc-50 text-zinc-400"
@@ -545,18 +556,16 @@ function MenuItemRow({
           >
             {item.title}
           </p>
-          <p className="text-[12px] text-zinc-500 mt-0.5">
-            {item.description}
-          </p>
+          <p className="text-[12px] text-zinc-500 mt-0.5">{item.description}</p>
         </div>
       </div>
-      {item.rightElement ? (
-        <div className="ml-12 flex justify-start sm:ml-3 sm:justify-end">
-          {item.rightElement}
-        </div>
-      ) : (
-        <ChevronRight className="hidden w-4 h-4 text-zinc-300 flex-shrink-0 ml-3 sm:block" />
-      )}
+      <div className="flex-shrink-0">
+        {item.rightElement ? (
+          item.rightElement
+        ) : (
+          <ChevronRight20Regular className="w-4 h-4 text-zinc-300" />
+        )}
+      </div>
     </div>
   );
 
@@ -585,9 +594,7 @@ function MenuItemRow({
   }
 
   return (
-    <div className={`w-full bg-white ${itemWrapperClassName}`}>
-      {Content}
-    </div>
+    <div className={`w-full bg-white ${itemWrapperClassName}`}>{Content}</div>
   );
 }
 

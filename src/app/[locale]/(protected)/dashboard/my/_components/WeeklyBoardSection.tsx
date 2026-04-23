@@ -7,7 +7,7 @@ import { WeeklyMobileCards } from "@/app/[locale]/(protected)/dashboard/my/_comp
 import { isEditableDailyLogDate } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { Check } from "lucide-react";
+import { Checkmark20Regular } from "@fluentui/react-icons";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -174,7 +174,7 @@ export function WeeklyBoardSection({
                               }`}
                             >
                               {currentValue === true ? (
-                                <Check className="h-3.5 w-3.5" />
+                                <Checkmark20Regular className="h-3.5 w-3.5" />
                               ) : null}
                             </Button>
                           </td>

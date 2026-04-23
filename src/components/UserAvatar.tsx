@@ -5,7 +5,7 @@ import {
   getProfileAvatarSrc,
   type ProfileAvatarKey,
 } from "@/domain/profile/avatar-options";
-import { User as UserIcon } from "lucide-react";
+import { Person24Regular } from "@fluentui/react-icons";
 import Image from "next/image";
 import { useRef } from "react";
 
@@ -50,9 +50,8 @@ export function UserAvatar({
         <div
           className={`flex h-full w-full items-center justify-center bg-primary/10 text-primary ${radiusClassName}`}
         >
-          <UserIcon
+          <Person24Regular
             className="h-1/2 w-1/2"
-            strokeWidth={2}
             aria-hidden="true"
           />
         </div>

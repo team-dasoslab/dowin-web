@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useTranslations } from "next-intl";
-import { Plus, Zap } from "lucide-react";
+import { Add20Regular, Flash24Regular } from "@fluentui/react-icons";
 
 export default function NewWorkspacePage() {
   const t = useTranslations("Workspace.new");
@@ -33,7 +33,7 @@ export default function NewWorkspacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-4">
       {isPending && (
         <LoadingOverlay message={t("loading")} />
       )}
@@ -47,7 +47,7 @@ export default function NewWorkspacePage() {
         {/* 헤더 */}
         <div className="space-y-5">
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-            <Zap className="text-primary w-6 h-6" />
+            <Flash24Regular className="text-primary w-6 h-6" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
@@ -101,7 +101,7 @@ export default function NewWorkspacePage() {
               <InlineSpinner size="sm" />
             ) : (
               <>
-                <Plus className="w-4 h-4" />
+                <Add20Regular className="w-4 h-4" />
                 <span>{t("button")}</span>
               </>
             )}

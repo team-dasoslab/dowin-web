@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Check } from "lucide-react";
+import { Checkmark20Regular } from "@fluentui/react-icons";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
 
@@ -103,7 +103,7 @@ export function LandingPricingSection() {
                             : "bg-slate-200 text-slate-400"
                         }`}
                       >
-                        <Check className="h-3 w-3" strokeWidth={3} />
+                        <Checkmark20Regular className="h-3 w-3" />
                       </div>
                       <p
                         className={`text-[15px] leading-[1.5] font-medium break-keep ${

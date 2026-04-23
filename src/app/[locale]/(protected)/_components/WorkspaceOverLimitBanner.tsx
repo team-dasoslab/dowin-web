@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
-import { AlertTriangle, CreditCard, Users } from "lucide-react";
+import { Warning20Regular, Payment20Regular, People20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 type WorkspaceOverLimitBannerProps = {
@@ -24,7 +24,7 @@ export function WorkspaceOverLimitBanner({
     <section className="rounded-lg border border-red-200 bg-red-50 px-4 py-4 text-red-800">
       <div className="flex gap-3">
         <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-red-600">
-          <AlertTriangle className="h-4 w-4" />
+          <Warning20Regular className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1 space-y-3">
           <div className="space-y-1">
@@ -45,7 +45,7 @@ export function WorkspaceOverLimitBanner({
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-[11px] font-bold text-red-700"
               >
                 <Link href="/profile/members">
-                  <Users className="h-3.5 w-3.5" />
+                   <People20Regular className="h-3.5 w-3.5" />
                   {t("manageMembers")}
                 </Link>
               </Button>
@@ -54,7 +54,7 @@ export function WorkspaceOverLimitBanner({
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-600 px-3 text-[11px] font-bold text-white hover:bg-red-700"
               >
                 <Link href="/profile/billing">
-                  <CreditCard className="h-3.5 w-3.5" />
+                   <Payment20Regular className="h-3.5 w-3.5" />
                   {t("billing")}
                 </Link>
               </Button>

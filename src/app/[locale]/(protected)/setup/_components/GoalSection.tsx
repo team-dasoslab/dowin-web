@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Zap } from "lucide-react";
+import { Flash20Filled } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 interface GoalSectionProps {
@@ -22,6 +22,9 @@ export function GoalSection({
       data-coachmark="setup-goal"
     >
       <div className="space-y-4">
+        <div className="w-10 h-10 bg-primary/10 rounded-content flex items-center justify-center">
+          <Flash20Filled className="text-primary w-5 h-5" />
+        </div>
         <div>
           <label className="block text-sm font-bold text-zinc-900">
             {t("goalQuestion")}
