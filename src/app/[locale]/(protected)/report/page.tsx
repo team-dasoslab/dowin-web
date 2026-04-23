@@ -165,14 +165,25 @@ export default function ReportPage() {
       <div className="mx-auto w-full max-w-[860px] space-y-8 px-4 py-6 md:px-8 md:py-10">
 
         <header className="space-y-4 px-1">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
-            <Users className="h-3.5 w-3.5 text-[#626A7D]" />
-            <span className="font-medium text-text-secondary">{workspaceName}</span>
-            <span className="text-border">·</span>
-            <CalendarDays className="h-3.5 w-3.5 text-[#626A7D]" />
-            <span className="font-mono rounded border border-border bg-sub-background px-2 py-0.5 text-[11px] tracking-tight">
-              {weekLabel}
-            </span>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
+              <Users className="h-3.5 w-3.5 text-[#626A7D]" />
+              <span className="font-medium text-text-secondary">{workspaceName}</span>
+              <span className="text-border">·</span>
+              <CalendarDays className="h-3.5 w-3.5 text-[#626A7D]" />
+              <span className="font-mono rounded border border-border bg-sub-background px-2 py-0.5 text-[11px] tracking-tight">
+                {weekLabel}
+              </span>
+            </div>
+            <Button
+              asChild
+              className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-lg border border-[rgba(94,106,210,0.3)] bg-[rgba(94,106,210,0.06)] px-3 py-2 text-xs font-bold text-[#5e6ad2] transition-colors hover:bg-[rgba(94,106,210,0.1)] hover:border-[rgba(94,106,210,0.4)]"
+            >
+              <Link href="/dashboard">
+                {t("cta.button")}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
           </div>
 
           <div className="space-y-2">
@@ -200,31 +211,31 @@ export default function ReportPage() {
             <SectionLabel title={t("sections.teamStatus")} />
             <Card className="overflow-hidden rounded-lg border border-border bg-white">
               {hasActive ? (
-              <div className="px-5 py-5">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-bold text-text-primary">
-                      {t("winRate.title")}
-                    </p>
-                    <p className="mt-0.5 text-xs text-text-muted">
-                      {t("winRate.desc")}
-                    </p>
+                <div className="px-5 py-5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-bold text-text-primary">
+                        {t("winRate.title")}
+                      </p>
+                      <p className="mt-0.5 text-xs text-text-muted">
+                        {t("winRate.desc")}
+                      </p>
+                    </div>
+                    <TrendingUp className="h-4 w-4 shrink-0 text-[#5e6ad2]" />
                   </div>
-                  <TrendingUp className="h-4 w-4 shrink-0 text-[#5e6ad2]" />
+                  <WinRateOverview
+                    winningCount={summary.winningCount}
+                    losingCount={summary.losingStartedCount}
+                    notStartedCount={summary.notStartedCount}
+                    noScoreboardCount={summary.noScoreboardCount}
+                    activeCount={summary.activeCount}
+                    totalCount={summary.totalCount}
+                    winningNames={summary.winningNames}
+                    losingNames={summary.losingStartedNames}
+                    notStartedNames={summary.notStartedNames}
+                    noScoreboardNames={summary.noScoreboardNames}
+                  />
                 </div>
-                <WinRateOverview
-                  winningCount={summary.winningCount}
-                  losingCount={summary.losingStartedCount}
-                  notStartedCount={summary.notStartedCount}
-                  noScoreboardCount={summary.noScoreboardCount}
-                  activeCount={summary.activeCount}
-                  totalCount={summary.totalCount}
-                  winningNames={summary.winningNames}
-                  losingNames={summary.losingStartedNames}
-                  notStartedNames={summary.notStartedNames}
-                  noScoreboardNames={summary.noScoreboardNames}
-                />
-              </div>
               ) : (
                 <InlineEmptyState
                   title={t("empty.noActiveScoreboardsTitle")}
@@ -266,26 +277,6 @@ export default function ReportPage() {
             </div>
           )}
         </section>
-
-        <div className="border-t border-border pt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-1">
-          <div>
-            <p className="text-sm font-bold text-text-primary">
-              {t("cta.title")}
-            </p>
-            <p className="mt-0.5 text-xs text-text-muted">
-              {t("cta.desc")}
-            </p>
-          </div>
-          <Button
-            asChild
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-[rgba(94,106,210,0.3)] bg-[rgba(94,106,210,0.06)] px-3 py-2 text-xs font-bold text-[#5e6ad2] transition-colors hover:bg-[rgba(94,106,210,0.1)] hover:border-[rgba(94,106,210,0.4)]"
-          >
-            <Link href="/dashboard">
-              {t("cta.button")}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
-        </div>
 
       </div>
     </div>
