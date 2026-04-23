@@ -364,8 +364,6 @@
       "duplicatedTag": "같은 이름의 태그가 이미 있어요.",
       "leadMeasureCreateFailed": "선행지표 생성에 실패했습니다.",
       "scoreboardIdNotFound": "점수판 ID를 확인할 수 없습니다.",
-      "archiveSuccess": "점수판을 보관했습니다.",
-      "archiveFailed": "점수판 보관에 실패했습니다.",
       "reactivateSuccess": "점수판을 다시 활성화했습니다.",
       "reactivateFailed": "점수판 활성화에 실패했습니다."
     }
