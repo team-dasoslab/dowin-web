@@ -383,12 +383,12 @@ export default function ProfilePage() {
           }
         />
       )}
-      <ProtectedPageContainer className="space-y-12">
+      <ProtectedPageContainer className="space-y-8 lg:space-y-12">
         <ProtectedPageHeader title={t("title")} description={t("description")} />
 
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
+        <div className="flex flex-col gap-8 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 사이드바 내비게이션 ── */}
-          <aside className="w-full lg:w-[240px] lg:sticky lg:top-12 space-y-1">
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-6 flex w-[calc(100%+3rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-6 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             {menuGroups
               .filter((group) => group.items.length > 0)
               .map((group) => {
@@ -408,15 +408,15 @@ export default function ProfilePage() {
                         });
                       }
                     }}
-                    className={`w-full flex items-center px-4 py-2 rounded-button text-[14px] font-bold transition-all text-left ${
+                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
                       isActive 
                         ? "text-primary" 
                         : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      {isActive && <div className="w-1 h-4 bg-primary rounded-full" />}
-                      <span className={isActive ? "" : "pl-4"}>{group.label}</span>
+                      {isActive && <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />}
+                      <span className={isActive ? "" : "lg:pl-4"}>{group.label}</span>
                     </div>
                   </button>
                 );
@@ -424,10 +424,10 @@ export default function ProfilePage() {
           </aside>
 
           {/* ── 우측 메인 콘텐츠 ── */}
-          <div className="flex-1 space-y-12 max-w-[800px]">
+          <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
             {/* 프로필 요약 카드 */}
             <div className="space-y-4">
-              <Card className="border border-zinc-200 rounded-content px-8 py-8 flex items-center gap-6 bg-white">
+              <Card className="border border-zinc-200 rounded-content px-5 py-5 flex items-center gap-4 bg-white sm:px-8 sm:py-8 sm:gap-6">
                 <UserAvatar
                   avatarKey={avatarKey}
                   avatarSeed={nickname}
@@ -455,7 +455,7 @@ export default function ProfilePage() {
             </div>
 
             {/* 설정 그룹들 */}
-            <div className="space-y-16 pb-[60vh]">
+            <div className="space-y-10 pb-24 lg:space-y-16 lg:pb-[60vh]">
               {menuGroups
                 .filter((group) => group.items.length > 0)
                 .map((group) => (
@@ -473,7 +473,7 @@ export default function ProfilePage() {
                     </div>
 
                     {group.id === "workspace" && workspace && (
-                      <div className="mb-4 rounded-content border border-zinc-200 bg-white px-8 py-7 flex items-center justify-between">
+                      <div className="mb-4 rounded-content border border-zinc-200 bg-white px-5 py-5 flex items-center justify-between gap-3 sm:px-8 sm:py-7">
                         <div className="flex flex-col min-w-0 text-left">
                           <p className="text-lg font-bold text-zinc-900 truncate tracking-tight">
                             {workspace.name}
@@ -526,10 +526,10 @@ function MenuItemRow({
   const itemWrapperClassName = isLast ? "" : "border-b border-zinc-100";
 
   const Content = (
-    <div className="flex items-center justify-between w-full px-6 py-5 transition-colors">
-      <div className="flex items-center gap-4 min-w-0">
+    <div className="flex w-full flex-col gap-3 px-4 py-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+      <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
         <div
-          className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 ${
+          className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0 ${
             item.danger
               ? "border-red-100 bg-red-50 text-red-500"
               : "border-zinc-100 bg-zinc-50 text-zinc-400"
@@ -551,9 +551,11 @@ function MenuItemRow({
         </div>
       </div>
       {item.rightElement ? (
-        item.rightElement
+        <div className="ml-12 flex justify-start sm:ml-3 sm:justify-end">
+          {item.rightElement}
+        </div>
       ) : (
-        <ChevronRight className="w-4 h-4 text-zinc-300 flex-shrink-0 ml-3" />
+        <ChevronRight className="hidden w-4 h-4 text-zinc-300 flex-shrink-0 ml-3 sm:block" />
       )}
     </div>
   );

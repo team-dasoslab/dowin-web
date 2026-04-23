@@ -58,7 +58,7 @@ export default async function ProtectedLayout({
         hasScoreboard={Boolean(activeScoreboard)}
       />
       <main className="md:pl-[80px] lg:pl-[240px]">
-        <div className="pb-20 md:pb-0">
+        <div className="pb-[calc(5.25rem+env(safe-area-inset-bottom))] md:pb-0">
           <ProtectedContentLayout>{children}</ProtectedContentLayout>
         </div>
       </main>

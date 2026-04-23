@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Activity, Ellipsis, Minus, Plus, Tag, X } from "lucide-react";
+import { Ellipsis, Minus, Plus, Tag, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -76,7 +76,7 @@ export function LeadMeasuresSection({
         ))}
       </div>
 
-      <div className="border-t border-dashed border-zinc-200 px-8 py-5 bg-zinc-50/30">
+      <div className="border-t border-dashed border-zinc-200 bg-zinc-50/30 px-4 py-4 sm:px-8 sm:py-5">
         <Button
           type="button"
           disabled={isMutating}
@@ -138,7 +138,7 @@ function LeadMeasureRow({
   const t = useTranslations("Setup");
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="space-y-5 p-4 sm:space-y-6 sm:p-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <label className="text-sm font-bold text-zinc-900">
@@ -168,8 +168,8 @@ function LeadMeasureRow({
         required
       />
 
-      <div className="flex items-center gap-3">
-        <div className="flex shrink-0 gap-1 rounded-content border border-zinc-200 bg-zinc-50/50 p-1">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="grid w-full grid-cols-2 gap-1 rounded-content border border-zinc-200 bg-zinc-50/50 p-1 sm:w-auto sm:shrink-0 sm:flex">
           {(["WEEKLY", "MONTHLY"] as const).map((period) => (
             <Button
               key={period}
@@ -183,7 +183,7 @@ function LeadMeasureRow({
                   period === "WEEKLY" ? 3 : 1,
                 );
               }}
-              className={`rounded-content px-4 py-2 text-sm font-bold transition-all ${
+              className={`rounded-button px-3 py-2 text-sm font-bold transition-all sm:px-4 ${
                 measure.period === period
                   ? "bg-white text-primary shadow-sm border border-zinc-200/50"
                   : "text-zinc-400 hover:text-zinc-600"
@@ -194,7 +194,7 @@ function LeadMeasureRow({
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2 sm:justify-start">
           <div className="flex items-center rounded-content border border-zinc-200 bg-white overflow-hidden">
             <Button
               type="button"
@@ -246,7 +246,7 @@ function LeadMeasureRow({
         className="rounded-content border border-zinc-200 bg-zinc-50/30 overflow-hidden"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
       >
-        <div className="flex items-start justify-between gap-3 px-5 py-4">
+        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <Tag className="mt-1 h-3.5 w-3.5 shrink-0 text-primary/60" />
             <div className="min-w-0 flex-1 space-y-2">
@@ -280,7 +280,7 @@ function LeadMeasureRow({
             type="button"
             disabled={isMutating}
             onClick={() => setIsTagEditorOpen((previous) => !previous)}
-            className={`shrink-0 rounded-content border px-4 py-2 text-xs font-bold transition-all ${
+            className={`w-full shrink-0 rounded-button border px-4 py-2 text-xs font-bold transition-all sm:w-auto ${
               isTagEditorOpen
                 ? "bg-zinc-900 border-zinc-900 text-white"
                 : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300"

@@ -17,14 +17,14 @@ export function ActionRow({
 }: ActionRowProps) {
   return (
     <Card className={cn("bg-white px-5 py-4", className)}>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-text-primary">{title}</p>
           {description && (
             <p className="mt-0.5 text-[11px] text-text-muted">{description}</p>
           )}
         </div>
-        {action && <div className="ml-4 shrink-0">{action}</div>}
+        {action && <div className="shrink-0 sm:ml-4">{action}</div>}
       </div>
     </Card>
   );
