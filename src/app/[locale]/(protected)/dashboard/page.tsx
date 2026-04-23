@@ -2,16 +2,27 @@
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { MemberCard } from "@/app/[locale]/(protected)/dashboard/_components/MemberCard";
 import { WeeklyTable } from "@/app/[locale]/(protected)/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/[locale]/(protected)/dashboard/_hooks/useTeamDashboard";
 import { Button } from "@/components/ui/Button";
+import { PeriodBadge } from "@/components/ui/PeriodBadge";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { Plus, Users, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Add20Filled,
+  Flash20Filled,
+  People20Regular,
+} from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EmptyStatePanel } from "../_components/EmptyStatePanel";
 import { formatWeekLabel } from "./_lib/dashboard";
 
@@ -33,6 +44,40 @@ export default function DashboardPage() {
   const myAvatarKey =
     profileResponse?.status === 200 ? profileResponse.data.avatarKey : null;
   const hasTrackedViewRef = useRef(false);
+
+  const [activeSection, setActiveSection] = useState("summary");
+
+  const menuGroups = useMemo(
+    () => [
+      { id: "summary", label: t("memberSummary") },
+      { id: "scoreboard", label: t("teamWeeklyScoreboard") },
+    ],
+    [t],
+  );
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const container = document.getElementById("main-scroll-container");
+      if (!container) return;
+      const scrollPosition = container.scrollTop + 150;
+      let currentSectionId = activeSection;
+
+      for (const group of menuGroups) {
+        const el = document.getElementById(group.id);
+        if (el && el.offsetTop <= scrollPosition) {
+          currentSectionId = group.id;
+        }
+      }
+
+      if (currentSectionId !== activeSection) {
+        setActiveSection(currentSectionId);
+      }
+    };
+
+    const container = document.getElementById("main-scroll-container");
+    container?.addEventListener("scroll", handleScroll);
+    return () => container?.removeEventListener("scroll", handleScroll);
+  }, [activeSection, menuGroups]);
 
   useEffect(() => {
     if (
@@ -83,111 +128,146 @@ export default function DashboardPage() {
     members.find((member) => member.userId === myUserId)?.role ?? null;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] font-pretendard">
-      <div
-        className={`mx-auto max-w-[1200px] p-6 md:p-10 lg:p-12 animate-linear-in transition-transform duration-300 ease-out xl:origin-top ${
-          activeMemoState ? "xl:-translate-x-28" : "xl:translate-x-0"
-        }`}
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+      <ProtectedPageContainer
+        className={cn(
+          "relative transition-[left] duration-300 ease-out xl:origin-top space-y-6 lg:space-y-12",
+          activeMemoState ? "xl:left-[-112px]" : "xl:left-0",
+        )}
       >
-        <div className="space-y-10">
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-1">
-            <div className="flex items-center gap-3">
-              <div className="min-w-0">
-                <h1 className="truncate text-xl font-black text-zinc-900 tracking-tight">
-                  {t("teamStatus")}
-                </h1>
+        <ProtectedPageHeader title={t("teamStatus")} />
+
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
+          {/* ── 좌측 네비게이션 ── */}
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+            <nav className="flex gap-1 lg:block lg:space-y-1">
+              {menuGroups.map((group) => {
+                const isActive = activeSection === group.id;
+                return (
+                  <button
+                    key={group.id}
+                    onClick={() => {
+                      const element = document.getElementById(group.id);
+                      const container = document.getElementById(
+                        "main-scroll-container",
+                      );
+                      if (container && element) {
+                        const headerOffset = 100;
+                        const elementPosition = element.offsetTop;
+                        const offsetPosition = elementPosition - headerOffset;
+                        container.scrollTo({
+                          top: offsetPosition,
+                          behavior: "smooth",
+                        });
+                      }
+                    }}
+                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
+                      isActive
+                        ? "text-primary"
+                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isActive && (
+                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
+                      )}
+                      <span className={isActive ? "" : "lg:pl-4"}>
+                        {group.label}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
+
+          {/* ── 우측 메인 콘텐츠 ── */}
+          <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
+            <section id="summary" className="space-y-5 scroll-mt-28">
+              <div className="flex items-end justify-between">
+                <div className="flex-1">
+                  <SectionHeader title={t("memberSummary")} />
+                </div>
+                <div className="pb-1 px-1">
+                  <PeriodBadge label={weekLabel} />
+                </div>
               </div>
-            </div>
 
-            <div className="flex flex-wrap items-center gap-2"></div>
-          </header>
+              {members.length === 0 ? (
+                <div className="border border-border rounded-content p-8 text-center text-text-muted text-sm">
+                  {t("noMembers")}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {members.map((member) => (
+                    <MemberCard
+                      key={member.userId}
+                      member={member}
+                      isMe={member.userId === myUserId}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
 
-          <section className="space-y-4">
-            <div className="flex items-center justify-between px-1">
-              <h2 className="text-sm font-bold text-text-primary">
-                {t("memberSummary")}
-              </h2>
-              <span className="text-[11px] font-bold text-zinc-600 bg-white border border-zinc-200 px-2.5 py-1 rounded-content font-mono">
-                {weekLabel}
-              </span>
-            </div>
-
-            {members.length === 0 ? (
-              <div className="border border-border rounded-content p-8 text-center text-text-muted text-sm">
-                {t("noMembers")}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {members.map((member) => (
-                  <MemberCard
-                    key={member.userId}
-                    member={member}
-                    isMe={member.userId === myUserId}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
-
-          <div className="border-t border-border" />
-
-          <section className="space-y-6 overflow-visible">
-            <div className="px-1">
+            <section
+              id="scoreboard"
+              className="space-y-6 overflow-visible scroll-mt-28"
+            >
               <div>
-                <h2 className="text-sm font-bold text-text-primary">
-                  {t("teamWeeklyScoreboard")}
-                </h2>
-                <p className="mt-0.5 text-xs text-text-muted">
-                  {t("teamWeeklyScoreboardDesc")}
-                </p>
+                <SectionHeader
+                  title={t("teamWeeklyScoreboard")}
+                  description={t("teamWeeklyScoreboardDesc")}
+                />
               </div>
-            </div>
 
-            {membersWithScoreboard.map((member) => (
-              <WeeklyTable
-                key={member.userId}
-                member={member}
-                weekDates={weekDates}
-                isMe={member.userId === myUserId}
-                memoMode={
-                  activeMemoState != null &&
-                  activeMemoState.memberId === member.userId
-                    ? activeMemoState.mode
-                    : null
-                }
-                onToggleCompose={() =>
-                  setActiveMemoState((prev) =>
-                    prev != null &&
-                    prev.memberId === member.userId &&
-                    prev.mode === "compose"
-                      ? null
-                      : member.userId != null
-                        ? { memberId: member.userId, mode: "compose" }
-                        : null,
-                  )
-                }
-                onToggleView={() =>
-                  setActiveMemoState((prev) =>
-                    prev != null &&
-                    prev.memberId === member.userId &&
-                    prev.mode === "view"
-                      ? null
-                      : member.userId != null
-                        ? { memberId: member.userId, mode: "view" }
-                        : null,
-                  )
-                }
-                onCloseMemo={() => setActiveMemoState(null)}
-                currentUserId={myUserId}
-                currentUserNickname={myNickname}
-                currentUserAvatarKey={myAvatarKey}
-                currentUserRole={currentUserRole}
-              />
-            ))}
-          </section>
+              {membersWithScoreboard.map((member) => (
+                <WeeklyTable
+                  key={member.userId}
+                  member={member}
+                  weekDates={weekDates}
+                  isMe={member.userId === myUserId}
+                  memoMode={
+                    activeMemoState != null &&
+                    activeMemoState.memberId === member.userId
+                      ? activeMemoState.mode
+                      : null
+                  }
+                  onToggleCompose={() =>
+                    setActiveMemoState((prev) =>
+                      prev != null &&
+                      prev.memberId === member.userId &&
+                      prev.mode === "compose"
+                        ? null
+                        : member.userId != null
+                          ? { memberId: member.userId, mode: "compose" }
+                          : null,
+                    )
+                  }
+                  onToggleView={() =>
+                    setActiveMemoState((prev) =>
+                      prev != null &&
+                      prev.memberId === member.userId &&
+                      prev.mode === "view"
+                        ? null
+                        : member.userId != null
+                          ? { memberId: member.userId, mode: "view" }
+                          : null,
+                    )
+                  }
+                  onCloseMemo={() => setActiveMemoState(null)}
+                  currentUserId={myUserId}
+                  currentUserNickname={myNickname}
+                  currentUserAvatarKey={myAvatarKey}
+                  currentUserRole={currentUserRole}
+                />
+              ))}
+            </section>
+          </div>
         </div>
-      </div>
+      </ProtectedPageContainer>
     </div>
+
   );
 }
 
@@ -195,7 +275,7 @@ function DashboardLoadingState() {
   const t = useTranslations("Dashboard");
   return (
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
-      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-10 animate-pulse">
+      <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-16 rounded-content bg-sub-background" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="h-48 rounded-content bg-sub-background" />
@@ -211,9 +291,9 @@ function DashboardNoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
-      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-6 md:p-10 lg:p-12">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Users className="w-5 h-5 text-primary" />}
+          icon={<People20Regular className="w-5 h-5 text-primary" />}
           title={t("noWorkspaceTitle")}
           description={t("noWorkspaceDesc")}
           actions={<NoWorkspaceActions />}
@@ -227,9 +307,9 @@ function DashboardNoScoreboardState() {
   const t = useTranslations("Dashboard");
   return (
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
-      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-6 md:p-10 lg:p-12">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Zap className="w-5 h-5 text-primary" />}
+          icon={<Flash20Filled className="w-5 h-5 text-primary" />}
           title={t("noScoreboardTitle")}
           description={t("noScoreboardDesc")}
           actions={
@@ -238,7 +318,7 @@ function DashboardNoScoreboardState() {
               className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
-                <Plus className="w-4 h-4" />
+                <Add20Filled className="w-4 h-4" />
                 {t("createScoreboard")}
               </Link>
             </Button>

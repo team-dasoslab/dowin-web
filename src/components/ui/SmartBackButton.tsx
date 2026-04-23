@@ -2,7 +2,7 @@
 
 import { Button, type ButtonProps } from "@/components/ui/Button";
 import { useRouter } from "@/i18n/routing";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 const PREVIOUS_PATH_KEY = "wig.previousPath";
@@ -44,7 +44,7 @@ export function SmartBackButton({
       type={type}
       {...props}
     >
-      <ArrowLeft className={iconClassName ?? "h-3.5 w-3.5"} />
+      <ArrowLeft20Regular className={iconClassName ?? "h-3.5 w-3.5"} />
       {props.children}
     </Button>
   );

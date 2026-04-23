@@ -1,6 +1,7 @@
 import { formatDate } from "@/app/[locale]/(protected)/scoreboards/_lib/scoreboards";
 import { Card } from "@/components/ui/Card";
-import { CalendarDays, Target } from "lucide-react";
+import { Target20Regular } from "@fluentui/react-icons";
+import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
@@ -29,7 +30,7 @@ export function ScoreboardCard({
             {goalName || t("unnamedScoreboard")}
           </h2>
           <div className="flex items-center gap-2 text-sm text-text-secondary">
-            <Target className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
+            <Target20Regular className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
             <span className="leading-relaxed">
               {lagMeasure || t("noLagMeasure")}
             </span>
@@ -38,12 +39,10 @@ export function ScoreboardCard({
         {action}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-muted">
-        <span className="inline-flex items-center gap-1 rounded-md bg-sub-background px-2 py-1 border border-border">
-          <CalendarDays className="w-3 h-3" />
-          {t("activePeriod")} {formatDate(startDate)} -{" "}
-          {endDate ? formatDate(endDate) : t("inProgress")}
-        </span>
+      <div className="flex flex-wrap items-center gap-2">
+        <PeriodBadge
+          label={`${t("activePeriod")} ${formatDate(startDate)} - ${endDate ? formatDate(endDate) : t("inProgress")}`}
+        />
       </div>
     </Card>
   );

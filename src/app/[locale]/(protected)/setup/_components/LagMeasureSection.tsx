@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { TrendingUp } from "lucide-react";
+
 import { useTranslations } from "next-intl";
 
 interface LagMeasureSectionProps {

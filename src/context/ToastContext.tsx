@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Dismiss16Regular } from "@fluentui/react-icons";
 import {
   createContext,
   ReactNode,
@@ -92,7 +92,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               onClick={() => removeToast(toast.id)}
               className="p-1 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
             >
-              <X size={14} />
+              <Dismiss16Regular />
             </button>
           </div>
         ))}

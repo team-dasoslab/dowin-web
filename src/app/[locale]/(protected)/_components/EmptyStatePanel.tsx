@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
-import { Zap } from "lucide-react";
+import { Flash20Regular } from "@fluentui/react-icons";
 import type { ReactNode } from "react";
 
 type EmptyStatePanelProps = {
@@ -21,7 +21,7 @@ export function EmptyStatePanel({
     <div className="flex justify-center w-full">
       <Card className="max-w-[480px] w-full p-10 text-center space-y-6 rounded-content">
         <div className="mx-auto w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-          {icon || <Zap className="text-primary w-6 h-6" />}
+          {icon || <Flash20Regular className="text-primary w-6 h-6" />}
         </div>
 
         <div className="space-y-2">
@@ -33,9 +33,7 @@ export function EmptyStatePanel({
           </div>
         </div>
 
-        <div className="flex justify-center pt-2">
-          {actions}
-        </div>
+        <div className="flex justify-center pt-2">{actions}</div>
       </Card>
     </div>
   );

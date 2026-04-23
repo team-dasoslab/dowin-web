@@ -1,7 +1,7 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { ActionRow } from "@/components/ui/ActionRow";
 import { Button } from "@/components/ui/Button";
-import { Archive } from "lucide-react";
+import { Archive20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 interface SetupManageSectionProps {
@@ -39,7 +39,7 @@ export function SetupManageSection({
                 className="border-text-secondary/20 border-t-text-secondary"
               />
             ) : (
-              <Archive className="h-3.5 w-3.5" />
+              <Archive20Regular className="h-3.5 w-3.5" />
             )}
             {isArchivePending ? t("archivingBtn") : t("archiveBtn")}
           </Button>
