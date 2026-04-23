@@ -1,6 +1,7 @@
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { Card } from "@/components/ui/Card";
-import { Lock, Target, Zap } from "lucide-react";
+import { StatCard } from "@/components/ui/StatCard";
+import { Flash20Regular, LockClosed20Regular, TargetArrow20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 type WeeklyTrendPoint = {
@@ -35,11 +36,11 @@ export function ScoreboardOverviewSection({
   return (
     <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-2 md:items-stretch">
       <div className="space-y-3">
-        <Card className="overflow-hidden rounded-lg border border-border">
-          <div className="flex flex-col gap-4 border-b border-border px-4 py-4 sm:px-6">
+        <Card>
+          <div className="flex flex-col gap-4 border-b border-zinc-200 px-4 py-4 sm:px-6">
             <div className="flex flex-row items-center gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                <Zap className="h-4 w-4 text-primary" />
+                <Flash20Regular className="h-4 w-4 text-primary" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
@@ -52,8 +53,8 @@ export function ScoreboardOverviewSection({
             </div>
           </div>
 
-          <div className="flex items-start gap-3 bg-sub-background px-4 py-3 sm:items-center sm:px-6">
-            <Target className="h-3.5 w-3.5 text-text-muted" />
+          <div className="flex items-start gap-3 bg-zinc-50/50 px-4 py-3 sm:items-center sm:px-6">
+            <TargetArrow20Regular className="h-3.5 w-3.5 text-text-muted" />
             <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center">
               <span className="tracking-widest text-[10px] font-bold text-text-muted sm:mr-3">
                 {t("lagMeasureLabel")}
@@ -65,19 +66,33 @@ export function ScoreboardOverviewSection({
           </div>
         </Card>
 
-        <Card className="rounded-lg border border-border bg-white p-4">
+        <Card className="p-4">
           <div className="grid grid-cols-2 gap-2">
-            <DashboardRateCard
+            <StatCard
               label={t("weeklyAchievementRate")}
-              rate={weeklyOverallRate}
+              value={`${weeklyOverallRate}%`}
+              valueClassName={
+                weeklyOverallRate >= 80
+                  ? "text-green-600"
+                  : weeklyOverallRate >= 50
+                    ? "text-amber-600"
+                    : "text-text-primary"
+              }
             />
-            <DashboardRateCard
+            <StatCard
               label={
                 monthLabel
                   ? t("monthlyAchievementRateWithMonth", { month: monthLabel })
                   : t("monthlyAchievementRate")
               }
-              rate={monthlyOverallRate}
+              value={`${monthlyOverallRate}%`}
+              valueClassName={
+                monthlyOverallRate >= 80
+                  ? "text-green-600"
+                  : monthlyOverallRate >= 50
+                    ? "text-amber-600"
+                    : "text-text-primary"
+              }
             />
           </div>
         </Card>
@@ -92,24 +107,6 @@ export function ScoreboardOverviewSection({
   );
 }
 
-function DashboardRateCard({ label, rate }: { label: string; rate: number }) {
-  return (
-    <div className="rounded-md border border-border bg-sub-background px-3 py-2">
-      <p className="text-[10px] text-text-muted">{label}</p>
-      <p
-        className={`font-mono text-lg font-bold ${
-          rate >= 80
-            ? "text-green-600"
-            : rate >= 50
-              ? "text-amber-600"
-              : "text-text-primary"
-        }`}
-      >
-        {rate}%
-      </p>
-    </div>
-  );
-}
 
 function DashboardWeeklyTrendSection({
   isLoading,
@@ -123,7 +120,7 @@ function DashboardWeeklyTrendSection({
   const t = useTranslations("Dashboard");
 
   return (
-    <Card className="flex h-full min-h-[220px] flex-col overflow-hidden rounded-lg border border-border bg-white p-4">
+    <Card className="flex h-full min-h-[220px] flex-col p-4">
       <p className="text-sm font-semibold text-text-primary">
         {t("recentTrend")}
       </p>
@@ -132,7 +129,7 @@ function DashboardWeeklyTrendSection({
       ) : isHistoryLimited ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-2">
           <div className="rounded-full bg-sub-background p-2">
-            <Lock className="h-4 w-4 text-text-muted" />
+            <LockClosed20Regular className="h-4 w-4 text-text-muted" />
           </div>
           <p className="text-[11px] text-text-muted">
             {t("historyLimitMessage")}

@@ -1,6 +1,7 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
+import { ActionRow } from "@/components/ui/ActionRow";
 import { Button } from "@/components/ui/Button";
-import { Archive } from "lucide-react";
+import { Archive20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 interface SetupManageSectionProps {
@@ -17,20 +18,11 @@ export function SetupManageSection({
   const t = useTranslations("Setup");
 
   return (
-    <div className="space-y-2 pt-4">
-      <p className="px-0.5 text-[10px] font-bold uppercase tracking-widest text-text-muted">
-        {t("manage")}
-      </p>
-      <div className="overflow-hidden rounded-lg border border-border">
-        <div className="flex items-center justify-between bg-white px-5 py-4">
-          <div>
-            <p className="text-sm font-semibold text-text-primary">
-              {t("archiveLabel")}
-            </p>
-            <p className="mt-0.5 text-[11px] text-text-muted">
-              {t("archiveDesc")}
-            </p>
-          </div>
+    <div className="space-y-2">
+      <ActionRow
+        title={t("archiveLabel")}
+        description={t("archiveDesc")}
+        action={
           <Button
             type="button"
             disabled={isMutating}
@@ -39,7 +31,7 @@ export function SetupManageSection({
                 void archive();
               }
             }}
-            className="ml-4 flex shrink-0 items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-bold text-text-secondary transition-colors hover:border-[rgba(205,207,213,1)]"
+            className="flex shrink-0 items-center gap-1.5 rounded-content border border-zinc-200 px-3 py-1.5 text-xs font-bold text-text-secondary transition-colors hover:border-[rgba(205,207,213,1)]"
           >
             {isArchivePending ? (
               <InlineSpinner
@@ -47,12 +39,12 @@ export function SetupManageSection({
                 className="border-text-secondary/20 border-t-text-secondary"
               />
             ) : (
-              <Archive className="h-3.5 w-3.5" />
+              <Archive20Regular className="h-3.5 w-3.5" />
             )}
             {isArchivePending ? t("archivingBtn") : t("archiveBtn")}
           </Button>
-        </div>
-      </div>
+        }
+      />
     </div>
   );
 }

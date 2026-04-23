@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { Plus, Zap } from "lucide-react";
+import { Add20Regular, Flash20Regular } from "@fluentui/react-icons";
 import { Link } from "@/i18n/routing";
 
 const meta: Meta<typeof Button> = {
@@ -18,7 +18,7 @@ type Story = StoryObj<typeof Button>;
 export const Default: Story = {
   args: {
     children: "Default Button",
-    className: "px-4 py-2 border border-border rounded-lg text-sm",
+    className: "px-4 py-2 border border-border text-sm",
   },
 };
 
@@ -26,7 +26,7 @@ export const Primary: Story = {
   args: {
     children: (
       <div className="flex items-center gap-2">
-        <Zap className="w-4 h-4 fill-current" />
+        <Flash20Regular className="w-4 h-4 fill-current" />
         <span>Primary Action</span>
       </div>
     ),
@@ -51,14 +51,14 @@ export const Loading: Story = {
       <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
     ),
     className:
-      "bg-primary/50 text-white px-5 py-3 rounded-lg flex items-center justify-center",
+      "bg-primary/50 text-white px-5 py-3 flex items-center justify-center",
   },
 };
 
 export const IconButton: Story = {
   args: {
-    children: <Plus className="w-4 h-4" />,
+    children: <Add20Regular className="w-4 h-4" />,
     className:
-      "w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-border-hover transition-colors",
+      "w-8 h-8 border border-border flex items-center justify-center text-text-muted hover:border-border-hover transition-colors",
   },
 };

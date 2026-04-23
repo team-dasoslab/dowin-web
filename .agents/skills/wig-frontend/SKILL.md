@@ -35,6 +35,7 @@ If current code and docs differ, verify the implementation and preserve establis
 - Use Zod for form validation.
 - For server state, use generated Orval hooks and TanStack Query patterns.
 - After mutations, invalidate related queries.
+- For user-facing UI copy, use `next-intl` translations instead of hardcoded strings. Add or update matching keys in `src/messages/ko.json` and `src/messages/en.json` when introducing or changing visible text.
 - Do not introduce `useSearchParams()` in a page path unless it is wrapped by a `Suspense` boundary. If the value can be resolved on the server, prefer reading the page `searchParams` prop and passing it down instead.
 - Treat date display and date-key generation in the UI as KST-based unless the current feature explicitly requires another timezone.
 - Keep mobile behavior in scope, especially dashboard and scoreboard flows.
@@ -73,6 +74,7 @@ When contracts change, regenerate the client.
 - keep page components focused on composition and rendering; move form state and server-state orchestration into domain hooks when the logic is non-trivial
 - use toast feedback for meaningful actions
 - keep forms and buttons disabled during pending submissions when needed
+- avoid new hardcoded user-facing Korean or English strings in components; wire visible labels, empty states, errors, tooltips, button text, and status copy through `useTranslations` or the established server translation pattern
 
 ### 4. Storybook rule
 
@@ -117,6 +119,7 @@ Apply `gen:api` only when the API contract actually changed. If there is no cont
 - If the page mixes local form state and TanStack Query mutation logic, did you split them into domain hooks with clear responsibilities?
 - If server state changed, were related queries invalidated?
 - If query-string state is needed, did you choose between server `searchParams` props and client `useSearchParams()` intentionally, and add `Suspense` when using the client hook?
+- Are new or changed visible UI strings covered in both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded?
 - If API contracts changed, was `yarn gen:api` run?
 - If shared UI changed, was Storybook updated?
 - Was mobile layout considered?

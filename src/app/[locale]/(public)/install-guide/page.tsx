@@ -4,14 +4,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import {
-  ChevronRight,
-  Ellipsis,
-  House,
-  PlusSquare,
-  Share,
-  Smartphone,
-  Timer,
-} from "lucide-react";
+  AddSquare24Regular,
+  ChevronRight24Regular,
+  Home24Regular,
+  MoreHorizontal24Regular,
+  Phone24Regular,
+  ShareIos24Regular,
+  Timer24Regular,
+} from "@fluentui/react-icons";
 
 const steps = [
   {
@@ -19,14 +19,14 @@ const steps = [
     title: "Safari에서 WIG 링크 열기",
     description:
       "iPhone에서는 Safari에서만 WIG를 홈 화면에 설치할 수 있어요. 다른 브라우저에서 열었다면 Safari로 다시 열어 진행해주세요.",
-    icon: Smartphone,
+    icon: Phone24Regular,
   },
   {
     step: "STEP 2",
     title: "하단 점 세 개 버튼 누르기",
     description:
       "화면 아래 메뉴에서 점 세 개 버튼을 눌러 추가 메뉴를 열어주세요.",
-    icon: Ellipsis,
+    icon: MoreHorizontal24Regular,
     imageSrc: "/assets/guide/guide01.png",
     imageAlt: "Safari 하단 더보기 버튼 예시",
   },
@@ -35,14 +35,14 @@ const steps = [
     title: "공유 버튼 누르기",
     description:
       "펼쳐진 메뉴에서 공유 버튼을 눌러 설치 관련 옵션이 있는 공유 시트를 띄웁니다.",
-    icon: Share,
+    icon: ShareIos24Regular,
   },
   {
     step: "STEP 4",
     title: "더보기 클릭",
     description:
       "공유 시트 옵션이 짧게 보이면 더보기를 눌러 전체 액션 목록을 확인합니다.",
-    icon: ChevronRight,
+    icon: ChevronRight24Regular,
     imageSrc: "/assets/guide/guide02.png",
     imageAlt: "Safari 공유 시트 더보기 예시",
   },
@@ -51,7 +51,7 @@ const steps = [
     title: "홈 화면에 추가 선택",
     description:
       "액션 목록에서 홈 화면에 추가를 누르면 앱 아이콘 이름을 확인할 수 있습니다.",
-    icon: PlusSquare,
+    icon: AddSquare24Regular,
     imageSrc: "/assets/guide/guide03.png",
     imageAlt: "홈 화면에 추가 메뉴 예시",
   },
@@ -60,7 +60,7 @@ const steps = [
     title: "설치 완료",
     description:
       "홈 화면에 WIG 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
-    icon: House,
+    icon: Home24Regular,
     imageSrc: "/assets/guide/guide04.png",
     imageAlt: "홈 화면에 설치된 WIG 예시",
   },
@@ -94,7 +94,7 @@ export default function InstallGuidePage() {
                 </p>
               </div>
               <div className="flex items-center gap-2 text-[11px] leading-none text-text-muted">
-                <Timer className="h-3 w-3" />
+                <Timer24Regular className="h-3 w-3" />
                 <span>설치 소요 약 1분</span>
               </div>
             </div>
