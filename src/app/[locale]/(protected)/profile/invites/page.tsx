@@ -278,7 +278,7 @@ export default function ProfileInvitesPage() {
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
                               <Checkmark20Regular className="h-3.5 w-3.5" />{" "}
-                              {t("copySuccess")}
+                              {t("copiedLabel")}
                             </span>
                           ) : (
                             <span className="flex items-center gap-1.5">
