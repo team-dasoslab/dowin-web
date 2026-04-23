@@ -1270,6 +1270,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.1.2":
+  version: 7.29.2
+  resolution: "@babel/runtime@npm:7.29.2"
+  checksum: 10c0/30b80a0140d16467792e1bbeb06f655b0dab70407da38dfac7fedae9c859f9ae9d846ef14ad77bd3814c064295fe9b1bc551f1541ea14646ae9f22b71a8bc17a
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.12.5":
   version: 7.28.6
   resolution: "@babel/runtime@npm:7.28.6"
@@ -1553,6 +1560,13 @@ __metadata:
   dependencies:
     tslib: "npm:^2.4.0"
   checksum: 10c0/e6d54bf2b1e64cdd83d2916411e44e579b6ae35d5def0dea61a3c452d9921373044dff32a8b8473ae60c80692bdc39323e98b96a3f3d87ba6886b24dd0ef7ca1
+  languageName: node
+  linkType: hard
+
+"@emotion/hash@npm:^0.9.0":
+  version: 0.9.2
+  resolution: "@emotion/hash@npm:0.9.2"
+  checksum: 10c0/0dc254561a3cc0a06a10bbce7f6a997883fd240c8c1928b93713f803a2e9153a257a488537012efe89dbe1246f2abfe2add62cdb3471a13d67137fcb808e81c2
   languageName: node
   linkType: hard
 
@@ -2596,6 +2610,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fluentui/react-icons@npm:^2.0.324":
+  version: 2.0.324
+  resolution: "@fluentui/react-icons@npm:2.0.324"
+  dependencies:
+    "@griffel/react": "npm:^1.6.1"
+    tslib: "npm:^2.1.0"
+  peerDependencies:
+    react: ">=16.8.0 <20.0.0"
+  checksum: 10c0/47bf21743cec7fa3620522aae6eeef5b50bca1dfde1e9511718c6eb24d8dda31e8a4108e3454dfaa9953538966d204ca30a024c63fd7d439ccc0377eefcb020d
+  languageName: node
+  linkType: hard
+
 "@formatjs/fast-memoize@npm:3.1.2, @formatjs/fast-memoize@npm:^3.1.0":
   version: 3.1.2
   resolution: "@formatjs/fast-memoize@npm:3.1.2"
@@ -2674,6 +2700,41 @@ __metadata:
   dependencies:
     type-fest: "npm:^4.1.0"
   checksum: 10c0/c998bfb41ff84b5640fcb0cd47d2bdf963c7d36792673edddc469d5a1752a5f7105697e79d34db69062562ae3506283c2474ca14785af652610d8abe17ddbef3
+  languageName: node
+  linkType: hard
+
+"@griffel/core@npm:^1.20.1":
+  version: 1.20.1
+  resolution: "@griffel/core@npm:1.20.1"
+  dependencies:
+    "@emotion/hash": "npm:^0.9.0"
+    "@griffel/style-types": "npm:^1.4.0"
+    csstype: "npm:^3.1.3"
+    rtl-css-js: "npm:^1.16.1"
+    stylis: "npm:^4.2.0"
+    tslib: "npm:^2.1.0"
+  checksum: 10c0/0e0149ab5bb5f3ee0b4e81eafa24e1c7c02104d84cfa75827b96f19d084e3d45d773927673fa9bf51c97178eb00bfbd4f98eeee4d9b417858799922b624db2ba
+  languageName: node
+  linkType: hard
+
+"@griffel/react@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@griffel/react@npm:1.6.1"
+  dependencies:
+    "@griffel/core": "npm:^1.20.1"
+    tslib: "npm:^2.1.0"
+  peerDependencies:
+    react: ">=16.8.0 <20.0.0"
+  checksum: 10c0/953ab19add128f118d2c4995b93a806c8f015ebc9433b78cdabec0ab79f8d056664bf839115138eec513f89a03e54e9bd5c1af013c045b16d08e74b05e267b74
+  languageName: node
+  linkType: hard
+
+"@griffel/style-types@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@griffel/style-types@npm:1.4.0"
+  dependencies:
+    csstype: "npm:^3.1.3"
+  checksum: 10c0/1e77939450fc868423caf041815519d3c3a973297e6d5617237d4ee05249a2aa191027be2870ca268012c7a94860db475c14b8ac0884b66c84e2fdb48599b7d5
   languageName: node
   linkType: hard
 
@@ -7249,7 +7310,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csstype@npm:^3.2.2":
+"csstype@npm:^3.1.3, csstype@npm:^3.2.2":
   version: 3.2.3
   resolution: "csstype@npm:3.2.3"
   checksum: 10c0/cd29c51e70fa822f1cecd8641a1445bed7063697469d35633b516e60fe8c1bde04b08f6c5b6022136bb669b64c63d4173af54864510fbb4ee23281801841a3ce
@@ -12360,6 +12421,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rtl-css-js@npm:^1.16.1":
+  version: 1.16.1
+  resolution: "rtl-css-js@npm:1.16.1"
+  dependencies:
+    "@babel/runtime": "npm:^7.1.2"
+  checksum: 10c0/4b81ef50e50c97455d61c9bb576e2892651c79bac5d0c52b4123ebb9d6a2c5144590a79c9db0a3212a81b4eb83bf317e03637220f20b387a37b96cbac324d3d2
+  languageName: node
+  linkType: hard
+
 "run-applescript@npm:^7.0.0":
   version: 7.1.0
   resolution: "run-applescript@npm:7.1.0"
@@ -13100,6 +13170,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stylis@npm:^4.2.0":
+  version: 4.4.0
+  resolution: "stylis@npm:4.4.0"
+  checksum: 10c0/259be096d90dfbfe903c8656dcb7591e52a421e577e950ef42ebd9ca02f387623a1165dd08761492fb6e92a7a562d62a53a694a10b0a2f6dcd7a0db107b4bf55
+  languageName: node
+  linkType: hard
+
 "supports-color@npm:^10.0.0":
   version: 10.2.2
   resolution: "supports-color@npm:10.2.2"
@@ -13365,7 +13442,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.1, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.8.0, tslib@npm:^2.8.1":
+"tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.8.0, tslib@npm:^2.8.1":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
@@ -14187,6 +14264,7 @@ __metadata:
     "@block65/webcrypto-web-push": "npm:^1.0.2"
     "@chromatic-com/storybook": "npm:^5.0.1"
     "@eslint/eslintrc": "npm:^3"
+    "@fluentui/react-icons": "npm:^2.0.324"
     "@opennextjs/cloudflare": "npm:^1.17.1"
     "@radix-ui/react-slot": "npm:^1.2.4"
     "@serwist/next": "npm:^9.5.6"
