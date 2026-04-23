@@ -85,7 +85,7 @@ function MonthlyMobileWeekCard({
   const t = useTranslations("Dashboard");
 
   return (
-    <div className="rounded-lg border border-border bg-white p-4">
+    <div className="rounded-content border border-border bg-white p-4">
       <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
         <p className="text-sm font-bold text-text-primary">
           {t("weekNumber", { n: weekIndex + 1 })}
@@ -143,7 +143,7 @@ function MonthlyMobileMeasureCard({
   }, 0);
 
   return (
-    <div className="rounded-lg border border-border bg-sub-background/40 p-3">
+    <div className="rounded-content border border-border bg-sub-background/40 p-3">
       <div className="flex items-start justify-between gap-3">
         <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
         <AchievementProgress

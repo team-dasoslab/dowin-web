@@ -110,7 +110,7 @@ export function WeeklyTable({
               {member.nickname}
             </span>
             {isMe ? (
-              <span className="rounded border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+              <span className="rounded-content border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
                 {tc("me")}
               </span>
             ) : null}
@@ -123,7 +123,7 @@ export function WeeklyTable({
               <Button
                 type="button"
                 onClick={onToggleView}
-                className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-bold transition-colors ${
+                className={`shrink-0 rounded-content border px-3 py-2 text-xs font-bold transition-colors ${
                   memoMode === "view"
                     ? "border-primary/25 bg-primary/10 text-primary"
                     : "border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
@@ -135,7 +135,7 @@ export function WeeklyTable({
             <Button
               type="button"
               onClick={handleComposeClick}
-              className={`shrink-0 rounded-lg border px-3 py-2 text-xs font-bold transition-colors ${
+              className={`shrink-0 rounded-content border px-3 py-2 text-xs font-bold transition-colors ${
                 memoMode === "compose"
                   ? "border-primary/25 bg-primary/10 text-primary"
                   : "border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
@@ -156,7 +156,7 @@ export function WeeklyTable({
             return (
               <div
                 key={`${member.userId}-${leadMeasure.id}-mobile`}
-                className="rounded-lg border border-border bg-white p-4"
+                className="rounded-content border border-zinc-200 bg-white p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <LeadMeasureSummary name={leadMeasure.name} />
@@ -207,10 +207,10 @@ export function WeeklyTable({
           })}
         </div>
 
-        <div className="hidden overflow-hidden rounded-lg border border-border md:block">
+        <div className="hidden overflow-hidden rounded-content border border-zinc-200 md:block">
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
-              <div className="bg-sub-background border-b border-border">
+              <div className="bg-zinc-50/50 border-b border-zinc-200">
                 <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[38%]" />

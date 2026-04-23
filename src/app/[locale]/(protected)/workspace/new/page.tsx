@@ -33,36 +33,36 @@ export default function NewWorkspacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-6">
       {isPending && (
         <LoadingOverlay message={t("loading")} />
       )}
-      <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
+      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-linear-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
-          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0" />
-          <span className="text-xs font-bold text-text-muted">{tCommon("back")}</span>
+          <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 transition-colors shrink-0" />
+          <span className="text-xs font-bold text-zinc-400">{tCommon("back")}</span>
         </div>
 
         {/* 헤더 */}
-        <div className="space-y-4">
-          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+        <div className="space-y-5">
+          <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
             <Zap className="text-primary w-6 h-6" />
           </div>
-          <div className="space-y-1">
-            <h1 className="text-xl font-bold text-text-primary tracking-tight">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
               {t("title")}
             </h1>
-            <p className="text-xs text-text-muted leading-relaxed whitespace-pre-line">
+            <p className="text-sm text-zinc-500 font-medium leading-relaxed whitespace-pre-line">
               {t("description")}
             </p>
           </div>
         </div>
 
         {/* 폼 */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-3">
-            <label className="text-[11px] block font-bold text-text-secondary ml-0.5">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-4">
+            <label className="text-[11px] block font-black text-zinc-400 uppercase tracking-widest ml-1">
               {t("label")}
             </label>
             <Input
@@ -72,14 +72,14 @@ export default function NewWorkspacePage() {
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder={t("placeholder")}
               autoFocus
-              className="w-full px-4 py-3 bg-sub-background border border-border rounded-lg text-sm focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
+              className="w-full px-5 py-4 bg-zinc-50/50 border border-zinc-200 rounded-content text-base focus:border-primary outline-none transition-all placeholder:text-zinc-300"
               required
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-danger/5 border border-danger/20 rounded-lg">
-              <p className="text-danger text-[11px] font-bold text-center">
+            <div className="p-4 bg-red-50 border border-red-100 rounded-content">
+              <p className="text-red-600 text-xs font-bold text-center">
                 {error}
               </p>
             </div>
@@ -89,11 +89,11 @@ export default function NewWorkspacePage() {
             type="submit"
             disabled={isPending || !name.trim()}
             className={`
-              w-full py-3 flex items-center justify-center gap-2 rounded-lg text-sm font-bold transition-all
+              w-full py-4 flex items-center justify-center gap-2 rounded-button text-sm font-black transition-all
               ${
                 isPending || !name.trim()
                   ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-linear-primary shadow-sm"
+                  : "btn-linear-primary hover:scale-[1.02] active:scale-[0.98]"
               }
             `}
           >

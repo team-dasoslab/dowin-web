@@ -13130,6 +13130,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tailwind-merge@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "tailwind-merge@npm:3.5.0"
+  checksum: 10c0/4dc588f5b5296ba3f38e1ebb41f02b6d24a8c5bb45e44b33748c118fb4b5767dd0efc464431ca3e75404056b618b5f67bec3708158baa65fed8a2fc9201e0c53
+  languageName: node
+  linkType: hard
+
 "tailwindcss@npm:4.2.1, tailwindcss@npm:^4":
   version: 4.2.1
   resolution: "tailwindcss@npm:4.2.1"
@@ -14206,6 +14213,7 @@ __metadata:
     axios: "npm:^1.13.6"
     bcryptjs: "npm:^3.0.3"
     canvas-confetti: "npm:^1.9.4"
+    clsx: "npm:^2.1.1"
     drizzle-kit: "npm:^0.31.9"
     drizzle-orm: "npm:^0.45.1"
     eslint: "npm:^9"
@@ -14225,6 +14233,7 @@ __metadata:
     serwist: "npm:^9.5.6"
     sharp: "npm:^0.34.5"
     storybook: "npm:^10.2.19"
+    tailwind-merge: "npm:^3.5.0"
     tailwindcss: "npm:^4"
     typescript: "npm:^5.7.4"
     vite: "npm:^8.0.0"

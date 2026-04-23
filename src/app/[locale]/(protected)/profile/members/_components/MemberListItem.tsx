@@ -76,7 +76,7 @@ export function MemberListItem({
             type="button"
             disabled={isPendingTransfer || isPendingDelete}
             onClick={() => onTransferAdmin(memberId, nickname)}
-            className="flex min-w-fit items-center justify-center gap-1.5 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/10"
+            className="flex min-w-fit items-center justify-center gap-1.5 rounded-content border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/10"
           >
             <Shield className="h-3.5 w-3.5" />
             <span>{isPendingTransfer ? t("processing") : t("transferAdmin")}</span>
@@ -87,7 +87,7 @@ export function MemberListItem({
           type="button"
           disabled={!canRemove || isPendingDelete || isPendingTransfer}
           onClick={() => onRemove(memberId, nickname)}
-          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-colors ${
+          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-content px-3 py-2 text-xs font-bold transition-colors ${
             canRemove
               ? "border border-danger/20 bg-danger/5 text-danger hover:bg-danger/10"
               : "cursor-not-allowed border border-border bg-sub-background text-text-muted"

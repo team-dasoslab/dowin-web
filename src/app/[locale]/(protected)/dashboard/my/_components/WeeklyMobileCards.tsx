@@ -80,7 +80,7 @@ function WeeklyMobileCard({
   const guide = weeklyGuideById.get(leadMeasureId);
 
   return (
-    <div className="rounded-lg border border-border bg-white p-4">
+    <div className="rounded-content border border-border bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <LeadMeasureSummary

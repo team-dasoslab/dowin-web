@@ -17,20 +17,20 @@ import { useTranslations } from "next-intl";
 export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
   const t = useTranslations("ProductUpdates");
   return (
-    <Card className="rounded-lg border border-border px-4 py-4">
+    <Card className="rounded-content border border-border px-4 py-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="rounded-md border border-border bg-sub-background px-2 py-1 text-[10px] font-bold text-text-secondary">
+            <Badge className="rounded-button border border-border bg-sub-background px-2 py-1 text-[10px] font-bold text-text-secondary">
               {t(`tags.${item.tag}`)}
             </Badge>
             {item.isNew ? (
-              <Badge className="rounded-md border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
+              <Badge className="rounded-button border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
                 NEW
               </Badge>
             ) : null}
             {item.plan === "STANDARD" ? (
-              <Badge className="rounded-md border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
+              <Badge className="rounded-button border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
                 {t("standardOnly")}
               </Badge>
             ) : null}
@@ -50,7 +50,7 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
 
         <Button
           asChild
-          className="shrink-0 self-start rounded-lg border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary sm:self-auto"
+          className="shrink-0 self-start rounded-button border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary sm:self-auto"
         >
           <Link
             href={item.ctaHref}

@@ -22,7 +22,7 @@ export function ScoreboardCard({
   const t = useTranslations("Scoreboard");
 
   return (
-    <Card className="border border-border rounded-lg p-5 space-y-4 bg-white">
+    <Card className="border border-border rounded-content p-5 space-y-4 bg-white">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
           <h2 className="text-base font-bold text-text-primary">

@@ -57,7 +57,7 @@ export function WeeklyBoardSection({
         weeklyById={weeklyById}
       />
 
-      <div className="relative hidden overflow-hidden rounded-lg border border-border md:block">
+      <div className="relative hidden overflow-hidden rounded-content border border-border md:block">
         <div className="overflow-x-auto">
           <div className="min-w-[600px]">
             <div className="border-b border-border bg-sub-background">

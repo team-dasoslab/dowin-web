@@ -25,36 +25,33 @@ export default function JoinWorkspacePage() {
     });
 
   return (
-    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-6">
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-6">
       {isPending && (
         <LoadingOverlay message={t("loading")} />
       )}
-      <div className="w-full max-w-[400px] space-y-8 animate-linear-in">
+      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-linear-in">
         <div className="flex items-center gap-3">
-          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors shrink-0" />
-          <span className="text-xs font-bold text-text-muted">{tCommon("back")}</span>
+          <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 transition-colors shrink-0" />
+          <span className="text-xs font-bold text-zinc-400">{tCommon("back")}</span>
         </div>
 
-        <div className="space-y-4">
-          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+        <div className="space-y-5">
+          <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
             <Zap className="text-primary w-6 h-6" />
           </div>
-          <div className="space-y-1">
-            <h1 className="text-xl font-bold text-text-primary tracking-tight">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
               {t("title")}
             </h1>
-            <p className="text-xs text-text-muted leading-relaxed">
+            <p className="text-sm text-zinc-500 font-medium leading-relaxed">
               {t("description")}
-            </p>
-            <p className="text-[11px] text-text-muted leading-relaxed">
-              {t("planInfo")}
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-3">
-            <label className="text-[11px] block font-bold text-text-secondary ml-0.5">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-4">
+            <label className="text-[11px] block font-black text-zinc-400 uppercase tracking-widest ml-1">
               {t("label")}
             </label>
             <Input
@@ -64,42 +61,28 @@ export default function JoinWorkspacePage() {
               onChange={(e) => handleInviteCodeChange(e.target.value)}
               placeholder={t("placeholder")}
               autoFocus
-              className="w-full px-4 py-3 bg-sub-background border border-border rounded-lg text-sm focus:border-primary outline-none transition-colors placeholder:text-text-muted/40"
+              className="w-full px-5 py-4 bg-zinc-50/50 border border-zinc-200 rounded-content text-base focus:border-primary outline-none transition-all placeholder:text-zinc-300"
               required
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-danger/5 border border-danger/20 rounded-lg">
-              <p className="text-danger text-[11px] font-bold text-center">
+            <div className="p-4 bg-red-50 border border-red-100 rounded-content">
+              <p className="text-red-600 text-xs font-bold text-center">
                 {error}
               </p>
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Button
-              asChild
-              disabled={isPending}
-              className="w-full rounded-lg border border-border bg-white py-3 text-sm font-bold text-text-primary hover:border-[rgba(205,207,213,1)]"
-            >
-              <Link
-                href="/workspace/new"
-                className="flex items-center justify-center gap-2"
-              >
-                <Users className="w-4 h-4" />
-                {t("createButton")}
-              </Link>
-            </Button>
-
+          <div className="grid grid-cols-1 gap-3">
             <Button
               type="submit"
               disabled={isPending || inviteCode.trim().length === 0}
-              className={`w-full py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 ${
-                isPending || inviteCode.trim().length === 0
-                  ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-linear-primary"
-              }`}
+              className={`w-full py-4 rounded-button text-sm font-black transition-all flex items-center justify-center gap-2 ${
+              isPending || inviteCode.trim().length === 0
+                ? "bg-primary/50 text-white cursor-not-allowed"
+                : "btn-linear-primary hover:scale-[1.02] active:scale-[0.98]"
+            }`}
             >
               {isPending ? (
                 <InlineSpinner size="sm" />
@@ -109,6 +92,20 @@ export default function JoinWorkspacePage() {
                   {t("button")}
                 </>
               )}
+            </Button>
+
+            <Button
+              asChild
+              disabled={isPending}
+              className="w-full rounded-button border border-zinc-200 bg-white py-4 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              <Link
+                href="/workspace/new"
+                className="flex items-center justify-center gap-2"
+              >
+                <Users className="w-4 h-4" />
+                {t("createButton")}
+              </Link>
             </Button>
           </div>
         </form>

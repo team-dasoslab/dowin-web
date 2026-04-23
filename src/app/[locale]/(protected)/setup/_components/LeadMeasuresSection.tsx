@@ -7,12 +7,11 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Activity, Ellipsis, Minus, Plus, Tag, X } from "lucide-react";
+import { Ellipsis, Minus, Plus, Tag, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 interface LeadMeasuresSectionProps {
-  activeTooltip: "lag" | "lead" | null;
   addMeasureRow: () => void;
   availableTags: SetupTag[];
   coachmarkTarget?: "lead-measure-tags" | null;
@@ -29,12 +28,10 @@ interface LeadMeasuresSectionProps {
   monthlyTargetMax: number;
   renameTag: (tagId: number, rawName: string) => Promise<boolean>;
   removeMeasureRow: (id: string) => void;
-  setActiveTooltip: (value: "lag" | "lead" | null) => void;
   toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }
 
 export function LeadMeasuresSection({
-  activeTooltip,
   addMeasureRow,
   availableTags,
   coachmarkTarget,
@@ -47,37 +44,15 @@ export function LeadMeasuresSection({
   monthlyTargetMax,
   renameTag,
   removeMeasureRow,
-  setActiveTooltip,
   toggleMeasureTag,
 }: LeadMeasuresSectionProps) {
   const t = useTranslations("Setup");
 
   return (
     <Card
-      className="rounded-lg border border-border"
       data-coachmark="setup-lead"
     >
-      <div className="flex items-center justify-between rounded-t-lg border-b border-border bg-sub-background px-5 py-3">
-        <div className="flex items-center gap-2">
-          <Activity className="h-3.5 w-3.5 text-rose-500" />
-          <span className="text-xs font-bold text-text-primary">
-            {t("leadMeasure")}
-          </span>
-          <span className="text-[10px] text-text-muted">
-            — {t("leadMeasureQuestion")}
-          </span>
-        </div>
-        <LeadTooltip
-          active={activeTooltip === "lead"}
-          isMutating={isMutating}
-          onClose={() => setActiveTooltip(null)}
-          onToggle={() =>
-            setActiveTooltip(activeTooltip === "lead" ? null : "lead")
-          }
-        />
-      </div>
-
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-zinc-200/60">
         {measures.map((measure, index) => (
           <LeadMeasureRow
             key={measure.id}
@@ -101,14 +76,14 @@ export function LeadMeasuresSection({
         ))}
       </div>
 
-      <div className="border-t border-dashed border-border px-5 py-3">
+      <div className="border-t border-dashed border-zinc-200 bg-zinc-50/30 px-4 py-4 sm:px-8 sm:py-5">
         <Button
           type="button"
           disabled={isMutating}
           onClick={addMeasureRow}
-          className="flex w-full items-center justify-center gap-1.5 py-1 text-xs font-bold text-text-muted transition-colors hover:text-primary"
+          className="flex w-full items-center justify-center gap-2 py-3 rounded-content border border-zinc-200 bg-white text-sm font-bold text-zinc-500 transition-all hover:text-primary hover:border-primary/30"
         >
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-4 w-4" />
           {t("addLeadMeasure")}
         </Button>
       </div>
@@ -116,51 +91,6 @@ export function LeadMeasuresSection({
   );
 }
 
-function LeadTooltip({
-  active,
-  isMutating,
-  onClose,
-  onToggle,
-}: {
-  active: boolean;
-  isMutating: boolean;
-  onClose: () => void;
-  onToggle: () => void;
-}) {
-  const t = useTranslations("Setup");
-  return (
-    <div className="relative">
-      <Button
-        type="button"
-        disabled={isMutating}
-        onClick={onToggle}
-        className="flex items-center gap-0.5 text-[10px] font-medium text-text-muted transition-colors hover:text-primary"
-      >
-        {t("metricGuide")}
-      </Button>
-      {active ? (
-        <>
-          <div className="fixed inset-0 z-10" onClick={onClose} />
-          <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-lg border border-border bg-white p-4 shadow-lg transition-all">
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-primary">
-              {t("goodLeadTitle")}
-            </p>
-            <ul className="space-y-2 text-[11px] leading-relaxed text-text-secondary">
-              <li>
-                <b className="text-text-primary">{t("leadTip1Label")}</b>
-                {t("leadTip1Text")}
-              </li>
-              <li>
-                <b className="text-text-primary">{t("leadTip2Label")}</b>
-                {t("leadTip2Text")}
-              </li>
-            </ul>
-          </div>
-        </>
-      ) : null}
-    </div>
-  );
-}
 
 function LeadMeasureRow({
   handleMeasureChange,
@@ -208,17 +138,19 @@ function LeadMeasureRow({
   const t = useTranslations("Setup");
 
   return (
-    <div className="space-y-4 p-5">
+    <div className="space-y-5 p-4 sm:space-y-6 sm:p-8">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-bold text-text-secondary">
-          {t("leadMeasureShort")} #{index + 1}
-        </label>
+        <div className="flex items-center gap-3">
+          <label className="text-sm font-bold text-zinc-900">
+            {t("leadMeasureShort")} #{index + 1}
+          </label>
+        </div>
         {measuresCount > 1 ? (
           <Button
             type="button"
             disabled={isMutating}
             onClick={() => removeMeasureRow(measure.id)}
-            className="rounded px-2 py-0.5 text-[11px] font-bold text-danger transition-colors hover:bg-danger/5"
+            className="px-3 py-1 text-xs font-bold text-red-500 hover:bg-red-50 rounded-content transition-colors"
           >
             {t("delete")}
           </Button>
@@ -232,12 +164,12 @@ function LeadMeasureRow({
           handleMeasureChange(measure.id, "name", e.target.value)
         }
         placeholder={t("leadMeasurePlaceholder")}
-        className="w-full rounded-lg border border-border bg-sub-background p-3 text-sm outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary"
+        className="w-full rounded-content border border-zinc-200 bg-zinc-50/50 px-5 py-4 text-base focus:border-primary outline-none transition-all placeholder:text-zinc-300"
         required
       />
 
-      <div className="flex items-center gap-3">
-        <div className="flex shrink-0 gap-0.5 rounded-lg border border-border bg-sub-background p-0.5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="grid w-full grid-cols-2 gap-1 rounded-content border border-zinc-200 bg-zinc-50/50 p-1 sm:w-auto sm:shrink-0 sm:flex">
           {(["WEEKLY", "MONTHLY"] as const).map((period) => (
             <Button
               key={period}
@@ -251,10 +183,10 @@ function LeadMeasureRow({
                   period === "WEEKLY" ? 3 : 1,
                 );
               }}
-              className={`rounded-md px-3 py-1.5 text-xs font-bold transition-colors ${
+              className={`rounded-button px-3 py-2 text-sm font-bold transition-all sm:px-4 ${
                 measure.period === period
-                  ? "border border-border bg-white text-primary shadow-sm"
-                  : "text-text-muted hover:text-text-primary"
+                  ? "bg-white text-primary shadow-sm border border-zinc-200/50"
+                  : "text-zinc-400 hover:text-zinc-600"
               }`}
             >
               {period === "WEEKLY" ? t("modeWeekly") : t("modeMonthly")}
@@ -262,8 +194,8 @@ function LeadMeasureRow({
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex items-center rounded-lg border border-border bg-white">
+        <div className="flex items-center justify-between gap-2 sm:justify-start">
+          <div className="flex items-center rounded-content border border-zinc-200 bg-white overflow-hidden">
             <Button
               type="button"
               disabled={isMutating || measure.targetValue <= 1}
@@ -274,12 +206,12 @@ function LeadMeasureRow({
                   measure.targetValue - 1,
                 )
               }
-              className="flex h-10 w-10 items-center justify-center rounded-l-lg text-text-secondary hover:bg-sub-background disabled:opacity-40"
+              className="flex h-11 w-11 items-center justify-center text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600 disabled:opacity-30 transition-colors"
               aria-label={t("decrement")}
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <div className="flex h-10 min-w-12 items-center justify-center border-x border-border px-2 text-sm font-bold text-text-primary">
+            <div className="flex h-11 min-w-14 items-center justify-center border-x border-zinc-200 px-3 text-base font-black text-zinc-900 font-mono">
               {measure.targetValue}
             </div>
             <Button
@@ -296,7 +228,7 @@ function LeadMeasureRow({
                   measure.targetValue + 1,
                 )
               }
-              className="flex h-10 w-10 items-center justify-center rounded-r-lg text-text-secondary hover:bg-sub-background disabled:opacity-40"
+              className="flex h-11 w-11 items-center justify-center text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600 disabled:opacity-30 transition-colors"
               aria-label={t("increment")}
             >
               <Plus className="h-4 w-4" />
@@ -311,14 +243,14 @@ function LeadMeasureRow({
       </div>
 
       <div
-        className="rounded-xl border border-border bg-sub-background/60"
+        className="rounded-content border border-zinc-200 bg-zinc-50/30 overflow-hidden"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
       >
-        <div className="flex items-start justify-between gap-3 px-3 py-2.5">
-          <div className="flex min-w-0 flex-1 items-start gap-2">
-            <Tag className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="text-[11px] font-bold text-text-secondary">
+        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+          <div className="flex min-w-0 flex-1 items-start gap-3">
+            <Tag className="mt-1 h-3.5 w-3.5 shrink-0 text-primary/60" />
+            <div className="min-w-0 flex-1 space-y-2">
+              <p className="text-[11px] font-black text-zinc-400 uppercase tracking-wider">
                 {t("tagLabel")}
               </p>
               {measure.tags.length > 0 ? (
@@ -329,7 +261,7 @@ function LeadMeasureRow({
                       type="button"
                       disabled={isMutating}
                       onClick={() => toggleMeasureTag(measure.id, tag)}
-                      className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary px-2.5 py-1 text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
+                      className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95"
                     >
                       #{tag.name}
                       <X className="h-3 w-3" />
@@ -337,7 +269,7 @@ function LeadMeasureRow({
                   ))}
                 </div>
               ) : (
-                <p className="text-[11px] leading-relaxed text-text-muted">
+                <p className="text-sm font-medium text-zinc-400">
                   {t("noTags")}
                 </p>
               )}
@@ -348,14 +280,18 @@ function LeadMeasureRow({
             type="button"
             disabled={isMutating}
             onClick={() => setIsTagEditorOpen((previous) => !previous)}
-            className="shrink-0 rounded-full border border-border bg-white px-3 py-1.5 text-[11px] font-semibold text-text-secondary transition-colors hover:bg-sub-background hover:text-text-primary"
+            className={`w-full shrink-0 rounded-button border px-4 py-2 text-xs font-bold transition-all sm:w-auto ${
+              isTagEditorOpen
+                ? "bg-zinc-900 border-zinc-900 text-white"
+                : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:border-zinc-300"
+            }`}
           >
             {isTagEditorOpen ? t("done") : t("select")}
           </Button>
         </div>
 
         {isTagEditorOpen ? (
-          <div className="space-y-3 border-t border-border px-3 py-3">
+          <div className="space-y-3 border-t border-zinc-200 px-3 py-3">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[11px] text-text-muted">
                 {t("tagLimit", { n: MAX_MEASURE_TAGS })}
@@ -378,7 +314,7 @@ function LeadMeasureRow({
                 return (
                   <div
                     key={tag.id}
-                    className="relative flex items-center gap-1 rounded-full border border-border bg-white pr-1"
+                    className="relative flex items-center gap-1 rounded-full border border-zinc-200 bg-white pr-1"
                   >
                     {editingTagId === tag.id ? (
                       <>
@@ -471,7 +407,7 @@ function LeadMeasureRow({
                               className="fixed inset-0 z-10"
                               onClick={() => setOpenActionTagId(null)}
                             />
-                            <div className="absolute right-0 top-full z-20 mt-2 min-w-28 rounded-xl border border-border bg-white p-1.5 shadow-lg">
+                            <div className="absolute right-0 top-full z-20 mt-2 min-w-28 rounded-content border border-zinc-200 bg-white p-1.5 shadow-lg">
                               <Button
                                 type="button"
                                 disabled={isMutating || isTagMutationPending}
@@ -480,7 +416,7 @@ function LeadMeasureRow({
                                   setEditingTagName(tag.name);
                                   setOpenActionTagId(null);
                                 }}
-                                className="flex w-full items-center justify-start rounded-lg px-3 py-2 text-[11px] font-semibold text-text-primary hover:bg-sub-background"
+                                className="flex w-full items-center justify-start rounded-content px-3 py-2 text-[11px] font-semibold text-text-primary hover:bg-zinc-50/50"
                               >
                                 {t("edit")}
                               </Button>
@@ -501,7 +437,7 @@ function LeadMeasureRow({
                                     setOpenActionTagId(null);
                                   });
                                 }}
-                                className="flex w-full items-center justify-start rounded-lg px-3 py-2 text-[11px] font-semibold text-danger hover:bg-danger/5"
+                                className="flex w-full items-center justify-start rounded-content px-3 py-2 text-[11px] font-semibold text-danger hover:bg-danger/5"
                               >
                                 {t("delete")}
                               </Button>
@@ -534,7 +470,7 @@ function LeadMeasureRow({
                   });
                 }}
                 placeholder={t("newTagPlaceholder", { n: MAX_TAG_NAME_LENGTH })}
-                className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary"
+                className="w-full rounded-content border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary"
               />
               <Button
                 type="button"
@@ -546,7 +482,7 @@ function LeadMeasureRow({
                     }
                   });
                 }}
-                className="rounded-lg border border-border bg-white px-4 py-2 text-xs font-bold text-text-primary transition-colors hover:bg-sub-background sm:shrink-0"
+                className="rounded-content border border-zinc-200 bg-white px-4 py-2 text-xs font-bold text-text-primary transition-colors hover:bg-zinc-50/50 sm:shrink-0"
               >
                 {t("addTag")}
               </Button>

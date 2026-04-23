@@ -20,7 +20,6 @@ export default function ScoreboardsPage() {
     isLoading,
     pendingActionId,
     reactivate,
-    workspace,
   } = useScoreboardArchive();
 
   if (isLoading) {
@@ -32,15 +31,12 @@ export default function ScoreboardsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
       {pendingActionId !== null && (
         <LoadingOverlay message={t("changingStatus")} />
       )}
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
-        <ScoreboardsHeader
-          hasActiveScoreboard={Boolean(activeScoreboard)}
-          workspaceName={workspace?.name}
-        />
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-10 animate-linear-in">
+        <ScoreboardsHeader />
         <ActiveScoreboardSection
           activeScoreboard={activeScoreboard}
           activeScoreboardId={activeScoreboardId}
@@ -63,11 +59,11 @@ export default function ScoreboardsPage() {
 
 function ScoreboardsSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-16 rounded-2xl bg-sub-background" />
-        <div className="h-44 rounded-2xl bg-sub-background" />
-        <div className="h-72 rounded-2xl bg-sub-background" />
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-10 animate-pulse">
+        <div className="h-16 rounded-content bg-sub-background" />
+        <div className="h-44 rounded-content bg-sub-background" />
+        <div className="h-72 rounded-content bg-sub-background" />
       </div>
     </div>
   );
@@ -77,9 +73,9 @@ function ScoreboardsNoWorkspaceState() {
   const t = useTranslations("Scoreboard");
   const td = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-background font-pretendard flex items-center justify-center p-8">
-      <div className="max-w-[420px] w-full space-y-8 animate-linear-in">
-        <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center">
+    <div className="min-h-screen bg-slate-50/50 font-pretendard flex items-center justify-center p-8">
+      <div className="max-w-[420px] w-full space-y-10 animate-linear-in">
+        <div className="w-14 h-14 bg-primary/10 rounded-content flex items-center justify-center">
           <Zap className="text-primary w-7 h-7" />
         </div>
         <div className="space-y-2">

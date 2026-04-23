@@ -47,7 +47,7 @@ export function ArchivedScoreboardsSection({
       </div>
 
       {archivedScoreboards.length === 0 ? (
-        <Card className="border border-dashed border-border rounded-lg p-8 bg-white text-center text-sm text-text-muted">
+        <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center text-sm text-text-muted">
           {t("noArchived")}
         </Card>
       ) : (
