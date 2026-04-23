@@ -7,9 +7,13 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { useTranslations } from "next-intl";
-import { LogIn, Users, Zap } from "lucide-react";
 import { Link } from "@/i18n/routing";
+import {
+  ArrowJoin20Regular,
+  Flash24Regular,
+  People20Regular,
+} from "@fluentui/react-icons";
+import { useTranslations } from "next-intl";
 
 export default function JoinWorkspacePage() {
   const t = useTranslations("Workspace.join");
@@ -25,19 +29,19 @@ export default function JoinWorkspacePage() {
     });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-6">
-      {isPending && (
-        <LoadingOverlay message={t("loading")} />
-      )}
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-4">
+      {isPending && <LoadingOverlay message={t("loading")} />}
       <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-linear-in">
         <div className="flex items-center gap-3">
           <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 transition-colors shrink-0" />
-          <span className="text-xs font-bold text-zinc-400">{tCommon("back")}</span>
+          <span className="text-xs font-bold text-zinc-400">
+            {tCommon("back")}
+          </span>
         </div>
 
         <div className="space-y-5">
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-            <Zap className="text-primary w-6 h-6" />
+            <Flash24Regular className="text-primary w-6 h-6" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
@@ -79,16 +83,16 @@ export default function JoinWorkspacePage() {
               type="submit"
               disabled={isPending || inviteCode.trim().length === 0}
               className={`w-full py-4 rounded-button text-sm font-black transition-all flex items-center justify-center gap-2 ${
-              isPending || inviteCode.trim().length === 0
-                ? "bg-primary/50 text-white cursor-not-allowed"
-                : "btn-linear-primary hover:scale-[1.02] active:scale-[0.98]"
-            }`}
+                isPending || inviteCode.trim().length === 0
+                  ? "bg-primary/50 text-white cursor-not-allowed"
+                  : "btn-linear-primary hover:scale-[1.02] active:scale-[0.98]"
+              }`}
             >
               {isPending ? (
                 <InlineSpinner size="sm" />
               ) : (
                 <>
-                  <LogIn className="w-4 h-4" />
+                  <ArrowJoin20Regular className="w-4 h-4" />
                   {t("button")}
                 </>
               )}
@@ -103,7 +107,7 @@ export default function JoinWorkspacePage() {
                 href="/workspace/new"
                 className="flex items-center justify-center gap-2"
               >
-                <Users className="w-4 h-4" />
+                <People20Regular className="w-4 h-4" />
                 {t("createButton")}
               </Link>
             </Button>
