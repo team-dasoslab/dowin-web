@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import { Shield, Ticket, Users } from "lucide-react";
+import { People20Regular, ShieldLock20Regular, TicketDiagonal20Regular } from "@fluentui/react-icons";
 import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
@@ -100,7 +100,7 @@ export default function ProfileMembersPage() {
 
         <Card className="flex items-center gap-4 rounded-lg border border-border px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Users className="h-5 w-5" />
+            <People20Regular className="h-5 w-5" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-text-primary">
@@ -134,7 +134,7 @@ export default function ProfileMembersPage() {
             className="btn-linear-primary rounded-content px-3 py-2 text-xs font-bold"
           >
             <Link href="/profile/invites" className="flex items-center gap-1.5">
-              <Ticket className="h-3.5 w-3.5" />
+              <TicketDiagonal20Regular className="h-3.5 w-3.5" />
               {t("invitesCardButton")}
             </Link>
           </Button>
@@ -210,7 +210,7 @@ function NoWorkspaceState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <Users className="h-5 w-5" />
+            <People20Regular className="h-5 w-5" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">
@@ -234,7 +234,7 @@ function NoAccessState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <Shield className="h-5 w-5" />
+            <ShieldLock20Regular className="h-5 w-5" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">
