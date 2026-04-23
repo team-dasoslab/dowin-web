@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { LogIn, Plus } from "lucide-react";
+import { Add20Regular, ArrowEnterLeft20Regular } from "@fluentui/react-icons";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
@@ -12,7 +12,7 @@ export function NoWorkspaceActions() {
         className="btn-linear-primary flex items-center gap-2 rounded-button px-5 py-3 text-sm font-bold"
       >
         <Link href="/workspace/new">
-          <Plus className="w-4 h-4" />
+          <Add20Regular className="w-4 h-4" />
           {t("createWorkspace")}
         </Link>
       </Button>
@@ -22,7 +22,7 @@ export function NoWorkspaceActions() {
         className="flex items-center gap-2 rounded-button bg-white border border-border px-5 py-3 text-sm font-bold text-text-primary hover:border-[rgba(205,207,213,1)]"
       >
         <Link href="/workspace/join">
-          <LogIn className="w-4 h-4" />
+          <ArrowEnterLeft20Regular className="w-4 h-4" />
           {t("joinWorkspace")}
         </Link>
       </Button>
