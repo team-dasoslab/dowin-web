@@ -7,7 +7,7 @@ import { getApiErrorStatus } from "@/lib/client/frontend-api";
 export const useTeamWeeklyReport = () => {
   const currentWeekDates = getWeekDates();
   const weekStart = currentWeekDates[0];
-  const { data, isLoading, error } = useGetReportsTeamWeekly(
+  const { data, isError, isLoading, error, refetch } = useGetReportsTeamWeekly(
     weekStart ? { weekStart, weeks: 5 } : undefined,
     {
       query: {
@@ -23,6 +23,8 @@ export const useTeamWeeklyReport = () => {
     report: data?.status === 200 ? data.data : null,
     hasNoWorkspace: getApiErrorStatus(error) === 404,
     isForbidden: getApiErrorStatus(error) === 403,
+    isError,
     isLoading,
+    refetch,
   };
 };

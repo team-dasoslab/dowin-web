@@ -203,6 +203,14 @@
         "mobileScore": "Current score {score}"
       }
     },
+    "empty": {
+      "noMembersTitle": "No team members to show in this report yet.",
+      "noMembersDesc": "Once members join the workspace, the weekly report will summarize team status.",
+      "noActiveScoreboardsTitle": "No active scoreboards yet.",
+      "noActiveScoreboardsDesc": "When members create scoreboards, win rate and execution flow can be calculated.",
+      "noTrendTitle": "No trend data yet.",
+      "noTrendDesc": "Recent weekly trends will appear after the team creates scoreboards and starts logging."
+    },
     "cta": {
       "title": "Need more detail?",
       "desc": "Continue into the team dashboard to review lead-measure flow.",
@@ -213,6 +221,9 @@
       "noWorkspaceDesc": "Create a workspace or join with an invite code before viewing the team report.",
       "forbiddenTitle": "Only leaders can view the weekly report",
       "forbiddenDesc": "This page is only available to workspace admins.",
+      "errorTitle": "Could not load the report",
+      "errorDesc": "Try again in a moment or return to the team dashboard.",
+      "retry": "Retry",
       "backToDashboard": "Back to Team Dashboard"
     }
   },

@@ -131,13 +131,15 @@ const buildReportSummary = (
 
 export default function ReportPage() {
   const t = useTranslations("Report");
-  const { report, hasNoWorkspace, isForbidden, isLoading } =
+  const { report, hasNoWorkspace, isError, isForbidden, isLoading, refetch } =
     useTeamWeeklyReport();
 
   if (isLoading) return <ReportLoadingState />;
   if (hasNoWorkspace) return <ReportNoWorkspaceState />;
   if (isForbidden) return <ReportForbiddenState />;
-  if (!report) return <ReportLoadingState />;
+  if (isError || !report) {
+    return <ReportErrorState onRetry={() => void refetch()} />;
+  }
 
   const members = report.members ?? [];
   const summary = buildReportSummary(members, {
@@ -156,6 +158,7 @@ export default function ReportPage() {
       : t("common.thisWeek");
   const workspaceName = report.workspaceName ?? t("common.workspaceFallback");
   const hasActive = summary.activeCount > 0;
+  const hasMembers = summary.totalCount > 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -192,10 +195,11 @@ export default function ReportPage() {
           </div>
         </header>
 
-        <section className="space-y-3">
-          <SectionLabel title={t("sections.teamStatus")} />
-          <Card className="overflow-hidden rounded-lg border border-border bg-white">
-            {hasActive && (
+        {hasMembers ? (
+          <section className="space-y-3">
+            <SectionLabel title={t("sections.teamStatus")} />
+            <Card className="overflow-hidden rounded-lg border border-border bg-white">
+              {hasActive ? (
               <div className="px-5 py-5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -221,9 +225,20 @@ export default function ReportPage() {
                   noScoreboardNames={summary.noScoreboardNames}
                 />
               </div>
-            )}
-          </Card>
-        </section>
+              ) : (
+                <InlineEmptyState
+                  title={t("empty.noActiveScoreboardsTitle")}
+                  description={t("empty.noActiveScoreboardsDesc")}
+                />
+              )}
+            </Card>
+          </section>
+        ) : (
+          <InlineEmptyState
+            title={t("empty.noMembersTitle")}
+            description={t("empty.noMembersDesc")}
+          />
+        )}
 
         <TeamTrendChart
           trends={report.trends ?? []}
@@ -330,17 +345,18 @@ function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
     winRate: trend.winRate ?? 0,
     execRate: trend.executionRate ?? 0,
   }));
+  const hasTrendData = data.length > 0;
 
   return (
     <section className="space-y-3">
-      <div className="flex items-baseline justify-between px-1">
+      <div className="flex flex-col gap-2 px-1 sm:flex-row sm:items-baseline sm:justify-between">
         <div className="space-y-0.5">
           <h2 className="text-sm font-bold text-text-primary">
             {t("trend.title")}
           </h2>
           <p className="text-xs text-text-muted">{t("trend.desc")}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <ChartLegendTooltip
             active={activeTooltip === "winRate"}
             label={t("trend.winRateLabel")}
@@ -360,82 +376,93 @@ function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
         </div>
       </div>
       <Card className="overflow-hidden rounded-lg border border-border bg-white px-2 py-5">
-        <ResponsiveContainer width="100%" height={180}>
-          <AreaChart data={data} margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="winGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#5e6ad2" stopOpacity={0.12} />
-                <stop offset="95%" stopColor="#5e6ad2" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="execGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#84cc16" stopOpacity={0.12} />
-                <stop offset="95%" stopColor="#84cc16" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="#e5e7eb"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="week"
-              tick={{ fontSize: 11, fill: "#9ca3af" }}
-              axisLine={false}
-              tickLine={false}
-              dy={6}
-            />
-            <YAxis
-              domain={[0, 100]}
-              tick={{ fontSize: 11, fill: "#9ca3af" }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(v) => `${v}%`}
-              ticks={[0, 25, 50, 75, 100]}
-            />
-            <Tooltip
-              cursor={{ stroke: "#e5e7eb", strokeWidth: 1 }}
-              content={({ active, payload, label }) => {
-                if (!active || !payload?.length) return null;
-                return (
-                  <div className="rounded-lg border border-border bg-white px-3 py-2 shadow-sm">
-                    <p className="mb-1.5 text-[11px] font-bold text-text-primary">{label}</p>
-                    {payload.map((entry) => (
-                      <p key={entry.dataKey as string} className="text-[11px] text-text-muted">
-                        <span
-                          className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full"
-                          style={{ backgroundColor: entry.color }}
-                        />
-                        {entry.dataKey === "winRate"
-                          ? t("trend.winRateLabel")
-                          : t("trend.executionRateLabel")}
-                        :{" "}
-                        <span className="font-mono font-bold text-text-primary">{entry.value}%</span>
-                      </p>
-                    ))}
-                  </div>
-                );
-              }}
-            />
-            <Area
-              type="monotone"
-              dataKey="winRate"
-              stroke="#5e6ad2"
-              strokeWidth={2}
-              fill="url(#winGrad)"
-              dot={false}
-              activeDot={{ r: 4, fill: "#5e6ad2", strokeWidth: 0 }}
-            />
-            <Area
-              type="monotone"
-              dataKey="execRate"
-              stroke="#84cc16"
-              strokeWidth={1.5}
-              fill="url(#execGrad)"
-              dot={false}
-              activeDot={{ r: 4, fill: "#84cc16", strokeWidth: 0 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {hasTrendData ? (
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={data} margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="winGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#5e6ad2" stopOpacity={0.12} />
+                  <stop offset="95%" stopColor="#5e6ad2" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="execGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#84cc16" stopOpacity={0.12} />
+                  <stop offset="95%" stopColor="#84cc16" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#e5e7eb"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="week"
+                tick={{ fontSize: 11, fill: "#9ca3af" }}
+                axisLine={false}
+                tickLine={false}
+                dy={6}
+              />
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fontSize: 11, fill: "#9ca3af" }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(v) => `${v}%`}
+                ticks={[0, 25, 50, 75, 100]}
+              />
+              <Tooltip
+                cursor={{ stroke: "#e5e7eb", strokeWidth: 1 }}
+                content={({ active, payload, label }) => {
+                  if (!active || !payload?.length) return null;
+                  return (
+                    <div className="rounded-lg border border-border bg-white px-3 py-2 shadow-sm">
+                      <p className="mb-1.5 text-[11px] font-bold text-text-primary">{label}</p>
+                      {payload.map((entry) => (
+                        <p key={entry.dataKey as string} className="text-[11px] text-text-muted">
+                          <span
+                            className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full"
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          {entry.dataKey === "winRate"
+                            ? t("trend.winRateLabel")
+                            : t("trend.executionRateLabel")}
+                          :{" "}
+                          <span className="font-mono font-bold text-text-primary">{entry.value}%</span>
+                        </p>
+                      ))}
+                    </div>
+                  );
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="winRate"
+                stroke="#5e6ad2"
+                strokeWidth={2}
+                fill="url(#winGrad)"
+                dot={false}
+                activeDot={{ r: 4, fill: "#5e6ad2", strokeWidth: 0 }}
+              />
+              <Area
+                type="monotone"
+                dataKey="execRate"
+                stroke="#84cc16"
+                strokeWidth={1.5}
+                fill="url(#execGrad)"
+                dot={false}
+                activeDot={{ r: 4, fill: "#84cc16", strokeWidth: 0 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex min-h-[180px] flex-col items-center justify-center px-4 text-center">
+            <p className="text-sm font-semibold text-text-primary">
+              {t("empty.noTrendTitle")}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              {t("empty.noTrendDesc")}
+            </p>
+          </div>
+        )}
       </Card>
     </section>
   );
@@ -705,6 +732,21 @@ function SectionLabel({
   );
 }
 
+function InlineEmptyState({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-sub-background px-5 py-8 text-center">
+      <p className="text-sm font-semibold text-text-primary">{title}</p>
+      <p className="mt-1 text-xs leading-5 text-text-muted">{description}</p>
+    </div>
+  );
+}
+
 // ─── FocusMemberList ─────────────────────────────────────────────────────────
 
 function FocusMemberList({ members }: { members: FocusMember[] }) {
@@ -822,6 +864,37 @@ function ReportForbiddenState() {
           </p>
           <div className="flex justify-center">
             <Button asChild>
+              <Link href="/dashboard">{t("states.backToDashboard")}</Link>
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function ReportErrorState({ onRetry }: { onRetry: () => void }) {
+  const t = useTranslations("Report");
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-[720px] p-4 md:p-8">
+        <Card className="card-linear space-y-4 p-8 text-center">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <BarChart3 className="h-5 w-5 text-primary" />
+          </div>
+          <h1 className="text-xl font-bold text-text-primary">
+            {t("states.errorTitle")}
+          </h1>
+          <p className="text-sm text-text-secondary">
+            {t("states.errorDesc")}
+          </p>
+          <div className="flex flex-col justify-center gap-2 sm:flex-row">
+            <Button onClick={onRetry}>{t("states.retry")}</Button>
+            <Button
+              asChild
+              className="rounded-lg border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors hover:border-[rgba(205,207,213,1)]"
+            >
               <Link href="/dashboard">{t("states.backToDashboard")}</Link>
             </Button>
           </div>
