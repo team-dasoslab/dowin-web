@@ -11,9 +11,11 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
+import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { ArrowRight, BarChart3, CalendarDays, TrendingUp, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -133,6 +135,29 @@ export default function ReportPage() {
   const t = useTranslations("Report");
   const { report, hasNoWorkspace, isError, isForbidden, isLoading, refetch } =
     useTeamWeeklyReport();
+  const hasTrackedViewRef = useRef(false);
+
+  useEffect(() => {
+    if (isLoading || hasNoWorkspace || !report || hasTrackedViewRef.current) {
+      return;
+    }
+
+    const memberCount = report.members?.length ?? 0;
+    const memberCountBucket =
+      memberCount <= 1
+        ? "1"
+        : memberCount <= 5
+          ? "2_5"
+          : memberCount <= 15
+            ? "6_15"
+            : "16_plus";
+
+    trackEvent("team_report_viewed", {
+      member_count_bucket: memberCountBucket,
+      workspace_id_hash: hashId(report.workspaceId),
+    });
+    hasTrackedViewRef.current = true;
+  }, [report, hasNoWorkspace, isLoading]);
 
   if (isLoading) return <ReportLoadingState />;
   if (hasNoWorkspace) return <ReportNoWorkspaceState />;
@@ -177,6 +202,13 @@ export default function ReportPage() {
             </div>
             <Button
               asChild
+              onClick={() => {
+                if (report?.workspaceId) {
+                  trackEvent("team_report_cta_clicked", {
+                    workspace_id_hash: hashId(report.workspaceId),
+                  });
+                }
+              }}
               className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-lg border border-[rgba(94,106,210,0.3)] bg-[rgba(94,106,210,0.06)] px-3 py-2 text-xs font-bold text-[#5e6ad2] transition-colors hover:bg-[rgba(94,106,210,0.1)] hover:border-[rgba(94,106,210,0.4)]"
             >
               <Link href="/dashboard">
@@ -253,6 +285,7 @@ export default function ReportPage() {
 
         <TeamTrendChart
           trends={report.trends ?? []}
+          workspaceId={report.workspaceId}
         />
 
         <section className="space-y-3">
@@ -325,7 +358,13 @@ function ChartLegendTooltip({
   );
 }
 
-function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
+function TeamTrendChart({
+  trends,
+  workspaceId,
+}: {
+  trends: TeamWeeklyReportTrend[];
+  workspaceId?: number;
+}) {
   const t = useTranslations("Report");
   const [activeTooltip, setActiveTooltip] = useState<ChartLegendKey>(null);
   const data = trends.map((trend, index) => ({
@@ -353,7 +392,16 @@ function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
             label={t("trend.winRateLabel")}
             description={t("trend.winRateDesc")}
             color="#5e6ad2"
-            onToggle={() => setActiveTooltip(activeTooltip === "winRate" ? null : "winRate")}
+            onToggle={() => {
+              const next = activeTooltip === "winRate" ? null : "winRate";
+              setActiveTooltip(next);
+              if (next) {
+                trackEvent("team_report_trend_legend_clicked", {
+                  legend_type: "winRate",
+                  workspace_id_hash: hashId(workspaceId),
+                });
+              }
+            }}
             onClose={() => setActiveTooltip(null)}
           />
           <ChartLegendTooltip
@@ -361,7 +409,16 @@ function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
             label={t("trend.executionRateLabel")}
             description={t("trend.executionRateDesc")}
             color="#84cc16"
-            onToggle={() => setActiveTooltip(activeTooltip === "execRate" ? null : "execRate")}
+            onToggle={() => {
+              const next = activeTooltip === "execRate" ? null : "execRate";
+              setActiveTooltip(next);
+              if (next) {
+                trackEvent("team_report_trend_legend_clicked", {
+                  legend_type: "execRate",
+                  workspace_id_hash: hashId(workspaceId),
+                });
+              }
+            }}
             onClose={() => setActiveTooltip(null)}
           />
         </div>
