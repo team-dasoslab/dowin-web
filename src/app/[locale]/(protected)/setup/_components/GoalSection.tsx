@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Zap } from "lucide-react";
+import { Flash20Filled } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 interface GoalSectionProps {
@@ -18,25 +18,24 @@ export function GoalSection({
 
   return (
     <Card
-      className="overflow-hidden rounded-lg border border-border"
+      className="p-6 md:p-8 space-y-6"
       data-coachmark="setup-goal"
     >
-      <div className="flex items-center gap-2 border-b border-border bg-sub-background px-5 py-3">
-        <Zap className="h-3.5 w-3.5 text-primary" />
-        <span className="text-xs font-bold text-text-primary">
-          {t("wigShort")}
-        </span>
-      </div>
-      <div className="space-y-3 p-5">
-        <label className="block text-xs font-bold text-text-secondary">
-          {t("goalQuestion")}
-        </label>
+      <div className="space-y-4">
+        <div className="w-10 h-10 bg-primary/10 rounded-content flex items-center justify-center">
+          <Flash20Filled className="text-primary w-5 h-5" />
+        </div>
+        <div>
+          <label className="block text-sm font-bold text-zinc-900">
+            {t("goalQuestion")}
+          </label>
+        </div>
         <Input
           value={goalName}
           disabled={isMutating}
           onChange={(e) => setGoalName(e.target.value)}
           placeholder={t("goalPlaceholder")}
-          className="w-full rounded-lg border border-border bg-sub-background p-3 text-sm outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary"
+          className="w-full rounded-content border border-zinc-200 bg-zinc-50/50 px-5 py-4 text-base focus:border-primary outline-none transition-all placeholder:text-zinc-300"
           required
         />
       </div>

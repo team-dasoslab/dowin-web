@@ -2,7 +2,7 @@ import { LeadMeasureSummary } from "@/app/[locale]/(protected)/dashboard/_compon
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { MonthlyMobileCards } from "@/app/[locale]/(protected)/dashboard/my/_components/MonthlyMobileCards";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
-import { Check } from "lucide-react";
+import { Checkmark20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 interface MonthlyBoardSectionProps {
@@ -43,7 +43,7 @@ export function MonthlyBoardSection({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-border bg-white px-5 py-3">
+      <div className="rounded-content border border-border bg-white px-5 py-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-xs font-bold text-text-primary">
@@ -64,7 +64,7 @@ export function MonthlyBoardSection({
       </div>
 
       {monthlyLeadMeasures.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white p-8 text-center text-sm text-text-muted">
+        <div className="rounded-content border border-border bg-white p-8 text-center text-sm text-text-muted">
           {t("noMonthlyMeasures")}
         </div>
       ) : (
@@ -81,7 +81,7 @@ export function MonthlyBoardSection({
             {monthWeeks.map((weekDatesInMonth, weekIndex) => (
               <div
                 key={`${monthLabel}-week-${weekIndex + 1}`}
-                className="overflow-hidden rounded-lg border border-border bg-white"
+                className="overflow-hidden rounded-content border border-border bg-white"
               >
                 <div className="border-b border-border bg-sub-background px-5 py-3">
                   <div className="flex items-center justify-between gap-2">
@@ -214,7 +214,7 @@ export function MonthlyBoardSection({
                                       }`}
                                     >
                                       {value === true ? (
-                                        <Check className="h-3.5 w-3.5" />
+                                        <Checkmark20Regular className="h-3.5 w-3.5" />
                                       ) : null}
                                     </span>
                                   </td>

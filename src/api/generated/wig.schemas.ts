@@ -626,6 +626,21 @@ export interface TeamDashboardResponse {
   members?: TeamDashboardMember[];
 }
 
+export interface TeamWeeklyReportTrend {
+  weekStart?: string;
+  weekEnd?: string;
+  activeCount?: number;
+  totalCount?: number;
+  winningCount?: number;
+  startedCount?: number;
+  winRate?: number;
+  executionRate?: number;
+}
+
+export type TeamWeeklyReportResponse = TeamDashboardResponse & {
+  trends?: TeamWeeklyReportTrend[];
+};
+
 export interface DashboardTeamMemoAuthor {
   userId: number;
   nickname: string;
@@ -901,6 +916,15 @@ export type PostBillingCheckoutBody = {
 export type GetDashboardTeamParams = {
 weekStart?: string;
 cursor?: string;
+};
+
+export type GetReportsTeamWeeklyParams = {
+weekStart?: string;
+/**
+ * @minimum 1
+ * @maximum 12
+ */
+weeks?: number;
 };
 
 export type GetDashboardTeamMemosParams = {

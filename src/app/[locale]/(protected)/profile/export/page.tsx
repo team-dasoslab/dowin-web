@@ -2,6 +2,10 @@
 
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { useProfileExportAction } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportAction";
 import { useProfileExportData } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportData";
 import { useProfileExportForm } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportForm";
@@ -9,7 +13,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { Download, Plus } from "lucide-react";
+import { Add20Regular, ArrowDownload20Regular } from "@fluentui/react-icons";
 import { Link } from "@/i18n/routing";
 
 export default function ProfileExportPage() {
@@ -57,11 +61,11 @@ export default function ProfileExportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-6 animate-linear-in">
-        <ProfileExportHeader />
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer>
+        <ProtectedPageHeader title="데이터 내보내기" />
 
-        <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
+        <Card className="border border-border rounded-content px-6 py-5 flex items-center gap-4">
           <UserAvatar
             avatarKey={user?.avatarKey}
             avatarSeed={user?.nickname}
@@ -89,7 +93,7 @@ export default function ProfileExportPage() {
         </Card>
 
         {!isStandardPlan ? (
-          <Card className="border border-border rounded-lg p-4 space-y-2 bg-sub-background">
+          <Card className="border border-border rounded-content p-4 space-y-2 bg-sub-background">
             <p className="text-sm font-bold text-text-primary">
               CSV 다운로드는 STANDARD 플랜 기능입니다.
             </p>
@@ -100,7 +104,7 @@ export default function ProfileExportPage() {
           </Card>
         ) : null}
 
-        <Card className="border border-border rounded-lg p-4 space-y-4">
+        <Card className="border border-border rounded-content p-4 space-y-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               내보내기 조건
@@ -111,7 +115,7 @@ export default function ProfileExportPage() {
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2">
-            <label className="flex h-9 min-w-0 items-center gap-2 rounded-lg border border-border bg-white px-3 text-xs text-text-secondary">
+            <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
               <span className="shrink-0 text-[11px]">시작일</span>
               <input
                 type="date"
@@ -120,7 +124,7 @@ export default function ProfileExportPage() {
                 className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
               />
             </label>
-            <label className="flex h-9 min-w-0 items-center gap-2 rounded-lg border border-border bg-white px-3 text-xs text-text-secondary">
+            <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
               <span className="shrink-0 text-[11px]">종료일</span>
               <input
                 type="date"
@@ -151,7 +155,7 @@ export default function ProfileExportPage() {
                 return (
                   <label
                     key={measure.id}
-                    className="flex items-center gap-2 rounded-lg border border-border px-2.5 py-2 text-xs text-text-primary"
+                    className="flex items-center gap-2 rounded-content border border-border px-2.5 py-2 text-xs text-text-primary"
                   >
                     <input
                       type="checkbox"
@@ -166,7 +170,7 @@ export default function ProfileExportPage() {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 rounded-lg border border-border bg-sub-background px-3 py-2 text-xs text-text-secondary">
+          <label className="flex items-center gap-2 rounded-content border border-border bg-sub-background px-3 py-2 text-xs text-text-secondary">
             <input
               type="checkbox"
               checked={splitByWeek}
@@ -184,9 +188,9 @@ export default function ProfileExportPage() {
               type="button"
               onClick={() => void exportCsv()}
               disabled={isExporting || !isStandardPlan}
-              className="h-9 w-full rounded-lg bg-primary px-4 text-xs font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
+              className="h-9 w-full rounded-content bg-primary px-4 text-xs font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
-              <Download className="w-3.5 h-3.5" />
+              <ArrowDownload20Regular className="w-3.5 h-3.5" />
               {isStandardPlan
                 ? isExporting
                   ? "CSV 생성 중..."
@@ -195,7 +199,7 @@ export default function ProfileExportPage() {
             </Button>
           </div>
         </Card>
-      </div>
+      </ProtectedPageContainer>
     </div>
   );
 }
@@ -203,7 +207,7 @@ export default function ProfileExportPage() {
 function ProfileExportHeader() {
   return (
     <header className="flex items-center justify-between">
-      <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
+      <SmartBackButton className="w-8 h-8 rounded-content border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
       <p className="text-xs text-text-muted">데이터 내보내기</p>
       <div className="w-8" />
     </header>
@@ -212,12 +216,12 @@ function ProfileExportHeader() {
 
 function ExportSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
-        <div className="h-[420px] rounded-2xl bg-sub-background" />
-      </div>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer isLoading>
+        <div className="h-10 rounded-content bg-sub-background" />
+        <div className="h-24 rounded-content bg-sub-background" />
+        <div className="h-[420px] rounded-content bg-sub-background" />
+      </ProtectedPageContainer>
     </div>
   );
 }
@@ -263,7 +267,7 @@ function NoScoreboardState() {
               className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
               <Link href="/setup?mode=create">
-                <Plus className="w-4 h-4" />새 점수판 만들기
+                <Add20Regular className="w-4 h-4" />새 점수판 만들기
               </Link>
             </Button>
           }

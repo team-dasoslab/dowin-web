@@ -7,7 +7,7 @@ import { isEditableDailyLogDate } from "@/app/[locale]/(protected)/dashboard/my/
 import { AchievementProgress } from "@/app/[locale]/(protected)/dashboard/_components/AchievementProgress";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { Check } from "lucide-react";
+import { Checkmark20Regular } from "@fluentui/react-icons";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -80,7 +80,7 @@ function WeeklyMobileCard({
   const guide = weeklyGuideById.get(leadMeasureId);
 
   return (
-    <div className="rounded-lg border border-border bg-white p-4">
+    <div className="rounded-content border border-border bg-white p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <LeadMeasureSummary
@@ -180,7 +180,7 @@ function WeeklyMobileCardDay({
         }`}
       >
         {value === true ? (
-          <Check className="mx-auto h-3.5 w-3.5" />
+          <Checkmark20Regular className="mx-auto h-3.5 w-3.5" />
         ) : (
           <span className="text-[10px] font-mono">{date.slice(8, 10)}</span>
         )}

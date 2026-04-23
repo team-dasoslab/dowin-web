@@ -2,11 +2,14 @@
 
 import { usePasswordChangeAction } from "@/app/[locale]/(protected)/profile/password/_hooks/usePasswordChangeAction";
 import { usePasswordChangeForm } from "@/app/[locale]/(protected)/profile/password/_hooks/usePasswordChangeForm";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { KeyRound } from "lucide-react";
+import { Key20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 export default function ProfilePasswordPage() {
@@ -27,17 +30,13 @@ export default function ProfilePasswordPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[560px] space-y-6 p-4 md:p-8 animate-linear-in">
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary" />
-          <p className="text-xs text-text-muted">{t("header")}</p>
-          <div className="w-8" />
-        </header>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer>
+        <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center gap-4 rounded-lg border border-border px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <KeyRound className="h-5 w-5" />
+        <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
+            <Key20Regular className="h-5 w-5" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-text-primary">
@@ -47,7 +46,7 @@ export default function ProfilePasswordPage() {
           </div>
         </Card>
 
-        <Card className="space-y-5 rounded-lg border border-border p-5">
+        <Card className="space-y-5 rounded-content border border-border p-5">
           <PasswordField
             label={t("currentPasswordLabel")}
             value={currentPassword}
@@ -74,12 +73,12 @@ export default function ProfilePasswordPage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => void submit()}
-            className="btn-linear-primary h-11 w-full rounded-lg text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-linear-primary h-11 w-full rounded-content text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>
         </Card>
-      </div>
+      </ProtectedPageContainer>
     </div>
   );
 }
@@ -108,7 +107,7 @@ function PasswordField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-lg border border-border bg-white px-3 pr-20 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-primary"
+        className="h-11 w-full rounded-content border border-border bg-white px-3 pr-20 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-primary"
         toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors hover:text-text-primary"
       />
       {hint ? <p className="text-[11px] text-text-muted">{hint}</p> : null}

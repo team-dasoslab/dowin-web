@@ -4,7 +4,6 @@ import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
-import { DashboardHeader } from "@/app/[locale]/(protected)/dashboard/my/_components/DashboardHeader";
 import { HistoryLimitOverlay } from "@/app/[locale]/(protected)/dashboard/my/_components/HistoryLimitOverlay";
 import { MonthlyBoardSection } from "@/app/[locale]/(protected)/dashboard/my/_components/MonthlyBoardSection";
 import { PeriodControls } from "@/app/[locale]/(protected)/dashboard/my/_components/PeriodControls";
@@ -17,13 +16,18 @@ import { type CelebrationLevel } from "@/app/[locale]/(protected)/dashboard/my/_
 import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-links";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { Plus, Zap } from "lucide-react";
+import { Add20Filled, Flash20Filled } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "../../_components/ProtectedPageShell";
 
 export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
@@ -63,6 +67,7 @@ export default function MyDashboardPage() {
     isPeriodLoading,
     isHistoryLimited,
     isTrendLimited,
+    // isPreviousTrendLoading,
   } = useDashboardScoreboard();
   const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe({
     query: {
@@ -97,6 +102,40 @@ export default function MyDashboardPage() {
   const monthWeeks = getMonthCalendarWeeks(selectedDate);
   const lastTrackedViewRef = useRef<string | null>(null);
 
+  const [activeSection, setActiveSection] = useState("overview");
+
+  const menuGroups = useMemo(
+    () => [
+      { id: "overview", label: t("recentTrend") },
+      { id: "scoreboard", label: t("executionBoard") },
+    ],
+    [t],
+  );
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const container = document.getElementById("main-scroll-container");
+      if (!container) return;
+      const scrollPosition = container.scrollTop + 150;
+      let currentSectionId = activeSection;
+
+      for (const group of menuGroups) {
+        const el = document.getElementById(group.id);
+        if (el && el.offsetTop <= scrollPosition) {
+          currentSectionId = group.id;
+        }
+      }
+
+      if (currentSectionId !== activeSection) {
+        setActiveSection(currentSectionId);
+      }
+    };
+
+    const container = document.getElementById("main-scroll-container");
+    container?.addEventListener("scroll", handleScroll);
+    return () => container?.removeEventListener("scroll", handleScroll);
+  }, [activeSection, menuGroups]);
+
   useEffect(() => {
     if (isLoading || isProfileLoading) {
       return;
@@ -113,7 +152,13 @@ export default function MyDashboardPage() {
       workspace_id_hash: hashId(workspace?.id),
     });
     lastTrackedViewRef.current = selectedView;
-  }, [activeScoreboard, isLoading, isProfileLoading, selectedView, workspace?.id]);
+  }, [
+    activeScoreboard,
+    isLoading,
+    isProfileLoading,
+    selectedView,
+    workspace?.id,
+  ]);
 
   if (
     isLoading ||
@@ -135,12 +180,16 @@ export default function MyDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       {celebrationLevel ? (
         <DashboardCelebrationOverlay level={celebrationLevel} />
       ) : null}
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
-        <DashboardHeader nickname={nickname} workspaceName={workspace?.name} />
+      <ProtectedPageContainer className="space-y-6 lg:space-y-12">
+        <ProtectedPageHeader
+          title={
+            nickname ? t("userScoreboard", { nickname }) : t("myScoreboard")
+          }
+        />
 
         {workspace?.isOverFreeMemberLimit ? (
           <WorkspaceOverLimitBanner
@@ -150,71 +199,124 @@ export default function MyDashboardPage() {
           />
         ) : null}
 
-        <ScoreboardOverviewSection
-          activeScoreboard={activeScoreboard}
-          isWeeklyTrendLoading={isWeeklyTrendLoading}
-          isTrendLimited={isTrendLimited}
-          monthLabel={monthLabel}
-          monthlyOverallRate={monthlyOverallRate}
-          weeklyOverallRate={weeklyOverallRate}
-          weeklyTrendPoints={weeklyTrendPoints}
-        />
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
+          {/* ── 좌측 네비게이션 ── */}
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+            <nav className="flex gap-1 lg:block lg:space-y-1">
+              {menuGroups.map((group) => {
+                const isActive = activeSection === group.id;
+                return (
+                  <button
+                    key={group.id}
+                    onClick={() => {
+                      const element = document.getElementById(group.id);
+                      const container = document.getElementById(
+                        "main-scroll-container",
+                      );
+                      if (container && element) {
+                        const headerOffset = 100;
+                        const elementPosition = element.offsetTop;
+                        const offsetPosition = elementPosition - headerOffset;
+                        container.scrollTo({
+                          top: offsetPosition,
+                          behavior: "smooth",
+                        });
+                      }
+                    }}
+                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
+                      isActive
+                        ? "text-primary"
+                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isActive && (
+                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
+                      )}
+                      <span className={isActive ? "" : "lg:pl-4"}>
+                        {group.label}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </nav>
+          </aside>
 
-        {latestMajorUpdate && isUpdateCardVisible ? (
-          <ProductUpdateCard
-            update={latestMajorUpdate}
-            onDismiss={handleDismissProductUpdate}
-          />
-        ) : null}
-
-        <section className="space-y-3">
-          <PeriodControls
-            monthLabel={monthLabel}
-            monthlyGoalCount={monthlyGoalCount}
-            movePeriod={movePeriod}
-            resetToToday={resetToToday}
-            selectedDate={selectedDate}
-            selectedView={selectedView}
-            setSelectedDate={setSelectedDate}
-            setSelectedView={setSelectedView}
-            weekLabel={weekLabel}
-            weeklyGoalCount={weeklyGoalCount}
-            historyLimitDate={historyLimitDate}
-            isPreviousDisabled={isPreviousDisabled}
-            isPeriodLoading={isPeriodLoading}
-          />
-
-          <HistoryLimitOverlay isLimited={isHistoryLimited}>
-            {activeLeadMeasures.length === 0 ? (
-              <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
-                {t("noActiveMeasures")}
-              </div>
-            ) : selectedView === "month" ? (
-              <MonthlyBoardSection
-                activeLeadMeasures={activeLeadMeasures}
+          {/* ── 우측 메인 콘텐츠 ── */}
+          <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
+            <section id="overview" className="space-y-5 scroll-mt-28">
+              <SectionHeader title={t("recentTrend")} />
+              <ScoreboardOverviewSection
+                activeScoreboard={activeScoreboard}
+                isWeeklyTrendLoading={isWeeklyTrendLoading}
+                isTrendLimited={isTrendLimited}
                 monthLabel={monthLabel}
-                monthWeeks={monthWeeks}
-                monthlyLeadMeasures={monthlyLeadMeasures}
                 monthlyOverallRate={monthlyOverallRate}
-                monthlySummary={monthlySummary}
-                today={today}
+                weeklyOverallRate={weeklyOverallRate}
+                weeklyTrendPoints={weeklyTrendPoints}
               />
-            ) : (
-              <WeeklyBoardSection
-                activeLeadMeasures={activeLeadMeasures}
-                onBeforeToggle={markCelebrationPending}
-                pendingLogKeys={pendingLogKeys}
-                today={today}
-                toggleLog={toggleLog}
-                weekDates={weekDates}
-                weeklyGuideById={weeklyGuideById}
-                weeklyById={weeklyById}
+            </section>
+
+            {latestMajorUpdate && isUpdateCardVisible ? (
+              <ProductUpdateCard
+                update={latestMajorUpdate}
+                onDismiss={handleDismissProductUpdate}
               />
-            )}
-          </HistoryLimitOverlay>
-        </section>
-      </div>
+            ) : null}
+
+            <section id="scoreboard" className="space-y-3 scroll-mt-28">
+              <SectionHeader title={t("executionBoard")} />
+              <PeriodControls
+                monthLabel={monthLabel}
+                monthlyGoalCount={monthlyGoalCount}
+                movePeriod={movePeriod}
+                resetToToday={resetToToday}
+                selectedDate={selectedDate}
+                selectedView={selectedView}
+                setSelectedDate={setSelectedDate}
+                setSelectedView={setSelectedView}
+                weekLabel={weekLabel}
+                weeklyGoalCount={weeklyGoalCount}
+                historyLimitDate={historyLimitDate}
+                isPreviousDisabled={isPreviousDisabled}
+                isPeriodLoading={isPeriodLoading}
+              />
+
+              <HistoryLimitOverlay isLimited={isHistoryLimited}>
+                {activeLeadMeasures.length === 0 ? (
+                  <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
+                    {t("noActiveMeasures")}
+                  </div>
+                ) : selectedView === "month" ? (
+                  <MonthlyBoardSection
+                    activeLeadMeasures={activeLeadMeasures}
+                    monthLabel={monthLabel}
+                    monthWeeks={monthWeeks}
+                    monthlyLeadMeasures={monthlyLeadMeasures}
+                    monthlyOverallRate={monthlyOverallRate}
+                    monthlySummary={monthlySummary}
+                    today={today}
+                  />
+                ) : (
+                  <WeeklyBoardSection
+                    activeLeadMeasures={activeLeadMeasures}
+                    onBeforeToggle={markCelebrationPending}
+                    pendingLogKeys={pendingLogKeys}
+                    today={today}
+                    toggleLog={toggleLog}
+                    weekDates={weekDates}
+                    weeklyGuideById={weeklyGuideById}
+                    weeklyById={weeklyById}
+                  />
+                )}
+              </HistoryLimitOverlay>
+            </section>
+          </div>
+        </div>
+      </ProtectedPageContainer>
     </div>
+
   );
 }
 
@@ -232,15 +334,15 @@ function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
 
 function MyDashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-16 rounded-2xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+      <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
+        <div className="h-16 rounded-content bg-sub-background" />
+        <div className="h-24 rounded-content bg-sub-background" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-2xl bg-sub-background" />
-          <div className="h-48 rounded-2xl bg-sub-background" />
+          <div className="h-48 rounded-content bg-sub-background" />
+          <div className="h-48 rounded-content bg-sub-background" />
         </div>
-        <div className="h-72 rounded-2xl bg-sub-background" />
+        <div className="h-72 rounded-content bg-sub-background" />
       </div>
     </div>
   );
@@ -249,10 +351,10 @@ function MyDashboardSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
-        <MyDashboardEmptyHeader variant="no-workspace" />
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
+          icon={<Flash20Filled className="w-5 h-5 text-primary" />}
           title={t("noWorkspaceTitle")}
           description={
             <div className="whitespace-pre-line">{t("noWorkspaceDesc")}</div>
@@ -267,11 +369,10 @@ function NoWorkspaceState() {
 function NoScoreboardState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
-        <MyDashboardEmptyHeader variant="no-scoreboard" />
-
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
+          icon={<Flash20Filled className="w-5 h-5 text-primary" />}
           title={t("noScoreboardTitle")}
           description={
             <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>
@@ -279,10 +380,10 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
-                <Plus className="w-4 h-4" />
+                <Add20Filled className="w-4 h-4" />
                 {t("createScoreboard")}
               </Link>
             </Button>
@@ -309,8 +410,8 @@ function MyDashboardEmptyHeader({
       <div className="flex items-center gap-3">
         {variant === "no-workspace" ? (
           <>
-            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 text-primary shrink-0">
-              <Zap className="w-4 h-4" />
+            <div className="w-9 h-9 bg-primary/10 rounded-content flex items-center justify-center border border-primary/20 text-primary shrink-0">
+              <Flash20Filled className="w-4 h-4" />
             </div>
             <div className="min-w-0">
               <h1 className="text-base font-bold tracking-tight text-text-primary truncate">
@@ -338,7 +439,7 @@ function MyDashboardEmptyHeader({
           <Button
             key={href}
             asChild
-            className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
+            className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-content text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
           >
             <Link href={href}>
               <Icon className="w-3.5 h-3.5 text-text-muted shrink-0" />
