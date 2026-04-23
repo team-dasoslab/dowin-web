@@ -1,9 +1,12 @@
 "use client";
 
-import { TeamDashboardMember } from "@/api/generated/wig.schemas";
+import {
+  TeamDashboardMember,
+  TeamWeeklyReportTrend,
+} from "@/api/generated/wig.schemas";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
-import { useTeamDashboard } from "@/app/[locale]/(protected)/dashboard/_hooks/useTeamDashboard";
 import { formatWeekLabel } from "@/app/[locale]/(protected)/dashboard/_lib/dashboard";
+import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/report/_hooks/useTeamWeeklyReport";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -104,18 +107,21 @@ const buildReportSummary = (members: TeamDashboardMember[]) => {
 };
 
 export default function ReportPage() {
-  const { dashboard, hasNoWorkspace, isLoading } = useTeamDashboard();
+  const { report, hasNoWorkspace, isForbidden, isLoading } =
+    useTeamWeeklyReport();
 
   if (isLoading) return <ReportLoadingState />;
-  if (hasNoWorkspace || !dashboard) return <ReportNoWorkspaceState />;
+  if (hasNoWorkspace) return <ReportNoWorkspaceState />;
+  if (isForbidden) return <ReportForbiddenState />;
+  if (!report) return <ReportLoadingState />;
 
-  const members = dashboard.members ?? [];
+  const members = report.members ?? [];
   const summary = buildReportSummary(members);
   const weekLabel =
-    dashboard.weekStart && dashboard.weekEnd
-      ? formatWeekLabel(dashboard.weekStart, dashboard.weekEnd)
+    report.weekStart && report.weekEnd
+      ? formatWeekLabel(report.weekStart, report.weekEnd)
       : "이번 주";
-  const workspaceName = dashboard.workspaceName ?? "워크스페이스";
+  const workspaceName = report.workspaceName ?? "워크스페이스";
   const hasActive = summary.activeCount > 0;
 
   return (
@@ -185,8 +191,7 @@ export default function ReportPage() {
 
         {/* 팀 추세 차트 */}
         <TeamTrendChart
-          currentWinRate={summary.activeCount > 0 ? Math.round((summary.winningCount / summary.activeCount) * 100) : 0}
-          currentExecRate={summary.activeCount > 0 ? Math.round((summary.startedCount / summary.activeCount) * 100) : 0}
+          trends={report.trends ?? []}
         />
 
         {/* E. 개입 대상 목록 */}
@@ -239,13 +244,6 @@ export default function ReportPage() {
 
 // ─── TeamTrendChart ────────────────────────────────────────────────────────────
 
-const MOCK_PAST_WEEKS = [
-  { week: "3/4주", winRate: 45, execRate: 60 },
-  { week: "4/1주", winRate: 42, execRate: 58 },
-  { week: "4/2주", winRate: 50, execRate: 67 },
-  { week: "4/3주", winRate: 48, execRate: 64 },
-];
-
 type ChartLegendKey = "winRate" | "execRate" | null;
 
 function ChartLegendTooltip({
@@ -286,25 +284,23 @@ function ChartLegendTooltip({
   );
 }
 
-function TeamTrendChart({
-  currentWinRate,
-  currentExecRate,
-}: {
-  currentWinRate: number;
-  currentExecRate: number;
-}) {
+function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
   const [activeTooltip, setActiveTooltip] = useState<ChartLegendKey>(null);
-  const data = [
-    ...MOCK_PAST_WEEKS,
-    { week: "이번 주", winRate: currentWinRate, execRate: currentExecRate },
-  ];
+  const data = trends.map((trend, index) => ({
+    week:
+      index === trends.length - 1
+        ? "이번 주"
+        : formatShortWeekLabel(trend.weekStart),
+    winRate: trend.winRate ?? 0,
+    execRate: trend.executionRate ?? 0,
+  }));
 
   return (
     <section className="space-y-3">
       <div className="flex items-baseline justify-between px-1">
         <div className="space-y-0.5">
           <h2 className="text-sm font-bold text-text-primary">팀 승률 추이</h2>
-          <p className="text-xs text-text-muted">이번 주만 실제 데이터 · 과거 4주는 샘플 추세입니다</p>
+          <p className="text-xs text-text-muted">최근 주차별 실제 팀 승률과 실행률입니다</p>
         </div>
         <div className="flex items-center gap-3">
           <ChartLegendTooltip
@@ -402,6 +398,13 @@ function TeamTrendChart({
       </Card>
     </section>
   );
+}
+
+function formatShortWeekLabel(weekStart?: string) {
+  if (!weekStart) return "-";
+
+  const [, month, day] = weekStart.split("-");
+  return `${Number(month)}/${Number(day)}주`;
 }
 
 // ─── WinRateOverview ───────────────────────────────────────────────────────
@@ -742,6 +745,31 @@ function ReportNoWorkspaceState() {
           </p>
           <div className="flex justify-center">
             <NoWorkspaceActions />
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function ReportForbiddenState() {
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-[720px] p-4 md:p-8">
+        <Card className="card-linear space-y-4 p-8 text-center">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <BarChart3 className="h-5 w-5 text-primary" />
+          </div>
+          <h1 className="text-xl font-bold text-text-primary">
+            리더만 주간 리포트를 볼 수 있습니다
+          </h1>
+          <p className="text-sm text-text-secondary">
+            이 화면은 워크스페이스 관리자에게만 공개됩니다.
+          </p>
+          <div className="flex justify-center">
+            <Button asChild>
+              <Link href="/dashboard">팀 대시보드로 돌아가기</Link>
+            </Button>
           </div>
         </Card>
       </div>
