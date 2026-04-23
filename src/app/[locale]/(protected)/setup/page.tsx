@@ -6,19 +6,22 @@ import { LeadMeasuresSection } from "@/app/[locale]/(protected)/setup/_component
 import { SetupCoachmark } from "@/app/[locale]/(protected)/setup/_components/SetupCoachmark";
 import { SetupManageSection } from "@/app/[locale]/(protected)/setup/_components/SetupManageSection";
 import { SetupSubmitButton } from "@/app/[locale]/(protected)/setup/_components/SetupSubmitButton";
+import { SetupGuideCard } from "@/app/[locale]/(protected)/setup/_components/SetupGuideCard";
 import { useScoreboardSetup } from "@/app/[locale]/(protected)/setup/_hooks/useScoreboardSetup";
 import {
   SETUP_COACHMARK_LEAD_TAGS_QUERY,
   SETUP_COACHMARK_STORAGE_KEY,
 } from "@/app/[locale]/(protected)/setup/_lib/setup-coachmark";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { SmartBackButton } from "@/components/ui/SmartBackButton";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { SmartBackButton } from "@/components/ui/SmartBackButton";
 
 export default function SetupPage() {
   const t = useTranslations("Setup");
+  const tc = useTranslations("Common");
   const router = useRouter();
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const [coachmarkMode, setCoachmarkMode] = useState<
@@ -42,7 +45,6 @@ export default function SetupPage() {
     monthlyTargetMax,
     renameTag,
     removeMeasureRow,
-    setActiveTooltip,
     setGoalName,
     setLagMeasure,
     isSubmitPending,
@@ -83,6 +85,37 @@ export default function SetupPage() {
     }
   }, []);
 
+  const [activeSection, setActiveSection] = useState("wig");
+
+  const menuGroups = [
+    { id: "wig", label: t("wigShort") },
+    { id: "lag", label: t("lagMeasureLabel") },
+    { id: "lead", label: t("leadMeasureHead") },
+    ...(isEditMode ? [{ id: "manage", label: t("manage") }] : []),
+  ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 150;
+      let currentSectionId = activeSection;
+
+      const sectionIds = menuGroups.map(g => g.id);
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= scrollPosition) {
+          currentSectionId = id;
+        }
+      }
+
+      if (currentSectionId !== activeSection) {
+        setActiveSection(currentSectionId);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [activeSection, menuGroups]);
+
   if (isInitializing) {
     return <SetupSkeleton />;
   }
@@ -90,7 +123,7 @@ export default function SetupPage() {
   const isMutating = isSubmitPending || isArchivePending;
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen font-pretendard">
       <SetupCoachmark
         isRunning={isCoachmarkRunning}
         mode={coachmarkMode}
@@ -107,78 +140,134 @@ export default function SetupPage() {
           }
         />
       )}
-      <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
-        {/* ── 헤더 ── */}
-        <header className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-12">
+        <header className="flex flex-col gap-1 px-1">
+          <SmartBackButton
+            iconClassName="h-4 w-4"
+            className="flex w-fit items-center gap-1 text-[13px] font-bold text-zinc-400 transition-colors hover:text-zinc-600 mb-2"
+          >
+            {tc("back")}
+          </SmartBackButton>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-black text-zinc-900 tracking-tight">
+              {isEditMode ? t("editTitle") : t("createTitle")}
+            </h1>
           </div>
-          <p className="text-xs text-text-muted">{t("header")}</p>
-          <div className="w-8" />
-        </header>
-
-        {/* ── 페이지 타이틀 ── */}
-        <div className="space-y-1 px-0.5">
-          <h1 className="text-xl font-bold text-text-primary tracking-tight">
-            {isEditMode ? t("editTitle") : t("createTitle")}
-          </h1>
-          <p className="text-xs text-text-muted leading-relaxed">
+          <p className="text-sm text-zinc-500 font-medium">
             {t("description")}
           </p>
+        </header>
+
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          {/* ── 좌측 네비게이션 & 액션 ── */}
+          <aside className="w-full lg:w-[240px] lg:sticky lg:top-12 space-y-8">
+            <nav className="space-y-1">
+              {menuGroups.map((group) => {
+                const isActive = activeSection === group.id;
+                return (
+                  <button
+                    key={group.id}
+                    onClick={() => {
+                      const element = document.getElementById(group.id);
+                      if (element) {
+                        const headerOffset = 100;
+                        const elementPosition = element.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({
+                          top: offsetPosition,
+                          behavior: "smooth"
+                        });
+                      }
+                    }}
+                    className={`w-full flex items-center px-4 py-2 rounded-content text-[14px] font-bold transition-all text-left ${
+                      isActive 
+                        ? "text-primary" 
+                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isActive && <div className="w-1 h-4 bg-primary rounded-full" />}
+                      <span className={isActive ? "" : "pl-4"}>{group.label}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="space-y-8">
+              <div className="pt-4 border-t border-zinc-200/60">
+                <SetupSubmitButton
+                  isEditMode={isEditMode}
+                  isMutating={isMutating}
+                  isSubmitPending={isSubmitPending}
+                  formId="setup-form"
+                />
+              </div>
+
+              <SetupGuideCard />
+            </div>
+          </aside>
+
+          {/* ── 우측 메인 콘텐츠 ── */}
+          <form id="setup-form" onSubmit={handleSubmit} className="flex-1 space-y-16 max-w-[800px] pb-[60vh]">
+            {/* WIG 섹션 */}
+            <section id="wig" className="space-y-5 scroll-mt-28">
+              <SectionHeader title={t("wigShort")} />
+              <GoalSection
+                goalName={goalName}
+                isMutating={isMutating}
+                setGoalName={setGoalName}
+              />
+            </section>
+
+            {/* 결과지표 섹션 */}
+            <section id="lag" className="space-y-5 scroll-mt-28">
+              <SectionHeader title={t("lagMeasureLabel")} />
+              <LagMeasureSection
+                isMutating={isMutating}
+                lagMeasure={lagMeasure}
+                setLagMeasure={setLagMeasure}
+              />
+            </section>
+
+            {/* 행동지표 섹션 */}
+            <section id="lead" className="space-y-5 scroll-mt-28">
+              <SectionHeader title={t("leadMeasureHead")} />
+              <LeadMeasuresSection
+                addMeasureRow={addMeasureRow}
+                availableTags={availableTags}
+                coachmarkTarget={
+                  coachmarkMode === SETUP_COACHMARK_LEAD_TAGS_QUERY &&
+                  isCoachmarkRunning
+                    ? SETUP_COACHMARK_LEAD_TAGS_QUERY
+                    : null
+                }
+                createTag={createTag}
+                deleteTag={deleteTag}
+                handleMeasureChange={handleMeasureChange}
+                isMutating={isMutating}
+                isTagMutationPending={isTagMutationPending}
+                measures={measures}
+                monthlyTargetMax={monthlyTargetMax}
+                renameTag={renameTag}
+                removeMeasureRow={removeMeasureRow}
+                toggleMeasureTag={toggleMeasureTag}
+              />
+            </section>
+
+            {/* 관리 섹션 (수정 모드일 때만) */}
+            {isEditMode && (
+              <section id="manage" className="space-y-5 scroll-mt-28">
+                <SectionHeader title={t("manage")} />
+                <SetupManageSection
+                  archive={archive}
+                  isArchivePending={isArchivePending}
+                  isMutating={isMutating}
+                />
+              </section>
+            )}
+          </form>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <GoalSection
-            goalName={goalName}
-            isMutating={isMutating}
-            setGoalName={setGoalName}
-          />
-
-          <LagMeasureSection
-            activeTooltip={activeTooltip}
-            isMutating={isMutating}
-            lagMeasure={lagMeasure}
-            setActiveTooltip={setActiveTooltip}
-            setLagMeasure={setLagMeasure}
-          />
-
-          <LeadMeasuresSection
-            activeTooltip={activeTooltip}
-            addMeasureRow={addMeasureRow}
-            availableTags={availableTags}
-            coachmarkTarget={
-              coachmarkMode === SETUP_COACHMARK_LEAD_TAGS_QUERY &&
-              isCoachmarkRunning
-                ? SETUP_COACHMARK_LEAD_TAGS_QUERY
-                : null
-            }
-            createTag={createTag}
-            deleteTag={deleteTag}
-            handleMeasureChange={handleMeasureChange}
-            isMutating={isMutating}
-            isTagMutationPending={isTagMutationPending}
-            measures={measures}
-            monthlyTargetMax={monthlyTargetMax}
-            renameTag={renameTag}
-            removeMeasureRow={removeMeasureRow}
-            setActiveTooltip={setActiveTooltip}
-            toggleMeasureTag={toggleMeasureTag}
-          />
-
-          <SetupSubmitButton
-            isEditMode={isEditMode}
-            isMutating={isMutating}
-            isSubmitPending={isSubmitPending}
-          />
-
-          {isEditMode ? (
-            <SetupManageSection
-              archive={archive}
-              isArchivePending={isArchivePending}
-              isMutating={isMutating}
-            />
-          ) : null}
-        </form>
       </div>
     </div>
   );
@@ -186,13 +275,13 @@ export default function SetupPage() {
 
 function SetupSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[580px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-12 rounded-xl bg-sub-background" />
-        <div className="h-44 rounded-2xl bg-sub-background" />
-        <div className="h-44 rounded-2xl bg-sub-background" />
-        <div className="h-64 rounded-2xl bg-sub-background" />
+    <div className="min-h-screen font-pretendard">
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-10 animate-pulse">
+        <div className="h-10 rounded-content bg-sub-background" />
+        <div className="h-12 rounded-content bg-sub-background" />
+        <div className="h-44 rounded-content bg-sub-background" />
+        <div className="h-44 rounded-content bg-sub-background" />
+        <div className="h-64 rounded-content bg-sub-background" />
       </div>
     </div>
   );

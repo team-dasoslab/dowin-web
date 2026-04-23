@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { ArrowRight, BarChart3, CalendarDays, TrendingUp, Users } from "lucide-react";
+import { BarChart3, CalendarDays, TrendingUp } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -133,6 +133,7 @@ const buildReportSummary = (
 
 export default function ReportPage() {
   const t = useTranslations("Report");
+  const tDashboard = useTranslations("Dashboard");
   const { report, hasNoWorkspace, isError, isForbidden, isLoading, refetch } =
     useTeamWeeklyReport();
   const hasTrackedViewRef = useRef(false);
@@ -181,67 +182,50 @@ export default function ReportPage() {
     report.weekStart && report.weekEnd
       ? formatWeekLabel(report.weekStart, report.weekEnd)
       : t("common.thisWeek");
-  const workspaceName = report.workspaceName ?? t("common.workspaceFallback");
   const hasActive = summary.activeCount > 0;
   const hasMembers = summary.totalCount > 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto w-full max-w-[860px] space-y-8 px-4 py-6 md:px-8 md:py-10">
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <div className="mx-auto w-full max-w-[1200px] space-y-8 px-6 py-8 md:px-10 md:py-12 lg:px-12">
 
-        <header className="space-y-4 px-1">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
-              <Users className="h-3.5 w-3.5 text-[#626A7D]" />
-              <span className="font-medium text-text-secondary">{workspaceName}</span>
-              <span className="text-border">·</span>
-              <CalendarDays className="h-3.5 w-3.5 text-[#626A7D]" />
-              <span className="font-mono rounded border border-border bg-sub-background px-2 py-0.5 text-[11px] tracking-tight">
+        <header className="px-1">
+          <div className="min-w-0">
+            <h1 className="text-xl font-black text-slate-900 tracking-tight">
+              {tDashboard("weeklyReport")}
+            </h1>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-muted">
+              <CalendarDays className="h-3.5 w-3.5 text-slate-500" />
+              <span className="font-mono rounded border border-slate-200 bg-slate-100/80 px-2 py-0.5 text-[11px] font-bold text-slate-600 tracking-tight">
                 {weekLabel}
               </span>
             </div>
-            <Button
-              asChild
-              onClick={() => {
-                if (report?.workspaceId) {
-                  trackEvent("team_report_cta_clicked", {
-                    workspace_id_hash: hashId(report.workspaceId),
-                  });
-                }
-              }}
-              className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-lg border border-[rgba(94,106,210,0.3)] bg-[rgba(94,106,210,0.06)] px-3 py-2 text-xs font-bold text-[#5e6ad2] transition-colors hover:bg-[rgba(94,106,210,0.1)] hover:border-[rgba(94,106,210,0.4)]"
-            >
-              <Link href="/dashboard">
-                {t("cta.button")}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            <h1 className="text-xl font-bold tracking-tight text-text-primary md:text-2xl">
-              {hasActive
-                ? t("header.activeTitle", {
-                    activeCount: summary.activeCount,
-                    winningCount: summary.winningCount,
-                  })
-                : t("header.noActiveTitle")}
-            </h1>
-            <p className="text-sm leading-6 text-text-secondary">
-              {summary.immediateCheckCount > 0
-                ? t("header.needsCheckDesc", {
-                    notStartedCount: summary.notStartedCount,
-                    noScoreboardCount: summary.noScoreboardCount,
-                  })
-                : t("header.allStartedDesc")}
-            </p>
           </div>
         </header>
+
+        <div className="space-y-2 px-1">
+          <h2 className="text-lg font-bold tracking-tight text-text-primary md:text-xl">
+            {hasActive
+              ? t("header.activeTitle", {
+                  activeCount: summary.activeCount,
+                  winningCount: summary.winningCount,
+                })
+              : t("header.noActiveTitle")}
+          </h2>
+          <p className="text-sm leading-6 text-text-secondary">
+            {summary.immediateCheckCount > 0
+              ? t("header.needsCheckDesc", {
+                  notStartedCount: summary.notStartedCount,
+                  noScoreboardCount: summary.noScoreboardCount,
+                })
+              : t("header.allStartedDesc")}
+          </p>
+        </div>
 
         {hasMembers ? (
           <section className="space-y-3">
             <SectionLabel title={t("sections.teamStatus")} />
-            <Card className="overflow-hidden rounded-lg border border-border bg-white">
+            <Card className="overflow-hidden rounded-content border border-border bg-white">
               {hasActive ? (
                 <div className="px-5 py-5">
                   <div className="flex items-start justify-between gap-2">
@@ -300,7 +284,7 @@ export default function ReportPage() {
           {summary.focusMembers.length > 0 ? (
             <FocusMemberList members={summary.focusMembers} />
           ) : (
-            <div className="rounded-lg border border-border bg-sub-background px-5 py-8 text-center">
+            <div className="rounded-content border border-border bg-sub-background px-5 py-8 text-center">
               <p className="text-sm font-semibold text-text-primary">
                 {t("focus.emptyTitle")}
               </p>
@@ -348,7 +332,7 @@ function ChartLegendTooltip({
       {active && (
         <>
           <div className="fixed inset-0 z-10" onClick={onClose} />
-          <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-lg border border-border bg-white p-4 shadow-lg">
+          <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-content border border-border bg-white p-4">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-primary">{label}</p>
             <p className="text-[11px] leading-relaxed text-text-secondary">{description}</p>
           </div>
@@ -423,7 +407,7 @@ function TeamTrendChart({
           />
         </div>
       </div>
-      <Card className="overflow-hidden rounded-lg border border-border bg-white px-2 py-5">
+      <Card className="overflow-hidden rounded-content border border-border bg-white px-2 py-5">
         {hasTrendData ? (
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={data} margin={{ top: 4, right: 16, left: -20, bottom: 0 }}>
@@ -462,7 +446,7 @@ function TeamTrendChart({
                 content={({ active, payload, label }) => {
                   if (!active || !payload?.length) return null;
                   return (
-                    <div className="rounded-lg border border-border bg-white px-3 py-2 shadow-sm">
+                    <div className="rounded-content border border-border bg-white px-3 py-2">
                       <p className="mb-1.5 text-[11px] font-bold text-text-primary">{label}</p>
                       {payload.map((entry) => (
                         <p key={entry.dataKey as string} className="text-[11px] text-text-muted">
@@ -619,7 +603,7 @@ function WinRateOverview({
 
   return (
     <div className="mt-4 space-y-3">
-      <div className="rounded-lg border border-[rgba(94,106,210,0.15)] bg-[rgba(94,106,210,0.03)] px-4 py-4">
+      <div className="rounded-content border border-[rgba(94,106,210,0.15)] bg-[rgba(94,106,210,0.03)] px-4 py-4">
         <div className="space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5e6ad2]">
             {t("winOverview.summaryLabel")}
@@ -706,7 +690,7 @@ function StatusBoardCard({
   const shownNames = expanded ? names : names.slice(0, COLLAPSED_MAX);
 
   return (
-    <div className={`rounded-xl border px-4 py-4 ${ring} ${surface}`}>
+    <div className={`rounded-content border px-4 py-4 ${ring} ${surface}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -729,7 +713,7 @@ function StatusBoardCard({
               {shownNames.map((name) => (
                 <span
                   key={`${label}-${name}`}
-                  className="rounded-full border border-white/70 bg-white px-2.5 py-1 text-xs font-medium text-text-primary shadow-[0_1px_0_rgba(15,23,42,0.04)]"
+                  className="rounded-full border border-white/70 bg-white px-2.5 py-1 text-xs font-medium text-text-primary"
                 >
                   {name}
                 </span>
@@ -788,7 +772,7 @@ function InlineEmptyState({
   description: string;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-sub-background px-5 py-8 text-center">
+    <div className="rounded-content border border-border bg-sub-background px-5 py-8 text-center">
       <p className="text-sm font-semibold text-text-primary">{title}</p>
       <p className="mt-1 text-xs leading-5 text-text-muted">{description}</p>
     </div>
@@ -801,7 +785,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
   const t = useTranslations("Report");
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-white">
+    <div className="overflow-hidden rounded-content border border-border bg-white">
       <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-border bg-sub-background px-5 py-3 text-[11px] font-semibold text-text-muted md:grid">
         <span>{t("focus.table.member")}</span>
         <span>{t("focus.table.status")}</span>
@@ -855,15 +839,15 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
 
 function ReportLoadingState() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-[860px] space-y-8 px-4 py-6 md:px-8 md:py-10 animate-pulse">
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <div className="mx-auto w-full max-w-[1200px] space-y-8 px-6 py-8 md:px-10 md:py-12 lg:px-12 animate-pulse">
         <div className="space-y-3 px-1">
           <div className="h-4 w-40 rounded bg-sub-background" />
           <div className="h-7 w-72 rounded bg-sub-background" />
           <div className="h-4 w-56 rounded bg-sub-background" />
         </div>
-        <div className="h-48 rounded-lg bg-sub-background" />
-        <div className="h-40 rounded-lg bg-sub-background" />
+        <div className="h-48 rounded-content bg-sub-background" />
+        <div className="h-40 rounded-content bg-sub-background" />
       </div>
     </div>
   );
@@ -875,8 +859,8 @@ function ReportNoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
-        <Card className="card-linear space-y-4 p-8 text-center">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+        <Card className="space-y-4 p-8 text-center rounded-content">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
             <BarChart3 className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
@@ -900,8 +884,8 @@ function ReportForbiddenState() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
-        <Card className="card-linear space-y-4 p-8 text-center">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+        <Card className="space-y-4 p-8 text-center rounded-content">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
             <BarChart3 className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
@@ -911,7 +895,7 @@ function ReportForbiddenState() {
             {t("states.forbiddenDesc")}
           </p>
           <div className="flex justify-center">
-            <Button asChild>
+            <Button asChild className="rounded-content">
               <Link href="/dashboard">{t("states.backToDashboard")}</Link>
             </Button>
           </div>
@@ -927,8 +911,8 @@ function ReportErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
-        <Card className="card-linear space-y-4 p-8 text-center">
-          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+        <Card className="space-y-4 p-8 text-center rounded-content">
+          <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
             <BarChart3 className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
@@ -938,10 +922,10 @@ function ReportErrorState({ onRetry }: { onRetry: () => void }) {
             {t("states.errorDesc")}
           </p>
           <div className="flex flex-col justify-center gap-2 sm:flex-row">
-            <Button onClick={onRetry}>{t("states.retry")}</Button>
+            <Button onClick={onRetry} className="rounded-content">{t("states.retry")}</Button>
             <Button
               asChild
-              className="rounded-lg border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors hover:border-[rgba(205,207,213,1)]"
+              className="rounded-content border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors hover:border-[rgba(205,207,213,1)]"
             >
               <Link href="/dashboard">{t("states.backToDashboard")}</Link>
             </Button>

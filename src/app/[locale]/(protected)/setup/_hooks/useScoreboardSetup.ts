@@ -46,10 +46,11 @@ import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export const useScoreboardSetup = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const t = useTranslations("Setup.Toast");
@@ -599,6 +600,7 @@ export const useScoreboardSetup = () => {
         });
 
         showToast("success", t("createSuccess"));
+        router.refresh();
         return true;
       }
 
@@ -665,6 +667,7 @@ export const useScoreboardSetup = () => {
 
         await invalidateScoreboardQueries(scoreboardId);
         showToast("success", t("saveSuccess"));
+        router.refresh();
       }
 
       return true;
@@ -685,6 +688,7 @@ export const useScoreboardSetup = () => {
       });
       await invalidateScoreboardQueries(scoreboardId);
       showToast("success", t("archiveSuccess"));
+      router.refresh();
       return true;
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("archiveFailed")));

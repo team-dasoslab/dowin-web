@@ -135,12 +135,12 @@ export default function MyDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard">
       {celebrationLevel ? (
         <DashboardCelebrationOverlay level={celebrationLevel} />
       ) : null}
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
-        <DashboardHeader nickname={nickname} workspaceName={workspace?.name} />
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-10 animate-linear-in">
+        <DashboardHeader nickname={nickname} />
 
         {workspace?.isOverFreeMemberLimit ? (
           <WorkspaceOverLimitBanner
@@ -232,15 +232,15 @@ function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
 
 function MyDashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-16 rounded-2xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard">
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-10 animate-pulse">
+        <div className="h-16 rounded-content bg-sub-background" />
+        <div className="h-24 rounded-content bg-sub-background" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-2xl bg-sub-background" />
-          <div className="h-48 rounded-2xl bg-sub-background" />
+          <div className="h-48 rounded-content bg-sub-background" />
+          <div className="h-48 rounded-content bg-sub-background" />
         </div>
-        <div className="h-72 rounded-2xl bg-sub-background" />
+        <div className="h-72 rounded-content bg-sub-background" />
       </div>
     </div>
   );
@@ -249,10 +249,10 @@ function MyDashboardSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
-        <MyDashboardEmptyHeader variant="no-workspace" />
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-6 md:p-10 lg:p-12">
         <EmptyStatePanel
+          icon={<Zap className="w-5 h-5 text-primary" />}
           title={t("noWorkspaceTitle")}
           description={
             <div className="whitespace-pre-line">{t("noWorkspaceDesc")}</div>
@@ -267,11 +267,10 @@ function NoWorkspaceState() {
 function NoScoreboardState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
-        <MyDashboardEmptyHeader variant="no-scoreboard" />
-
+    <div className="min-h-screen bg-[#F8FAFC] font-pretendard">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-6 md:p-10 lg:p-12">
         <EmptyStatePanel
+          icon={<Zap className="w-5 h-5 text-primary" />}
           title={t("noScoreboardTitle")}
           description={
             <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>
@@ -279,7 +278,7 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
                 <Plus className="w-4 h-4" />
@@ -309,7 +308,7 @@ function MyDashboardEmptyHeader({
       <div className="flex items-center gap-3">
         {variant === "no-workspace" ? (
           <>
-            <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center border border-primary/20 text-primary shrink-0">
+            <div className="w-9 h-9 bg-primary/10 rounded-content flex items-center justify-center border border-primary/20 text-primary shrink-0">
               <Zap className="w-4 h-4" />
             </div>
             <div className="min-w-0">
@@ -338,7 +337,7 @@ function MyDashboardEmptyHeader({
           <Button
             key={href}
             asChild
-            className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
+            className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-content text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
           >
             <Link href={href}>
               <Icon className="w-3.5 h-3.5 text-text-muted shrink-0" />

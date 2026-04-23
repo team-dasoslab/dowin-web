@@ -171,14 +171,14 @@ export function TeamMemberMemoPanel({
                     }
                   }}
                   placeholder={t("addComment")}
-                  className="h-10 flex-1 rounded-xl border border-border bg-white px-3 text-sm text-text-primary placeholder:text-text-muted"
+                  className="h-10 flex-1 rounded-button border border-border bg-white px-3 text-sm text-text-primary placeholder:text-text-muted"
                   disabled={isCreatePending}
                 />
                 <Button
                   type="button"
                   onClick={() => void handleAddMemo()}
                   disabled={!memoDraft.trim() || isCreatePending}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-primary disabled:opacity-40"
+                  className="inline-flex h-10 w-10 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
                   aria-label={t("submitMemo")}
                 >
                   <ArrowUp className="h-4 w-4" />
@@ -265,7 +265,7 @@ export function TeamMemberMemoPanel({
 
       <div className="hidden space-y-3 md:hidden xl:absolute xl:left-[calc(100%+20px)] xl:top-8 xl:block xl:w-[300px]">
         {isComposeMode ? (
-          <Card className="rounded-2xl border border-border bg-white p-2.5 shadow-none">
+          <Card className="rounded-content border border-border bg-white p-2.5 shadow-none">
             <div className="flex items-center gap-2">
               <Input
                 value={memoDraft}
@@ -284,7 +284,7 @@ export function TeamMemberMemoPanel({
                 type="button"
                 onClick={() => void handleAddMemo()}
                 disabled={!memoDraft.trim() || isCreatePending}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary disabled:opacity-40"
+                className="inline-flex h-8 w-8 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
                 aria-label={t("submitMemo")}
               >
                 <ArrowUp className="h-4 w-4" />
@@ -346,7 +346,7 @@ function MemoCard({
 
   return (
     <Card
-      className={`rounded-xl border px-4 py-3 transition-colors ${
+      className={`rounded-content border px-4 py-3 transition-colors ${
         memo.isResolved
           ? "border-primary/20 bg-primary/5"
           : "border-border bg-white"
@@ -419,7 +419,7 @@ function MemoCard({
 
 function MemoStatusCard({ message }: { message: string }) {
   return (
-    <Card className="rounded-xl border border-border bg-white px-4 py-4">
+    <Card className="rounded-content border border-border bg-white px-4 py-4">
       <p className="text-sm text-text-muted">{message}</p>
     </Card>
   );

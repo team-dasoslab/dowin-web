@@ -204,9 +204,9 @@ export default function PushSubscriptionManager({
   if (isInitialLoading) {
     if (variant === "toggle")
       return (
-        <div className="w-10 h-5 bg-gray-200 animate-pulse rounded-full" />
+        <div className="w-10 h-5 bg-zinc-200 animate-pulse rounded-full" />
       );
-    return <div className="animate-pulse h-10 w-32 bg-gray-200 rounded-lg" />;
+    return <div className="animate-pulse h-10 w-32 bg-zinc-200 rounded-lg" />;
   }
 
   if (variant === "toggle") {

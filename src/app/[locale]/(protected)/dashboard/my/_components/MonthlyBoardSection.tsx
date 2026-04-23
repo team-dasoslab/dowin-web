@@ -43,7 +43,7 @@ export function MonthlyBoardSection({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-border bg-white px-5 py-3">
+      <div className="rounded-content border border-border bg-white px-5 py-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-xs font-bold text-text-primary">
@@ -64,7 +64,7 @@ export function MonthlyBoardSection({
       </div>
 
       {monthlyLeadMeasures.length === 0 ? (
-        <div className="rounded-lg border border-border bg-white p-8 text-center text-sm text-text-muted">
+        <div className="rounded-content border border-border bg-white p-8 text-center text-sm text-text-muted">
           {t("noMonthlyMeasures")}
         </div>
       ) : (
@@ -81,7 +81,7 @@ export function MonthlyBoardSection({
             {monthWeeks.map((weekDatesInMonth, weekIndex) => (
               <div
                 key={`${monthLabel}-week-${weekIndex + 1}`}
-                className="overflow-hidden rounded-lg border border-border bg-white"
+                className="overflow-hidden rounded-content border border-border bg-white"
               >
                 <div className="border-b border-border bg-sub-background px-5 py-3">
                   <div className="flex items-center justify-between gap-2">
