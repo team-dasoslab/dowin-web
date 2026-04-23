@@ -443,7 +443,7 @@
     "noInvites": "No invite codes created yet.",
     "noCode": "No Code",
     "copyCode": "Copy Code",
-    "copySuccess": "Copied",
+    "copiedLabel": "Copied",
     "active": "ACTIVE",
     "inactive": "INACTIVE",
     "usageLabel": "Usage {usage}",
