@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { ArrowRight, BarChart3, CalendarDays, TrendingUp, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
   Area,
@@ -32,15 +33,29 @@ type FocusMember = {
   badgeTone: string;
 };
 
-const getMemberName = (member: TeamDashboardMember) =>
-  member.nickname?.trim() || "이름 없음";
+type ReportSummaryCopy = {
+  unnamedMember: string;
+  unsetScore: string;
+  noScoreboardStatus: string;
+  noScoreboardAction: string;
+  notStartedStatus: string;
+  notStartedAction: string;
+  losingStartedStatus: string;
+  losingStartedAction: string;
+};
 
-const formatScore = (member: TeamDashboardMember) => {
-  if (!member.hasScoreboard) return "설정 전";
+const getMemberName = (member: TeamDashboardMember, fallback: string) =>
+  member.nickname?.trim() || fallback;
+
+const formatScore = (member: TeamDashboardMember, unsetScore: string) => {
+  if (!member.hasScoreboard) return unsetScore;
   return `${member.achieved ?? 0} / ${member.total ?? 0}`;
 };
 
-const buildReportSummary = (members: TeamDashboardMember[]) => {
+const buildReportSummary = (
+  members: TeamDashboardMember[],
+  copy: ReportSummaryCopy,
+) => {
   const activeMembers = members.filter((m) => m.hasScoreboard);
   const noScoreboardMembers = members.filter((m) => !m.hasScoreboard);
   const winningMembers = activeMembers.filter((m) => m.isWinning);
@@ -53,34 +68,42 @@ const buildReportSummary = (members: TeamDashboardMember[]) => {
   );
   const immediateCheckCount =
     noScoreboardMembers.length + notStartedMembers.length;
-  const noScoreboardNames = noScoreboardMembers.map(getMemberName);
-  const winningNames = winningMembers.map(getMemberName);
-  const losingStartedNames = losingStartedMembers.map(getMemberName);
-  const notStartedNames = notStartedMembers.map(getMemberName);
+  const noScoreboardNames = noScoreboardMembers.map((member) =>
+    getMemberName(member, copy.unnamedMember),
+  );
+  const winningNames = winningMembers.map((member) =>
+    getMemberName(member, copy.unnamedMember),
+  );
+  const losingStartedNames = losingStartedMembers.map((member) =>
+    getMemberName(member, copy.unnamedMember),
+  );
+  const notStartedNames = notStartedMembers.map((member) =>
+    getMemberName(member, copy.unnamedMember),
+  );
 
   const focusMembers: FocusMember[] = [
     ...noScoreboardMembers.map((m) => ({
-      key: `no-scoreboard-${m.userId ?? getMemberName(m)}`,
-      name: getMemberName(m),
-      status: "점수판 없음",
-      score: "설정 전",
-      nextAction: "WIG와 선행지표 설정부터 열어주기",
+      key: `no-scoreboard-${m.userId ?? getMemberName(m, copy.unnamedMember)}`,
+      name: getMemberName(m, copy.unnamedMember),
+      status: copy.noScoreboardStatus,
+      score: copy.unsetScore,
+      nextAction: copy.noScoreboardAction,
       badgeTone: "border-border bg-sub-background text-text-secondary",
     })),
     ...notStartedMembers.map((m) => ({
-      key: `not-started-${m.userId ?? getMemberName(m)}`,
-      name: getMemberName(m),
-      status: "이번 주 미기록",
-      score: formatScore(m),
-      nextAction: "이번 주 시작 가능한 가장 작은 행동부터 확인",
+      key: `not-started-${m.userId ?? getMemberName(m, copy.unnamedMember)}`,
+      name: getMemberName(m, copy.unnamedMember),
+      status: copy.notStartedStatus,
+      score: formatScore(m, copy.unsetScore),
+      nextAction: copy.notStartedAction,
       badgeTone: "border-amber-200 bg-amber-50 text-amber-700",
     })),
     ...losingStartedMembers.map((m) => ({
-      key: `losing-${m.userId ?? getMemberName(m)}`,
-      name: getMemberName(m),
-      status: "시작했지만 밀리는 중",
-      score: formatScore(m),
-      nextAction: "선행지표 난이도나 이번 주 실행 리듬 확인",
+      key: `losing-${m.userId ?? getMemberName(m, copy.unnamedMember)}`,
+      name: getMemberName(m, copy.unnamedMember),
+      status: copy.losingStartedStatus,
+      score: formatScore(m, copy.unsetScore),
+      nextAction: copy.losingStartedAction,
       badgeTone: "border-[rgba(94,106,210,0.3)] bg-[rgba(94,106,210,0.06)] text-[#5e6ad2]",
     })),
   ].slice(0, 3);
@@ -107,6 +130,7 @@ const buildReportSummary = (members: TeamDashboardMember[]) => {
 };
 
 export default function ReportPage() {
+  const t = useTranslations("Report");
   const { report, hasNoWorkspace, isForbidden, isLoading } =
     useTeamWeeklyReport();
 
@@ -116,19 +140,27 @@ export default function ReportPage() {
   if (!report) return <ReportLoadingState />;
 
   const members = report.members ?? [];
-  const summary = buildReportSummary(members);
+  const summary = buildReportSummary(members, {
+    unnamedMember: t("common.unnamedMember"),
+    unsetScore: t("common.unsetScore"),
+    noScoreboardStatus: t("focus.status.noScoreboard"),
+    noScoreboardAction: t("focus.action.noScoreboard"),
+    notStartedStatus: t("focus.status.notStarted"),
+    notStartedAction: t("focus.action.notStarted"),
+    losingStartedStatus: t("focus.status.losingStarted"),
+    losingStartedAction: t("focus.action.losingStarted"),
+  });
   const weekLabel =
     report.weekStart && report.weekEnd
       ? formatWeekLabel(report.weekStart, report.weekEnd)
-      : "이번 주";
-  const workspaceName = report.workspaceName ?? "워크스페이스";
+      : t("common.thisWeek");
+  const workspaceName = report.workspaceName ?? t("common.workspaceFallback");
   const hasActive = summary.activeCount > 0;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-[860px] space-y-8 px-4 py-6 md:px-8 md:py-10">
 
-        {/* 헤더 */}
         <header className="space-y-4 px-1">
           <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
             <Users className="h-3.5 w-3.5 text-[#626A7D]" />
@@ -143,31 +175,35 @@ export default function ReportPage() {
           <div className="space-y-2">
             <h1 className="text-xl font-bold tracking-tight text-text-primary md:text-2xl">
               {hasActive
-                ? `이번 주 팀은 ${summary.activeCount}명 중 ${summary.winningCount}명이 이기고 있어요.`
-                : "아직 활성 점수판이 없어 팀 승패를 계산할 수 없어요."}
+                ? t("header.activeTitle", {
+                    activeCount: summary.activeCount,
+                    winningCount: summary.winningCount,
+                  })
+                : t("header.noActiveTitle")}
             </h1>
             <p className="text-sm leading-6 text-text-secondary">
               {summary.immediateCheckCount > 0
-                ? `아직 시작하지 않은 ${summary.notStartedCount}명과 점수판이 없는 ${summary.noScoreboardCount}명이 있어 먼저 확인이 필요합니다.`
-                : "이번 주 기록이 모두 시작됐습니다. 팀 대시보드에서 세부 선행지표 흐름을 이어서 확인하세요."}
+                ? t("header.needsCheckDesc", {
+                    notStartedCount: summary.notStartedCount,
+                    noScoreboardCount: summary.noScoreboardCount,
+                  })
+                : t("header.allStartedDesc")}
             </p>
           </div>
         </header>
 
-        {/* 팀 상태 한눈에 보기 */}
         <section className="space-y-3">
-          <SectionLabel title="팀 현황" />
+          <SectionLabel title={t("sections.teamStatus")} />
           <Card className="overflow-hidden rounded-lg border border-border bg-white">
-            {/* Win Rate 시각화 */}
             {hasActive && (
               <div className="px-5 py-5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-sm font-bold text-text-primary">
-                      이번 주 승률
+                      {t("winRate.title")}
                     </p>
                     <p className="mt-0.5 text-xs text-text-muted">
-                      활성 점수판 기준으로 이번 주 팀 상태를 나눠서 보여줍니다.
+                      {t("winRate.desc")}
                     </p>
                   </div>
                   <TrendingUp className="h-4 w-4 shrink-0 text-[#5e6ad2]" />
@@ -189,17 +225,15 @@ export default function ReportPage() {
           </Card>
         </section>
 
-        {/* 팀 추세 차트 */}
         <TeamTrendChart
           trends={report.trends ?? []}
         />
 
-        {/* E. 개입 대상 목록 */}
         <section className="space-y-3">
           <div className="flex items-baseline justify-between gap-2 px-1">
             <SectionLabel
-              title="먼저 확인할 팀원"
-              desc="운영 우선순위 기준으로 정렬됩니다"
+              title={t("focus.title")}
+              desc={t("focus.desc")}
               inline
             />
           </div>
@@ -209,21 +243,22 @@ export default function ReportPage() {
           ) : (
             <div className="rounded-lg border border-border bg-sub-background px-5 py-8 text-center">
               <p className="text-sm font-semibold text-text-primary">
-                이번 주 바로 확인해야 할 팀원이 없습니다.
+                {t("focus.emptyTitle")}
               </p>
               <p className="mt-1 text-xs leading-5 text-text-muted">
-                팀 대시보드에서 선행지표별 세부 흐름만 점검하면 됩니다.
+                {t("focus.emptyDesc")}
               </p>
             </div>
           )}
         </section>
 
-        {/* 하단 CTA */}
         <div className="border-t border-border pt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-1">
           <div>
-            <p className="text-sm font-bold text-text-primary">더 자세히 보려면</p>
+            <p className="text-sm font-bold text-text-primary">
+              {t("cta.title")}
+            </p>
             <p className="mt-0.5 text-xs text-text-muted">
-              팀 대시보드에서 선행지표 흐름을 이어서 확인하세요.
+              {t("cta.desc")}
             </p>
           </div>
           <Button
@@ -231,7 +266,7 @@ export default function ReportPage() {
             className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-[rgba(94,106,210,0.3)] bg-[rgba(94,106,210,0.06)] px-3 py-2 text-xs font-bold text-[#5e6ad2] transition-colors hover:bg-[rgba(94,106,210,0.1)] hover:border-[rgba(94,106,210,0.4)]"
           >
             <Link href="/dashboard">
-              팀 대시보드 보기
+              {t("cta.button")}
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </Button>
@@ -285,12 +320,13 @@ function ChartLegendTooltip({
 }
 
 function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
+  const t = useTranslations("Report");
   const [activeTooltip, setActiveTooltip] = useState<ChartLegendKey>(null);
   const data = trends.map((trend, index) => ({
     week:
       index === trends.length - 1
-        ? "이번 주"
-        : formatShortWeekLabel(trend.weekStart),
+        ? t("common.thisWeek")
+        : formatShortWeekLabel(trend.weekStart, t),
     winRate: trend.winRate ?? 0,
     execRate: trend.executionRate ?? 0,
   }));
@@ -299,22 +335,24 @@ function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
     <section className="space-y-3">
       <div className="flex items-baseline justify-between px-1">
         <div className="space-y-0.5">
-          <h2 className="text-sm font-bold text-text-primary">팀 승률 추이</h2>
-          <p className="text-xs text-text-muted">최근 주차별 실제 팀 승률과 실행률입니다</p>
+          <h2 className="text-sm font-bold text-text-primary">
+            {t("trend.title")}
+          </h2>
+          <p className="text-xs text-text-muted">{t("trend.desc")}</p>
         </div>
         <div className="flex items-center gap-3">
           <ChartLegendTooltip
             active={activeTooltip === "winRate"}
-            label="승률"
-            description="활성 점수판 팀원 중 이번 주 목표 pace를 넘긴 비율입니다. 전체 팀원이 아닌 점수판이 있는 멤버 기준입니다."
+            label={t("trend.winRateLabel")}
+            description={t("trend.winRateDesc")}
             color="#5e6ad2"
             onToggle={() => setActiveTooltip(activeTooltip === "winRate" ? null : "winRate")}
             onClose={() => setActiveTooltip(null)}
           />
           <ChartLegendTooltip
             active={activeTooltip === "execRate"}
-            label="실행률"
-            description="활성 점수판 팀원 중 이번 주 선행지표를 1건 이상 기록한 비율입니다. 시작 여부를 측정하는 지표입니다."
+            label={t("trend.executionRateLabel")}
+            description={t("trend.executionRateDesc")}
             color="#84cc16"
             onToggle={() => setActiveTooltip(activeTooltip === "execRate" ? null : "execRate")}
             onClose={() => setActiveTooltip(null)}
@@ -367,7 +405,10 @@ function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
                           className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full"
                           style={{ backgroundColor: entry.color }}
                         />
-                        {entry.dataKey === "winRate" ? "승률" : "실행률"}:{" "}
+                        {entry.dataKey === "winRate"
+                          ? t("trend.winRateLabel")
+                          : t("trend.executionRateLabel")}
+                        :{" "}
                         <span className="font-mono font-bold text-text-primary">{entry.value}%</span>
                       </p>
                     ))}
@@ -400,11 +441,17 @@ function TeamTrendChart({ trends }: { trends: TeamWeeklyReportTrend[] }) {
   );
 }
 
-function formatShortWeekLabel(weekStart?: string) {
+function formatShortWeekLabel(
+  weekStart: string | undefined,
+  t: ReturnType<typeof useTranslations<"Report">>,
+) {
   if (!weekStart) return "-";
 
   const [, month, day] = weekStart.split("-");
-  return `${Number(month)}/${Number(day)}주`;
+  return t("trend.shortWeekLabel", {
+    month: Number(month),
+    day: Number(day),
+  });
 }
 
 // ─── WinRateOverview ───────────────────────────────────────────────────────
@@ -432,29 +479,30 @@ function WinRateOverview({
   notStartedNames: string[];
   noScoreboardNames: string[];
 }) {
+  const t = useTranslations("Report");
   if (totalCount === 0) return null;
 
   const winRate = activeCount > 0 ? Math.round((winningCount / activeCount) * 100) : 0;
   const statusHeadline =
     activeCount === 0
-      ? "아직 이번 주 승률을 볼 활성 점수판이 없습니다."
+      ? t("winOverview.headline.noActive")
       : winningCount === 0
-        ? "아직 이기는 팀원이 없습니다."
+        ? t("winOverview.headline.noWinning")
         : winningCount === activeCount
-          ? "활성 점수판 멤버 전원이 이기고 있어요."
-          : `${winningCount}명이 현재 이기고 있어요.`;
+          ? t("winOverview.headline.allWinning")
+          : t("winOverview.headline.someWinning", { winningCount });
   const statusSubline =
     noScoreboardCount > 0
-      ? `점수판 없는 ${noScoreboardCount}명부터 먼저 정리하는 게 좋습니다.`
+      ? t("winOverview.subline.noScoreboard", { noScoreboardCount })
       : notStartedCount > 0
-        ? `이번 주 미시작 ${notStartedCount}명 확인이 먼저 필요합니다.`
+        ? t("winOverview.subline.notStarted", { notStartedCount })
         : losingCount > 0
-          ? `밀리는 ${losingCount}명의 실행 흐름 점검이 필요합니다.`
-          : "활성 점수판 기준으로 이번 주 흐름이 안정적입니다.";
+          ? t("winOverview.subline.losing", { losingCount })
+          : t("winOverview.subline.stable");
   const statusCards = [
     {
-      label: "이기는 중",
-      caption: "이번 주 pace를 넘기고 있어요",
+      label: t("statusCards.winning.label"),
+      caption: t("statusCards.winning.caption"),
       count: winningCount,
       names: winningNames,
       color: "bg-[#5e6ad2]",
@@ -463,8 +511,8 @@ function WinRateOverview({
       valueTone: "text-[#5e6ad2]",
     },
     {
-      label: "밀리는 중",
-      caption: "기록은 했지만 아직 부족해요",
+      label: t("statusCards.losing.label"),
+      caption: t("statusCards.losing.caption"),
       count: losingCount,
       names: losingNames,
       color: "bg-amber-400",
@@ -473,8 +521,8 @@ function WinRateOverview({
       valueTone: "text-amber-700",
     },
     {
-      label: "미시작",
-      caption: "이번 주 기록이 아직 없어요",
+      label: t("statusCards.notStarted.label"),
+      caption: t("statusCards.notStarted.caption"),
       count: notStartedCount,
       names: notStartedNames,
       color: "bg-[rgba(156,163,175,1)]",
@@ -483,8 +531,8 @@ function WinRateOverview({
       valueTone: "text-text-secondary",
     },
     {
-      label: "점수판 없음",
-      caption: "아직 경기에 들어오지 않았어요",
+      label: t("statusCards.noScoreboard.label"),
+      caption: t("statusCards.noScoreboard.caption"),
       count: noScoreboardCount,
       names: noScoreboardNames,
       color: "bg-[rgba(226,228,233,1)]",
@@ -499,7 +547,7 @@ function WinRateOverview({
       <div className="rounded-lg border border-[rgba(94,106,210,0.15)] bg-[rgba(94,106,210,0.03)] px-4 py-4">
         <div className="space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5e6ad2]">
-            이번 주 팀 상태 요약
+            {t("winOverview.summaryLabel")}
           </p>
           <p className="text-lg font-bold tracking-tight text-text-primary md:text-xl">
             {statusHeadline}
@@ -510,7 +558,7 @@ function WinRateOverview({
           <div className="grid gap-2 pt-2 sm:grid-cols-2">
             <div className="rounded-md border border-border bg-white px-3 py-2.5">
               <p className="text-[11px] font-semibold text-text-muted">
-                활성 점수판 기준 승률
+                {t("winOverview.activeWinRate")}
               </p>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="font-mono text-lg font-bold tracking-tight text-[#5e6ad2]">
@@ -523,14 +571,14 @@ function WinRateOverview({
             </div>
             <div className="rounded-md border border-border bg-white px-3 py-2.5">
               <p className="text-[11px] font-semibold text-text-muted">
-                전체 팀원
+                {t("winOverview.totalMembers")}
               </p>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="font-mono text-lg font-bold tracking-tight text-text-primary">
-                  {totalCount}명
+                  {t("common.memberCount", { count: totalCount })}
                 </span>
                 <span className="text-xs text-text-muted">
-                  이번 주 전체 기준
+                  {t("winOverview.thisWeekBasis")}
                 </span>
               </div>
             </div>
@@ -576,6 +624,7 @@ function StatusBoardCard({
   surface: string;
   valueTone: string;
 }) {
+  const t = useTranslations("Report");
   const COLLAPSED_MAX = 4;
   const [expanded, setExpanded] = useState(false);
   const hasMore = names.length > COLLAPSED_MAX;
@@ -617,12 +666,14 @@ function StatusBoardCard({
                 onClick={() => setExpanded((prev) => !prev)}
                 className="mt-2 text-xs font-semibold text-text-secondary underline-offset-2 hover:text-text-primary hover:underline"
               >
-                {expanded ? "접기" : `더보기 (${names.length}명)`}
+                {expanded
+                  ? t("common.collapse")
+                  : t("common.showMoreMembers", { count: names.length })}
               </button>
             )}
           </div>
         ) : (
-          <p className="text-xs text-text-muted">해당 팀원이 없습니다</p>
+          <p className="text-xs text-text-muted">{t("common.noMatchingMembers")}</p>
         )}
       </div>
     </div>
@@ -657,14 +708,15 @@ function SectionLabel({
 // ─── FocusMemberList ─────────────────────────────────────────────────────────
 
 function FocusMemberList({ members }: { members: FocusMember[] }) {
+  const t = useTranslations("Report");
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-white">
-      {/* 데스크탑 헤더 */}
       <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-border bg-sub-background px-5 py-3 text-[11px] font-semibold text-text-muted md:grid">
-        <span>팀원</span>
-        <span>상태</span>
-        <span>현재 점수</span>
-        <span>다음 액션</span>
+        <span>{t("focus.table.member")}</span>
+        <span>{t("focus.table.status")}</span>
+        <span>{t("focus.table.score")}</span>
+        <span>{t("focus.table.nextAction")}</span>
       </div>
 
       <div className="divide-y divide-border">
@@ -673,7 +725,6 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
             key={member.key}
             className="grid gap-3 px-5 py-4 md:grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] md:items-center md:gap-4"
           >
-            {/* 이름 + 우선순위 번호 */}
             <div className="flex items-center gap-3">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border bg-sub-background font-mono text-[11px] font-bold text-text-muted">
                 {idx + 1}
@@ -683,7 +734,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
                   {member.name}
                 </p>
                 <p className="text-xs text-text-muted md:hidden">
-                  현재 점수 {member.score}
+                  {t("focus.table.mobileScore", { score: member.score })}
                 </p>
               </div>
             </div>
@@ -710,7 +761,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
   );
 }
 
-// ─── 상태 컴포넌트 ────────────────────────────────────────────────────────────
+// Page-local status components
 
 function ReportLoadingState() {
   return (
@@ -729,6 +780,8 @@ function ReportLoadingState() {
 }
 
 function ReportNoWorkspaceState() {
+  const t = useTranslations("Report");
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
@@ -737,11 +790,10 @@ function ReportNoWorkspaceState() {
             <BarChart3 className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
-            주간 리포트를 만들 워크스페이스가 없습니다
+            {t("states.noWorkspaceTitle")}
           </h1>
           <p className="text-sm text-text-secondary">
-            워크스페이스를 만들거나 초대코드로 참가한 뒤 팀 리포트를 확인할 수
-            있습니다.
+            {t("states.noWorkspaceDesc")}
           </p>
           <div className="flex justify-center">
             <NoWorkspaceActions />
@@ -753,6 +805,8 @@ function ReportNoWorkspaceState() {
 }
 
 function ReportForbiddenState() {
+  const t = useTranslations("Report");
+
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
@@ -761,14 +815,14 @@ function ReportForbiddenState() {
             <BarChart3 className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
-            리더만 주간 리포트를 볼 수 있습니다
+            {t("states.forbiddenTitle")}
           </h1>
           <p className="text-sm text-text-secondary">
-            이 화면은 워크스페이스 관리자에게만 공개됩니다.
+            {t("states.forbiddenDesc")}
           </p>
           <div className="flex justify-center">
             <Button asChild>
-              <Link href="/dashboard">팀 대시보드로 돌아가기</Link>
+              <Link href="/dashboard">{t("states.backToDashboard")}</Link>
             </Button>
           </div>
         </Card>

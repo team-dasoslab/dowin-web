@@ -111,6 +111,111 @@
       "memoDeleteFailed": "Failed to delete memo."
     }
   },
+  "Report": {
+    "common": {
+      "unnamedMember": "Unnamed",
+      "unsetScore": "Not set",
+      "thisWeek": "This week",
+      "workspaceFallback": "Workspace",
+      "memberCount": "{count} members",
+      "collapse": "Collapse",
+      "showMoreMembers": "Show more ({count})",
+      "noMatchingMembers": "No matching members"
+    },
+    "header": {
+      "activeTitle": "This week, {winningCount} of {activeCount} active members are winning.",
+      "noActiveTitle": "No active scoreboards yet, so team win/loss cannot be calculated.",
+      "needsCheckDesc": "{notStartedCount} members have not started and {noScoreboardCount} members have no scoreboard. Check them first.",
+      "allStartedDesc": "Everyone has started logging this week. Continue into the team dashboard for lead-measure details."
+    },
+    "sections": {
+      "teamStatus": "Team Status"
+    },
+    "winRate": {
+      "title": "This Week's Win Rate",
+      "desc": "Breaks down team status this week based on active scoreboards."
+    },
+    "trend": {
+      "title": "Team Win Rate Trend",
+      "desc": "Actual team win rate and execution rate by recent week.",
+      "winRateLabel": "Win rate",
+      "executionRateLabel": "Execution rate",
+      "winRateDesc": "The share of active-scoreboard members who are ahead of this week's target pace.",
+      "executionRateDesc": "The share of active-scoreboard members who logged at least one lead measure this week.",
+      "shortWeekLabel": "{month}/{day} week"
+    },
+    "winOverview": {
+      "summaryLabel": "This Week's Team Status",
+      "activeWinRate": "Win rate among active scoreboards",
+      "totalMembers": "Total members",
+      "thisWeekBasis": "This week overall",
+      "headline": {
+        "noActive": "No active scoreboards are available for this week's win rate.",
+        "noWinning": "No members are winning yet.",
+        "allWinning": "Every active-scoreboard member is winning.",
+        "someWinning": "{winningCount} members are currently winning."
+      },
+      "subline": {
+        "noScoreboard": "Start by helping {noScoreboardCount} members set up scoreboards.",
+        "notStarted": "Check the {notStartedCount} members who have not started this week.",
+        "losing": "Review the execution rhythm for {losingCount} members who are behind.",
+        "stable": "This week's flow is stable among active scoreboards."
+      }
+    },
+    "statusCards": {
+      "winning": {
+        "label": "Winning",
+        "caption": "Ahead of this week's pace"
+      },
+      "losing": {
+        "label": "Behind",
+        "caption": "Started, but still short"
+      },
+      "notStarted": {
+        "label": "Not started",
+        "caption": "No records yet this week"
+      },
+      "noScoreboard": {
+        "label": "No scoreboard",
+        "caption": "Not in the game yet"
+      }
+    },
+    "focus": {
+      "title": "Members to Check First",
+      "desc": "Sorted by operating priority",
+      "emptyTitle": "No members need immediate attention this week.",
+      "emptyDesc": "Use the team dashboard to review lead-measure details.",
+      "status": {
+        "noScoreboard": "No scoreboard",
+        "notStarted": "No records this week",
+        "losingStarted": "Started but behind"
+      },
+      "action": {
+        "noScoreboard": "Help set up their WIG and lead measures",
+        "notStarted": "Confirm the smallest action they can start this week",
+        "losingStarted": "Check lead-measure difficulty or execution rhythm"
+      },
+      "table": {
+        "member": "Member",
+        "status": "Status",
+        "score": "Current score",
+        "nextAction": "Next action",
+        "mobileScore": "Current score {score}"
+      }
+    },
+    "cta": {
+      "title": "Need more detail?",
+      "desc": "Continue into the team dashboard to review lead-measure flow.",
+      "button": "View Team Dashboard"
+    },
+    "states": {
+      "noWorkspaceTitle": "No workspace for a weekly report",
+      "noWorkspaceDesc": "Create a workspace or join with an invite code before viewing the team report.",
+      "forbiddenTitle": "Only leaders can view the weekly report",
+      "forbiddenDesc": "This page is only available to workspace admins.",
+      "backToDashboard": "Back to Team Dashboard"
+    }
+  },
   "Scoreboard": {
     "archiveTitle": "Scoreboard Archive",
     "changingStatus": "Updating scoreboard status...",
