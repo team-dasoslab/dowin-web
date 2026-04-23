@@ -361,8 +361,6 @@
       "duplicatedTag": "A tag with the same name already exists.",
       "leadMeasureCreateFailed": "Failed to create lead measure.",
       "scoreboardIdNotFound": "Could not identify scoreboard ID.",
-      "archiveSuccess": "Scoreboard archived successfully.",
-      "archiveFailed": "Failed to archive scoreboard.",
       "reactivateSuccess": "Scoreboard reactivated successfully.",
       "reactivateFailed": "Failed to reactivate scoreboard."
     }
