@@ -166,6 +166,108 @@ describe("DashboardService", () => {
     );
   });
 
+  it("팀 주간 리포트는 현재 주 대시보드와 최근 주차별 추세를 함께 반환한다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
+    findMembers.mockResolvedValue([
+      {
+        id: 100,
+        workspaceId: 3,
+        userId: 11,
+        role: "ADMIN",
+        user: { nickname: "지훈", avatarKey: "smile.blue" },
+      },
+      {
+        id: 101,
+        workspaceId: 3,
+        userId: 12,
+        role: "MEMBER",
+        user: { nickname: "민서", avatarKey: null },
+      },
+    ]);
+    findActiveScoreboardsByWorkspace.mockResolvedValue([
+      {
+        id: 21,
+        userId: 11,
+        goalName: "러닝 루틴 만들기",
+        lagMeasure: "주 5회 달리기",
+        status: "ACTIVE",
+        leadMeasures: [
+          {
+            id: 31,
+            name: "아침 러닝",
+            targetValue: 2,
+            period: "WEEKLY",
+            status: "ACTIVE",
+            tags: [],
+          },
+        ],
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 31, logDate: "2026-04-06", value: true },
+      { leadMeasureId: 31, logDate: "2026-04-13", value: true },
+      { leadMeasureId: 31, logDate: "2026-04-14", value: true },
+      { leadMeasureId: 31, logDate: "2026-04-20", value: true },
+    ]);
+
+    const result = await service.getTeamWeeklyReport(11, "2026-04-20", 3);
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        workspaceId: 3,
+        workspaceName: "러닝 크루",
+        weekStart: "2026-04-20",
+        weekEnd: "2026-04-26",
+        trends: [
+          {
+            weekStart: "2026-04-06",
+            weekEnd: "2026-04-12",
+            activeCount: 1,
+            totalCount: 2,
+            winningCount: 0,
+            startedCount: 1,
+            winRate: 0,
+            executionRate: 100,
+          },
+          {
+            weekStart: "2026-04-13",
+            weekEnd: "2026-04-19",
+            activeCount: 1,
+            totalCount: 2,
+            winningCount: 1,
+            startedCount: 1,
+            winRate: 100,
+            executionRate: 100,
+          },
+          {
+            weekStart: "2026-04-20",
+            weekEnd: "2026-04-26",
+            activeCount: 1,
+            totalCount: 2,
+            winningCount: 0,
+            startedCount: 1,
+            winRate: 0,
+            executionRate: 100,
+          },
+        ],
+      }),
+    );
+    expect(result.members[0]).toEqual(
+      expect.objectContaining({
+        userId: 11,
+        achieved: 1,
+        total: 2,
+        weeklyAchievementRate: 50,
+      }),
+    );
+    expect(findActiveScoreboardsByWorkspace).toHaveBeenCalledOnce();
+    expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
+      [31],
+      "2026-04-01",
+      "2026-04-30",
+    );
+  });
+
   it("팀 대시보드 주간 전체 달성률은 각 지표 목표 상한을 넘겨 합산하지 않는다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
     findMembers.mockResolvedValue([
