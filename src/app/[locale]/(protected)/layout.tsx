@@ -50,14 +50,14 @@ export default async function ProtectedLayout({
     : null;
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-zinc-50/50">
       <LocaleEnforcer />
       <Sidebar
         workspaceName={memberInfo?.workspaceName}
         role={memberInfo?.role}
         hasScoreboard={Boolean(activeScoreboard)}
       />
-      <main className="md:pl-[80px] lg:pl-[240px]">
+      <main id="main-scroll-container" className="flex-1 overflow-y-auto overflow-x-hidden md:pl-[80px] lg:pl-[240px]">
         <div className="pb-[calc(5.25rem+env(safe-area-inset-bottom))] md:pb-0">
           <ProtectedContentLayout>{children}</ProtectedContentLayout>
         </div>
