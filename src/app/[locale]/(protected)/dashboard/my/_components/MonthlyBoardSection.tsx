@@ -2,7 +2,7 @@ import { LeadMeasureSummary } from "@/app/[locale]/(protected)/dashboard/_compon
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { MonthlyMobileCards } from "@/app/[locale]/(protected)/dashboard/my/_components/MonthlyMobileCards";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
-import { Check } from "lucide-react";
+import { Checkmark20Regular } from "@fluentui/react-icons";
 import { useTranslations } from "next-intl";
 
 interface MonthlyBoardSectionProps {
@@ -214,7 +214,7 @@ export function MonthlyBoardSection({
                                       }`}
                                     >
                                       {value === true ? (
-                                        <Check className="h-3.5 w-3.5" />
+                                        <Checkmark20Regular className="h-3.5 w-3.5" />
                                       ) : null}
                                     </span>
                                   </td>
