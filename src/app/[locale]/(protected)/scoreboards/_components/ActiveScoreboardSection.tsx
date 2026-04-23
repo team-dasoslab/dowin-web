@@ -85,8 +85,8 @@ function EmptyActiveScoreboardCard() {
   const t = useTranslations("Scoreboard");
   const td = useTranslations("Dashboard");
   return (
-    <Card className="border border-dashed border-border rounded-lg p-8 bg-white text-center space-y-4">
-      <div className="w-12 h-12 bg-primary/10 rounded-lg  mx-auto flex items-center justify-center">
+    <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center space-y-4">
+      <div className="w-12 h-12 bg-primary/10 rounded-content  mx-auto flex items-center justify-center">
         <Zap className="text-primary w-6 h-6" />
       </div>
       <div className="space-y-1">

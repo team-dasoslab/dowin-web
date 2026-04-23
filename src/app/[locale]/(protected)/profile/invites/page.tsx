@@ -6,6 +6,10 @@ import {
   useGetWorkspacesMe,
 } from "@/api/generated/workspace/workspace";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { useInviteActions } from "@/app/[locale]/(protected)/profile/invites/_hooks/useInviteActions";
 import { useInviteForm } from "@/app/[locale]/(protected)/profile/invites/_hooks/useInviteForm";
@@ -13,7 +17,6 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { Check, Copy, Shield, Ticket, Users } from "lucide-react";
@@ -110,16 +113,12 @@ export default function ProfileInvitesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[720px] space-y-6 p-4 md:p-8 animate-linear-in">
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary" />
-          <p className="text-xs text-text-muted">{t("header")}</p>
-          <div className="w-8" />
-        </header>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer>
+        <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center gap-4 rounded-lg border border-border px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Ticket className="h-5 w-5" />
           </div>
           <div className="min-w-0">
@@ -143,7 +142,7 @@ export default function ProfileInvitesPage() {
           />
         ) : null}
 
-        <Card className="space-y-4 rounded-lg border border-border p-4">
+        <Card className="space-y-4 rounded-content border border-border p-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               {t("newInviteTitle")}
@@ -151,7 +150,7 @@ export default function ProfileInvitesPage() {
             <p className="text-[11px] text-text-muted">{t("newInviteDesc")}</p>
           </div>
 
-          <div className="space-y-3 rounded-lg border border-border bg-white p-3">
+          <div className="space-y-3 rounded-content border border-border bg-white p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-bold text-text-secondary">
                 {t("maxUsesLabel")}
@@ -160,7 +159,7 @@ export default function ProfileInvitesPage() {
             </div>
 
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-11 min-w-0 items-center gap-2 rounded-lg border border-border bg-white px-3 text-xs text-text-secondary">
+              <label className="flex h-11 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -185,7 +184,7 @@ export default function ProfileInvitesPage() {
                 type="button"
                 onClick={() => void handleCreateInvite()}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
-                className={`h-11 rounded-lg px-4 text-xs font-bold ${
+                className={`h-11 rounded-content px-4 text-xs font-bold ${
                   isCreatingInvite || isOverFreeMemberLimit
                     ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
                     : "btn-linear-primary"
@@ -223,7 +222,7 @@ export default function ProfileInvitesPage() {
           </div>
         </Card>
 
-        <Card className="space-y-4 rounded-lg border border-border p-4">
+        <Card className="space-y-4 rounded-content border border-border p-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               {t("inviteListTitle")}
@@ -231,7 +230,7 @@ export default function ProfileInvitesPage() {
             <p className="text-[11px] text-text-muted">{t("inviteListDesc")}</p>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-content border border-border">
             {invites.length === 0 ? (
               <div className="bg-white px-4 py-10 text-center text-sm text-text-muted">
                 {t("noInvites")}
@@ -274,7 +273,7 @@ export default function ProfileInvitesPage() {
                         <Button
                           type="button"
                           onClick={() => void copyInviteCode(inviteId, code)}
-                          className="h-8 rounded-lg border border-border bg-white px-2.5 text-[11px] font-bold text-text-primary"
+                          className="h-8 rounded-content border border-border bg-white px-2.5 text-[11px] font-bold text-text-primary"
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
@@ -335,20 +334,20 @@ export default function ProfileInvitesPage() {
             )}
           </div>
         </Card>
-      </div>
+      </ProtectedPageContainer>
     </div>
   );
 }
 
 function InvitePageSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[720px] animate-pulse space-y-6 p-4 md:p-8">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
-        <div className="h-44 rounded-2xl bg-sub-background" />
-        <div className="h-72 rounded-2xl bg-sub-background" />
-      </div>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer isLoading>
+        <div className="h-10 rounded-content bg-sub-background" />
+        <div className="h-24 rounded-content bg-sub-background" />
+        <div className="h-44 rounded-content bg-sub-background" />
+        <div className="h-72 rounded-content bg-sub-background" />
+      </ProtectedPageContainer>
     </div>
   );
 }
@@ -358,8 +357,8 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-lg border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Users className="h-5 w-5" />
           </div>
           <div className="space-y-1">
@@ -382,8 +381,8 @@ function NoAccessState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-lg border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Shield className="h-5 w-5" />
           </div>
           <div className="space-y-1">
@@ -394,7 +393,7 @@ function NoAccessState() {
           </div>
           <Button
             asChild
-            className="w-full rounded-lg border border-border bg-white py-3 text-sm font-semibold text-text-primary"
+            className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
           >
             <Link href="/profile">{t("backToSettings")}</Link>
           </Button>

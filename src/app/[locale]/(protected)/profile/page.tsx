@@ -6,6 +6,10 @@ import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/L
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import {
   PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
   ProfileCoachmark,
 } from "@/app/[locale]/(protected)/profile/_components/ProfileCoachmark";
@@ -15,9 +19,7 @@ import {
 } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";
@@ -111,30 +113,8 @@ export default function ProfilePage() {
     router.replace("/dashboard/my");
   }, [isProfileLoading, router, showToast, user, t]);
 
-  useEffect(() => {
-    const currentUrl = new URL(window.location.href);
-    const coachmark = currentUrl.searchParams.get("coachmark");
-
-    if (coachmark !== PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY) {
-      return;
-    }
-
-    setIsCoachmarkRunning(true);
-    currentUrl.searchParams.delete("coachmark");
-    window.history.replaceState(
-      {},
-      "",
-      currentUrl.pathname + currentUrl.search,
-    );
-  }, []);
-
-  if (isProfileLoading) {
-    return <ProfileSkeleton />;
-  }
-
-  if (!user) {
-    return null;
-  }
+  const [activeSection, setActiveSection] = useState<string>("general");
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const menuGroups: { id: string; label: string; items: MenuItem[] }[] = [
     {
@@ -328,203 +308,301 @@ export default function ProfilePage() {
     },
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      // 현재 스크롤 위치에 따른 섹션 감지
+      const scrollPosition = window.scrollY + 150; // 헤더 높이 등을 고려한 오프셋
+
+      let currentSectionId = activeSection;
+      const sortedSections = Object.entries(sectionRefs.current)
+        .filter(([, el]) => el !== null)
+        .sort((a, b) => (a[1]?.offsetTop ?? 0) - (b[1]?.offsetTop ?? 0));
+
+      for (const [id, el] of sortedSections) {
+        if (el && el.offsetTop <= scrollPosition) {
+          currentSectionId = id;
+        }
+      }
+
+      if (currentSectionId !== activeSection) {
+        setActiveSection(currentSectionId);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    // 초기 로드 시 한 번 실행
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [activeSection]);
+
+  useEffect(() => {
+    const currentUrl = new URL(window.location.href);
+    const coachmark = currentUrl.searchParams.get("coachmark");
+
+    if (coachmark !== PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY) {
+      return;
+    }
+
+    setIsCoachmarkRunning(true);
+    currentUrl.searchParams.delete("coachmark");
+    window.history.replaceState(
+      {},
+      "",
+      currentUrl.pathname + currentUrl.search,
+    );
+  }, []);
+
+  if (isProfileLoading) {
+    return <ProfileSkeleton />;
+  }
+
+  if (!user) {
+    return null;
+  }
+
+
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <ProfileCoachmark
         isRunning={isCoachmarkRunning}
         setIsRunning={setIsCoachmarkRunning}
       />
       {isActionPending && (
         <LoadingOverlay
-          variant="ios"
           message={
             pendingAction === "nickname"
               ? t("loadingNickname")
               : pendingAction === "workspace-name"
                 ? t("loadingWorkspaceName")
-                : pendingAction === "workspace-leave"
-                  ? t("loadingWorkspaceLeave")
-                  : pendingAction === "workspace-delete"
-                    ? t("loadingWorkspaceDelete")
-                    : pendingAction === "account-delete"
-                      ? t("loadingAccountDelete")
-                      : t("loadingLogout")
+                : pendingAction === "LOGOUT"
+                  ? t("loadingLogout")
+                  : t("processing")
           }
         />
       )}
-      <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-8 animate-linear-in">
-        {/* ── 헤더 ── */}
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
-          <p className="text-xs text-text-muted">{t("header")}</p>
-          <div className="w-8" /> {/* 우측 균형 맞춤 */}
-        </header>
+      <ProtectedPageContainer className="space-y-8 lg:space-y-12">
+        <ProtectedPageHeader title={t("title")} description={t("description")} />
 
-        {/* ── 프로필 카드 ── */}
-        <Card className="border border-border rounded-lg px-6 py-5 flex items-center gap-4">
-          <UserAvatar
-            avatarKey={avatarKey}
-            avatarSeed={nickname}
-            alt={t("avatarAlt", { name: nickname })}
-            size={44}
-            className="flex-shrink-0"
-          />
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold text-text-primary tracking-tight">
-                {nickname}
-              </h1>
-            </div>
-            <p className="text-xs text-text-muted mt-0.5">
-              @{customId}
-              {workspace ? ` · ${workspace.name}` : ""}
-            </p>
-          </div>
-        </Card>
-
-        {workspace?.isOverFreeMemberLimit ? (
-          <WorkspaceOverLimitBanner
-            freeMemberLimit={workspace.freeMemberLimit}
-            isAdmin={isWorkspaceAdmin}
-            memberCount={workspace.memberCount}
-          />
-        ) : null}
-
-        {/* ── 메뉴 그룹 ── */}
-        <div className="space-y-6">
-          {menuGroups
-            .filter((group) => group.items.length > 0)
-            .map((group) => (
-              <div key={group.id} className="space-y-1.5">
-                {/* 그룹 레이블 */}
-                <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest px-0.5">
-                  {group.label}
-                </p>
-
-                {group.id === "workspace" && workspace ? (
-                  <div className="flex items-center justify-between rounded-lg border border-border bg-white px-5 py-4">
-                    <div className="flex flex-col min-w-0 text-left">
-                      <p className="text-sm font-semibold text-text-primary truncate">
-                        {workspace.name}
-                      </p>
-                      <p className="text-[11px] text-text-muted mt-0.5">
-                        {isWorkspaceAdmin
-                          ? t("workspaceAdmin")
-                          : t("workspaceMember")}
-                      </p>
+        <div className="flex flex-col gap-8 lg:flex-row lg:gap-12 items-start">
+          {/* ── 좌측 사이드바 내비게이션 ── */}
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-6 flex w-[calc(100%+3rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-6 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+            {menuGroups
+              .filter((group) => group.items.length > 0)
+              .map((group) => {
+                const isActive = activeSection === group.id;
+                return (
+                  <button
+                    key={group.id}
+                    onClick={() => {
+                      const element = document.getElementById(group.id);
+                      if (element) {
+                        const headerOffset = 100;
+                        const elementPosition = element.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({
+                          top: offsetPosition,
+                          behavior: "smooth"
+                        });
+                      }
+                    }}
+                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
+                      isActive 
+                        ? "text-primary" 
+                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isActive && <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />}
+                      <span className={isActive ? "" : "lg:pl-4"}>{group.label}</span>
                     </div>
-                    <span
-                      className={`inline-flex items-center h-6 rounded px-2 text-[10px] font-bold tracking-wide border ${
-                        workspacePlanCode === "STANDARD"
-                          ? "border-primary/20 bg-primary/5 text-primary"
-                          : "border-border bg-sub-background text-text-secondary"
-                      }`}
-                    >
-                      {workspacePlanCode}
-                    </span>
-                  </div>
-                ) : null}
+                  </button>
+                );
+              })}
+          </aside>
 
-                {/* 아이템 목록 */}
-                <div className="border border-border rounded-lg overflow-hidden">
-                  {group.items.map((item, index) => {
-                    const itemWrapperClassName =
-                      index < group.items.length - 1
-                        ? "border-b border-border"
-                        : "";
-                    const Content = (
-                      <div className="flex items-center justify-between w-full px-5 py-4 transition-colors group">
-                        <div className="flex items-center gap-3 min-w-0">
-                          {/* 아이콘 */}
-                          <div
-                            className={`w-7 h-7 rounded-md border flex items-center justify-center flex-shrink-0 transition-colors ${
-                              item.danger
-                                ? "border-danger/20 bg-danger/5 text-danger"
-                                : "border-border bg-sub-background text-text-muted"
-                            }`}
-                          >
-                            {item.icon}
-                          </div>
-
-                          {/* 텍스트 */}
-                          <div className="text-left min-w-0">
-                            <p
-                              className={`text-sm font-semibold ${
-                                item.danger
-                                  ? "text-danger"
-                                  : "text-text-primary"
-                              }`}
-                            >
-                              {item.title}
-                            </p>
-                            <p className="text-[11px] text-text-muted truncate">
-                              {item.description}
-                            </p>
-                          </div>
-                        </div>
-
-                        {item.rightElement ? (
-                          item.rightElement
-                        ) : (
-                          <ChevronRight className="w-3.5 h-3.5 text-text-muted/40 flex-shrink-0 ml-3" />
-                        )}
-                      </div>
-                    );
-
-                    if (item.onClick) {
-                      return (
-                        <div key={item.id} className={itemWrapperClassName}>
-                          <Button
-                            disabled={isActionPending}
-                            onClick={item.onClick}
-                            className="w-full bg-white"
-                          >
-                            {Content}
-                          </Button>
-                        </div>
-                      );
-                    }
-
-                    if (item.href) {
-                      return (
-                        <div key={item.id} className={itemWrapperClassName}>
-                          <Button asChild className="block w-full bg-white">
-                            <Link href={item.href}>{Content}</Link>
-                          </Button>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={item.id}
-                        className={`w-full bg-white transition-colors ${itemWrapperClassName}`}
-                      >
-                        {Content}
-                      </div>
-                    );
-                  })}
+          {/* ── 우측 메인 콘텐츠 ── */}
+          <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
+            {/* 프로필 요약 카드 */}
+            <div className="space-y-4">
+              <Card className="border border-zinc-200 rounded-content px-5 py-5 flex items-center gap-4 bg-white sm:px-8 sm:py-8 sm:gap-6">
+                <UserAvatar
+                  avatarKey={avatarKey}
+                  avatarSeed={nickname}
+                  alt={t("avatarAlt", { name: nickname })}
+                  size={64}
+                  className="flex-shrink-0"
+                />
+                <div className="min-w-0">
+                  <h2 className="text-xl font-bold text-zinc-900 tracking-tight">
+                    {nickname}
+                  </h2>
+                  <p className="text-sm font-medium text-zinc-500 mt-1">
+                    @{customId}
+                  </p>
                 </div>
-              </div>
-            ))}
+              </Card>
+
+              {workspace?.isOverFreeMemberLimit && (
+                <WorkspaceOverLimitBanner
+                  freeMemberLimit={workspace.freeMemberLimit}
+                  isAdmin={isWorkspaceAdmin}
+                  memberCount={workspace.memberCount}
+                />
+              )}
+            </div>
+
+            {/* 설정 그룹들 */}
+            <div className="space-y-10 pb-24 lg:space-y-16 lg:pb-[60vh]">
+              {menuGroups
+                .filter((group) => group.items.length > 0)
+                .map((group) => (
+                  <section 
+                    key={group.id} 
+                    id={group.id} 
+                    ref={(el) => { sectionRefs.current[group.id] = el; }}
+                    className="space-y-5 scroll-mt-28"
+                  >
+                    <div className="flex items-center gap-4 px-1">
+                      <h3 className="text-[13px] font-black text-zinc-400 uppercase tracking-wider">
+                        {group.label}
+                      </h3>
+                      <div className="h-px flex-1 bg-zinc-200/60" />
+                    </div>
+
+                    {group.id === "workspace" && workspace && (
+                      <div className="mb-4 rounded-content border border-zinc-200 bg-white px-5 py-5 flex items-center justify-between gap-3 sm:px-8 sm:py-7">
+                        <div className="flex flex-col min-w-0 text-left">
+                          <p className="text-lg font-bold text-zinc-900 truncate tracking-tight">
+                            {workspace.name}
+                          </p>
+                          <p className="text-xs font-medium text-zinc-500 mt-1">
+                            {isWorkspaceAdmin ? t("workspaceAdmin") : t("workspaceMember")}
+                          </p>
+                        </div>
+                        <span
+                          className={`inline-flex items-center h-6 rounded-button px-2.5 text-[10px] font-black tracking-wider border ${
+                            workspacePlanCode === "STANDARD"
+                              ? "border-primary/20 bg-primary/5 text-primary"
+                              : "border-zinc-200 bg-zinc-50 text-zinc-500"
+                          }`}
+                        >
+                          {workspacePlanCode}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
+                      {group.items.map((item, index) => (
+                        <MenuItemRow
+                          key={item.id}
+                          item={item}
+                          isLast={index === group.items.length - 1}
+                          isActionPending={isActionPending}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ))}
+            </div>
+          </div>
+        </div>
+      </ProtectedPageContainer>
+    </div>
+  );
+}
+
+function MenuItemRow({
+  item,
+  isLast,
+  isActionPending,
+}: {
+  item: MenuItem;
+  isLast: boolean;
+  isActionPending: boolean;
+}) {
+  const itemWrapperClassName = isLast ? "" : "border-b border-zinc-100";
+
+  const Content = (
+    <div className="flex w-full flex-col gap-3 px-4 py-4 transition-colors sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+      <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
+        <div
+          className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0 ${
+            item.danger
+              ? "border-red-100 bg-red-50 text-red-500"
+              : "border-zinc-100 bg-zinc-50 text-zinc-400"
+          }`}
+        >
+          {item.icon}
+        </div>
+        <div className="text-left min-w-0">
+          <p
+            className={`text-[14px] font-bold ${
+              item.danger ? "text-red-600" : "text-zinc-900"
+            }`}
+          >
+            {item.title}
+          </p>
+          <p className="text-[12px] text-zinc-500 mt-0.5">
+            {item.description}
+          </p>
         </div>
       </div>
+      {item.rightElement ? (
+        <div className="ml-12 flex justify-start sm:ml-3 sm:justify-end">
+          {item.rightElement}
+        </div>
+      ) : (
+        <ChevronRight className="hidden w-4 h-4 text-zinc-300 flex-shrink-0 ml-3 sm:block" />
+      )}
+    </div>
+  );
+
+  if (item.onClick) {
+    return (
+      <div className={itemWrapperClassName}>
+        <button
+          disabled={isActionPending}
+          onClick={item.onClick}
+          className="w-full bg-white text-left"
+        >
+          {Content}
+        </button>
+      </div>
+    );
+  }
+
+  if (item.href) {
+    return (
+      <div className={itemWrapperClassName}>
+        <Link href={item.href} className="block w-full bg-white">
+          {Content}
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`w-full bg-white ${itemWrapperClassName}`}>
+      {Content}
     </div>
   );
 }
 
 function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[560px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer isLoading>
+        <div className="h-10 rounded-content bg-sub-background" />
+        <div className="h-24 rounded-content bg-sub-background" />
         <div className="space-y-4">
-          <div className="h-44 rounded-2xl bg-sub-background" />
-          <div className="h-36 rounded-2xl bg-sub-background" />
-          <div className="h-28 rounded-2xl bg-sub-background" />
+          <div className="h-44 rounded-content bg-sub-background" />
+          <div className="h-36 rounded-content bg-sub-background" />
+          <div className="h-28 rounded-content bg-sub-background" />
         </div>
-      </div>
+      </ProtectedPageContainer>
     </div>
   );
 }

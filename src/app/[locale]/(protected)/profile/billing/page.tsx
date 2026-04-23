@@ -2,10 +2,13 @@
 
 import { useGetBillingMe } from "@/api/generated/billing/billing";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/billing/_hooks/useProfileBillingActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import {
   ArrowUpRight,
@@ -83,20 +86,15 @@ export default function ProfileBillingPage() {
     (billing.planCode === "STANDARD" ||
       billing.billingStatus === "ACTIVE" ||
       billing.billingStatus === "CANCELED");
-  const statusTone = getStatusTone(billing.billingStatus);
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[720px] space-y-6 p-4 md:p-8 animate-linear-in">
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary" />
-          <p className="text-xs text-text-muted">{t("header")}</p>
-          <div className="w-8" />
-        </header>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer>
+        <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center justify-between gap-4 rounded-lg border border-border px-6 py-5">
+        <Card className="flex items-center justify-between gap-4 rounded-content border border-border px-6 py-5">
           <div className="flex items-center gap-4 min-w-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-primary/10 text-primary">
               <Wallet className="h-5 w-5" />
             </div>
             <div className="min-w-0">
@@ -112,7 +110,7 @@ export default function ProfileBillingPage() {
                 type="button"
                 onClick={startCheckout}
                 disabled={isCheckoutPending}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-[11px] font-bold btn-linear-primary`}
+                className={`flex h-9 items-center justify-center gap-1.5 rounded-content px-3 text-[11px] font-bold btn-linear-primary`}
               >
                 <CreditCard className="h-3.5 w-3.5" />
                 {isCheckoutPending ? t("checkoutLoading") : t("upgradeButton")}
@@ -123,7 +121,7 @@ export default function ProfileBillingPage() {
               <Button
                 type="button"
                 onClick={() => void openPortal()}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-lg border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors hover:bg-sub-background`}
+                className={`flex h-9 items-center justify-center gap-1.5 rounded-content border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors hover:bg-sub-background`}
               >
                 <ArrowUpRight className="h-3.5 w-3.5" />
                 {t("portalButton")}
@@ -133,13 +131,13 @@ export default function ProfileBillingPage() {
         </Card>
 
         {!isAdmin && (
-          <div className="rounded-lg border border-border bg-sub-background px-3 py-3 text-[11px] leading-relaxed text-text-muted">
+          <div className="rounded-content border border-border bg-sub-background px-3 py-3 text-[11px] leading-relaxed text-text-muted">
             {t("memberNotice")}
           </div>
         )}
 
         {isReturningFromCheckout ? (
-          <Card className="space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <Card className="space-y-2 rounded-content border border-primary/20 bg-primary/5 p-4">
             <p className="text-sm font-bold text-text-primary">
               {t("pendingTitle")}
             </p>
@@ -149,7 +147,7 @@ export default function ProfileBillingPage() {
             <Button
               type="button"
               onClick={() => void refetch()}
-              className="mt-1 inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-primary/20 bg-white px-3 text-[11px] font-bold text-primary"
+              className="mt-1 inline-flex h-8 items-center justify-center gap-1.5 rounded-content border border-primary/20 bg-white px-3 text-[11px] font-bold text-primary"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
               {t("refresh")}
@@ -158,9 +156,9 @@ export default function ProfileBillingPage() {
         ) : null}
 
         {requiresManualReview ? (
-          <Card className="space-y-3 rounded-lg border border-red-200 bg-red-50 p-4">
+          <Card className="space-y-3 rounded-content border border-red-200 bg-red-50 p-4">
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-red-600">
+              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-content bg-white text-red-600">
                 <Shield className="h-4 w-4" />
               </div>
               <div className="space-y-1">
@@ -178,7 +176,7 @@ export default function ProfileBillingPage() {
           </Card>
         ) : null}
 
-        <Card className="space-y-4 rounded-lg border border-border p-4">
+        <Card className="space-y-4 rounded-content border border-border p-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               {t("currentPlanTitle")}
@@ -207,7 +205,7 @@ export default function ProfileBillingPage() {
           </div>
         </Card>
 
-        <Card className="space-y-1 rounded-lg border border-border bg-sub-background p-4">
+        <Card className="space-y-1 rounded-content border border-border bg-sub-background p-4">
           <h2 className="text-sm font-bold text-text-primary">
             {t("downgradePolicyTitle")}
           </h2>
@@ -216,7 +214,7 @@ export default function ProfileBillingPage() {
           </p>
         </Card>
 
-        <Card className="space-y-3 rounded-lg border border-border p-4">
+        <Card className="space-y-3 rounded-content border border-border p-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               {t("standardTitle")}
@@ -232,14 +230,14 @@ export default function ProfileBillingPage() {
             ].map((feature) => (
               <div
                 key={feature}
-                className="rounded-lg border border-border bg-white px-3 py-2 text-xs text-text-primary"
+                className="rounded-content border border-border bg-white px-3 py-2 text-xs text-text-primary"
               >
                 {feature}
               </div>
             ))}
           </div>
         </Card>
-      </div>
+      </ProtectedPageContainer>
     </div>
   );
 }
@@ -254,7 +252,7 @@ function BillingInfoCell({
   tone: "default" | "primary" | "danger";
 }) {
   return (
-    <div className="rounded-lg border border-border bg-white px-3 py-3">
+    <div className="rounded-content border border-border bg-white px-3 py-3">
       <p className="text-[10px] font-bold uppercase tracking-widest text-text-muted">
         {label}
       </p>
@@ -271,22 +269,6 @@ function BillingInfoCell({
       </p>
     </div>
   );
-}
-
-function getStatusTone(status: BillingStatus) {
-  switch (status) {
-    case "ACTIVE":
-      return { badge: "bg-primary/10 text-primary" };
-    case "CANCELED":
-      return { badge: "bg-yellow-50 text-yellow-700" };
-    case "REVOKED":
-      return { badge: "bg-red-50 text-red-700" };
-    case "EXPIRED":
-      return { badge: "bg-sub-background text-text-secondary" };
-    case "NONE":
-    default:
-      return { badge: "bg-sub-background text-text-secondary" };
-  }
 }
 
 function formatDateLabel(value: string | null | undefined, fallback: string) {
@@ -338,13 +320,13 @@ function getStatusDescription({
 
 function ProfileBillingSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[720px] animate-pulse space-y-6 p-4 md:p-8">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
-        <div className="h-48 rounded-2xl bg-sub-background" />
-        <div className="h-36 rounded-2xl bg-sub-background" />
-      </div>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer isLoading>
+        <div className="h-10 rounded-content bg-sub-background" />
+        <div className="h-24 rounded-content bg-sub-background" />
+        <div className="h-48 rounded-content bg-sub-background" />
+        <div className="h-36 rounded-content bg-sub-background" />
+      </ProtectedPageContainer>
     </div>
   );
 }
@@ -355,8 +337,8 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-lg border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Wallet className="h-5 w-5" />
           </div>
           <div className="space-y-1">
@@ -380,8 +362,8 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-lg border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Shield className="h-5 w-5" />
           </div>
           <div className="space-y-1">
@@ -393,7 +375,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
           <Button
             type="button"
             onClick={onRefresh}
-            className="w-full rounded-lg border border-border bg-white py-3 text-sm font-semibold text-text-primary"
+            className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
           >
             {t("refresh")}
           </Button>

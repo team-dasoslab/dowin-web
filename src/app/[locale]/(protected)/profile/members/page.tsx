@@ -6,13 +6,16 @@ import {
   useGetWorkspacesMe,
 } from "@/api/generated/workspace/workspace";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { MemberListItem } from "@/app/[locale]/(protected)/profile/members/_components/MemberListItem";
 import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/profile/members/_hooks/useRemoveWorkspaceMember";
 import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/profile/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { Shield, Ticket, Users } from "lucide-react";
@@ -91,13 +94,9 @@ export default function ProfileMembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[720px] space-y-6 p-4 md:p-8 animate-linear-in">
-        <header className="flex items-center justify-between">
-          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary" />
-          <p className="text-xs text-text-muted">{t("header")}</p>
-          <div className="w-8" />
-        </header>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer>
+        <ProtectedPageHeader title={t("header")} />
 
         <Card className="flex items-center gap-4 rounded-lg border border-border px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -132,7 +131,7 @@ export default function ProfileMembersPage() {
           </div>
           <Button
             asChild
-            className="btn-linear-primary rounded-lg px-3 py-2 text-xs font-bold"
+            className="btn-linear-primary rounded-content px-3 py-2 text-xs font-bold"
           >
             <Link href="/profile/invites" className="flex items-center gap-1.5">
               <Ticket className="h-3.5 w-3.5" />
@@ -158,7 +157,7 @@ export default function ProfileMembersPage() {
             </p>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border">
+          <div className="overflow-hidden rounded-content border border-border">
             {members.length === 0 ? (
               <div className="bg-white px-4 py-10 text-center text-sm text-text-muted">
                 {t("noMembers")}
@@ -187,19 +186,19 @@ export default function ProfileMembersPage() {
             )}
           </div>
         </Card>
-      </div>
+      </ProtectedPageContainer>
     </div>
   );
 }
 
 function MembersPageSkeleton() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto max-w-[720px] animate-pulse space-y-6 p-4 md:p-8">
-        <div className="h-10 rounded-xl bg-sub-background" />
-        <div className="h-24 rounded-2xl bg-sub-background" />
-        <div className="h-72 rounded-2xl bg-sub-background" />
-      </div>
+    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+      <ProtectedPageContainer isLoading>
+        <div className="h-10 rounded-content bg-sub-background" />
+        <div className="h-24 rounded-content bg-sub-background" />
+        <div className="h-72 rounded-content bg-sub-background" />
+      </ProtectedPageContainer>
     </div>
   );
 }
@@ -209,8 +208,8 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-lg border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Users className="h-5 w-5" />
           </div>
           <div className="space-y-1">
@@ -233,8 +232,8 @@ function NoAccessState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-lg border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Shield className="h-5 w-5" />
           </div>
           <div className="space-y-1">
@@ -245,7 +244,7 @@ function NoAccessState() {
           </div>
           <Button
             asChild
-            className="w-full rounded-lg border border-border bg-white py-3 text-sm font-semibold text-text-primary"
+            className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
           >
             <Link href="/profile">{t("backToSettings")}</Link>
           </Button>

@@ -1,19 +1,19 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
+import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import { MemberCard } from "@/app/[locale]/(protected)/dashboard/_components/MemberCard";
 import { WeeklyTable } from "@/app/[locale]/(protected)/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/[locale]/(protected)/dashboard/_hooks/useTeamDashboard";
-import { formatWeekLabel } from "@/app/[locale]/(protected)/dashboard/_lib/dashboard";
-import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { BarChart3, Calendar, UserIcon, Users, Zap } from "lucide-react";
-import { Link } from "@/i18n/routing";
-import { useEffect, useRef, useState } from "react";
+import { Plus, Users, Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from "react";
+import { EmptyStatePanel } from "../_components/EmptyStatePanel";
+import { formatWeekLabel } from "./_lib/dashboard";
 
 type ActiveMemoState = {
   memberId: number;
@@ -35,7 +35,12 @@ export default function DashboardPage() {
   const hasTrackedViewRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading || hasNoWorkspace || !dashboard || hasTrackedViewRef.current) {
+    if (
+      isLoading ||
+      hasNoWorkspace ||
+      !dashboard ||
+      hasTrackedViewRef.current
+    ) {
       return;
     }
 
@@ -60,72 +65,41 @@ export default function DashboardPage() {
     return <DashboardLoadingState />;
   }
 
+  const members = dashboard?.members ?? [];
+  const membersWithScoreboard = members.filter(
+    (member) => member.hasScoreboard,
+  );
+
   if (hasNoWorkspace || !dashboard) {
     return <DashboardNoWorkspaceState />;
   }
 
+  if (membersWithScoreboard.length === 0) {
+    return <DashboardNoScoreboardState />;
+  }
+
   const weekLabel = formatWeekLabel(dashboard.weekStart, dashboard.weekEnd);
-  const members = dashboard.members ?? [];
-  const membersWithScoreboard = members.filter(
-    (member) => member.hasScoreboard,
-  );
   const currentUserRole =
     members.find((member) => member.userId === myUserId)?.role ?? null;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background font-pretendard">
+    <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] font-pretendard">
       <div
-        className={`mx-auto max-w-[860px] p-4 md:p-8 animate-linear-in transition-transform duration-300 ease-out xl:origin-top ${
+        className={`mx-auto max-w-[1200px] p-6 md:p-10 lg:p-12 animate-linear-in transition-transform duration-300 ease-out xl:origin-top ${
           activeMemoState ? "xl:-translate-x-28" : "xl:translate-x-0"
         }`}
       >
         <div className="space-y-10">
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-1">
+          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-1">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center text-primary shrink-0">
-                <Zap className="w-4 h-4 fill-current" />
-              </div>
               <div className="min-w-0">
-                <h1 className="text-base font-bold text-text-primary tracking-tight truncate">
-                  {dashboard.workspaceName}
-                </h1>
-                <p className="text-[11px] text-text-muted truncate">
+                <h1 className="truncate text-xl font-black text-zinc-900 tracking-tight">
                   {t("teamStatus")}
-                </p>
+                </h1>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              {currentUserRole === "ADMIN" && (
-                <Button
-                  asChild
-                  className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-                >
-                  <Link href="/report">
-                    <BarChart3 className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                    <span>{t("weeklyReport")}</span>
-                  </Link>
-                </Button>
-              )}
-              <Button
-                asChild
-                className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-              >
-                <Link href="/dashboard/my">
-                  <Calendar className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                  <span>{t("myDashboard")}</span>
-                </Link>
-              </Button>
-              <Button
-                asChild
-                className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-              >
-                <Link href="/profile">
-                  <UserIcon className="w-3.5 h-3.5 text-text-muted shrink-0" />
-                  <span>{t("myProfile")}</span>
-                </Link>
-              </Button>
-            </div>
+            <div className="flex flex-wrap items-center gap-2"></div>
           </header>
 
           <section className="space-y-4">
@@ -133,13 +107,13 @@ export default function DashboardPage() {
               <h2 className="text-sm font-bold text-text-primary">
                 {t("memberSummary")}
               </h2>
-              <span className="text-[11px] text-text-muted bg-sub-background border border-border px-2 py-1 rounded font-mono">
+              <span className="text-[11px] font-bold text-zinc-600 bg-white border border-zinc-200 px-2.5 py-1 rounded-content font-mono">
                 {weekLabel}
               </span>
             </div>
 
             {members.length === 0 ? (
-              <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
+              <div className="border border-border rounded-content p-8 text-center text-text-muted text-sm">
                 {t("noMembers")}
               </div>
             ) : (
@@ -169,53 +143,47 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {membersWithScoreboard.length === 0 ? (
-              <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
-                {t("noActiveScoreboards")}
-              </div>
-            ) : (
-              membersWithScoreboard.map((member) => (
-                <WeeklyTable
-                  key={member.userId}
-                  member={member}
-                  weekDates={weekDates}
-                  isMe={member.userId === myUserId}
-                  memoMode={
-                    activeMemoState != null &&
-                    activeMemoState.memberId === member.userId
-                      ? activeMemoState.mode
-                      : null
-                  }
-                  onToggleCompose={() =>
-                    setActiveMemoState((prev) =>
-                      prev != null &&
-                      prev.memberId === member.userId &&
-                      prev.mode === "compose"
-                        ? null
-                        : member.userId != null
-                          ? { memberId: member.userId, mode: "compose" }
-                          : null,
-                    )
-                  }
-                  onToggleView={() =>
-                    setActiveMemoState((prev) =>
-                      prev != null &&
-                      prev.memberId === member.userId &&
-                      prev.mode === "view"
-                        ? null
-                        : member.userId != null
-                          ? { memberId: member.userId, mode: "view" }
-                          : null,
-                    )
-                  }
-                  onCloseMemo={() => setActiveMemoState(null)}
-                  currentUserId={myUserId}
-                  currentUserNickname={myNickname}
-                  currentUserAvatarKey={myAvatarKey}
-                  currentUserRole={currentUserRole}
-                />
-              ))
-            )}
+            {membersWithScoreboard.map((member) => (
+              <WeeklyTable
+                key={member.userId}
+                member={member}
+                weekDates={weekDates}
+                isMe={member.userId === myUserId}
+                memoMode={
+                  activeMemoState != null &&
+                  activeMemoState.memberId === member.userId
+                    ? activeMemoState.mode
+                    : null
+                }
+                onToggleCompose={() =>
+                  setActiveMemoState((prev) =>
+                    prev != null &&
+                    prev.memberId === member.userId &&
+                    prev.mode === "compose"
+                      ? null
+                      : member.userId != null
+                        ? { memberId: member.userId, mode: "compose" }
+                        : null,
+                  )
+                }
+                onToggleView={() =>
+                  setActiveMemoState((prev) =>
+                    prev != null &&
+                    prev.memberId === member.userId &&
+                    prev.mode === "view"
+                      ? null
+                      : member.userId != null
+                        ? { memberId: member.userId, mode: "view" }
+                        : null,
+                  )
+                }
+                onCloseMemo={() => setActiveMemoState(null)}
+                currentUserId={myUserId}
+                currentUserNickname={myNickname}
+                currentUserAvatarKey={myAvatarKey}
+                currentUserRole={currentUserRole}
+              />
+            ))}
           </section>
         </div>
       </div>
@@ -224,15 +192,16 @@ export default function DashboardPage() {
 }
 
 function DashboardLoadingState() {
+  const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[860px] mx-auto p-4 md:p-8 space-y-6 animate-pulse">
-        <div className="h-16 rounded-2xl bg-sub-background" />
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10 lg:p-12 space-y-10 animate-pulse">
+        <div className="h-16 rounded-content bg-sub-background" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-2xl bg-sub-background" />
-          <div className="h-48 rounded-2xl bg-sub-background" />
+          <div className="h-48 rounded-content bg-sub-background" />
+          <div className="h-48 rounded-content bg-sub-background" />
         </div>
-        <div className="h-64 rounded-2xl bg-sub-background" />
+        <div className="h-64 rounded-content bg-sub-background" />
       </div>
     </div>
   );
@@ -241,22 +210,40 @@ function DashboardLoadingState() {
 function DashboardNoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[720px] mx-auto p-4 md:p-8">
-        <Card className="card-linear p-8 text-center space-y-4">
-          <div className="mx-auto w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-primary" />
-          </div>
-          <h1 className="text-xl font-bold text-text-primary">
-            {t("noWorkspaceTitle")}
-          </h1>
-          <p className="text-sm text-text-secondary">
-            {t("noWorkspaceDesc")}
-          </p>
-          <div className="flex justify-center">
-            <NoWorkspaceActions />
-          </div>
-        </Card>
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-6 md:p-10 lg:p-12">
+        <EmptyStatePanel
+          icon={<Users className="w-5 h-5 text-primary" />}
+          title={t("noWorkspaceTitle")}
+          description={t("noWorkspaceDesc")}
+          actions={<NoWorkspaceActions />}
+        />
+      </div>
+    </div>
+  );
+}
+
+function DashboardNoScoreboardState() {
+  const t = useTranslations("Dashboard");
+  return (
+    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+      <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-6 md:p-10 lg:p-12">
+        <EmptyStatePanel
+          icon={<Zap className="w-5 h-5 text-primary" />}
+          title={t("noScoreboardTitle")}
+          description={t("noScoreboardDesc")}
+          actions={
+            <Button
+              asChild
+              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
+            >
+              <Link href="/setup?mode=create">
+                <Plus className="w-4 h-4" />
+                {t("createScoreboard")}
+              </Link>
+            </Button>
+          }
+        />
       </div>
     </div>
   );
