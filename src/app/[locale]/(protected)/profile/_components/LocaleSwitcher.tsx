@@ -3,10 +3,11 @@
 import { usePutUsersMe } from "@/api/generated/profile/profile";
 import { useToast } from "@/context/ToastContext";
 import { usePathname, useRouter } from "@/i18n/routing";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export function LocaleSwitcher() {
   const locale = useLocale() as "ko" | "en";
+  const t = useTranslations("Profile");
   const router = useRouter();
   const pathname = usePathname();
   const { showToast } = useToast();
@@ -24,38 +25,35 @@ export function LocaleSwitcher() {
           router.replace(pathname, { locale: newLocale });
         },
         onError: () => {
-          showToast(
-            "error",
-            locale === "ko"
-              ? "언어 변경에 실패했습니다."
-              : "Failed to change language.",
-          );
+          showToast("error", t("languageChangeFailed"));
         },
       },
     );
   };
 
   return (
-    <div className="flex items-center gap-1 bg-sub-background border border-border rounded-lg p-1">
+    <div className="grid shrink-0 grid-cols-2 gap-1 rounded-lg border border-border bg-sub-background p-1">
       <button
+        type="button"
         onClick={() => handleLocaleChange("ko")}
-        className={`px-3 py-1.5 text-[11px] font-bold rounded-md transition-all ${
+        className={`flex h-8 w-[4.25rem] items-center justify-center whitespace-nowrap rounded-md px-2 text-center text-[11px] font-bold leading-none transition-all ${
           locale === "ko"
             ? "bg-white text-primary shadow-sm border border-border"
             : "text-text-muted hover:text-text-primary"
         }`}
       >
-        한국어
+        {t("languageKo")}
       </button>
       <button
+        type="button"
         onClick={() => handleLocaleChange("en")}
-        className={`px-3 py-1.5 text-[11px] font-bold rounded-md transition-all ${
+        className={`flex h-8 w-[4.25rem] items-center justify-center whitespace-nowrap rounded-md px-2 text-center text-[11px] font-bold leading-none transition-all ${
           locale === "en"
             ? "bg-white text-primary shadow-sm border border-border"
             : "text-text-muted hover:text-text-primary"
         }`}
       >
-        English
+        {t("languageEn")}
       </button>
     </div>
   );

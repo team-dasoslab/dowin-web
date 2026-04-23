@@ -40,6 +40,13 @@ type DailyLogLookupPort = {
 };
 
 const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
+type WorkspaceLookup = { id: number; name: string; planCode?: string };
+type WorkspaceMemberLookup = Awaited<
+  ReturnType<WorkspaceLookupPort["findMembers"]>
+>[number];
+type DailyLogLookup = Awaited<
+  ReturnType<DailyLogLookupPort["findLogsForLeadMeasures"]>
+>[number];
 
 export class DashboardService {
   constructor(
@@ -57,40 +64,110 @@ export class DashboardService {
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     assertHistoryLimit(workspace.planCode ?? "FREE", normalizedWeekStart);
 
+    const members = await this.workspaceStorage.findMembers(workspace.id);
+    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
+      workspace.id,
+    );
+    const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
+    const logRange = getDashboardLogRange(normalizedWeekStart);
+    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
+      allLeadMeasureIds,
+      logRange.start,
+      logRange.end,
+    );
+
+    return buildTeamDashboard({
+      workspace,
+      userId,
+      normalizedWeekStart,
+      members,
+      scoreboards,
+      logs,
+    });
+  }
+
+  async getTeamWeeklyReport(userId: number, weekStart?: string, weeks = 5) {
+    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
+    const boundedWeeks = Math.min(Math.max(weeks, 1), 12);
+    const trendWeekStarts = getPreviousWeekStarts(
+      normalizedWeekStart,
+      boundedWeeks,
+    );
+    const earliestWeekStart = trendWeekStarts[0] ?? normalizedWeekStart;
+
+    assertHistoryLimit(workspace.planCode ?? "FREE", earliestWeekStart);
+
+    const members = await this.workspaceStorage.findMembers(workspace.id);
+    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
+      workspace.id,
+    );
+    const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
+    const currentDashboardLogRange = getDashboardLogRange(normalizedWeekStart);
+    const trendEnd = getWeekDates(normalizedWeekStart)[6];
+    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
+      allLeadMeasureIds,
+      earliestWeekStart < currentDashboardLogRange.start
+        ? earliestWeekStart
+        : currentDashboardLogRange.start,
+      trendEnd > currentDashboardLogRange.end
+        ? trendEnd
+        : currentDashboardLogRange.end,
+    );
+    const dashboard = buildTeamDashboard({
+      workspace,
+      userId,
+      normalizedWeekStart,
+      members,
+      scoreboards,
+      logs,
+    });
+    const trends = trendWeekStarts.map((trendWeekStart) =>
+      buildWeeklyTrend({
+        weekStart: trendWeekStart,
+        members,
+        scoreboards,
+        logs,
+      }),
+    );
+
+    return {
+      ...dashboard,
+      trends,
+    };
+  }
+}
+
+function buildTeamDashboard({
+  workspace,
+  userId,
+  normalizedWeekStart,
+  members,
+  scoreboards,
+  logs,
+}: {
+  workspace: WorkspaceLookup;
+  userId: number;
+  normalizedWeekStart: string;
+  members: WorkspaceMemberLookup[];
+  scoreboards: TeamScoreboard[];
+  logs: DailyLogLookup[];
+}) {
     const weekDates = getWeekDates(normalizedWeekStart);
     const weekEnd = weekDates[6];
     const normalizedMonthStart = normalizeMonthStart(normalizedWeekStart);
     const monthDates = getMonthDates(normalizedMonthStart);
     const monthEnd = monthDates[monthDates.length - 1];
-    const members = await this.workspaceStorage.findMembers(workspace.id);
     const sortedMembers = [...members].sort((a, b) => {
       const aPriority = a.userId === userId ? 0 : 1;
       const bPriority = b.userId === userId ? 0 : 1;
       return aPriority - bPriority;
     });
-    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
-      workspace.id,
-    );
-    const allLeadMeasureIds = scoreboards.flatMap((scoreboard) =>
-      scoreboard.leadMeasures
-        .filter((leadMeasure) => leadMeasure.status === "ACTIVE")
-        .map((leadMeasure) => leadMeasure.id),
-    );
-    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
-      allLeadMeasureIds,
-      normalizedWeekStart < normalizedMonthStart
-        ? normalizedWeekStart
-        : normalizedMonthStart,
-      weekEnd > monthEnd ? weekEnd : monthEnd,
-    );
-    const logsByLeadMeasure = new Map<number, Array<(typeof logs)[number]>>();
-
-    for (const log of logs) {
-      logsByLeadMeasure.set(log.leadMeasureId, [
-        ...(logsByLeadMeasure.get(log.leadMeasureId) ?? []),
-        log,
-      ]);
-    }
+    const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
 
     const scoreboardsByUserId = new Map(
       scoreboards.map((scoreboard) => [scoreboard.userId, scoreboard]),
@@ -236,7 +313,113 @@ export class DashboardService {
         };
       }),
     };
+}
+
+function buildWeeklyTrend({
+  weekStart,
+  members,
+  scoreboards,
+  logs,
+}: {
+  weekStart: string;
+  members: WorkspaceMemberLookup[];
+  scoreboards: TeamScoreboard[];
+  logs: DailyLogLookup[];
+}) {
+  const weekDates = getWeekDates(weekStart);
+  const weekEnd = weekDates[6];
+  const scoreboardsByUserId = new Map(
+    scoreboards.map((scoreboard) => [scoreboard.userId, scoreboard]),
+  );
+  const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
+  let activeCount = 0;
+  let winningCount = 0;
+  let startedCount = 0;
+
+  for (const member of members) {
+    const scoreboard = scoreboardsByUserId.get(member.userId);
+    if (!scoreboard) continue;
+
+    const weeklyLeadMeasures = scoreboard.leadMeasures.filter(
+      (leadMeasure) =>
+        leadMeasure.status === "ACTIVE" && leadMeasure.period !== "MONTHLY",
+    );
+    const achieved = weeklyLeadMeasures.reduce((sum, leadMeasure) => {
+      const truthyLogCount = (logsByLeadMeasure.get(leadMeasure.id) ?? []).filter(
+        (log) =>
+          log.value &&
+          log.logDate >= weekStart &&
+          log.logDate <= weekEnd,
+      ).length;
+
+      return sum + Math.min(truthyLogCount, leadMeasure.targetValue);
+    }, 0);
+    const total = weeklyLeadMeasures.reduce(
+      (sum, leadMeasure) => sum + leadMeasure.targetValue,
+      0,
+    );
+    const achievementRate = total > 0 ? Math.round((achieved / total) * 100) : 0;
+
+    activeCount += 1;
+    if (achieved > 0) startedCount += 1;
+    if (achievementRate >= 80) winningCount += 1;
   }
+
+  return {
+    weekStart,
+    weekEnd,
+    activeCount,
+    totalCount: members.length,
+    winningCount,
+    startedCount,
+    winRate: activeCount > 0 ? Math.round((winningCount / activeCount) * 100) : 0,
+    executionRate:
+      activeCount > 0 ? Math.round((startedCount / activeCount) * 100) : 0,
+  };
+}
+
+function buildLogsByLeadMeasure(logs: DailyLogLookup[]) {
+  const logsByLeadMeasure = new Map<number, DailyLogLookup[]>();
+
+  for (const log of logs) {
+    logsByLeadMeasure.set(log.leadMeasureId, [
+      ...(logsByLeadMeasure.get(log.leadMeasureId) ?? []),
+      log,
+    ]);
+  }
+
+  return logsByLeadMeasure;
+}
+
+function getActiveLeadMeasureIds(scoreboards: TeamScoreboard[]) {
+  return scoreboards.flatMap((scoreboard) =>
+    scoreboard.leadMeasures
+      .filter((leadMeasure) => leadMeasure.status === "ACTIVE")
+      .map((leadMeasure) => leadMeasure.id),
+  );
+}
+
+function getDashboardLogRange(weekStart: string) {
+  const weekDates = getWeekDates(weekStart);
+  const weekEnd = weekDates[6];
+  const monthStart = normalizeMonthStart(weekStart);
+  const monthDates = getMonthDates(monthStart);
+  const monthEnd = monthDates[monthDates.length - 1];
+
+  return {
+    start: weekStart < monthStart ? weekStart : monthStart,
+    end: weekEnd > monthEnd ? weekEnd : monthEnd,
+  };
+}
+
+function getPreviousWeekStarts(weekStart: string, count: number) {
+  const base = parseDate(weekStart);
+
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(base);
+    date.setUTCDate(base.getUTCDate() - (count - index - 1) * 7);
+    return formatDate(date);
+  });
 }
 
 function getAchievementRate(achieved: number, targetValue: number) {

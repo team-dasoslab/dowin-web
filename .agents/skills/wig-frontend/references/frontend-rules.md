@@ -22,6 +22,7 @@
 - Use Zod for forms.
 - Use generated Orval hooks and TanStack Query for server state.
 - Invalidate related queries after mutations.
+- Use `next-intl` for user-facing UI copy. New or changed visible labels, helper text, empty/error states, button text, tooltips, and status copy should be added to both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded in components.
 - Treat mobile optimization as a required part of frontend work.
 - Check layout, readability, touch targets, scrolling flow, and primary actions on small screens.
 - Consider mobile layout, empty states, loading states, and failure rollback.

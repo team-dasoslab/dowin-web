@@ -4,6 +4,11 @@ export const dashboardTeamQuerySchema = z.object({
   weekStart: z.string().date().optional(),
 });
 
+export const teamWeeklyReportQuerySchema = z.object({
+  weekStart: z.string().date().optional(),
+  weeks: z.coerce.number().int().min(1).max(12).default(5),
+});
+
 export const dashboardTeamMemoListQuerySchema = z.object({
   targetUserId: z.coerce.number().int().positive(),
 });

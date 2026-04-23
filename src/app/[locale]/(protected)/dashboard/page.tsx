@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { Calendar, UserIcon, Users, Zap } from "lucide-react";
+import { BarChart3, Calendar, UserIcon, Users, Zap } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
@@ -96,6 +96,17 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              {currentUserRole === "ADMIN" && (
+                <Button
+                  asChild
+                  className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
+                >
+                  <Link href="/report">
+                    <BarChart3 className="w-3.5 h-3.5 text-text-muted shrink-0" />
+                    <span>{t("weeklyReport")}</span>
+                  </Link>
+                </Button>
+              )}
               <Button
                 asChild
                 className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-lg text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"

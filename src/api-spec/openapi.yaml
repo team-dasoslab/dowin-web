@@ -1591,6 +1591,43 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
+  /reports/team-weekly:
+    get:
+      summary: 리더용 주간 팀 리포트 조회
+      tags: [Reports]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: weekStart
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - name: weeks
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            default: 5
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamWeeklyReportResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 워크스페이스 관리자 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /dashboard/team/memos:
     get:
       summary: 팀 대시보드 사용자 메모 조회
@@ -2283,6 +2320,27 @@ components:
         members:
           type: array
           items: { $ref: "#/components/schemas/TeamDashboardMember" }
+
+    TeamWeeklyReportTrend:
+      type: object
+      properties:
+        weekStart: { type: string, format: date }
+        weekEnd: { type: string, format: date }
+        activeCount: { type: integer }
+        totalCount: { type: integer }
+        winningCount: { type: integer }
+        startedCount: { type: integer }
+        winRate: { type: integer }
+        executionRate: { type: integer }
+
+    TeamWeeklyReportResponse:
+      allOf:
+        - $ref: "#/components/schemas/TeamDashboardResponse"
+        - type: object
+          properties:
+            trends:
+              type: array
+              items: { $ref: "#/components/schemas/TeamWeeklyReportTrend" }
 
     DashboardTeamMemoAuthor:
       type: object
