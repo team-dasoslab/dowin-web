@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { WigIcon, type IconName } from "@/components/ui/WigIcon";
+import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 import React from "react";
 
 interface PeriodBadgeProps {
@@ -25,7 +25,7 @@ export function PeriodBadge({
         className,
       )}
     >
-      <WigIcon
+      <DowinIcon
         name={iconName}
         size={isMd ? 16 : 14}
         className="text-zinc-400"

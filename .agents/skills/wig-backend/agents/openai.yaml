@@ -1,7 +1,0 @@
-interface:
-  display_name: "WIG Backend"
-  short_description: "WIG backend API and repository backend rules"
-  default_prompt: "Use $wig-backend to implement or change a WIG backend API with the repository's backend rules."
-
-policy:
-  allow_implicit_invocation: true

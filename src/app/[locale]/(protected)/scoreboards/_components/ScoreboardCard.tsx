@@ -1,6 +1,6 @@
 import { formatDate } from "@/app/[locale]/(protected)/scoreboards/_lib/scoreboards";
 import { Card } from "@/components/ui/Card";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
@@ -30,7 +30,7 @@ export function ScoreboardCard({
             {goalName || t("unnamedScoreboard")}
           </h2>
           <div className="flex items-center gap-2 text-sm text-text-secondary">
-            <WigIcon name="domain-target-arrow" size="14px" className="text-text-muted flex-shrink-0" />
+            <DowinIcon name="domain-target-arrow" size="14px" className="text-text-muted flex-shrink-0" />
             <span className="leading-relaxed">
               {lagMeasure || t("noLagMeasure")}
             </span>

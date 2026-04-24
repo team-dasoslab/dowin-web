@@ -1,7 +1,7 @@
 import type { EventData, Options, Step, Styles } from "react-joyride";
 import { STATUS } from "react-joyride";
 
-export const SETUP_COACHMARK_STORAGE_KEY = "wig.setup.coachmark.v1.dismissed";
+export const SETUP_COACHMARK_STORAGE_KEY = "dowin.setup.coachmark.v1.dismissed";
 export const SETUP_COACHMARK_LEAD_TAGS_QUERY = "lead-measure-tags";
 
 export const getSetupCoachmarkSteps = (t: (key: string) => string): Step[] => [

@@ -6,7 +6,7 @@ import {
   useGetUsersMe,
   usePutUsersMe,
 } from "@/api/generated/profile/profile";
-import type { UserProfileUpdateRequest } from "@/api/generated/wig.schemas";
+import type { UserProfileUpdateRequest } from "@/api/generated/dowin.schemas";
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "@/i18n/routing";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";

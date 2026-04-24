@@ -20,7 +20,7 @@ import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -353,7 +353,7 @@ function NoWorkspaceState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<WigIcon name="domain-flash-active" size="20px" className="text-primary" />}
+          icon={<DowinIcon name="domain-flash-active" size="20px" className="text-primary" />}
           title={t("noWorkspaceTitle")}
           description={
             <div className="whitespace-pre-line">{t("noWorkspaceDesc")}</div>
@@ -371,7 +371,7 @@ function NoScoreboardState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<WigIcon name="domain-flash-active" size="20px" className="text-primary" />}
+          icon={<DowinIcon name="domain-flash-active" size="20px" className="text-primary" />}
           title={t("noScoreboardTitle")}
           description={
             <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>
@@ -382,7 +382,7 @@ function NoScoreboardState() {
               className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
-                <WigIcon name="action-add-active" size="16px" />
+                <DowinIcon name="action-add-active" size="16px" />
                 {t("createScoreboard")}
               </Link>
             </Button>

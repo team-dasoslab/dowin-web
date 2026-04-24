@@ -5,7 +5,7 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 type ArchivedScoreboardItem = {
@@ -67,7 +67,7 @@ export function ArchivedScoreboardsSection({
                         className="border-text-secondary/20 border-t-text-secondary"
                       />
                     ) : (
-                      <WigIcon name="action-undo" size="14px" />
+                      <DowinIcon name="action-undo" size="14px" />
                     )}
                     {pendingActionId === scoreboardId
                       ? t("reactivating")

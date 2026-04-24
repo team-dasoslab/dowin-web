@@ -27,7 +27,7 @@ export class PerfTrace {
   ) {
     this.enabled = options?.enabled ?? process.env.NODE_ENV !== "production";
     this.logFilePath = this.enabled
-      ? resolvePerfLogFilePath(process.env.WIG_PERF_LOG_FILE)
+      ? resolvePerfLogFilePath(process.env.DOWIN_PERF_LOG_FILE)
       : null;
     this.startedAt = performance.now();
     this.lastMarkAt = this.startedAt;

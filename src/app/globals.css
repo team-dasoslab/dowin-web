@@ -129,7 +129,7 @@ body {
   animation: toastOut 0.3s ease-in forwards;
 }
 
-@keyframes wigLoaderIos {
+@keyframes dowinLoaderIos {
   0%,
   39%,
   100% {
@@ -141,8 +141,8 @@ body {
   }
 }
 
-.wig-loader-ios-bar {
-  animation: wigLoaderIos 0.9s linear infinite;
+.dowin-loader-ios-bar {
+  animation: dowinLoaderIos 0.9s linear infinite;
 }
 
 .swagger-ui .topbar {

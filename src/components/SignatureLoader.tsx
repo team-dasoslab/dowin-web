@@ -54,7 +54,7 @@ export function SignatureLoader({
       {Array.from({ length: 12 }).map((_, index) => (
         <span
           key={index}
-          className={`wig-loader-ios-bar absolute left-1/2 top-1/2 ${config.barWidth} ${config.barHeight} -translate-x-1/2 -translate-y-1/2 rounded-full bg-current`}
+          className={`dowin-loader-ios-bar absolute left-1/2 top-1/2 ${config.barWidth} ${config.barHeight} -translate-x-1/2 -translate-y-1/2 rounded-full bg-current`}
           style={{
             transform: `translate(-50%, -50%) rotate(${index * 30}deg) translateY(-${config.radius}px)`,
             animationDelay: `${index * 0.075}s`,

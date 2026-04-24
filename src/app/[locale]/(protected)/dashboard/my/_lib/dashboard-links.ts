@@ -1,4 +1,4 @@
-import { IconName } from "@/components/ui/WigIcon";
+import { IconName } from "@/components/ui/DowinIcon";
 
 export const MY_DASHBOARD_LINKS: {
   href: string;

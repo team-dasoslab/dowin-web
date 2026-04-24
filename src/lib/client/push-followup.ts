@@ -7,7 +7,7 @@
  * 이 방식으로 BigQuery 없이도 GA4 Data API만으로 푸시 후속 전환을 집계할 수 있다.
  */
 
-const STORAGE_KEY = "wig.push_followup_context";
+const STORAGE_KEY = "dowin.push_followup_context";
 const FOLLOWUP_WINDOW_MS = 24 * 60 * 60 * 1000; // 24시간
 
 type PushFollowupContext = {

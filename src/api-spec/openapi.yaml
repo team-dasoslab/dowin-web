@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: WIG API
-  description: WIG(가중목) 서비스 API 명세서
+  title: DOWIN API
+  description: DOWIN(가중목) 서비스 API 명세서
   version: 0.1.0
 servers:
   - url: /api
@@ -30,7 +30,7 @@ paths:
               schema:
                 {
                   type: string,
-                  example: "wig_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000",
+                  example: "dowin_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000",
                 }
           content:
             application/json:
@@ -72,7 +72,7 @@ paths:
               schema:
                 {
                   type: string,
-                  example: "wig_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000",
+                  example: "dowin_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000",
                 }
           content:
             application/json:
@@ -112,7 +112,7 @@ paths:
               schema:
                 {
                   type: string,
-                  example: "wig_sid=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
+                  example: "dowin_sid=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
                 }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -2478,4 +2478,4 @@ components:
     sessionCookie:
       type: apiKey
       in: cookie
-      name: wig_sid
+      name: dowin_sid

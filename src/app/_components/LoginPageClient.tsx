@@ -10,7 +10,7 @@ import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation";
@@ -53,12 +53,12 @@ export default function LoginPageClient() {
   const isPending = loginMutation.isPending || signupMutation.isPending;
 
   useEffect(() => {
-    const rawFlashToast = window.sessionStorage.getItem("wig.flash.toast");
+    const rawFlashToast = window.sessionStorage.getItem("dowin.flash.toast");
     if (!rawFlashToast) {
       return;
     }
 
-    window.sessionStorage.removeItem("wig.flash.toast");
+    window.sessionStorage.removeItem("dowin.flash.toast");
 
     try {
       const parsed = JSON.parse(rawFlashToast) as {
@@ -111,7 +111,7 @@ export default function LoginPageClient() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "wig-recovery-codes.txt";
+    link.download = "dowin-recovery-codes.txt";
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -240,12 +240,12 @@ export default function LoginPageClient() {
             >
               {isCopied ? (
                 <span className="inline-flex items-center gap-2">
-                  <WigIcon name="status-checkmark" size="16px" />
+                  <DowinIcon name="status-checkmark" size="16px" />
                   {t("recovery.copied")}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
-                  <WigIcon name="action-copy" size="16px" />
+                  <DowinIcon name="action-copy" size="16px" />
                   {t("recovery.copy")}
                 </span>
               )}
@@ -278,11 +278,11 @@ export default function LoginPageClient() {
       <Card className="w-full max-w-[380px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
         <div className="flex flex-col items-center text-center space-y-4 mb-10">
           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-            <WigIcon name="domain-flash" className="text-primary" size="24px" />
+            <DowinIcon name="domain-flash" className="text-primary" size="24px" />
           </div>
           <div className="space-y-1.5">
             <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-              WIG
+              DOWIN
             </h1>
             <p className="text-[13px] text-text-muted">
               {t("subtitle")}
@@ -388,12 +388,12 @@ export default function LoginPageClient() {
               <>
                 {mode === "login" ? (
                   <>
-                    <WigIcon name="action-enter" size="16px" />
+                    <DowinIcon name="action-enter" size="16px" />
                     <span>{t("login")}</span>
                   </>
                 ) : (
                   <>
-                    <WigIcon name="action-person-add" size="16px" />
+                    <DowinIcon name="action-person-add" size="16px" />
                     <span>{t("signup")}</span>
                   </>
                 )}

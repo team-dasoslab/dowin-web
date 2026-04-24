@@ -7,7 +7,7 @@ import {
   usePatchDashboardTeamMemosMemoIdResolve,
   usePostDashboardTeamMemos,
 } from "@/api/generated/dashboard/dashboard";
-import { DashboardTeamMemo } from "@/api/generated/wig.schemas";
+import { DashboardTeamMemo } from "@/api/generated/dowin.schemas";
 import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useQueryClient } from "@tanstack/react-query";

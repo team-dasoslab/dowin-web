@@ -5,7 +5,7 @@ import {
   getProfileAvatarSrc,
   type ProfileAvatarKey,
 } from "@/domain/profile/avatar-options";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import Image from "next/image";
 import { useRef } from "react";
 
@@ -32,7 +32,7 @@ export function UserAvatar({
   const wrapperClassName = className
     ? `${className} ${radiusClassName}`
     : radiusClassName;
-  const randomSeedRef = useRef(`wig-avatar-${Math.random().toString(36).slice(2, 10)}`);
+  const randomSeedRef = useRef(`dowin-avatar-${Math.random().toString(36).slice(2, 10)}`);
   const resolvedSeed = avatarSeed?.trim() || randomSeedRef.current;
   const resolvedSrc = resolvedSeed
     ? getDiceBearGlassAvatarSrc(resolvedSeed)
@@ -50,7 +50,7 @@ export function UserAvatar({
         <div
           className={`flex h-full w-full items-center justify-center bg-primary/10 text-primary ${radiusClassName}`}
         >
-          <WigIcon
+          <DowinIcon
             name="domain-person"
             className="h-1/2 w-1/2"
             aria-hidden="true"

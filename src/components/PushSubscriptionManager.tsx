@@ -4,7 +4,7 @@ import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useToast } from "@/context/ToastContext";
 import { getFetchErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
@@ -236,7 +236,7 @@ export default function PushSubscriptionManager({
           : "bg-primary text-white hover:opacity-90 shadow-md shadow-primary/10 animate-linear-in"
       }`}
     >
-      {isSubscribed ? <WigIcon name="status-alert-off-compact" size={16} /> : <WigIcon name="status-alert-compact" size={16} />}
+      {isSubscribed ? <DowinIcon name="status-alert-off-compact" size={16} /> : <DowinIcon name="status-alert-compact" size={16} />}
       {isSubscribed ? t("buttonUnsubscribe") : t("buttonSubscribe")}
     </button>
   );

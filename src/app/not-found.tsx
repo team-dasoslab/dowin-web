@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 export default async function NotFound() {
   const headerList = await headers();
   const locale = detectLocale({
-    customLocale: headerList.get("x-wig-locale"),
+    customLocale: headerList.get("x-dowin-locale"),
     acceptLanguage: headerList.get("accept-language"),
   });
 

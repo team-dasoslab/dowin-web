@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
 
@@ -103,7 +103,7 @@ export function LandingPricingSection() {
                             : "bg-slate-200 text-slate-400"
                         }`}
                       >
-                        <WigIcon name="status-checkmark" size="12px" />
+                        <DowinIcon name="status-checkmark" size="12px" />
                       </div>
                       <p
                         className={`text-[15px] leading-[1.5] font-medium break-keep ${

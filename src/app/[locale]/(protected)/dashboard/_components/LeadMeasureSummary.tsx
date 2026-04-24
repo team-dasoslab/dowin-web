@@ -1,6 +1,6 @@
 "use client";
 
-import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
+import { type WeeklyLogGuide } from "@/api/generated/dowin.schemas";
 import { LeadMeasureGuideTooltip } from "@/app/[locale]/(protected)/dashboard/my/_components/LeadMeasureGuideTooltip";
 import { Badge } from "@/components/ui/Badge";
 

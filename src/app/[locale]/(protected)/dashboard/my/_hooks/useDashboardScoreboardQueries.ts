@@ -13,7 +13,7 @@ import {
   GetDashboardTeamParams,
   GetScoreboardsScoreboardIdLogsMonthlyParams,
   GetScoreboardsScoreboardIdLogsWeeklyParams,
-} from "@/api/generated/wig.schemas";
+} from "@/api/generated/dowin.schemas";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import {
   computeWeeklyRate,

@@ -3,7 +3,7 @@
 import {
   TeamDashboardMember,
   TeamWeeklyReportTrend,
-} from "@/api/generated/wig.schemas";
+} from "@/api/generated/dowin.schemas";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
   ProtectedPageContainer,
@@ -18,7 +18,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -319,7 +319,7 @@ export default function ReportPage() {
                             {t("winRate.desc")}
                           </p>
                         </div>
-                        <WigIcon name="domain-trending" size="16px" className="shrink-0 text-[#5e6ad2]" />
+                        <DowinIcon name="domain-trending" size="16px" className="shrink-0 text-[#5e6ad2]" />
                       </div>
                       <WinRateOverview
                         winningCount={summary.winningCount}
@@ -933,7 +933,7 @@ function ReportNoWorkspaceState() {
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
-            <WigIcon name="nav-report" size="20px" className="text-primary" />
+            <DowinIcon name="nav-report" size="20px" className="text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
             {t("states.noWorkspaceTitle")}
@@ -958,7 +958,7 @@ function ReportForbiddenState() {
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
-            <WigIcon name="nav-report" size="20px" className="text-primary" />
+            <DowinIcon name="nav-report" size="20px" className="text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
             {t("states.forbiddenTitle")}
@@ -985,7 +985,7 @@ function ReportErrorState({ onRetry }: { onRetry: () => void }) {
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
-            <WigIcon name="nav-report" size="20px" className="text-primary" />
+            <DowinIcon name="nav-report" size="20px" className="text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
             {t("states.errorTitle")}

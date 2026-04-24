@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 export default function ProfileDeleteAccountPage() {
@@ -34,7 +34,7 @@ export default function ProfileDeleteAccountPage() {
 
         <Card className="flex items-center gap-4 rounded-content border border-red-200 bg-red-50/60 px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-content bg-red-100 text-red-600">
-            <WigIcon name="status-warning" size="20px" />
+            <DowinIcon name="status-warning" size="20px" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-text-primary">

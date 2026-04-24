@@ -86,11 +86,11 @@ export default function SetupPage() {
     }
   }, []);
 
-  const [activeSection, setActiveSection] = useState("wig");
+  const [activeSection, setActiveSection] = useState("dowin");
 
   const menuGroups = useMemo(
     () => [
-      { id: "wig", label: t("wigShort") },
+      { id: "dowin", label: t("dowinShort") },
       { id: "lag", label: t("lagMeasureLabel") },
       { id: "lead", label: t("leadMeasureHead") },
       ...(isEditMode ? [{ id: "manage", label: t("manage") }] : []),
@@ -205,9 +205,9 @@ export default function SetupPage() {
             onSubmit={handleSubmit}
             className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]"
           >
-            {/* WIG 섹션 */}
-            <section id="wig" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("wigShort")} />
+            {/* DOWIN 섹션 */}
+            <section id="dowin" className="space-y-5 scroll-mt-28">
+              <SectionHeader title={t("dowinShort")} />
               <GoalSection
                 goalName={goalName}
                 isMutating={isMutating}
