@@ -13,7 +13,6 @@ import { WeeklyBoardSection } from "@/app/[locale]/(protected)/dashboard/my/_com
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { useMyDashboardPageState } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useMyDashboardPageState";
 import { type CelebrationLevel } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-celebration";
-import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-links";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -394,64 +393,3 @@ function NoScoreboardState() {
   );
 }
 
-function MyDashboardEmptyHeader({
-  variant,
-}: {
-  variant: "no-workspace" | "no-scoreboard";
-}) {
-  const t = useTranslations("Dashboard");
-  const links =
-    variant === "no-workspace"
-      ? MY_DASHBOARD_LINKS.filter(({ href }) => href === "/profile")
-      : MY_DASHBOARD_LINKS.filter(({ href }) => href !== "/setup?mode=update");
-
-  return (
-    <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        {variant === "no-workspace" ? (
-          <>
-            <div className="w-9 h-9 bg-primary/10 rounded-content flex items-center justify-center border border-primary/20 text-primary shrink-0">
-              <WigIcon name="domain-flash-active" size="16px" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-base font-bold tracking-tight text-text-primary truncate">
-                WIG
-              </h1>
-              <p className="text-[11px] text-text-muted truncate">
-                {t("wigSlogan")}
-              </p>
-            </div>
-          </>
-        ) : (
-          <div className="min-w-0">
-            <p className="text-[11px] text-text-muted truncate">
-              {t("myDashboard")}
-            </p>
-            <h1 className="text-sm font-bold text-text-primary truncate">
-              {t("myScoreboard")}
-            </h1>
-          </div>
-        )}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        {links.map(({ href, iconName, translationKey }) => (
-          <Button
-            key={href}
-            asChild
-            className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-content text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
-          >
-            <Link href={href}>
-              <WigIcon
-                name={iconName}
-                size="14px"
-                className="text-text-muted shrink-0"
-              />
-              <span>{t(translationKey)}</span>
-            </Link>
-          </Button>
-        ))}
-      </div>
-    </header>
-  );
-}

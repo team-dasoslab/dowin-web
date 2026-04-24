@@ -173,7 +173,7 @@ interface WigIconProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 export function WigIcon({ name, size, className, ...props }: WigIconProps) {
-  const IconComponent = (ICON_MAP as any)[name];
+  const IconComponent = ICON_MAP[name];
 
   if (!IconComponent) {
     return null;

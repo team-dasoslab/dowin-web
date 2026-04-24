@@ -2,7 +2,6 @@
 
 import { ScoreboardCard } from "@/app/[locale]/(protected)/scoreboards/_components/ScoreboardCard";
 import { InlineSpinner } from "@/components/InlineSpinner";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";

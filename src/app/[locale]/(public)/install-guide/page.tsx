@@ -3,7 +3,7 @@ import { GuideImage } from "@/app/[locale]/(public)/install-guide/_components/Gu
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { WigIcon, type IconName } from "@/components/ui/WigIcon";
 
 const steps = [
   {
@@ -105,7 +105,7 @@ export default function InstallGuidePage() {
 
                 <div className="absolute left-0 top-0 flex flex-col items-center">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-white text-primary shadow-sm">
-                    <WigIcon name={step.iconName as any} size="20px" />
+                    <WigIcon name={step.iconName as IconName} size="20px" />
                   </div>
                 </div>
 

@@ -24,7 +24,6 @@ import {
 
 export default function SetupPage() {
   const t = useTranslations("Setup");
-  const tc = useTranslations("Common");
   const router = useRouter();
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const [coachmarkMode, setCoachmarkMode] = useState<

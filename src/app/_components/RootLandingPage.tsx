@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { WigIcon, type IconName } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
@@ -109,7 +109,7 @@ export function RootLandingPage() {
                       className={`w-full h-10 rounded-xl flex items-center px-4 gap-3 ${idx === 0 ? "bg-slate-100 text-slate-900" : "text-slate-400"}`}
                     >
                       <WigIcon
-                        name={iconName as any}
+                        name={iconName as IconName}
                         size="20px"
                         className="mx-auto lg:mx-0 shrink-0"
                       />
