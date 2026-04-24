@@ -1,6 +1,6 @@
 {
   "Metadata": {
-    "title": "WIG Tracker",
+    "title": "DOWIN Tracker",
     "description": "가장 중요한 목표에 집중하세요."
   },
   "Common": {
@@ -67,8 +67,8 @@
     "addedMemo": "메모를 추가했습니다.",
     "noActiveMeasures": "활성화된 선행지표가 없습니다.",
     "myScoreboard": "내 대시보드",
-    "wigSlogan": "가장 중요한 목표에 집중하세요.",
-    "wigLabel": "가중목",
+    "dowinSlogan": "가장 중요한 목표에 집중하세요.",
+    "dowinLabel": "가중목",
     "lagMeasureLabel": "후행지표",
     "weeklyAchievementRate": "이번 주 달성률",
     "monthlyAchievementRate": "이번 달 달성률",
@@ -193,7 +193,7 @@
         "losingStarted": "시작했지만 밀리는 중"
       },
       "action": {
-        "noScoreboard": "WIG와 선행지표 설정부터 열어주기",
+        "noScoreboard": "DOWIN와 선행지표 설정부터 열어주기",
         "notStarted": "이번 주 시작 가능한 가장 작은 행동부터 확인",
         "losingStarted": "선행지표 난이도나 이번 주 실행 리듬 확인"
       },
@@ -257,7 +257,7 @@
     "header": "점수판 설정",
     "createTitle": "새 점수판 생성하기",
     "editTitle": "점수판 수정하기",
-    "description": "하나의 목표(WIG)와 성공 척도(후행지표), 선행지표를 설정하세요.",
+    "description": "하나의 목표(DOWIN)와 성공 척도(후행지표), 선행지표를 설정하세요.",
     "archiving": "점수판을 보관하는 중입니다.",
     "saving": "점수판 변경사항을 저장하는 중입니다.",
     "creating": "점수판을 생성하고 있습니다...",
@@ -278,7 +278,7 @@
     "archiveBtn": "보관",
     "archivingBtn": "보관 중...",
     "confirmArchive": "이 점수판을 보관하시겠습니까?",
-    "wigShort": "가중목",
+    "dowinShort": "가중목",
     "goalQuestion": "가장 중요한 목표는 무엇인가요?",
     "goalPlaceholder": "예: 8주 안에 5km 완주하기",
     "lagMeasure": "후행지표",
@@ -750,7 +750,7 @@
       "copied": "복사 완료",
       "saveTxt": "txt 저장",
       "failedToCopy": "복원코드 복사에 실패했습니다. 수동으로 저장해주세요.",
-      "txtHeader": "WIG 복원코드",
+      "txtHeader": "DOWIN 복원코드",
       "txtDescription": "아래 코드는 계정 복구에 사용됩니다. 안전한 곳에 보관하세요."
     },
     "errors": {
@@ -784,7 +784,7 @@
       "title": "새 워크스페이스 만들기",
       "description": "워크스페이스는 팀의 목표를 함께 관리하는 공간입니다.\n멋진 이름을 지어주세요.",
       "label": "워크스페이스 이름",
-      "placeholder": "예: 마케팅 팀, WIG 프로젝트",
+      "placeholder": "예: 마케팅 팀, DOWIN 프로젝트",
       "button": "워크스페이스 생성하기",
       "loading": "워크스페이스를 만드는 중입니다."
     },
@@ -815,8 +815,8 @@
     "Mockup": {
       "workspace": "Our Workspace",
       "stats": {
-        "wigTitle": "최우선 목표",
-        "wigGoal": "리텐션 40% 방어 및\n신규 파이프라인 구축",
+        "dowinTitle": "최우선 목표",
+        "dowinGoal": "리텐션 40% 방어 및\n신규 파이프라인 구축",
         "leadTitle": "선행지표: 이번 주 액션",
         "week": "Week 4",
         "action1": "이탈 징후 고객 10명 통화",
@@ -833,11 +833,11 @@
       "stat2Value": "10",
       "stat2Desc": "길어질 필요 없는\n압도적으로 짧은 매주 점검"
     },
-    "WhyWig": {
+    "WhyDowin": {
       "header": "팀의 목표를 달성하는\n가장 확실하고 주도적인 흐름",
       "description": "결과 지표는 이미 일어난 과거이기에 우리가 곧바로 바꿀 수는 없습니다.\n하지만 결과를 만들어낼 '오늘의 행동'은 우리 스스로 계획하고 100% 통제할 수 있습니다. 막연한 불안감을 넘어 주도적인 팀의 실행력을 갖춰보세요.",
       "item1Badge": "가장 중요한 단 하나",
-      "item1Title": "팀의 마일스톤,\n최우선 목표 (WIG)",
+      "item1Title": "팀의 마일스톤,\n최우선 목표 (DOWIN)",
       "item1Desc": "수많은 업무 사이에서 길을 잃지 않도록 지표가 되어 드릴게요. 팀 전체의 판도를 바꿀 수 있는 가장 중요하고 임팩트 있는 단 하나의 목표에 집중해보세요.",
       "item1VisualGoal": "연말까지 월 매출 1억 달성",
       "item1VisualDesc": "이 목표 외의 업무는 후순위로 미뤄집니다.",
@@ -851,7 +851,7 @@
       "title": "복잡함을 걷어낸\n단 3단계의 실행 흐름.",
       "description": "입력이 부담스러운 복잡한 템플릿 대신,\n팀원 모두가 편안하고 투명하게 바라볼 수 있는 가장 직관적인 흐름을 제안합니다.",
       "step1Title": "단 하나의 목표 정조준",
-      "step1Desc": "이번 주 우리가 달성해야 할 WIG를 최상단에 고정합니다. 흔들리지 않고 한 곳을 바라봅니다.",
+      "step1Desc": "이번 주 우리가 달성해야 할 DOWIN를 최상단에 고정합니다. 흔들리지 않고 한 곳을 바라봅니다.",
       "step2Title": "매일매일 행동 누적",
       "step2Desc": "거창한 회의실 대신 눈앞의 대시보드에서 행동 지표 데일리 빙고를 채워나갑니다. 도장 깨기 하듯 매일의 성취감이 쌓이며 실행의 관성이 붙습니다.",
       "step3Title": "핑계 없는 점수판, 주간 회고",
@@ -905,7 +905,7 @@
     "Footer": {
       "headline": "진짜 실행의 흐름,\n지금 바로 시작해볼까요?",
       "description": "초기 세팅에 들어가는 고민과 시간은 덜어냈습니다.\n이제 팀원들과 함께 즐겁게 목표를 향해 달려보세요.",
-      "cta": "WIG 무료로 시작하기"
+      "cta": "DOWIN 무료로 시작하기"
     }
   },
   "NotFound": {

@@ -5,7 +5,7 @@ import { routing } from "./src/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-const SESSION_COOKIE = "wig_sid";
+const SESSION_COOKIE = "dowin_sid";
 const LOGIN_ROUTE = "/";
 const DEFAULT_AUTHENTICATED_ROUTE = "/dashboard/my";
 
@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
     : isSupportedLocale(nextLocaleCookie)
     ? nextLocaleCookie
     : detectLocale({
-        customLocale: request.headers.get("x-wig-locale"),
+        customLocale: request.headers.get("x-dowin-locale"),
         acceptLanguage: request.headers.get("accept-language"),
       });
 

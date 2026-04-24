@@ -8,7 +8,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "FREE",
         }),
         findMembershipByUserId: vi.fn().mockResolvedValue({
@@ -31,7 +31,7 @@ describe("BillingService", () => {
 
     await expect(service.getMyBilling(7)).resolves.toEqual({
       workspaceId: 1,
-      workspaceName: "WIG",
+      workspaceName: "DOWIN",
       planCode: "FREE",
       billingStatus: "NONE",
       provider: null,
@@ -50,7 +50,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "FREE",
         }),
         findMembershipByUserId: vi.fn().mockResolvedValue({
@@ -78,7 +78,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "FREE",
         }),
         findMembershipByUserId: vi.fn().mockResolvedValue({
@@ -120,7 +120,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
@@ -165,7 +165,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
@@ -210,7 +210,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "STANDARD",
           billingCustomerExternalRef: "workspace:1",
         }),
@@ -250,7 +250,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
@@ -287,7 +287,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
@@ -326,7 +326,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "STANDARD",
           billingCustomerExternalRef: "workspace:1",
         }),
@@ -368,7 +368,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
-          name: "WIG",
+          name: "DOWIN",
           planCode: "STANDARD",
           billingCustomerExternalRef: "workspace:1",
         }),

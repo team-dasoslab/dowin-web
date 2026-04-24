@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
@@ -100,7 +100,7 @@ export default function ProfileMembersPage() {
 
         <Card className="flex items-center gap-4 rounded-lg border border-border px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <WigIcon name="domain-people" size="20px" />
+            <DowinIcon name="domain-people" size="20px" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-text-primary">
@@ -134,7 +134,7 @@ export default function ProfileMembersPage() {
             className="btn-linear-primary rounded-content px-3 py-2 text-xs font-bold"
           >
             <Link href="/profile/invites" className="flex items-center gap-1.5">
-              <WigIcon name="domain-ticket-diagonal" size="14px" />
+              <DowinIcon name="domain-ticket-diagonal" size="14px" />
               {t("invitesCardButton")}
             </Link>
           </Button>
@@ -210,7 +210,7 @@ function NoWorkspaceState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <WigIcon name="domain-people" size="20px" />
+            <DowinIcon name="domain-people" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">
@@ -234,7 +234,7 @@ function NoAccessState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <WigIcon name="status-locked" size="20px" />
+            <DowinIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">

@@ -13,7 +13,7 @@ export default function ApiDocsPage() {
       <section className="mx-auto mb-4 flex max-w-[1400px] flex-wrap items-center justify-between gap-3 rounded-[20px] border border-[var(--color-border)] bg-white/92 px-5 py-4 backdrop-blur-[12px]">
         <div>
           <h1 className="m-0 text-[28px] leading-none font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
-            WIG API Docs
+            DOWIN API Docs
           </h1>
           <p className="mt-1.5 text-sm text-[var(--color-text-secondary)]">
             source: src/api-spec/openapi.yaml

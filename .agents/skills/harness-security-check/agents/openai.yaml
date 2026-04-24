@@ -1,0 +1,7 @@
+interface:
+  display_name: "DOWIN Harness Security Check"
+  short_description: "DOWIN AI harness and prompt security review"
+  default_prompt: "Use $dowin-harness-security-check to review DOWIN's agent harness, prompt files, and local AI tooling guidance for secret exposure, unsafe permissions, and risky automation."
+
+policy:
+  allow_implicit_invocation: true

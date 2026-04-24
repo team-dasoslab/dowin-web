@@ -1,6 +1,6 @@
 "use client";
 
-import { TeamDashboardMember, TeamDashboardMemberRole } from "@/api/generated/wig.schemas";
+import { TeamDashboardMember, TeamDashboardMemberRole } from "@/api/generated/dowin.schemas";
 import { AchievementProgress } from "@/app/[locale]/(protected)/dashboard/_components/AchievementProgress";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/dashboard/_components/LeadMeasureSummary";
 import { TeamMemberMemoPanel } from "@/app/[locale]/(protected)/dashboard/_components/TeamMemberMemoPanel";

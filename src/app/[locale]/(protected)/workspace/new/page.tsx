@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useTranslations } from "next-intl";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 
 export default function NewWorkspacePage() {
   const t = useTranslations("Workspace.new");
@@ -47,7 +47,7 @@ export default function NewWorkspacePage() {
         {/* 헤더 */}
         <div className="space-y-5">
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-            <WigIcon name="domain-flash-large" size="24px" className="text-primary" />
+            <DowinIcon name="domain-flash-large" size="24px" className="text-primary" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
@@ -101,7 +101,7 @@ export default function NewWorkspacePage() {
               <InlineSpinner size="sm" />
             ) : (
               <>
-                <WigIcon name="action-add" size="16px" />
+                <DowinIcon name="action-add" size="16px" />
                 <span>{t("button")}</span>
               </>
             )}

@@ -1,5 +1,5 @@
 import { Input, type InputProps } from "@/components/ui/Input";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -33,9 +33,9 @@ export const PasswordInput = ({
           className={toggleClassName}
         >
           {isVisible ? (
-            <WigIcon name="auth-eye-off" size="14px" />
+            <DowinIcon name="auth-eye-off" size="14px" />
           ) : (
-            <WigIcon name="auth-eye" size="14px" />
+            <DowinIcon name="auth-eye" size="14px" />
           )}
           <span className={toggleLabelClassName}>
             {isVisible ? t("hide") : t("show")}

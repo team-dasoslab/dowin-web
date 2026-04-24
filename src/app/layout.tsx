@@ -9,9 +9,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        <title>WIG Tracker</title>
+        <title>DOWIN Tracker</title>
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
-        <meta property="og:title" content="WIG Tracker" />
+        <meta property="og:title" content="DOWIN Tracker" />
         <meta
           property="og:description"
           content="가장 중요한 목표에 집중하세요."
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta property="og:image" content="/cover.png" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="WIG Tracker" />
+        <meta name="twitter:title" content="DOWIN Tracker" />
         <meta
           name="twitter:description"
           content="가장 중요한 목표에 집중하세요."
@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="WIG Tracker" />
+        <meta name="apple-mobile-web-app-title" content="DOWIN Tracker" />
         <meta name="theme-color" content="#EFF0FA" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.svg" />

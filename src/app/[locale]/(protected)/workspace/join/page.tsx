@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Link } from "@/i18n/routing";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 export default function JoinWorkspacePage() {
@@ -37,7 +37,7 @@ export default function JoinWorkspacePage() {
 
         <div className="space-y-5">
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-            <WigIcon name="domain-flash-large" size="24px" className="text-primary" />
+            <DowinIcon name="domain-flash-large" size="24px" className="text-primary" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
@@ -88,7 +88,7 @@ export default function JoinWorkspacePage() {
                 <InlineSpinner size="sm" />
               ) : (
                 <>
-                  <WigIcon name="action-join" size="16px" />
+                  <DowinIcon name="action-join" size="16px" />
                   {t("button")}
                 </>
               )}
@@ -103,7 +103,7 @@ export default function JoinWorkspacePage() {
                 href="/workspace/new"
                 className="flex items-center justify-center gap-2"
               >
-                <WigIcon name="domain-people" size="16px" />
+                <DowinIcon name="domain-people" size="16px" />
                 {t("createButton")}
               </Link>
             </Button>

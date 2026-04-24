@@ -1,6 +1,6 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface SetupSubmitButtonProps {
@@ -33,7 +33,7 @@ export function SetupSubmitButton({
         <InlineSpinner />
       ) : (
         <>
-          <WigIcon name="action-save" size="14px" />
+          <DowinIcon name="action-save" size="14px" />
           {isEditMode ? t("saveChanges") : t("createScoreboard")}
         </>
       )}

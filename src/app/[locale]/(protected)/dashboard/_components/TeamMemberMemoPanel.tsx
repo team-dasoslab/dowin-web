@@ -5,12 +5,12 @@ import {
   DashboardTeamMemo,
   TeamDashboardMember,
   TeamDashboardMemberRole,
-} from "@/api/generated/wig.schemas";
+} from "@/api/generated/dowin.schemas";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { TouchEvent, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -181,7 +181,7 @@ export function TeamMemberMemoPanel({
                   className="inline-flex h-10 w-10 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
                   aria-label={t("submitMemo")}
                 >
-                  <WigIcon name="action-send" size="16px" />
+                  <DowinIcon name="action-send" size="16px" />
                 </Button>
               </div>
             </div>
@@ -287,7 +287,7 @@ export function TeamMemberMemoPanel({
                 className="inline-flex h-8 w-8 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
                 aria-label={t("submitMemo")}
               >
-                <WigIcon name="action-send" size="16px" />
+                <DowinIcon name="action-send" size="16px" />
               </Button>
             </div>
           </Card>
@@ -385,7 +385,7 @@ function MemoCard({
                 }`}
                 aria-label={t("verifyMemo")}
               >
-                <WigIcon name="action-checkmark" size="16px" />
+                <DowinIcon name="action-checkmark" size="16px" />
               </button>
             ) : null}
             {canDeleteMemo ? (
@@ -398,7 +398,7 @@ function MemoCard({
                 }`}
                 aria-label={t("deleteMemo")}
               >
-                <WigIcon name="action-delete" size="16px" />
+                <DowinIcon name="action-delete" size="16px" />
               </button>
             ) : null}
           </div>

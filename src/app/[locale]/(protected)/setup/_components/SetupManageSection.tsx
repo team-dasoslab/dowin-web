@@ -1,7 +1,7 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { ActionRow } from "@/components/ui/ActionRow";
 import { Button } from "@/components/ui/Button";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface SetupManageSectionProps {
@@ -39,7 +39,7 @@ export function SetupManageSection({
                 className="border-text-secondary/20 border-t-text-secondary"
               />
             ) : (
-              <WigIcon name="action-archive" size="14px" />
+              <DowinIcon name="action-archive" size="14px" />
             )}
             {isArchivePending ? t("archivingBtn") : t("archiveBtn")}
           </Button>

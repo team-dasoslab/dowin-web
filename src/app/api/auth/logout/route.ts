@@ -13,11 +13,11 @@ export const POST = withErrorHandler(async () => {
   const service = new AuthService(storage);
 
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get("wig_sid")?.value;
+  const sessionId = cookieStore.get("dowin_sid")?.value;
 
   if (sessionId) {
     await service.logout(sessionId);
-    cookieStore.delete("wig_sid");
+    cookieStore.delete("dowin_sid");
   }
 
   return apiSuccess(null, 204);

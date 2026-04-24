@@ -2,7 +2,7 @@ import { LeadMeasureSummary } from "@/app/[locale]/(protected)/dashboard/_compon
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { MonthlyMobileCards } from "@/app/[locale]/(protected)/dashboard/my/_components/MonthlyMobileCards";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface MonthlyBoardSectionProps {
@@ -214,7 +214,7 @@ export function MonthlyBoardSection({
                                       }`}
                                     >
                                       {value === true ? (
-                                        <WigIcon name="action-checkmark" size="14px" />
+                                        <DowinIcon name="action-checkmark" size="14px" />
                                       ) : null}
                                     </span>
                                   </td>

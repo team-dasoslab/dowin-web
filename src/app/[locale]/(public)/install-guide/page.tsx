@@ -3,14 +3,14 @@ import { GuideImage } from "@/app/[locale]/(public)/install-guide/_components/Gu
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { WigIcon, type IconName } from "@/components/ui/WigIcon";
+import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 
 const steps = [
   {
     step: "STEP 1",
-    title: "Safari에서 WIG 링크 열기",
+    title: "Safari에서 DOWIN 링크 열기",
     description:
-      "iPhone에서는 Safari에서만 WIG를 홈 화면에 설치할 수 있어요. 다른 브라우저에서 열었다면 Safari로 다시 열어 진행해주세요.",
+      "iPhone에서는 Safari에서만 DOWIN를 홈 화면에 설치할 수 있어요. 다른 브라우저에서 열었다면 Safari로 다시 열어 진행해주세요.",
     iconName: "domain-phone",
   },
   {
@@ -51,10 +51,10 @@ const steps = [
     step: "STEP 6",
     title: "설치 완료",
     description:
-      "홈 화면에 WIG 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
+      "홈 화면에 DOWIN 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
     iconName: "nav-home",
     imageSrc: "/assets/guide/guide04.png",
-    imageAlt: "홈 화면에 설치된 WIG 예시",
+    imageAlt: "홈 화면에 설치된 DOWIN 예시",
   },
 ] as const;
 
@@ -78,7 +78,7 @@ export default function InstallGuidePage() {
               </div>
               <div className="space-y-1.5">
                 <h1 className="text-xl font-bold tracking-tight text-text-primary">
-                  홈 화면에 추가해서 WIG를 앱처럼 써보세요
+                  홈 화면에 추가해서 DOWIN를 앱처럼 써보세요
                 </h1>
                 <p className="max-w-[520px] text-sm leading-6 text-text-secondary">
                   iPhone에서는 Safari 기준으로 홈 화면에 추가하면 더 빠르게
@@ -86,7 +86,7 @@ export default function InstallGuidePage() {
                 </p>
               </div>
               <div className="flex items-center gap-2 text-[11px] leading-none text-text-muted">
-                <WigIcon name="status-timer" size="12px" />
+                <DowinIcon name="status-timer" size="12px" />
                 <span>설치 소요 약 1분</span>
               </div>
             </div>
@@ -105,7 +105,7 @@ export default function InstallGuidePage() {
 
                 <div className="absolute left-0 top-0 flex flex-col items-center">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-white text-primary shadow-sm">
-                    <WigIcon name={step.iconName as IconName} size="20px" />
+                    <DowinIcon name={step.iconName as IconName} size="20px" />
                   </div>
                 </div>
 

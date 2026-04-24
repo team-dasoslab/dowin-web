@@ -1,13 +1,13 @@
 "use client";
 
-import { type WeeklyLogGuide } from "@/api/generated/wig.schemas";
+import { type WeeklyLogGuide } from "@/api/generated/dowin.schemas";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { isEditableDailyLogDate } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-scoreboard";
 import { AchievementProgress } from "@/app/[locale]/(protected)/dashboard/_components/AchievementProgress";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -180,7 +180,7 @@ function WeeklyMobileCardDay({
         }`}
       >
         {value === true ? (
-          <WigIcon name="action-checkmark" size="14px" className="mx-auto" />
+          <DowinIcon name="action-checkmark" size="14px" className="mx-auto" />
         ) : (
           <span className="text-[10px] font-mono">{date.slice(8, 10)}</span>
         )}

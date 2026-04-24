@@ -53,7 +53,7 @@ describe("GET /api/billing/me", () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockGetMyBilling.mockResolvedValue({
       workspaceId: 1,
-      workspaceName: "WIG",
+      workspaceName: "DOWIN",
       planCode: "FREE",
       billingStatus: "NONE",
       provider: null,

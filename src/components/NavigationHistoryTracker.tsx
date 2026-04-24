@@ -4,8 +4,8 @@ import { usePathname } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-const PREVIOUS_PATH_KEY = "wig.previousPath";
-const CURRENT_PATH_KEY = "wig.currentPath";
+const PREVIOUS_PATH_KEY = "dowin.previousPath";
+const CURRENT_PATH_KEY = "dowin.currentPath";
 
 export function NavigationHistoryTracker() {
   const pathname = usePathname();

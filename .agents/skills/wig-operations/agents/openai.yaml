@@ -1,7 +1,0 @@
-interface:
-  display_name: "WIG Operations"
-  short_description: "WIG incident response and runbooks"
-  default_prompt: "Use $wig-operations for WIG production operations work such as incident readiness, DB restore, deployment rollback, Cloudflare outage response, and operational runbooks."
-
-policy:
-  allow_implicit_invocation: true

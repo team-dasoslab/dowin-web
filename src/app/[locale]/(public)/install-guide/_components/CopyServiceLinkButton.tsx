@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -38,9 +38,9 @@ export function CopyServiceLinkButton() {
       type="button"
     >
       {isCopied ? (
-        <WigIcon name="status-checkmark" size="14px" className="text-primary" />
+        <DowinIcon name="status-checkmark" size="14px" className="text-primary" />
       ) : (
-        <WigIcon name="action-copy" size="14px" className="text-text-muted" />
+        <DowinIcon name="action-copy" size="14px" className="text-text-muted" />
       )}
       {isCopied ? t("Common.copyDone") : tPage("copyLinkButton")}
     </Button>

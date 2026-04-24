@@ -2,10 +2,10 @@
 
 import { Button, type ButtonProps } from "@/components/ui/Button";
 import { useRouter } from "@/i18n/routing";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
-const PREVIOUS_PATH_KEY = "wig.previousPath";
+const PREVIOUS_PATH_KEY = "dowin.previousPath";
 
 type SmartBackButtonProps = Omit<ButtonProps, "onClick"> & {
   fallbackHref?: string;
@@ -44,7 +44,7 @@ export function SmartBackButton({
       type={type}
       {...props}
     >
-      <WigIcon name="nav-back" className={iconClassName} size="14px" />
+      <DowinIcon name="nav-back" className={iconClassName} size="14px" />
       {props.children}
     </Button>
   );

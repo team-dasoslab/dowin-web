@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -72,7 +72,7 @@ export function PeriodControls({
                 disabled={isPreviousDisabled || isPeriodLoading}
                 className="h-9 w-9 rounded-button border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <WigIcon name="nav-chevron-left" size="16px" className="mx-auto" />
+                <DowinIcon name="nav-chevron-left" size="16px" className="mx-auto" />
               </Button>
               <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
                 <input
@@ -90,7 +90,7 @@ export function PeriodControls({
                 disabled={isPeriodLoading}
                 className="h-9 w-9 rounded-button border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <WigIcon name="nav-chevron-right" size="16px" className="mx-auto" />
+                <DowinIcon name="nav-chevron-right" size="16px" className="mx-auto" />
               </Button>
             </div>
             <Button
@@ -141,7 +141,7 @@ export function PeriodControls({
             className="flex items-center justify-center gap-1 rounded-button border border-border bg-white px-2.5 py-1.5 text-[11px] font-bold text-text-secondary transition-colors hover:border-[rgba(205,207,213,1)] hover:text-primary"
           >
             <Link href="/setup?mode=addMeasure">
-              <WigIcon name="action-add" size="12px" />
+              <DowinIcon name="action-add" size="12px" />
               {t("addMeasure")}
             </Link>
           </Button>

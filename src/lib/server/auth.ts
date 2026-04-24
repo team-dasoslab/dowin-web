@@ -9,7 +9,7 @@ import {
 import { and, eq, gt } from "drizzle-orm";
 import { cookies } from "next/headers";
 
-export const SESSION_COOKIE = "wig_sid";
+export const SESSION_COOKIE = "dowin_sid";
 export const SESSION_COOKIE_SECURE = !serverRuntimeConfig.isDevelopment;
 type Db = ReturnType<typeof getDb>;
 type AuthSession = Pick<

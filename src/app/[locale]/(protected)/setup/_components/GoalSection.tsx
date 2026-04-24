@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface GoalSectionProps {
@@ -23,7 +23,7 @@ export function GoalSection({
     >
       <div className="space-y-4">
         <div className="w-10 h-10 bg-primary/10 rounded-content flex items-center justify-center">
-          <WigIcon name="domain-flash-active" size="20px" className="text-primary" />
+          <DowinIcon name="domain-flash-active" size="20px" className="text-primary" />
         </div>
         <div>
           <label className="block text-sm font-bold text-zinc-900">

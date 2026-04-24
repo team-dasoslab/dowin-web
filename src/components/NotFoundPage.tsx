@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Link from "next/link";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 
 type Locale = "ko" | "en";
 
@@ -59,7 +59,7 @@ export function NotFoundPage({
 
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-                WIG
+                DOWIN
               </p>
               <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
                 {copy.title}
@@ -74,7 +74,7 @@ export function NotFoundPage({
               className="btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm"
             >
               <Link href={homeHref}>
-                <WigIcon name="nav-home" size="16px" />
+                <DowinIcon name="nav-home" size="16px" />
                 {copy.goHome}
               </Link>
             </Button>

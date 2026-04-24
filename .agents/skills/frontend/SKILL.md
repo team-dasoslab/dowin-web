@@ -1,0 +1,170 @@
+---
+name: dowin-frontend
+description: Use this skill when building or changing DOWIN frontend pages, domain components, UI composition, form validation, Orval API integration, TanStack Query state updates, Storybook stories, or mobile-responsive dashboard flows. Trigger it for requests about page UI, component refactors, API-to-UI wiring, dashboard interactions, or shared UI work in this repository.
+---
+
+# Dowin Frontend
+
+## Overview
+
+Use this skill for frontend work in `src/app`, `src/components/ui`, `src/context`, and `src/api/generated`.
+
+Read only the files needed for the task.
+
+Start with:
+
+1. `references/frontend-rules.md`
+2. the relevant domain doc
+3. the current page/component implementation
+4. API contract/generated client files when needed
+
+If current code and docs differ, verify the implementation and preserve established patterns.
+
+## DOWIN Frontend Facts
+
+- Prefer `src/components/ui` shared components before creating new ones.
+- Shared UI should remain unopinionated; inject styling at usage sites.
+- Use `asChild` when a `Button` wraps `Link`.
+- React 19 means new `forwardRef` wrappers should not be introduced by default.
+- Use Lucide React for icons.
+- When a page owns both local client state and TanStack Query server-state logic, split them into domain hooks instead of keeping both concerns in the page component.
+- Put local form state, field handlers, and client-side validation in a dedicated `use...Form` hook.
+- Put TanStack Query mutations, cache invalidation, toast handling, and navigation side effects in a dedicated domain hook such as `use...Mutation`.
+- Page-local status components such as skeleton, empty, error, and no-workspace states should stay in the same page/domain file by default.
+- Declare those page-local status components near the bottom of the file, like private helpers for the main page/domain component, unless they are reused across multiple files.
+- Use Zod for form validation.
+- For server state, use generated Orval hooks and TanStack Query patterns.
+- After mutations, invalidate related queries.
+- For user-facing UI copy, use `next-intl` translations instead of hardcoded strings. Add or update matching keys in `src/messages/ko.json` and `src/messages/en.json` when introducing or changing visible text.
+- Do not introduce `useSearchParams()` in a page path unless it is wrapped by a `Suspense` boundary. If the value can be resolved on the server, prefer reading the page `searchParams` prop and passing it down instead.
+- Treat date display and date-key generation in the UI as KST-based unless the current feature explicitly requires another timezone.
+- Keep mobile behavior in scope, especially dashboard and scoreboard flows.
+- When creating commits, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `feat|fix|docs|chore|refactor|style` with the format `<type>: <변경 요약>`.
+
+For detailed file paths and doc priorities, read `references/frontend-rules.md`.
+
+## Workflow
+
+### 1. Identify the UI boundary
+
+Decide whether the change belongs in:
+
+- `src/components/ui` for shared primitives
+- `src/app/<domain>/_components` for domain UI
+- `src/app/<domain>/_hooks` for domain hooks
+- `src/context` or shared hooks only if the concern is truly cross-domain
+
+If a page starts accumulating input state, validation, mutation wiring, invalidation, toast calls, and navigation effects together, move that logic into `_hooks` before adding more UI code.
+
+### 2. Confirm data shape before coding
+
+If the UI depends on API data:
+
+1. inspect `src/api-spec/openapi.yaml`
+2. inspect generated hooks in `src/api/generated`
+3. inspect existing consumers before creating new fetch patterns
+
+When contracts change, regenerate the client.
+
+### 3. Implement with the existing visual language
+
+- preserve the current DOWIN aesthetic and utility patterns
+- keep loading, empty, error, and success states explicit
+- prefer keeping skeleton, empty, and similar fallback UIs as page-local helpers in the same file instead of splitting them into separate top-level files too early
+- keep page components focused on composition and rendering; move form state and server-state orchestration into domain hooks when the logic is non-trivial
+- use toast feedback for meaningful actions
+- keep forms and buttons disabled during pending submissions when needed
+- avoid new hardcoded user-facing Korean or English strings in components; wire visible labels, empty states, errors, tooltips, button text, and status copy through `useTranslations` or the established server translation pattern
+
+### 4. Storybook rule
+
+If a shared UI component is added or materially changed, add or update a story in `src/components/ui/stories`.
+
+### 5. Verify
+
+Run the smallest useful set first:
+
+```bash
+yarn tsc --noEmit
+yarn lint
+yarn eslint <changed-files>
+```
+
+Then run broader checks when the change is substantial:
+
+```bash
+yarn storybook
+yarn test
+yarn test:storybook --run
+```
+
+### 6. Commit order
+
+When frontend work is committed in multiple steps, prefer this order:
+
+1. `gen:api`
+2. UI
+3. API integration
+4. docs
+
+Apply `gen:api` only when the API contract actually changed. If there is no contract change, start from UI or API integration as appropriate.
+
+## Frontend Checklist
+
+- Is this in the correct layer and directory?
+- Did shared UI get reused before creating a new primitive?
+- If a button navigates, is `asChild` used correctly?
+- Are loading, empty, and error states handled?
+- Are page-local skeleton, empty, error, and no-workspace UIs kept in the same file near the bottom unless reuse justifies extraction?
+- If the page mixes local form state and TanStack Query mutation logic, did you split them into domain hooks with clear responsibilities?
+- If server state changed, were related queries invalidated?
+- If query-string state is needed, did you choose between server `searchParams` props and client `useSearchParams()` intentionally, and add `Suspense` when using the client hook?
+- Are new or changed visible UI strings covered in both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded?
+- If API contracts changed, was `yarn gen:api` run?
+- If shared UI changed, was Storybook updated?
+- Was mobile layout considered?
+
+## Output Contract
+
+When finishing frontend work, report with this shape by default:
+
+```text
+stage: frontend
+status: pass|needs_revision|fail
+summary: 한두 문장 요약
+findings:
+- ...
+failure_categories:
+- ...
+return_to: planning|backend|frontend|none
+next_step: 다음 단계 또는 검증
+```
+
+Use these frontend-oriented categories when relevant:
+
+- `api_contract_mismatch`
+- `state_handling_gap`
+- `rollback_gap`
+- `missing_test`
+- `doc_impl_drift`
+
+Return rules:
+
+- `pass`
+  - UI integration, state handling, and relevant verification are ready for review
+- `needs_revision`
+  - frontend fixes are needed, but the task should stay in `frontend`
+- `fail`
+  - return to `backend` when the blocking issue is contract or API behavior; return to `planning` when the scope itself is wrong; otherwise return to `frontend`
+
+## When To Update Docs
+
+Update docs when frontend conventions or user-facing flows change materially:
+
+- relevant domain doc in `docs/dev/`
+- `docs/onboarding.md`
+- this skill or `references/frontend-rules.md` if the frontend standard itself changed
+
+## Next Step
+
+After frontend integration is finished, run `dowin-security-check` on the final changed path before treating the work as complete.

@@ -46,7 +46,7 @@ export async function breakWeeklyFocusTie(
       model: google(config.model),
       schema: weeklyFocusChoiceSchema,
       prompt: [
-        `WIG goal: ${input.goalName}`,
+        `DOWIN goal: ${input.goalName}`,
         "Choose exactly one lead measure id that should be nudged first this week.",
         "Only choose from the candidates below.",
         JSON.stringify(input.candidates),

@@ -36,7 +36,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   );
 
   const cookieStore = await cookies();
-  cookieStore.set("wig_sid", sessionId, {
+  cookieStore.set("dowin_sid", sessionId, {
     httpOnly: true,
     secure: SESSION_COOKIE_SECURE,
     sameSite: "lax",
