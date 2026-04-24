@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ICON_MAP, IconName, WigIcon } from "../WigIcon";
 
 const meta: Meta<typeof WigIcon> = {
