@@ -19,7 +19,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import { Checkmark20Regular, Copy20Regular, People20Regular, ShieldLock20Regular, TicketDiagonal20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
@@ -119,7 +119,7 @@ export default function ProfileInvitesPage() {
 
         <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <TicketDiagonal20Regular className="h-5 w-5" />
+            <WigIcon name="domain-ticket-diagonal" size="20px" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-text-primary">
@@ -277,12 +277,12 @@ export default function ProfileInvitesPage() {
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
-                              <Checkmark20Regular className="h-3.5 w-3.5" />{" "}
+                              <WigIcon name="status-checkmark" size="14px" />{" "}
                               {t("copiedLabel")}
                             </span>
                           ) : (
                             <span className="flex items-center gap-1.5">
-                              <Copy20Regular className="h-3.5 w-3.5" /> {t("copyCode")}
+                              <WigIcon name="action-copy" size="14px" /> {t("copyCode")}
                             </span>
                           )}
                         </Button>
@@ -359,7 +359,7 @@ function NoWorkspaceState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <People20Regular className="h-5 w-5" />
+            <WigIcon name="domain-people" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">
@@ -383,7 +383,7 @@ function NoAccessState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <ShieldLock20Regular className="h-5 w-5" />
+            <WigIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">

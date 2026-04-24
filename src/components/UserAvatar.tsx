@@ -5,7 +5,7 @@ import {
   getProfileAvatarSrc,
   type ProfileAvatarKey,
 } from "@/domain/profile/avatar-options";
-import { Person24Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import Image from "next/image";
 import { useRef } from "react";
 
@@ -50,7 +50,8 @@ export function UserAvatar({
         <div
           className={`flex h-full w-full items-center justify-center bg-primary/10 text-primary ${radiusClassName}`}
         >
-          <Person24Regular
+          <WigIcon
+            name="domain-person"
             className="h-1/2 w-1/2"
             aria-hidden="true"
           />

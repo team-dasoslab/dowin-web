@@ -2,7 +2,7 @@
 
 import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/wig.schemas";
 import { Button } from "@/components/ui/Button";
-import { Info20Regular, Navigation20Regular, Settings20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -15,12 +15,12 @@ type LeadMeasureGuideTooltipProps = {
 
 const guideStyles = {
   [WeeklyLogGuideKind.change]: {
-    icon: Navigation20Regular,
+    icon: "nav-compass",
     iconClassName: "text-rose-600",
     triggerClassName: "text-rose-600 hover:text-rose-700",
   },
   [WeeklyLogGuideKind.adjust]: {
-    icon: Settings20Regular,
+    icon: "nav-settings",
     iconClassName: "text-amber-500",
     triggerClassName: "text-amber-500 hover:text-amber-600",
   },
@@ -33,7 +33,7 @@ export function LeadMeasureGuideTooltip({
   onToggle,
 }: LeadMeasureGuideTooltipProps) {
   const style = guideStyles[guide.kind];
-  const Icon = style.icon;
+  const iconName = style.icon;
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [position, setPosition] = useState<{ left: number; top: number } | null>(
     null,
@@ -79,7 +79,7 @@ export function LeadMeasureGuideTooltip({
         className={`inline-flex h-4 w-4 items-center justify-center transition-colors ${style.triggerClassName}`}
         aria-label={t("ariaLabel")}
       >
-        <Info20Regular className={`h-3 w-3 ${style.iconClassName}`} />
+        <WigIcon name="status-info" size="12px" className={style.iconClassName} />
       </Button>
 
       {active ? (
@@ -97,7 +97,7 @@ export function LeadMeasureGuideTooltip({
             }
           >
             <div className="mb-2 flex items-center gap-1.5">
-              <Icon className={`h-3.5 w-3.5 ${style.iconClassName}`} />
+              <WigIcon name={iconName} size="14px" className={style.iconClassName} />
               <p className="text-[10px] font-bold text-text-primary">
                 {guide.kind === WeeklyLogGuideKind.change
                   ? t("changeProposal")

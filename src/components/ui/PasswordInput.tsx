@@ -1,5 +1,5 @@
 import { Input, type InputProps } from "@/components/ui/Input";
-import { Eye20Regular, EyeOff20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -33,9 +33,9 @@ export const PasswordInput = ({
           className={toggleClassName}
         >
           {isVisible ? (
-            <EyeOff20Regular className="h-3.5 w-3.5" />
+            <WigIcon name="auth-eye-off" size="14px" />
           ) : (
-            <Eye20Regular className="h-3.5 w-3.5" />
+            <WigIcon name="auth-eye" size="14px" />
           )}
           <span className={toggleLabelClassName}>
             {isVisible ? t("hide") : t("show")}

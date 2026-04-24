@@ -2,7 +2,7 @@ import { LeadMeasureSummary } from "@/app/[locale]/(protected)/dashboard/_compon
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { AchievementProgress } from "@/app/[locale]/(protected)/dashboard/_components/AchievementProgress";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
-import { Checkmark20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 
 type MonthlyLeadMeasure = NonNullable<
@@ -210,7 +210,7 @@ function MonthlyMobileMeasureDay({
         }`}
       >
         {value === true ? (
-          <Checkmark20Regular className="h-3.5 w-3.5" />
+          <WigIcon name="action-checkmark" size="14px" />
         ) : date ? (
           date.slice(8, 10)
         ) : (

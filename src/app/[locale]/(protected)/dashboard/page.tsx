@@ -16,11 +16,7 @@ import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { cn } from "@/lib/utils";
-import {
-  Add20Filled,
-  Flash20Filled,
-  People20Regular,
-} from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EmptyStatePanel } from "../_components/EmptyStatePanel";
@@ -272,7 +268,6 @@ export default function DashboardPage() {
 }
 
 function DashboardLoadingState() {
-  const t = useTranslations("Dashboard");
   return (
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
@@ -293,7 +288,7 @@ function DashboardNoWorkspaceState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<People20Regular className="w-5 h-5 text-primary" />}
+          icon={<WigIcon name="domain-people" size="20px" className="text-primary" />}
           title={t("noWorkspaceTitle")}
           description={t("noWorkspaceDesc")}
           actions={<NoWorkspaceActions />}
@@ -309,7 +304,7 @@ function DashboardNoScoreboardState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Flash20Filled className="w-5 h-5 text-primary" />}
+          icon={<WigIcon name="domain-flash-active" size="20px" className="text-primary" />}
           title={t("noScoreboardTitle")}
           description={t("noScoreboardDesc")}
           actions={
@@ -318,7 +313,7 @@ function DashboardNoScoreboardState() {
               className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
-                <Add20Filled className="w-4 h-4" />
+                <WigIcon name="action-add-active" size="16px" />
                 {t("createScoreboard")}
               </Link>
             </Button>

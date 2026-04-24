@@ -1,6 +1,6 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
-import { Save20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 
 interface SetupSubmitButtonProps {
@@ -33,7 +33,7 @@ export function SetupSubmitButton({
         <InlineSpinner />
       ) : (
         <>
-          <Save20Regular className="h-3.5 w-3.5" />
+          <WigIcon name="action-save" size="14px" />
           {isEditMode ? t("saveChanges") : t("createScoreboard")}
         </>
       )}
