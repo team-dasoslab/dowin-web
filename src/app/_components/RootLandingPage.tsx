@@ -1,19 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
-import {
-  ArrowRight24Regular,
-  Board24Regular,
-  CalendarLtr24Regular,
-  Checkmark24Regular,
-  DataTrending24Regular,
-  Flash24Regular,
-  People24Regular,
-  Pulse24Regular,
-  TargetArrow24Regular,
-  TextAlignLeft24Regular,
-  ArrowTrending24Regular,
-} from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
@@ -32,7 +20,7 @@ export function RootLandingPage() {
       <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between bg-white/70 px-4 md:px-8 xl:px-12 backdrop-blur-xl border-b border-slate-200/50">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-slate-900 text-white">
-            <Flash24Regular className="h-4 w-4" />
+            <WigIcon name="domain-flash-large" size="16px" />
           </div>
           <p className="font-outfit text-[22px] font-black tracking-tight text-slate-900">
             WIG
@@ -104,23 +92,30 @@ export function RootLandingPage() {
               {/* Sidebar */}
               <div className="w-[80px] lg:w-[240px] border-r border-slate-200 bg-white p-4 shrink-0 hidden md:block">
                 <div className="w-full h-10 rounded-xl bg-primary/10 mb-6 flex lg:px-4 items-center justify-center lg:justify-start gap-3">
-                  <Flash24Regular className="w-5 h-5 text-primary" />
+                  <WigIcon name="domain-flash-large" size="20px" className="text-primary" />
                   <span className="hidden lg:block font-bold text-primary text-sm">
                     {t("Mockup.workspace")}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {[Board24Regular, TextAlignLeft24Regular, DataTrending24Regular, People24Regular].map(
-                    (Icon, idx) => (
-                      <div
-                        key={idx}
-                        className={`w-full h-10 rounded-xl flex items-center px-4 gap-3 ${idx === 0 ? "bg-slate-100 text-slate-900" : "text-slate-400"}`}
-                      >
-                        <Icon className="w-5 h-5 mx-auto lg:mx-0 shrink-0" />
-                        <div className="hidden lg:block h-3 w-16 bg-current rounded-full opacity-20" />
-                      </div>
-                    ),
-                  )}
+                  {[
+                    "domain-board",
+                    "action-align-left",
+                    "domain-trending",
+                    "domain-people-large",
+                  ].map((iconName, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-full h-10 rounded-xl flex items-center px-4 gap-3 ${idx === 0 ? "bg-slate-100 text-slate-900" : "text-slate-400"}`}
+                    >
+                      <WigIcon
+                        name={iconName as any}
+                        size="20px"
+                        className="mx-auto lg:mx-0 shrink-0"
+                      />
+                      <div className="hidden lg:block h-3 w-16 bg-current rounded-full opacity-20" />
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -130,7 +125,7 @@ export function RootLandingPage() {
                 <div className="flex flex-wrap gap-4">
                   <div className="w-full lg:w-1/3 bg-white border border-slate-200 rounded-[24px] p-6">
                     <p className="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-2 gap-2 flex items-center">
-                      <TargetArrow24Regular className="w-4 h-4" />{" "}
+                      <WigIcon name="domain-target-arrow-large" size="16px" />{" "}
                       {t("Mockup.stats.wigTitle")}
                     </p>
                     <h3 className="text-xl font-bold text-slate-800 tracking-tight leading-snug mb-5 whitespace-pre-line">
@@ -153,7 +148,7 @@ export function RootLandingPage() {
                   <div className="flex-1 bg-white border border-slate-200 rounded-[24px] p-6 min-w-[300px]">
                     <div className="flex justify-between items-center mb-6">
                       <p className="text-[13px] font-bold text-slate-400 uppercase tracking-wider gap-2 flex items-center">
-                        <Pulse24Regular className="w-4 h-4" />{" "}
+                        <WigIcon name="domain-pulse-large" size="16px" />{" "}
                         {t("Mockup.stats.leadTitle")}
                       </p>
                       <span className="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-bold">
@@ -301,7 +296,7 @@ export function RootLandingPage() {
                 <div className="absolute inset-0 bg-blue-100 rounded-full blur-[80px] opacity-50" />
                 <div className="relative bg-white rounded-[24px] p-6 border border-slate-200">
                   <div className="h-48 w-full bg-slate-50 rounded-[20px] border border-slate-100 flex flex-col items-center justify-center text-center px-6">
-                    <TargetArrow24Regular className="w-10 h-10 text-blue-500 mb-4" />
+                    <WigIcon name="domain-target-arrow-large" size="40px" className="text-blue-500 mb-4" />
                     <p className="text-[20px] font-bold text-slate-800">
                       {t("WhyWig.item1VisualGoal")}
                     </p>
@@ -320,12 +315,12 @@ export function RootLandingPage() {
                 <div className="relative bg-white rounded-[24px] p-6 border border-slate-200">
                   <div className="h-40 w-full bg-slate-50 rounded-[16px] border border-slate-100 p-6 flex flex-col justify-center">
                     <p className="font-bold text-slate-600 mb-4 flex items-center gap-2 text-[14px]">
-                      <Pulse24Regular className="w-5 h-5 text-emerald-500" />
+                      <WigIcon name="domain-pulse-large" size="20px" className="text-emerald-500" />
                       {t("WhyWig.item2VisualTitle")}
                     </p>
                     <div className="bg-white rounded-xl h-14 border border-slate-200 flex items-center px-4 gap-4">
                       <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <Checkmark24Regular className="w-4 h-4" />
+                        <WigIcon name="status-checkmark-large" size="16px" />
                       </div>
                       <p className="font-bold text-slate-800 text-[14px]">
                         {t("WhyWig.item2VisualAction")}
@@ -421,7 +416,7 @@ export function RootLandingPage() {
                       key={i}
                       className={`w-10 h-10 rounded-lg flex items-center justify-center border ${i < 3 ? "bg-primary border-primary" : "bg-transparent border-white/20 text-white/20"}`}
                     >
-                      <Checkmark24Regular className="w-5 h-5" />
+                      <WigIcon name="status-checkmark-large" size="20px" />
                     </div>
                   ))}
                 </div>
@@ -475,13 +470,13 @@ export function RootLandingPage() {
                 </p>
               </div>
               <div className="absolute right-0 bottom-0 top-0 w-[50%] bg-gradient-to-l from-primary/5 to-transparent flex items-center justify-end pr-8">
-                <ArrowTrending24Regular className="w-32 h-32 text-primary/10 transition-transform" />
+                <WigIcon name="domain-trending" size="128px" className="text-primary/10 transition-transform" />
               </div>
             </div>
 
             <div className="md:col-span-4 bg-primary rounded-[24px] p-8 text-white relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl transition-transform" />
-              <Board24Regular className="w-8 h-8 mb-6" />
+              <WigIcon name="domain-board" size="32px" className="mb-6" />
               <h4 className="text-[20px] font-black mb-2">
                 {t("Features.item2Title")}
               </h4>
@@ -491,7 +486,7 @@ export function RootLandingPage() {
             </div>
 
             <div className="md:col-span-5 bg-white rounded-[24px] border border-slate-200 p-8 transition-all overflow-hidden relative">
-              <CalendarLtr24Regular className="w-8 h-8 text-slate-300 transition-colors mb-6" />
+              <WigIcon name="domain-calendar-large" size="32px" className="text-slate-300 transition-colors mb-6" />
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
                 {t("Features.item3Title")}
               </h4>
@@ -502,7 +497,7 @@ export function RootLandingPage() {
 
             <div className="md:col-span-7 bg-white rounded-[24px] border border-slate-200 p-8 transition-all flex flex-col justify-end relative overflow-hidden">
               <div className="absolute top-6 right-6">
-                <TargetArrow24Regular className="w-16 h-16 text-slate-100 transition-all" />
+                <WigIcon name="domain-target-arrow-large" size="64px" className="text-slate-100 transition-all" />
               </div>
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
                 {t("Features.item4Title")}
@@ -518,7 +513,7 @@ export function RootLandingPage() {
       {/* 7. Footer CTA */}
       <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
         <div className="flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-primary to-primary-light mb-10 transition-transform">
-          <Flash24Regular className="h-8 w-8 text-white fill-white" />
+          <WigIcon name="domain-flash-large" size="32px" className="text-white fill-white" />
         </div>
         <h2 className="font-pretendard text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
           {t("Footer.headline")}
@@ -531,7 +526,7 @@ export function RootLandingPage() {
           className="inline-flex h-[60px] items-center justify-center rounded-2xl bg-slate-900 px-10 text-[18px] font-bold text-white transition-all"
         >
           <Link href="/login">
-            {t("Footer.cta")} <ArrowRight24Regular className="ml-3 h-5 w-5 opacity-70" />
+            {t("Footer.cta")} <WigIcon name="action-arrow-right" size="20px" className="ml-3 opacity-70" />
           </Link>
         </Button>
         <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider uppercase">

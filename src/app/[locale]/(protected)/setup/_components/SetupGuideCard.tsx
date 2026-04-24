@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Info20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 
 export function SetupGuideCard() {
   const t = useTranslations("Setup.guide");
@@ -10,7 +10,7 @@ export function SetupGuideCard() {
     <div className="p-5 bg-white border border-zinc-200 rounded-content space-y-4 animate-linear-in">
       <div className="flex items-center gap-2">
         <div className="w-6 h-6 bg-primary/10 rounded-button flex items-center justify-center">
-          <Info20Regular className="w-3.5 h-3.5 text-primary" />
+          <WigIcon name="status-info" size="14px" className="text-primary" />
         </div>
         <h4 className="text-[11px] font-black text-zinc-900 uppercase tracking-widest">
           {t("title")}

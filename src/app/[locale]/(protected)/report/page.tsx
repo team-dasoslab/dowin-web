@@ -18,11 +18,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import {
-  ArrowTrending20Regular,
-  CalendarLtr20Regular,
-  ChartMultiple20Regular,
-} from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -323,7 +319,7 @@ export default function ReportPage() {
                             {t("winRate.desc")}
                           </p>
                         </div>
-                        <ArrowTrending20Regular className="h-4 w-4 shrink-0 text-[#5e6ad2]" />
+                        <WigIcon name="domain-trending" size="16px" className="shrink-0 text-[#5e6ad2]" />
                       </div>
                       <WinRateOverview
                         winningCount={summary.winningCount}
@@ -937,7 +933,7 @@ function ReportNoWorkspaceState() {
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
-            <ChartMultiple20Regular className="h-5 w-5 text-primary" />
+            <WigIcon name="nav-report" size="20px" className="text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
             {t("states.noWorkspaceTitle")}
@@ -962,7 +958,7 @@ function ReportForbiddenState() {
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
-            <ChartMultiple20Regular className="h-5 w-5 text-primary" />
+            <WigIcon name="nav-report" size="20px" className="text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
             {t("states.forbiddenTitle")}
@@ -989,7 +985,7 @@ function ReportErrorState({ onRetry }: { onRetry: () => void }) {
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
-            <ChartMultiple20Regular className="h-5 w-5 text-primary" />
+            <WigIcon name="nav-report" size="20px" className="text-primary" />
           </div>
           <h1 className="text-xl font-bold text-text-primary">
             {t("states.errorTitle")}

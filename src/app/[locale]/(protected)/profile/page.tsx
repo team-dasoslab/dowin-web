@@ -7,7 +7,6 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { SubPageLayout } from "@/app/[locale]/(protected)/_components/SubPageLayout";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
@@ -26,21 +25,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import {
-  Alert20Regular,
-  ArrowDownload20Regular,
-  Chat20Regular,
-  ChevronRight20Regular,
-  Delete20Regular,
-  Edit20Regular,
-  Key20Regular,
-  LocalLanguage20Regular,
-  Payment20Regular,
-  People20Regular,
-  Premium20Regular,
-  SignOut20Regular,
-  TicketDiagonal20Regular,
-} from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -124,7 +109,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "language",
-          icon: <LocalLanguage20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="domain-language" className="w-4 h-4" />,
           title: t("languageTitle"),
           description: t("languageDesc"),
           rightElement: <LocaleSwitcher />,
@@ -137,7 +122,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "nickname",
-          icon: <Edit20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="action-edit" className="w-4 h-4" />,
           title: t("nicknameChangeTitle"),
           description: t("nicknameChangeDesc"),
           danger: false,
@@ -147,14 +132,14 @@ export default function ProfilePage() {
         },
         {
           id: "password",
-          icon: <Key20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="auth-key" className="w-4 h-4" />,
           title: t("passwordChangeTitle"),
           description: t("passwordChangeDesc"),
           href: "/profile/password",
         },
         {
           id: "logout",
-          icon: <SignOut20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="auth-sign-out" className="w-4 h-4" />,
           title: t("logoutTitle"),
           description: t("logoutDesc"),
           danger: false,
@@ -164,7 +149,7 @@ export default function ProfilePage() {
         },
         {
           id: "account-delete",
-          icon: <Delete20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="action-delete" className="w-4 h-4" />,
           title: t("deleteAccountTitle"),
           description: t("deleteAccountDesc"),
           danger: true,
@@ -180,14 +165,14 @@ export default function ProfilePage() {
           ? [
               {
                 id: "billing",
-                icon: <Payment20Regular className="w-4 h-4" />,
+                icon: <WigIcon name="domain-payment" className="w-4 h-4" />,
                 title: t("billingTitle"),
                 description: t("billingDesc"),
                 href: "/profile/billing",
               },
               {
                 id: "workspace-name",
-                icon: <Edit20Regular className="w-4 h-4" />,
+                icon: <WigIcon name="action-edit" className="w-4 h-4" />,
                 title: t("changeWorkspaceName"),
                 description: t("changeWorkspaceNameDesc"),
                 onClick: () => {
@@ -196,21 +181,21 @@ export default function ProfilePage() {
               },
               {
                 id: "members",
-                icon: <People20Regular className="w-4 h-4" />,
+                icon: <WigIcon name="domain-people" className="w-4 h-4" />,
                 title: t("manageMembers"),
                 description: t("manageMembersDesc"),
                 href: "/profile/members",
               },
               {
                 id: "invites",
-                icon: <TicketDiagonal20Regular className="w-4 h-4" />,
+                icon: <WigIcon name="domain-ticket" className="w-4 h-4" />,
                 title: t("manageInvites"),
                 description: t("manageInvitesDesc"),
                 href: "/profile/invites",
               },
               {
                 id: "workspace-delete",
-                icon: <Delete20Regular className="w-4 h-4" />,
+                icon: <WigIcon name="action-delete" className="w-4 h-4" />,
                 title: t("workspaceDelete"),
                 description: t("workspaceDeleteDescFull"),
                 danger: true,
@@ -222,7 +207,7 @@ export default function ProfilePage() {
           : [
               {
                 id: "workspace-leave",
-                icon: <SignOut20Regular className="w-4 h-4" />,
+                icon: <WigIcon name="auth-sign-out" className="w-4 h-4" />,
                 title: t("workspaceLeave"),
                 description: t("workspaceLeaveDescFull"),
                 danger: true,
@@ -241,7 +226,7 @@ export default function ProfilePage() {
           ? [
               {
                 id: "export",
-                icon: <ArrowDownload20Regular className="w-4 h-4" />,
+                icon: <WigIcon name="action-download" className="w-4 h-4" />,
                 title: t("csvDownload"),
                 description: t("csvDownloadDesc"),
                 href: "/profile/export",
@@ -255,7 +240,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "push-notification",
-          icon: <Alert20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="status-alert" className="w-4 h-4" />,
           title: t("pushReminder"),
           description: t("pushReminderDesc"),
           rightElement: (
@@ -284,7 +269,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "updates",
-          icon: <Premium20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="status-premium" className="w-4 h-4" />,
           title: t("newFeatures"),
           description: t("newFeaturesDesc"),
           href: "/updates",
@@ -298,7 +283,7 @@ export default function ProfilePage() {
         }, */
         {
           id: "contact",
-          icon: <Chat20Regular className="w-4 h-4" />,
+          icon: <WigIcon name="domain-chat" className="w-4 h-4" />,
           title: t("contactUs"),
           description: t("contactUsDesc"),
           onClick: () => {
@@ -563,7 +548,7 @@ function MenuItemRow({
         {item.rightElement ? (
           item.rightElement
         ) : (
-          <ChevronRight20Regular className="w-4 h-4 text-zinc-300" />
+          <WigIcon name="nav-chevron-right" className="w-4 h-4 text-zinc-300" />
         )}
       </div>
     </div>

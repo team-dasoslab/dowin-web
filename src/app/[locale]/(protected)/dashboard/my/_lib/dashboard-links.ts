@@ -1,60 +1,53 @@
-import {
-  Archive20Filled,
-  ChartMultiple20Filled,
-  DataTreemap20Filled,
-  People20Filled,
-  Person20Filled,
-  Settings20Filled,
-} from "@fluentui/react-icons";
+import { IconName } from "@/components/ui/WigIcon";
 
 export const MY_DASHBOARD_LINKS: {
   href: string;
-  icon: typeof People20Filled;
-  iconFilled: typeof People20Filled;
+  iconName: IconName;
+  iconNameActive: IconName;
   label: string;
   translationKey: string;
   adminOnly?: boolean;
 }[] = [
   {
     href: "/dashboard",
-    icon: People20Filled,
-    iconFilled: People20Filled,
+    iconName: "nav-team",
+    iconNameActive: "nav-team-active",
     label: "팀 대시보드",
     translationKey: "teamDashboard",
   },
   {
     href: "/dashboard/my",
-    icon: DataTreemap20Filled,
-    iconFilled: DataTreemap20Filled,
+    iconName: "nav-dashboard",
+    iconNameActive: "nav-dashboard-active",
     label: "나의 대시보드",
     translationKey: "myDashboard",
   },
   {
     href: "/report",
-    icon: ChartMultiple20Filled,
-    iconFilled: ChartMultiple20Filled,
+    iconName: "nav-report",
+    iconNameActive: "nav-report-active",
     label: "주간 리포트",
     translationKey: "weeklyReport",
     adminOnly: true,
   },
   {
     href: "/scoreboards",
-    icon: Archive20Filled,
-    iconFilled: Archive20Filled,
+    iconName: "nav-archive",
+    iconNameActive: "nav-archive-active",
     label: "점수판 보관함",
     translationKey: "scoreboardArchive",
   },
   {
     href: "/setup?mode=update",
-    icon: Settings20Filled,
-    iconFilled: Settings20Filled,
+    iconName: "nav-settings",
+    iconNameActive: "nav-settings-active",
     label: "점수판 관리",
     translationKey: "manageScoreboard",
   },
   {
     href: "/profile",
-    icon: Person20Filled,
-    iconFilled: Person20Filled,
+    iconName: "nav-profile",
+    iconNameActive: "nav-profile-active",
     label: "내 프로필",
     translationKey: "myProfile",
   },

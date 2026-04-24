@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Add20Regular, Dismiss20Regular, MoreHorizontal20Regular, Subtract20Regular, Tag20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -83,7 +83,7 @@ export function LeadMeasuresSection({
           onClick={addMeasureRow}
           className="flex w-full items-center justify-center gap-2 py-3 rounded-content border border-zinc-200 bg-white text-sm font-bold text-zinc-500 transition-all hover:text-primary hover:border-primary/30"
         >
-          <Add20Regular className="h-4 w-4" />
+          <WigIcon name="action-add" size="16px" />
           {t("addLeadMeasure")}
         </Button>
       </div>
@@ -209,7 +209,7 @@ function LeadMeasureRow({
               className="flex h-11 w-11 items-center justify-center text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600 disabled:opacity-30 transition-colors"
               aria-label={t("decrement")}
             >
-              <Subtract20Regular className="h-4 w-4" />
+              <WigIcon name="action-subtract" size="16px" />
             </Button>
             <div className="flex h-11 min-w-14 items-center justify-center border-x border-zinc-200 px-3 text-base font-black text-zinc-900 font-mono">
               {measure.targetValue}
@@ -231,7 +231,7 @@ function LeadMeasureRow({
               className="flex h-11 w-11 items-center justify-center text-zinc-400 hover:bg-zinc-50 hover:text-zinc-600 disabled:opacity-30 transition-colors"
               aria-label={t("increment")}
             >
-              <Add20Regular className="h-4 w-4" />
+              <WigIcon name="action-add" size="16px" />
             </Button>
           </div>
           <span className="whitespace-nowrap text-xs font-medium text-text-secondary">
@@ -248,7 +248,7 @@ function LeadMeasureRow({
       >
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <Tag20Regular className="mt-1 h-3.5 w-3.5 shrink-0 text-primary/60" />
+            <WigIcon name="status-tag" size="14px" className="mt-1 shrink-0 text-primary/60" />
             <div className="min-w-0 flex-1 space-y-2">
               <p className="text-[11px] font-black text-zinc-400 uppercase tracking-wider">
                 {t("tagLabel")}
@@ -264,7 +264,7 @@ function LeadMeasureRow({
                       className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white transition-all hover:scale-105 active:scale-95"
                     >
                       #{tag.name}
-                      <Dismiss20Regular className="h-3 w-3" />
+                      <WigIcon name="action-dismiss" size="12px" />
                     </Button>
                   ))}
                 </div>
@@ -399,7 +399,7 @@ function LeadMeasureRow({
                           className="rounded-full p-1 text-text-muted hover:text-text-primary"
                           aria-label={t("edit")}
                         >
-                          <MoreHorizontal20Regular className="h-3 w-3" />
+                          <WigIcon name="action-more" size="12px" />
                         </Button>
                         {openActionTagId === tag.id ? (
                           <>

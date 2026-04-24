@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
-import { Key24Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { z } from "zod";
@@ -100,7 +100,7 @@ export default function AccountRecoveryPageClient() {
       <Card className="w-full max-w-[440px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
         <div className="flex flex-col items-center text-center space-y-4 mb-8">
           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-            <Key24Regular className="text-primary w-6 h-6" />
+            <WigIcon name="auth-key-large" className="text-primary" size="24px" />
           </div>
           <div className="space-y-1.5">
             <h1 className="text-2xl font-bold tracking-tight text-text-primary">

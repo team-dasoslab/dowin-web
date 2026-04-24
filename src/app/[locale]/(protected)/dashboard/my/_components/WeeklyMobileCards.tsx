@@ -7,7 +7,7 @@ import { isEditableDailyLogDate } from "@/app/[locale]/(protected)/dashboard/my/
 import { AchievementProgress } from "@/app/[locale]/(protected)/dashboard/_components/AchievementProgress";
 import { Button } from "@/components/ui/Button";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { Checkmark20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -180,7 +180,7 @@ function WeeklyMobileCardDay({
         }`}
       >
         {value === true ? (
-          <Checkmark20Regular className="mx-auto h-3.5 w-3.5" />
+          <WigIcon name="action-checkmark" size="14px" className="mx-auto" />
         ) : (
           <span className="text-[10px] font-mono">{date.slice(8, 10)}</span>
         )}

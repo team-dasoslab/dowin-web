@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Link from "next/link";
-import { Home20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 
 type Locale = "ko" | "en";
 
@@ -74,7 +74,7 @@ export function NotFoundPage({
               className="btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm"
             >
               <Link href={homeHref}>
-                <Home20Regular className="h-4 w-4" />
+                <WigIcon name="nav-home" size="16px" />
                 {copy.goHome}
               </Link>
             </Button>

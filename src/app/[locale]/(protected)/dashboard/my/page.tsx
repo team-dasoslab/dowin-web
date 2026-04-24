@@ -21,7 +21,7 @@ import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { Add20Filled, Flash20Filled } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -354,7 +354,7 @@ function NoWorkspaceState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Flash20Filled className="w-5 h-5 text-primary" />}
+          icon={<WigIcon name="domain-flash-active" size="20px" className="text-primary" />}
           title={t("noWorkspaceTitle")}
           description={
             <div className="whitespace-pre-line">{t("noWorkspaceDesc")}</div>
@@ -372,7 +372,7 @@ function NoScoreboardState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Flash20Filled className="w-5 h-5 text-primary" />}
+          icon={<WigIcon name="domain-flash-active" size="20px" className="text-primary" />}
           title={t("noScoreboardTitle")}
           description={
             <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>
@@ -383,7 +383,7 @@ function NoScoreboardState() {
               className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
-                <Add20Filled className="w-4 h-4" />
+                <WigIcon name="action-add-active" size="16px" />
                 {t("createScoreboard")}
               </Link>
             </Button>
@@ -411,7 +411,7 @@ function MyDashboardEmptyHeader({
         {variant === "no-workspace" ? (
           <>
             <div className="w-9 h-9 bg-primary/10 rounded-content flex items-center justify-center border border-primary/20 text-primary shrink-0">
-              <Flash20Filled className="w-4 h-4" />
+              <WigIcon name="domain-flash-active" size="16px" />
             </div>
             <div className="min-w-0">
               <h1 className="text-base font-bold tracking-tight text-text-primary truncate">
@@ -435,14 +435,18 @@ function MyDashboardEmptyHeader({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        {links.map(({ href, icon: Icon, translationKey }) => (
+        {links.map(({ href, iconName, translationKey }) => (
           <Button
             key={href}
             asChild
             className="flex-1 sm:flex-none justify-center px-3 py-2 bg-white border border-border rounded-content text-xs font-bold text-text-primary hover:border-[rgba(205,207,213,1)] transition-colors flex items-center gap-1.5 min-w-fit"
           >
             <Link href={href}>
-              <Icon className="w-3.5 h-3.5 text-text-muted shrink-0" />
+              <WigIcon
+                name={iconName}
+                size="14px"
+                className="text-text-muted shrink-0"
+              />
               <span>{t(translationKey)}</span>
             </Link>
           </Button>
