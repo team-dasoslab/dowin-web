@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
-import { Checkmark20Regular, Copy20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -38,9 +38,9 @@ export function CopyServiceLinkButton() {
       type="button"
     >
       {isCopied ? (
-        <Checkmark20Regular className="h-3.5 w-3.5 text-primary" />
+        <WigIcon name="status-checkmark" size="14px" className="text-primary" />
       ) : (
-        <Copy20Regular className="h-3.5 w-3.5 text-text-muted" />
+        <WigIcon name="action-copy" size="14px" className="text-text-muted" />
       )}
       {isCopied ? t("Common.copyDone") : tPage("copyLinkButton")}
     </Button>

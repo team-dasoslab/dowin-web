@@ -1,6 +1,6 @@
 "use client";
 
-import { Dismiss16Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import {
   createContext,
   ReactNode,
@@ -92,7 +92,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               onClick={() => removeToast(toast.id)}
               className="p-1 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
             >
-              <Dismiss16Regular />
+              <WigIcon name="action-dismiss" size="16px" />
             </button>
           </div>
         ))}

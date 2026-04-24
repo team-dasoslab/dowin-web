@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { ArrowCounterclockwise20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 
 type ArchivedScoreboardItem = {
@@ -68,7 +68,7 @@ export function ArchivedScoreboardsSection({
                         className="border-text-secondary/20 border-t-text-secondary"
                       />
                     ) : (
-                      <ArrowCounterclockwise20Regular className="w-3.5 h-3.5" />
+                      <WigIcon name="action-undo" size="14px" />
                     )}
                     {pendingActionId === scoreboardId
                       ? t("reactivating")

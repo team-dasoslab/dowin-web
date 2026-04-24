@@ -4,7 +4,7 @@ import type { WorkspaceMember } from "@/api/generated/wig.schemas";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { PersonDelete20Regular, ShieldLock20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 
 interface MemberListItemProps {
   member: WorkspaceMember;
@@ -78,7 +78,7 @@ export function MemberListItem({
             onClick={() => onTransferAdmin(memberId, nickname)}
             className="flex min-w-fit items-center justify-center gap-1.5 rounded-content border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/10"
           >
-            <ShieldLock20Regular className="h-3.5 w-3.5" />
+            <WigIcon name="status-locked" size="14px" />
             <span>{isPendingTransfer ? t("processing") : t("transferAdmin")}</span>
           </Button>
         ) : null}
@@ -93,7 +93,7 @@ export function MemberListItem({
               : "cursor-not-allowed border border-border bg-sub-background text-text-muted"
           }`}
         >
-          <PersonDelete20Regular className="h-3.5 w-3.5" />
+          <WigIcon name="action-member-remove" size="14px" />
           <span>{isPendingDelete ? t("processing") : t("remove")}</span>
         </Button>
       </div>

@@ -1,7 +1,7 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { ActionRow } from "@/components/ui/ActionRow";
 import { Button } from "@/components/ui/Button";
-import { Archive20Regular } from "@fluentui/react-icons";
+import { WigIcon } from "@/components/ui/WigIcon";
 import { useTranslations } from "next-intl";
 
 interface SetupManageSectionProps {
@@ -39,7 +39,7 @@ export function SetupManageSection({
                 className="border-text-secondary/20 border-t-text-secondary"
               />
             ) : (
-              <Archive20Regular className="h-3.5 w-3.5" />
+              <WigIcon name="action-archive" size="14px" />
             )}
             {isArchivePending ? t("archivingBtn") : t("archiveBtn")}
           </Button>
