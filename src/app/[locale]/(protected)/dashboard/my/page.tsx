@@ -21,6 +21,7 @@ import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -353,7 +354,7 @@ function NoWorkspaceState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<DowinIcon name="domain-flash-active" size="20px" className="text-primary" />}
+          icon={<Logo size="20px" className="text-primary" />}
           title={t("noWorkspaceTitle")}
           description={
             <div className="whitespace-pre-line">{t("noWorkspaceDesc")}</div>
@@ -371,7 +372,7 @@ function NoScoreboardState() {
     <div className="min-h-screen bg-zinc-50/50 font-pretendard">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<DowinIcon name="domain-flash-active" size="20px" className="text-primary" />}
+          icon={<Logo size="20px" className="text-primary" />}
           title={t("noScoreboardTitle")}
           description={
             <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>

@@ -2,6 +2,7 @@ import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/
 import { Card } from "@/components/ui/Card";
 import { StatCard } from "@/components/ui/StatCard";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
 type WeeklyTrendPoint = {
@@ -40,7 +41,7 @@ export function ScoreboardOverviewSection({
           <div className="flex flex-col gap-4 border-b border-zinc-200 px-4 py-4 sm:px-6">
             <div className="flex flex-row items-center gap-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                <DowinIcon name="domain-flash" size="16px" className="text-primary" />
+                <Logo size="16px" className="text-primary" />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-primary">

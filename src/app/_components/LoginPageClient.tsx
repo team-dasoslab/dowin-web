@@ -11,6 +11,7 @@ import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation";
@@ -278,7 +279,7 @@ export default function LoginPageClient() {
       <Card className="w-full max-w-[380px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
         <div className="flex flex-col items-center text-center space-y-4 mb-10">
           <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-            <DowinIcon name="domain-flash" className="text-primary" size="24px" />
+            <Logo className="text-primary" size="24px" />
           </div>
           <div className="space-y-1.5">
             <h1 className="text-2xl font-bold tracking-tight text-text-primary">

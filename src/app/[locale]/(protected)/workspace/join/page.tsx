@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Link } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
 export default function JoinWorkspacePage() {
@@ -37,7 +38,7 @@ export default function JoinWorkspacePage() {
 
         <div className="space-y-5">
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-            <DowinIcon name="domain-flash-large" size="24px" className="text-primary" />
+            <Logo size="24px" className="text-primary" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">

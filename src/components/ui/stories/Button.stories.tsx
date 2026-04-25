@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 
 const meta: Meta<typeof Button> = {
@@ -26,7 +27,7 @@ export const Primary: Story = {
   args: {
     children: (
       <div className="flex items-center gap-2">
-        <DowinIcon name="domain-flash" size="16px" className="fill-current" />
+        <Logo size="16px" />
         <span>Primary Action</span>
       </div>
     ),

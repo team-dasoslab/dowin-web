@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
 import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
@@ -20,7 +21,7 @@ export function RootLandingPage() {
       <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between bg-white/70 px-4 md:px-8 xl:px-12 backdrop-blur-xl border-b border-slate-200/50">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-slate-900 text-white">
-            <DowinIcon name="domain-flash-large" size="16px" />
+            <Logo size="16px" />
           </div>
           <p className="font-outfit text-[22px] font-black tracking-tight text-slate-900">
             DOWIN
@@ -92,7 +93,7 @@ export function RootLandingPage() {
               {/* Sidebar */}
               <div className="w-[80px] lg:w-[240px] border-r border-slate-200 bg-white p-4 shrink-0 hidden md:block">
                 <div className="w-full h-10 rounded-xl bg-primary/10 mb-6 flex lg:px-4 items-center justify-center lg:justify-start gap-3">
-                  <DowinIcon name="domain-flash-large" size="20px" className="text-primary" />
+                  <Logo size="20px" className="text-primary" />
                   <span className="hidden lg:block font-bold text-primary text-sm">
                     {t("Mockup.workspace")}
                   </span>
@@ -513,7 +514,7 @@ export function RootLandingPage() {
       {/* 7. Footer CTA */}
       <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
         <div className="flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-primary to-primary-light mb-10 transition-transform">
-          <DowinIcon name="domain-flash-large" size="32px" className="text-white fill-white" />
+          <Logo size="32px" className="text-white" />
         </div>
         <h2 className="font-pretendard text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
           {t("Footer.headline")}

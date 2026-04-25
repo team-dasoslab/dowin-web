@@ -4,6 +4,7 @@ import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
 interface SidebarProps {
@@ -61,7 +62,7 @@ export function Sidebar({
         {/* Workspace Pill */}
         {workspaceName ? (
           <div className="mb-6 flex h-10 w-full items-center justify-center gap-3 rounded-content bg-primary/10 lg:justify-start lg:px-4">
-            <DowinIcon name="domain-flash-active" size="20px" className="text-primary" />
+            <Logo size="20px" className="text-primary" />
             <span className="hidden truncate text-sm font-bold text-primary lg:block">
               {workspaceName}
             </span>
