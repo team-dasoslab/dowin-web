@@ -188,7 +188,7 @@ function ScoreboardsNoWorkspaceState() {
   const td = useTranslations("Dashboard");
   return (
     <div className="min-h-screen bg-zinc-50/50 font-pretendard flex items-center justify-center p-8">
-      <div className="max-w-[420px] w-full space-y-10 animate-linear-in">
+      <div className="max-w-[420px] w-full space-y-10 animate-dowin-in">
         <div className="w-14 h-14 bg-primary/10 rounded-content flex items-center justify-center">
           <Logo className="text-primary" size="28px" />
         </div>

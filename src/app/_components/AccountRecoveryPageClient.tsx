@@ -108,9 +108,9 @@ export default function AccountRecoveryPageClient() {
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 font-pretendard overflow-hidden selection:bg-primary/20">
       {/* Background Grid */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[460px] bg-white border border-zinc-200 rounded-content p-8 md:p-12 animate-linear-in relative z-10">
+      <Card className="w-full max-w-[460px] bg-white border border-zinc-200 rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-10">
           <div className="w-16 h-16 bg-white border border-zinc-200 rounded-2xl flex items-center justify-center">
             <DowinIcon

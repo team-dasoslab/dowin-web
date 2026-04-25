@@ -13,12 +13,12 @@ import { formatWeekLabel } from "@/app/[locale]/(protected)/dashboard/_lib/dashb
 import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/report/_hooks/useTeamWeeklyReport";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -319,7 +319,11 @@ export default function ReportPage() {
                             {t("winRate.desc")}
                           </p>
                         </div>
-                        <DowinIcon name="domain-trending" size="16px" className="shrink-0 text-[#5e6ad2]" />
+                        <DowinIcon
+                          name="domain-trending"
+                          size="16px"
+                          className="shrink-0 text-[#5e6ad2]"
+                        />
                       </div>
                       <WinRateOverview
                         winningCount={summary.winningCount}
@@ -350,7 +354,10 @@ export default function ReportPage() {
             </section>
 
             <section id="trend" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("trend.title")} description={t("trend.desc")} />
+              <SectionHeader
+                title={t("trend.title")}
+                description={t("trend.desc")}
+              />
               <TeamTrendChart
                 trends={report.trends ?? []}
                 workspaceId={report.workspaceId}
@@ -358,7 +365,10 @@ export default function ReportPage() {
             </section>
 
             <section id="focus" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("focus.title")} description={t("focus.desc")} />
+              <SectionHeader
+                title={t("focus.title")}
+                description={t("focus.desc")}
+              />
 
               {summary.focusMembers.length > 0 ? (
                 <FocusMemberList members={summary.focusMembers} />
@@ -377,7 +387,6 @@ export default function ReportPage() {
         </div>
       </ProtectedPageContainer>
     </div>
-
   );
 }
 
@@ -696,7 +705,7 @@ function WinRateOverview({
 
   return (
     <div className="mt-4 space-y-3">
-      <div className="rounded-content border border-border bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-4 py-4">
+      <div className="rounded-content border border-border bg-dowin-surface-gradient px-4 py-4">
         <div className="space-y-1.5">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5e6ad2]">
             {t("winOverview.summaryLabel")}

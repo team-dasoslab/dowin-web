@@ -32,7 +32,7 @@ export const Primary: Story = {
       </div>
     ),
     className:
-      "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+      "btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
   },
 };
 
@@ -41,7 +41,7 @@ export const AsChildLink: Story = {
     asChild: true,
     children: <Link href="#">Go to Dashboard</Link>,
     className:
-      "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+      "btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
   },
 };
 

@@ -9,7 +9,7 @@ export function NoWorkspaceActions() {
     <div className="flex flex-wrap items-center gap-2">
       <Button
         asChild
-        className="btn-linear-primary flex items-center gap-2 rounded-button px-5 py-3 text-sm font-bold"
+        className="btn-dowin-primary flex items-center gap-2 rounded-button px-5 py-3 text-sm font-bold"
       >
         <Link href="/workspace/new">
           <DowinIcon name="action-add" size="16px" />

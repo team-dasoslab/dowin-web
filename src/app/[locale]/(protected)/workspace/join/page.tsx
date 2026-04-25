@@ -28,7 +28,7 @@ export default function JoinWorkspacePage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-4">
       {isPending && <LoadingOverlay message={t("loading")} />}
-      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-linear-in">
+      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-dowin-in">
         <div className="flex items-center gap-3">
           <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 transition-colors shrink-0" />
           <span className="text-xs font-bold text-zinc-400">
@@ -82,7 +82,7 @@ export default function JoinWorkspacePage() {
               className={`w-full py-4 rounded-button text-sm font-black transition-all flex items-center justify-center gap-2 ${
                 isPending || inviteCode.trim().length === 0
                   ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-linear-primary hover:scale-[1.02] active:scale-[0.98]"
+                  : "btn-dowin-primary hover:scale-[1.02] active:scale-[0.98]"
               }`}
             >
               {isPending ? (

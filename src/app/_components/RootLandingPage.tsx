@@ -12,7 +12,7 @@ export function RootLandingPage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-white font-pretendard text-slate-900 selection:bg-primary/20 selection:text-slate-900">
       {/* Background Grid Pattern & Ambient Glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:24px_24px]"></div>
       <div className="pointer-events-none absolute left-0 top-0 h-[800px] w-full overflow-hidden -z-10">
         <div className="absolute -left-1/4 -top-[100px] h-[700px] w-[700px] rounded-full bg-blue-100/30 blur-[120px]" />
         <div className="absolute right-[-10%] top-[10%] h-[600px] w-[600px] rounded-full bg-primary/20 blur-[120px]" />
@@ -361,7 +361,7 @@ export function RootLandingPage() {
         className="bg-slate-900 py-24 md:py-32 text-white relative overflow-hidden"
       >
         {/* Deep perspective grids */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-dowin-grid-pattern bg-[size:64px_64px]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(79,70,229,0.2),transparent_60%)] pointer-events-none" />
 
         <div className="mx-auto max-w-[1200px] px-6 text-center md:px-12 mb-20 md:mb-24 relative z-10">

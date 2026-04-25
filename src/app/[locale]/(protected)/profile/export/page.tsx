@@ -229,7 +229,7 @@ function ExportSkeleton() {
 function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
           title="소속된 워크스페이스가 없어요"
@@ -250,7 +250,7 @@ function NoWorkspaceState() {
 function NoScoreboardState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
           title="아직 가중목이 없어요"
@@ -264,7 +264,7 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+              className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
               <Link href="/setup?mode=create">
                 <DowinIcon name="action-add" size="16px" />새 점수판 만들기

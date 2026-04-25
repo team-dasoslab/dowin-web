@@ -89,7 +89,7 @@ function EmptyActiveScoreboardCard() {
       <div className="flex justify-center">
         <Button
           asChild
-          className="btn-linear-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5"
+          className="btn-dowin-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5"
         >
           <Link href="/setup?mode=create">
              <DowinIcon name="action-add" size="14px" />

@@ -22,7 +22,7 @@ export function ProtectedPageContainer({
         "mx-auto max-w-[1200px] px-4 pb-6 md:px-10 md:pb-10 lg:px-12 lg:pb-12",
         topPadding === "compact" ? "pt-2 md:pt-4 lg:pt-4" : "pt-4 md:pt-10 lg:pt-12",
         spacing === "compact" ? "space-y-4" : "space-y-10",
-        isLoading ? "animate-pulse" : "animate-linear-in",
+        isLoading ? "animate-pulse" : "animate-dowin-in",
         className,
       )}
     >

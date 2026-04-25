@@ -104,7 +104,7 @@ export default function ProfileBillingPage() {
                 type="button"
                 onClick={startCheckout}
                 disabled={isCheckoutPending}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-content px-3 text-[11px] font-bold btn-linear-primary`}
+                className={`flex h-9 items-center justify-center gap-1.5 rounded-content px-3 text-[11px] font-bold btn-dowin-primary`}
               >
                 <DowinIcon name="domain-payment" size="14px" />
                 {isCheckoutPending ? t("checkoutLoading") : t("upgradeButton")}
