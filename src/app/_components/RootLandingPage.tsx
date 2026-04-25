@@ -551,7 +551,7 @@ export function RootLandingPage() {
             />
           </Link>
         </Button>
-        <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider uppercase">
+        <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider">
           © 2026 Dasoslab. All rights reserved.
         </p>
       </footer>
