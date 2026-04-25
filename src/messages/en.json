@@ -4,6 +4,7 @@
     "description": "Focus on your most important goals."
   },
   "Common": {
+    "serviceName": "Dowin",
     "me": "Me",
     "unsetTitle": "Unset",
     "today": "Today",

@@ -4,6 +4,7 @@
     "description": "가장 중요한 목표에 집중하세요."
   },
   "Common": {
+    "serviceName": "Dowin",
     "me": "나",
     "unsetTitle": "미설정",
     "today": "오늘",

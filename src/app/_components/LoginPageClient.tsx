@@ -39,6 +39,7 @@ const signupFormSchema = z.object({
 
 export default function LoginPageClient() {
   const t = useTranslations("Auth");
+  const tCommon = useTranslations("Common");
   const [mode, setMode] = useState<AuthMode>("login");
   const [id, setId] = useState("");
   const [nickname, setNickname] = useState("");
@@ -282,8 +283,8 @@ export default function LoginPageClient() {
             <Logo className="text-primary" size="24px" />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-              DOWIN
+            <h1 className="text-2xl font-bold tracking-tight text-text-primary uppercase">
+              {tCommon("serviceName")}
             </h1>
             <p className="text-[13px] text-text-muted">
               {t("subtitle")}

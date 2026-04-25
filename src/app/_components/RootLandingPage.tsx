@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
   const t = useTranslations("Landing");
+  const tCommon = useTranslations("Common");
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-white font-pretendard text-slate-900 selection:bg-primary/20 selection:text-slate-900">
@@ -20,11 +21,9 @@ export function RootLandingPage() {
       {/* Top Banner Navigation */}
       <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between bg-white/70 px-4 md:px-8 xl:px-12 backdrop-blur-xl border-b border-slate-200/50">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-slate-900 text-white">
-            <Logo size="16px" />
-          </div>
+          <Logo />
           <p className="font-outfit text-[22px] font-black tracking-tight text-slate-900">
-            DOWIN
+            {tCommon("serviceName")}
           </p>
         </Link>
         <div className="flex items-center gap-6">
@@ -533,9 +532,6 @@ export function RootLandingPage() {
 
       {/* 7. Footer CTA */}
       <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
-        <div className="flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-primary to-primary-light mb-10 transition-transform">
-          <Logo size="32px" className="text-white" />
-        </div>
         <h2 className="font-pretendard text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
           {t("Footer.headline")}
         </h2>
