@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/Button";
-import { Link } from "@/i18n/routing";
 import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
@@ -297,7 +297,11 @@ export function RootLandingPage() {
                 <div className="absolute inset-0 bg-blue-100 rounded-full blur-[80px] opacity-50" />
                 <div className="relative bg-white rounded-[24px] p-6 border border-slate-200">
                   <div className="h-48 w-full bg-slate-50 rounded-[20px] border border-slate-100 flex flex-col items-center justify-center text-center px-6">
-                    <DowinIcon name="domain-target-arrow-large" size="40px" className="text-blue-500 mb-4" />
+                    <DowinIcon
+                      name="domain-target-arrow-large"
+                      size="40px"
+                      className="text-blue-500 mb-4"
+                    />
                     <p className="text-[20px] font-bold text-slate-800">
                       {t("WhyDowin.item1VisualGoal")}
                     </p>
@@ -316,7 +320,11 @@ export function RootLandingPage() {
                 <div className="relative bg-white rounded-[24px] p-6 border border-slate-200">
                   <div className="h-40 w-full bg-slate-50 rounded-[16px] border border-slate-100 p-6 flex flex-col justify-center">
                     <p className="font-bold text-slate-600 mb-4 flex items-center gap-2 text-[14px]">
-                      <DowinIcon name="domain-pulse-large" size="20px" className="text-emerald-500" />
+                      <DowinIcon
+                        name="domain-pulse-large"
+                        size="20px"
+                        className="text-emerald-500"
+                      />
                       {t("WhyDowin.item2VisualTitle")}
                     </p>
                     <div className="bg-white rounded-xl h-14 border border-slate-200 flex items-center px-4 gap-4">
@@ -471,7 +479,11 @@ export function RootLandingPage() {
                 </p>
               </div>
               <div className="absolute right-0 bottom-0 top-0 w-[50%] bg-gradient-to-l from-primary/5 to-transparent flex items-center justify-end pr-8">
-                <DowinIcon name="domain-trending" size="128px" className="text-primary/10 transition-transform" />
+                <DowinIcon
+                  name="domain-trending"
+                  size="128px"
+                  className="text-primary/10 transition-transform"
+                />
               </div>
             </div>
 
@@ -487,7 +499,11 @@ export function RootLandingPage() {
             </div>
 
             <div className="md:col-span-5 bg-white rounded-[24px] border border-slate-200 p-8 transition-all overflow-hidden relative">
-              <DowinIcon name="domain-calendar-large" size="32px" className="text-slate-300 transition-colors mb-6" />
+              <DowinIcon
+                name="domain-calendar-large"
+                size="32px"
+                className="text-slate-300 transition-colors mb-6"
+              />
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
                 {t("Features.item3Title")}
               </h4>
@@ -498,7 +514,11 @@ export function RootLandingPage() {
 
             <div className="md:col-span-7 bg-white rounded-[24px] border border-slate-200 p-8 transition-all flex flex-col justify-end relative overflow-hidden">
               <div className="absolute top-6 right-6">
-                <DowinIcon name="domain-target-arrow-large" size="64px" className="text-slate-100 transition-all" />
+                <DowinIcon
+                  name="domain-target-arrow-large"
+                  size="64px"
+                  className="text-slate-100 transition-all"
+                />
               </div>
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
                 {t("Features.item4Title")}
@@ -527,11 +547,16 @@ export function RootLandingPage() {
           className="inline-flex h-[60px] items-center justify-center rounded-2xl bg-slate-900 px-10 text-[18px] font-bold text-white transition-all"
         >
           <Link href="/login">
-            {t("Footer.cta")} <DowinIcon name="action-arrow-right" size="20px" className="ml-3 opacity-70" />
+            {t("Footer.cta")}{" "}
+            <DowinIcon
+              name="action-arrow-right"
+              size="20px"
+              className="ml-3 opacity-70"
+            />
           </Link>
         </Button>
         <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider uppercase">
-          © 2026 DOWIN. All rights reserved.
+          © 2026 Dasoslab. All rights reserved.
         </p>
       </footer>
     </main>
