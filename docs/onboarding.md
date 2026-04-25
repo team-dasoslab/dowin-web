@@ -15,7 +15,7 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 5. 대시보드에서 날짜별 O/X 기록
 6. 이번 주 승패를 점수판 형태로 확인
 
-## 2. 현재 상태 요약 (2026-04-21 기준)
+## 2. 현재 상태 요약 (2026-04-25 기준)
 
 ### 2.1. 구현 완료
 
@@ -47,6 +47,9 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 비로그인 사용자용 서비스 소개형 루트 랜딩 페이지(`/`) 구현 완료
 - Analytics export API와 프로필 CSV 다운로드 화면 구현 완료
 - 푸시 구독 토글 및 개인 기록 리마인드 시간 설정 구현 완료
+- WebView bridge 웹 타입 정리 및 `@webview-bridge/web` 연동 경로 정리 완료
+- 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 요청 트리거 추가 완료
+- WebView bridge / native-web handoff 전용 로컬 스킬 `frontend-webview` 추가 완료
 - 선행지표 상세 화면 제거 완료
 - API 라우트 dynamic slug는 `id` 기준으로 정리 완료
 - `getSession(db)`는 실제 Drizzle DB 타입 기준으로 동작하도록 정리 완료
@@ -75,6 +78,7 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 프로필 탈퇴 UX는 구현됐지만 닉네임/워크스페이스 이름 변경은 여전히 `prompt` 기반이다
 - 첫 진입 온보딩 문구/CTA 용어 일관성(`워크스페이스` 중심) 정리는 진행 중이다
 - 웹 푸시 구독이 전제인 만큼 개인 기록 리마인드의 실제 반응률과 후속 기록 재개율은 운영 데이터로 검증이 더 필요하다
+- 로그인 직후 `dashboard/my`에서 수행하는 알림 권한 요청은 현재 권한 prompt까지만 연결돼 있고, 실제 push subscription 자동 등록은 아직 붙지 않았다
 - 유료 기능 후보는 `달성률 임계치 기반 자동 리마인드`보다 `리더 액션 어시스턴트` 중심으로 재정의했다. 핵심은 자동 꾸짖기가 아니라 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인`이며, 팀원 수용성/알림 피로 가드레일까지 포함해 `docs/planning/2026.04.14-leader-report-reminder-plan.md`를 본다
 - Polar customer portal 진입은 코드에서 `POLAR_ACCESS_TOKEN` fallback 지원까지 반영됐지만, 실제 sandbox 환경에는 `customer_sessions:write` scope가 있는 토큰 설정이 아직 필요하다
 - 환불 악용 방지 문서 기준의 `STANDARD` usage event 저장은 아직 미구현이며, 결제 운영을 계속할 거면 우선순위를 높여 반드시 구현해야 한다
@@ -155,6 +159,7 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 2. 작업 유형별 스킬
    - 오케스트레이션/작업 분류: `.agents/skills/orchestrator/SKILL.md`
    - 프론트엔드: `.agents/skills/frontend/SKILL.md`
+   - WebView 프론트엔드: `.agents/skills/frontend-webview/SKILL.md`
    - 백엔드: `.agents/skills/backend/SKILL.md`
    - 기획/문서: `.agents/skills/planning/SKILL.md`
    - 운영/장애 대응: `.agents/skills/operations/SKILL.md`
@@ -219,8 +224,18 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
   - 복원코드 기반 계정 복구 페이지
 - `src/app/(protected)/dashboard/my/page.tsx`
   - 내 대시보드
+- `src/app/(protected)/dashboard/my/_hooks/usePostLoginNotificationPermissionPrompt.ts`
+  - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 prompt를 1회 트리거하는 훅
 - `src/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard.ts`
   - 내 대시보드 API 조회/토글 로직
+- `src/lib/bridge.ts`
+  - WebView bridge 연결, store selector, 네이티브 메서드 래퍼
+- `src/types/bridge.ts`
+  - 웹에서 사용하는 bridge 공개 타입
+- `src/hooks/useAppBridgeNotifications.ts`
+  - bridge 기반 알림 권한 / 마지막 알림 상태 구독 훅
+- `src/hooks/useAppBridgeDeepLink.ts`
+  - bridge 기반 마지막 딥링크 상태 구독 훅
 - `src/app/(protected)/scoreboards/page.tsx`
   - 점수판 보관함 화면
 - `src/app/(protected)/scoreboards/_hooks/useScoreboardArchive.ts`

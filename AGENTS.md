@@ -22,6 +22,7 @@ If documents conflict with code, verify the implementation and prefer the curren
 - Use `yarn` only.
 - For backend changes, follow `.agents/skills/backend/SKILL.md`.
 - For frontend changes, follow `.agents/skills/frontend/SKILL.md`.
+- For WebView bridge, native-web handoff, and app-shell-dependent frontend changes, follow `.agents/skills/frontend-webview/SKILL.md`.
 - For planning and documentation work, follow `.agents/skills/planning/SKILL.md`.
 - For production operations, runbooks, incident response, restore/rollback guidance, or release-operability docs, follow `.agents/skills/operations/SKILL.md`.
 - Reuse existing patterns before introducing new structure.
@@ -47,6 +48,7 @@ Available local skills:
 - `dowin-orchestrator`
 - `dowin-backend`
 - `dowin-frontend`
+- `frontend-webview`
 - `dowin-planning`
 - `dowin-operations`
 - `dowin-quality-check`
@@ -60,6 +62,7 @@ Skill file locations:
 - `.agents/skills/orchestrator/SKILL.md`
 - `.agents/skills/backend/SKILL.md`
 - `.agents/skills/frontend/SKILL.md`
+- `.agents/skills/frontend-webview/SKILL.md`
 - `.agents/skills/planning/SKILL.md`
 - `.agents/skills/operations/SKILL.md`
 - `.agents/skills/quality-check/SKILL.md`
@@ -88,6 +91,10 @@ Trigger examples:
   - "dashboard/my를 실제 API 데이터로 바꿔줘"
   - "공통 Button 변형 추가하고 story도 갱신해줘"
   - "모바일 점수판 테이블 인터랙션 다듬어줘"
+- `frontend-webview`
+  - "webview bridge 타입 맞춰줘"
+  - "앱에서 들어온 deep link를 웹에서 처리하게 붙여줘"
+  - "네이티브 알림 권한 / 브라우저 fallback 흐름 정리해줘"
 - `dowin-planning`
   - "새 기능 기획안 문서 만들어줘"
   - "온보딩 문서 최신 상태로 정리해줘"

@@ -6344,6 +6344,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@webview-bridge/types@npm:1.7.9":
+  version: 1.7.9
+  resolution: "@webview-bridge/types@npm:1.7.9"
+  checksum: 10c0/327dd13b0879a05e53b8f0eb41b76aeee7e1bbabc336273ae41400db0ad489f4b7c7839bf31a2c84ecffb39672607a14214e3a4a9ddd3ea300b63b68b6e4521f
+  languageName: node
+  linkType: hard
+
+"@webview-bridge/utils@npm:1.7.9":
+  version: 1.7.9
+  resolution: "@webview-bridge/utils@npm:1.7.9"
+  checksum: 10c0/46079ebfc352bc63a22a2de9c14617610bf75f1c267180840c89f1d02013dbda3d85b46c09d56d7f67b762e722e1b1002266626c218ba9213f621bd6c0700a75
+  languageName: node
+  linkType: hard
+
+"@webview-bridge/web@npm:^1.7.9":
+  version: 1.7.9
+  resolution: "@webview-bridge/web@npm:1.7.9"
+  dependencies:
+    "@webview-bridge/types": "npm:1.7.9"
+    "@webview-bridge/utils": "npm:1.7.9"
+  checksum: 10c0/3a3cf459a3acb390bdf3c1ac088292c1078e993da82af78aca454cb6f719d87600ab89b338a3917a64069cf92d0d5a53c075043384e01aa7434a50f211f0a22d
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:^4.0.0":
   version: 4.0.0
   resolution: "abbrev@npm:4.0.0"
@@ -7591,6 +7615,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^5.1.4"
     "@vitest/browser-playwright": "npm:4.0.18"
     "@vitest/coverage-v8": "npm:4.0.18"
+    "@webview-bridge/web": "npm:^1.7.9"
     ai: "npm:^6.0.104"
     axios: "npm:^1.13.6"
     bcryptjs: "npm:^3.0.3"
