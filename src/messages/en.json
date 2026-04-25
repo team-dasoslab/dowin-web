@@ -257,7 +257,7 @@
     "header": "Scoreboard Settings",
     "editTitle": "Edit Current Goal",
     "createTitle": "Set Next Scoreboard",
-    "description": "Set one goal (DOWIN), its success metric (lag measure), and key actions (lead measures).",
+    "description": "Set a single goal and define your measures.",
     "archiving": "Archiving scoreboard...",
     "saving": "Saving changes...",
     "creating": "Creating scoreboard...",
