@@ -1,6 +1,6 @@
 {
   "Metadata": {
-    "title": "DOWIN Tracker",
+    "title": "Dowin",
     "description": "Focus on your most important goals."
   },
   "Common": {
@@ -193,7 +193,7 @@
         "losingStarted": "Started but behind"
       },
       "action": {
-        "noScoreboard": "Help set up their DOWIN and lead measures",
+        "noScoreboard": "Help set up their Wildly Important Goal and lead measures",
         "notStarted": "Confirm the smallest action they can start this week",
         "losingStarted": "Check lead-measure difficulty or execution rhythm"
       },
@@ -333,10 +333,10 @@
       "last": "Done",
       "next": "Next",
       "skip": "Skip",
-      "goalTitle": "DOWIN (Wildly Important Goal)",
-      "goalContent": "A good DOWIN is about choosing 'what is most important'. Too many goals results in lack of focus. Set only one for this period.",
+      "goalTitle": "Wildly Important Goal",
+      "goalContent": "A good 'Wildly Important Goal' is about choosing 'what is most important'. Too many goals results in lack of focus. Set only one for this period.",
       "lagTitle": "Lag Measure",
-      "lagContent": "A lag measure shows the final result. Write a metric measuring DOWIN achievement in the form 'X to Y by date'.",
+      "lagContent": "A lag measure shows the final result. Write a metric measuring 'Wildly Important Goal' achievement in the form 'X to Y by date'.",
       "leadTitle": "Lead Measure",
       "leadContent": "Lead measures are predictive actions that change the result. They must be influenceable. Write daily/weekly recurring actions.",
       "tagsTitle": "Lead Measure Tags",
@@ -351,7 +351,7 @@
       "tagCreateFailed": "Failed to create tag.",
       "tagUpdateFailed": "Failed to update tag name.",
       "tagDeleteFailed": "Failed to delete tag.",
-      "fillRequiredFields": "Please enter a DOWIN, lag measure, and at least one lead measure.",
+      "fillRequiredFields": "Please enter a Wildly Important Goal, lag measure, and at least one lead measure.",
       "createSuccess": "New scoreboard created successfully.",
       "createFailed": "Failed to create new scoreboard.",
       "saveSuccess": "Scoreboard saved successfully.",
@@ -781,7 +781,7 @@
       "title": "Create New Workspace",
       "description": "A workspace is a space where your team manages goals together.\nPlease give it a great name.",
       "label": "Workspace Name",
-      "placeholder": "e.g. Marketing Team, DOWIN Project",
+      "placeholder": "e.g. Marketing Team, Company Name",
       "button": "Create Workspace",
       "loading": "Creating workspace..."
     },
@@ -834,7 +834,7 @@
       "header": "The most reliable and proactive flow\nto achieve team goals",
       "description": "Outcome metrics are already in the past; we can't change them immediately.\nBut the 'actions of today' that create those results are planned and 100% controlled by us. Move beyond vague anxiety and gain proactive execution power.",
       "item1Badge": "The most important one",
-      "item1Title": "Team Milestone,\nWildly Important Goal (DOWIN)",
+      "item1Title": "Team Milestone,\nWildly Important Goal",
       "item1Desc": "We'll be your compass so you don't get lost among countless tasks. Focus on the single most important and impactful goal that can change the game for your team.",
       "item1VisualGoal": "Reach $100k monthly revenue by EO-year",
       "item1VisualDesc": "Tasks other than this goal will be deprioritized.",
@@ -848,7 +848,7 @@
       "title": "The execution flow in 3 stages,\nstripped of complexity.",
       "description": "Instead of complex templates that make input a burden,\nwe propose a most intuitive flow that all team members can look at comfortably and transparently.",
       "step1Title": "Zero in on the one goal",
-      "step1Desc": "Fix the DOWIN we need to achieve this week at the very top. Look in one direction without being shaken.",
+      "step1Desc": "Fix the goal we need to achieve this week at the very top. Look towards the goal without being shaken.",
       "step2Title": "Accumulate actions daily",
       "step2Desc": "Instead of a formal meeting room, fill out your behavior bingo on your dashboard. Achievement builds up daily like breaking seals, creating momentum for execution.",
       "step3Title": "The scoreboard of no excuses, weekly review",
@@ -902,7 +902,7 @@
     "Footer": {
       "headline": "The real flow of execution,\nshall we start now?",
       "description": "We've removed the worry and time spent on initial setup.\nNow run towards your goals happily with your team members.",
-      "cta": "Start DOWIN for Free"
+      "cta": "Start for Free"
     }
   },
   "NotFound": {
