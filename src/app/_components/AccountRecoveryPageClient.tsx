@@ -10,20 +10,22 @@ import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 
-const passwordSchema = z
-  .string()
-  .regex(
-    /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/,
-    "비밀번호는 8자 이상의 영문/숫자/허용 특수문자 조합이어야 합니다.",
-  );
+
 
 export default function AccountRecoveryPageClient() {
   const t = useTranslations("Auth");
+  const passwordSchema = useMemo(
+    () =>
+      z
+        .string()
+        .regex(/^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/, t("errors.invalidPassword")),
+    [t],
+  );
   const [recoveryCode, setRecoveryCode] = useState("");
   const [recoveryAccount, setRecoveryAccount] = useState<{
     customId: string;
@@ -60,16 +62,19 @@ export default function AccountRecoveryPageClient() {
         setRecoveryAccount(response.data.user);
         return;
       } catch (verifyError) {
-        setError(
-          getApiErrorMessage(verifyError, t("recoveryPage.errors.checkCode")),
-        );
+        const status = getApiErrorStatus(verifyError);
+        if (status === 404) {
+          setError(t("recoveryPage.errors.checkCode"));
+        } else {
+          setError(getApiErrorMessage(verifyError, t("recoveryPage.errors.checkCode")));
+        }
         return;
       }
     }
 
     const parsedPassword = passwordSchema.safeParse(newPassword);
     if (!parsedPassword.success) {
-      setError(t("errors.invalidPassword"));
+      setError(parsedPassword.error.issues[0]?.message || t("errors.invalidPassword"));
       return;
     }
 
@@ -91,9 +96,12 @@ export default function AccountRecoveryPageClient() {
       setRecoveryCode("");
       setNewPassword("");
     } catch (resetError) {
-      setError(
-        getApiErrorMessage(resetError, t("recoveryPage.errors.resetFailed")),
-      );
+      const status = getApiErrorStatus(resetError);
+      if (status === 404) {
+        setError(t("recoveryPage.errors.checkCode"));
+      } else {
+        setError(getApiErrorMessage(resetError, t("recoveryPage.errors.resetFailed")));
+      }
     }
   };
 

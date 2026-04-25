@@ -10,31 +10,15 @@ import { Logo } from "@/components/ui/Logo";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 
 type AuthMode = "login" | "signup";
-
-const signupFormSchema = z.object({
-  customId: z
-    .string()
-    .regex(/^[a-zA-Z0-9]{3,20}$/, "아이디는 3~20자의 영문/숫자여야 합니다."),
-  nickname: z
-    .string()
-    .min(1, "닉네임을 입력해주세요.")
-    .max(50, "닉네임은 50자 이하여야 합니다."),
-  password: z
-    .string()
-    .regex(
-      /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/,
-      "비밀번호는 8자 이상의 영문/숫자/허용 특수문자 조합이어야 합니다.",
-    ),
-});
 
 export default function LoginPageClient() {
   const t = useTranslations("Auth");
@@ -52,6 +36,26 @@ export default function LoginPageClient() {
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const isPending = loginMutation.isPending || signupMutation.isPending;
+
+  const signupFormSchema = useMemo(
+    () =>
+      z.object({
+        customId: z
+          .string()
+          .regex(/^[a-zA-Z0-9]{3,20}$/, t("errors.invalidId")),
+        nickname: z
+          .string()
+          .min(1, t("errors.nicknameRequired"))
+          .max(50, t("errors.nicknameTooLong")),
+        password: z
+          .string()
+          .regex(
+            /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/,
+            t("errors.invalidPassword"),
+          ),
+      }),
+    [t],
+  );
 
   useEffect(() => {
     const rawFlashToast = window.sessionStorage.getItem("dowin.flash.toast");
@@ -129,16 +133,8 @@ export default function LoginPageClient() {
       });
 
       if (!parsed.success) {
-        const fieldErrors = parsed.error.flatten().fieldErrors;
-        if (fieldErrors.customId) {
-          setError(t("errors.invalidId"));
-        } else if (fieldErrors.nickname) {
-          setError(t("errors.nicknameRequired"));
-        } else if (fieldErrors.password) {
-          setError(t("errors.invalidPassword"));
-        } else {
-          setError(t("errors.checkInputs"));
-        }
+        const errorMsg = parsed.error.issues[0]?.message;
+        setError(errorMsg || t("errors.checkInputs"));
         return;
       }
 
@@ -168,7 +164,12 @@ export default function LoginPageClient() {
           user_id_hash: hashId(response.data.user.id),
         });
       } catch (signupError) {
-        setError(getApiErrorMessage(signupError, t("errors.signupFailed")));
+        const status = getApiErrorStatus(signupError);
+        if (status === 409) {
+          setError(t("errors.idAlreadyExists"));
+        } else {
+          setError(getApiErrorMessage(signupError, t("errors.signupFailed")));
+        }
       }
 
       return;
@@ -190,7 +191,12 @@ export default function LoginPageClient() {
       const nextPath = searchParams.get("next");
       router.push(nextPath || "/dashboard/my");
     } catch (loginError) {
-      setError(getApiErrorMessage(loginError, t("errors.loginFailed")));
+      const status = getApiErrorStatus(loginError);
+      if (status === 401) {
+        setError(t("errors.loginFailed"));
+      } else {
+        setError(getApiErrorMessage(loginError, t("errors.loginFailed")));
+      }
     }
   };
 
@@ -305,7 +311,6 @@ export default function LoginPageClient() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-
           <div className="space-y-5">
             <div className="space-y-2">
               <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
@@ -330,9 +335,7 @@ export default function LoginPageClient() {
                   type="text"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
-                  placeholder={
-                    t("nickname") === "Nickname" ? "John Doe" : "홍길동"
-                  }
+                  placeholder={t("nicknamePlaceholder")}
                   className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
                   required
                 />

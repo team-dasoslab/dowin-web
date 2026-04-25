@@ -737,8 +737,12 @@
     "signup": "Sign Up",
     "id": "ID",
     "nickname": "Nickname",
+    "nicknamePlaceholder": "John Doe",
     "password": "Password",
     "subtitle": "Focus on what matters most.",
+    "signupSubtitle": "Create an account and start achieving your goals.",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
     "forgotPassword": "Forgot your ID or Password?",
     "continue": "Continue",
     "recovery": {
@@ -758,7 +762,8 @@
       "invalidPassword": "Password must be 8+ characters (mix of letters/numbers/special chars).",
       "checkInputs": "Please check your inputs.",
       "signupFailed": "Failed to sign up.",
-      "loginFailed": "Invalid ID or password."
+      "loginFailed": "Invalid ID or password.",
+      "idAlreadyExists": "This ID is already taken."
     },
     "recoveryPage": {
       "title": "Account Recovery",
