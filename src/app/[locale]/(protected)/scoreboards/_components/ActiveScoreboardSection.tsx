@@ -49,7 +49,7 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
             >
               {pendingActionId === activeScoreboardId ? (
                 <InlineSpinner

@@ -149,7 +149,7 @@ export default function ScoreboardsPage() {
                     description={t("archivedScoreboardsDesc")}
                   />
                 </div>
-                <div className="pb-1 px-1">
+                <div className="pb-1 px-1 flex-shrink-0">
                   <div className="px-2 py-1 rounded-md border border-border bg-sub-background text-[10px] font-black text-text-muted uppercase tracking-tight">
                     {t("totalCount", { count: archivedScoreboards.length })}
                   </div>
