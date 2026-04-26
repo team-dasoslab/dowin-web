@@ -125,7 +125,7 @@ export default function DashboardPage() {
     members.find((member) => member.userId === myUserId)?.role ?? null;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <ProtectedPageContainer
         className={cn(
           "relative transition-[left] duration-300 ease-out xl:origin-top space-y-6 lg:space-y-12",
@@ -270,7 +270,7 @@ export default function DashboardPage() {
 
 function DashboardLoadingState() {
   return (
-    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-16 rounded-content bg-sub-background" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -286,7 +286,7 @@ function DashboardLoadingState() {
 function DashboardNoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<DowinIcon name="domain-people" size="20px" className="text-primary" />}
@@ -302,7 +302,7 @@ function DashboardNoWorkspaceState() {
 function DashboardNoScoreboardState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}

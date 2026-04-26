@@ -10,7 +10,7 @@ export function RootLandingPage() {
   const tCommon = useTranslations("Common");
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white font-pretendard text-slate-900 selection:bg-primary/20 selection:text-slate-900">
+    <main className="min-h-screen overflow-x-hidden bg-white text-slate-900 selection:bg-primary/20 selection:text-slate-900">
       {/* Background Grid Pattern & Ambient Glow */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:24px_24px]"></div>
       <div className="pointer-events-none absolute left-0 top-0 h-[800px] w-full overflow-hidden -z-10">
@@ -22,7 +22,7 @@ export function RootLandingPage() {
       <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between bg-white/70 px-4 md:px-8 xl:px-12 backdrop-blur-xl border-b border-slate-200/50">
         <Link href="/" className="flex items-center gap-2.5">
           <Logo />
-          <p className="font-outfit text-[22px] font-black tracking-tight text-slate-900">
+          <p className="text-[22px] font-black tracking-tight text-slate-900">
             {tCommon("serviceName")}
           </p>
         </Link>
@@ -55,7 +55,7 @@ export function RootLandingPage() {
           </div>
 
           {/* Headline - Editorial Tight typography */}
-          <h1 className="font-pretendard text-[42px] leading-[1.15] font-black tracking-tight text-slate-900 md:text-[72px] md:tracking-[-0.03em] break-keep animate-fade-in-up [animation-delay:100ms] whitespace-pre-line">
+          <h1 className="text-[42px] leading-[1.15] font-black tracking-tight text-slate-900 md:text-[72px] md:tracking-[-0.03em] break-keep animate-fade-in-up [animation-delay:100ms] whitespace-pre-line">
             {t("Hero.headline")}
           </h1>
 
@@ -132,7 +132,7 @@ export function RootLandingPage() {
                       {t("Mockup.stats.dowinGoal")}
                     </h3>
                     <div className="flex items-end justify-between">
-                      <span className="text-[32px] font-outfit font-black text-primary leading-none">
+                      <span className="text-[32px] font-black text-primary leading-none">
                         68%
                       </span>
                       <div className="flex -space-x-2">
@@ -231,7 +231,7 @@ export function RootLandingPage() {
                 <p className="text-[17px] font-bold text-primary mb-2">
                   {t("MetricBand.oneTitle")}
                 </p>
-                <h3 className="text-[48px] md:text-[64px] font-outfit font-black tracking-tighter text-slate-900 leading-none">
+                <h3 className="text-[48px] md:text-[64px] font-black tracking-tighter text-slate-900 leading-none">
                   ONE
                 </h3>
                 <p className="text-[16px] text-slate-500 font-medium leading-[1.6] max-w-[340px] pt-4 break-keep">
@@ -241,7 +241,7 @@ export function RootLandingPage() {
 
               <div className="md:col-span-6 flex flex-col sm:flex-row gap-4">
                 <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100 transition-colors">
-                  <p className="text-[36px] md:text-[42px] font-outfit font-black text-primary leading-none mb-3 tracking-tighter">
+                  <p className="text-[36px] md:text-[42px] font-black text-primary leading-none mb-3 tracking-tighter">
                     {t("MetricBand.stat1Value")}
                     <span className="text-[20px]">%</span>
                   </p>
@@ -250,7 +250,7 @@ export function RootLandingPage() {
                   </p>
                 </div>
                 <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100 transition-colors">
-                  <p className="text-[36px] md:text-[42px] font-outfit font-black text-emerald-500 leading-none mb-3 tracking-tighter">
+                  <p className="text-[36px] md:text-[42px] font-black text-emerald-500 leading-none mb-3 tracking-tighter">
                     {t("MetricBand.stat2Value")}
                     <span className="text-[20px]">m</span>
                   </p>
@@ -268,7 +268,7 @@ export function RootLandingPage() {
       <section className="py-24 md:py-32 bg-white overflow-hidden">
         <div className="mx-auto max-w-[1200px] px-6 md:px-12">
           <div className="text-center md:text-left mb-20 max-w-[700px]">
-            <h2 className="font-pretendard text-[32px] leading-[1.2] font-black tracking-[-0.03em] text-slate-900 md:text-[48px] break-keep whitespace-pre-line">
+            <h2 className="text-[32px] leading-[1.2] font-black tracking-[-0.03em] text-slate-900 md:text-[48px] break-keep whitespace-pre-line">
               {t("WhyDowin.header")}
             </h2>
             <p className="text-[18px] leading-[1.6] text-slate-500 mt-5 break-keep font-medium whitespace-pre-line">
@@ -365,7 +365,7 @@ export function RootLandingPage() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(79,70,229,0.2),transparent_60%)] pointer-events-none" />
 
         <div className="mx-auto max-w-[1200px] px-6 text-center md:px-12 mb-20 md:mb-24 relative z-10">
-          <h2 className="font-pretendard text-[36px] leading-[1.2] font-black tracking-[-0.03em] md:text-[48px] mb-5 break-keep whitespace-pre-line">
+          <h2 className="text-[36px] leading-[1.2] font-black tracking-[-0.03em] md:text-[48px] mb-5 break-keep whitespace-pre-line">
             {t("ExecutionLoop.title")}
           </h2>
           <p className="text-[17px] text-slate-400 leading-[1.7] max-w-[600px] mx-auto break-keep font-medium whitespace-pre-line">
@@ -378,10 +378,10 @@ export function RootLandingPage() {
           <div className="relative pl-0 md:pl-24 space-y-12 md:space-y-16">
             {/* Step 1 */}
             <div className="relative flex flex-col md:flex-row gap-8 lg:gap-12 items-start md:items-center">
-              <div className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 w-12 h-12 rounded-[16px] bg-primary items-center justify-center font-outfit text-xl font-black border border-white/20 text-white z-10 transition-transform">
+              <div className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 w-12 h-12 rounded-[16px] bg-primary items-center justify-center text-xl font-black border border-white/20 text-white z-10 transition-transform">
                 1
               </div>
-              <div className="md:hidden flex h-12 w-12 rounded-xl bg-primary items-center justify-center font-outfit text-xl font-black text-white">
+              <div className="md:hidden flex h-12 w-12 rounded-xl bg-primary items-center justify-center text-xl font-black text-white">
                 1
               </div>
               <div className="flex-1">
@@ -403,10 +403,10 @@ export function RootLandingPage() {
 
             {/* Step 2 */}
             <div className="relative flex flex-col md:flex-row gap-8 lg:gap-12 items-start md:items-center">
-              <div className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 w-12 h-12 rounded-[16px] bg-slate-800 items-center justify-center font-outfit text-xl font-black border border-white/10 text-slate-300 z-10 transition-transform">
+              <div className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 w-12 h-12 rounded-[16px] bg-slate-800 items-center justify-center text-xl font-black border border-white/10 text-slate-300 z-10 transition-transform">
                 2
               </div>
-              <div className="md:hidden flex h-12 w-12 rounded-xl bg-slate-800 items-center justify-center font-outfit text-xl font-black border border-white/10 text-white">
+              <div className="md:hidden flex h-12 w-12 rounded-xl bg-slate-800 items-center justify-center text-xl font-black border border-white/10 text-white">
                 2
               </div>
               <div className="flex-1 md:order-2">
@@ -433,10 +433,10 @@ export function RootLandingPage() {
 
             {/* Step 3 */}
             <div className="relative flex flex-col md:flex-row gap-8 lg:gap-12 items-start md:items-center">
-              <div className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 w-12 h-12 rounded-[16px] bg-slate-800 items-center justify-center font-outfit text-xl font-black border border-white/10 text-slate-300 z-10 transition-transform">
+              <div className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 w-12 h-12 rounded-[16px] bg-slate-800 items-center justify-center text-xl font-black border border-white/10 text-slate-300 z-10 transition-transform">
                 3
               </div>
-              <div className="md:hidden flex h-12 w-12 rounded-xl bg-slate-800 items-center justify-center font-outfit text-xl font-black border border-white/10 text-white">
+              <div className="md:hidden flex h-12 w-12 rounded-xl bg-slate-800 items-center justify-center text-xl font-black border border-white/10 text-white">
                 3
               </div>
               <div className="flex-1">
@@ -450,7 +450,7 @@ export function RootLandingPage() {
               <div className="flex-1 w-full bg-white/5 border border-white/10 rounded-[20px] p-6 backdrop-blur-md rotate-1 transition-transform">
                 <div className="flex items-end justify-between border-b border-white/10 pb-3 mb-3">
                   <div className="h-2.5 w-14 bg-slate-500 rounded" />
-                  <p className="font-outfit text-[32px] font-black leading-none tracking-tighter">
+                  <p className="text-[32px] font-black leading-none tracking-tighter">
                     92<span className="text-[16px] opacity-50">%</span>
                   </p>
                 </div>
@@ -532,7 +532,7 @@ export function RootLandingPage() {
 
       {/* 7. Footer CTA */}
       <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
-        <h2 className="font-pretendard text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
+        <h2 className="text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
           {t("Footer.headline")}
         </h2>
         <p className="text-[18px] text-slate-500 mb-10 max-w-[600px] leading-[1.6] break-keep font-medium whitespace-pre-line">
@@ -546,7 +546,7 @@ export function RootLandingPage() {
             {t("Footer.cta")}
           </Link>
         </Button>
-        <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider">
+        <p className="text-[13px] text-slate-400 mt-20 font-bold tracking-wider">
           © 2026 Dasoslab. All rights reserved.
         </p>
       </footer>

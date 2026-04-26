@@ -130,7 +130,7 @@ export default function SetupPage() {
   const isMutating = isSubmitPending || isArchivePending;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <SetupCoachmark
         isRunning={isCoachmarkRunning}
         mode={coachmarkMode}
@@ -279,7 +279,7 @@ export default function SetupPage() {
 
 function SetupSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-12 rounded-content bg-sub-background" />

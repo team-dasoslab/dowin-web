@@ -61,7 +61,7 @@ export function LandingPricingSection() {
                       {planT("eyebrow")}
                     </p>
                     <h3
-                      className={`text-[28px] font-black tracking-tight font-outfit ${
+                      className={`text-[28px] font-black tracking-tight ${
                         isFree ? "text-slate-900" : "text-slate-400"
                       }`}
                     >
@@ -72,7 +72,7 @@ export function LandingPricingSection() {
 
                 <div className="mb-6 flex items-end gap-2">
                   <span
-                    className={`font-outfit text-[36px] font-black leading-none tracking-tighter ${
+                    className={`text-[36px] font-black leading-none tracking-tighter ${
                       isFree ? "text-slate-900" : "text-slate-300"
                     }`}
                   >

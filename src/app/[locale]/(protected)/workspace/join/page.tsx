@@ -26,7 +26,7 @@ export default function JoinWorkspacePage() {
     });
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
       {isPending && <LoadingOverlay message={t("loading")} />}
       <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-dowin-in">
         <div className="flex items-center gap-3">

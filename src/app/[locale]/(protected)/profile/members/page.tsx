@@ -94,7 +94,7 @@ export default function ProfileMembersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+    <div className="min-h-screen bg-slate-50/50 ">
       <ProtectedPageContainer>
         <ProtectedPageHeader title={t("header")} />
 
@@ -193,7 +193,7 @@ export default function ProfileMembersPage() {
 
 function MembersPageSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+    <div className="min-h-screen bg-slate-50/50 ">
       <ProtectedPageContainer isLoading>
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-24 rounded-content bg-sub-background" />
@@ -206,7 +206,7 @@ function MembersPageSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("ProfileMembers");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-background ">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
@@ -230,7 +230,7 @@ function NoWorkspaceState() {
 function NoAccessState() {
   const t = useTranslations("ProfileMembers");
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-background ">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
