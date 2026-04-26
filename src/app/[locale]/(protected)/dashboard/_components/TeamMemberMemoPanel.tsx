@@ -12,7 +12,6 @@ import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { useTranslations } from "next-intl";
-import { usePathname } from "@/i18n/routing";
 import { TouchEvent, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -60,24 +59,10 @@ export function TeamMemberMemoPanel({
   currentUserRole,
 }: TeamMemberMemoPanelProps) {
   const t = useTranslations("Comments");
-  const pathname = usePathname();
   const [memoDraft, setMemoDraft] = useState("");
   const [sheetDragY, setSheetDragY] = useState(0);
   const isSubmittingMemoRef = useRef(false);
   const sheetTouchStartYRef = useRef<number | null>(null);
-
-  // Main tab paths where the bottom navigation is visible
-  const mainTabPaths = [
-    "/",
-    "/dashboard",
-    "/dashboard/my",
-    "/report",
-    "/setup",
-    "/scoreboards",
-    "/profile",
-  ];
-
-  const isMainTab = mainTabPaths.includes(pathname);
 
   const {
     isVisible: isMobileViewSheetVisible,

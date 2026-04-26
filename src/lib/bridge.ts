@@ -31,6 +31,7 @@ export const isNativeApp = () => {
  * Haptic feedback helper with browser fallback.
  */
 export const vibrate = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type: AppBridgeMethods["vibrate"] extends (arg: infer T) => any ? T : never,
 ) => {
   if (isNativeApp()) {

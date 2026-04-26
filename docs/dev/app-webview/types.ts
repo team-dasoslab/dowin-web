@@ -10,6 +10,7 @@ export type AppBridgeState = {
   };
   statusBarHeight: number;
   notificationPermission: "granted" | "denied" | "not-determined";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   lastNotification: Record<string, any> | null;
   lastDeepLink: string | null;
 };

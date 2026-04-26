@@ -1,6 +1,7 @@
 "use client";
 
 import { bridge } from "@/lib/bridge";
+import type { AppBridgeState } from "@/types/bridge";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -21,7 +22,7 @@ export function BridgeInitializer({ isNative }: { isNative: boolean }) {
   }, [isNative]);
 
   useEffect(() => {
-    const handleStateUpdate = (state: any) => {
+    const handleStateUpdate = (state: AppBridgeState) => {
       // 1. Sync Safe Area Insets to CSS Variables
       if (state.safeAreaInsets) {
         const root = document.documentElement;
@@ -51,7 +52,7 @@ export function BridgeInitializer({ isNative }: { isNative: boolean }) {
           if (url.origin === window.location.origin) {
             router.push(url.pathname + url.search + url.hash);
           }
-        } catch (e) {
+        } catch {
           if (state.lastDeepLink.startsWith("/")) {
             router.push(state.lastDeepLink);
           }
