@@ -56,6 +56,19 @@ export function Sidebar({
     return isScoreboardRelated && !hasScoreboard;
   };
 
+  // Main tab paths where the bottom navigation should be visible
+  const mainTabPaths = [
+    "/",
+    "/dashboard",
+    "/dashboard/my",
+    "/report",
+    "/setup",
+    "/scoreboards",
+    "/profile",
+  ];
+
+  const isMainTab = mainTabPaths.includes(pathname);
+
   return (
     <>
       <aside className="fixed left-0 top-0 hidden h-screen w-[80px] flex-col border-r border-zinc-200 bg-white p-4 md:flex lg:w-[240px]">
@@ -128,52 +141,54 @@ export function Sidebar({
         </nav>
       </aside>
 
-      <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-200 bg-white px-1 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 md:hidden">
-        <div className="mx-auto grid max-w-[520px] grid-cols-5 gap-1">
-          {mobileLinks.map(({ href, iconName, iconNameActive, translationKey }) => {
-            const isActive = getIsActive(href);
-            const isDisabled = getIsDisabled(translationKey);
-            const label = t(translationKey);
+      {isMainTab && (
+        <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-200 bg-white px-1 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 md:hidden">
+          <div className="mx-auto grid max-w-[520px] grid-cols-5 gap-1">
+            {mobileLinks.map(
+              ({ href, iconName, iconNameActive, translationKey }) => {
+                const isActive = getIsActive(href);
+                const isDisabled = getIsDisabled(translationKey);
+                const label = t(translationKey);
 
-            if (isDisabled) {
-              return (
-                <div
-                  key={href}
-                  title={commonT("noScoreboardNotice")}
-                  className="flex min-w-0 cursor-not-allowed flex-col items-center justify-center gap-1 rounded-button px-1 py-2 text-zinc-300 opacity-50"
-                >
-                  <DowinIcon name={iconNameActive} size="20px" />
-                  <span className="max-w-full truncate text-[10px] font-bold leading-none">
-                    {label}
-                  </span>
-                </div>
-              );
-            }
+                if (isDisabled) {
+                  return (
+                    <div
+                      key={href}
+                      title={commonT("noScoreboardNotice")}
+                      className="flex min-w-0 cursor-not-allowed flex-col items-center justify-center gap-1 rounded-button px-1 py-2 text-zinc-300 opacity-50"
+                    >
+                      <DowinIcon name={iconNameActive} size="20px" />
+                      <span className="max-w-full truncate text-[10px] font-bold leading-none">
+                        {label}
+                      </span>
+                    </div>
+                  );
+                }
 
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={cn(
-                  "flex min-w-0 flex-col items-center justify-center gap-1 rounded-button px-1 py-2 transition-colors",
-                  isActive
-                    ? "text-zinc-950"
-                    : "text-zinc-400 active:bg-zinc-100/70",
-                )}
-              >
-                <DowinIcon
-                  name={isActive ? iconNameActive : iconName}
-                  size="20px"
-                  className={cn("transition-all", isActive && "scale-105")}
-                />
-                <span className="max-w-full truncate text-[10px] font-bold leading-none">
-                  {label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      "flex min-w-0 flex-col items-center justify-center gap-1 rounded-button px-1 py-2 transition-colors",
+                      isActive ? "text-zinc-950" : "text-zinc-400",
+                    )}
+                  >
+                    <DowinIcon
+                      name={isActive ? iconNameActive : iconName}
+                      size="20px"
+                      className={cn("transition-all", isActive && "scale-105")}
+                    />
+                    <span className="max-w-full truncate text-[10px] font-bold leading-none">
+                      {label}
+                    </span>
+                  </Link>
+                );
+              },
+            )}
+          </div>
+        </nav>
+      )}
     </>
   );
 }
