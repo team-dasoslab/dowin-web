@@ -61,7 +61,7 @@ const steps = [
 export default function InstallGuidePage() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
-      <div className="mx-auto flex max-w-[560px] flex-col gap-6 p-4 pb-10 animate-linear-in md:p-8">
+      <div className="mx-auto flex max-w-[560px] flex-col gap-6 p-4 pb-10 animate-dowin-in md:p-8">
         <header className="flex items-center justify-between">
           <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary" />
           <p className="text-xs text-text-muted">iPhone 설치 가이드</p>
@@ -69,7 +69,7 @@ export default function InstallGuidePage() {
         </header>
 
         <Card className="overflow-hidden rounded-lg border border-border bg-white">
-          <div className="bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-5 py-5 sm:px-6">
+          <div className="bg-dowin-surface-gradient px-5 py-5 sm:px-6">
             <div className="space-y-3">
               <div>
                 <Badge className="w-fit rounded-md border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">

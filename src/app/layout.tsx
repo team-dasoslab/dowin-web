@@ -1,7 +1,7 @@
-import "./globals.css";
-import { ReactNode } from "react";
-import Script from "next/script";
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
+import Script from "next/script";
+import { ReactNode } from "react";
+import "./globals.css";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
@@ -9,9 +9,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko" suppressHydrationWarning>
       <head>
-        <title>DOWIN Tracker</title>
+        <title>Dowin</title>
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
-        <meta property="og:title" content="DOWIN Tracker" />
+        <meta property="og:title" content="Dowin" />
         <meta
           property="og:description"
           content="가장 중요한 목표에 집중하세요."
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta property="og:image" content="/cover.png" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="DOWIN Tracker" />
+        <meta name="twitter:title" content="Dowin" />
         <meta
           name="twitter:description"
           content="가장 중요한 목표에 집중하세요."
@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="DOWIN Tracker" />
+        <meta name="apple-mobile-web-app-title" content="Dowin" />
         <meta name="theme-color" content="#EFF0FA" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.svg" />
@@ -102,7 +102,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap"
         />
       </head>
       <body>

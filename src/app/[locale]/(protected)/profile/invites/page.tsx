@@ -187,7 +187,7 @@ export default function ProfileInvitesPage() {
                 className={`h-11 rounded-content px-4 text-xs font-bold ${
                   isCreatingInvite || isOverFreeMemberLimit
                     ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
-                    : "btn-linear-primary"
+                    : "btn-dowin-primary"
                 }`}
               >
                 {isCreatingInvite ? t("creatingButton") : t("createButton")}

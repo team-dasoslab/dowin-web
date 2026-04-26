@@ -54,7 +54,7 @@ export function getDashboardCelebrationBursts(
   const bursts: ConfettiOptions[] = [
     {
       angle: 60,
-      colors: ["#5e6ad2", "#84cc16", "#f59e0b", "#fb7185"],
+      colors: ["#1e293b", "#84cc16", "#f59e0b", "#fb7185"],
       origin: { x: 0.14, y: 0.58 },
       particleCount: level === "all" ? 140 : 90,
       scalar: level === "all" ? 1.05 : 0.92,
@@ -63,7 +63,7 @@ export function getDashboardCelebrationBursts(
     },
     {
       angle: 120,
-      colors: ["#22c55e", "#5e6ad2", "#fb7185", "#f59e0b"],
+      colors: ["#22c55e", "#1e293b", "#fb7185", "#f59e0b"],
       origin: { x: 0.86, y: 0.58 },
       particleCount: level === "all" ? 140 : 90,
       scalar: level === "all" ? 1.05 : 0.92,
@@ -75,7 +75,7 @@ export function getDashboardCelebrationBursts(
   if (level === "all") {
     bursts.push({
       angle: 90,
-      colors: ["#5e6ad2", "#84cc16", "#f59e0b", "#fb7185", "#22c55e"],
+      colors: ["#1e293b", "#84cc16", "#f59e0b", "#fb7185", "#22c55e"],
       origin: { x: 0.5, y: 0.42 },
       particleCount: 110,
       scalar: 0.98,

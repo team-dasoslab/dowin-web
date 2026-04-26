@@ -28,7 +28,7 @@ export function NotificationSettingControl({
         value={dailyReminderTime}
         disabled={disabled || !isSubscribed}
         onChange={(event) => onDailyReminderTimeChange(event.target.value)}
-        className="h-9 rounded-lg border border-border bg-white px-2 text-xs font-semibold text-text-primary disabled:cursor-not-allowed disabled:bg-sub-background disabled:text-text-muted"
+        className="h-9 cursor-pointer rounded-button border border-border bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:border-primary focus:bg-white disabled:cursor-not-allowed disabled:bg-sub-background disabled:text-text-muted"
       >
         {timeOptions.map((time) => (
           <option key={time} value={time}>

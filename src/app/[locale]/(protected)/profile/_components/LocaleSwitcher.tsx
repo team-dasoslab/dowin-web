@@ -32,29 +32,15 @@ export function LocaleSwitcher() {
   };
 
   return (
-    <div className="grid shrink-0 grid-cols-2 gap-1 rounded-lg border border-border bg-sub-background p-1">
-      <button
-        type="button"
-        onClick={() => handleLocaleChange("ko")}
-        className={`flex h-8 w-[4.25rem] items-center justify-center whitespace-nowrap rounded-md px-2 text-center text-[11px] font-bold leading-none transition-all ${
-          locale === "ko"
-            ? "bg-white text-primary shadow-sm border border-border"
-            : "text-text-muted hover:text-text-primary"
-        }`}
+    <div className="flex shrink-0">
+      <select
+        value={locale}
+        onChange={(e) => handleLocaleChange(e.target.value as "ko" | "en")}
+        className="h-9 min-w-[100px] cursor-pointer rounded-button border border-border bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:border-primary focus:bg-white"
       >
-        {t("languageKo")}
-      </button>
-      <button
-        type="button"
-        onClick={() => handleLocaleChange("en")}
-        className={`flex h-8 w-[4.25rem] items-center justify-center whitespace-nowrap rounded-md px-2 text-center text-[11px] font-bold leading-none transition-all ${
-          locale === "en"
-            ? "bg-white text-primary shadow-sm border border-border"
-            : "text-text-muted hover:text-text-primary"
-        }`}
-      >
-        {t("languageEn")}
-      </button>
+        <option value="ko">{t("languageKo")}</option>
+        <option value="en">{t("languageEn")}</option>
+      </select>
     </div>
   );
 }

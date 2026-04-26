@@ -1,6 +1,5 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface SetupSubmitButtonProps {
@@ -26,16 +25,15 @@ export function SetupSubmitButton({
       className={`flex w-full items-center justify-center gap-2 rounded-button py-3 text-sm font-bold transition-all ${
         isMutating
           ? "cursor-not-allowed bg-primary/50 text-white"
-          : "btn-linear-primary"
+          : "btn-dowin-primary"
       }`}
     >
       {isSubmitPending ? (
         <InlineSpinner />
+      ) : isEditMode ? (
+        t("saveChanges")
       ) : (
-        <>
-          <DowinIcon name="action-save" size="14px" />
-          {isEditMode ? t("saveChanges") : t("createScoreboard")}
-        </>
+        t("createScoreboard")
       )}
     </Button>
   );

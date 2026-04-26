@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useTranslations } from "next-intl";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 
 export default function NewWorkspacePage() {
   const t = useTranslations("Workspace.new");
@@ -37,7 +38,7 @@ export default function NewWorkspacePage() {
       {isPending && (
         <LoadingOverlay message={t("loading")} />
       )}
-      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-linear-in">
+      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-dowin-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
           <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 transition-colors shrink-0" />
@@ -47,7 +48,7 @@ export default function NewWorkspacePage() {
         {/* 헤더 */}
         <div className="space-y-5">
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-            <DowinIcon name="domain-flash-large" size="24px" className="text-primary" />
+            <Logo size="24px" className="text-primary" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
@@ -93,7 +94,7 @@ export default function NewWorkspacePage() {
               ${
                 isPending || !name.trim()
                   ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-linear-primary hover:scale-[1.02] active:scale-[0.98]"
+                  : "btn-dowin-primary hover:scale-[1.02] active:scale-[0.98]"
               }
             `}
           >

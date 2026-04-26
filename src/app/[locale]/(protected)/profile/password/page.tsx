@@ -73,7 +73,7 @@ export default function ProfilePasswordPage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => void submit()}
-            className="btn-linear-primary h-11 w-full rounded-content text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-dowin-primary h-11 w-full rounded-content text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>

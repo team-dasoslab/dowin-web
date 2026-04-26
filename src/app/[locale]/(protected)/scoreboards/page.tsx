@@ -10,7 +10,7 @@ import { ArchivedScoreboardsSection } from "@/app/[locale]/(protected)/scoreboar
 import { useScoreboardArchive } from "@/app/[locale]/(protected)/scoreboards/_hooks/useScoreboardArchive";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
@@ -188,9 +188,9 @@ function ScoreboardsNoWorkspaceState() {
   const td = useTranslations("Dashboard");
   return (
     <div className="min-h-screen bg-zinc-50/50 font-pretendard flex items-center justify-center p-8">
-      <div className="max-w-[420px] w-full space-y-10 animate-linear-in">
+      <div className="max-w-[420px] w-full space-y-10 animate-dowin-in">
         <div className="w-14 h-14 bg-primary/10 rounded-content flex items-center justify-center">
-          <DowinIcon name="domain-flash-active" className="text-primary" size="28px" />
+          <Logo className="text-primary" size="28px" />
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold text-text-primary tracking-tight">

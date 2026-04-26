@@ -4,40 +4,25 @@ import { usePostAuthLogin, usePostAuthSignup } from "@/api/generated/auth/auth";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
+import { Logo } from "@/components/ui/Logo";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useToast } from "@/context/ToastContext";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { Link, useRouter } from "@/i18n/routing";
+import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Link } from "@/i18n/routing";
-import { useRouter } from "@/i18n/routing"
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 
 type AuthMode = "login" | "signup";
 
-const signupFormSchema = z.object({
-  customId: z
-    .string()
-    .regex(/^[a-zA-Z0-9]{3,20}$/, "아이디는 3~20자의 영문/숫자여야 합니다."),
-  nickname: z
-    .string()
-    .min(1, "닉네임을 입력해주세요.")
-    .max(50, "닉네임은 50자 이하여야 합니다."),
-  password: z
-    .string()
-    .regex(
-      /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/,
-      "비밀번호는 8자 이상의 영문/숫자/허용 특수문자 조합이어야 합니다.",
-    ),
-});
-
 export default function LoginPageClient() {
   const t = useTranslations("Auth");
+  const tCommon = useTranslations("Common");
   const [mode, setMode] = useState<AuthMode>("login");
   const [id, setId] = useState("");
   const [nickname, setNickname] = useState("");
@@ -51,6 +36,26 @@ export default function LoginPageClient() {
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const isPending = loginMutation.isPending || signupMutation.isPending;
+
+  const signupFormSchema = useMemo(
+    () =>
+      z.object({
+        customId: z
+          .string()
+          .regex(/^[a-zA-Z0-9]{3,20}$/, t("errors.invalidId")),
+        nickname: z
+          .string()
+          .min(1, t("errors.nicknameRequired"))
+          .max(50, t("errors.nicknameTooLong")),
+        password: z
+          .string()
+          .regex(
+            /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/,
+            t("errors.invalidPassword"),
+          ),
+      }),
+    [t],
+  );
 
   useEffect(() => {
     const rawFlashToast = window.sessionStorage.getItem("dowin.flash.toast");
@@ -128,16 +133,8 @@ export default function LoginPageClient() {
       });
 
       if (!parsed.success) {
-        const fieldErrors = parsed.error.flatten().fieldErrors;
-        if (fieldErrors.customId) {
-          setError(t("errors.invalidId"));
-        } else if (fieldErrors.nickname) {
-          setError(t("errors.nicknameRequired"));
-        } else if (fieldErrors.password) {
-          setError(t("errors.invalidPassword"));
-        } else {
-          setError(t("errors.checkInputs"));
-        }
+        const errorMsg = parsed.error.issues[0]?.message;
+        setError(errorMsg || t("errors.checkInputs"));
         return;
       }
 
@@ -167,7 +164,12 @@ export default function LoginPageClient() {
           user_id_hash: hashId(response.data.user.id),
         });
       } catch (signupError) {
-        setError(getApiErrorMessage(signupError, t("errors.signupFailed")));
+        const status = getApiErrorStatus(signupError);
+        if (status === 409) {
+          setError(t("errors.idAlreadyExists"));
+        } else {
+          setError(getApiErrorMessage(signupError, t("errors.signupFailed")));
+        }
       }
 
       return;
@@ -189,34 +191,37 @@ export default function LoginPageClient() {
       const nextPath = searchParams.get("next");
       router.push(nextPath || "/dashboard/my");
     } catch (loginError) {
-      setError(
-        getApiErrorMessage(
-          loginError,
-          t("errors.loginFailed"),
-        ),
-      );
+      const status = getApiErrorStatus(loginError);
+      if (status === 401) {
+        setError(t("errors.loginFailed"));
+      } else {
+        setError(getApiErrorMessage(loginError, t("errors.loginFailed")));
+      }
     }
   };
 
   if (recoveryCodes) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 font-pretendard">
-        <Card className="w-full max-w-[520px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
-          <div className="space-y-2 text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+      <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 font-pretendard overflow-hidden selection:bg-primary/20">
+        {/* Background Grid */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
+
+        <Card className="w-full max-w-[520px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+          <div className="space-y-4 text-center mb-8">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary font-outfit uppercase leading-none">
               {t("recovery.title")}
             </h1>
-            <p className="text-sm text-text-muted">
+            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
               {t("recovery.description")}
             </p>
           </div>
 
-          <div className="mt-6 rounded-xl border border-border bg-sub-background p-4">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="mt-8 rounded-content border border-border bg-sub-background p-6">
+            <div className="grid grid-cols-2 gap-3">
               {recoveryCodes.map((code) => (
                 <div
                   key={code}
-                  className="rounded-lg border border-border bg-white px-3 py-2 text-center text-sm font-semibold tracking-wide text-text-primary"
+                  className="rounded-button border border-border bg-sub-background px-4 py-3 text-center text-sm font-black tracking-widest text-text-primary"
                 >
                   {code}
                 </div>
@@ -225,27 +230,35 @@ export default function LoginPageClient() {
           </div>
 
           {error && (
-            <div className="mt-4 p-3 bg-danger/5 border border-danger/20 rounded-xl">
-              <p className="text-danger text-[11px] font-bold text-center">
+            <div className="mt-6 p-4 bg-danger/5 border border-danger/10 rounded-content">
+              <p className="text-danger text-[12px] font-bold text-center leading-tight">
                 {error}
               </p>
             </div>
           )}
 
-          <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Button
               type="button"
               onClick={handleCopyRecoveryCodes}
-              className="w-full rounded-xl py-3 text-sm font-semibold border border-border bg-white text-text-primary hover:bg-sub-background"
+              className="w-full rounded-button py-4 text-[13px] font-bold border border-border bg-white text-text-primary transition-all"
             >
               {isCopied ? (
                 <span className="inline-flex items-center gap-2">
-                  <DowinIcon name="status-checkmark" size="16px" />
+                  <DowinIcon
+                    name="status-checkmark"
+                    size="16px"
+                    className="text-success"
+                  />
                   {t("recovery.copied")}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2">
-                  <DowinIcon name="action-copy" size="16px" />
+                  <DowinIcon
+                    name="action-copy"
+                    size="16px"
+                    className="opacity-50"
+                  />
                   {t("recovery.copy")}
                 </span>
               )}
@@ -253,7 +266,7 @@ export default function LoginPageClient() {
             <Button
               type="button"
               onClick={handleDownloadRecoveryCodes}
-              className="w-full rounded-xl py-3 text-sm font-semibold border border-border bg-white text-text-primary hover:bg-sub-background"
+              className="w-full rounded-button py-4 text-[13px] font-bold border border-border bg-white text-text-primary transition-all"
             >
               {t("recovery.saveTxt")}
             </Button>
@@ -263,62 +276,44 @@ export default function LoginPageClient() {
                 const nextPath = searchParams.get("next");
                 router.push(nextPath || "/dashboard/my");
               }}
-              className="w-full rounded-xl py-3 text-sm font-semibold btn-linear-primary text-white"
+              className="w-full rounded-button py-4 text-[13px] font-black bg-text-primary text-white transition-all"
             >
               {t("continue")}
             </Button>
           </div>
         </Card>
+
+        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest font-outfit">
+          © 2026 Dasoslab. All rights reserved.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 font-pretendard">
-      <Card className="w-full max-w-[380px] bg-white border border-border rounded-2xl p-8 md:p-10 shadow-sm animate-linear-in">
-        <div className="flex flex-col items-center text-center space-y-4 mb-10">
-          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-            <DowinIcon name="domain-flash" className="text-primary" size="24px" />
+    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 font-pretendard overflow-hidden selection:bg-primary/20">
+      {/* Background Grid */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
+
+      <Card className="w-full max-w-[420px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+        <div className="flex flex-col items-center text-center space-y-5 mb-12">
+          <div className="w-16 h-16 bg-white border border-border rounded-content flex items-center justify-center">
+            <Logo size="32px" className="text-text-primary" />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary">
-              DOWIN
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary font-outfit leading-none">
+              {mode === "login" ? t("login") : t("signup")}
             </h1>
-            <p className="text-[13px] text-text-muted">
-              {t("subtitle")}
+            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
+              {mode === "login" ? t("subtitle") : t("signupSubtitle")}
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-2 gap-2 rounded-xl bg-sub-background p-1">
-            <Button
-              type="button"
-              onClick={() => resetErrorAndSwitchMode("login")}
-              className={`rounded-lg py-2 text-xs font-bold transition-colors ${
-                mode === "login"
-                  ? "bg-white text-primary border border-border"
-                  : "text-text-muted hover:text-text-primary"
-              }`}
-            >
-              {t("login")}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => resetErrorAndSwitchMode("signup")}
-              className={`rounded-lg py-2 text-xs font-bold transition-colors ${
-                mode === "signup"
-                  ? "bg-white text-primary border border-border"
-                  : "text-text-muted hover:text-text-primary"
-              }`}
-            >
-              {t("signup")}
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
                 {t("id")}
               </label>
               <Input
@@ -326,93 +321,110 @@ export default function LoginPageClient() {
                 value={id}
                 onChange={(e) => setId(e.target.value)}
                 placeholder="admin"
-                className="w-full px-4 py-3 bg-sub-background border border-border rounded-xl text-sm focus:border-primary focus:bg-white outline-none transition-colors placeholder:text-text-muted/40 font-medium"
+                className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
                 required
               />
             </div>
 
             {mode === "signup" && (
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
+              <div className="space-y-2 animate-fade-in-up">
+                <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
                   {t("nickname")}
                 </label>
                 <Input
                   type="text"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
-                  placeholder={mode === "signup" ? (t("nickname") === "Nickname" ? "John Doe" : "홍길동") : ""}
-                  className="w-full px-4 py-3 bg-sub-background border border-border rounded-xl text-sm focus:border-primary focus:bg-white outline-none transition-colors placeholder:text-text-muted/40 font-medium"
+                  placeholder={t("nicknamePlaceholder")}
+                  className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
                   required
                 />
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-bold text-text-muted uppercase tracking-wider ml-0.5">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
                 {t("password")}
               </label>
               <PasswordInput
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-border bg-sub-background px-4 py-3 pr-20 text-sm font-medium outline-none transition-colors placeholder:text-text-muted/40 focus:border-primary focus:bg-white"
-                toggleClassName="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors hover:text-text-primary"
+                className="w-full rounded-content border border-border bg-sub-background px-5 py-4 pr-14 text-sm font-bold outline-none transition-all placeholder:text-text-muted focus:border-primary focus:bg-white"
+                toggleClassName="absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-text-muted transition-colors"
                 required
               />
             </div>
           </div>
 
           {error && (
-            <div className="p-3 bg-danger/5 border border-danger/20 rounded-xl">
-              <p className="text-danger text-[11px] font-bold text-center">
+            <div className="p-4 bg-danger/5 border border-danger/10 rounded-content animate-shake">
+              <p className="text-danger text-[12px] font-bold text-center leading-tight">
                 {error}
               </p>
             </div>
           )}
 
-          <Button
-            type="submit"
-            disabled={isPending}
-            className={`
-              w-full py-3.5 flex items-center justify-center gap-2 rounded-xl text-sm font-bold transition-all
-              ${
-                isPending
-                  ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-linear-primary shadow-lg shadow-primary/10"
-              }
-            `}
-          >
-            {isPending ? (
-              <InlineSpinner />
-            ) : (
-              <>
-                {mode === "login" ? (
-                  <>
-                    <DowinIcon name="action-enter" size="16px" />
+          <div className="space-y-4">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className={`
+                w-full py-4 flex items-center justify-center gap-3 rounded-button text-[15px] font-black transition-all
+                ${
+                  isPending
+                    ? "bg-sub-background text-text-muted cursor-not-allowed border border-border"
+                    : "bg-text-primary text-white"
+                }
+              `}
+            >
+              {isPending ? (
+                <InlineSpinner />
+              ) : (
+                <>
+                  {mode === "login" ? (
                     <span>{t("login")}</span>
-                  </>
-                ) : (
-                  <>
-                    <DowinIcon name="action-person-add" size="16px" />
+                  ) : (
                     <span>{t("signup")}</span>
-                  </>
-                )}
-              </>
-            )}
-          </Button>
+                  )}
+                </>
+              )}
+            </Button>
 
-          {mode === "login" && (
-            <div className="text-center">
-              <Link
-                href="/account-recovery"
-                className="text-xs font-medium text-text-muted hover:text-text-primary underline underline-offset-2"
-              >
-                {t("forgotPassword")}
-              </Link>
+            <div className="text-center space-y-3">
+              {mode === "login" ? (
+                <>
+                  <Link
+                    href="/account-recovery"
+                    className="block text-[13px] font-bold text-text-muted transition-colors"
+                  >
+                    {t("forgotPassword")}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => resetErrorAndSwitchMode("signup")}
+                    className="text-[13px] font-bold text-primary transition-colors"
+                  >
+                    {t("noAccount")} {t("signup")}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => resetErrorAndSwitchMode("login")}
+                  className="text-[13px] font-bold text-primary transition-colors"
+                >
+                  {t("hasAccount")} {t("login")}
+                </button>
+              )}
             </div>
-          )}
+          </div>
         </form>
       </Card>
+
+      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest font-outfit">
+        © 2026 Dasoslab. All rights reserved.
+      </p>
     </div>
   );
 }

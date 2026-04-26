@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface GoalSectionProps {
@@ -17,14 +16,8 @@ export function GoalSection({
   const t = useTranslations("Setup");
 
   return (
-    <Card
-      className="p-6 md:p-8 space-y-6"
-      data-coachmark="setup-goal"
-    >
+    <Card className="p-6 md:p-8 space-y-6" data-coachmark="setup-goal">
       <div className="space-y-4">
-        <div className="w-10 h-10 bg-primary/10 rounded-content flex items-center justify-center">
-          <DowinIcon name="domain-flash-active" size="20px" className="text-primary" />
-        </div>
         <div>
           <label className="block text-sm font-bold text-zinc-900">
             {t("goalQuestion")}

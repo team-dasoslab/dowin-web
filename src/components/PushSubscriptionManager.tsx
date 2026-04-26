@@ -232,8 +232,8 @@ export default function PushSubscriptionManager({
       onClick={(e) => (isSubscribed ? unsubscribe(e) : subscribe(e))}
       className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
         isSubscribed
-          ? "bg-sub-background text-text-muted hover:bg-border transition-colors animate-linear-in"
-          : "bg-primary text-white hover:opacity-90 shadow-md shadow-primary/10 animate-linear-in"
+          ? "bg-sub-background text-text-muted hover:bg-border transition-colors animate-dowin-in"
+          : "bg-primary text-white hover:opacity-90 shadow-md shadow-primary/10 animate-dowin-in"
       }`}
     >
       {isSubscribed ? <DowinIcon name="status-alert-off-compact" size={16} /> : <DowinIcon name="status-alert-compact" size={16} />}
