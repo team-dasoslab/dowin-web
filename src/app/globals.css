@@ -59,6 +59,20 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 1023px) {
+    input,
+    textarea,
+    select {
+      font-size: max(16px, 1rem) !important;
+    }
+  }
+}
+
 /* iOS CJK Rendering Fix: Disable text-transform on elements that might contain Korean */
 :lang(ko) * {
   text-transform: none !important;
