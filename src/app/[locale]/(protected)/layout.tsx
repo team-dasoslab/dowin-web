@@ -2,9 +2,11 @@ import { getDb } from "@/db";
 import { redirect } from "@/i18n/routing";
 import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { SidebarProvider } from "@/context/SidebarContext";
 import { LocaleEnforcer } from "./_components/LocaleEnforcer";
 import { MainContentWrapper } from "./_components/MainContentWrapper";
 import { ProtectedContentLayout } from "./_components/ProtectedContentLayout";
+import { ProtectedLayoutShell } from "./_components/ProtectedLayoutShell";
 import { Sidebar } from "./_components/Sidebar";
 
 export default async function ProtectedLayout({
@@ -24,17 +26,15 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-zinc-50/50">
-      <LocaleEnforcer />
-      <Sidebar />
-      <main
-        id="main-scroll-container"
-        className="flex-1 overflow-y-auto overflow-x-hidden md:pl-[80px] lg:pl-[240px]"
+    <SidebarProvider>
+      <ProtectedLayoutShell
+        sidebar={<Sidebar />}
+        localeEnforcer={<LocaleEnforcer />}
       >
         <MainContentWrapper>
           <ProtectedContentLayout>{children}</ProtectedContentLayout>
         </MainContentWrapper>
-      </main>
-    </div>
+      </ProtectedLayoutShell>
+    </SidebarProvider>
   );
 }
