@@ -1,18 +1,30 @@
 "use client";
 
-import { useMobileViewSheet } from "@/app/[locale]/(protected)/dashboard/_hooks/useMobileViewSheet";
 import {
   DashboardTeamMemo,
   TeamDashboardMember,
   TeamDashboardMemberRole,
 } from "@/api/generated/dowin.schemas";
+import { useMobileViewSheet } from "@/app/[locale]/(protected)/dashboard/_hooks/useMobileViewSheet";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { TouchEvent, useEffect, useRef, useState } from "react";
+import { Input } from "@/components/ui/Input";
 import { useTranslations } from "next-intl";
+import { usePathname } from "@/i18n/routing";
+import { TouchEvent, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
+const Portal = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return mounted ? createPortal(children, document.body) : null;
+};
 
 type TeamMemberMemoPanelProps = {
   member: TeamDashboardMember;
@@ -48,10 +60,25 @@ export function TeamMemberMemoPanel({
   currentUserRole,
 }: TeamMemberMemoPanelProps) {
   const t = useTranslations("Comments");
+  const pathname = usePathname();
   const [memoDraft, setMemoDraft] = useState("");
   const [sheetDragY, setSheetDragY] = useState(0);
   const isSubmittingMemoRef = useRef(false);
   const sheetTouchStartYRef = useRef<number | null>(null);
+
+  // Main tab paths where the bottom navigation is visible
+  const mainTabPaths = [
+    "/",
+    "/dashboard",
+    "/dashboard/my",
+    "/report",
+    "/setup",
+    "/scoreboards",
+    "/profile",
+  ];
+
+  const isMainTab = mainTabPaths.includes(pathname);
+
   const {
     isVisible: isMobileViewSheetVisible,
     isClosing: isMobileViewSheetClosing,
@@ -144,124 +171,126 @@ export function TeamMemberMemoPanel({
     sheetTouchStartYRef.current = null;
   };
 
-  if (!shouldShowMemoRail) {
-    return null;
-  }
-
   return (
     <>
-      <div className="fixed inset-0 z-[70] h-dvh overflow-hidden bg-black/55 backdrop-blur-[1px] md:hidden">
-        {isComposeMode ? (
-          <>
-            <button
-              type="button"
-              onClick={onCloseMemo}
-              className="absolute inset-0"
-              aria-label={t("closeMemo")}
-            />
-            <div className="absolute inset-x-0 bottom-0 border-t border-border bg-white px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Input
-                  value={memoDraft}
-                  onChange={(event) => setMemoDraft(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" && !event.shiftKey) {
-                      event.preventDefault();
-                      void handleAddMemo();
-                    }
-                  }}
-                  placeholder={t("addComment")}
-                  className="h-10 flex-1 rounded-button border border-border bg-white px-3 text-sm text-text-primary placeholder:text-text-muted"
-                  disabled={isCreatePending}
-                />
-                <Button
+      {shouldShowMemoRail && (
+        <Portal>
+          <div className="fixed inset-0 z-[200] h-dvh overflow-hidden bg-black/55 backdrop-blur-[1px] md:hidden">
+            {isComposeMode ? (
+              <>
+                <button
                   type="button"
-                  onClick={() => void handleAddMemo()}
-                  disabled={!memoDraft.trim() || isCreatePending}
-                  className="inline-flex h-10 w-10 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
-                  aria-label={t("submitMemo")}
+                  onClick={onCloseMemo}
+                  className="absolute inset-0"
+                  aria-label={t("closeMemo")}
+                />
+                <div
+                  className="absolute inset-x-0 bottom-0 border-t border-border bg-white px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
                 >
-                  <DowinIcon name="action-send" size="16px" />
-                </Button>
-              </div>
-            </div>
-          </>
-        ) : isMobileViewSheetVisible ? (
-          <>
-            <button
-              type="button"
-              onClick={closeMobileViewSheet}
-              className={`absolute inset-0 transition-opacity duration-200 ${
-                isMobileViewSheetClosing || isMobileViewSheetEntering
-                  ? "opacity-0"
-                  : "opacity-100"
-              }`}
-              aria-label={t("closeMemo")}
-            />
-            <div
-              className="absolute inset-x-0 bottom-0 max-h-[78dvh] overflow-hidden rounded-t-[28px] bg-white shadow-[0_-18px_40px_rgba(15,23,42,0.18)] transition-transform duration-200 ease-out"
-              style={{
-                transform: isMobileViewSheetClosing
-                  ? "translateY(100%)"
-                  : isMobileViewSheetEntering
-                    ? "translateY(100%)"
-                  : `translateY(${sheetDragY}px)`,
-              }}
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
-            >
-              <div className="flex justify-center pt-3">
-                <span className="h-1.5 w-12 rounded-full bg-border" />
-              </div>
-              <div className="px-4 py-3">
-                <div className="flex min-w-0 items-center gap-3">
-                  <UserAvatar
-                    avatarKey={member.avatarKey}
-                    avatarSeed={member.nickname}
-                    alt={`${member.nickname ?? "사용자"} 아바타`}
-                    size={28}
-                  />
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-bold text-text-primary">
-                      {member.nickname}
-                    </p>
-                    <p className="truncate text-xs text-text-muted">
-                      {t("viewMemos")}
-                    </p>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={memoDraft}
+                      onChange={(event) => setMemoDraft(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" && !event.shiftKey) {
+                          event.preventDefault();
+                          void handleAddMemo();
+                        }
+                      }}
+                      placeholder={t("addComment")}
+                      className="h-10 flex-1 rounded-button border border-border bg-white px-3 text-sm text-text-primary placeholder:text-text-muted"
+                      disabled={isCreatePending}
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => void handleAddMemo()}
+                      disabled={!memoDraft.trim() || isCreatePending}
+                      className="inline-flex h-10 w-10 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
+                      aria-label={t("submitMemo")}
+                    >
+                      <DowinIcon name="action-send" size="16px" />
+                    </Button>
                   </div>
                 </div>
-              </div>
-
-              <div
-                className="overflow-y-auto px-4 py-4 pb-6"
-                style={{ maxHeight: "calc(78dvh - 73px)" }}
-              >
-                <div className="space-y-3">
-                  {isMemosLoading ? (
-                    <MemoStatusCard message={t("loadingMemos")} />
-                  ) : isMemosError ? (
-                    <MemoStatusCard message={t("memosError")} />
-                  ) : hasMemos ? (
-                    memos.map((memo) => (
-                      <MemoCard
-                        key={memo.id}
-                        memo={memo}
-                        currentUserId={currentUserId}
-                        currentUserRole={currentUserRole}
-                        isResolvePending={isResolvePending}
-                        isDeletePending={isDeletePending}
-                        onResolve={handleResolveMemo}
-                        onDelete={handleDeleteMemo}
+              </>
+            ) : isMobileViewSheetVisible ? (
+              <>
+                <button
+                  type="button"
+                  onClick={closeMobileViewSheet}
+                  className={`absolute inset-0 transition-opacity duration-200 ${
+                    isMobileViewSheetClosing || isMobileViewSheetEntering
+                      ? "opacity-0"
+                      : "opacity-100"
+                  }`}
+                  aria-label={t("closeMemo")}
+                />
+                <div
+                  className="absolute inset-x-0 bottom-0 max-h-[78dvh] overflow-hidden rounded-t-[28px] bg-white pb-[var(--safe-area-inset-bottom,0px)] shadow-[0_-18px_40px_rgba(15,23,42,0.18)] transition-transform duration-200 ease-out"
+                  style={{
+                    transform: isMobileViewSheetClosing
+                      ? "translateY(100%)"
+                      : isMobileViewSheetEntering
+                        ? "translateY(100%)"
+                        : `translateY(${sheetDragY}px)`,
+                  }}
+                  onTouchStart={handleSheetTouchStart}
+                  onTouchMove={handleSheetTouchMove}
+                  onTouchEnd={handleSheetTouchEnd}
+                >
+                  <div className="flex justify-center pt-3">
+                    <span className="h-1.5 w-12 rounded-full bg-border" />
+                  </div>
+                  <div className="px-4 py-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <UserAvatar
+                        avatarKey={member.avatarKey}
+                        avatarSeed={member.nickname}
+                        alt={`${member.nickname ?? "사용자"} 아바타`}
+                        size={28}
                       />
-                    ))
-                  ) : null}
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-text-primary">
+                          {member.nickname}
+                        </p>
+                        <p className="truncate text-xs text-text-muted">
+                          {t("viewMemos")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="overflow-y-auto px-4 py-4 pb-6"
+                    style={{ maxHeight: "calc(78dvh - 73px)" }}
+                  >
+                    <div className="space-y-3">
+                      {isMemosLoading ? (
+                        <MemoStatusCard message={t("loadingMemos")} />
+                      ) : isMemosError ? (
+                        <MemoStatusCard message={t("memosError")} />
+                      ) : hasMemos ? (
+                        memos.map((memo) => (
+                          <MemoCard
+                            key={memo.id}
+                            memo={memo}
+                            currentUserId={currentUserId}
+                            currentUserRole={currentUserRole}
+                            isResolvePending={isResolvePending}
+                            isDeletePending={isDeletePending}
+                            onResolve={handleResolveMemo}
+                            onDelete={handleDeleteMemo}
+                          />
+                        ))
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </>
-        ) : null}
-      </div>
+              </>
+            ) : null}
+          </div>
+        </Portal>
+      )}
 
       <div className="hidden space-y-3 md:hidden xl:absolute xl:left-[calc(100%+20px)] xl:top-8 xl:block xl:w-[300px]">
         {isComposeMode ? (
