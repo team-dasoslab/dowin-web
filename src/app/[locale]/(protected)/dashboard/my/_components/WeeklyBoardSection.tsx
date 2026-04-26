@@ -161,7 +161,7 @@ export function WeeklyBoardSection({
                                   void toggleLog(leadMeasureId, date);
                                 }
                               }}
-                              className={`mx-auto flex h-7 w-7 items-center justify-center rounded-md border transition-colors ${
+                              className={`mx-auto flex aspect-square h-7 w-7 items-center justify-center rounded-md border p-0 transition-colors ${
                                 currentValue === true
                                   ? "border-primary bg-primary text-white"
                                   : isToday
@@ -174,7 +174,7 @@ export function WeeklyBoardSection({
                               }`}
                             >
                               {currentValue === true ? (
-                                <DowinIcon name="action-checkmark" size="14px" />
+                                <DowinIcon name="action-checkmark" size="14px" className="shrink-0" />
                               ) : null}
                             </Button>
                           </td>
