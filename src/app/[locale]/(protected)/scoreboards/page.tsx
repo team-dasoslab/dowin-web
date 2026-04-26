@@ -142,19 +142,15 @@ export default function ScoreboardsPage() {
             </section>
 
             <section id="archived" className="space-y-5 scroll-mt-28">
-              <div className="flex items-end justify-between">
-                <div className="flex-1">
-                  <SectionHeader
-                    title={t("archivedScoreboards")}
-                    description={t("archivedScoreboardsDesc")}
-                  />
-                </div>
-                <div className="pb-1 px-1 flex-shrink-0">
-                  <div className="px-2 py-1 rounded-md border border-border bg-sub-background text-[10px] font-black text-text-muted uppercase tracking-tight">
+              <SectionHeader
+                title={t("archivedScoreboards")}
+                description={t("archivedScoreboardsDesc")}
+                badge={
+                  <div className="px-2 py-0.5 rounded-md border border-border bg-sub-background text-[10px] font-black text-text-muted uppercase tracking-tight">
                     {t("totalCount", { count: archivedScoreboards.length })}
                   </div>
-                </div>
-              </div>
+                }
+              />
               <ArchivedScoreboardsSection
                 archivedScoreboards={archivedScoreboards}
                 onReactivate={(id) => {
