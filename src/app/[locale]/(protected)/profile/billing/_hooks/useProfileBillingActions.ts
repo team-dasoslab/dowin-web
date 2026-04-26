@@ -9,6 +9,7 @@ import {
 } from "@/lib/client/frontend-api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
+import { generateId } from "@/lib/utils";
 
 export function useProfileBillingActions() {
   const t = useTranslations("ProfileBilling");
@@ -22,7 +23,7 @@ export function useProfileBillingActions() {
         { locale },
         {
           headers: {
-            "Idempotency-Key": crypto.randomUUID(),
+            "Idempotency-Key": generateId(),
           },
         },
       );

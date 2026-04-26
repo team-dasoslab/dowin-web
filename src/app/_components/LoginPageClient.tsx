@@ -22,7 +22,6 @@ type AuthMode = "login" | "signup";
 
 export default function LoginPageClient() {
   const t = useTranslations("Auth");
-  const tCommon = useTranslations("Common");
   const [mode, setMode] = useState<AuthMode>("login");
   const [id, setId] = useState("");
   const [nickname, setNickname] = useState("");

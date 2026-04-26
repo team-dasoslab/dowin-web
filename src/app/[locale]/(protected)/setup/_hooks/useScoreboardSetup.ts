@@ -47,6 +47,7 @@ import { hashId } from "@/lib/client/id-hash";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
+import { generateId } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export const useScoreboardSetup = () => {
@@ -139,7 +140,7 @@ export const useScoreboardSetup = () => {
       setLagMeasure(activeScoreboard.lagMeasure ?? "");
       setMeasures(
         nextLeadMeasures.map((leadMeasure) => ({
-          id: String(leadMeasure.id ?? crypto.randomUUID()),
+          id: String(leadMeasure.id ?? generateId()),
           existingId: toNumberId(leadMeasure.id),
           name: leadMeasure.name ?? "",
           period: leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",

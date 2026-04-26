@@ -1,24 +1,27 @@
 "use client";
 
+import { BridgeInitializer } from "@/components/bridge/BridgeInitializer";
+import { CampaignAttribution } from "@/components/CampaignAttribution";
+import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { ToastProvider } from "@/context/ToastContext";
 import { usePushNotificationAnalytics } from "@/hooks/usePushNotificationAnalytics";
 import { useSerwistRegistration } from "@/hooks/useSerwistRegistration";
 import { DEFAULT_TIME_ZONE } from "@/i18n/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Suspense, useEffect, useState } from "react";
-import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
-import { CampaignAttribution } from "@/components/CampaignAttribution";
 import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
+import { Suspense, useEffect, useState } from "react";
 
 export function Providers({
   children,
   locale,
   messages,
+  isNative,
 }: {
   children: React.ReactNode;
   locale: string;
   messages: AbstractIntlMessages;
+  isNative: boolean;
 }) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
   const shouldRegisterServiceWorker = !publicRuntimeConfig.isDevelopment;
@@ -49,6 +52,7 @@ export function Providers({
     >
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
+          <BridgeInitializer isNative={isNative} />
           <Suspense fallback={null}>
             <NavigationHistoryTracker />
             <CampaignAttribution />
