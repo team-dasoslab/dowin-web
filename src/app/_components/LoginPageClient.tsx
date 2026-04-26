@@ -22,7 +22,6 @@ type AuthMode = "login" | "signup";
 
 export default function LoginPageClient() {
   const t = useTranslations("Auth");
-  const tCommon = useTranslations("Common");
   const [mode, setMode] = useState<AuthMode>("login");
   const [id, setId] = useState("");
   const [nickname, setNickname] = useState("");
@@ -202,13 +201,13 @@ export default function LoginPageClient() {
 
   if (recoveryCodes) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 font-pretendard overflow-hidden selection:bg-primary/20">
+      <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 overflow-hidden selection:bg-primary/20">
         {/* Background Grid */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
         <Card className="w-full max-w-[520px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
           <div className="space-y-4 text-center mb-8">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary font-outfit uppercase leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
               {t("recovery.title")}
             </h1>
             <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
@@ -283,7 +282,7 @@ export default function LoginPageClient() {
           </div>
         </Card>
 
-        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest font-outfit">
+        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest ">
           © 2026 Dasoslab. All rights reserved.
         </p>
       </div>
@@ -291,7 +290,7 @@ export default function LoginPageClient() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 font-pretendard overflow-hidden selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 overflow-hidden selection:bg-primary/20">
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
@@ -301,7 +300,7 @@ export default function LoginPageClient() {
             <Logo size="32px" className="text-text-primary" />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary font-outfit leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary leading-none">
               {mode === "login" ? t("login") : t("signup")}
             </h1>
             <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
@@ -422,7 +421,7 @@ export default function LoginPageClient() {
         </form>
       </Card>
 
-      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest font-outfit">
+      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest ">
         © 2026 Dasoslab. All rights reserved.
       </p>
     </div>

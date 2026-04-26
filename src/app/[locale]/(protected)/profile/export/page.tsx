@@ -61,7 +61,7 @@ export default function ProfileExportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+    <div className="min-h-screen bg-slate-50/50 ">
       <ProtectedPageContainer>
         <ProtectedPageHeader title="데이터 내보내기" />
 
@@ -216,7 +216,7 @@ function ProfileExportHeader() {
 
 function ExportSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50/50 font-pretendard">
+    <div className="min-h-screen bg-slate-50/50 ">
       <ProtectedPageContainer isLoading>
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-24 rounded-content bg-sub-background" />
@@ -228,7 +228,7 @@ function ExportSkeleton() {
 
 function NoWorkspaceState() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-background ">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
@@ -249,7 +249,7 @@ function NoWorkspaceState() {
 
 function NoScoreboardState() {
   return (
-    <div className="min-h-screen bg-background font-pretendard">
+    <div className="min-h-screen bg-background ">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel

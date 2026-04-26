@@ -227,7 +227,7 @@ export default function ReportPage() {
   const hasMembers = summary.totalCount > 0;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 font-pretendard">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={tDashboard("weeklyReport")}

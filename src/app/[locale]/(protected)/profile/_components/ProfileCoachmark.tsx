@@ -26,16 +26,13 @@ const PROFILE_COACHMARK_STYLES: Partial<Styles> = {
     borderRadius: 12,
   },
   tooltipContainer: {
-    fontFamily: "var(--font-pretendard)",
   },
   tooltipTitle: {
-    fontFamily: "var(--font-pretendard)",
     fontSize: "14px",
     fontWeight: 700,
     color: "rgba(17, 24, 39, 1)",
   },
   tooltipContent: {
-    fontFamily: "var(--font-pretendard)",
     fontSize: "13px",
     lineHeight: "1.55",
     color: "rgba(75, 85, 99, 1)",
@@ -44,7 +41,6 @@ const PROFILE_COACHMARK_STYLES: Partial<Styles> = {
     backgroundColor: "var(--color-primary)",
     borderRadius: 8,
     color: "#fff",
-    fontFamily: "var(--font-pretendard)",
     fontWeight: 700,
     fontSize: "12px",
     lineHeight: "1.2",
@@ -55,7 +51,6 @@ const PROFILE_COACHMARK_STYLES: Partial<Styles> = {
   },
   buttonSkip: {
     color: "rgba(156, 163, 175, 1)",
-    fontFamily: "var(--font-pretendard)",
     fontWeight: 600,
     fontSize: "12px",
     lineHeight: "1.2",

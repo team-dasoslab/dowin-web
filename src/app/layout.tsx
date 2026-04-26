@@ -1,13 +1,28 @@
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
+import type { Viewport } from "next";
 import Script from "next/script";
+import { detectLocale } from "@/i18n/detect-locale";
+import { headers } from "next/headers";
 import { ReactNode } from "react";
 import "./globals.css";
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
+  const headerList = await headers();
+  const locale = detectLocale({
+    customLocale: headerList.get("x-dowin-locale"),
+    acceptLanguage: headerList.get("accept-language"),
+  });
 
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <title>Dowin</title>
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
@@ -25,10 +40,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           content="가장 중요한 목표에 집중하세요."
         />
         <meta name="twitter:image" content="/cover.png" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Dowin" />
@@ -97,12 +108,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           rel="apple-touch-startup-image"
           href="/splash/apple-splash-750-1334.jpg"
           media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-        />
-
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap"
         />
       </head>
       <body>

@@ -14,7 +14,7 @@ export function SubPageLayout({
   const tc = useTranslations("Common");
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50/50 font-pretendard">
+    <div className="flex min-h-screen flex-col bg-slate-50/50 ">
       {showBackButton && (
         <div className="mx-auto w-full max-w-[1200px] px-6 pt-6 md:px-10 md:pt-10 lg:px-12 lg:pt-12 pb-0">
           <SmartBackButton
