@@ -25,7 +25,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -109,7 +109,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "language",
-          icon: <WigIcon name="domain-language" className="w-4 h-4" />,
+          icon: <DowinIcon name="domain-language" className="w-4 h-4" />,
           title: t("languageTitle"),
           description: t("languageDesc"),
           rightElement: <LocaleSwitcher />,
@@ -122,7 +122,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "nickname",
-          icon: <WigIcon name="action-edit" className="w-4 h-4" />,
+          icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
           title: t("nicknameChangeTitle"),
           description: t("nicknameChangeDesc"),
           danger: false,
@@ -132,14 +132,14 @@ export default function ProfilePage() {
         },
         {
           id: "password",
-          icon: <WigIcon name="auth-key" className="w-4 h-4" />,
+          icon: <DowinIcon name="auth-key" className="w-4 h-4" />,
           title: t("passwordChangeTitle"),
           description: t("passwordChangeDesc"),
           href: "/profile/password",
         },
         {
           id: "logout",
-          icon: <WigIcon name="auth-sign-out" className="w-4 h-4" />,
+          icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
           title: t("logoutTitle"),
           description: t("logoutDesc"),
           danger: false,
@@ -149,7 +149,7 @@ export default function ProfilePage() {
         },
         {
           id: "account-delete",
-          icon: <WigIcon name="action-delete" className="w-4 h-4" />,
+          icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
           title: t("deleteAccountTitle"),
           description: t("deleteAccountDesc"),
           danger: true,
@@ -165,14 +165,14 @@ export default function ProfilePage() {
           ? [
               {
                 id: "billing",
-                icon: <WigIcon name="domain-payment" className="w-4 h-4" />,
+                icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
                 title: t("billingTitle"),
                 description: t("billingDesc"),
                 href: "/profile/billing",
               },
               {
                 id: "workspace-name",
-                icon: <WigIcon name="action-edit" className="w-4 h-4" />,
+                icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
                 title: t("changeWorkspaceName"),
                 description: t("changeWorkspaceNameDesc"),
                 onClick: () => {
@@ -181,21 +181,21 @@ export default function ProfilePage() {
               },
               {
                 id: "members",
-                icon: <WigIcon name="domain-people" className="w-4 h-4" />,
+                icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
                 title: t("manageMembers"),
                 description: t("manageMembersDesc"),
                 href: "/profile/members",
               },
               {
                 id: "invites",
-                icon: <WigIcon name="domain-ticket" className="w-4 h-4" />,
+                icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
                 title: t("manageInvites"),
                 description: t("manageInvitesDesc"),
                 href: "/profile/invites",
               },
               {
                 id: "workspace-delete",
-                icon: <WigIcon name="action-delete" className="w-4 h-4" />,
+                icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
                 title: t("workspaceDelete"),
                 description: t("workspaceDeleteDescFull"),
                 danger: true,
@@ -207,7 +207,7 @@ export default function ProfilePage() {
           : [
               {
                 id: "workspace-leave",
-                icon: <WigIcon name="auth-sign-out" className="w-4 h-4" />,
+                icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
                 title: t("workspaceLeave"),
                 description: t("workspaceLeaveDescFull"),
                 danger: true,
@@ -226,7 +226,7 @@ export default function ProfilePage() {
           ? [
               {
                 id: "export",
-                icon: <WigIcon name="action-download" className="w-4 h-4" />,
+                icon: <DowinIcon name="action-download" className="w-4 h-4" />,
                 title: t("csvDownload"),
                 description: t("csvDownloadDesc"),
                 href: "/profile/export",
@@ -240,7 +240,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "push-notification",
-          icon: <WigIcon name="status-alert" className="w-4 h-4" />,
+          icon: <DowinIcon name="status-bell" className="w-4 h-4" />,
           title: t("pushReminder"),
           description: t("pushReminderDesc"),
           rightElement: (
@@ -269,7 +269,7 @@ export default function ProfilePage() {
       items: [
         {
           id: "updates",
-          icon: <WigIcon name="status-premium" className="w-4 h-4" />,
+          icon: <DowinIcon name="status-announcement" className="w-4 h-4" />,
           title: t("newFeatures"),
           description: t("newFeaturesDesc"),
           href: "/updates",
@@ -283,7 +283,7 @@ export default function ProfilePage() {
         }, */
         {
           id: "contact",
-          icon: <WigIcon name="domain-chat" className="w-4 h-4" />,
+          icon: <DowinIcon name="domain-chat" className="w-4 h-4" />,
           title: t("contactUs"),
           description: t("contactUsDesc"),
           onClick: () => {
@@ -380,7 +380,7 @@ export default function ProfilePage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 사이드바 내비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-sub-background/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             {menuGroups
               .filter((group) => group.items.length > 0)
               .map((group) => {
@@ -433,10 +433,10 @@ export default function ProfilePage() {
                   className="flex-shrink-0"
                 />
                 <div className="min-w-0">
-                  <h2 className="text-xl font-bold text-zinc-900 tracking-tight">
+                  <h2 className="text-xl font-bold text-text-primary tracking-tight">
                     {nickname}
                   </h2>
-                  <p className="text-sm font-medium text-zinc-500 mt-1">
+                  <p className="text-sm font-medium text-text-secondary mt-1">
                     @{customId}
                   </p>
                 </div>
@@ -469,10 +469,10 @@ export default function ProfilePage() {
                     {group.id === "workspace" && workspace && (
                       <div className="mb-4 rounded-content border border-zinc-200 bg-white px-4 py-4 flex items-center justify-between gap-3 sm:px-8 sm:py-7">
                         <div className="flex flex-col min-w-0 text-left">
-                          <p className="text-lg font-bold text-zinc-900 truncate tracking-tight">
+                          <p className="text-lg font-bold text-text-primary truncate tracking-tight">
                             {workspace.name}
                           </p>
-                          <p className="text-xs font-medium text-zinc-500 mt-1">
+                          <p className="text-xs font-medium text-text-secondary mt-1">
                             {isWorkspaceAdmin
                               ? t("workspaceAdmin")
                               : t("workspaceMember")}
@@ -527,8 +527,8 @@ function MenuItemRow({
         <div
           className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 ${
             item.danger
-              ? "border-red-100 bg-red-50 text-red-500"
-              : "border-zinc-100 bg-zinc-50 text-zinc-400"
+              ? "border-danger/10 bg-danger/5 text-danger"
+              : "border-border/50 bg-sub-background text-text-muted"
           }`}
         >
           {item.icon}
@@ -536,19 +536,19 @@ function MenuItemRow({
         <div className="text-left min-w-0">
           <p
             className={`text-[14px] font-bold ${
-              item.danger ? "text-red-600" : "text-zinc-900"
+              item.danger ? "text-danger" : "text-text-primary"
             }`}
           >
             {item.title}
           </p>
-          <p className="text-[12px] text-zinc-500 mt-0.5">{item.description}</p>
+          <p className="text-[12px] text-text-secondary mt-0.5">{item.description}</p>
         </div>
       </div>
       <div className="flex-shrink-0">
         {item.rightElement ? (
           item.rightElement
         ) : (
-          <WigIcon name="nav-chevron-right" className="w-4 h-4 text-zinc-300" />
+          <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />
         )}
       </div>
     </div>

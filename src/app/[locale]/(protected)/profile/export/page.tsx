@@ -13,7 +13,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Link } from "@/i18n/routing";
 
 export default function ProfileExportPage() {
@@ -190,7 +190,7 @@ export default function ProfileExportPage() {
               disabled={isExporting || !isStandardPlan}
               className="h-9 w-full rounded-content bg-primary px-4 text-xs font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
-              <WigIcon name="action-download" size="14px" />
+              <DowinIcon name="action-download" size="14px" />
               {isStandardPlan
                 ? isExporting
                   ? "CSV 생성 중..."
@@ -229,7 +229,7 @@ function ExportSkeleton() {
 function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
           title="소속된 워크스페이스가 없어요"
@@ -250,7 +250,7 @@ function NoWorkspaceState() {
 function NoScoreboardState() {
   return (
     <div className="min-h-screen bg-background font-pretendard">
-      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-linear-in">
+      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
           title="아직 가중목이 없어요"
@@ -264,10 +264,10 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-linear-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+              className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
               <Link href="/setup?mode=create">
-                <WigIcon name="action-add" size="16px" />새 점수판 만들기
+                <DowinIcon name="action-add" size="16px" />새 점수판 만들기
               </Link>
             </Button>
           }

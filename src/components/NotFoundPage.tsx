@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Link from "next/link";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 
 type Locale = "ko" | "en";
 
@@ -49,7 +49,7 @@ export function NotFoundPage({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(94,106,210,0.14),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(132,204,22,0.14),transparent_24%)]" />
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-4 py-10 sm:px-6">
-        <Card className="card-linear w-full max-w-xl animate-linear-in rounded-[28px] border border-border/80 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8">
+        <Card className="card-dowin w-full max-w-xl animate-dowin-in rounded-[28px] border border-border/80 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8">
           <div className="space-y-6">
             <div className="flex items-center justify-between gap-3">
               <Badge className="rounded-md border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
@@ -59,7 +59,7 @@ export function NotFoundPage({
 
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-                WIG
+                DOWIN
               </p>
               <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
                 {copy.title}
@@ -71,10 +71,10 @@ export function NotFoundPage({
 
             <Button
               asChild
-              className="btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm"
+              className="btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm"
             >
               <Link href={homeHref}>
-                <WigIcon name="nav-home" size="16px" />
+                <DowinIcon name="nav-home" size="16px" />
                 {copy.goHome}
               </Link>
             </Button>

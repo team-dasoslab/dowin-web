@@ -10,7 +10,7 @@ import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/bil
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -89,7 +89,7 @@ export default function ProfileBillingPage() {
         <Card className="flex items-center justify-between gap-4 rounded-content border border-border px-6 py-5">
           <div className="flex items-center gap-4 min-w-0">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-primary/10 text-primary">
-              <WigIcon name="domain-wallet" size="20px" />
+              <DowinIcon name="domain-wallet" size="20px" />
             </div>
             <div className="min-w-0">
               <h1 className="text-lg font-bold tracking-tight text-text-primary">
@@ -104,9 +104,9 @@ export default function ProfileBillingPage() {
                 type="button"
                 onClick={startCheckout}
                 disabled={isCheckoutPending}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-content px-3 text-[11px] font-bold btn-linear-primary`}
+                className={`flex h-9 items-center justify-center gap-1.5 rounded-content px-3 text-[11px] font-bold btn-dowin-primary`}
               >
-                <WigIcon name="domain-payment" size="14px" />
+                <DowinIcon name="domain-payment" size="14px" />
                 {isCheckoutPending ? t("checkoutLoading") : t("upgradeButton")}
               </Button>
             )}
@@ -117,7 +117,7 @@ export default function ProfileBillingPage() {
                 onClick={() => void openPortal()}
                 className={`flex h-9 items-center justify-center gap-1.5 rounded-content border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors hover:bg-sub-background`}
               >
-                <WigIcon name="action-external" size="14px" />
+                <DowinIcon name="action-external" size="14px" />
                 {t("portalButton")}
               </Button>
             )}
@@ -143,7 +143,7 @@ export default function ProfileBillingPage() {
               onClick={() => void refetch()}
               className="mt-1 inline-flex h-8 items-center justify-center gap-1.5 rounded-content border border-primary/20 bg-white px-3 text-[11px] font-bold text-primary"
             >
-              <WigIcon name="action-refresh" size="14px" className={isFetching ? "animate-spin" : ""} />
+              <DowinIcon name="action-refresh" size="14px" className={isFetching ? "animate-spin" : ""} />
               {t("refresh")}
             </Button>
           </Card>
@@ -153,7 +153,7 @@ export default function ProfileBillingPage() {
           <Card className="space-y-3 rounded-content border border-red-200 bg-red-50 p-4">
             <div className="flex items-start gap-3">
               <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-content bg-white text-red-600">
-                <WigIcon name="status-locked" size="16px" />
+                <DowinIcon name="status-locked" size="16px" />
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-bold text-text-primary">
@@ -333,7 +333,7 @@ function NoWorkspaceState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <WigIcon name="domain-wallet" size="20px" />
+            <DowinIcon name="domain-wallet" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">
@@ -358,7 +358,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <WigIcon name="status-locked" size="20px" />
+            <DowinIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">

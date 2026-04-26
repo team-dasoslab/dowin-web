@@ -1,6 +1,6 @@
 "use client";
 
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import {
   createContext,
   ReactNode,
@@ -92,7 +92,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               onClick={() => removeToast(toast.id)}
               className="p-1 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
             >
-              <WigIcon name="action-dismiss" size="16px" />
+              <DowinIcon name="action-dismiss" size="16px" />
             </button>
           </div>
         ))}

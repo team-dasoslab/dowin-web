@@ -43,7 +43,7 @@ export const useDeleteAccountAction = ({
       }
 
       window.sessionStorage.setItem(
-        "wig.flash.toast",
+        "dowin.flash.toast",
         JSON.stringify({
           message: t("deleteSuccess"),
           type: "success",

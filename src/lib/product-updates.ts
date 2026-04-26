@@ -2,7 +2,7 @@ import { productUpdates, type ProductUpdate } from "@/content/product-updates";
 
 export const PRODUCT_UPDATES_NEW_WINDOW_DAYS = 14;
 export const PRODUCT_UPDATES_DISMISS_STORAGE_KEY =
-  "wig:dismissed-product-update";
+  "dowin:dismissed-product-update";
 
 type DismissedProductUpdate = {
   updateId: string;

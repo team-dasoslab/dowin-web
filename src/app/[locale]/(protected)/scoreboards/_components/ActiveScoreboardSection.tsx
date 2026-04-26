@@ -4,7 +4,8 @@ import { ScoreboardCard } from "@/app/[locale]/(protected)/scoreboards/_componen
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
@@ -56,7 +57,7 @@ export function ActiveScoreboardSection({
                   className="border-text-secondary/20 border-t-text-secondary"
                 />
               ) : (
-                 <WigIcon name="action-archive" size="14px" />
+                 <DowinIcon name="action-archive" size="14px" />
               )}
               {pendingActionId === activeScoreboardId
                 ? t("archiving")
@@ -77,7 +78,7 @@ function EmptyActiveScoreboardCard() {
   return (
     <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center space-y-4">
       <div className="w-12 h-12 bg-primary/10 rounded-content  mx-auto flex items-center justify-center">
-         <WigIcon name="domain-flash-active" size="24px" className="text-primary" />
+         <Logo size="24px" className="text-primary" />
       </div>
       <div className="space-y-1">
         <p className="text-sm font-semibold text-text-primary">
@@ -88,10 +89,10 @@ function EmptyActiveScoreboardCard() {
       <div className="flex justify-center">
         <Button
           asChild
-          className="btn-linear-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5"
+          className="btn-dowin-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5"
         >
           <Link href="/setup?mode=create">
-             <WigIcon name="action-add" size="14px" />
+             <DowinIcon name="action-add" size="14px" />
             {td("createScoreboard")}
           </Link>
         </Button>

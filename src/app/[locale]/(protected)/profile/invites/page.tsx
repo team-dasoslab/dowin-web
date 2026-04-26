@@ -19,7 +19,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
@@ -119,7 +119,7 @@ export default function ProfileInvitesPage() {
 
         <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <WigIcon name="domain-ticket-diagonal" size="20px" />
+            <DowinIcon name="domain-ticket-diagonal" size="20px" />
           </div>
           <div className="min-w-0">
             <h1 className="text-lg font-bold tracking-tight text-text-primary">
@@ -187,7 +187,7 @@ export default function ProfileInvitesPage() {
                 className={`h-11 rounded-content px-4 text-xs font-bold ${
                   isCreatingInvite || isOverFreeMemberLimit
                     ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
-                    : "btn-linear-primary"
+                    : "btn-dowin-primary"
                 }`}
               >
                 {isCreatingInvite ? t("creatingButton") : t("createButton")}
@@ -277,12 +277,12 @@ export default function ProfileInvitesPage() {
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
-                              <WigIcon name="status-checkmark" size="14px" />{" "}
+                              <DowinIcon name="status-checkmark" size="14px" />{" "}
                               {t("copiedLabel")}
                             </span>
                           ) : (
                             <span className="flex items-center gap-1.5">
-                              <WigIcon name="action-copy" size="14px" /> {t("copyCode")}
+                              <DowinIcon name="action-copy" size="14px" /> {t("copyCode")}
                             </span>
                           )}
                         </Button>
@@ -359,7 +359,7 @@ function NoWorkspaceState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <WigIcon name="domain-people" size="20px" />
+            <DowinIcon name="domain-people" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">
@@ -383,7 +383,7 @@ function NoAccessState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <WigIcon name="status-locked" size="20px" />
+            <DowinIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">

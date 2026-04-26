@@ -9,11 +9,11 @@ export default function ApiDocsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(85,99,217,0.12),transparent_32%),linear-gradient(180deg,#f7f9fc_0%,#f5f7fb_100%)] px-3 py-3 sm:px-5 sm:py-5">
+    <main className="min-h-screen bg-dowin-api-docs px-3 py-3 sm:px-5 sm:py-5">
       <section className="mx-auto mb-4 flex max-w-[1400px] flex-wrap items-center justify-between gap-3 rounded-[20px] border border-[var(--color-border)] bg-white/92 px-5 py-4 backdrop-blur-[12px]">
         <div>
           <h1 className="m-0 text-[28px] leading-none font-semibold tracking-[-0.04em] text-[var(--color-text-primary)]">
-            WIG API Docs
+            DOWIN API Docs
           </h1>
           <p className="mt-1.5 text-sm text-[var(--color-text-secondary)]">
             source: src/api-spec/openapi.yaml

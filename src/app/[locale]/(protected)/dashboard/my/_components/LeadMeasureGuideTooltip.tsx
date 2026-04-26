@@ -1,8 +1,8 @@
 "use client";
 
-import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/wig.schemas";
+import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/dowin.schemas";
 import { Button } from "@/components/ui/Button";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -79,7 +79,7 @@ export function LeadMeasureGuideTooltip({
         className={`inline-flex h-4 w-4 items-center justify-center transition-colors ${style.triggerClassName}`}
         aria-label={t("ariaLabel")}
       >
-        <WigIcon name="status-info" size="12px" className={style.iconClassName} />
+        <DowinIcon name="status-info" size="12px" className={style.iconClassName} />
       </Button>
 
       {active ? (
@@ -97,7 +97,7 @@ export function LeadMeasureGuideTooltip({
             }
           >
             <div className="mb-2 flex items-center gap-1.5">
-              <WigIcon name={iconName} size="14px" className={style.iconClassName} />
+              <DowinIcon name={iconName} size="14px" className={style.iconClassName} />
               <p className="text-[10px] font-bold text-text-primary">
                 {guide.kind === WeeklyLogGuideKind.change
                   ? t("changeProposal")

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 
 const meta: Meta<typeof Button> = {
@@ -26,12 +27,12 @@ export const Primary: Story = {
   args: {
     children: (
       <div className="flex items-center gap-2">
-        <WigIcon name="domain-flash" size="16px" className="fill-current" />
+        <Logo size="16px" />
         <span>Primary Action</span>
       </div>
     ),
     className:
-      "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+      "btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
   },
 };
 
@@ -40,7 +41,7 @@ export const AsChildLink: Story = {
     asChild: true,
     children: <Link href="#">Go to Dashboard</Link>,
     className:
-      "btn-linear-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+      "btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
   },
 };
 
@@ -57,7 +58,7 @@ export const Loading: Story = {
 
 export const IconButton: Story = {
   args: {
-    children: <WigIcon name="action-add" size="16px" />,
+    children: <DowinIcon name="action-add" size="16px" />,
     className:
       "w-8 h-8 border border-border flex items-center justify-center text-text-muted hover:border-border-hover transition-colors",
   },

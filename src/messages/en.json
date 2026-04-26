@@ -1,9 +1,10 @@
 {
   "Metadata": {
-    "title": "WIG Tracker",
+    "title": "Dowin",
     "description": "Focus on your most important goals."
   },
   "Common": {
+    "serviceName": "Dowin",
     "me": "Me",
     "unsetTitle": "Unset",
     "today": "Today",
@@ -67,8 +68,8 @@
     "addedMemo": "Added memo.",
     "noActiveMeasures": "No active lead measures.",
     "myScoreboard": "My Dashboard",
-    "wigSlogan": "Focus on the wildly important.",
-    "wigLabel": "WIG",
+    "dowinSlogan": "Focus on the wildly important.",
+    "dowinLabel": "DOWIN",
     "lagMeasureLabel": "Lag Measure",
     "weeklyAchievementRate": "Weekly Achievement",
     "monthlyAchievementRate": "Monthly Achievement",
@@ -193,7 +194,7 @@
         "losingStarted": "Started but behind"
       },
       "action": {
-        "noScoreboard": "Help set up their WIG and lead measures",
+        "noScoreboard": "Help set up their Wildly Important Goal and lead measures",
         "notStarted": "Confirm the smallest action they can start this week",
         "losingStarted": "Check lead-measure difficulty or execution rhythm"
       },
@@ -257,7 +258,7 @@
     "header": "Scoreboard Settings",
     "editTitle": "Edit Current Goal",
     "createTitle": "Set Next Scoreboard",
-    "description": "Set one goal (WIG), its success metric (lag measure), and key actions (lead measures).",
+    "description": "Set a single goal and define your measures.",
     "archiving": "Archiving scoreboard...",
     "saving": "Saving changes...",
     "creating": "Creating scoreboard...",
@@ -278,7 +279,7 @@
     "archiveBtn": "Archive",
     "archivingBtn": "Archiving...",
     "confirmArchive": "Do you want to archive this scoreboard?",
-    "wigShort": "WIG",
+    "dowinShort": "DOWIN",
     "goalQuestion": "What is your most important goal?",
     "goalPlaceholder": "e.g., Complete a 5km run in 8 weeks",
     "lagMeasure": "Lag Measure",
@@ -333,10 +334,10 @@
       "last": "Done",
       "next": "Next",
       "skip": "Skip",
-      "goalTitle": "WIG (Wildly Important Goal)",
-      "goalContent": "A good WIG is about choosing 'what is most important'. Too many goals results in lack of focus. Set only one for this period.",
+      "goalTitle": "Wildly Important Goal",
+      "goalContent": "A good 'Wildly Important Goal' is about choosing 'what is most important'. Too many goals results in lack of focus. Set only one for this period.",
       "lagTitle": "Lag Measure",
-      "lagContent": "A lag measure shows the final result. Write a metric measuring WIG achievement in the form 'X to Y by date'.",
+      "lagContent": "A lag measure shows the final result. Write a metric measuring 'Wildly Important Goal' achievement in the form 'X to Y by date'.",
       "leadTitle": "Lead Measure",
       "leadContent": "Lead measures are predictive actions that change the result. They must be influenceable. Write daily/weekly recurring actions.",
       "tagsTitle": "Lead Measure Tags",
@@ -351,7 +352,7 @@
       "tagCreateFailed": "Failed to create tag.",
       "tagUpdateFailed": "Failed to update tag name.",
       "tagDeleteFailed": "Failed to delete tag.",
-      "fillRequiredFields": "Please enter a WIG, lag measure, and at least one lead measure.",
+      "fillRequiredFields": "Please enter a Wildly Important Goal, lag measure, and at least one lead measure.",
       "createSuccess": "New scoreboard created successfully.",
       "createFailed": "Failed to create new scoreboard.",
       "saveSuccess": "Scoreboard saved successfully.",
@@ -681,7 +682,7 @@
       },
       "2026-03-25-team-dashboard-memos": {
         "title": "Leave meeting memos directly on the team dashboard",
-        "summary": "You can now write down and check memos or action items next to each team member's weekly scoreboard during WIG meetings."
+        "summary": "You can now write down and check memos or action items next to each team member's weekly scoreboard during DOWIN meetings."
       },
       "2026-03-22-team-dashboard-me-highlight": {
         "title": "Find your card faster on the team dashboard",
@@ -736,8 +737,12 @@
     "signup": "Sign Up",
     "id": "ID",
     "nickname": "Nickname",
+    "nicknamePlaceholder": "John Doe",
     "password": "Password",
     "subtitle": "Focus on what matters most.",
+    "signupSubtitle": "Create an account and start achieving your goals.",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
     "forgotPassword": "Forgot your ID or Password?",
     "continue": "Continue",
     "recovery": {
@@ -747,7 +752,7 @@
       "copied": "Copied",
       "saveTxt": "Save .txt",
       "failedToCopy": "Failed to copy recovery codes. Please save them manually.",
-      "txtHeader": "WIG Recovery Codes",
+      "txtHeader": "DOWIN Recovery Codes",
       "txtDescription": "The codes below are used for account recovery. Keep them in a safe place."
     },
     "errors": {
@@ -757,7 +762,8 @@
       "invalidPassword": "Password must be 8+ characters (mix of letters/numbers/special chars).",
       "checkInputs": "Please check your inputs.",
       "signupFailed": "Failed to sign up.",
-      "loginFailed": "Invalid ID or password."
+      "loginFailed": "Invalid ID or password.",
+      "idAlreadyExists": "This ID is already taken."
     },
     "recoveryPage": {
       "title": "Account Recovery",
@@ -781,7 +787,7 @@
       "title": "Create New Workspace",
       "description": "A workspace is a space where your team manages goals together.\nPlease give it a great name.",
       "label": "Workspace Name",
-      "placeholder": "e.g. Marketing Team, WIG Project",
+      "placeholder": "e.g. Marketing Team, Company Name",
       "button": "Create Workspace",
       "loading": "Creating workspace..."
     },
@@ -812,8 +818,8 @@
     "Mockup": {
       "workspace": "Our Workspace",
       "stats": {
-        "wigTitle": "Wildly Important Goal",
-        "wigGoal": "Retain 40% of customers &\nBuild new pipeline",
+        "dowinTitle": "Wildly Important Goal",
+        "dowinGoal": "Retain 40% of customers &\nBuild new pipeline",
         "leadTitle": "Lead Measure: Actions this week",
         "week": "Week 4",
         "action1": "Call 10 customers showing churn signs",
@@ -830,11 +836,11 @@
       "stat2Value": "10",
       "stat2Desc": "Overwhelmingly short\nweekly reviews"
     },
-    "WhyWig": {
+    "WhyDowin": {
       "header": "The most reliable and proactive flow\nto achieve team goals",
       "description": "Outcome metrics are already in the past; we can't change them immediately.\nBut the 'actions of today' that create those results are planned and 100% controlled by us. Move beyond vague anxiety and gain proactive execution power.",
       "item1Badge": "The most important one",
-      "item1Title": "Team Milestone,\nWildly Important Goal (WIG)",
+      "item1Title": "Team Milestone,\nWildly Important Goal",
       "item1Desc": "We'll be your compass so you don't get lost among countless tasks. Focus on the single most important and impactful goal that can change the game for your team.",
       "item1VisualGoal": "Reach $100k monthly revenue by EO-year",
       "item1VisualDesc": "Tasks other than this goal will be deprioritized.",
@@ -848,7 +854,7 @@
       "title": "The execution flow in 3 stages,\nstripped of complexity.",
       "description": "Instead of complex templates that make input a burden,\nwe propose a most intuitive flow that all team members can look at comfortably and transparently.",
       "step1Title": "Zero in on the one goal",
-      "step1Desc": "Fix the WIG we need to achieve this week at the very top. Look in one direction without being shaken.",
+      "step1Desc": "Fix the goal we need to achieve this week at the very top. Look towards the goal without being shaken.",
       "step2Title": "Accumulate actions daily",
       "step2Desc": "Instead of a formal meeting room, fill out your behavior bingo on your dashboard. Achievement builds up daily like breaking seals, creating momentum for execution.",
       "step3Title": "The scoreboard of no excuses, weekly review",
@@ -902,7 +908,7 @@
     "Footer": {
       "headline": "The real flow of execution,\nshall we start now?",
       "description": "We've removed the worry and time spent on initial setup.\nNow run towards your goals happily with your team members.",
-      "cta": "Start WIG for Free"
+      "cta": "Start for Free"
     }
   },
   "NotFound": {

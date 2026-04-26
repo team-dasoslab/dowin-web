@@ -1,9 +1,9 @@
-import { TeamDashboardMember } from "@/api/generated/wig.schemas";
+import { TeamDashboardMember } from "@/api/generated/dowin.schemas";
 import { getRateTone } from "@/app/[locale]/(protected)/dashboard/_lib/dashboard";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 type MemberCardProps = {
@@ -56,7 +56,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
       </div>
 
       <div className="flex items-center gap-2 text-xs text-text-secondary bg-sub-background border border-border rounded-content px-3 py-2">
-        <WigIcon name="domain-target-arrow" size="12px" className="text-text-muted flex-shrink-0" />
+        <DowinIcon name="domain-target-arrow" size="12px" className="text-text-muted flex-shrink-0" />
         <span className="truncate">
           {hasScoreboard ? member.lagMeasure : t("noScoreboardDesc")}
         </span>

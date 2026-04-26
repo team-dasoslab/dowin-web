@@ -1,12 +1,12 @@
 import { defineConfig } from "orval";
 
 export default defineConfig({
-  wig: {
+  dowin: {
     input: {
       target: "./src/api-spec/openapi.yaml",
     },
     output: {
-      target: "./src/api/generated/wig.ts",
+      target: "./src/api/generated/dowin.ts",
       mode: "tags-split",
       client: "react-query",
       baseUrl: "/api",

@@ -7,23 +7,23 @@ const DEFAULT_CONNECTIONS = "10";
 const PRESETS = {
   "users-me": {
     path: "/api/users/me",
-    requiredEnv: ["WIG_COOKIE"],
+    requiredEnv: ["DOWIN_COOKIE"],
     headers: () => ({
-      Cookie: `wig_sid=${process.env.WIG_COOKIE}`,
+      Cookie: `dowin_sid=${process.env.DOWIN_COOKIE}`,
     }),
   },
   "workspace-detail": {
-    path: `/api/workspaces/${process.env.WIG_WORKSPACE_ID ?? ":workspaceId"}`,
-    requiredEnv: ["WIG_COOKIE", "WIG_WORKSPACE_ID"],
+    path: `/api/workspaces/${process.env.DOWIN_WORKSPACE_ID ?? ":workspaceId"}`,
+    requiredEnv: ["DOWIN_COOKIE", "DOWIN_WORKSPACE_ID"],
     headers: () => ({
-      Cookie: `wig_sid=${process.env.WIG_COOKIE}`,
+      Cookie: `dowin_sid=${process.env.DOWIN_COOKIE}`,
     }),
   },
   "push-weekly-focus": {
     path: "/api/push/send-weekly-focus",
-    requiredEnv: ["WIG_CRON_SECRET"],
+    requiredEnv: ["DOWIN_CRON_SECRET"],
     headers: () => ({
-      Authorization: `Bearer ${process.env.WIG_CRON_SECRET}`,
+      Authorization: `Bearer ${process.env.DOWIN_CRON_SECRET}`,
     }),
   },
 };
@@ -40,9 +40,9 @@ function printUsage() {
 
 Presets:
   all                run the default slow-route bundle
-  users-me           GET /api/users/me               requires WIG_COOKIE
-  workspace-detail   GET /api/workspaces/:id         requires WIG_COOKIE, WIG_WORKSPACE_ID
-  push-weekly-focus  GET /api/push/send-weekly-focus requires WIG_CRON_SECRET
+  users-me           GET /api/users/me               requires DOWIN_COOKIE
+  workspace-detail   GET /api/workspaces/:id         requires DOWIN_COOKIE, DOWIN_WORKSPACE_ID
+  push-weekly-focus  GET /api/push/send-weekly-focus requires DOWIN_CRON_SECRET
 
 Optional env:
   BASE_URL           default ${DEFAULT_BASE_URL}

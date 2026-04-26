@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Link } from "@/i18n/routing";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
 export default function JoinWorkspacePage() {
@@ -27,7 +28,7 @@ export default function JoinWorkspacePage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-4">
       {isPending && <LoadingOverlay message={t("loading")} />}
-      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-linear-in">
+      <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-dowin-in">
         <div className="flex items-center gap-3">
           <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 transition-colors shrink-0" />
           <span className="text-xs font-bold text-zinc-400">
@@ -37,7 +38,7 @@ export default function JoinWorkspacePage() {
 
         <div className="space-y-5">
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-            <WigIcon name="domain-flash-large" size="24px" className="text-primary" />
+            <Logo size="24px" className="text-primary" />
           </div>
           <div className="space-y-2">
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
@@ -81,14 +82,14 @@ export default function JoinWorkspacePage() {
               className={`w-full py-4 rounded-button text-sm font-black transition-all flex items-center justify-center gap-2 ${
                 isPending || inviteCode.trim().length === 0
                   ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-linear-primary hover:scale-[1.02] active:scale-[0.98]"
+                  : "btn-dowin-primary hover:scale-[1.02] active:scale-[0.98]"
               }`}
             >
               {isPending ? (
                 <InlineSpinner size="sm" />
               ) : (
                 <>
-                  <WigIcon name="action-join" size="16px" />
+                  <DowinIcon name="action-join" size="16px" />
                   {t("button")}
                 </>
               )}
@@ -103,7 +104,7 @@ export default function JoinWorkspacePage() {
                 href="/workspace/new"
                 className="flex items-center justify-center gap-2"
               >
-                <WigIcon name="domain-people" size="16px" />
+                <DowinIcon name="domain-people" size="16px" />
                 {t("createButton")}
               </Link>
             </Button>

@@ -1,7 +1,7 @@
 import type { EventData, Options, Step, Styles } from "react-joyride";
 import { STATUS } from "react-joyride";
 
-export const SETUP_COACHMARK_STORAGE_KEY = "wig.setup.coachmark.v1.dismissed";
+export const SETUP_COACHMARK_STORAGE_KEY = "dowin.setup.coachmark.v1.dismissed";
 export const SETUP_COACHMARK_LEAD_TAGS_QUERY = "lead-measure-tags";
 
 export const getSetupCoachmarkSteps = (t: (key: string) => string): Step[] => [
@@ -36,7 +36,7 @@ export const getSetupLeadTagsCoachmarkSteps = (
 
 export const SETUP_COACHMARK_OPTIONS: Partial<Options> = {
   buttons: ["back", "primary", "skip"],
-  primaryColor: "rgba(94, 106, 210, 1)",
+  primaryColor: "var(--color-primary)",
   backgroundColor: "rgba(255, 255, 255, 1)",
   textColor: "rgba(17, 24, 39, 1)",
   zIndex: 1100,
@@ -62,7 +62,7 @@ export const SETUP_COACHMARK_STYLES: Partial<Styles> = {
     color: "rgba(75, 85, 99, 1)",
   },
   buttonPrimary: {
-    backgroundColor: "rgba(94, 106, 210, 1)",
+    backgroundColor: "var(--color-primary)",
     borderRadius: 8,
     color: "#fff",
     fontFamily: "var(--font-pretendard)",

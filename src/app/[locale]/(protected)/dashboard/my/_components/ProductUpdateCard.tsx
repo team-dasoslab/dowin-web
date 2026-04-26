@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { ProductUpdate } from "@/content/product-updates";
 import { Link } from "@/i18n/routing";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface ProductUpdateCardProps {
@@ -19,14 +19,14 @@ export function ProductUpdateCard({
 
   return (
     <Card className="overflow-hidden rounded-lg border border-border">
-      <div className="relative bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-4 py-4 sm:px-5">
+      <div className="relative bg-dowin-surface-gradient px-4 py-4 sm:px-5">
         <Button
           type="button"
           onClick={onDismiss}
           className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md border border-white/70 bg-white/80 text-text-muted hover:text-text-primary"
           aria-label={t("dismissUpdate")}
         >
-          <WigIcon name="action-dismiss" size="14px" />
+          <DowinIcon name="action-dismiss" size="14px" />
         </Button>
 
         <div className="space-y-2.5 pr-10 sm:max-w-[84%] sm:pr-0">
@@ -46,7 +46,7 @@ export function ProductUpdateCard({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none text-text-muted">
-            <WigIcon name="domain-calendar" size="12px" />
+            <DowinIcon name="domain-calendar" size="12px" />
             <span>{update.publishedAt}</span>
             <span className="text-border">•</span>
             <span>{updateT(`tags.${update.tag}`)}</span>

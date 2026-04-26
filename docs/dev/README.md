@@ -1,12 +1,12 @@
-# WIG Developer Onboarding
+# DOWIN Developer Onboarding
 
 최종 확인일: 2026-04-03
 
-이 문서는 WIG 저장소에 처음 들어온 개발자나 에이전트가 "무엇을 먼저 읽고, 어디를 고치고, 무엇을 조심해야 하는지"를 빠르게 파악하도록 만든 개발자용 시작 문서다. 기존 [`docs/onboarding.md`](/docs/onboarding.md)를 대체하지 않고, 현재 구현 기준으로 더 촘촘한 작업 안내를 보강한다.
+이 문서는 DOWIN 저장소에 처음 들어온 개발자나 에이전트가 "무엇을 먼저 읽고, 어디를 고치고, 무엇을 조심해야 하는지"를 빠르게 파악하도록 만든 개발자용 시작 문서다. 기존 [`docs/onboarding.md`](/docs/onboarding.md)를 대체하지 않고, 현재 구현 기준으로 더 촘촘한 작업 안내를 보강한다.
 
 ## 1. 서비스와 현재 범위
 
-WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워크스페이스에 속하고, 활성 점수판을 만들고, 선행지표를 기록하면서 개인/팀 대시보드를 보는 구조다.
+DOWIN는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워크스페이스에 속하고, 활성 점수판을 만들고, 선행지표를 기록하면서 개인/팀 대시보드를 보는 구조다.
 
 현재 구현 중심축은 아래 축들이다.
 
@@ -39,15 +39,15 @@ WIG는 4DX 기반 목표 관리 서비스다. 핵심 흐름은 로그인 후 워
 2. [`docs/onboarding.md`](/docs/onboarding.md)
 3. 백엔드 첫 진입 시: [`docs/dev/backend/2026.03.18-backend-onboarding.md`](/docs/dev/backend/2026.03.18-backend-onboarding.md)
 4. 작업 유형별 스킬
-   - 문서/기획: [`.agents/skills/wig-planning/SKILL.md`](/.agents/skills/wig-planning/SKILL.md)
-   - 운영/장애 대응: [`.agents/skills/wig-operations/SKILL.md`](/.agents/skills/wig-operations/SKILL.md)
-   - 프론트: [`.agents/skills/wig-frontend/SKILL.md`](/.agents/skills/wig-frontend/SKILL.md)
-   - 백엔드: [`.agents/skills/wig-backend/SKILL.md`](/.agents/skills/wig-backend/SKILL.md)
-   - 품질 점검: [`.agents/skills/wig-quality-check/SKILL.md`](/.agents/skills/wig-quality-check/SKILL.md)
-   - 성능 점검: [`.agents/skills/wig-performance-check/SKILL.md`](/.agents/skills/wig-performance-check/SKILL.md)
-   - 보안 점검: [`.agents/skills/wig-security-check/SKILL.md`](/.agents/skills/wig-security-check/SKILL.md)
-   - 하네스 보안 점검: [`.agents/skills/wig-harness-security-check/SKILL.md`](/.agents/skills/wig-harness-security-check/SKILL.md)
-   - 제품 업데이트: [`.agents/skills/wig-product-updates/SKILL.md`](/.agents/skills/wig-product-updates/SKILL.md)
+   - 문서/기획: [`.agents/skills/planning/SKILL.md`](/.agents/skills/planning/SKILL.md)
+   - 운영/장애 대응: [`.agents/skills/operations/SKILL.md`](/.agents/skills/operations/SKILL.md)
+   - 프론트: [`.agents/skills/frontend/SKILL.md`](/.agents/skills/frontend/SKILL.md)
+   - 백엔드: [`.agents/skills/backend/SKILL.md`](/.agents/skills/backend/SKILL.md)
+   - 품질 점검: [`.agents/skills/quality-check/SKILL.md`](/.agents/skills/quality-check/SKILL.md)
+   - 성능 점검: [`.agents/skills/performance-check/SKILL.md`](/.agents/skills/performance-check/SKILL.md)
+   - 보안 점검: [`.agents/skills/security-check/SKILL.md`](/.agents/skills/security-check/SKILL.md)
+   - 하네스 보안 점검: [`.agents/skills/harness-security-check/SKILL.md`](/.agents/skills/harness-security-check/SKILL.md)
+   - 제품 업데이트: [`.agents/skills/product-updates/SKILL.md`](/.agents/skills/product-updates/SKILL.md)
 5. 공통 설계 문서
    - [`docs/dev/common/2026.03.12-domain-overview.md`](/docs/dev/common/2026.03.12-domain-overview.md)
    - [`docs/dev/common/2026.03.12-api-conventions.md`](/docs/dev/common/2026.03.12-api-conventions.md)
@@ -99,7 +99,7 @@ yarn preview
 ### 환경에서 알아둘 점
 
 - DB 바인딩 이름은 `DB`다.
-- 세션 쿠키 이름은 `wig_sid`다.
+- 세션 쿠키 이름은 `dowin_sid`다.
 - 푸시 알림은 `NEXT_PUBLIC_VAPID_PUBLIC_KEY`가 필요하다.
 - 배포 타깃은 Cloudflare Workers이며 OpenNext를 거친다.
 - D1 마이그레이션은 `drizzle/` 디렉터리를 사용한다.
@@ -176,7 +176,7 @@ yarn preview
 
 - 로그인 페이지는 로그인/회원가입을 함께 제공하고, 세션이 있으면 `/dashboard/my`로 리다이렉트한다.
 - 보호 라우트는 서버에서 세션 없으면 `/`로 돌려보낸다.
-- 세션은 D1 `sessions` 테이블과 `wig_sid` 쿠키를 함께 사용한다.
+- 세션은 D1 `sessions` 테이블과 `dowin_sid` 쿠키를 함께 사용한다.
 - 회원가입 직후 복원코드 8개를 1회 노출하고, 별도 계정 복구 페이지를 제공한다.
 
 ### Workspace

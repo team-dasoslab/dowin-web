@@ -3,7 +3,8 @@
 import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-links";
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
-import { WigIcon } from "@/components/ui/WigIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
 interface SidebarProps {
@@ -61,7 +62,7 @@ export function Sidebar({
         {/* Workspace Pill */}
         {workspaceName ? (
           <div className="mb-6 flex h-10 w-full items-center justify-center gap-3 rounded-content bg-primary/10 lg:justify-start lg:px-4">
-            <WigIcon name="domain-flash-active" size="20px" className="text-primary" />
+            <Logo size="20px" className="text-primary" />
             <span className="hidden truncate text-sm font-bold text-primary lg:block">
               {workspaceName}
             </span>
@@ -71,7 +72,7 @@ export function Sidebar({
             href="/workspace/new"
             className="mb-6 flex h-10 w-full items-center justify-center gap-3 rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-colors hover:bg-primary/10 lg:justify-start lg:px-4"
           >
-            <WigIcon name="action-add-active" size="16px" />
+            <DowinIcon name="action-add-active" size="16px" />
             <span className="hidden truncate text-[13px] font-bold lg:block">
               {commonT("createWorkspace")}
             </span>
@@ -91,7 +92,7 @@ export function Sidebar({
                   title={commonT("noScoreboardNotice")}
                   className="flex h-11 w-full cursor-not-allowed items-center gap-3 rounded-button px-4 text-zinc-300 opacity-50"
                 >
-                  <WigIcon name={iconNameActive} size="20px" className="mx-auto lg:mx-0 shrink-0" />
+                  <DowinIcon name={iconNameActive} size="20px" className="mx-auto lg:mx-0 shrink-0" />
                   <span className="hidden text-[14px] font-bold lg:block">
                     {t(translationKey)}
                   </span>
@@ -110,7 +111,7 @@ export function Sidebar({
                     : "text-zinc-400 hover:bg-zinc-100/50 hover:text-zinc-600",
                 )}
               >
-                <WigIcon
+                <DowinIcon
                   name={isActive ? iconNameActive : iconName}
                   size="20px"
                   className={cn(
@@ -141,7 +142,7 @@ export function Sidebar({
                   title={commonT("noScoreboardNotice")}
                   className="flex min-w-0 cursor-not-allowed flex-col items-center justify-center gap-1 rounded-button px-1 py-2 text-zinc-300 opacity-50"
                 >
-                  <WigIcon name={iconNameActive} size="20px" />
+                  <DowinIcon name={iconNameActive} size="20px" />
                   <span className="max-w-full truncate text-[10px] font-bold leading-none">
                     {label}
                   </span>
@@ -160,7 +161,7 @@ export function Sidebar({
                     : "text-zinc-400 active:bg-zinc-100/70",
                 )}
               >
-                <WigIcon
+                <DowinIcon
                   name={isActive ? iconNameActive : iconName}
                   size="20px"
                   className={cn("transition-all", isActive && "scale-105")}

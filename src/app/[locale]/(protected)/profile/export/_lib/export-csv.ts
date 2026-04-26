@@ -98,7 +98,7 @@ export function downloadCsv(csv: string, from: string, to: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `wig-my-export-${from.replaceAll("-", "")}-${to.replaceAll("-", "")}.csv`;
+  anchor.download = `dowin-my-export-${from.replaceAll("-", "")}-${to.replaceAll("-", "")}.csv`;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
