@@ -37,7 +37,7 @@ export function ScoreboardCard({
       </div>
 
       <div className="flex items-center justify-between gap-3 pt-4 border-t border-zinc-50">
-        <div className="flex-1 min-w-0">
+        <div className="flex-shrink-0">
           <PeriodBadge
             label={`${t("activePeriod")} ${formatDate(startDate)} - ${endDate ? formatDate(endDate) : t("inProgress")}`}
           />
