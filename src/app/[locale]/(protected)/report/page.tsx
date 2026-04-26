@@ -112,7 +112,7 @@ const buildReportSummary = (
       score: formatScore(m, copy.unsetScore),
       nextAction: copy.losingStartedAction,
       badgeTone:
-        "border-[rgba(94,106,210,0.3)] bg-[rgba(94,106,210,0.06)] text-[#5e6ad2]",
+        "border-primary/30 bg-primary/6 text-primary",
     })),
   ].slice(0, 3);
 
@@ -322,7 +322,7 @@ export default function ReportPage() {
                         <DowinIcon
                           name="domain-trending"
                           size="16px"
-                          className="shrink-0 text-[#5e6ad2]"
+                          className="shrink-0 text-primary"
                         />
                       </div>
                       <WinRateOverview
@@ -466,7 +466,7 @@ function TeamTrendChart({
             active={activeTooltip === "winRate"}
             label={t("trend.winRateLabel")}
             description={t("trend.winRateDesc")}
-            color="#5e6ad2"
+            color="#1e293b"
             onToggle={() => {
               const next = activeTooltip === "winRate" ? null : "winRate";
               setActiveTooltip(next);
@@ -507,8 +507,8 @@ function TeamTrendChart({
             >
               <defs>
                 <linearGradient id="winGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#5e6ad2" stopOpacity={0.12} />
-                  <stop offset="95%" stopColor="#5e6ad2" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#1e293b" stopOpacity={0.12} />
+                  <stop offset="95%" stopColor="#1e293b" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="execGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#84cc16" stopOpacity={0.12} />
@@ -569,11 +569,11 @@ function TeamTrendChart({
               <Area
                 type="monotone"
                 dataKey="winRate"
-                stroke="#5e6ad2"
+                stroke="#1e293b"
                 strokeWidth={2}
                 fill="url(#winGrad)"
                 dot={false}
-                activeDot={{ r: 4, fill: "#5e6ad2", strokeWidth: 0 }}
+                activeDot={{ r: 4, fill: "#1e293b", strokeWidth: 0 }}
               />
               <Area
                 type="monotone"
@@ -666,10 +666,10 @@ function WinRateOverview({
       caption: t("statusCards.winning.caption"),
       count: winningCount,
       names: winningNames,
-      color: "bg-[#5e6ad2]",
-      ring: "border-[rgba(94,106,210,0.2)]",
-      surface: "bg-[rgba(94,106,210,0.04)]",
-      valueTone: "text-[#5e6ad2]",
+      color: "bg-primary",
+      ring: "border-primary/20",
+      surface: "bg-primary/[0.04]",
+      valueTone: "text-primary",
     },
     {
       label: t("statusCards.losing.label"),
@@ -686,8 +686,8 @@ function WinRateOverview({
       caption: t("statusCards.notStarted.caption"),
       count: notStartedCount,
       names: notStartedNames,
-      color: "bg-[rgba(156,163,175,1)]",
-      ring: "border-[rgba(226,228,233,1)]",
+      color: "bg-zinc-400",
+      ring: "border-zinc-200",
       surface: "bg-sub-background",
       valueTone: "text-text-secondary",
     },
@@ -696,8 +696,8 @@ function WinRateOverview({
       caption: t("statusCards.noScoreboard.caption"),
       count: noScoreboardCount,
       names: noScoreboardNames,
-      color: "bg-[rgba(226,228,233,1)]",
-      ring: "border-[rgba(226,228,233,1)]",
+      color: "bg-zinc-200",
+      ring: "border-zinc-200",
       surface: "bg-sub-background",
       valueTone: "text-text-muted",
     },
@@ -707,7 +707,7 @@ function WinRateOverview({
     <div className="mt-4 space-y-3">
       <div className="rounded-content border border-border bg-dowin-surface-gradient px-4 py-4">
         <div className="space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5e6ad2]">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
             {t("winOverview.summaryLabel")}
           </p>
           <p className="text-lg font-bold tracking-tight text-text-primary md:text-xl">
@@ -720,7 +720,7 @@ function WinRateOverview({
                 {t("winOverview.activeWinRate")}
               </p>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="font-mono text-lg font-bold tracking-tight text-[#5e6ad2]">
+                <span className="font-mono text-lg font-bold tracking-tight text-primary">
                   {winRate}%
                 </span>
                 <span className="text-xs text-text-muted">
@@ -1006,7 +1006,7 @@ function ReportErrorState({ onRetry }: { onRetry: () => void }) {
             </Button>
             <Button
               asChild
-              className="rounded-content border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors hover:border-[rgba(205,207,213,1)]"
+              className="rounded-content border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors hover:border-zinc-300"
             >
               <Link href="/dashboard">{t("states.backToDashboard")}</Link>
             </Button>

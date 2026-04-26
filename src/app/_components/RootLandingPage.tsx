@@ -35,9 +35,9 @@ export function RootLandingPage() {
           </Link>
           <Button
             asChild
-            className="inline-flex items-center justify-center h-10 rounded-full bg-slate-900 px-6 text-[15px] font-bold text-white transition-all"
+            className="flex h-10 items-center justify-center rounded-full bg-primary px-6 text-[15px] font-bold text-white transition-all hover:opacity-90"
           >
-            <Link href="/login">{t("Navigation.start")}</Link>
+            <Link href="/login" className="text-white">{t("Navigation.start")}</Link>
           </Button>
         </div>
       </header>
@@ -66,9 +66,9 @@ export function RootLandingPage() {
           <div className="pt-4 flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up [animation-delay:300ms]">
             <Button
               asChild
-              className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white transition-all w-full sm:w-auto"
+              className="flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white transition-all hover:opacity-90 w-full sm:w-auto"
             >
-              <Link href="/login">{t("Hero.cta")}</Link>
+              <Link href="/login" className="text-white">{t("Hero.cta")}</Link>
             </Button>
           </div>
         </div>
@@ -540,15 +540,10 @@ export function RootLandingPage() {
         </p>
         <Button
           asChild
-          className="inline-flex h-[60px] items-center justify-center rounded-2xl bg-slate-900 px-10 text-[18px] font-bold text-white transition-all"
+          className="flex h-[60px] items-center justify-center rounded-2xl bg-primary px-10 text-[18px] font-bold text-white transition-all hover:opacity-90"
         >
-          <Link href="/login">
-            {t("Footer.cta")}{" "}
-            <DowinIcon
-              name="action-arrow-right"
-              size="20px"
-              className="ml-3 opacity-70"
-            />
+          <Link href="/login" className="text-white">
+            {t("Footer.cta")}
           </Link>
         </Button>
         <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider">
