@@ -19,7 +19,7 @@ export function ProductUpdateCard({
 
   return (
     <Card className="overflow-hidden rounded-lg border border-border">
-      <div className="relative bg-[linear-gradient(135deg,rgba(49,81,255,0.10),rgba(255,255,255,0.96)_55%,rgba(49,81,255,0.04))] px-4 py-4 sm:px-5">
+      <div className="relative bg-dowin-surface-gradient px-4 py-4 sm:px-5">
         <Button
           type="button"
           onClick={onDismiss}

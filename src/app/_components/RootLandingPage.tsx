@@ -1,16 +1,18 @@
 "use client";
 import { Button } from "@/components/ui/Button";
-import { Link } from "@/i18n/routing";
 import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
   const t = useTranslations("Landing");
+  const tCommon = useTranslations("Common");
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-white font-pretendard text-slate-900 selection:bg-primary/20 selection:text-slate-900">
       {/* Background Grid Pattern & Ambient Glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:24px_24px]"></div>
       <div className="pointer-events-none absolute left-0 top-0 h-[800px] w-full overflow-hidden -z-10">
         <div className="absolute -left-1/4 -top-[100px] h-[700px] w-[700px] rounded-full bg-blue-100/30 blur-[120px]" />
         <div className="absolute right-[-10%] top-[10%] h-[600px] w-[600px] rounded-full bg-primary/20 blur-[120px]" />
@@ -19,11 +21,9 @@ export function RootLandingPage() {
       {/* Top Banner Navigation */}
       <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between bg-white/70 px-4 md:px-8 xl:px-12 backdrop-blur-xl border-b border-slate-200/50">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-slate-900 text-white">
-            <DowinIcon name="domain-flash-large" size="16px" />
-          </div>
+          <Logo />
           <p className="font-outfit text-[22px] font-black tracking-tight text-slate-900">
-            DOWIN
+            {tCommon("serviceName")}
           </p>
         </Link>
         <div className="flex items-center gap-6">
@@ -35,9 +35,9 @@ export function RootLandingPage() {
           </Link>
           <Button
             asChild
-            className="inline-flex items-center justify-center h-10 rounded-full bg-slate-900 px-6 text-[15px] font-bold text-white transition-all"
+            className="flex h-10 items-center justify-center rounded-full bg-primary px-6 text-[15px] font-bold text-white transition-all hover:opacity-90"
           >
-            <Link href="/login">{t("Navigation.start")}</Link>
+            <Link href="/login" className="text-white">{t("Navigation.start")}</Link>
           </Button>
         </div>
       </header>
@@ -66,9 +66,9 @@ export function RootLandingPage() {
           <div className="pt-4 flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up [animation-delay:300ms]">
             <Button
               asChild
-              className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white transition-all w-full sm:w-auto"
+              className="flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white transition-all hover:opacity-90 w-full sm:w-auto"
             >
-              <Link href="/login">{t("Hero.cta")}</Link>
+              <Link href="/login" className="text-white">{t("Hero.cta")}</Link>
             </Button>
           </div>
         </div>
@@ -92,7 +92,7 @@ export function RootLandingPage() {
               {/* Sidebar */}
               <div className="w-[80px] lg:w-[240px] border-r border-slate-200 bg-white p-4 shrink-0 hidden md:block">
                 <div className="w-full h-10 rounded-xl bg-primary/10 mb-6 flex lg:px-4 items-center justify-center lg:justify-start gap-3">
-                  <DowinIcon name="domain-flash-large" size="20px" className="text-primary" />
+                  <Logo size="20px" className="text-primary" />
                   <span className="hidden lg:block font-bold text-primary text-sm">
                     {t("Mockup.workspace")}
                   </span>
@@ -296,7 +296,11 @@ export function RootLandingPage() {
                 <div className="absolute inset-0 bg-blue-100 rounded-full blur-[80px] opacity-50" />
                 <div className="relative bg-white rounded-[24px] p-6 border border-slate-200">
                   <div className="h-48 w-full bg-slate-50 rounded-[20px] border border-slate-100 flex flex-col items-center justify-center text-center px-6">
-                    <DowinIcon name="domain-target-arrow-large" size="40px" className="text-blue-500 mb-4" />
+                    <DowinIcon
+                      name="domain-target-arrow-large"
+                      size="40px"
+                      className="text-blue-500 mb-4"
+                    />
                     <p className="text-[20px] font-bold text-slate-800">
                       {t("WhyDowin.item1VisualGoal")}
                     </p>
@@ -315,7 +319,11 @@ export function RootLandingPage() {
                 <div className="relative bg-white rounded-[24px] p-6 border border-slate-200">
                   <div className="h-40 w-full bg-slate-50 rounded-[16px] border border-slate-100 p-6 flex flex-col justify-center">
                     <p className="font-bold text-slate-600 mb-4 flex items-center gap-2 text-[14px]">
-                      <DowinIcon name="domain-pulse-large" size="20px" className="text-emerald-500" />
+                      <DowinIcon
+                        name="domain-pulse-large"
+                        size="20px"
+                        className="text-emerald-500"
+                      />
                       {t("WhyDowin.item2VisualTitle")}
                     </p>
                     <div className="bg-white rounded-xl h-14 border border-slate-200 flex items-center px-4 gap-4">
@@ -353,7 +361,7 @@ export function RootLandingPage() {
         className="bg-slate-900 py-24 md:py-32 text-white relative overflow-hidden"
       >
         {/* Deep perspective grids */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-dowin-grid-pattern bg-[size:64px_64px]" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(79,70,229,0.2),transparent_60%)] pointer-events-none" />
 
         <div className="mx-auto max-w-[1200px] px-6 text-center md:px-12 mb-20 md:mb-24 relative z-10">
@@ -470,7 +478,11 @@ export function RootLandingPage() {
                 </p>
               </div>
               <div className="absolute right-0 bottom-0 top-0 w-[50%] bg-gradient-to-l from-primary/5 to-transparent flex items-center justify-end pr-8">
-                <DowinIcon name="domain-trending" size="128px" className="text-primary/10 transition-transform" />
+                <DowinIcon
+                  name="domain-trending"
+                  size="128px"
+                  className="text-primary/10 transition-transform"
+                />
               </div>
             </div>
 
@@ -486,7 +498,11 @@ export function RootLandingPage() {
             </div>
 
             <div className="md:col-span-5 bg-white rounded-[24px] border border-slate-200 p-8 transition-all overflow-hidden relative">
-              <DowinIcon name="domain-calendar-large" size="32px" className="text-slate-300 transition-colors mb-6" />
+              <DowinIcon
+                name="domain-calendar-large"
+                size="32px"
+                className="text-slate-300 transition-colors mb-6"
+              />
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
                 {t("Features.item3Title")}
               </h4>
@@ -497,7 +513,11 @@ export function RootLandingPage() {
 
             <div className="md:col-span-7 bg-white rounded-[24px] border border-slate-200 p-8 transition-all flex flex-col justify-end relative overflow-hidden">
               <div className="absolute top-6 right-6">
-                <DowinIcon name="domain-target-arrow-large" size="64px" className="text-slate-100 transition-all" />
+                <DowinIcon
+                  name="domain-target-arrow-large"
+                  size="64px"
+                  className="text-slate-100 transition-all"
+                />
               </div>
               <h4 className="text-[20px] font-black text-slate-900 mb-2 tracking-tight">
                 {t("Features.item4Title")}
@@ -512,9 +532,6 @@ export function RootLandingPage() {
 
       {/* 7. Footer CTA */}
       <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
-        <div className="flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-primary to-primary-light mb-10 transition-transform">
-          <DowinIcon name="domain-flash-large" size="32px" className="text-white fill-white" />
-        </div>
         <h2 className="font-pretendard text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
           {t("Footer.headline")}
         </h2>
@@ -523,14 +540,14 @@ export function RootLandingPage() {
         </p>
         <Button
           asChild
-          className="inline-flex h-[60px] items-center justify-center rounded-2xl bg-slate-900 px-10 text-[18px] font-bold text-white transition-all"
+          className="flex h-[60px] items-center justify-center rounded-2xl bg-primary px-10 text-[18px] font-bold text-white transition-all hover:opacity-90"
         >
-          <Link href="/login">
-            {t("Footer.cta")} <DowinIcon name="action-arrow-right" size="20px" className="ml-3 opacity-70" />
+          <Link href="/login" className="text-white">
+            {t("Footer.cta")}
           </Link>
         </Button>
-        <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider uppercase">
-          © 2026 DOWIN. All rights reserved.
+        <p className="text-[13px] text-slate-400 mt-20 font-outfit font-bold tracking-wider">
+          © 2026 Dasoslab. All rights reserved.
         </p>
       </footer>
     </main>

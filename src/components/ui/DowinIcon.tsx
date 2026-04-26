@@ -4,6 +4,7 @@ import {
   AlignLeft,
   Archive,
   ArrowUpRight,
+  Bell,
   Calendar,
   ChartBar,
   Check,
@@ -28,6 +29,7 @@ import {
   LogIn,
   LogOut,
   Medal,
+  Megaphone,
   MessageSquare,
   MoreHorizontal,
   Pencil,
@@ -39,6 +41,7 @@ import {
   Share2,
   ShieldCheck,
   Shuffle,
+  Sparkles,
   SquarePlus,
   Tag,
   Target,
@@ -101,6 +104,9 @@ export const ICON_MAP = {
   "status-warning": CircleAlert,
   "status-info": Info,
   "status-tag": Tag,
+  "status-sparkle": Sparkles,
+  "status-bell": Bell,
+  "status-announcement": Megaphone,
 
   // Domain Objects
   "domain-flash": Zap,

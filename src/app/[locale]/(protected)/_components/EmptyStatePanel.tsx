@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
-import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import type { ReactNode } from "react";
 
 type EmptyStatePanelProps = {
@@ -21,7 +21,7 @@ export function EmptyStatePanel({
     <div className="flex justify-center w-full">
       <Card className="max-w-[480px] w-full p-10 text-center space-y-6 rounded-content">
         <div className="mx-auto w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
-          {icon || <DowinIcon name="domain-flash" size="24px" className="text-primary" />}
+          {icon || <Logo size="24px" className="text-primary" />}
         </div>
 
         <div className="space-y-2">
