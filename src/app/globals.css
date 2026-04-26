@@ -37,12 +37,17 @@
   border-radius: var(--radius-button) !important;
 }
 
-.scrollbar-none {
-  scrollbar-width: none;
-}
+@media (max-width: 1023px) {
+  .scrollbar-none,
+  #main-scroll-container {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
+  .scrollbar-none::-webkit-scrollbar,
+  #main-scroll-container::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 body {
