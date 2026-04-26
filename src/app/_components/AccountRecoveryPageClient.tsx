@@ -106,7 +106,7 @@ export default function AccountRecoveryPageClient() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 font-pretendard overflow-hidden selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 overflow-hidden selection:bg-primary/20">
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
@@ -120,7 +120,7 @@ export default function AccountRecoveryPageClient() {
             />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary font-outfit uppercase leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
               {t("recoveryPage.title")}
             </h1>
             <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep px-4">
@@ -247,7 +247,7 @@ export default function AccountRecoveryPageClient() {
         </form>
       </Card>
 
-      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest font-outfit">
+      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest ">
         © 2026 Dasoslab. All rights reserved.
       </p>
     </div>

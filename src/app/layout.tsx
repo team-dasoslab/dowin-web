@@ -99,11 +99,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
         />
 
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap"
-        />
+
       </head>
       <body>
         {gaId ? (

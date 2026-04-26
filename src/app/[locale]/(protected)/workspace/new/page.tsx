@@ -34,7 +34,7 @@ export default function NewWorkspacePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-pretendard flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
       {isPending && (
         <LoadingOverlay message={t("loading")} />
       )}
