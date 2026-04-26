@@ -1,5 +1,7 @@
 "use client";
 
+import { useGetUsersMe } from "@/api/generated/profile/profile";
+import { useGetScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
 import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-links";
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
@@ -7,20 +9,33 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
-interface SidebarProps {
-  workspaceName?: string;
-  role?: "ADMIN" | "MEMBER";
-  hasScoreboard?: boolean;
-}
-
-export function Sidebar({
-  workspaceName,
-  role,
-  hasScoreboard = true,
-}: SidebarProps) {
+export function Sidebar() {
   const t = useTranslations("Dashboard");
   const commonT = useTranslations("Common");
   const pathname = usePathname();
+ 
+  const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
+  const { data: scoreboardResponse, isLoading: isScoreboardLoading } =
+    useGetScoreboardsActive();
+ 
+  const profile = profileResponse?.status === 200 ? profileResponse.data : null;
+  const workspaceName = profile?.workspaceName;
+  const role = profile?.role;
+  const hasScoreboard =
+    scoreboardResponse?.status === 200 && !!scoreboardResponse.data;
+ 
+  if (isProfileLoading || isScoreboardLoading) {
+    return (
+      <aside className="fixed left-0 top-0 hidden h-screen w-[80px] flex-col border-r border-zinc-200 bg-white p-4 md:flex lg:w-[240px]">
+        <div className="mb-6 flex h-10 w-full animate-pulse items-center justify-center gap-3 rounded-content bg-zinc-100 lg:justify-start lg:px-4" />
+        <div className="flex-1 space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-11 w-full animate-pulse rounded-button bg-zinc-50" />
+          ))}
+        </div>
+      </aside>
+    );
+  }
 
   const filteredLinks = MY_DASHBOARD_LINKS.filter((link) => {
     if (link.adminOnly && role !== "ADMIN") return false;

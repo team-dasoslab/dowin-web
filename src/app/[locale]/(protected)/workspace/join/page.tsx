@@ -82,7 +82,7 @@ export default function JoinWorkspacePage() {
               className={`w-full py-4 rounded-button text-sm font-black transition-all flex items-center justify-center gap-2 ${
                 isPending || inviteCode.trim().length === 0
                   ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-dowin-primary hover:scale-[1.02] active:scale-[0.98]"
+                  : "btn-dowin-primary active:scale-[0.98]"
               }`}
             >
               {isPending ? (
