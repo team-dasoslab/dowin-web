@@ -132,7 +132,14 @@ export default function DashboardPage() {
           activeMemoState ? "xl:left-[-112px]" : "xl:left-0",
         )}
       >
-        <ProtectedPageHeader title={t("teamStatus")} />
+        <ProtectedPageHeader
+          title={t("teamStatus")}
+          rightElement={
+            <div className="flex items-center gap-2">
+              <PeriodBadge label={weekLabel} size="md" />
+            </div>
+          }
+        />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 네비게이션 ── */}
@@ -181,14 +188,7 @@ export default function DashboardPage() {
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="summary" className="space-y-5 scroll-mt-28">
-              <div className="flex items-end justify-between">
-                <div className="flex-1">
-                  <SectionHeader title={t("memberSummary")} />
-                </div>
-                <div className="pb-1 px-1">
-                  <PeriodBadge label={weekLabel} />
-                </div>
-              </div>
+              <SectionHeader title={t("memberSummary")} />
 
               {members.length === 0 ? (
                 <div className="border border-border rounded-content p-8 text-center text-text-muted text-sm">
