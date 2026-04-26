@@ -1,6 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
-import { detectLocale, isSupportedLocale } from "./src/i18n/detect-locale";
+import { DEFAULT_LOCALE, detectLocale, isSupportedLocale } from "./src/i18n/detect-locale";
 import { routing } from "./src/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -39,12 +39,10 @@ export function middleware(request: NextRequest) {
   const segments = pathname.split("/");
   const locale = isSupportedLocale(segments[1])
     ? segments[1]
-    : isSupportedLocale(nextLocaleCookie)
-    ? nextLocaleCookie
     : detectLocale({
         customLocale: request.headers.get("x-dowin-locale"),
         acceptLanguage: request.headers.get("accept-language"),
-      });
+      }) || (isSupportedLocale(nextLocaleCookie) ? nextLocaleCookie : DEFAULT_LOCALE);
 
   if (hasSessionCookie && isPublicPath(pathname)) {
     const target = new URL(

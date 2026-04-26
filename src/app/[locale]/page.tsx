@@ -4,6 +4,7 @@ import { redirect } from "@/i18n/routing";
 import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { setRequestLocale } from "next-intl/server";
+import { headers } from "next/headers";
 
 export default async function HomePage({
   params,
@@ -19,6 +20,13 @@ export default async function HomePage({
 
   if (session) {
     redirect({ href: "/dashboard/my", locale: locale });
+  }
+
+  const userAgent = (await headers()).get("user-agent") || "";
+  const isApp = userAgent.includes("DowinApp");
+
+  if (isApp) {
+    redirect({ href: "/login", locale: locale });
   }
 
   return <RootLandingPage />;

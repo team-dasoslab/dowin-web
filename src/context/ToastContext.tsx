@@ -1,6 +1,7 @@
 "use client";
 
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { usePathname } from "@/i18n/routing";
 import {
   createContext,
   ReactNode,
@@ -26,6 +27,20 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const pathname = usePathname();
+
+  // Main tab paths where the bottom navigation is visible
+  const mainTabPaths = [
+    "/",
+    "/dashboard",
+    "/dashboard/my",
+    "/report",
+    "/setup",
+    "/scoreboards",
+    "/profile",
+  ];
+
+  const isMainTab = mainTabPaths.includes(pathname);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) =>
@@ -61,7 +76,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-3 w-full max-w-md px-4 pointer-events-none">
+      <div
+        className={`fixed left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-3 w-full max-w-md px-4 pointer-events-none transition-[bottom] duration-200 ease-out`}
+        style={{
+          bottom: isMainTab
+            ? "calc(6.75rem + var(--safe-area-inset-bottom, 0px))"
+            : "calc(1.5rem + var(--safe-area-inset-bottom, 0px))",
+        }}
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}

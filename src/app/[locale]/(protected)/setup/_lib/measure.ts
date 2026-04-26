@@ -1,3 +1,5 @@
+import { generateId } from "@/lib/utils";
+
 export type MeasureInput = {
   id: string;
   existingId: number | null;
@@ -56,7 +58,7 @@ export const clampMeasureTargetValue = (
 };
 
 export const createEmptyMeasure = (): MeasureInput => ({
-  id: crypto.randomUUID(),
+  id: generateId(),
   existingId: null,
   name: "",
   period: "WEEKLY",

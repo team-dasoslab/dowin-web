@@ -1,13 +1,15 @@
 import { Providers } from "@/components/Providers";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { routing } from "@/i18n/routing";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export default async function AppLayout({
+export default async function RootLayout({
   children,
   params,
 }: {
@@ -25,10 +27,12 @@ export default async function AppLayout({
   setRequestLocale(locale);
 
   const messages = await getMessages();
+  const headersList = await headers();
+  const isNative = headersList.get("x-dowin-client") === "app";
 
   return (
-    <Providers locale={locale} messages={messages}>
-      {children}
+    <Providers locale={locale} messages={messages} isNative={isNative}>
+      <AppLayout>{children}</AppLayout>
     </Providers>
   );
 }

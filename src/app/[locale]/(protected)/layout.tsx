@@ -7,6 +7,7 @@ import { ProtectedContentLayout } from "./_components/ProtectedContentLayout";
 import { Sidebar } from "./_components/Sidebar";
 import { scoreboards, workspaceMembers, workspaces } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
+import { MainContentWrapper } from "./_components/MainContentWrapper";
 
 export default async function ProtectedLayout({
   children,
@@ -50,7 +51,7 @@ export default async function ProtectedLayout({
     : null;
 
   return (
-    <div className="flex h-[100dvh] flex-col overflow-hidden bg-zinc-50/50">
+    <div className="flex h-full flex-col overflow-hidden bg-zinc-50/50">
       <LocaleEnforcer />
       <Sidebar
         workspaceName={memberInfo?.workspaceName}
@@ -58,9 +59,9 @@ export default async function ProtectedLayout({
         hasScoreboard={Boolean(activeScoreboard)}
       />
       <main id="main-scroll-container" className="flex-1 overflow-y-auto overflow-x-hidden md:pl-[80px] lg:pl-[240px]">
-        <div className="pb-[calc(5.25rem+env(safe-area-inset-bottom))] md:pb-0">
+        <MainContentWrapper>
           <ProtectedContentLayout>{children}</ProtectedContentLayout>
-        </div>
+        </MainContentWrapper>
       </main>
     </div>
   );
