@@ -25,7 +25,9 @@
     "copyDone": "Copied",
     "noScoreboardNotice": "No active scoreboard. Please create a scoreboard first.",
     "createWorkspace": "Create New Workspace",
-    "joinWorkspace": "Join with Invite Code"
+    "joinWorkspace": "Join with Invite Code",
+    "open": "Open",
+    "close": "Close"
   },
   "Dashboard": {
     "teamStatus": "Team Dashboard",

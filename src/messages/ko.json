@@ -25,7 +25,9 @@
     "copyDone": "복사 완료",
     "noScoreboardNotice": "점수판이 없습니다. 점수판을 먼저 생성해주세요.",
     "createWorkspace": "새 워크스페이스 만들기",
-    "joinWorkspace": "초대코드로 참가하기"
+    "joinWorkspace": "초대코드로 참가하기",
+    "open": "열기",
+    "close": "닫기"
   },
   "Dashboard": {
     "teamStatus": "팀 대시보드",
