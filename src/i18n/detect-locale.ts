@@ -19,14 +19,14 @@ export function detectLocale({
   }
 
   const normalizedAcceptLanguage = acceptLanguage?.toLowerCase();
-
-  if (normalizedAcceptLanguage?.startsWith("en")) {
-    return "en";
-  }
-
+ 
   if (normalizedAcceptLanguage?.startsWith("ko")) {
     return "ko";
   }
-
+ 
+  if (normalizedAcceptLanguage?.startsWith("en")) {
+    return "en";
+  }
+ 
   return DEFAULT_LOCALE;
 }
