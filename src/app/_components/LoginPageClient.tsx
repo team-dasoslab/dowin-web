@@ -319,7 +319,7 @@ export default function LoginPageClient() {
                 type="text"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
-                placeholder="admin"
+                placeholder={t("idPlaceholder")}
                 className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
                 required
               />
@@ -348,7 +348,7 @@ export default function LoginPageClient() {
               <PasswordInput
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t("passwordPlaceholder")}
                 className="w-full rounded-content border border-border bg-sub-background px-5 py-4 pr-14 text-sm font-bold outline-none transition-all placeholder:text-text-muted focus:border-primary focus:bg-white"
                 toggleClassName="absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-text-muted transition-colors"
                 required
