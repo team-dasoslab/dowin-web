@@ -28,6 +28,7 @@ vi.mock("@/lib/server/auth", async () => {
 
 vi.mock("next/headers", () => ({
   cookies: vi.fn().mockResolvedValue({
+    get: vi.fn(),
     delete: mockCookieDelete,
   }),
   headers: vi.fn(async () => new Map()),

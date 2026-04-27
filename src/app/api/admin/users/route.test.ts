@@ -44,6 +44,13 @@ vi.mock("@/lib/server/authz", () => ({
   requireWorkspaceAdmin: mockRequireWorkspaceAdmin,
 }));
 
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(async () => ({
+    get: vi.fn(),
+  })),
+  headers: vi.fn(async () => new Map()),
+}));
+
 describe("POST /api/admin/users", () => {
   beforeEach(() => {
     vi.clearAllMocks();
