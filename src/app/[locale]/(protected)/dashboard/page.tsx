@@ -107,11 +107,15 @@ export default function DashboardPage() {
     (member) => member.hasScoreboard,
   );
 
-  if (!isLoading && (hasNoWorkspace || !dashboard)) {
+  if (isLoading) {
+    return <DashboardLoadingState />;
+  }
+
+  if (hasNoWorkspace || !dashboard) {
     return <DashboardNoWorkspaceState />;
   }
 
-  if (!isLoading && membersWithScoreboard.length === 0) {
+  if (membersWithScoreboard.length === 0) {
     return <DashboardNoScoreboardState />;
   }
 

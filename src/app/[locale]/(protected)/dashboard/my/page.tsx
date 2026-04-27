@@ -161,11 +161,15 @@ export default function MyDashboardPage() {
   ]);
 
 
+  if (isLoading) {
+    return <MyDashboardSkeleton />;
+  }
+
   if (hasNoWorkspace) {
     return <NoWorkspaceState />;
   }
 
-  if (!isLoading && (hasNoScoreboard || !activeScoreboard)) {
+  if (hasNoScoreboard || !activeScoreboard) {
     return <NoScoreboardState />;
   }
 
