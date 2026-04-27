@@ -4,7 +4,6 @@ import { ScoreboardCard } from "@/app/[locale]/(protected)/scoreboards/_componen
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";

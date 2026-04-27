@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
 interface PeriodControlsProps {
   monthLabel?: string;
-  monthlyGoalCount: number;
   resetToToday: () => void;
   selectedDate: string;
   selectedView: "week" | "month";
@@ -14,7 +12,6 @@ interface PeriodControlsProps {
   setSelectedView: (value: "week" | "month") => void;
   movePeriod: (direction: -1 | 1) => void;
   weekLabel: string;
-  weeklyGoalCount: number;
   today: string;
   historyLimitDate?: string;
   isPreviousDisabled?: boolean;
@@ -23,7 +20,6 @@ interface PeriodControlsProps {
 
 export function PeriodControls({
   monthLabel,
-  monthlyGoalCount,
   movePeriod,
   resetToToday,
   selectedDate,
@@ -31,14 +27,12 @@ export function PeriodControls({
   setSelectedDate,
   setSelectedView,
   weekLabel,
-  weeklyGoalCount,
   today,
   historyLimitDate,
   isPreviousDisabled,
   isPeriodLoading,
 }: PeriodControlsProps) {
   const t = useTranslations("Dashboard");
-  const tc = useTranslations("Common");
 
   return (
     <>

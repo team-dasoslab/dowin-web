@@ -13,7 +13,7 @@ import { formatWeekLabel } from "@/app/[locale]/(protected)/dashboard/_lib/dashb
 import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/report/_hooks/useTeamWeeklyReport";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
@@ -26,9 +26,6 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -767,39 +764,7 @@ function WinRateOverview({
   );
 }
 
-function AchievementDonut({ rate }: { rate: number }) {
-  const data = [
-    { name: "achieved", value: Math.min(rate, 100) },
-    { name: "remaining", value: Math.max(0, 100 - rate) },
-  ];
 
-  const COLORS = {
-    achieved: "#3a64c7", // Primary
-    remaining: "#e2e8f0", // Slate-200
-  };
-
-  return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={24}
-          outerRadius={30}
-          paddingAngle={0}
-          dataKey="value"
-          startAngle={90}
-          endAngle={-270}
-          stroke="none"
-        >
-          <Cell fill={COLORS.achieved} />
-          <Cell fill={COLORS.remaining} />
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
-  );
-}
 
 function StatusBoardCard({
   label,

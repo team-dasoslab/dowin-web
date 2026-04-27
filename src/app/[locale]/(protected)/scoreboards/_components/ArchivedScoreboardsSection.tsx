@@ -5,7 +5,6 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 type ArchivedScoreboardItem = {

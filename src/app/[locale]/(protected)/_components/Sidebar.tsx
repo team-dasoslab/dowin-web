@@ -1,7 +1,6 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { useGetScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
 import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-links";
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
@@ -18,16 +17,10 @@ export function Sidebar() {
 
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
-  const { data: scoreboardResponse, isLoading: isScoreboardLoading } =
-    useGetScoreboardsActive();
 
   const profile = profileResponse?.status === 200 ? profileResponse.data : null;
   const workspaceName = profile?.workspaceName;
   const role = profile?.role;
-  const hasScoreboard =
-    scoreboardResponse?.status === 200 && !!scoreboardResponse.data;
-
-  const isInitialLoading = isProfileLoading || isScoreboardLoading;
 
   const filteredLinks = MY_DASHBOARD_LINKS.filter((link) => {
     if (isProfileLoading) return true;

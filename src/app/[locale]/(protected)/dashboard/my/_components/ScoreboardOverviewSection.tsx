@@ -1,7 +1,5 @@
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { Card } from "@/components/ui/Card";
-import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
-import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import {
@@ -26,7 +24,6 @@ interface ScoreboardOverviewSectionProps {
   activeScoreboard: ReturnType<typeof useDashboardScoreboard>["activeScoreboard"];
   isWeeklyTrendLoading: boolean;
   isTrendLimited: boolean;
-  monthLabel?: string;
   monthlyOverallRate: number;
   weeklyOverallRate: number;
   weeklyTrendPoints: WeeklyTrendPoint[];
@@ -36,7 +33,6 @@ export function ScoreboardOverviewSection({
   activeScoreboard,
   isWeeklyTrendLoading,
   isTrendLimited,
-  monthLabel,
   monthlyOverallRate,
   weeklyOverallRate,
   weeklyTrendPoints,
@@ -176,12 +172,6 @@ function getRateColorHex(v: number) {
   if (v >= 80) return "#16a34a"; // Green-600
   if (v >= 50) return "#d97706"; // Amber-600
   return "#3a64c7"; // Primary
-}
-
-function getProgressColor(v: number) {
-  if (v >= 80) return "bg-green-500";
-  if (v >= 50) return "bg-amber-500";
-  return "bg-primary";
 }
 
 function DashboardWeeklyTrendSection({

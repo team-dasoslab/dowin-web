@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Link } from "@/i18n/routing";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 

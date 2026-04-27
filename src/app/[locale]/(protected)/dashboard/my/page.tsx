@@ -15,13 +15,12 @@ import { useMyDashboardPageState } from "@/app/[locale]/(protected)/dashboard/my
 import { type CelebrationLevel } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-celebration";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
+import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -39,9 +38,7 @@ export default function MyDashboardPage() {
     hasNoWorkspace,
     isLoading,
     isLogPending,
-    isMonthlyLogsLoading,
     isWeeklyTrendLoading,
-    isWeeklyLogsLoading,
     monthlyLeadMeasures,
     monthlyOverallRate,
     monthlySummary,
@@ -80,12 +77,6 @@ export default function MyDashboardPage() {
       : null;
   const isWorkspaceAdmin =
     profileResponse?.status === 200 && profileResponse.data.role === "ADMIN";
-  const weeklyGoalCount = activeLeadMeasures.filter(
-    (leadMeasure) => leadMeasure.period === "WEEKLY",
-  ).length;
-  const monthlyGoalCount = activeLeadMeasures.filter(
-    (leadMeasure) => leadMeasure.period === "MONTHLY",
-  ).length;
   const {
     celebrationLevel,
     handleDismissProductUpdate,
@@ -159,7 +150,6 @@ export default function MyDashboardPage() {
     selectedView,
     workspace?.id,
   ]);
-
 
   if (isLoading) {
     return <MyDashboardSkeleton />;
@@ -251,7 +241,6 @@ export default function MyDashboardPage() {
                 activeScoreboard={activeScoreboard}
                 isWeeklyTrendLoading={isWeeklyTrendLoading}
                 isTrendLimited={isTrendLimited}
-                monthLabel={monthLabel}
                 monthlyOverallRate={monthlyOverallRate}
                 weeklyOverallRate={weeklyOverallRate}
                 weeklyTrendPoints={weeklyTrendPoints}
@@ -269,7 +258,6 @@ export default function MyDashboardPage() {
               <SectionHeader title={t("executionBoard")} />
               <PeriodControls
                 monthLabel={monthLabel}
-                monthlyGoalCount={monthlyGoalCount}
                 movePeriod={movePeriod}
                 resetToToday={resetToToday}
                 selectedDate={selectedDate}
@@ -277,7 +265,6 @@ export default function MyDashboardPage() {
                 setSelectedDate={setSelectedDate}
                 setSelectedView={setSelectedView}
                 weekLabel={weekLabel}
-                weeklyGoalCount={weeklyGoalCount}
                 today={today}
                 historyLimitDate={historyLimitDate}
                 isPreviousDisabled={isPreviousDisabled}
@@ -319,7 +306,6 @@ export default function MyDashboardPage() {
         </div>
       </ProtectedPageContainer>
     </div>
-
   );
 }
 
@@ -385,9 +371,7 @@ function NoScoreboardState() {
               asChild
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
-              <Link href="/setup?mode=create">
-                {t("createScoreboard")}
-              </Link>
+              <Link href="/setup?mode=create">{t("createScoreboard")}</Link>
             </Button>
           }
         />
@@ -395,4 +379,3 @@ function NoScoreboardState() {
     </div>
   );
 }
-

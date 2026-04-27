@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useTranslations } from "next-intl";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 
 export default function NewWorkspacePage() {
