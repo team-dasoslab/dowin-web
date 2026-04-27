@@ -87,6 +87,17 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
     - 문서상 환불 예외 판단 기준을 실제 운영 로직으로 연결하려면 `STANDARD` usage ledger가 필요하다
   - 함께 남은 후속:
     - 반복 환불 이력의 운영 알림/수동 검토 흐름 고도화
+- 다국어(i18n)는 `next-intl` + URL locale 세그먼트 방식으로 동작한다
+  - 서버 locale 우선순위:
+    - `X-DOWIN-Locale`
+    - `NEXT_LOCALE`
+    - `Accept-Language`
+    - 기본값 `ko`
+  - 로그인 사용자가 다른 locale 경로로 들어오면 미들웨어가 같은 경로의 locale prefix만 교정한다
+  - 관련 구현 시작점:
+    - `middleware.ts`
+    - `src/i18n/detect-locale.ts`
+    - `src/lib/server/locale.ts`
 
 ### 2.3. 현재 우선순위 (2026-04-21 기준)
 
