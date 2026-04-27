@@ -278,6 +278,7 @@ export default function MyDashboardPage() {
                 setSelectedView={setSelectedView}
                 weekLabel={weekLabel}
                 weeklyGoalCount={weeklyGoalCount}
+                today={today}
                 historyLimitDate={historyLimitDate}
                 isPreviousDisabled={isPreviousDisabled}
                 isPeriodLoading={isPeriodLoading}
