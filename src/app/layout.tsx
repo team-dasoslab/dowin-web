@@ -1,8 +1,8 @@
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import type { Viewport } from "next";
 import Script from "next/script";
-import { detectLocale } from "@/i18n/detect-locale";
-import { headers } from "next/headers";
+import { resolveLocale } from "@/i18n/detect-locale";
+import { cookies, headers } from "next/headers";
 import { ReactNode } from "react";
 import "./globals.css";
 
@@ -16,8 +16,10 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
   const headerList = await headers();
-  const locale = detectLocale({
+  const cookieStore = await cookies();
+  const locale = resolveLocale({
     customLocale: headerList.get("x-dowin-locale"),
+    cookieLocale: cookieStore.get("NEXT_LOCALE")?.value,
     acceptLanguage: headerList.get("accept-language"),
   });
 

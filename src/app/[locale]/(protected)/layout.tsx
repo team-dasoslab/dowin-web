@@ -3,7 +3,6 @@ import { redirect } from "@/i18n/routing";
 import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { SidebarProvider } from "@/context/SidebarContext";
-import { LocaleEnforcer } from "./_components/LocaleEnforcer";
 import { MainContentWrapper } from "./_components/MainContentWrapper";
 import { ProtectedContentLayout } from "./_components/ProtectedContentLayout";
 import { ProtectedLayoutShell } from "./_components/ProtectedLayoutShell";
@@ -27,10 +26,7 @@ export default async function ProtectedLayout({
 
   return (
     <SidebarProvider>
-      <ProtectedLayoutShell
-        sidebar={<Sidebar />}
-        localeEnforcer={<LocaleEnforcer />}
-      >
+      <ProtectedLayoutShell sidebar={<Sidebar />}>
         <MainContentWrapper>
           <ProtectedContentLayout>{children}</ProtectedContentLayout>
         </MainContentWrapper>

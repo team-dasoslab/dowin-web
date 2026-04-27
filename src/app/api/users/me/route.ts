@@ -11,6 +11,7 @@ import {
   getSessionWithRefresh,
   SESSION_COOKIE,
 } from "@/lib/server/auth";
+import { isSupportedLocale } from "@/i18n/detect-locale";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -69,6 +70,14 @@ export const PUT = withErrorHandler(async (request: Request) => {
     session.userId,
     parsed.data,
   );
+
+  if (profile?.locale && isSupportedLocale(profile.locale)) {
+    const cookieStore = await cookies();
+    cookieStore.set("NEXT_LOCALE", profile.locale, {
+      path: "/",
+      maxAge: 31536000,
+    });
+  }
 
   return apiSuccess(profile);
 });

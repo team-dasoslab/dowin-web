@@ -1,6 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
-import { DEFAULT_LOCALE, detectLocale, isSupportedLocale } from "./src/i18n/detect-locale";
+import { isSupportedLocale, resolveLocale } from "./src/i18n/detect-locale";
 import { routing } from "./src/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -24,6 +24,17 @@ const isPublicPath = (pathname: string) => {
   return PUBLIC_PATHS.has(pathname);
 };
 
+const replaceLocalePrefix = (pathname: string, locale: string) => {
+  const segments = pathname.split("/");
+
+  if (isSupportedLocale(segments[1])) {
+    segments[1] = locale;
+    return segments.join("/") || `/${locale}`;
+  }
+
+  return `/${locale}${pathname === "/" ? "" : pathname}`;
+};
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -37,12 +48,25 @@ export function middleware(request: NextRequest) {
 
   // Identify internal locale for redirects
   const segments = pathname.split("/");
-  const locale = isSupportedLocale(segments[1])
+  const localeInPath = isSupportedLocale(segments[1]) ? segments[1] : null;
+  const locale = localeInPath
     ? segments[1]
-    : detectLocale({
+    : resolveLocale({
         customLocale: request.headers.get("x-dowin-locale"),
+        cookieLocale: nextLocaleCookie,
         acceptLanguage: request.headers.get("accept-language"),
-      }) || (isSupportedLocale(nextLocaleCookie) ? nextLocaleCookie : DEFAULT_LOCALE);
+      });
+
+  if (
+    hasSessionCookie &&
+    localeInPath &&
+    isSupportedLocale(nextLocaleCookie) &&
+    nextLocaleCookie !== localeInPath
+  ) {
+    const target = request.nextUrl.clone();
+    target.pathname = replaceLocalePrefix(pathname, nextLocaleCookie);
+    return NextResponse.redirect(target);
+  }
 
   if (hasSessionCookie && isPublicPath(pathname)) {
     const target = new URL(

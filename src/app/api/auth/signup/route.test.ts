@@ -15,6 +15,7 @@ vi.mock("@/db", () => ({
 
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
+    get: vi.fn(),
     set: mockCookieSet,
   })),
   headers: vi.fn(async () => new Map()),

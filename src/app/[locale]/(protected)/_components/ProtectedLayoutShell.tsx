@@ -7,19 +7,16 @@ import React from "react";
 interface ProtectedLayoutShellProps {
   children: React.ReactNode;
   sidebar: React.ReactNode;
-  localeEnforcer: React.ReactNode;
 }
 
 export function ProtectedLayoutShell({
   children,
   sidebar,
-  localeEnforcer,
 }: ProtectedLayoutShellProps) {
   const { isCollapsed } = useSidebar();
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-zinc-50/50">
-      {localeEnforcer}
       {sidebar}
       <main
         id="main-scroll-container"
