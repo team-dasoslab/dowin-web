@@ -1,8 +1,8 @@
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
-import type { Viewport } from "next";
-import Script from "next/script";
 import { resolveLocale } from "@/i18n/detect-locale";
+import type { Viewport } from "next";
 import { cookies, headers } from "next/headers";
+import Script from "next/script";
 import { ReactNode } from "react";
 import "./globals.css";
 
@@ -13,7 +13,11 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default async function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
   const headerList = await headers();
   const cookieStore = await cookies();
@@ -23,10 +27,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     acceptLanguage: headerList.get("accept-language"),
   });
 
+  const isNative = headerList.get("x-dowin-client") === "app";
+  const platform = isNative ? "app" : "web";
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
         <title>Dowin</title>
+        {/* ... existing meta tags ... */}
         <meta name="description" content="가장 중요한 목표에 집중하세요." />
         <meta property="og:title" content="Dowin" />
         <meta
@@ -50,6 +58,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <link rel="icon" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/favicon-192x192.png" />
 
+        {/* ... existing startup images ... */}
         <link
           rel="apple-touch-startup-image"
           href="/splash/apple-splash-2048-2732.jpg"
@@ -121,12 +130,17 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             />
             <Script id="gtag-init" strategy="afterInteractive">
               {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){window.dataLayer.push(arguments);}
-                window.gtag = gtag;
-                gtag('js', new Date());
-                gtag('config', '${gaId}');
-              `}
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){window.dataLayer.push(arguments);}
+                  window.gtag = gtag;
+                  gtag('js', new Date());
+                  gtag('config', '${gaId}', {
+                    'client_platform': '${platform}',
+                    'user_properties': {
+                      'client_type': '${platform}'
+                    }
+                  });
+                `}
             </Script>
           </>
         ) : null}
