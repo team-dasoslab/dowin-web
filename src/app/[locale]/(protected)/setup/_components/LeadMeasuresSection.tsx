@@ -243,7 +243,7 @@ function LeadMeasureRow({
       </div>
 
       <div
-        className="rounded-content border border-zinc-200 bg-zinc-50/30 overflow-hidden"
+        className="rounded-content border border-zinc-200 bg-zinc-50/30"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
       >
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
