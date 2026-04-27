@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
 interface PeriodControlsProps {
   monthLabel?: string;
-  monthlyGoalCount: number;
   resetToToday: () => void;
   selectedDate: string;
   selectedView: "week" | "month";
@@ -14,7 +12,7 @@ interface PeriodControlsProps {
   setSelectedView: (value: "week" | "month") => void;
   movePeriod: (direction: -1 | 1) => void;
   weekLabel: string;
-  weeklyGoalCount: number;
+  today: string;
   historyLimitDate?: string;
   isPreviousDisabled?: boolean;
   isPeriodLoading?: boolean;
@@ -22,7 +20,6 @@ interface PeriodControlsProps {
 
 export function PeriodControls({
   monthLabel,
-  monthlyGoalCount,
   movePeriod,
   resetToToday,
   selectedDate,
@@ -30,121 +27,114 @@ export function PeriodControls({
   setSelectedDate,
   setSelectedView,
   weekLabel,
-  weeklyGoalCount,
+  today,
   historyLimitDate,
   isPreviousDisabled,
   isPeriodLoading,
 }: PeriodControlsProps) {
   const t = useTranslations("Dashboard");
-  const tc = useTranslations("Common");
 
   return (
     <>
-      <div className="flex flex-col gap-3 rounded-content border border-border bg-white p-4">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="inline-flex w-fit rounded-content border border-border bg-sub-background p-1">
-            {(["week", "month"] as const).map((view) => {
-              const isActive = selectedView === view;
-
-              return (
-                <Button
-                  key={view}
-                  type="button"
-                  onClick={() => setSelectedView(view)}
-                  disabled={isPeriodLoading}
-                  className={`rounded-button px-3 py-1.5 text-xs font-bold transition-colors disabled:opacity-50 ${
-                    isActive
-                      ? "bg-white text-primary shadow-sm border border-border"
-                      : "text-text-secondary"
-                  }`}
-                >
-                  {view === "week" ? t("weekView") : t("monthView")}
-                </Button>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="grid grid-cols-[40px_minmax(0,1fr)_40px] items-center gap-2 sm:flex sm:items-center">
-              <Button
-                type="button"
-                onClick={() => movePeriod(-1)}
-                disabled={isPreviousDisabled || isPeriodLoading}
-                className="h-9 w-9 rounded-button border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <DowinIcon name="nav-chevron-left" size="16px" className="mx-auto" />
-              </Button>
-              <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
-                <input
-                  type="date"
-                  value={selectedDate}
-                  min={historyLimitDate}
-                  disabled={isPeriodLoading}
-                  onChange={(event) => setSelectedDate(event.target.value)}
-                  className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none disabled:opacity-50"
-                />
-              </label>
-              <Button
-                type="button"
-                onClick={() => movePeriod(1)}
-                disabled={isPeriodLoading}
-                className="h-9 w-9 rounded-button border border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <DowinIcon name="nav-chevron-right" size="16px" className="mx-auto" />
-              </Button>
-            </div>
-            <Button
-              type="button"
-              onClick={resetToToday}
-              disabled={isPeriodLoading}
-              className="h-9 w-full rounded-button border border-border bg-white px-3 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed sm:w-auto"
-            >
-              {t("backToToday")}
-            </Button>
-          </div>
-        </div>
-
-        <p className="text-[11px] text-text-muted">
-          {selectedView === "week" ? t("weekViewDesc") : t("monthViewDesc")}
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-3 px-0.5 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-1">
-          <h2 className="text-sm font-bold text-text-primary">
+      <div className="flex flex-col gap-4 py-2">
+        {/* Row 1: Title & Add Button */}
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-base font-bold tracking-tight text-text-primary">
             {selectedView === "week"
               ? t("weeklyLeadMeasures")
               : t("monthlyAggregation")}
           </h2>
-          <p className="text-[11px] text-text-muted">
-            {selectedView === "week"
-              ? t("weeklyLeadMeasuresDesc", {
-                  count: weeklyGoalCount,
-                  monthlyCount: monthlyGoalCount,
-                })
-              : t("monthlyAggregationDesc", {
-                  month: monthLabel ?? tc("unsetTitle"),
-                  count: weeklyGoalCount + monthlyGoalCount,
-                })}
-          </p>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <PeriodBadge
-            label={
-              selectedView === "week"
-                ? weekLabel
-                : (monthLabel ?? tc("unsetTitle"))
-            }
-          />
+
           <Button
             asChild
-            className="flex items-center justify-center gap-1 rounded-button border border-border bg-white px-2.5 py-1.5 text-[11px] font-bold text-text-secondary transition-colors hover:border-[rgba(205,207,213,1)] hover:text-primary"
+            className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all hover:bg-primary/10 lg:h-8 lg:px-3 lg:text-[11px]"
           >
             <Link href="/setup?mode=addMeasure">
-              <DowinIcon name="action-add" size="12px" />
-              {t("addMeasure")}
+              <DowinIcon name="action-add" size="14px" />
+              <span className="sm:inline">{t("addMeasure")}</span>
             </Link>
           </Button>
+        </div>
+
+        {/* Row 2: Navigation & Settings */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
+          <div className="flex items-center gap-2">
+            {/* Utility: Calendar Picker (Now at the very front) */}
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all hover:border-primary/30 focus-within:border-primary/30">
+              <DowinIcon name="domain-calendar" size="16px" className="text-zinc-400" />
+              <input
+                type="date"
+                value={selectedDate}
+                min={historyLimitDate}
+                disabled={isPeriodLoading}
+                onChange={(event) => setSelectedDate(event.target.value)}
+                className="absolute inset-0 w-full cursor-pointer opacity-0"
+              />
+            </div>
+
+            {/* Primary Group: Date Navigation */}
+            <div className="flex flex-1 items-center justify-between gap-1 rounded-button border border-border bg-white p-1 sm:justify-start lg:flex-none">
+              <Button
+                type="button"
+                onClick={() => movePeriod(-1)}
+                disabled={isPreviousDisabled || isPeriodLoading}
+                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+              >
+                <DowinIcon name="nav-chevron-left" size="14px" />
+              </Button>
+              
+              <div className="flex-1 px-3 text-center text-[12px] font-bold text-text-primary tabular-nums sm:flex-none">
+                {selectedView === "week" ? weekLabel : monthLabel}
+              </div>
+
+              <Button
+                type="button"
+                onClick={() => movePeriod(1)}
+                disabled={isPeriodLoading}
+                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+              >
+                <DowinIcon name="nav-chevron-right" size="14px" />
+              </Button>
+
+              {selectedDate !== today && (
+                <div className="mx-1 h-3 w-px bg-border sm:block" />
+              )}
+
+              {selectedDate !== today && (
+                <Button
+                  type="button"
+                  onClick={resetToToday}
+                  disabled={isPeriodLoading}
+                  className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary hover:bg-zinc-100 hover:text-primary"
+                >
+                  <DowinIcon name="action-refresh" size="10px" />
+                  <span>{t("backToToday")}</span>
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Secondary Group: View Toggle (At the very end) */}
+          <div className="inline-flex w-fit shrink-0 rounded-button border border-border bg-sub-background p-1 lg:ml-auto">
+            {(["week", "month"] as const).map((view) => {
+              const isActive = selectedView === view;
+              return (
+                <button
+                  key={view}
+                  type="button"
+                  onClick={() => setSelectedView(view)}
+                  disabled={isPeriodLoading}
+                  className={`rounded-button px-3 py-1 text-[11px] font-bold transition-all ${
+                    isActive
+                      ? "bg-white text-primary border border-border shadow-sm"
+                      : "text-text-secondary hover:text-text-primary"
+                  }`}
+                >
+                  {view === "week" ? t("weekView") : t("monthView")}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </>

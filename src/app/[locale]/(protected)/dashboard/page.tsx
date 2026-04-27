@@ -10,14 +10,13 @@ import { MemberCard } from "@/app/[locale]/(protected)/dashboard/_components/Mem
 import { WeeklyTable } from "@/app/[locale]/(protected)/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/[locale]/(protected)/dashboard/_hooks/useTeamDashboard";
 import { Button } from "@/components/ui/Button";
+import { Logo } from "@/components/ui/Logo";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { cn } from "@/lib/utils";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EmptyStatePanel } from "../_components/EmptyStatePanel";
@@ -103,14 +102,14 @@ export default function DashboardPage() {
     hasTrackedViewRef.current = true;
   }, [dashboard, hasNoWorkspace, isLoading]);
 
-  if (isLoading) {
-    return <DashboardLoadingState />;
-  }
-
   const members = dashboard?.members ?? [];
   const membersWithScoreboard = members.filter(
     (member) => member.hasScoreboard,
   );
+
+  if (isLoading) {
+    return <DashboardLoadingState />;
+  }
 
   if (hasNoWorkspace || !dashboard) {
     return <DashboardNoWorkspaceState />;
@@ -120,7 +119,7 @@ export default function DashboardPage() {
     return <DashboardNoScoreboardState />;
   }
 
-  const weekLabel = formatWeekLabel(dashboard.weekStart, dashboard.weekEnd);
+  const weekLabel = formatWeekLabel(dashboard?.weekStart, dashboard?.weekEnd);
   const currentUserRole =
     members.find((member) => member.userId === myUserId)?.role ?? null;
 
@@ -132,7 +131,18 @@ export default function DashboardPage() {
           activeMemoState ? "xl:left-[-112px]" : "xl:left-0",
         )}
       >
-        <ProtectedPageHeader title={t("teamStatus")} />
+        <ProtectedPageHeader
+          title={t("teamStatus")}
+          rightElement={
+            <div className="flex items-center gap-2">
+              {isLoading ? (
+                <div className="h-6 w-24 animate-pulse rounded-full bg-zinc-100" />
+              ) : (
+                <PeriodBadge label={weekLabel} size="md" />
+              )}
+            </div>
+          }
+        />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 네비게이션 ── */}
@@ -181,16 +191,18 @@ export default function DashboardPage() {
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="summary" className="space-y-5 scroll-mt-28">
-              <div className="flex items-end justify-between">
-                <div className="flex-1">
-                  <SectionHeader title={t("memberSummary")} />
-                </div>
-                <div className="pb-1 px-1">
-                  <PeriodBadge label={weekLabel} />
-                </div>
-              </div>
+              <SectionHeader title={t("memberSummary")} />
 
-              {members.length === 0 ? (
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="h-28 w-full animate-pulse rounded-content bg-zinc-50"
+                    />
+                  ))}
+                </div>
+              ) : members.length === 0 ? (
                 <div className="border border-border rounded-content p-8 text-center text-text-muted text-sm">
                   {t("noMembers")}
                 </div>
@@ -218,53 +230,63 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {membersWithScoreboard.map((member) => (
-                <WeeklyTable
-                  key={member.userId}
-                  member={member}
-                  weekDates={weekDates}
-                  isMe={member.userId === myUserId}
-                  memoMode={
-                    activeMemoState != null &&
-                    activeMemoState.memberId === member.userId
-                      ? activeMemoState.mode
-                      : null
-                  }
-                  onToggleCompose={() =>
-                    setActiveMemoState((prev) =>
-                      prev != null &&
-                      prev.memberId === member.userId &&
-                      prev.mode === "compose"
-                        ? null
-                        : member.userId != null
-                          ? { memberId: member.userId, mode: "compose" }
-                          : null,
-                    )
-                  }
-                  onToggleView={() =>
-                    setActiveMemoState((prev) =>
-                      prev != null &&
-                      prev.memberId === member.userId &&
-                      prev.mode === "view"
-                        ? null
-                        : member.userId != null
-                          ? { memberId: member.userId, mode: "view" }
-                          : null,
-                    )
-                  }
-                  onCloseMemo={() => setActiveMemoState(null)}
-                  currentUserId={myUserId}
-                  currentUserNickname={myNickname}
-                  currentUserAvatarKey={myAvatarKey}
-                  currentUserRole={currentUserRole}
-                />
-              ))}
+              {isLoading ? (
+                <div className="space-y-6">
+                  {[1, 2].map((i) => (
+                    <div
+                      key={i}
+                      className="h-64 w-full animate-pulse rounded-content bg-zinc-50"
+                    />
+                  ))}
+                </div>
+              ) : (
+                membersWithScoreboard.map((member) => (
+                  <WeeklyTable
+                    key={member.userId}
+                    member={member}
+                    weekDates={weekDates}
+                    isMe={member.userId === myUserId}
+                    memoMode={
+                      activeMemoState != null &&
+                      activeMemoState.memberId === member.userId
+                        ? activeMemoState.mode
+                        : null
+                    }
+                    onToggleCompose={() =>
+                      setActiveMemoState((prev) =>
+                        prev != null &&
+                        prev.memberId === member.userId &&
+                        prev.mode === "compose"
+                          ? null
+                          : member.userId != null
+                            ? { memberId: member.userId, mode: "compose" }
+                            : null,
+                      )
+                    }
+                    onToggleView={() =>
+                      setActiveMemoState((prev) =>
+                        prev != null &&
+                        prev.memberId === member.userId &&
+                        prev.mode === "view"
+                          ? null
+                          : member.userId != null
+                            ? { memberId: member.userId, mode: "view" }
+                            : null,
+                      )
+                    }
+                    onCloseMemo={() => setActiveMemoState(null)}
+                    currentUserId={myUserId}
+                    currentUserNickname={myNickname}
+                    currentUserAvatarKey={myAvatarKey}
+                    currentUserRole={currentUserRole}
+                  />
+                ))
+              )}
             </section>
           </div>
         </div>
       </ProtectedPageContainer>
     </div>
-
   );
 }
 
@@ -289,7 +311,7 @@ function DashboardNoWorkspaceState() {
     <div className="min-h-screen bg-zinc-50/50 ">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<DowinIcon name="domain-people" size="20px" className="text-primary" />}
+          icon={<Logo size="20px" className="text-primary" />}
           title={t("noWorkspaceTitle")}
           description={t("noWorkspaceDesc")}
           actions={<NoWorkspaceActions />}
@@ -313,10 +335,7 @@ function DashboardNoScoreboardState() {
               asChild
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
-              <Link href="/setup?mode=create">
-                <DowinIcon name="action-add-active" size="16px" />
-                {t("createScoreboard")}
-              </Link>
+              <Link href="/setup?mode=create">{t("createScoreboard")}</Link>
             </Button>
           }
         />

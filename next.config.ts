@@ -1,7 +1,7 @@
 import withSerwistInit from "@serwist/next";
 import type { NextConfig } from "next";
-import { serverRuntimeConfig } from "./src/config/server-runtime-config";
 import createNextIntlPlugin from "next-intl/plugin";
+import { serverRuntimeConfig } from "./src/config/server-runtime-config";
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -14,6 +14,7 @@ const withSerwist = withSerwistInit({
 const nextConfig: NextConfig = {
   /* config options here */
   // Silence Turbopack vs Webpack conflict in Next.js 16
+  // devIndicators: false,
   turbopack: {},
 };
 
