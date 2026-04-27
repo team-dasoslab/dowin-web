@@ -24,6 +24,13 @@ vi.mock("@/lib/server/authz", () => ({
   requireWorkspaceMember: mockRequireWorkspaceMember,
 }));
 
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(async () => ({
+    get: vi.fn(),
+  })),
+  headers: vi.fn(async () => new Map()),
+}));
+
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
   WorkspaceStorage: vi.fn(),
 }));
