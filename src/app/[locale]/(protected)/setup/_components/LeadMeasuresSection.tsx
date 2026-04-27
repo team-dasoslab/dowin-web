@@ -243,7 +243,7 @@ function LeadMeasureRow({
       </div>
 
       <div
-        className="rounded-content border border-zinc-200 bg-zinc-50/30 overflow-hidden"
+        className="rounded-content border border-zinc-200 bg-zinc-50/30"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
       >
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
@@ -324,7 +324,7 @@ function LeadMeasureRow({
                           maxLength={MAX_TAG_NAME_LENGTH}
                           onChange={(e) => setEditingTagName(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === "Enter") {
+                            if (e.key === "Enter" && !e.nativeEvent.isComposing) {
                               e.preventDefault();
                               void renameTag(tag.id, editingTagName).then(
                                 (isRenamed) => {
@@ -458,14 +458,17 @@ function LeadMeasureRow({
                 maxLength={MAX_TAG_NAME_LENGTH}
                 onChange={(e) => setDraftTagName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key !== "Enter") {
+                  if (e.key !== "Enter" || e.nativeEvent.isComposing) {
                     return;
                   }
 
                   e.preventDefault();
-                  void createTag(measure.id, draftTagName).then((isCreated) => {
-                    if (isCreated) {
-                      setDraftTagName("");
+                  const tagName = draftTagName;
+                  setDraftTagName("");
+                  void createTag(measure.id, tagName).then((isCreated) => {
+                    if (!isCreated) {
+                      // Optionally restore if you want, but user asked to clear
+                      // For now, keeping it cleared as requested
                     }
                   });
                 }}
@@ -476,11 +479,9 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating}
                 onClick={() => {
-                  void createTag(measure.id, draftTagName).then((isCreated) => {
-                    if (isCreated) {
-                      setDraftTagName("");
-                    }
-                  });
+                  const tagName = draftTagName;
+                  setDraftTagName("");
+                  void createTag(measure.id, tagName);
                 }}
                 className="rounded-content border border-zinc-200 bg-white px-4 py-2 text-xs font-bold text-text-primary transition-colors hover:bg-zinc-50/50 sm:shrink-0"
               >

@@ -167,7 +167,7 @@ function WeeklyMobileCardDay({
             void toggleLog(leadMeasureId, date);
           }
         }}
-        className={`h-9 w-full rounded-md border text-sm transition-colors ${
+        className={`flex aspect-square w-full items-center justify-center rounded-md border p-0 text-sm transition-colors ${
           value === true
             ? "border-primary bg-primary text-white"
             : isToday

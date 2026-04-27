@@ -4,20 +4,23 @@ import React from "react";
 interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   description?: string;
+  badge?: React.ReactNode;
 }
 
 export function SectionHeader({
   title,
   description,
+  badge,
   className,
   ...props
 }: SectionHeaderProps) {
   return (
     <div className={cn("space-y-1.5", className)} {...props}>
-      <div className="flex items-center gap-4 px-1">
-        <h3 className="text-[13px] font-black text-zinc-400 uppercase tracking-wider">
+      <div className="flex items-center gap-3 px-1">
+        <h3 className="text-[13px] font-black text-zinc-400 uppercase tracking-wider shrink-0">
           {title}
         </h3>
+        {badge && <div className="shrink-0">{badge}</div>}
         <div className="h-px flex-1 bg-zinc-200/60" />
       </div>
       {description && (

@@ -19,6 +19,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
+import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -286,70 +287,37 @@ export default function ReportPage() {
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="status" className="space-y-5 scroll-mt-28">
               <SectionHeader title={t("sections.teamStatus")} />
-
-              <div className="space-y-2 px-1">
-                <h2 className="text-lg font-bold tracking-tight text-text-primary md:text-xl">
-                  {hasActive
-                    ? t("header.activeTitle", {
-                        activeCount: summary.activeCount,
-                        winningCount: summary.winningCount,
-                      })
-                    : t("header.noActiveTitle")}
-                </h2>
-                <p className="text-sm leading-6 text-text-secondary">
-                  {summary.immediateCheckCount > 0
-                    ? t("header.needsCheckDesc", {
-                        notStartedCount: summary.notStartedCount,
-                        noScoreboardCount: summary.noScoreboardCount,
-                      })
-                    : t("header.allStartedDesc")}
-                </p>
-              </div>
-
               {hasMembers ? (
-                <Card className="overflow-hidden rounded-content border border-border bg-white">
+                <div className="space-y-3">
                   {hasActive ? (
-                    <div className="px-5 py-5">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-bold text-text-primary">
-                            {t("winRate.title")}
-                          </p>
-                          <p className="mt-0.5 text-xs text-text-muted">
-                            {t("winRate.desc")}
-                          </p>
-                        </div>
-                        <DowinIcon
-                          name="domain-trending"
-                          size="16px"
-                          className="shrink-0 text-primary"
-                        />
-                      </div>
-                      <WinRateOverview
-                        winningCount={summary.winningCount}
-                        losingCount={summary.losingStartedCount}
-                        notStartedCount={summary.notStartedCount}
-                        noScoreboardCount={summary.noScoreboardCount}
-                        activeCount={summary.activeCount}
-                        totalCount={summary.totalCount}
-                        winningNames={summary.winningNames}
-                        losingNames={summary.losingStartedNames}
-                        notStartedNames={summary.notStartedNames}
-                        noScoreboardNames={summary.noScoreboardNames}
-                      />
-                    </div>
-                  ) : (
-                    <InlineEmptyState
-                      title={t("empty.noActiveScoreboardsTitle")}
-                      description={t("empty.noActiveScoreboardsDesc")}
+                    <WinRateOverview
+                      winningCount={summary.winningCount}
+                      losingCount={summary.losingStartedCount}
+                      notStartedCount={summary.notStartedCount}
+                      noScoreboardCount={summary.noScoreboardCount}
+                      activeCount={summary.activeCount}
+                      totalCount={summary.totalCount}
+                      winningNames={summary.winningNames}
+                      losingNames={summary.losingStartedNames}
+                      notStartedNames={summary.notStartedNames}
+                      noScoreboardNames={summary.noScoreboardNames}
                     />
+                  ) : (
+                    <Card className="overflow-hidden rounded-content border border-border bg-white">
+                      <InlineEmptyState
+                        title={t("empty.noActiveScoreboardsTitle")}
+                        description={t("empty.noActiveScoreboardsDesc")}
+                      />
+                    </Card>
                   )}
-                </Card>
+                </div>
               ) : (
-                <InlineEmptyState
-                  title={t("empty.noMembersTitle")}
-                  description={t("empty.noMembersDesc")}
-                />
+                <Card className="overflow-hidden rounded-content border border-border bg-white">
+                  <InlineEmptyState
+                    title={t("empty.noMembersTitle")}
+                    description={t("empty.noMembersDesc")}
+                  />
+                </Card>
               )}
             </section>
 
@@ -358,10 +326,11 @@ export default function ReportPage() {
                 title={t("trend.title")}
                 description={t("trend.desc")}
               />
-              <TeamTrendChart
-                trends={report.trends ?? []}
-                workspaceId={report.workspaceId}
-              />
+              <Card className="overflow-visible p-6 sm:p-8 border border-zinc-200 bg-white">
+                <div className="h-[300px] w-full">
+                  <TeamTrendChart trends={report.trends ?? []} />
+                </div>
+              </Card>
             </section>
 
             <section id="focus" className="space-y-5 scroll-mt-28">
@@ -414,18 +383,21 @@ function ChartLegendTooltip({
       <button
         type="button"
         onClick={onToggle}
-        className="flex items-center gap-1.5 text-[11px] text-text-muted transition-colors hover:text-text-primary"
+        onMouseEnter={onToggle}
+        onMouseLeave={onClose}
+        className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted transition-colors hover:text-text-primary"
       >
         <span
           className="inline-block h-2 w-2 rounded-full"
           style={{ backgroundColor: color }}
         />
         {label}
+        <DowinIcon name="status-info" size={10} className="text-zinc-300 ml-0.5" />
       </button>
       {active && (
         <>
-          <div className="fixed inset-0 z-10" onClick={onClose} />
-          <div className="absolute right-0 top-full z-20 mt-2 w-56 rounded-content border border-border bg-white p-4">
+          <div className="fixed inset-0 z-10 sm:hidden" onClick={onClose} />
+          <div className="absolute left-0 top-full z-20 mt-2 w-56 rounded-content border border-border bg-white p-4 shadow-xl animate-dowin-in">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-primary">
               {label}
             </p>
@@ -459,56 +431,55 @@ function TeamTrendChart({
   const hasTrendData = data.length > 0;
 
   return (
-    <section className="space-y-3">
-      <div className="flex flex-col gap-2 px-1 sm:flex-row sm:items-baseline sm:justify-between">
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <ChartLegendTooltip
-            active={activeTooltip === "winRate"}
-            label={t("trend.winRateLabel")}
-            description={t("trend.winRateDesc")}
-            color="#1e293b"
-            onToggle={() => {
-              const next = activeTooltip === "winRate" ? null : "winRate";
-              setActiveTooltip(next);
-              if (next) {
-                trackEvent("team_report_trend_legend_clicked", {
-                  legend_type: "winRate",
-                  workspace_id_hash: hashId(workspaceId),
-                });
-              }
-            }}
-            onClose={() => setActiveTooltip(null)}
-          />
-          <ChartLegendTooltip
-            active={activeTooltip === "execRate"}
-            label={t("trend.executionRateLabel")}
-            description={t("trend.executionRateDesc")}
-            color="#84cc16"
-            onToggle={() => {
-              const next = activeTooltip === "execRate" ? null : "execRate";
-              setActiveTooltip(next);
-              if (next) {
-                trackEvent("team_report_trend_legend_clicked", {
-                  legend_type: "execRate",
-                  workspace_id_hash: hashId(workspaceId),
-                });
-              }
-            }}
-            onClose={() => setActiveTooltip(null)}
-          />
-        </div>
+    <div className="flex h-full flex-col space-y-4">
+      <div className="flex items-center gap-x-4">
+        <ChartLegendTooltip
+          active={activeTooltip === "winRate"}
+          label={t("trend.winRateLabel")}
+          description={t("trend.winRateDesc")}
+          color="#3a64c7"
+          onToggle={() => {
+            const next = activeTooltip === "winRate" ? null : "winRate";
+            setActiveTooltip(next);
+            if (next) {
+              trackEvent("team_report_trend_legend_clicked", {
+                legend_type: "winRate",
+                workspace_id_hash: hashId(workspaceId),
+              });
+            }
+          }}
+          onClose={() => setActiveTooltip(null)}
+        />
+        <ChartLegendTooltip
+          active={activeTooltip === "execRate"}
+          label={t("trend.executionRateLabel")}
+          description={t("trend.executionRateDesc")}
+          color="#84cc16"
+          onToggle={() => {
+            const next = activeTooltip === "execRate" ? null : "execRate";
+            setActiveTooltip(next);
+            if (next) {
+              trackEvent("team_report_trend_legend_clicked", {
+                legend_type: "execRate",
+                workspace_id_hash: hashId(workspaceId),
+              });
+            }
+          }}
+          onClose={() => setActiveTooltip(null)}
+        />
       </div>
-      <Card className="overflow-hidden rounded-content border border-border bg-white px-2 py-5">
+
+      <div className="flex-1 min-h-[200px]">
         {hasTrendData ? (
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data}
-              margin={{ top: 4, right: 16, left: -20, bottom: 0 }}
+              margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
             >
               <defs>
                 <linearGradient id="winGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#1e293b" stopOpacity={0.12} />
-                  <stop offset="95%" stopColor="#1e293b" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#3a64c7" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#3a64c7" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="execGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#84cc16" stopOpacity={0.12} />
@@ -517,51 +488,56 @@ function TeamTrendChart({
               </defs>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="#e5e7eb"
+                stroke="#f1f5f9"
                 vertical={false}
               />
               <XAxis
                 dataKey="week"
-                tick={{ fontSize: 11, fill: "#9ca3af" }}
+                tick={{ fontSize: 10, fill: "#9ca3af", fontWeight: 500 }}
                 axisLine={false}
                 tickLine={false}
-                dy={6}
+                dy={8}
               />
               <YAxis
                 domain={[0, 100]}
-                tick={{ fontSize: 11, fill: "#9ca3af" }}
+                tick={{ fontSize: 10, fill: "#9ca3af", fontWeight: 500 }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) => `${v}%`}
-                ticks={[0, 25, 50, 75, 100]}
+                ticks={[0, 50, 100]}
               />
               <Tooltip
-                cursor={{ stroke: "#e5e7eb", strokeWidth: 1 }}
+                cursor={{ stroke: "rgba(58, 100, 199, 0.1)", strokeWidth: 1 }}
                 content={({ active, payload, label }) => {
                   if (!active || !payload?.length) return null;
                   return (
-                    <div className="rounded-content border border-border bg-white px-3 py-2">
-                      <p className="mb-1.5 text-[11px] font-bold text-text-primary">
+                    <div className="rounded-lg border border-zinc-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm">
+                      <p className="mb-2 text-[11px] font-bold text-text-primary">
                         {label}
                       </p>
-                      {payload.map((entry) => (
-                        <p
-                          key={entry.dataKey as string}
-                          className="text-[11px] text-text-muted"
-                        >
-                          <span
-                            className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full"
-                            style={{ backgroundColor: entry.color }}
-                          />
-                          {entry.dataKey === "winRate"
-                            ? t("trend.winRateLabel")
-                            : t("trend.executionRateLabel")}
-                          :{" "}
-                          <span className="font-mono font-bold text-text-primary">
-                            {entry.value}%
-                          </span>
-                        </p>
-                      ))}
+                      <div className="space-y-1.5">
+                        {payload.map((entry) => (
+                          <div
+                            key={entry.dataKey as string}
+                            className="flex items-center justify-between gap-4"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="h-1.5 w-1.5 rounded-full"
+                                style={{ backgroundColor: entry.color }}
+                              />
+                              <span className="text-[11px] font-medium text-text-secondary">
+                                {entry.dataKey === "winRate"
+                                  ? t("trend.winRateLabel")
+                                  : t("trend.executionRateLabel")}
+                              </span>
+                            </div>
+                            <span className="font-mono text-[11px] font-bold text-text-primary">
+                              {entry.value}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   );
                 }}
@@ -569,35 +545,38 @@ function TeamTrendChart({
               <Area
                 type="monotone"
                 dataKey="winRate"
-                stroke="#1e293b"
-                strokeWidth={2}
+                stroke="#3a64c7"
+                strokeWidth={2.5}
                 fill="url(#winGrad)"
-                dot={false}
-                activeDot={{ r: 4, fill: "#1e293b", strokeWidth: 0 }}
+                dot={{ r: 3, fill: "#fff", stroke: "#3a64c7", strokeWidth: 2 }}
+                activeDot={{ r: 5, fill: "#3a64c7", stroke: "#fff", strokeWidth: 2 }}
+                animationDuration={1000}
               />
               <Area
                 type="monotone"
                 dataKey="execRate"
                 stroke="#84cc16"
-                strokeWidth={1.5}
+                strokeWidth={2}
                 fill="url(#execGrad)"
+                strokeDasharray="4 4"
                 dot={false}
-                activeDot={{ r: 4, fill: "#84cc16", strokeWidth: 0 }}
+                activeDot={{ r: 4, fill: "#84cc16", stroke: "#fff", strokeWidth: 2 }}
+                animationDuration={1000}
               />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex min-h-[180px] flex-col items-center justify-center px-4 text-center">
+          <div className="flex h-full flex-col items-center justify-center text-center">
             <p className="text-sm font-semibold text-text-primary">
               {t("empty.noTrendTitle")}
             </p>
-            <p className="mt-1 text-xs leading-5 text-text-muted">
+            <p className="mt-1 text-xs text-text-muted">
               {t("empty.noTrendDesc")}
             </p>
           </div>
         )}
-      </Card>
-    </section>
+      </div>
+    </div>
   );
 }
 
@@ -640,6 +619,7 @@ function WinRateOverview({
   noScoreboardNames: string[];
 }) {
   const t = useTranslations("Report");
+  const [showInfo, setShowInfo] = useState(false);
   if (totalCount === 0) return null;
 
   const winRate =
@@ -663,100 +643,120 @@ function WinRateOverview({
   const statusCards = [
     {
       label: t("statusCards.winning.label"),
-      caption: t("statusCards.winning.caption"),
       count: winningCount,
       names: winningNames,
       color: "bg-primary",
-      ring: "border-primary/20",
-      surface: "bg-primary/[0.04]",
-      valueTone: "text-primary",
+      indicator: "bg-primary",
     },
     {
       label: t("statusCards.losing.label"),
-      caption: t("statusCards.losing.caption"),
       count: losingCount,
       names: losingNames,
       color: "bg-amber-400",
-      ring: "border-amber-200",
-      surface: "bg-amber-50/50",
-      valueTone: "text-amber-700",
+      indicator: "bg-amber-400",
     },
     {
       label: t("statusCards.notStarted.label"),
-      caption: t("statusCards.notStarted.caption"),
       count: notStartedCount,
       names: notStartedNames,
       color: "bg-zinc-400",
-      ring: "border-zinc-200",
-      surface: "bg-sub-background",
-      valueTone: "text-text-secondary",
+      indicator: "bg-zinc-400",
     },
     {
       label: t("statusCards.noScoreboard.label"),
-      caption: t("statusCards.noScoreboard.caption"),
       count: noScoreboardCount,
       names: noScoreboardNames,
       color: "bg-zinc-200",
-      ring: "border-zinc-200",
-      surface: "bg-sub-background",
-      valueTone: "text-text-muted",
+      indicator: "bg-zinc-200",
     },
   ];
 
   return (
-    <div className="mt-4 space-y-3">
-      <div className="rounded-content border border-border bg-dowin-surface-gradient px-4 py-4">
-        <div className="space-y-1.5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-            {t("winOverview.summaryLabel")}
-          </p>
-          <p className="text-lg font-bold tracking-tight text-text-primary md:text-xl">
-            {statusHeadline}
-          </p>
-          <p className="text-sm text-text-secondary">{statusSubline}</p>
-          <div className="grid gap-2 pt-2 sm:grid-cols-2">
-            <div className="rounded-md border border-border bg-white px-3 py-2.5">
-              <p className="text-[11px] font-semibold text-text-muted">
-                {t("winOverview.activeWinRate")}
-              </p>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="font-mono text-lg font-bold tracking-tight text-primary">
-                  {winRate}%
-                </span>
-                <span className="text-xs text-text-muted">
-                  {winningCount} / {activeCount}
-                </span>
+    <div className="space-y-4">
+      {/* Main Status Card */}
+      <Card className="relative overflow-visible border border-zinc-200 bg-white">
+        {/* Clipped background glow */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-content">
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+        </div>
+        <div className="relative flex flex-col p-6 sm:p-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="flex-1 space-y-3">
+              <div className="inline-flex items-center px-2.5 py-1 rounded-button border border-primary/10 bg-primary/5 text-primary text-[11px] font-bold tracking-tight shadow-sm shadow-primary/5">
+                {t("winOverview.summaryLabel")}
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl leading-[1.15]">
+                  {statusHeadline}
+                </h2>
+                <p className="text-[15px] font-medium text-text-secondary leading-relaxed max-w-2xl">
+                  {statusSubline}
+                </p>
               </div>
             </div>
-            <div className="rounded-md border border-border bg-white px-3 py-2.5">
-              <p className="text-[11px] font-semibold text-text-muted">
-                {t("winOverview.totalMembers")}
-              </p>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="font-mono text-lg font-bold tracking-tight text-text-primary">
-                  {t("common.memberCount", { count: totalCount })}
-                </span>
-                <span className="text-xs text-text-muted">
-                  {t("winOverview.thisWeekBasis")}
-                </span>
+
+            <div className="flex items-center gap-8 md:gap-12 shrink-0 border-t border-zinc-100 pt-6 md:border-t-0 md:pt-0">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
+                  {t("winOverview.totalMembers")}
+                </p>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-mono text-4xl font-bold tracking-tight text-text-primary">
+                    {totalCount}
+                  </span>
+                  <span className="text-xs font-bold text-text-muted">{t("common.memberCount", { count: "" })}</span>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <div className="flex items-center gap-1">
+                  <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
+                    {t("winOverview.activeWinRate")}
+                  </p>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowInfo(!showInfo)}
+                      onMouseEnter={() => setShowInfo(true)}
+                      onMouseLeave={() => setShowInfo(false)}
+                      className="text-zinc-400 transition-colors hover:text-zinc-600 outline-none"
+                    >
+                      <DowinIcon name="status-info" size={12} />
+                    </button>
+                    {showInfo && (
+                      <div className="absolute top-full right-0 mt-2 w-64 rounded-content border border-zinc-200 bg-white p-4 shadow-xl z-[60] animate-dowin-in">
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-primary">
+                          {t("winOverview.activeWinRate")}
+                        </p>
+                        <p className="text-[11px] leading-relaxed text-text-secondary whitespace-normal normal-case tracking-normal">
+                          {t("trend.winRateDesc")}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className={cn(
+                    "font-mono text-4xl font-bold tracking-tight",
+                    winRate >= 80 ? "text-primary" : winRate >= 50 ? "text-amber-500" : "text-zinc-400"
+                  )}>
+                    {winRate}%
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {statusCards.map((card) => (
           <StatusBoardCard
             key={card.label}
             label={card.label}
-            caption={card.caption}
             count={card.count}
             names={card.names}
-            color={card.color}
-            ring={card.ring}
-            surface={card.surface}
-            valueTone={card.valueTone}
+            indicator={card.indicator}
           />
         ))}
       </div>
@@ -764,82 +764,78 @@ function WinRateOverview({
   );
 }
 
+
+
 function StatusBoardCard({
   label,
-  caption,
   count,
   names,
-  color,
-  ring,
-  surface,
-  valueTone,
+  indicator,
 }: {
   label: string;
-  caption: string;
   count: number;
   names: string[];
-  color: string;
-  ring: string;
-  surface: string;
-  valueTone: string;
+  indicator: string;
 }) {
   const t = useTranslations("Report");
-  const COLLAPSED_MAX = 4;
+  const COLLAPSED_MAX = 3;
   const [expanded, setExpanded] = useState(false);
   const hasMore = names.length > COLLAPSED_MAX;
   const shownNames = expanded ? names : names.slice(0, COLLAPSED_MAX);
 
   return (
-    <div className={`rounded-content border px-4 py-4 ${ring} ${surface}`}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+    <Card className="flex flex-col border border-zinc-200 bg-white">
+      <div className="flex flex-col flex-1 p-4 sm:p-5 gap-3">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className={`h-2.5 w-2.5 rounded-full ${color}`} />
-            <p className="text-sm font-semibold text-text-primary">{label}</p>
+            <div className={cn("h-2 w-2 rounded-full", indicator)} />
+            <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">
+              {label}
+            </p>
           </div>
-          <p className="mt-1 text-[11px] leading-4 text-text-muted">
-            {caption}
-          </p>
+          <span className="font-mono text-2xl font-bold tracking-tighter text-text-primary">
+            {count}
+          </span>
         </div>
-        <div
-          className={`font-mono text-2xl font-bold tracking-tight ${valueTone}`}
-        >
-          {count}
-        </div>
-      </div>
 
-      <div className="mt-4">
-        {shownNames.length > 0 ? (
-          <div>
-            <div className="flex flex-wrap gap-2">
+        <div className="flex-1">
+          {shownNames.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
               {shownNames.map((name) => (
                 <span
                   key={`${label}-${name}`}
-                  className="rounded-full border border-white/70 bg-white px-2.5 py-1 text-xs font-medium text-text-primary"
+                  className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-bold text-text-secondary"
                 >
                   {name}
                 </span>
               ))}
+              {hasMore && !expanded && (
+                <button
+                  type="button"
+                  onClick={() => setExpanded(true)}
+                  className="rounded bg-zinc-50 px-1.5 py-0.5 text-[11px] font-bold text-text-muted hover:bg-zinc-100"
+                >
+                  +{names.length - COLLAPSED_MAX}
+                </button>
+              )}
             </div>
-            {hasMore && (
-              <button
-                type="button"
-                onClick={() => setExpanded((prev) => !prev)}
-                className="mt-2 text-xs font-semibold text-text-secondary underline-offset-2 hover:text-text-primary hover:underline"
-              >
-                {expanded
-                  ? t("common.collapse")
-                  : t("common.showMoreMembers", { count: names.length })}
-              </button>
-            )}
-          </div>
-        ) : (
-          <p className="text-xs text-text-muted">
-            {t("common.noMatchingMembers")}
-          </p>
-        )}
+          ) : (
+            <p className="text-[11px] font-medium text-text-muted italic">
+              {t("common.noMatchingMembers")}
+            </p>
+          )}
+          {expanded && hasMore && (
+            <button
+              type="button"
+              onClick={() => setExpanded(false)}
+              className="mt-2 text-[11px] font-bold text-primary hover:underline"
+            >
+              {t("common.collapse")}
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -864,19 +860,19 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
   const t = useTranslations("Report");
 
   return (
-    <div className="overflow-hidden rounded-content border border-border bg-white">
-      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-border bg-sub-background px-5 py-3 text-[11px] font-semibold text-text-muted md:grid">
+    <Card className="overflow-hidden border border-zinc-200 bg-white">
+      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-zinc-100 bg-zinc-50/50 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-text-muted md:grid">
         <span>{t("focus.table.member")}</span>
-        <span>{t("focus.table.status")}</span>
-        <span>{t("focus.table.score")}</span>
+        <span className="text-center">{t("focus.table.status")}</span>
+        <span className="text-center">{t("focus.table.score")}</span>
         <span>{t("focus.table.nextAction")}</span>
       </div>
 
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-zinc-100">
         {members.map((member) => (
           <div
             key={member.key}
-            className="grid gap-3 px-5 py-4 md:grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] md:items-center md:gap-4"
+            className="grid gap-3 px-6 py-5 md:grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] md:items-center md:gap-4"
           >
             <div className="flex items-center gap-3">
               <span className="text-sm font-bold text-text-primary">
@@ -886,25 +882,28 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
 
             <div className="flex md:justify-center">
               <span
-                className={`rounded border px-2 py-0.5 text-[10px] font-bold tracking-tight md:text-[11px] ${member.badgeTone}`}
+                className={cn(
+                  "rounded px-2 py-0.5 text-[10px] font-bold tracking-tight md:text-[11px] border",
+                  member.badgeTone
+                )}
               >
                 {member.status}
               </span>
             </div>
 
             <div className="flex md:justify-center">
-              <span className="font-mono text-sm font-bold text-text-primary">
+              <span className="font-mono text-sm font-bold text-primary">
                 {member.score}
               </span>
             </div>
 
-            <div className="text-xs leading-relaxed text-text-secondary">
+            <div className="text-xs font-medium leading-relaxed text-text-secondary">
               {member.nextAction}
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
 

@@ -266,9 +266,7 @@ function NoScoreboardState() {
               asChild
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
-              <Link href="/setup?mode=create">
-                <DowinIcon name="action-add" size="16px" />새 점수판 만들기
-              </Link>
+              <Link href="/setup?mode=create">새 점수판 만들기</Link>
             </Button>
           }
         />

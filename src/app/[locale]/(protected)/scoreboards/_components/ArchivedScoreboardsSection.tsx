@@ -5,7 +5,6 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 type ArchivedScoreboardItem = {
@@ -59,15 +58,13 @@ export function ArchivedScoreboardsSection({
 
                       onReactivate(scoreboardId);
                     }}
-                    className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
+                    className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors whitespace-nowrap flex-shrink-0"
                   >
-                    {pendingActionId === scoreboardId ? (
+                    {pendingActionId === scoreboardId && (
                       <InlineSpinner
                         size="sm"
                         className="border-text-secondary/20 border-t-text-secondary"
                       />
-                    ) : (
-                      <DowinIcon name="action-undo" size="14px" />
                     )}
                     {pendingActionId === scoreboardId
                       ? t("reactivating")

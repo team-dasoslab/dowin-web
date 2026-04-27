@@ -98,51 +98,58 @@ export function WeeklyTable({
   return (
     <div className="relative space-y-2 xl:pr-0">
       <div className="px-1">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-2">
-            <UserAvatar
-              avatarKey={member.avatarKey}
-              avatarSeed={member.nickname}
-              alt={`${member.nickname ?? "사용자"} 아바타`}
-              size={20}
-            />
-            <span className="truncate text-xs font-bold text-text-primary">
-              {member.nickname}
-            </span>
-            {isMe ? (
-              <span className="rounded-content border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
-                {tc("me")}
+        <div className="flex flex-col gap-1.5 sm:gap-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <UserAvatar
+                avatarKey={member.avatarKey}
+                avatarSeed={member.nickname}
+                alt={`${member.nickname ?? "사용자"} 아바타`}
+                size={20}
+              />
+              <span className="truncate text-xs font-bold text-text-primary">
+                {member.nickname}
               </span>
-            ) : null}
-            <span className="truncate text-xs text-text-secondary">
-              — {member.goalName}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {hasMemos ? (
+              {isMe ? (
+                <span className="shrink-0 rounded-content border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+                  {tc("me")}
+                </span>
+              ) : null}
+              <span className="hidden truncate text-xs text-text-secondary sm:inline">
+                — {member.goalName}
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              {hasMemos ? (
+                <Button
+                  type="button"
+                  onClick={onToggleView}
+                  className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                    memoMode === "view"
+                      ? "border-primary/25 bg-primary/10 text-primary"
+                      : "border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                  }`}
+                >
+                  {t("viewMemos")}
+                </Button>
+              ) : null}
               <Button
                 type="button"
-                onClick={onToggleView}
-                className={`shrink-0 rounded-content border px-3 py-2 text-xs font-bold transition-colors ${
-                  memoMode === "view"
+                onClick={handleComposeClick}
+                className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                  memoMode === "compose"
                     ? "border-primary/25 bg-primary/10 text-primary"
                     : "border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
                 }`}
               >
-                {t("viewMemos")}
+                {t("memoButton")}
               </Button>
-            ) : null}
-            <Button
-              type="button"
-              onClick={handleComposeClick}
-              className={`shrink-0 rounded-content border px-3 py-2 text-xs font-bold transition-colors ${
-                memoMode === "compose"
-                  ? "border-primary/25 bg-primary/10 text-primary"
-                  : "border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
-              }`}
-            >
-              {t("memoButton")}
-            </Button>
+            </div>
+          </div>
+          <div className="sm:hidden">
+            <p className="text-[11px] leading-relaxed text-text-secondary">
+              {member.goalName}
+            </p>
           </div>
         </div>
       </div>

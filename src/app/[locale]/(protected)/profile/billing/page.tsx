@@ -9,8 +9,9 @@ import {
 import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/billing/_hooks/useProfileBillingActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
+import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -48,7 +49,11 @@ export default function ProfileBillingPage() {
 
     setIsReturningFromCheckout(true);
     currentUrl.searchParams.delete("billing");
-    window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+    window.history.replaceState(
+      {},
+      "",
+      currentUrl.pathname + currentUrl.search,
+    );
     void handleReturnedFromCheckout();
   }, [handleReturnedFromCheckout]);
 
@@ -104,9 +109,8 @@ export default function ProfileBillingPage() {
                 type="button"
                 onClick={startCheckout}
                 disabled={isCheckoutPending}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-content px-3 text-[11px] font-bold btn-dowin-primary`}
+                className={`flex h-9 items-center justify-center rounded-content px-3 text-[11px] font-bold btn-dowin-primary`}
               >
-                <DowinIcon name="domain-payment" size="14px" />
                 {isCheckoutPending ? t("checkoutLoading") : t("upgradeButton")}
               </Button>
             )}
@@ -115,9 +119,8 @@ export default function ProfileBillingPage() {
               <Button
                 type="button"
                 onClick={() => void openPortal()}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-content border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors hover:bg-sub-background`}
+                className={`flex h-9 items-center justify-center rounded-content border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors`}
               >
-                <DowinIcon name="action-external" size="14px" />
                 {t("portalButton")}
               </Button>
             )}
@@ -143,7 +146,11 @@ export default function ProfileBillingPage() {
               onClick={() => void refetch()}
               className="mt-1 inline-flex h-8 items-center justify-center gap-1.5 rounded-content border border-primary/20 bg-white px-3 text-[11px] font-bold text-primary"
             >
-              <DowinIcon name="action-refresh" size="14px" className={isFetching ? "animate-spin" : ""} />
+              <DowinIcon
+                name="action-refresh"
+                size="14px"
+                className={isFetching ? "animate-spin" : ""}
+              />
               {t("refresh")}
             </Button>
           </Card>
@@ -193,7 +200,10 @@ export default function ProfileBillingPage() {
             />
             <BillingInfoCell
               label={t("periodEndLabel")}
-              value={formatDateLabel(billing.currentPeriodEnd, t("notAvailable"))}
+              value={formatDateLabel(
+                billing.currentPeriodEnd,
+                t("notAvailable"),
+              )}
               tone="default"
             />
           </div>
@@ -333,7 +343,7 @@ function NoWorkspaceState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <DowinIcon name="domain-wallet" size="20px" />
+            <Logo size="24px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">

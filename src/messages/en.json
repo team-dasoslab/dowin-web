@@ -25,7 +25,9 @@
     "copyDone": "Copied",
     "noScoreboardNotice": "No active scoreboard. Please create a scoreboard first.",
     "createWorkspace": "Create New Workspace",
-    "joinWorkspace": "Join with Invite Code"
+    "joinWorkspace": "Join with Invite Code",
+    "open": "Open",
+    "close": "Close"
   },
   "Dashboard": {
     "teamStatus": "Team Dashboard",
@@ -736,9 +738,11 @@
     "login": "Login",
     "signup": "Sign Up",
     "id": "ID",
+    "idPlaceholder": "Enter your ID",
     "nickname": "Nickname",
-    "nicknamePlaceholder": "John Doe",
+    "nicknamePlaceholder": "Enter your nickname",
     "password": "Password",
+    "passwordPlaceholder": "Enter your password",
     "subtitle": "Focus on what matters most.",
     "signupSubtitle": "Create an account and start achieving your goals.",
     "noAccount": "Don't have an account?",

@@ -126,9 +126,9 @@ html {
 .bg-dowin-surface-gradient {
   background: linear-gradient(
     135deg,
-    rgba(30, 41, 59, 0.1) 0%,
-    rgba(255, 255, 255, 0.96) 55%,
-    rgba(30, 41, 59, 0.04) 100%
+    rgba(58, 100, 199, 0.06) 0%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(90, 130, 225, 0.04) 100%
   );
 }
 

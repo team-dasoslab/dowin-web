@@ -4,7 +4,6 @@ import { ScoreboardCard } from "@/app/[locale]/(protected)/scoreboards/_componen
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -49,15 +48,13 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors whitespace-nowrap flex-shrink-0"
             >
-              {pendingActionId === activeScoreboardId ? (
+              {pendingActionId === activeScoreboardId && (
                 <InlineSpinner
                   size="sm"
                   className="border-text-secondary/20 border-t-text-secondary"
                 />
-              ) : (
-                 <DowinIcon name="action-archive" size="14px" />
               )}
               {pendingActionId === activeScoreboardId
                 ? t("archiving")
@@ -89,10 +86,9 @@ function EmptyActiveScoreboardCard() {
       <div className="flex justify-center">
         <Button
           asChild
-          className="btn-dowin-primary px-4 py-2 text-xs font-bold flex items-center gap-1.5"
+          className="btn-dowin-primary px-4 py-2 text-xs font-bold"
         >
           <Link href="/setup?mode=create">
-             <DowinIcon name="action-add" size="14px" />
             {td("createScoreboard")}
           </Link>
         </Button>

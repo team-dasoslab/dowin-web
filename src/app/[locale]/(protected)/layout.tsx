@@ -1,13 +1,13 @@
 import { getDb } from "@/db";
+import { redirect } from "@/i18n/routing";
 import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { redirect } from "@/i18n/routing";
+import { SidebarProvider } from "@/context/SidebarContext";
 import { LocaleEnforcer } from "./_components/LocaleEnforcer";
-import { ProtectedContentLayout } from "./_components/ProtectedContentLayout";
-import { Sidebar } from "./_components/Sidebar";
-import { scoreboards, workspaceMembers, workspaces } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
 import { MainContentWrapper } from "./_components/MainContentWrapper";
+import { ProtectedContentLayout } from "./_components/ProtectedContentLayout";
+import { ProtectedLayoutShell } from "./_components/ProtectedLayoutShell";
+import { Sidebar } from "./_components/Sidebar";
 
 export default async function ProtectedLayout({
   children,
@@ -25,44 +25,16 @@ export default async function ProtectedLayout({
     return redirect({ href: "/login", locale });
   }
 
-  const memberInfo = await db
-    .select({
-      workspaceId: workspaces.id,
-      workspaceName: workspaces.name,
-      role: workspaceMembers.role,
-    })
-    .from(workspaceMembers)
-    .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
-    .where(eq(workspaceMembers.userId, session.userId))
-    .get();
-
-  const activeScoreboard = memberInfo
-    ? await db
-        .select({ id: scoreboards.id })
-        .from(scoreboards)
-        .where(
-          and(
-            eq(scoreboards.workspaceId, memberInfo.workspaceId),
-            eq(scoreboards.userId, session.userId),
-            eq(scoreboards.status, "ACTIVE"),
-          ),
-        )
-        .get()
-    : null;
-
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-zinc-50/50">
-      <LocaleEnforcer />
-      <Sidebar
-        workspaceName={memberInfo?.workspaceName}
-        role={memberInfo?.role}
-        hasScoreboard={Boolean(activeScoreboard)}
-      />
-      <main id="main-scroll-container" className="flex-1 overflow-y-auto overflow-x-hidden md:pl-[80px] lg:pl-[240px]">
+    <SidebarProvider>
+      <ProtectedLayoutShell
+        sidebar={<Sidebar />}
+        localeEnforcer={<LocaleEnforcer />}
+      >
         <MainContentWrapper>
           <ProtectedContentLayout>{children}</ProtectedContentLayout>
         </MainContentWrapper>
-      </main>
-    </div>
+      </ProtectedLayoutShell>
+    </SidebarProvider>
   );
 }

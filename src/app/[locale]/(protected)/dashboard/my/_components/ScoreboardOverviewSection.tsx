@@ -1,8 +1,18 @@
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { Card } from "@/components/ui/Card";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { StatCard } from "@/components/ui/StatCard";
+import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import {
+  Area,
+  AreaChart,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 type WeeklyTrendPoint = {
   weekStart: string;
@@ -11,12 +21,9 @@ type WeeklyTrendPoint = {
 };
 
 interface ScoreboardOverviewSectionProps {
-  activeScoreboard: NonNullable<
-    ReturnType<typeof useDashboardScoreboard>["activeScoreboard"]
-  >;
+  activeScoreboard: ReturnType<typeof useDashboardScoreboard>["activeScoreboard"];
   isWeeklyTrendLoading: boolean;
   isTrendLimited: boolean;
-  monthLabel?: string;
   monthlyOverallRate: number;
   weeklyOverallRate: number;
   weeklyTrendPoints: WeeklyTrendPoint[];
@@ -26,7 +33,6 @@ export function ScoreboardOverviewSection({
   activeScoreboard,
   isWeeklyTrendLoading,
   isTrendLimited,
-  monthLabel,
   monthlyOverallRate,
   weeklyOverallRate,
   weeklyTrendPoints,
@@ -34,111 +40,171 @@ export function ScoreboardOverviewSection({
   const t = useTranslations("Dashboard");
 
   return (
-    <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-2 md:items-stretch">
-      <div className="space-y-3">
-        <Card>
-          <div className="flex flex-col gap-4 border-b border-zinc-200 px-4 py-4 sm:px-6">
-            <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
+    <div className="flex flex-col gap-3">
+      {/* ── WIG & Lag Measure Hero Card (Vertical Stack Design) ── */}
+      <Card className="border border-zinc-200 bg-white">
+        <div className="flex flex-col">
+          {/* Primary Goal (WIG) */}
+          <div className="px-6 pt-5 pb-3 sm:px-8 sm:pt-6 sm:pb-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-button border border-primary/10 bg-primary/5 text-primary text-[10px] font-bold tracking-tight shadow-sm shadow-primary/5 uppercase">
                 {t("dowinLabel")}
-              </p>
-              <h2 className="text-lg font-bold text-text-primary">
+              </div>
+            </div>
+            {activeScoreboard ? (
+              <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl break-words leading-[1.2]">
                 {activeScoreboard.goalName}
               </h2>
-            </div>
+            ) : (
+              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-100" />
+            )}
           </div>
 
-          <div className="flex items-start gap-3 bg-zinc-50/50 px-4 py-3 sm:items-center sm:px-6">
-            <DowinIcon
-              name="domain-target-arrow"
-              size="14px"
-              className="text-text-muted"
-            />
-            <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-center">
-              <span className="tracking-widest text-[10px] font-bold text-text-muted sm:mr-3">
+          {/* Lag Measure Section */}
+          <div className="px-6 pt-3 pb-5 sm:px-8 sm:pt-4 sm:pb-6 space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-button border border-zinc-200 bg-zinc-50 text-text-secondary text-[10px] font-bold tracking-tight shadow-sm shadow-zinc-100/50 uppercase">
                 {t("lagMeasureLabel")}
-              </span>
-              <span className="break-words text-sm font-medium text-text-primary">
+              </div>
+            </div>
+            {activeScoreboard ? (
+              <p className="text-sm font-medium text-text-secondary leading-relaxed break-words">
                 {activeScoreboard.lagMeasure}
-              </span>
+              </p>
+            ) : (
+              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-50" />
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-5">
+        {/* ── Consolidated Achievement Card (Vertical Stack) ── */}
+        <Card className="flex flex-col lg:col-span-1">
+          {/* Weekly Section */}
+          <div className="flex flex-col items-start p-4 gap-4">
+            <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+              {t("weeklyAchievementRate")}
+            </p>
+            <div className="relative h-20 w-20 self-center">
+              <AchievementDonut rate={weeklyOverallRate} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
+                <span className={cn("font-mono text-2xl font-bold leading-none", getRateColor(weeklyOverallRate))}>
+                  {weeklyOverallRate}
+                </span>
+                <span className="text-[10px] font-bold text-text-muted">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-px w-full bg-zinc-100" />
+
+          {/* Monthly Section */}
+          <div className="flex flex-col items-start p-4 gap-4">
+            <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+              {t("monthlyAchievementRate")}
+            </p>
+            <div className="relative h-20 w-20 self-center">
+              <AchievementDonut rate={monthlyOverallRate} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
+                <span className={cn("font-mono text-2xl font-bold leading-none", getRateColor(monthlyOverallRate))}>
+                  {monthlyOverallRate}
+                </span>
+                <span className="text-[10px] font-bold text-text-muted">%</span>
+              </div>
             </div>
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="grid grid-cols-2 gap-2">
-            <StatCard
-              label={t("weeklyAchievementRate")}
-              value={`${weeklyOverallRate}%`}
-              valueClassName={
-                weeklyOverallRate >= 80
-                  ? "text-green-600"
-                  : weeklyOverallRate >= 50
-                    ? "text-amber-600"
-                    : "text-text-primary"
-              }
-            />
-            <StatCard
-              label={
-                monthLabel
-                  ? t("monthlyAchievementRateWithMonth", { month: monthLabel })
-                  : t("monthlyAchievementRate")
-              }
-              value={`${monthlyOverallRate}%`}
-              valueClassName={
-                monthlyOverallRate >= 80
-                  ? "text-green-600"
-                  : monthlyOverallRate >= 50
-                    ? "text-amber-600"
-                    : "text-text-primary"
-              }
-            />
-          </div>
-        </Card>
+        {/* ── Recent Trend (Expanded) ── */}
+        <DashboardWeeklyTrendSection
+          isLoading={isWeeklyTrendLoading}
+          isHistoryLimited={isTrendLimited}
+          weeklyTrendPoints={weeklyTrendPoints}
+          className="lg:col-span-4"
+        />
       </div>
-
-      <DashboardWeeklyTrendSection
-        isLoading={isWeeklyTrendLoading}
-        isHistoryLimited={isTrendLimited}
-        weeklyTrendPoints={weeklyTrendPoints}
-      />
     </div>
   );
+}
+
+function AchievementDonut({ rate }: { rate: number }) {
+  const data = [
+    { name: "achieved", value: Math.min(rate, 100) },
+    { name: "remaining", value: Math.max(0, 100 - rate) },
+  ];
+
+  const COLORS = {
+    achieved: getRateColorHex(rate),
+    remaining: "#f4f4f5", // Zinc-100
+  };
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={data}
+          cx="50%"
+          cy="50%"
+          innerRadius={28}
+          outerRadius={32}
+          paddingAngle={0}
+          dataKey="value"
+          startAngle={90}
+          endAngle={-270}
+          stroke="none"
+        >
+          <Cell fill={COLORS.achieved} />
+          <Cell fill={COLORS.remaining} />
+        </Pie>
+      </PieChart>
+    </ResponsiveContainer>
+  );
+}
+
+function getRateColor(v: number) {
+  if (v >= 80) return "text-green-600";
+  if (v >= 50) return "text-amber-600";
+  return "text-primary";
+}
+
+function getRateColorHex(v: number) {
+  if (v >= 80) return "#16a34a"; // Green-600
+  if (v >= 50) return "#d97706"; // Amber-600
+  return "#3a64c7"; // Primary
 }
 
 function DashboardWeeklyTrendSection({
   isLoading,
   isHistoryLimited,
   weeklyTrendPoints,
+  className,
 }: {
   isLoading: boolean;
   isHistoryLimited: boolean;
   weeklyTrendPoints: WeeklyTrendPoint[];
+  className?: string;
 }) {
   const t = useTranslations("Dashboard");
 
   return (
-    <Card className="flex h-full min-h-[220px] flex-col p-4">
-      <p className="text-sm font-semibold text-text-primary">
-        {t("recentTrend")}
-      </p>
+    <Card className={cn("flex flex-col p-4", className)}>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+          {t("recentTrend")}
+        </p>
+      </div>
+
       {isLoading ? (
-        <div className="mt-auto h-full min-h-[140px] animate-pulse rounded-md bg-sub-background" />
+        <div className="flex-1 animate-pulse rounded-lg bg-zinc-50" />
       ) : isHistoryLimited ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2">
-          <div className="rounded-full bg-sub-background p-2">
-            <DowinIcon
-              name="status-locked"
-              size="16px"
-              className="text-text-muted"
-            />
-          </div>
-          <p className="text-[11px] text-text-muted">
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 py-1">
+          <p className="text-[10px] text-text-muted text-center leading-tight">
             {t("historyLimitMessage")}
           </p>
         </div>
       ) : (
-        <div className="mt-auto">
+        <div className="flex-1">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />
         </div>
       )}
@@ -147,35 +213,52 @@ function DashboardWeeklyTrendSection({
 }
 
 function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
-  return (
-    <div className="mt-3 flex h-full min-h-[140px] items-end gap-2 overflow-hidden pb-1">
-      {points.map((point, index) => {
-        const isCurrentWeek = index === points.length - 1;
+  const data = points.map((p) => ({
+    name: p.label,
+    rate: p.rate,
+  }));
 
-        return (
-          <div
-            key={point.weekStart}
-            className="flex h-full flex-1 flex-col items-center gap-1"
-          >
-            <div className="text-[10px] font-mono text-text-muted">
-              {point.rate}%
-            </div>
-            <div className="flex h-full min-h-[72px] w-full items-end">
-              <div
-                className="w-full rounded-sm bg-primary/70"
-                style={{ height: `${Math.max(point.rate, 4)}%` }}
-              />
-            </div>
-            <div
-              className={`text-[10px] font-mono ${
-                isCurrentWeek ? "text-text-primary" : "text-text-muted"
-              }`}
-            >
-              {point.label}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={data} margin={{ top: 10, right: 5, left: 5, bottom: 0 }}>
+        <defs>
+          <linearGradient id="rateGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.15} />
+            <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <Tooltip
+          cursor={{ stroke: "rgba(0,0,0,0.05)", strokeWidth: 1 }}
+          content={({ active, payload }) => {
+            if (!active || !payload?.length) return null;
+            return (
+              <div className="rounded-md border border-zinc-200 bg-white/90 px-2 py-1 shadow-sm backdrop-blur-sm">
+                <p className="font-mono text-[10px] font-bold text-primary">
+                  {payload[0].value}%
+                </p>
+              </div>
+            );
+          }}
+        />
+        <XAxis
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 11, fill: "#9ca3af" }}
+          dy={6}
+        />
+        <YAxis domain={[0, 100]} hide />
+        <Area
+          type="monotone"
+          dataKey="rate"
+          stroke="var(--color-primary)"
+          strokeWidth={2}
+          fill="url(#rateGrad)"
+          dot={{ r: 2, fill: "var(--color-primary)", strokeWidth: 0 }}
+          activeDot={{ r: 4, fill: "var(--color-primary)", strokeWidth: 0 }}
+          animationDuration={1000}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 }
