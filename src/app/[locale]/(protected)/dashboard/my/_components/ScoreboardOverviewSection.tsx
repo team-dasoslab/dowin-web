@@ -80,9 +80,9 @@ export function ScoreboardOverviewSection({
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-5">
         {/* ── Consolidated Achievement Card (Vertical Stack) ── */}
-        <Card className="flex flex-col lg:col-span-1">
+        <Card className="flex flex-row divide-x divide-zinc-100 lg:flex-col lg:divide-x-0 lg:divide-y lg:col-span-1">
           {/* Weekly Section */}
-          <div className="flex flex-col items-start p-4 gap-4">
+          <div className="flex flex-1 flex-col items-start p-4 gap-4 sm:p-5">
             <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
               {t("weeklyAchievementRate")}
             </p>
@@ -97,10 +97,8 @@ export function ScoreboardOverviewSection({
             </div>
           </div>
 
-          <div className="h-px w-full bg-zinc-100" />
-
           {/* Monthly Section */}
-          <div className="flex flex-col items-start p-4 gap-4">
+          <div className="flex flex-1 flex-col items-start p-4 gap-4 sm:p-5">
             <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
               {t("monthlyAchievementRate")}
             </p>
@@ -204,7 +202,7 @@ function DashboardWeeklyTrendSection({
           </p>
         </div>
       ) : (
-        <div className="flex-1">
+        <div className="h-[140px] w-full">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />
         </div>
       )}
