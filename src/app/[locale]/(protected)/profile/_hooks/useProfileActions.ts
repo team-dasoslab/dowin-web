@@ -12,6 +12,7 @@ import {
   useDeleteWorkspacesIdLeave,
   usePutWorkspacesId,
 } from "@/api/generated/workspace/workspace";
+import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "@/i18n/routing";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
@@ -59,6 +60,9 @@ export const useProfileActions = ({
         queryKey: getGetWorkspacesMeQueryKey(),
       }),
       queryClient.invalidateQueries({
+        queryKey: getGetScoreboardsActiveQueryKey(),
+      }),
+      queryClient.invalidateQueries({
         queryKey: getGetDashboardTeamQueryKey(undefined),
       }),
     ]);
@@ -80,15 +84,9 @@ export const useProfileActions = ({
         throw response;
       }
 
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: getGetUsersMeQueryKey(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: getGetDashboardTeamQueryKey(undefined),
-        }),
-      ]);
+      await invalidateWorkspaceQueries();
       showToast("success", t("nicknameChanged"));
+      router.refresh();
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("nicknameChangeFailed")));
     } finally {
@@ -119,15 +117,9 @@ export const useProfileActions = ({
         throw response;
       }
 
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: getGetWorkspacesMeQueryKey(),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: getGetDashboardTeamQueryKey(undefined),
-        }),
-      ]);
+      await invalidateWorkspaceQueries();
       showToast("success", t("workspaceNameChanged"));
+      router.refresh();
     } catch (error) {
       showToast(
         "error",
@@ -180,6 +172,7 @@ export const useProfileActions = ({
 
       await invalidateWorkspaceQueries();
       showToast("success", t("workspaceLeft"));
+      router.refresh();
       router.replace("/dashboard/my");
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("workspaceLeaveFailed")));
@@ -230,6 +223,7 @@ export const useProfileActions = ({
 
       await invalidateWorkspaceQueries();
       showToast("success", t("workspaceDeleted"));
+      router.refresh();
       router.replace("/dashboard/my");
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("workspaceDeleteFailed")));

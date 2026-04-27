@@ -201,7 +201,7 @@ export default function LoginPageClient() {
 
   if (recoveryCodes) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 overflow-hidden selection:bg-primary/20">
+      <div className="min-h-screen relative flex items-start justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
         {/* Background Grid */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
@@ -215,12 +215,12 @@ export default function LoginPageClient() {
             </p>
           </div>
 
-          <div className="mt-8 rounded-content border border-border bg-sub-background p-6">
-            <div className="grid grid-cols-2 gap-3">
+          <div className="mt-8 rounded-content border border-border bg-sub-background p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               {recoveryCodes.map((code) => (
                 <div
                   key={code}
-                  className="rounded-button border border-border bg-sub-background px-4 py-3 text-center text-sm font-black tracking-widest text-text-primary"
+                  className="rounded-button border border-border bg-sub-background px-3 py-3 text-center text-[13px] sm:text-sm font-black tracking-wider sm:tracking-widest text-text-primary truncate"
                 >
                   {code}
                 </div>
@@ -290,7 +290,7 @@ export default function LoginPageClient() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 overflow-hidden selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-start justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
@@ -319,7 +319,7 @@ export default function LoginPageClient() {
                 type="text"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
-                placeholder="admin"
+                placeholder={t("idPlaceholder")}
                 className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
                 required
               />
@@ -348,7 +348,7 @@ export default function LoginPageClient() {
               <PasswordInput
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t("passwordPlaceholder")}
                 className="w-full rounded-content border border-border bg-sub-background px-5 py-4 pr-14 text-sm font-bold outline-none transition-all placeholder:text-text-muted focus:border-primary focus:bg-white"
                 toggleClassName="absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-text-muted transition-colors"
                 required

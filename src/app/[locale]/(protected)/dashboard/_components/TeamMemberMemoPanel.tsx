@@ -277,57 +277,61 @@ export function TeamMemberMemoPanel({
         </Portal>
       )}
 
-      <div className="hidden space-y-3 md:hidden xl:absolute xl:left-[calc(100%+20px)] xl:top-8 xl:block xl:w-[300px]">
-        {isComposeMode ? (
-          <Card className="rounded-content border border-border bg-white p-2.5 shadow-none">
-            <div className="flex items-center gap-2">
-              <Input
-                value={memoDraft}
-                onChange={(event) => setMemoDraft(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && !event.shiftKey) {
-                    event.preventDefault();
-                    void handleAddMemo();
-                  }
-                }}
-                placeholder={t("addComment")}
-                className="h-8 flex-1 border-0 bg-transparent px-2 text-xs text-text-primary outline-none placeholder:text-text-muted"
-                disabled={isCreatePending}
-              />
-              <Button
-                type="button"
-                onClick={() => void handleAddMemo()}
-                disabled={!memoDraft.trim() || isCreatePending}
-                className="inline-flex h-8 w-8 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
-                aria-label={t("submitMemo")}
-              >
-                <DowinIcon name="action-send" size="16px" />
-              </Button>
-            </div>
-          </Card>
-        ) : null}
-
-        <div className="space-y-3 pb-20">
-          {isMemosLoading ? (
-            <MemoStatusCard message={t("loadingMemos")} />
-          ) : isMemosError ? (
-            <MemoStatusCard message={t("memosError")} />
-          ) : hasMemos ? (
-            memos.map((memo) => (
-              <MemoCard
-                key={memo.id}
-                memo={memo}
-                currentUserId={currentUserId}
-                currentUserRole={currentUserRole}
-                isResolvePending={isResolvePending}
-                isDeletePending={isDeletePending}
-                onResolve={handleResolveMemo}
-                onDelete={handleDeleteMemo}
-              />
-            ))
+      {shouldShowMemoRail && (
+        <div className="hidden space-y-3 md:hidden xl:absolute xl:left-[calc(100%+20px)] xl:top-8 xl:block xl:w-[300px]">
+          {isComposeMode ? (
+            <Card className="rounded-content border border-border bg-white p-2.5 shadow-none">
+              <div className="flex items-center gap-2">
+                <Input
+                  value={memoDraft}
+                  onChange={(event) => setMemoDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                      event.preventDefault();
+                      void handleAddMemo();
+                    }
+                  }}
+                  placeholder={t("addComment")}
+                  className="h-8 flex-1 border-0 bg-transparent px-2 text-xs text-text-primary outline-none placeholder:text-text-muted"
+                  disabled={isCreatePending}
+                />
+                <Button
+                  type="button"
+                  onClick={() => void handleAddMemo()}
+                  disabled={!memoDraft.trim() || isCreatePending}
+                  className="inline-flex h-8 w-8 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
+                  aria-label={t("submitMemo")}
+                >
+                  <DowinIcon name="action-send" size="16px" />
+                </Button>
+              </div>
+            </Card>
           ) : null}
+
+          {memoMode === "view" && (
+            <div className="space-y-3 pb-20">
+              {isMemosLoading ? (
+                <MemoStatusCard message={t("loadingMemos")} />
+              ) : isMemosError ? (
+                <MemoStatusCard message={t("memosError")} />
+              ) : hasMemos ? (
+                memos.map((memo) => (
+                  <MemoCard
+                    key={memo.id}
+                    memo={memo}
+                    currentUserId={currentUserId}
+                    currentUserRole={currentUserRole}
+                    isResolvePending={isResolvePending}
+                    isDeletePending={isDeletePending}
+                    onResolve={handleResolveMemo}
+                    onDelete={handleDeleteMemo}
+                  />
+                ))
+              ) : null}
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </>
   );
 }
