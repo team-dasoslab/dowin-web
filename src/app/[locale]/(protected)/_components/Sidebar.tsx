@@ -27,31 +27,14 @@ export function Sidebar() {
   const hasScoreboard =
     scoreboardResponse?.status === 200 && !!scoreboardResponse.data;
 
-  if (isProfileLoading || isScoreboardLoading) {
-    return (
-      <aside
-        className={cn(
-          "fixed left-0 top-0 hidden h-screen flex-col border-r border-zinc-200 bg-white p-4 transition-[width] duration-300 ease-in-out md:flex",
-          isCollapsed ? "w-[80px]" : "w-[80px] lg:w-[240px]",
-        )}
-      >
-        <div className="mb-6 flex h-10 w-full animate-pulse items-center justify-center gap-3 rounded-content bg-zinc-100 lg:justify-start lg:px-4" />
-        <div className="flex-1 space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="h-11 w-full animate-pulse rounded-button bg-zinc-50"
-            />
-          ))}
-        </div>
-      </aside>
-    );
-  }
+  const isInitialLoading = isProfileLoading || isScoreboardLoading;
 
   const filteredLinks = MY_DASHBOARD_LINKS.filter((link) => {
+    if (isProfileLoading) return true;
     if (link.adminOnly && role !== "ADMIN") return false;
     return true;
   });
+
   const mobileLinks = filteredLinks.filter(
     (link) => link.translationKey !== "weeklyReport",
   );
@@ -72,14 +55,6 @@ export function Sidebar() {
           );
         }))
     );
-  };
-
-  const getIsDisabled = (translationKey: string) => {
-    const isScoreboardRelated =
-      translationKey === "scoreboardArchive" ||
-      translationKey === "manageScoreboard";
-
-    return isScoreboardRelated && !hasScoreboard;
   };
 
   // Main tab paths where the bottom navigation should be visible
@@ -104,7 +79,14 @@ export function Sidebar() {
         )}
       >
         {/* Workspace Pill */}
-        {workspaceName ? (
+        {isProfileLoading ? (
+          <div
+            className={cn(
+              "mb-6 flex h-10 w-full animate-pulse items-center rounded-content bg-zinc-100 transition-all",
+              isCollapsed ? "justify-center" : "lg:px-4",
+            )}
+          />
+        ) : workspaceName ? (
           <div
             className={cn(
               "mb-6 flex h-10 w-full items-center rounded-content bg-primary/10 transition-all",
@@ -146,34 +128,6 @@ export function Sidebar() {
           {filteredLinks.map(
             ({ href, iconName, iconNameActive, translationKey }) => {
               const isActive = getIsActive(href);
-              const isDisabled = getIsDisabled(translationKey);
-
-              if (isDisabled) {
-                return (
-                  <div
-                    key={href}
-                    title={commonT("noScoreboardNotice")}
-                    className={cn(
-                      "flex h-11 w-full cursor-not-allowed items-center rounded-button text-zinc-300 opacity-50 transition-all",
-                      isCollapsed ? "justify-center gap-0 px-0" : "gap-3 px-4",
-                    )}
-                  >
-                    <DowinIcon
-                      name={iconNameActive}
-                      size="20px"
-                      className="shrink-0"
-                    />
-                    <span
-                      className={cn(
-                        "hidden text-[14px] font-bold lg:block whitespace-nowrap transition-all duration-300",
-                        isCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100",
-                      )}
-                    >
-                      {t(translationKey)}
-                    </span>
-                  </div>
-                );
-              }
 
               return (
                 <Link
@@ -234,23 +188,7 @@ export function Sidebar() {
             {mobileLinks.map(
               ({ href, iconName, iconNameActive, translationKey }) => {
                 const isActive = getIsActive(href);
-                const isDisabled = getIsDisabled(translationKey);
                 const label = t(translationKey);
-
-                if (isDisabled) {
-                  return (
-                    <div
-                      key={href}
-                      title={commonT("noScoreboardNotice")}
-                      className="flex min-w-0 cursor-not-allowed flex-col items-center justify-center gap-1 rounded-button px-1 py-2 text-zinc-300 opacity-50"
-                    >
-                      <DowinIcon name={iconNameActive} size="20px" />
-                      <span className="max-w-full truncate text-[10px] font-bold leading-none">
-                        {label}
-                      </span>
-                    </div>
-                  );
-                }
 
                 return (
                   <Link

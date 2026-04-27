@@ -23,9 +23,7 @@ type WeeklyTrendPoint = {
 };
 
 interface ScoreboardOverviewSectionProps {
-  activeScoreboard: NonNullable<
-    ReturnType<typeof useDashboardScoreboard>["activeScoreboard"]
-  >;
+  activeScoreboard: ReturnType<typeof useDashboardScoreboard>["activeScoreboard"];
   isWeeklyTrendLoading: boolean;
   isTrendLimited: boolean;
   monthLabel?: string;
@@ -58,9 +56,13 @@ export function ScoreboardOverviewSection({
                 {t("dowinLabel")}
               </p>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl break-words leading-[1.2]">
-              {activeScoreboard.goalName}
-            </h2>
+            {activeScoreboard ? (
+              <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl break-words leading-[1.2]">
+                {activeScoreboard.goalName}
+              </h2>
+            ) : (
+              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-100" />
+            )}
           </div>
 
           {/* Lag Measure Section */}
@@ -71,9 +73,13 @@ export function ScoreboardOverviewSection({
                 {t("lagMeasureLabel")}
               </p>
             </div>
-            <p className="text-sm font-medium text-text-secondary leading-relaxed break-words">
-              {activeScoreboard.lagMeasure}
-            </p>
+            {activeScoreboard ? (
+              <p className="text-sm font-medium text-text-secondary leading-relaxed break-words">
+                {activeScoreboard.lagMeasure}
+              </p>
+            ) : (
+              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-50" />
+            )}
           </div>
         </div>
       </Card>

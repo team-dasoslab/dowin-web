@@ -160,22 +160,12 @@ export default function MyDashboardPage() {
     workspace?.id,
   ]);
 
-  if (
-    isLoading ||
-    isProfileLoading ||
-    (activeScoreboard &&
-      ((selectedView === "week" && isWeeklyLogsLoading) ||
-        (selectedView === "month" && isMonthlyLogsLoading)) &&
-      weeklyById.size === 0)
-  ) {
-    return <MyDashboardSkeleton />;
-  }
 
   if (hasNoWorkspace) {
     return <NoWorkspaceState />;
   }
 
-  if (hasNoScoreboard || !activeScoreboard) {
+  if (!isLoading && (hasNoScoreboard || !activeScoreboard)) {
     return <NoScoreboardState />;
   }
 
@@ -187,7 +177,13 @@ export default function MyDashboardPage() {
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={
-            nickname ? t("userScoreboard", { nickname }) : t("myScoreboard")
+            isProfileLoading ? (
+              <div className="h-8 w-48 animate-pulse rounded-content bg-zinc-100" />
+            ) : nickname ? (
+              t("userScoreboard", { nickname })
+            ) : (
+              t("myScoreboard")
+            )
           }
         />
 
@@ -285,7 +281,9 @@ export default function MyDashboardPage() {
               />
 
               <HistoryLimitOverlay isLimited={isHistoryLimited}>
-                {activeLeadMeasures.length === 0 ? (
+                {isLoading ? (
+                  <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-50" />
+                ) : activeLeadMeasures.length === 0 ? (
                   <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
                     {t("noActiveMeasures")}
                   </div>
