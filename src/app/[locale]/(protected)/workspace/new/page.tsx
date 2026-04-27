@@ -94,17 +94,14 @@ export default function NewWorkspacePage() {
               ${
                 isPending || !name.trim()
                   ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-dowin-primary hover:scale-[1.02] active:scale-[0.98]"
+                  : "btn-dowin-primary"
               }
             `}
           >
             {isPending ? (
               <InlineSpinner size="sm" />
             ) : (
-              <>
-                <DowinIcon name="action-add" size="16px" />
-                <span>{t("button")}</span>
-              </>
+              <span>{t("button")}</span>
             )}
           </Button>
         </form>

@@ -134,8 +134,7 @@ export default function ProfileMembersPage() {
             asChild
             className="btn-dowin-primary rounded-content px-3 py-2 text-xs font-bold"
           >
-            <Link href="/profile/invites" className="flex items-center gap-1.5">
-              <DowinIcon name="domain-ticket-diagonal" size="14px" />
+            <Link href="/profile/invites">
               {t("invitesCardButton")}
             </Link>
           </Button>

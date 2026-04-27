@@ -82,29 +82,25 @@ export default function JoinWorkspacePage() {
               className={`w-full py-4 rounded-button text-sm font-black transition-all flex items-center justify-center gap-2 ${
                 isPending || inviteCode.trim().length === 0
                   ? "bg-primary/50 text-white cursor-not-allowed"
-                  : "btn-dowin-primary active:scale-[0.98]"
+                  : "btn-dowin-primary"
               }`}
             >
               {isPending ? (
                 <InlineSpinner size="sm" />
               ) : (
-                <>
-                  <DowinIcon name="action-join" size="16px" />
-                  {t("button")}
-                </>
+                t("button")
               )}
             </Button>
 
             <Button
               asChild
               disabled={isPending}
-              className="w-full rounded-button border border-zinc-200 bg-white py-4 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors"
+              className="w-full rounded-button border border-zinc-200 bg-white py-4 text-sm font-bold text-zinc-600 transition-colors"
             >
               <Link
                 href="/workspace/new"
-                className="flex items-center justify-center gap-2"
+                className="flex items-center justify-center"
               >
-                <DowinIcon name="domain-people" size="16px" />
                 {t("createButton")}
               </Link>
             </Button>

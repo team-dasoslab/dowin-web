@@ -109,9 +109,8 @@ export default function ProfileBillingPage() {
                 type="button"
                 onClick={startCheckout}
                 disabled={isCheckoutPending}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-content px-3 text-[11px] font-bold btn-dowin-primary`}
+                className={`flex h-9 items-center justify-center rounded-content px-3 text-[11px] font-bold btn-dowin-primary`}
               >
-                <DowinIcon name="domain-payment" size="14px" />
                 {isCheckoutPending ? t("checkoutLoading") : t("upgradeButton")}
               </Button>
             )}
@@ -120,9 +119,8 @@ export default function ProfileBillingPage() {
               <Button
                 type="button"
                 onClick={() => void openPortal()}
-                className={`flex h-9 items-center justify-center gap-1.5 rounded-content border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors hover:bg-sub-background`}
+                className={`flex h-9 items-center justify-center rounded-content border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors`}
               >
-                <DowinIcon name="action-external" size="14px" />
                 {t("portalButton")}
               </Button>
             )}
