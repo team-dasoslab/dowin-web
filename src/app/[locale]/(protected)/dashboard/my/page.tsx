@@ -384,7 +384,6 @@ function NoScoreboardState() {
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
-                <DowinIcon name="action-add-active" size="16px" />
                 {t("createScoreboard")}
               </Link>
             </Button>

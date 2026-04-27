@@ -19,6 +19,7 @@ import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
@@ -210,7 +211,7 @@ function NoWorkspaceState() {
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <DowinIcon name="domain-people" size="20px" />
+            <Logo size="24px" />
           </div>
           <div className="space-y-1">
             <h1 className="text-lg font-bold text-text-primary">

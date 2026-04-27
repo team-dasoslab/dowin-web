@@ -289,7 +289,7 @@ function DashboardNoWorkspaceState() {
     <div className="min-h-screen bg-zinc-50/50 ">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<DowinIcon name="domain-people" size="20px" className="text-primary" />}
+          icon={<Logo size="20px" className="text-primary" />}
           title={t("noWorkspaceTitle")}
           description={t("noWorkspaceDesc")}
           actions={<NoWorkspaceActions />}
@@ -314,7 +314,6 @@ function DashboardNoScoreboardState() {
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
               <Link href="/setup?mode=create">
-                <DowinIcon name="action-add-active" size="16px" />
                 {t("createScoreboard")}
               </Link>
             </Button>
