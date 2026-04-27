@@ -50,11 +50,10 @@ export function ScoreboardOverviewSection({
         <div className="flex flex-col">
           {/* Primary Goal (WIG) */}
           <div className="px-6 pt-5 pb-3 sm:px-8 sm:pt-6 sm:pb-4 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="h-4 w-1 bg-primary rounded-full" />
-              <p className="text-[11px] font-bold tracking-widest text-primary uppercase">
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-button border border-primary/10 bg-primary/5 text-primary text-[10px] font-bold tracking-tight shadow-sm shadow-primary/5 uppercase">
                 {t("dowinLabel")}
-              </p>
+              </div>
             </div>
             {activeScoreboard ? (
               <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl break-words leading-[1.2]">
@@ -67,11 +66,10 @@ export function ScoreboardOverviewSection({
 
           {/* Lag Measure Section */}
           <div className="px-6 pt-3 pb-5 sm:px-8 sm:pt-4 sm:pb-6 space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="h-4 w-1 bg-zinc-200 rounded-full" />
-              <p className="text-[11px] font-bold uppercase tracking-widest text-text-secondary">
+            <div className="flex items-center gap-2">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-button border border-zinc-200 bg-zinc-50 text-text-secondary text-[10px] font-bold tracking-tight shadow-sm shadow-zinc-100/50 uppercase">
                 {t("lagMeasureLabel")}
-              </p>
+              </div>
             </div>
             {activeScoreboard ? (
               <p className="text-sm font-medium text-text-secondary leading-relaxed break-words">
