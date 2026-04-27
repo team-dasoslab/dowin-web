@@ -27,6 +27,26 @@ export function detectLocale({
   if (normalizedAcceptLanguage?.startsWith("en")) {
     return "en";
   }
- 
+
   return DEFAULT_LOCALE;
+}
+
+export function resolveLocale({
+  customLocale,
+  cookieLocale,
+  acceptLanguage,
+}: {
+  customLocale?: string | null;
+  cookieLocale?: string | null;
+  acceptLanguage?: string | null;
+}): Locale {
+  if (isSupportedLocale(customLocale)) {
+    return customLocale;
+  }
+
+  if (isSupportedLocale(cookieLocale)) {
+    return cookieLocale;
+  }
+
+  return detectLocale({ acceptLanguage });
 }
