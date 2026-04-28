@@ -40,6 +40,7 @@ export default function SetupPage() {
     isArchivePending,
     isInitializing,
     isEditMode,
+    isRedirecting,
     isTagMutationPending,
     lagMeasure,
     measures,
@@ -122,6 +123,10 @@ export default function SetupPage() {
     container?.addEventListener("scroll", handleScroll);
     return () => container?.removeEventListener("scroll", handleScroll);
   }, [activeSection, menuGroups]);
+
+  if (isRedirecting) {
+    return null;
+  }
 
   if (isInitializing) {
     return <SetupSkeleton />;
