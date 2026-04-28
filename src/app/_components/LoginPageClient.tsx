@@ -201,11 +201,11 @@ export default function LoginPageClient() {
 
   if (recoveryCodes) {
     return (
-      <div className="min-h-screen relative flex items-start justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+      <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
         {/* Background Grid */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-        <Card className="w-full max-w-[520px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+        <Card className="w-full max-w-[480px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
           <div className="space-y-4 text-center mb-8">
             <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
               {t("recovery.title")}
@@ -290,11 +290,11 @@ export default function LoginPageClient() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-start justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[420px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+      <Card className="w-full max-w-[480px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-12">
           <div className="w-16 h-16 bg-white border border-border rounded-content flex items-center justify-center">
             <Logo size="32px" className="text-text-primary" />

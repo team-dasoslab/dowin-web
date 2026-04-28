@@ -20,15 +20,15 @@ export function LandingHeader() {
       <div className="flex items-center gap-6">
         <Link
           href="/login"
-          className="hidden sm:block text-[15px] font-bold text-slate-500 transition-colors"
+          className="hidden sm:flex h-10 items-center text-[15px] font-bold text-slate-500 leading-none"
         >
           {t("Navigation.login")}
         </Link>
         <Button
           asChild
-          className="flex h-10 items-center justify-center rounded-full bg-primary px-6 text-[15px] font-bold text-white transition-all hover:opacity-90"
+          className="flex h-10 items-center justify-center rounded-full bg-primary px-6 text-[15px] font-bold text-white leading-none"
         >
-          <Link href="/login" className="text-white">
+          <Link href="/login">
             {t("Navigation.start")}
           </Link>
         </Button>

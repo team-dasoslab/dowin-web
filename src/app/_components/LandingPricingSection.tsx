@@ -120,7 +120,7 @@ export function LandingPricingSection() {
                   {isFree ? (
                     <Button
                       asChild
-                      className="inline-flex h-12 w-full items-center justify-center rounded-[14px] bg-slate-900 px-6 text-[15px] font-bold text-white transition-none hover:bg-slate-800"
+                      className="inline-flex h-12 w-full items-center justify-center rounded-[14px] bg-slate-900 px-6 text-[15px] font-bold text-white transition-none"
                     >
                       <Link href="/login">{t("ctaFree")}</Link>
                     </Button>

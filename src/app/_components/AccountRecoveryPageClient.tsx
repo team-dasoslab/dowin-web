@@ -10,12 +10,13 @@ import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
-import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
+import {
+  getApiErrorMessage,
+  getApiErrorStatus,
+} from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-
-
 
 export default function AccountRecoveryPageClient() {
   const t = useTranslations("Auth");
@@ -23,7 +24,10 @@ export default function AccountRecoveryPageClient() {
     () =>
       z
         .string()
-        .regex(/^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/, t("errors.invalidPassword")),
+        .regex(
+          /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/,
+          t("errors.invalidPassword"),
+        ),
     [t],
   );
   const [recoveryCode, setRecoveryCode] = useState("");
@@ -66,7 +70,9 @@ export default function AccountRecoveryPageClient() {
         if (status === 404) {
           setError(t("recoveryPage.errors.checkCode"));
         } else {
-          setError(getApiErrorMessage(verifyError, t("recoveryPage.errors.checkCode")));
+          setError(
+            getApiErrorMessage(verifyError, t("recoveryPage.errors.checkCode")),
+          );
         }
         return;
       }
@@ -74,7 +80,9 @@ export default function AccountRecoveryPageClient() {
 
     const parsedPassword = passwordSchema.safeParse(newPassword);
     if (!parsedPassword.success) {
-      setError(parsedPassword.error.issues[0]?.message || t("errors.invalidPassword"));
+      setError(
+        parsedPassword.error.issues[0]?.message || t("errors.invalidPassword"),
+      );
       return;
     }
 
@@ -100,17 +108,19 @@ export default function AccountRecoveryPageClient() {
       if (status === 404) {
         setError(t("recoveryPage.errors.checkCode"));
       } else {
-        setError(getApiErrorMessage(resetError, t("recoveryPage.errors.resetFailed")));
+        setError(
+          getApiErrorMessage(resetError, t("recoveryPage.errors.resetFailed")),
+        );
       }
     }
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 overflow-hidden selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[460px] bg-white border border-zinc-200 rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+      <Card className="w-full max-w-[480px] bg-white border border-zinc-200 rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-10">
           <div className="w-16 h-16 bg-white border border-zinc-200 rounded-2xl flex items-center justify-center">
             <DowinIcon
@@ -236,12 +246,12 @@ export default function AccountRecoveryPageClient() {
             </Button>
 
             <div className="text-center">
-                <Link
-                  href="/login"
-                  className="text-[13px] font-bold text-text-muted transition-colors"
-                >
-                  {t("recoveryPage.backToLogin")}
-                </Link>
+              <Link
+                href="/login"
+                className="text-[13px] font-bold text-text-muted transition-colors"
+              >
+                {t("recoveryPage.backToLogin")}
+              </Link>
             </div>
           </div>
         </form>

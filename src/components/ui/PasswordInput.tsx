@@ -1,22 +1,18 @@
 import { Input, type InputProps } from "@/components/ui/Input";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type PasswordInputProps = Omit<InputProps, "type"> & {
   toggleClassName?: string;
-  toggleLabelClassName?: string;
   wrapperClassName?: string;
 };
 
 export const PasswordInput = ({
   className,
   toggleClassName,
-  toggleLabelClassName,
   wrapperClassName,
   ...props
 }: PasswordInputProps) => {
-  const t = useTranslations("Common");
   const [isVisible, setIsVisible] = useState(false);
 
   return (
@@ -37,9 +33,6 @@ export const PasswordInput = ({
           ) : (
             <DowinIcon name="auth-eye" size="14px" />
           )}
-          <span className={toggleLabelClassName}>
-            {isVisible ? t("hide") : t("show")}
-          </span>
         </button>
       </div>
     </div>
