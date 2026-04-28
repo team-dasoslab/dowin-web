@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetBillingMe } from "@/api/generated/billing/billing";
+import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
   ProtectedPageContainer,
@@ -11,7 +12,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
-import { Link } from "@/i18n/routing";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { useNativeApp } from "@/context/NativeAppContext";
+import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -21,7 +24,9 @@ type PlanCode = "FREE" | "STANDARD";
 
 export default function ProfileBillingPage() {
   const t = useTranslations("ProfileBilling");
+  const isNativeApp = useNativeApp();
   const locale = useLocale();
+  const router = useRouter();
   const {
     data: billingResponse,
     error,
@@ -35,9 +40,7 @@ export default function ProfileBillingPage() {
   });
   const {
     handleReturnedFromCheckout,
-    isCheckoutPending,
     openPortal,
-    startCheckout,
   } = useProfileBillingActions();
   const [isReturningFromCheckout, setIsReturningFromCheckout] = useState(false);
 
@@ -62,8 +65,26 @@ export default function ProfileBillingPage() {
   const hasNoWorkspace = getApiErrorStatus(error) === 404;
   const billing = billingResponse?.status === 200 ? billingResponse.data : null;
 
+  useEffect(() => {
+    if (
+      isNativeApp ||
+      !billing ||
+      billing.planCode === "STANDARD" ||
+      billing.billingStatus === "ACTIVE" ||
+      billing.billingStatus === "CANCELED"
+    ) {
+      return;
+    }
+
+    router.replace("/pricing");
+  }, [billing, isNativeApp, router]);
+
   if (isLoading) {
     return <ProfileBillingSkeleton />;
+  }
+
+  if (isNativeApp) {
+    return <BillingUnavailableInAppState />;
   }
 
   if (hasNoWorkspace) {
@@ -74,14 +95,16 @@ export default function ProfileBillingPage() {
     return <BillingErrorState onRefresh={() => void refetch()} />;
   }
 
+  if (
+    billing.planCode !== "STANDARD" &&
+    billing.billingStatus !== "ACTIVE" &&
+    billing.billingStatus !== "CANCELED"
+  ) {
+    return null;
+  }
+
   const isAdmin = billing.canManageBilling;
   const requiresManualReview = billing.requiresManualReview;
-  const canUpgrade =
-    isAdmin &&
-    !requiresManualReview &&
-    (billing.billingStatus === "NONE" ||
-      billing.billingStatus === "EXPIRED" ||
-      billing.billingStatus === "REVOKED");
   const canOpenPortal =
     isAdmin &&
     (billing.planCode === "STANDARD" ||
@@ -89,240 +112,209 @@ export default function ProfileBillingPage() {
       billing.billingStatus === "CANCELED");
 
   return (
-    <div className="min-h-screen bg-slate-50/50 ">
-      <ProtectedPageContainer>
+    <div className="min-h-screen bg-zinc-50/50 ">
+      <ProtectedPageContainer className="space-y-8 lg:space-y-12">
         <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center justify-between gap-4 rounded-content border border-border px-6 py-5">
-          <div className="flex items-center gap-4 min-w-0">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-primary/10 text-primary">
-              <DowinIcon name="domain-wallet" size="20px" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-lg font-bold tracking-tight text-text-primary">
-                {billing.workspaceName}
-              </h1>
-            </div>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-2">
-            {canUpgrade && (
-              <Button
-                type="button"
-                onClick={startCheckout}
-                disabled={isCheckoutPending}
-                className={`flex h-9 items-center justify-center rounded-content px-3 text-[11px] font-bold btn-dowin-primary`}
-              >
-                {isCheckoutPending ? t("checkoutLoading") : t("upgradeButton")}
-              </Button>
-            )}
-
-            {canOpenPortal && (
-              <Button
-                type="button"
-                onClick={() => void openPortal()}
-                className={`flex h-9 items-center justify-center rounded-content border border-border bg-white px-3 text-[11px] font-bold text-text-primary transition-colors`}
-              >
-                {t("portalButton")}
-              </Button>
-            )}
-          </div>
-        </Card>
-
-        {!isAdmin && (
-          <div className="rounded-content border border-border bg-sub-background px-3 py-3 text-[11px] leading-relaxed text-text-muted">
-            {t("memberNotice")}
-          </div>
-        )}
-
-        {isReturningFromCheckout ? (
-          <Card className="space-y-2 rounded-content border border-primary/20 bg-primary/5 p-4">
-            <p className="text-sm font-bold text-text-primary">
-              {t("pendingTitle")}
-            </p>
-            <p className="text-[11px] leading-relaxed text-text-muted">
-              {t("pendingDesc")}
-            </p>
-            <Button
-              type="button"
-              onClick={() => void refetch()}
-              className="mt-1 inline-flex h-8 items-center justify-center gap-1.5 rounded-content border border-primary/20 bg-white px-3 text-[11px] font-bold text-primary"
-            >
-              <DowinIcon
-                name="action-refresh"
-                size="14px"
-                className={isFetching ? "animate-spin" : ""}
-              />
-              {t("refresh")}
-            </Button>
-          </Card>
-        ) : null}
-
-        {requiresManualReview ? (
-          <Card className="space-y-3 rounded-content border border-red-200 bg-red-50 p-4">
-            <div className="flex items-start gap-3">
-              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-content bg-white text-red-600">
-                <DowinIcon name="status-locked" size="16px" />
+        {/* ── 워크스페이스 및 액션 ── */}
+        <div className="space-y-4">
+          <Card className="flex items-center justify-between gap-4 border-zinc-200 bg-white p-5 md:p-6">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-zinc-50 text-primary">
+                <DowinIcon name="domain-wallet" size="24px" />
               </div>
-              <div className="space-y-1">
-                <p className="text-sm font-bold text-text-primary">
-                  {t("riskReviewTitle")}
+              <div className="min-w-0">
+                <h2 className="text-lg font-black tracking-tight text-zinc-900">
+                  {billing.workspaceName}
+                </h2>
+                <p className="text-xs font-bold text-zinc-400">
+                  {billing.planCode === "STANDARD"
+                    ? t("standardPlanName")
+                    : t("freePlanName")}
                 </p>
-                <p className="text-[11px] leading-relaxed text-text-muted">
+              </div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              {canOpenPortal && (
+                <Button
+                  type="button"
+                  onClick={() => void openPortal()}
+                  className="h-10 rounded-button border border-zinc-200 bg-white px-5 text-sm font-black text-zinc-600 transition-colors hover:bg-zinc-50"
+                >
+                  {t("portalButton")}
+                </Button>
+              )}
+            </div>
+          </Card>
+
+          {!isAdmin && (
+            <div className="flex items-start gap-2.5 rounded-content border border-zinc-200 bg-zinc-100/50 px-4 py-3 text-[12px] leading-relaxed font-medium text-zinc-500">
+              <DowinIcon
+                name="status-locked"
+                size="14px"
+                className="mt-0.5 shrink-0"
+              />
+              {t("memberNotice")}
+            </div>
+          )}
+        </div>
+
+        {/* ── 현재 요금제 상세 ── */}
+        <section className="space-y-4">
+          <SectionHeader
+            title={t("currentPlanTitle")}
+          />
+          <Card className="divide-y divide-zinc-100 border-zinc-200 bg-white">
+            <div className="flex items-center justify-between p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                  <DowinIcon name="domain-target-arrow" size="16px" />
+                </div>
+                <span className="text-sm font-bold text-zinc-500">{t("planLabel")}</span>
+              </div>
+              <span
+                className={`text-sm font-black ${
+                  billing.planCode === "STANDARD"
+                    ? "text-primary"
+                    : "text-zinc-900"
+                }`}
+              >
+                {billing.planCode === "STANDARD" ? t("standardPlanName") : t("freePlanName")}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                  <DowinIcon name="domain-calendar" size="16px" />
+                </div>
+                <span className="text-sm font-bold text-zinc-500">{t("periodEndLabel")}</span>
+              </div>
+              <span className="text-sm font-black text-zinc-900">
+                {formatDateLabel(billing.currentPeriodEnd, t("notAvailable"), locale)}
+              </span>
+            </div>
+            <div className="bg-zinc-50/50 p-5">
+              <p className="text-xs font-medium leading-relaxed text-zinc-500">
+                {getStatusDescription({
+                  status: billing.billingStatus,
+                  planCode: billing.planCode,
+                  currentPeriodEnd: billing.currentPeriodEnd,
+                  locale,
+                  t,
+                })}
+              </p>
+            </div>
+          </Card>
+        </section>
+
+        {/* ── 상태 메시지 (결제 진행 중, 수동 검토 등) ── */}
+        {(isReturningFromCheckout || requiresManualReview) && (
+          <div className="space-y-4">
+            {isReturningFromCheckout && (
+              <Card className="space-y-3 border-primary/20 bg-primary/5 p-5">
+                <div className="flex items-center gap-2 text-primary">
+                  <DowinIcon name="status-info" size="18px" />
+                  <p className="text-[14px] font-black">{t("pendingTitle")}</p>
+                </div>
+                <p className="text-[12px] leading-relaxed text-zinc-600">
+                  {t("pendingDesc")}
+                </p>
+                <Button
+                  type="button"
+                  onClick={() => void refetch()}
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-button border border-primary/20 bg-white px-4 text-[12px] font-bold text-primary transition-all hover:bg-primary/5"
+                >
+                  <DowinIcon
+                    name="action-refresh"
+                    size="14px"
+                    className={isFetching ? "animate-spin" : ""}
+                  />
+                  {t("refresh")}
+                </Button>
+              </Card>
+            )}
+
+            {requiresManualReview && (
+              <Card className="space-y-3 border-red-200 bg-red-50 p-5">
+                <div className="flex items-center gap-2 text-red-600">
+                  <DowinIcon name="status-locked" size="18px" />
+                  <p className="text-[14px] font-black">{t("riskReviewTitle")}</p>
+                </div>
+                <p className="text-[12px] leading-relaxed text-red-700/80">
                   {t("riskReviewDesc", {
                     refundCount: billing.recentRefundCount,
                     revokedCount: billing.recentRevokedCount,
                   })}
                 </p>
-              </div>
-            </div>
+              </Card>
+            )}
+          </div>
+        )}
+
+        <section>
+          <Card className="border-zinc-200 bg-zinc-100/50 p-5">
+            <h3 className="flex items-center gap-2 text-[14px] font-black text-zinc-900">
+              <DowinIcon name="status-info" size="16px" className="text-zinc-400" />
+              {t("downgradePolicyTitle")}
+            </h3>
+            <p className="mt-2 text-[12px] leading-relaxed text-zinc-500 font-medium">
+              {t("downgradePolicyDesc")}
+            </p>
           </Card>
-        ) : null}
+        </section>
 
-        <Card className="space-y-4 rounded-content border border-border p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("currentPlanTitle")}
-            </h2>
-            <p className="text-[11px] leading-relaxed text-text-muted">
-              {getStatusDescription({
-                status: billing.billingStatus,
-                planCode: billing.planCode,
-                currentPeriodEnd: billing.currentPeriodEnd,
-                locale,
-                t,
-              })}
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <BillingInfoCell
-              label={t("planLabel")}
-              value={billing.planCode}
-              tone={billing.planCode === "STANDARD" ? "primary" : "default"}
-            />
-            <BillingInfoCell
-              label={t("periodEndLabel")}
-              value={formatDateLabel(
-                billing.currentPeriodEnd,
-                t("notAvailable"),
-              )}
-              tone="default"
-            />
-          </div>
-        </Card>
-
-        <Card className="space-y-4 rounded-content border border-border bg-white p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("checkoutNoticeTitle")}
-            </h2>
-            <p className="text-[11px] leading-relaxed text-text-muted">
-              {t("checkoutNoticeDesc")}
-            </p>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <BillingInfoCell
-              label={t("priceLabel")}
-              value={t("standardPriceValue")}
-              tone="primary"
-            />
-            <BillingInfoCell
-              label={t("billingCycleLabel")}
-              value={t("billingCycleValue")}
-              tone="default"
-            />
-            <BillingInfoCell
-              label={t("renewalLabel")}
-              value={t("renewalValue")}
-              tone="default"
-            />
-            <BillingInfoCell
-              label={t("cancelMethodLabel")}
-              value={t("cancelMethodValue")}
-              tone="default"
-            />
-          </div>
-
-          <div className="rounded-content border border-dashed border-border bg-sub-background/60 p-4">
-            <div className="space-y-2 text-[11px] leading-relaxed text-text-muted">
-              <p>{t("businessInfo")}</p>
-              <p>{t("refundSummary")}</p>
-              <p>{t("supportSummary")}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3 text-[11px] font-bold text-primary">
-            <Link href="/billing-policy">{t("billingPolicyLink")}</Link>
-            <Link href="/terms">{t("termsLink")}</Link>
-            <Link href="/privacy">{t("privacyLink")}</Link>
-            <Link href="/contact">{t("contactLink")}</Link>
-          </div>
-        </Card>
-
-        <Card className="space-y-1 rounded-content border border-border bg-sub-background p-4">
-          <h2 className="text-sm font-bold text-text-primary">
-            {t("downgradePolicyTitle")}
-          </h2>
-          <p className="text-[11px] leading-relaxed text-text-muted">
-            {t("downgradePolicyDesc")}
-          </p>
-        </Card>
-
-        <Card className="space-y-3 rounded-content border border-border p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("standardTitle")}
-            </h2>
-            <p className="text-[11px] text-text-muted">{t("standardDesc")}</p>
-          </div>
-
-          <div className="grid gap-2">
-            {[
-              t("standardFeature1"),
-              t("standardFeature2"),
-              t("standardFeature3"),
-            ].map((feature) => (
-              <div
-                key={feature}
-                className="rounded-content border border-border bg-white px-3 py-2 text-xs text-text-primary"
-              >
-                {feature}
-              </div>
-            ))}
-          </div>
-        </Card>
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
+          <Link
+            href="/billing-policy"
+            className="transition-colors hover:text-zinc-600"
+          >
+            {t("billingPolicyLink")}
+          </Link>
+          <Link
+            href="/terms"
+            className="transition-colors hover:text-zinc-600"
+          >
+            {t("termsLink")}
+          </Link>
+          <Link
+            href="/privacy"
+            className="transition-colors hover:text-zinc-600"
+          >
+            {t("privacyLink")}
+          </Link>
+          <Link
+            href="/contact"
+            className="transition-colors hover:text-zinc-600"
+          >
+            {t("contactLink")}
+          </Link>
+        </div>
       </ProtectedPageContainer>
     </div>
   );
 }
 
-function BillingInfoCell({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone: "default" | "primary" | "danger";
-}) {
+function BillingUnavailableInAppState() {
+  const t = useTranslations("ProfileBilling");
+
   return (
-    <div className="rounded-content border border-border bg-white px-3 py-3">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-text-muted">
-        {label}
-      </p>
-      <p
-        className={`mt-1 text-sm font-bold ${
-          tone === "primary"
-            ? "text-primary"
-            : tone === "danger"
-              ? "text-red-700"
-              : "text-text-primary"
-        }`}
-      >
-        {value}
-      </p>
+    <div className="min-h-screen bg-zinc-50/50 ">
+      <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
+        <EmptyStatePanel
+          title={t("appUnavailableTitle")}
+          description={t("appUnavailableDesc")}
+          actions={
+            <Button
+              asChild
+              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors hover:bg-zinc-50"
+            >
+              <Link href="/profile">{t("appUnavailableAction")}</Link>
+            </Button>
+          }
+          icon={<DowinIcon name="domain-wallet" size="24px" className="text-primary" />}
+        />
+      </div>
     </div>
   );
 }
@@ -386,12 +378,18 @@ function getStatusDescription({
 
 function ProfileBillingSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
-        <div className="h-48 rounded-content bg-sub-background" />
-        <div className="h-36 rounded-content bg-sub-background" />
+        <div className="h-10 w-48 rounded-content bg-zinc-100" />
+        <div className="h-32 rounded-content bg-zinc-100" />
+        <div className="space-y-4">
+          <div className="h-6 w-32 rounded-content bg-zinc-100" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="h-24 rounded-content bg-zinc-100" />
+            <div className="h-24 rounded-content bg-zinc-100" />
+          </div>
+        </div>
+        <div className="h-48 rounded-content bg-zinc-100" />
       </ProtectedPageContainer>
     </div>
   );
@@ -401,19 +399,21 @@ function NoWorkspaceState() {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <Logo size="24px" />
+        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <Logo size="32px" />
           </div>
-          <div className="space-y-1">
-            <h1 className="text-lg font-bold text-text-primary">
+          <div className="space-y-2">
+            <h1 className="text-xl font-black tracking-tight text-zinc-900">
               {t("noWorkspaceTitle")}
             </h1>
-            <p className="text-sm text-text-muted">{t("noWorkspaceDesc")}</p>
+            <p className="text-sm font-medium leading-relaxed text-zinc-500">
+              {t("noWorkspaceDesc")}
+            </p>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center pt-2">
             <NoWorkspaceActions />
           </div>
         </Card>
@@ -426,22 +426,24 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-zinc-50/50 ">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <DowinIcon name="status-locked" size="20px" />
+        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+            <DowinIcon name="status-locked" size="32px" />
           </div>
-          <div className="space-y-1">
-            <h1 className="text-lg font-bold text-text-primary">
+          <div className="space-y-2">
+            <h1 className="text-xl font-black tracking-tight text-zinc-900">
               {t("loadFailedTitle")}
             </h1>
-            <p className="text-sm text-text-muted">{t("loadFailedDesc")}</p>
+            <p className="text-sm font-medium leading-relaxed text-zinc-500">
+              {t("loadFailedDesc")}
+            </p>
           </div>
           <Button
             type="button"
             onClick={onRefresh}
-            className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
+            className="btn-dowin-primary w-full h-12 text-[15px] font-black"
           >
             {t("refresh")}
           </Button>

@@ -12,7 +12,8 @@ export function ProtectedContentLayout({
   const pathname = usePathname();
   const isProfilePath =
     pathname === "/profile" || pathname.startsWith("/profile/");
-  const usesSubPageLayout = pathname === "/updates" || isProfilePath;
+  const usesSubPageLayout =
+    pathname === "/updates" || pathname === "/pricing" || isProfilePath;
   const showBackButton = pathname !== "/profile";
 
   if (!usesSubPageLayout) {
