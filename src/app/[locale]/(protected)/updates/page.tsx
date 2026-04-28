@@ -7,7 +7,7 @@ import {
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { productUpdates } from "@/content/product-updates";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import {
   getLatestMajorProductUpdate,
@@ -17,8 +17,13 @@ import { useTranslations } from "next-intl";
 
 export default function UpdatesPage() {
   const t = useTranslations("ProductUpdates");
-  const updates = getProductUpdates();
-  const latestMajorUpdate = getLatestMajorProductUpdate();
+  const isNativeApp = useNativeApp();
+  const updates = getProductUpdates().filter(
+    (item) => !isNativeApp || item.plan !== "STANDARD",
+  );
+  const latestMajorUpdate =
+    updates.find((update) => update.isMajor) ??
+    (!isNativeApp ? getLatestMajorProductUpdate() : null);
 
   if (!latestMajorUpdate) {
     return null;
@@ -34,7 +39,7 @@ export default function UpdatesPage() {
             <Badge className="w-fit rounded-button border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
               {t("recommendedBadge")}
             </Badge>
-            {latestMajorUpdate.plan === "STANDARD" && (
+            {!isNativeApp && latestMajorUpdate.plan === "STANDARD" && (
               <Badge className="ml-2 w-fit rounded-button border border-primary/15 bg-white/80 px-2 py-1 text-[10px] font-bold text-primary">
                 STANDARD
               </Badge>
@@ -73,7 +78,7 @@ export default function UpdatesPage() {
             <p className="text-[11px] text-text-muted">{t("latestDesc")}</p>
           </div>
           <div className="flex items-center gap-2 rounded-content border border-border bg-white px-3 py-2 text-[11px] text-text-muted">
-            <span>{t("updateCount", { count: productUpdates.length })}</span>
+            <span>{t("updateCount", { count: updates.length })}</span>
           </div>
         </div>
 

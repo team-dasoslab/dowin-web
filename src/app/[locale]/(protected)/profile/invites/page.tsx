@@ -16,6 +16,7 @@ import { useInviteForm } from "@/app/[locale]/(protected)/profile/invites/_hooks
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
@@ -27,6 +28,7 @@ import { useTranslations } from "next-intl";
 
 export default function ProfileInvitesPage() {
   const t = useTranslations("ProfileInvites");
+  const isNativeApp = useNativeApp();
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
   const {
@@ -217,7 +219,9 @@ export default function ProfileInvitesPage() {
             ) : null}
             {isOverFreeMemberLimit ? (
               <p className="text-[11px] leading-relaxed text-danger">
-                {t("overLimitInviteDisabled")}
+                {isNativeApp
+                  ? t("overLimitInviteDisabledApp")
+                  : t("overLimitInviteDisabled")}
               </p>
             ) : null}
           </div>
