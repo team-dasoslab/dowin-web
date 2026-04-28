@@ -9,7 +9,6 @@ import { LandingHeader } from "@/components/layout/LandingHeader";
 
 export function RootLandingPage() {
   const t = useTranslations("Landing");
-  const tCommon = useTranslations("Common");
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-white text-slate-900 selection:bg-primary/20 selection:text-slate-900">
@@ -46,7 +45,7 @@ export function RootLandingPage() {
           <div className="pt-4 flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up [animation-delay:300ms]">
             <Button
               asChild
-              className="flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white transition-all hover:opacity-90 w-full sm:w-auto"
+              className="flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white w-full sm:w-auto"
             >
               <Link href="/login" className="text-white">
                 {t("Hero.cta")}
@@ -222,7 +221,7 @@ export function RootLandingPage() {
               </div>
 
               <div className="md:col-span-6 flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100 transition-colors">
+                <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100">
                   <p className="text-[36px] md:text-[42px] font-black text-primary leading-none mb-3 tracking-tighter">
                     {t("MetricBand.stat1Value")}
                     <span className="text-[20px]">%</span>
@@ -231,7 +230,7 @@ export function RootLandingPage() {
                     {t("MetricBand.stat1Desc")}
                   </p>
                 </div>
-                <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100 transition-colors">
+                <div className="flex-1 bg-slate-50 rounded-[20px] p-6 md:p-8 border border-slate-100">
                   <p className="text-[36px] md:text-[42px] font-black text-emerald-500 leading-none mb-3 tracking-tighter">
                     {t("MetricBand.stat2Value")}
                     <span className="text-[20px]">m</span>
@@ -518,16 +517,16 @@ export function RootLandingPage() {
         <div className="absolute left-1/2 top-1/2 -z-10 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
 
         <div className="mx-auto flex max-w-[900px] flex-col items-center px-6 text-center">
-          <h2 className="text-[40px] font-black leading-[1.1] tracking-tighter text-text-primary uppercase md:text-[64px]">
+          <h2 className="whitespace-pre-line text-[40px] font-black leading-[1.1] tracking-tighter text-text-primary uppercase md:text-[64px]">
             {t("Footer.headline")}
           </h2>
-          <p className="mt-6 max-w-[600px] text-[18px] font-medium leading-relaxed text-text-secondary break-keep md:text-[20px]">
+          <p className="mt-6 max-w-[600px] whitespace-pre-line text-[18px] font-medium leading-relaxed text-text-secondary break-keep md:text-[20px]">
             {t("Footer.description")}
           </p>
           <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row">
             <Button
               asChild
-              className="flex h-[64px] min-w-[240px] items-center justify-center rounded-button bg-text-primary px-10 text-[18px] font-black text-white transition-all hover:scale-105 hover:bg-primary"
+              className="flex h-[64px] min-w-[240px] items-center justify-center rounded-button bg-text-primary px-10 text-[18px] font-black text-white"
             >
               <Link href="/login" className="text-white">
                 {t("Footer.cta")}
