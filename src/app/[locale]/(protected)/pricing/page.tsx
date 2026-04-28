@@ -8,7 +8,9 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/billing/_hooks/useProfileBillingActions";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
@@ -260,15 +262,15 @@ function PlanCard({
     >
       <div className="space-y-4">
         <div className="space-y-2">
-          <span
-            className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${
+          <Badge
+            className={`inline-flex rounded-button px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] border ${
               tone === "primary"
-                ? "bg-white text-primary"
-                : "bg-zinc-100 text-zinc-500"
+                ? "border-primary/20 bg-white text-primary"
+                : "border-zinc-200 bg-zinc-50 text-zinc-500"
             }`}
           >
             {badge}
-          </span>
+          </Badge>
           <div className="space-y-1">
             <h3 className="text-lg font-black tracking-tight text-zinc-900">
               {title}

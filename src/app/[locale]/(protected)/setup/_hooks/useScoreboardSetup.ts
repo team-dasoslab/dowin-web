@@ -106,6 +106,12 @@ export const useScoreboardSetup = () => {
   const referenceStartDate =
     activeScoreboard?.startDate ?? new Date().toISOString().split("T")[0];
   const monthlyTargetMax = getDaysInMonthFromIsoDate(referenceStartDate);
+  const isRedirecting =
+    !isEditMode &&
+    mode === "update" &&
+    !isActiveScoreboardLoading &&
+    hasNoActiveScoreboard;
+
 
   const { data: leadMeasuresResponse, isLoading: isLeadMeasuresLoading } =
     useGetScoreboardsScoreboardIdLeadMeasures(scoreboardId ?? 0, undefined, {
@@ -127,6 +133,14 @@ export const useScoreboardSetup = () => {
   const createWorkspaceTagMutation = usePostWorkspacesIdTags();
   const updateWorkspaceTagMutation = usePutWorkspacesIdTagsTagId();
   const deleteWorkspaceTagMutation = useDeleteWorkspacesIdTagsTagId();
+
+  useEffect(() => {
+    if (!isEditMode && mode === "update" && !isActiveScoreboardLoading && hasNoActiveScoreboard) {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("mode", "create");
+      router.replace(currentUrl.pathname + currentUrl.search);
+    }
+  }, [isEditMode, mode, isActiveScoreboardLoading, hasNoActiveScoreboard, router]);
 
   useEffect(() => {
     if (
@@ -722,8 +736,10 @@ export const useScoreboardSetup = () => {
       deleteWorkspaceTagMutation.isPending,
     isArchivePending: archiveScoreboardMutation.isPending,
     isEditMode,
+    isRedirecting,
     lagMeasure,
     measures,
+
     monthlyTargetMax,
     renameTag,
     removeMeasureRow,
