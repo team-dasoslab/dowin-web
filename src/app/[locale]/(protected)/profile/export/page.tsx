@@ -14,9 +14,12 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 export default function ProfileExportPage() {
+  const isNativeApp = useNativeApp();
   const {
     activeScoreboard,
     exportMeasureOptions,
@@ -50,6 +53,10 @@ export default function ProfileExportPage() {
 
   if (isLoading) {
     return <ExportSkeleton />;
+  }
+
+  if (isNativeApp) {
+    return <ExportUnavailableInAppState />;
   }
 
   if (hasNoWorkspace) {
@@ -200,6 +207,30 @@ export default function ProfileExportPage() {
           </div>
         </Card>
       </ProtectedPageContainer>
+    </div>
+  );
+}
+
+function ExportUnavailableInAppState() {
+  const t = useTranslations("ProfileExport");
+
+  return (
+    <div className="min-h-screen bg-background ">
+      <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
+        <ProfileExportHeader />
+        <EmptyStatePanel
+          title={t("appUnavailableTitle")}
+          description={t("appUnavailableDesc")}
+          actions={
+            <Button
+              asChild
+              className="w-fit rounded-content border border-border bg-white px-5 py-3 text-sm font-semibold text-text-primary"
+            >
+              <Link href="/profile">{t("appUnavailableAction")}</Link>
+            </Button>
+          }
+        />
+      </div>
     </div>
   );
 }

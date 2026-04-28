@@ -23,6 +23,7 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Card } from "@/components/ui/Card";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -42,6 +43,7 @@ interface MenuItem {
 
 export default function ProfilePage() {
   const t = useTranslations("Profile");
+  const isNativeApp = useNativeApp();
   const router = useRouter();
   const { showToast } = useToast();
   const hasHandledMissingUserRef = useRef(false);
@@ -163,13 +165,28 @@ export default function ProfilePage() {
       items: hasWorkspace
         ? isWorkspaceAdmin
           ? [
-              {
-                id: "billing",
-                icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
-                title: t("billingTitle"),
-                description: t("billingDesc"),
-                href: "/profile/billing",
-              },
+              ...(!isNativeApp
+                ? [
+                    {
+                      id: workspacePlanCode === "STANDARD" ? "billing" : "pricing",
+                      icon: (
+                        <DowinIcon name="domain-payment" className="w-4 h-4" />
+                      ),
+                      title:
+                        workspacePlanCode === "STANDARD"
+                          ? t("billingTitle")
+                          : t("pricingTitle"),
+                      description:
+                        workspacePlanCode === "STANDARD"
+                          ? t("billingDesc")
+                          : t("pricingDesc"),
+                      href:
+                        workspacePlanCode === "STANDARD"
+                          ? "/profile/billing"
+                          : "/pricing",
+                    },
+                  ]
+                : []),
               {
                 id: "workspace-name",
                 icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
@@ -222,7 +239,7 @@ export default function ProfilePage() {
       id: "data",
       label: t("dataSection"),
       items:
-        workspacePlanCode === "STANDARD"
+        !isNativeApp && workspacePlanCode === "STANDARD"
           ? [
               {
                 id: "export",
@@ -286,9 +303,7 @@ export default function ProfilePage() {
           icon: <DowinIcon name="domain-chat" className="w-4 h-4" />,
           title: t("contactUs"),
           description: t("contactUsDesc"),
-          onClick: () => {
-            window.open("https://tally.so/r/2ExbKb", "_blank");
-          },
+          href: "/contact",
         },
       ],
     },
@@ -478,15 +493,17 @@ export default function ProfilePage() {
                               : t("workspaceMember")}
                           </p>
                         </div>
-                        <span
-                          className={`inline-flex items-center h-6 rounded-button px-2.5 text-[10px] font-black tracking-wider border ${
-                            workspacePlanCode === "STANDARD"
-                              ? "border-primary/20 bg-primary/5 text-primary"
-                              : "border-zinc-200 bg-zinc-50 text-zinc-500"
-                          }`}
-                        >
-                          {workspacePlanCode}
-                        </span>
+                        {!isNativeApp ? (
+                          <span
+                            className={`inline-flex items-center h-6 rounded-button px-2.5 text-[10px] font-black tracking-wider border ${
+                              workspacePlanCode === "STANDARD"
+                                ? "border-primary/20 bg-primary/5 text-primary"
+                                : "border-zinc-200 bg-zinc-50 text-zinc-500"
+                            }`}
+                          >
+                            {workspacePlanCode}
+                          </span>
+                        ) : null}
                       </div>
                     )}
 

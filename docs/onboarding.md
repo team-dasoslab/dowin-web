@@ -50,6 +50,7 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - WebView bridge 웹 타입 정리 및 `@webview-bridge/web` 연동 경로 정리 완료
 - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 요청 트리거 추가 완료
 - WebView bridge / native-web handoff 전용 로컬 스킬 `frontend-webview` 추가 완료
+- 앱 클라이언트에서는 billing/export/`STANDARD` 중심 유료 노출을 숨기고 무료 핵심 흐름 중심으로 보이도록 앱 전용 UI 분기 적용 완료
 - 선행지표 상세 화면 제거 완료
 - API 라우트 dynamic slug는 `id` 기준으로 정리 완료
 - `getSession(db)`는 실제 Drizzle DB 타입 기준으로 동작하도록 정리 완료

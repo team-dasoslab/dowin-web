@@ -4,6 +4,7 @@ import { BridgeInitializer } from "@/components/bridge/BridgeInitializer";
 import { CampaignAttribution } from "@/components/CampaignAttribution";
 import { NavigationHistoryTracker } from "@/components/NavigationHistoryTracker";
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
+import { NativeAppProvider } from "@/context/NativeAppContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { usePushNotificationAnalytics } from "@/hooks/usePushNotificationAnalytics";
 import { useSerwistRegistration } from "@/hooks/useSerwistRegistration";
@@ -45,21 +46,23 @@ export function Providers({
   );
 
   return (
-    <NextIntlClientProvider
-      locale={locale}
-      messages={messages}
-      timeZone={DEFAULT_TIME_ZONE}
-    >
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <BridgeInitializer isNative={isNative} />
-          <Suspense fallback={null}>
-            <NavigationHistoryTracker />
-            <CampaignAttribution />
-          </Suspense>
-          {children}
-        </ToastProvider>
-      </QueryClientProvider>
-    </NextIntlClientProvider>
+    <NativeAppProvider isNative={isNative}>
+      <NextIntlClientProvider
+        locale={locale}
+        messages={messages}
+        timeZone={DEFAULT_TIME_ZONE}
+      >
+        <QueryClientProvider client={queryClient}>
+          <ToastProvider>
+            <BridgeInitializer isNative={isNative} />
+            <Suspense fallback={null}>
+              <NavigationHistoryTracker />
+              <CampaignAttribution />
+            </Suspense>
+            {children}
+          </ToastProvider>
+        </QueryClientProvider>
+      </NextIntlClientProvider>
+    </NativeAppProvider>
   );
 }

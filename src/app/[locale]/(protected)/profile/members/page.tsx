@@ -16,6 +16,7 @@ import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/profile/mem
 import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/profile/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -26,6 +27,7 @@ import { useTranslations } from "next-intl";
 
 export default function ProfileMembersPage() {
   const t = useTranslations("ProfileMembers");
+  const isNativeApp = useNativeApp();
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
   const {
@@ -147,9 +149,11 @@ export default function ProfileMembersPage() {
               <span
                 className={`ml-2 text-xs font-semibold ${workspace.planCode !== "STANDARD" && members.length >= 10 ? "text-danger" : "text-text-secondary"}`}
               >
-                {workspace.planCode === "STANDARD"
-                  ? members.length
-                  : `${members.length} / 10`}
+                {isNativeApp
+                  ? `${members.length} / 10`
+                  : workspace.planCode === "STANDARD"
+                    ? members.length
+                    : `${members.length} / 10`}
               </span>
             </h2>
             <p className="text-[11px] text-text-muted">
