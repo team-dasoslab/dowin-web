@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Link } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { useNativeApp } from "@/context/NativeAppContext";
+import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 
 type WorkspaceOverLimitBannerProps = {
@@ -17,6 +18,7 @@ export function WorkspaceOverLimitBanner({
   memberCount,
 }: WorkspaceOverLimitBannerProps) {
   const t = useTranslations("WorkspaceOverLimit");
+  const isNativeApp = useNativeApp();
   const count = memberCount ?? 0;
   const limit = freeMemberLimit ?? 10;
 
@@ -28,13 +30,15 @@ export function WorkspaceOverLimitBanner({
         </div>
         <div className="min-w-0 flex-1 space-y-3">
           <div className="space-y-1">
-            <p className="text-sm font-bold text-text-primary">
-              {t("title")}
-            </p>
+            <p className="text-sm font-bold text-text-primary">{t("title")}</p>
             <p className="text-[11px] leading-relaxed text-text-muted">
               {isAdmin
-                ? t("adminDesc", { count, limit })
-                : t("memberDesc", { count, limit })}
+                ? isNativeApp
+                  ? t("adminDescApp", { count, limit })
+                  : t("adminDesc", { count, limit })
+                : isNativeApp
+                  ? t("memberDescApp", { count, limit })
+                  : t("memberDesc", { count, limit })}
             </p>
           </div>
 
@@ -45,19 +49,21 @@ export function WorkspaceOverLimitBanner({
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-[11px] font-bold text-red-700"
               >
                 <Link href="/profile/members">
-                   <DowinIcon name="domain-people" size="14px" />
+                  <DowinIcon name="domain-people" size="14px" />
                   {t("manageMembers")}
                 </Link>
               </Button>
-              <Button
-                asChild
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-600 px-3 text-[11px] font-bold text-white hover:bg-red-700"
-              >
-                <Link href="/profile/billing">
-                   <DowinIcon name="domain-payment" size="14px" />
-                  {t("billing")}
-                </Link>
-              </Button>
+              {!isNativeApp ? (
+                <Button
+                  asChild
+                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-600 px-3 text-[11px] font-bold text-white hover:bg-red-700"
+                >
+                  <Link href="/pricing">
+                    <DowinIcon name="domain-payment" size="14px" />
+                    {t("billing")}
+                  </Link>
+                </Button>
+              ) : null}
             </div>
           ) : null}
         </div>
