@@ -286,9 +286,7 @@ export default function ProfilePage() {
           icon: <DowinIcon name="domain-chat" className="w-4 h-4" />,
           title: t("contactUs"),
           description: t("contactUsDesc"),
-          onClick: () => {
-            window.open("https://tally.so/r/2ExbKb", "_blank");
-          },
+          href: "/contact",
         },
       ],
     },

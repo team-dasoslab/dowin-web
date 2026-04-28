@@ -1,9 +1,11 @@
 "use client";
+import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import { LandingHeader } from "@/components/layout/LandingHeader";
 
 export function RootLandingPage() {
   const t = useTranslations("Landing");
@@ -18,29 +20,7 @@ export function RootLandingPage() {
         <div className="absolute right-[-10%] top-[10%] h-[600px] w-[600px] rounded-full bg-primary/20 blur-[120px]" />
       </div>
 
-      {/* Top Banner Navigation */}
-      <header className="fixed top-0 z-50 flex h-16 w-full items-center justify-between bg-white/70 px-4 md:px-8 xl:px-12 backdrop-blur-xl border-b border-slate-200/50">
-        <Link href="/" className="flex items-center gap-2.5">
-          <Logo />
-          <p className="text-[22px] font-black tracking-tight text-slate-900">
-            {tCommon("serviceName")}
-          </p>
-        </Link>
-        <div className="flex items-center gap-6">
-          <Link
-            href="/login"
-            className="hidden sm:block text-[15px] font-bold text-slate-500 transition-colors"
-          >
-            {t("Navigation.login")}
-          </Link>
-          <Button
-            asChild
-            className="flex h-10 items-center justify-center rounded-full bg-primary px-6 text-[15px] font-bold text-white transition-all hover:opacity-90"
-          >
-            <Link href="/login" className="text-white">{t("Navigation.start")}</Link>
-          </Button>
-        </div>
-      </header>
+      <LandingHeader />
 
       {/* 1. Hero Section - Extreme Typography & Bleed Dashboard UI */}
       <section className="relative z-10 w-full pt-24 pb-0 md:pt-32 isolate overflow-hidden">
@@ -68,7 +48,9 @@ export function RootLandingPage() {
               asChild
               className="flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white transition-all hover:opacity-90 w-full sm:w-auto"
             >
-              <Link href="/login" className="text-white">{t("Hero.cta")}</Link>
+              <Link href="/login" className="text-white">
+                {t("Hero.cta")}
+              </Link>
             </Button>
           </div>
         </div>
@@ -530,26 +512,32 @@ export function RootLandingPage() {
         </div>
       </section>
 
-      {/* 7. Footer CTA */}
-      <footer className="w-full bg-white py-24 md:py-32 flex flex-col items-center text-center px-6 border-t border-slate-100">
-        <h2 className="text-[36px] leading-[1.1] font-black tracking-[-0.03em] md:text-[52px] text-slate-900 mb-6 break-keep whitespace-pre-line">
-          {t("Footer.headline")}
-        </h2>
-        <p className="text-[18px] text-slate-500 mb-10 max-w-[600px] leading-[1.6] break-keep font-medium whitespace-pre-line">
-          {t("Footer.description")}
-        </p>
-        <Button
-          asChild
-          className="flex h-[60px] items-center justify-center rounded-2xl bg-primary px-10 text-[18px] font-bold text-white transition-all hover:opacity-90"
-        >
-          <Link href="/login" className="text-white">
-            {t("Footer.cta")}
-          </Link>
-        </Button>
-        <p className="text-[13px] text-slate-400 mt-20 font-bold tracking-wider">
-          © 2026 Dasoslab. All rights reserved.
-        </p>
-      </footer>
+      {/* 7. Final CTA Section */}
+      <section className="relative w-full overflow-hidden border-t border-border bg-white py-24 md:py-40">
+        <div className="absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px] opacity-40" />
+        <div className="absolute left-1/2 top-1/2 -z-10 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
+
+        <div className="mx-auto flex max-w-[900px] flex-col items-center px-6 text-center">
+          <h2 className="text-[40px] font-black leading-[1.1] tracking-tighter text-text-primary uppercase md:text-[64px]">
+            {t("Footer.headline")}
+          </h2>
+          <p className="mt-6 max-w-[600px] text-[18px] font-medium leading-relaxed text-text-secondary break-keep md:text-[20px]">
+            {t("Footer.description")}
+          </p>
+          <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row">
+            <Button
+              asChild
+              className="flex h-[64px] min-w-[240px] items-center justify-center rounded-button bg-text-primary px-10 text-[18px] font-black text-white transition-all hover:scale-105 hover:bg-primary"
+            >
+              <Link href="/login" className="text-white">
+                {t("Footer.cta")}
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <Footer className="border-t border-border" />
     </main>
   );
 }

@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
+import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
@@ -20,6 +21,7 @@ type PlanCode = "FREE" | "STANDARD";
 
 export default function ProfileBillingPage() {
   const t = useTranslations("ProfileBilling");
+  const locale = useLocale();
   const {
     data: billingResponse,
     error,
@@ -187,6 +189,7 @@ export default function ProfileBillingPage() {
                 status: billing.billingStatus,
                 planCode: billing.planCode,
                 currentPeriodEnd: billing.currentPeriodEnd,
+                locale,
                 t,
               })}
             </p>
@@ -206,6 +209,55 @@ export default function ProfileBillingPage() {
               )}
               tone="default"
             />
+          </div>
+        </Card>
+
+        <Card className="space-y-4 rounded-content border border-border bg-white p-4">
+          <div className="space-y-1">
+            <h2 className="text-sm font-bold text-text-primary">
+              {t("checkoutNoticeTitle")}
+            </h2>
+            <p className="text-[11px] leading-relaxed text-text-muted">
+              {t("checkoutNoticeDesc")}
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <BillingInfoCell
+              label={t("priceLabel")}
+              value={t("standardPriceValue")}
+              tone="primary"
+            />
+            <BillingInfoCell
+              label={t("billingCycleLabel")}
+              value={t("billingCycleValue")}
+              tone="default"
+            />
+            <BillingInfoCell
+              label={t("renewalLabel")}
+              value={t("renewalValue")}
+              tone="default"
+            />
+            <BillingInfoCell
+              label={t("cancelMethodLabel")}
+              value={t("cancelMethodValue")}
+              tone="default"
+            />
+          </div>
+
+          <div className="rounded-content border border-dashed border-border bg-sub-background/60 p-4">
+            <div className="space-y-2 text-[11px] leading-relaxed text-text-muted">
+              <p>{t("businessInfo")}</p>
+              <p>{t("refundSummary")}</p>
+              <p>{t("supportSummary")}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3 text-[11px] font-bold text-primary">
+            <Link href="/billing-policy">{t("billingPolicyLink")}</Link>
+            <Link href="/terms">{t("termsLink")}</Link>
+            <Link href="/privacy">{t("privacyLink")}</Link>
+            <Link href="/contact">{t("contactLink")}</Link>
           </div>
         </Card>
 
@@ -275,7 +327,11 @@ function BillingInfoCell({
   );
 }
 
-function formatDateLabel(value: string | null | undefined, fallback: string) {
+function formatDateLabel(
+  value: string | null | undefined,
+  fallback: string,
+  locale = "ko",
+) {
   if (!value) {
     return fallback;
   }
@@ -285,7 +341,7 @@ function formatDateLabel(value: string | null | undefined, fallback: string) {
     return fallback;
   }
 
-  return new Intl.DateTimeFormat("ko-KR", {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ko-KR", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -296,14 +352,20 @@ function getStatusDescription({
   status,
   planCode,
   currentPeriodEnd,
+  locale,
   t,
 }: {
   status: BillingStatus;
   planCode: PlanCode;
   currentPeriodEnd: string | null | undefined;
+  locale: string;
   t: ReturnType<typeof useTranslations<"ProfileBilling">>;
 }) {
-  const formattedDate = formatDateLabel(currentPeriodEnd, t("notAvailable"));
+  const formattedDate = formatDateLabel(
+    currentPeriodEnd,
+    t("notAvailable"),
+    locale,
+  );
 
   switch (status) {
     case "ACTIVE":
