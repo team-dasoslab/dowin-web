@@ -1077,7 +1077,6 @@
     "permissionDenied": "Notification permission denied. Please allow notifications in browser settings for the best experience.",
     "permissionBlocked": "Browser notification permission is blocked. Please allow permissions in settings.",
     "vapidConfigError": "Problem setting up notification service. Please contact admin.",
-    "serviceWorkerError": "PWA service worker not registered. Please test in preview build.",
     "subscribeSuccess": "Push notifications enabled.",
     "subscribeError": "Problem setting up notifications. Please try again later.",
     "unsubscribeSuccess": "Notifications disabled.",

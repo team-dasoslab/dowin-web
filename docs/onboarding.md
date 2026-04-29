@@ -424,7 +424,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 ### 6.8. Notification / Push
 
 - `/api/notifications/devices`, `/api/push/send-daily`, `/api/push/send-weekly-focus` 라우트 존재
-- 프로필 화면에서 PWA 푸시 구독 토글 제공
+- 프로필 화면에서 앱 전용 푸시 알림 토글 제공
 - 일일 기록 리마인드와 주간 집중 리마인드가 구현되어 있다
 - OpenAPI 계약에는 아직 포함되지 않은 보조 API다
 
