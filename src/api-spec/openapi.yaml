@@ -347,6 +347,62 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /notifications/devices:
+    post:
+      summary: 현재 기기 알림 토큰 등록
+      tags: [Notification]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DevicePushTokenRegisterRequest"
+      responses:
+        "200":
+          description: 등록 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success: { type: boolean, example: true }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+    delete:
+      summary: 현재 기기 알림 토큰 비활성화
+      tags: [Notification]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DevicePushTokenDisableRequest"
+      responses:
+        "200":
+          description: 비활성화 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success: { type: boolean, example: true }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /admin/users:
     post:
       summary: "[ADMIN] 새 멤버 추가"
@@ -1988,6 +2044,36 @@ components:
           type: string
           pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
           example: "20:30"
+
+    DevicePushTokenRegisterRequest:
+      type: object
+      required: [provider, platform, token, notificationEnabled]
+      properties:
+        provider:
+          type: string
+          enum: [FCM]
+        platform:
+          type: string
+          enum: [IOS, ANDROID]
+        token:
+          type: string
+          minLength: 1
+          example: "fcm_device_token"
+        appVersion:
+          type: string
+          example: "1.2.3"
+        notificationEnabled:
+          type: boolean
+          example: true
+
+    DevicePushTokenDisableRequest:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          minLength: 1
+          example: "fcm_device_token"
 
     WorkspaceMember:
       type: object

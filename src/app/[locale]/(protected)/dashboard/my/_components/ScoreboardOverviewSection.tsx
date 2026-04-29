@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/dashboard/my/_hooks/useDashboardScoreboard";
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
@@ -138,25 +139,23 @@ function AchievementDonut({ rate }: { rate: number }) {
   };
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={28}
-          outerRadius={32}
-          paddingAngle={0}
-          dataKey="value"
-          startAngle={90}
-          endAngle={-270}
-          stroke="none"
-        >
-          <Cell fill={COLORS.achieved} />
-          <Cell fill={COLORS.remaining} />
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
+    <PieChart width={80} height={80}>
+      <Pie
+        data={data}
+        cx="50%"
+        cy="50%"
+        innerRadius={28}
+        outerRadius={32}
+        paddingAngle={0}
+        dataKey="value"
+        startAngle={90}
+        endAngle={-270}
+        stroke="none"
+      >
+        <Cell fill={COLORS.achieved} />
+        <Cell fill={COLORS.remaining} />
+      </Pie>
+    </PieChart>
   );
 }
 
@@ -211,13 +210,18 @@ function DashboardWeeklyTrendSection({
 }
 
 function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
   const data = points.map((p) => ({
     name: p.label,
     rate: p.rate,
   }));
 
+  if (!isMounted) return null;
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} initialDimension={{ width: 10, height: 10 }}>
       <AreaChart data={data} margin={{ top: 10, right: 5, left: 5, bottom: 0 }}>
         <defs>
           <linearGradient id="rateGrad" x1="0" y1="0" x2="0" y2="1">

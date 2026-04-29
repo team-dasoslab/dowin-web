@@ -609,6 +609,16 @@
     "Notification": {
       "timeChanged": "일일 리마인드 시간이 변경되었습니다.",
       "timeChangeFailed": "일일 리마인드 시간 변경에 실패했습니다."
+    },
+    "NotificationControl": {
+      "appOnly": "앱에서만 지원",
+      "permissionDenied": "앱 알림 권한이 허용되지 않았습니다.",
+      "enabled": "앱 알림을 켰습니다.",
+      "disabled": "앱 알림을 껐습니다.",
+      "enableFailed": "앱 알림을 켜지 못했습니다.",
+      "disableFailed": "앱 알림을 끄지 못했습니다.",
+      "toggleOn": "앱 알림 켜기",
+      "toggleOff": "앱 알림 끄기"
     }
   },
   "ProfileBilling": {
@@ -1068,7 +1078,6 @@
     "permissionDenied": "알림 권한이 거부되었습니다. 원활한 사용을 위해 브라우저 설정에서 알림을 허용해 주세요.",
     "permissionBlocked": "브라우저의 알림 권한이 차단되어 있습니다. 설정에서 권한을 허용해 주세요.",
     "vapidConfigError": "알림 서비스 설정에 문제가 발생했습니다. 관리자에게 문의해 주세요.",
-    "serviceWorkerError": "PWA 서비스 워커가 등록되지 않았습니다. 빌드 후 프리뷰(yarn preview)에서 테스트해주세요.",
     "subscribeSuccess": "푸시 알림이 설정되었습니다.",
     "subscribeError": "알림 설정 중 잠시 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.",
     "unsubscribeSuccess": "알림 설정이 해제되었습니다.",
