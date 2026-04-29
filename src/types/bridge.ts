@@ -1,5 +1,11 @@
 import { BridgeStore } from "@webview-bridge/web";
 
+type JsonPrimitive = string | number | boolean | null;
+type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
+type JsonObject = {
+  [key: string]: JsonValue;
+};
+
 export type AppBridgeState = {
   isNative: boolean;
   platform: "ios" | "android";
@@ -12,8 +18,7 @@ export type AppBridgeState = {
   };
   statusBarHeight: number;
   notificationPermission: "granted" | "denied" | "not-determined";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  lastNotification: Record<string, any> | null;
+  lastNotification: JsonObject | null;
   lastDeepLink: string | null;
 };
 

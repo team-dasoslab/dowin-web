@@ -350,7 +350,7 @@ export default function LoginPageClient() {
                 onChange={(e) => setPw(e.target.value)}
                 placeholder={t("passwordPlaceholder")}
                 className="w-full rounded-content border border-border bg-sub-background px-5 py-4 pr-14 text-sm font-bold outline-none transition-all placeholder:text-text-muted focus:border-primary focus:bg-white"
-                toggleClassName="absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-text-muted transition-colors"
+                toggleClassName="absolute right-4 top-1/2 flex -tranzinc-y-1/2 items-center text-text-muted transition-colors"
                 required
               />
             </div>
@@ -404,7 +404,7 @@ export default function LoginPageClient() {
                     onClick={() => resetErrorAndSwitchMode("signup")}
                     className="text-[13px] font-bold text-primary transition-colors"
                   >
-                    {t("noAccount")} {t("signup")}
+                    {t("noAccount")}
                   </button>
                 </>
               ) : (
@@ -413,7 +413,7 @@ export default function LoginPageClient() {
                   onClick={() => resetErrorAndSwitchMode("login")}
                   className="text-[13px] font-bold text-primary transition-colors"
                 >
-                  {t("hasAccount")} {t("login")}
+                  {t("hasAccount")}
                 </button>
               )}
             </div>

@@ -7,7 +7,6 @@ import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { NativeAppProvider } from "@/context/NativeAppContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { usePushNotificationAnalytics } from "@/hooks/usePushNotificationAnalytics";
-import { useSerwistRegistration } from "@/hooks/useSerwistRegistration";
 import { DEFAULT_TIME_ZONE } from "@/i18n/config";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
@@ -25,9 +24,6 @@ export function Providers({
   isNative: boolean;
 }) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
-  const shouldRegisterServiceWorker = !publicRuntimeConfig.isDevelopment;
-
-  useSerwistRegistration(shouldRegisterServiceWorker);
   usePushNotificationAnalytics(gaId.length > 0);
 
   useEffect(() => {

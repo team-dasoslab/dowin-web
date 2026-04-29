@@ -1,11 +1,11 @@
-# DOWIN 온보딩 가이드
+# Dowin 온보딩 가이드
 
 이 문서는 새로운 개발자나 AI Agent가 DOWIN 저장소에 바로 투입될 수 있도록 현재 상태, 읽기 순서, 핵심 파일 위치, 작업 규칙, 검증 방법을 한 번에 정리한 시작 문서다.  
 이 문서 하나를 먼저 읽고, 여기서 안내하는 다음 문서와 파일만 따라가면 된다.
 
 ## 1. 프로젝트 한 줄 요약
 
-DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또는 소규모 팀의 목표 실행을 관리하는 서비스다.  
+Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또는 소규모 팀의 목표 실행을 관리하는 서비스다.  
 핵심 사용자 흐름은 다음과 같다.
 
 1. 로그인
@@ -15,7 +15,7 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 5. 대시보드에서 날짜별 O/X 기록
 6. 이번 주 승패를 점수판 형태로 확인
 
-## 2. 현재 상태 요약 (2026-04-25 기준)
+## 2. 현재 상태 요약 (2026-04-28 기준)
 
 ### 2.1. 구현 완료
 
@@ -45,10 +45,15 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 멤버 관리 화면에서 관리자 권한 이전 가능
 - `/updates` 새 기능 모아보기 허브 구현 완료
 - 비로그인 사용자용 서비스 소개형 루트 랜딩 페이지(`/`) 구현 완료
+- 제품 전반 용어 기준을 `핵심 목표 / 성공 기준 / 액션 아이템 / 점수판`으로 정리 완료
+- Setup / 대시보드 / 리포트 / 랜딩 핵심 번역 카피에 위 용어 기준 1차 반영 완료
+- 랜딩 Hero 비교용 variant preview 지원 완료
+  - `/{locale}?variant=1|2|3` 로 Hero 헤드라인/서브카피 비교 가능
 - Analytics export API와 프로필 CSV 다운로드 화면 구현 완료
 - 푸시 구독 토글 및 개인 기록 리마인드 시간 설정 구현 완료
 - WebView bridge 웹 타입 정리 및 `@webview-bridge/web` 연동 경로 정리 완료
 - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 요청 트리거 추가 완료
+  - 정책: 앱(WebView) 환경에서만 동작하며, 로그인 흐름당 1회만 요청
 - WebView bridge / native-web handoff 전용 로컬 스킬 `frontend-webview` 추가 완료
 - 앱 클라이언트에서는 billing/export/`STANDARD` 중심 유료 노출을 숨기고 무료 핵심 흐름 중심으로 보이도록 앱 전용 UI 분기 적용 완료
 - 선행지표 상세 화면 제거 완료
@@ -78,8 +83,11 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 대시보드 차트/시각화 고도화 미완료
 - 프로필 탈퇴 UX는 구현됐지만 닉네임/워크스페이스 이름 변경은 여전히 `prompt` 기반이다
 - 첫 진입 온보딩 문구/CTA 용어 일관성(`워크스페이스` 중심) 정리는 진행 중이다
-- 웹 푸시 구독이 전제인 만큼 개인 기록 리마인드의 실제 반응률과 후속 기록 재개율은 운영 데이터로 검증이 더 필요하다
-- 로그인 직후 `dashboard/my`에서 수행하는 알림 권한 요청은 현재 권한 prompt까지만 연결돼 있고, 실제 push subscription 자동 등록은 아직 붙지 않았다
+- 제품 전반 용어 기준은 정리됐지만, 법률 문서/업데이트 히스토리/비핵심 카피까지 전면 치환하는 작업은 아직 남아 있다
+- 랜딩은 용어 치환 1차 반영과 Hero variant 비교 프리뷰까지 완료됐지만, 최종 카피 선택과 본문 전면 다듬기는 아직 남아 있다
+- 앱 전용 푸시 전환 이후 개인 기록 리마인드의 실제 반응률과 후속 기록 재개율은 운영 데이터로 검증이 더 필요하다
+- 웹 브라우저에서는 알림을 지원하지 않고, 앱(WebView)에서만 네이티브 권한 + FCM 토큰 등록 흐름을 사용한다
+- 프로필 알림 토글은 앱 환경에서 현재 기기 FCM 토큰을 서버에 등록/비활성화한다
 - 유료 기능 후보는 `달성률 임계치 기반 자동 리마인드`보다 `리더 액션 어시스턴트` 중심으로 재정의했다. 핵심은 자동 꾸짖기가 아니라 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인`이며, 팀원 수용성/알림 피로 가드레일까지 포함해 `docs/planning/2026.04.14-leader-report-reminder-plan.md`를 본다
 - Polar customer portal 진입은 코드에서 `POLAR_ACCESS_TOKEN` fallback 지원까지 반영됐지만, 실제 sandbox 환경에는 `customer_sessions:write` scope가 있는 토큰 설정이 아직 필요하다
 - 환불 악용 방지 문서 기준의 `STANDARD` usage event 저장은 아직 미구현이며, 결제 운영을 계속할 거면 우선순위를 높여 반드시 구현해야 한다
@@ -100,14 +108,18 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
     - `src/i18n/detect-locale.ts`
     - `src/lib/server/locale.ts`
 
-### 2.3. 현재 우선순위 (2026-04-21 기준)
+### 2.3. 현재 우선순위 (2026-04-28 기준)
 
 - 단기 우선순위는 `유료화`가 아니라 `범용 서비스화 + 무료 가치 강화`다.
+- 그 범용화에는 제품 전반의 4DX 책 용어를 책 비독자도 이해할 수 있는 범용 제품 언어로 재정리하는 작업이 포함된다.
 - 공개 회원가입과 워크스페이스 셀프서브 진입은 현재 동작 중이며, 다음 우선순위는 운영 마감 기능과 무료 가치 측정 체계를 보강하는 것이다.
 - 출시 전 우선 적용 대상은 `리더 리포트`보다 `Free 플랜 구조와 초기 제한`이다.
 - 현재 기준에서는 모든 워크스페이스를 `FREE`로 운영하고, 플랜 표시와 최소 제한을 먼저 제품에 연결한다.
 - 팀 회의/회고 흐름은 별도 미팅 모드보다 팀 대시보드 메모 레일로 운영한다.
 - 무료 가치 측정 지표, 온보딩 카피 일관성, 계정 탈퇴 같은 잔여 운영 기능을 다음 제품 축으로 본다.
+- 용어 범용화는 내부 모델을 지우는 작업이 아니라, 사용자 노출 카피와 설명 레이어를 재설계하는 작업으로 본다.
+- 현재 확정된 사용자 노출 기본 용어는 `핵심 목표 / 성공 기준 / 액션 아이템 / 점수판`이다.
+- 랜딩은 단순 용어 치환만으로 끝내지 않고, `누가 봐도 어떤 제품인지 이해되는 카피`로 별도 다듬는 것을 다음 우선 작업으로 둔다.
 - 초대코드 만료 시간 정책과 다중 워크스페이스는 당장 우선순위에 올리지 않는다.
 - 유료화(결제/청구)는 무료 가치와 리텐션 신호가 확인된 이후 단계로 둔다.
 
@@ -116,9 +128,12 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 루트 경로(`/`)는 비로그인 사용자에게 서비스 소개형 랜딩 페이지를 노출한다.
 - 로그인 화면은 `/login` 경로로 분리되었다.
 - 로그인 사용자가 `/` 또는 `/login`에 접근하면 기존처럼 `/dashboard/my`로 리다이렉트된다.
-- 랜딩은 책 내용을 직접 요약하는 페이지가 아니라, DOWIN가 해결하는 실행 문제와 제품 구조를 제품 언어로 설명하는 입구로 유지한다.
+- 랜딩은 책 내용을 직접 요약하는 페이지가 아니라, Dowin가 해결하는 실행 문제와 제품 구조를 제품 언어로 설명하는 입구로 유지한다.
+- 현재 Hero 카피 비교를 위해 `/{locale}?variant=1|2|3` 프리뷰를 지원한다.
+- 아직 최종 Hero 문구는 확정 전이며, 랜딩 본문도 추가 카피 다듬기가 남아 있다.
 - 관련 기준 문서:
   - `docs/planning/2026.03.24-root-landing-page-plan.md`
+  - `docs/planning/2026.04.28-product-language-dictionary-and-copy-map.md`
 
 ### 2.3.2. 워크스페이스 없음 상태 처리 규칙
 
@@ -201,6 +216,7 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 6. 전략/우선순위 문서 (필요 시)
    - 루트 랜딩 페이지 전환안: `docs/planning/2026.03.24-root-landing-page-plan.md`
    - 서비스 기획 개요: `docs/planning/2026.03.09-service-overview.md`
+   - 제품 용어 사전 + 화면별 카피 적용표: `docs/planning/2026.04.28-product-language-dictionary-and-copy-map.md`
    - 범용 마케팅 방법론 조사: `docs/planning/2026.04.19-marketing-methodology-research.md`
    - 초기 마케팅 방법론: `docs/planning/2026.04.19-marketing-methodology-plan.md`
    - 선행지표 태그 확장안: `docs/planning/2026.04.10-lead-measure-tag-plan.md`
@@ -236,18 +252,14 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
   - 복원코드 기반 계정 복구 페이지
 - `src/app/(protected)/dashboard/my/page.tsx`
   - 내 대시보드
-- `src/app/(protected)/dashboard/my/_hooks/usePostLoginNotificationPermissionPrompt.ts`
-  - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 prompt를 1회 트리거하는 훅
 - `src/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard.ts`
   - 내 대시보드 API 조회/토글 로직
 - `src/lib/bridge.ts`
-  - WebView bridge 연결, store selector, 네이티브 메서드 래퍼
+  - WebView bridge 연결, 알림 권한/토큰/앱 버전 helper, 네이티브 메서드 래퍼
 - `src/types/bridge.ts`
   - 웹에서 사용하는 bridge 공개 타입
-- `src/hooks/useAppBridgeNotifications.ts`
-  - bridge 기반 알림 권한 / 마지막 알림 상태 구독 훅
-- `src/hooks/useAppBridgeDeepLink.ts`
-  - bridge 기반 마지막 딥링크 상태 구독 훅
+- `src/components/bridge/BridgeInitializer.tsx`
+  - bridge store를 구독해 safe area와 deep link를 초기화하는 클라이언트 엔트리
 - `src/app/(protected)/scoreboards/page.tsx`
   - 점수판 보관함 화면
 - `src/app/(protected)/scoreboards/_hooks/useScoreboardArchive.ts`
@@ -411,8 +423,8 @@ DOWIN는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 
 ### 6.8. Notification / Push
 
-- `/api/push/subscribe`, `/api/push/send-daily`, `/api/push/send-weekly-focus` 라우트 존재
-- 프로필 화면에서 PWA 푸시 구독 토글 제공
+- `/api/notifications/devices`, `/api/push/send-daily`, `/api/push/send-weekly-focus` 라우트 존재
+- 프로필 화면에서 앱 전용 푸시 알림 토글 제공
 - 일일 기록 리마인드와 주간 집중 리마인드가 구현되어 있다
 - OpenAPI 계약에는 아직 포함되지 않은 보조 API다
 

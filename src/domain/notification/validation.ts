@@ -20,3 +20,15 @@ export const userNotificationSettingsUpdateSchema = z.object({
     .string()
     .regex(TIME_REGEX, "시간은 HH:mm 형식이어야 합니다."),
 });
+
+export const devicePushTokenRegisterSchema = z.object({
+  provider: z.literal("FCM"),
+  platform: z.enum(["IOS", "ANDROID"]),
+  token: z.string().min(1, "유효한 디바이스 토큰이 필요합니다."),
+  appVersion: z.string().trim().min(1).optional(),
+  notificationEnabled: z.boolean(),
+});
+
+export const devicePushTokenDisableSchema = z.object({
+  token: z.string().min(1, "유효한 디바이스 토큰이 필요합니다."),
+});
