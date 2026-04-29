@@ -167,6 +167,12 @@ export const useProfileActions = ({
         }
       }
 
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(
+          "dowin.notifications.current-device.enabled",
+        );
+      }
+
       const response = await logoutMutation.mutateAsync();
       if (response.status !== 204) {
         throw response;

@@ -6,7 +6,6 @@ import {
 } from "@/api/generated/notification/notification";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { useToast } from "@/context/ToastContext";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import {
   bridge,
   getAppVersion,
@@ -15,11 +14,21 @@ import {
   getPushToken,
   requestNotificationPermission,
 } from "@/lib/bridge";
+import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const DEVICE_NOTIFICATION_PREFERENCE_KEY =
   "dowin.notifications.current-device.enabled";
+
+const getInitialNotificationPreference = () => {
+  if (typeof window !== "undefined") {
+    return (
+      window.localStorage.getItem(DEVICE_NOTIFICATION_PREFERENCE_KEY) === "1"
+    );
+  }
+  return false;
+};
 
 type NotificationSettingControlProps = {
   isSubscribed: boolean;
@@ -41,18 +50,24 @@ export function NotificationSettingControl({
   const t = useTranslations("Profile.NotificationControl");
   const isNativeApp = useNativeApp();
   const { showToast } = useToast();
-  const registerDeviceMutation = usePostNotificationsDevices();
-  const disableDeviceMutation = useDeleteNotificationsDevices();
-  const [isRegistered, setIsRegistered] = useState(isSubscribed);
+  const { mutateAsync: registerDevice } = usePostNotificationsDevices();
+  const { mutateAsync: disableDevice, isPending: isDisablePending } = useDeleteNotificationsDevices();
+  const [isRegisterPending, setIsRegisterPending] = useState(false);
+  const initialPreference = getInitialNotificationPreference();
+  const [isRegistered, setIsRegistered] = useState(initialPreference);
   const [permission, setPermission] = useState(
     getBridgeNotificationPermission(),
   );
-  const [shouldResyncOnLoad, setShouldResyncOnLoad] = useState(false);
+  const [shouldResyncOnLoad, setShouldResyncOnLoad] =
+    useState(initialPreference);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [hasSyncedOnLoad, setHasSyncedOnLoad] = useState(false);
 
   useEffect(() => {
-    setIsRegistered(isSubscribed);
-  }, [isSubscribed]);
+    if (initialPreference && !isSubscribed) {
+      onSubscriptionChange(true);
+    }
+  }, [initialPreference, isSubscribed, onSubscriptionChange]);
 
   useEffect(() => {
     if (!isNativeApp) {
@@ -60,9 +75,6 @@ export function NotificationSettingControl({
       return;
     }
 
-    setShouldResyncOnLoad(
-      window.localStorage.getItem(DEVICE_NOTIFICATION_PREFERENCE_KEY) === "1",
-    );
     setPermission(getBridgeNotificationPermission());
 
     const unsubscribe = bridge.store.subscribe((state) => {
@@ -72,31 +84,38 @@ export function NotificationSettingControl({
     return unsubscribe;
   }, [isNativeApp]);
 
-  const registerCurrentDevice = useEffectEvent(
+  const registerCurrentDevice = useCallback(
     async ({ silent }: { silent: boolean }) => {
       const token = await getPushToken();
       const appVersion = await getAppVersion();
-      const response = await registerDeviceMutation.mutateAsync({
-        data: {
-          provider: "FCM",
-          platform: getBridgePlatform(),
-          token,
-          appVersion: appVersion ?? undefined,
-          notificationEnabled: true,
-        },
-      });
+      
+      setIsRegisterPending(true);
+      try {
+        const response = await registerDevice({
+          data: {
+            provider: "FCM",
+            platform: getBridgePlatform(),
+            token,
+            appVersion: appVersion ?? undefined,
+            notificationEnabled: true,
+          },
+        });
 
-      if (response.status !== 200) {
-        throw response;
-      }
+        if (response.status !== 200) {
+          throw response;
+        }
 
-      setIsRegistered(true);
-      onSubscriptionChange(true);
+        setIsRegistered(true);
+        onSubscriptionChange(true);
 
-      if (!silent) {
-        showToast("success", t("enabled"));
+        if (!silent) {
+          showToast("success", t("enabled"));
+        }
+      } finally {
+        setIsRegisterPending(false);
       }
     },
+    [onSubscriptionChange, registerDevice, showToast, t],
   );
 
   useEffect(() => {
@@ -104,7 +123,7 @@ export function NotificationSettingControl({
       !isNativeApp ||
       !shouldResyncOnLoad ||
       permission !== "granted" ||
-      isRegistered ||
+      hasSyncedOnLoad ||
       isSyncing
     ) {
       return;
@@ -116,6 +135,9 @@ export function NotificationSettingControl({
       try {
         setIsSyncing(true);
         await registerCurrentDevice({ silent: true });
+        if (!cancelled) {
+          setHasSyncedOnLoad(true);
+        }
       } catch (error) {
         if (!cancelled) {
           console.error("Failed to sync native push token:", error);
@@ -134,7 +156,7 @@ export function NotificationSettingControl({
     };
   }, [
     isNativeApp,
-    isRegistered,
+    hasSyncedOnLoad,
     isSyncing,
     permission,
     registerCurrentDevice,
@@ -155,6 +177,7 @@ export function NotificationSettingControl({
       window.localStorage.setItem(DEVICE_NOTIFICATION_PREFERENCE_KEY, "1");
       setShouldResyncOnLoad(true);
       await registerCurrentDevice({ silent: false });
+      setHasSyncedOnLoad(true);
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("enableFailed")));
     } finally {
@@ -166,7 +189,7 @@ export function NotificationSettingControl({
     try {
       setIsSyncing(true);
       const token = await getPushToken();
-      const response = await disableDeviceMutation.mutateAsync({
+      const response = await disableDevice({
         data: { token },
       });
 
@@ -189,8 +212,8 @@ export function NotificationSettingControl({
   const isToggleDisabled =
     disabled ||
     isSyncing ||
-    registerDeviceMutation.isPending ||
-    disableDeviceMutation.isPending ||
+    isRegisterPending ||
+    isDisablePending ||
     !isNativeApp;
 
   return (
