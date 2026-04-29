@@ -13,9 +13,11 @@ import {
   usePutWorkspacesId,
 } from "@/api/generated/workspace/workspace";
 import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "@/i18n/routing";
-import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { getApiErrorMessage, getFetchErrorMessage } from "@/lib/client/frontend-api";
+import { getPushToken } from "@/lib/bridge";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -36,6 +38,7 @@ export const useProfileActions = ({
   const queryClient = useQueryClient();
   const router = useRouter();
   const { showToast } = useToast();
+  const isNativeApp = useNativeApp();
   const [pendingAction, setPendingAction] = useState<string | null>(null);
 
   const updateNicknameMutation = usePutUsersMe();
@@ -137,6 +140,33 @@ export const useProfileActions = ({
 
     try {
       setPendingAction("logout");
+      if (isNativeApp) {
+        try {
+          const token = await getPushToken();
+
+          if (token) {
+            const response = await fetch("/api/notifications/devices", {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ token }),
+            });
+
+            if (!response.ok && response.status !== 401) {
+              throw new Error(
+                await getFetchErrorMessage(
+                  response,
+                  "디바이스 알림 토큰 비활성화에 실패했습니다.",
+                ),
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Failed to disable current device push token:", error);
+        }
+      }
+
       const response = await logoutMutation.mutateAsync();
       if (response.status !== 204) {
         throw response;

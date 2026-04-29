@@ -54,7 +54,6 @@ export default async function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Dowin" />
         <meta name="theme-color" content="#EFF0FA" />
-        <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/favicon-192x192.png" />
 

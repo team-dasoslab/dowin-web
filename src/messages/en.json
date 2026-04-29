@@ -606,6 +606,16 @@
     "Notification": {
       "timeChanged": "Daily reminder time has been changed.",
       "timeChangeFailed": "Failed to change daily reminder time."
+    },
+    "NotificationControl": {
+      "appOnly": "App only",
+      "permissionDenied": "App notification permission was not granted.",
+      "enabled": "App notifications enabled.",
+      "disabled": "App notifications disabled.",
+      "enableFailed": "Failed to enable app notifications.",
+      "disableFailed": "Failed to disable app notifications.",
+      "toggleOn": "Enable app notifications",
+      "toggleOff": "Disable app notifications"
     }
   },
   "ProfileBilling": {

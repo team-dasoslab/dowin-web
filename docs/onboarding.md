@@ -85,9 +85,9 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 첫 진입 온보딩 문구/CTA 용어 일관성(`워크스페이스` 중심) 정리는 진행 중이다
 - 제품 전반 용어 기준은 정리됐지만, 법률 문서/업데이트 히스토리/비핵심 카피까지 전면 치환하는 작업은 아직 남아 있다
 - 랜딩은 용어 치환 1차 반영과 Hero variant 비교 프리뷰까지 완료됐지만, 최종 카피 선택과 본문 전면 다듬기는 아직 남아 있다
-- 웹 푸시 구독이 전제인 만큼 개인 기록 리마인드의 실제 반응률과 후속 기록 재개율은 운영 데이터로 검증이 더 필요하다
-- 로그인 직후 `dashboard/my`에서 수행하는 알림 권한 요청은 현재 권한 prompt까지만 연결돼 있고, 실제 push subscription 자동 등록은 아직 붙지 않았다
-  - 현재 제품 정책상 이 권한 요청은 로그인 후 첫 `dashboard/my` 진입에서 1회만 수행해야 한다
+- 앱 전용 푸시 전환 이후 개인 기록 리마인드의 실제 반응률과 후속 기록 재개율은 운영 데이터로 검증이 더 필요하다
+- 웹 브라우저에서는 알림을 지원하지 않고, 앱(WebView)에서만 네이티브 권한 + FCM 토큰 등록 흐름을 사용한다
+- 프로필 알림 토글은 앱 환경에서 현재 기기 FCM 토큰을 서버에 등록/비활성화한다
 - 유료 기능 후보는 `달성률 임계치 기반 자동 리마인드`보다 `리더 액션 어시스턴트` 중심으로 재정의했다. 핵심은 자동 꾸짖기가 아니라 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인`이며, 팀원 수용성/알림 피로 가드레일까지 포함해 `docs/planning/2026.04.14-leader-report-reminder-plan.md`를 본다
 - Polar customer portal 진입은 코드에서 `POLAR_ACCESS_TOKEN` fallback 지원까지 반영됐지만, 실제 sandbox 환경에는 `customer_sessions:write` scope가 있는 토큰 설정이 아직 필요하다
 - 환불 악용 방지 문서 기준의 `STANDARD` usage event 저장은 아직 미구현이며, 결제 운영을 계속할 거면 우선순위를 높여 반드시 구현해야 한다
@@ -252,18 +252,14 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
   - 복원코드 기반 계정 복구 페이지
 - `src/app/(protected)/dashboard/my/page.tsx`
   - 내 대시보드
-- `src/app/(protected)/dashboard/my/_hooks/usePostLoginNotificationPermissionPrompt.ts`
-  - 로그인 직후 `dashboard/my` 첫 진입 시 앱(WebView) 환경에서만 알림 권한 prompt를 1회 트리거하는 훅
 - `src/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard.ts`
   - 내 대시보드 API 조회/토글 로직
 - `src/lib/bridge.ts`
-  - WebView bridge 연결, store selector, 네이티브 메서드 래퍼
+  - WebView bridge 연결, 알림 권한/토큰/앱 버전 helper, 네이티브 메서드 래퍼
 - `src/types/bridge.ts`
   - 웹에서 사용하는 bridge 공개 타입
-- `src/hooks/useAppBridgeNotifications.ts`
-  - bridge 기반 알림 권한 / 마지막 알림 상태 구독 훅
-- `src/hooks/useAppBridgeDeepLink.ts`
-  - bridge 기반 마지막 딥링크 상태 구독 훅
+- `src/components/bridge/BridgeInitializer.tsx`
+  - bridge store를 구독해 safe area와 deep link를 초기화하는 클라이언트 엔트리
 - `src/app/(protected)/scoreboards/page.tsx`
   - 점수판 보관함 화면
 - `src/app/(protected)/scoreboards/_hooks/useScoreboardArchive.ts`
