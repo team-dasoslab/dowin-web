@@ -4,7 +4,6 @@ import type { Viewport } from "next";
 import { cookies, headers } from "next/headers";
 import Script from "next/script";
 import { ReactNode } from "react";
-import { RechartsConsolePatcher } from "@/app/_components/RechartsConsolePatcher";
 import "./globals.css";
 
 export const viewport: Viewport = {
