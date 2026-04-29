@@ -606,6 +606,16 @@
     "Notification": {
       "timeChanged": "Daily reminder time has been changed.",
       "timeChangeFailed": "Failed to change daily reminder time."
+    },
+    "NotificationControl": {
+      "appOnly": "App only",
+      "permissionDenied": "App notification permission was not granted.",
+      "enabled": "App notifications enabled.",
+      "disabled": "App notifications disabled.",
+      "enableFailed": "Failed to enable app notifications.",
+      "disableFailed": "Failed to disable app notifications.",
+      "toggleOn": "Enable app notifications",
+      "toggleOff": "Disable app notifications"
     }
   },
   "ProfileBilling": {
@@ -1067,7 +1077,6 @@
     "permissionDenied": "Notification permission denied. Please allow notifications in browser settings for the best experience.",
     "permissionBlocked": "Browser notification permission is blocked. Please allow permissions in settings.",
     "vapidConfigError": "Problem setting up notification service. Please contact admin.",
-    "serviceWorkerError": "PWA service worker not registered. Please test in preview build.",
     "subscribeSuccess": "Push notifications enabled.",
     "subscribeError": "Problem setting up notifications. Please try again later.",
     "unsubscribeSuccess": "Notifications disabled.",

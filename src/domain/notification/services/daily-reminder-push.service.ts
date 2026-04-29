@@ -4,32 +4,30 @@ import { NotificationStorage } from "@/domain/notification/storage/notification.
 import en from "@/messages/en.json";
 import ko from "@/messages/ko.json";
 
-type PushSubscriptionLookupPort = Pick<
+type DevicePushTokenLookupPort = Pick<
   NotificationStorage,
-  "findAllPushSubscriptions" | "findUserNotificationSettingsByUserIds"
+  "findAllActiveDevicePushTokens" | "findUserNotificationSettingsByUserIds"
 >;
 
 const messages = { ko, en } as const;
 type Locale = keyof typeof messages;
 
 export type DailyReminderPushJob = {
-  endpoint: string;
-  p256dh: string;
-  auth: string;
+  userId: number;
+  token: string;
   title: string;
   body: string;
   url: `/${Locale}/dashboard/my`;
 };
 
 export class DailyReminderPushService {
-  constructor(private notificationStorage: PushSubscriptionLookupPort) {}
+  constructor(private notificationStorage: DevicePushTokenLookupPort) {}
 
   async buildDailyReminderJobs(input?: { now?: Date }) {
     const now = input?.now ?? new Date();
-    const subscriptions =
-      await this.notificationStorage.findAllPushSubscriptions();
+    const tokens = await this.notificationStorage.findAllActiveDevicePushTokens();
     const subscribedUserIds = [
-      ...new Set(subscriptions.map((item) => Number(item.userId))),
+      ...new Set(tokens.map((item) => Number(item.userId))),
     ].filter((userId) => Number.isInteger(userId));
 
     const settings =
@@ -72,15 +70,15 @@ export class DailyReminderPushService {
       return {
         jobs: [] as DailyReminderPushJob[],
         summary: {
-          totalSubscriptions: subscriptions.length,
+          totalDevices: tokens.length,
           eligibleUsers: 0,
           totalJobs: 0,
         },
       };
     }
 
-    const subscriptionsByUserId = subscriptions.reduce<
-      Map<number, typeof subscriptions>
+    const tokensByUserId = tokens.reduce<
+      Map<number, typeof tokens>
     >((map, subscription) => {
       const userId = Number(subscription.userId);
       if (!Number.isInteger(userId)) {
@@ -100,15 +98,14 @@ export class DailyReminderPushService {
     const jobs: DailyReminderPushJob[] = [];
 
     for (const userId of eligibleUserIds) {
-      const subscriptionsForUser = subscriptionsByUserId.get(userId) ?? [];
+      const subscriptionsForUser = tokensByUserId.get(userId) ?? [];
       const userLocale = localeMap.get(userId) ?? "ko";
       const t = messages[userLocale] ?? messages.ko;
 
       for (const subscription of subscriptionsForUser) {
         jobs.push({
-          endpoint: subscription.endpoint,
-          p256dh: subscription.p256dh,
-          auth: subscription.auth,
+          userId,
+          token: subscription.token,
           title: t.Notification.dailyReminderTitle,
           body: t.Notification.dailyReminderBody,
           url: getLocalizedDashboardPath(userLocale),
@@ -119,7 +116,7 @@ export class DailyReminderPushService {
     return {
       jobs,
       summary: {
-        totalSubscriptions: subscriptions.length,
+        totalDevices: tokens.length,
         eligibleUsers: eligibleUserIds.size,
         totalJobs: jobs.length,
       },

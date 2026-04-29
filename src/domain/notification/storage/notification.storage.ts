@@ -1,16 +1,20 @@
 import { getDb } from "@/db";
 import {
+  devicePushTokens,
   leadMeasures,
-  pushSubscriptions,
   scoreboards,
   userNotificationSettings,
   workspaceMembers,
 } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
-
-export type PushSubscriptionRecord = typeof pushSubscriptions.$inferSelect;
+export type DevicePushTokenRecord = typeof devicePushTokens.$inferSelect;
+export type DevicePushTokenWithLocaleRecord = DevicePushTokenRecord & {
+  user: {
+    locale: string | null;
+  };
+};
 export type UserNotificationSettingsRecord =
   typeof userNotificationSettings.$inferSelect;
 export type UserNotificationSettingsWithLocale =
@@ -23,51 +27,103 @@ export type UserNotificationSettingsWithLocale =
 export class NotificationStorage {
   constructor(private db: Db) {}
 
-  async upsertPushSubscription(input: {
+  async upsertDevicePushToken(input: {
     userId: number;
-    endpoint: string;
-    p256dh: string;
-    auth: string;
+    provider: "FCM";
+    platform: "IOS" | "ANDROID";
+    token: string;
+    appVersion?: string | null;
+    notificationEnabled: boolean;
   }): Promise<void> {
     await this.db
-      .insert(pushSubscriptions)
+      .insert(devicePushTokens)
       .values({
-        userId: String(input.userId),
-        endpoint: input.endpoint,
-        p256dh: input.p256dh,
-        auth: input.auth,
+        userId: input.userId,
+        provider: input.provider,
+        platform: input.platform,
+        token: input.token,
+        appVersion: input.appVersion ?? null,
+        notificationEnabled: input.notificationEnabled,
+        lastSeenAt: new Date(),
+        disabledAt: input.notificationEnabled ? null : new Date(),
       })
       .onConflictDoUpdate({
-        target: pushSubscriptions.endpoint,
+        target: devicePushTokens.token,
         set: {
-          userId: String(input.userId),
-          p256dh: input.p256dh,
-          auth: input.auth,
+          userId: input.userId,
+          provider: input.provider,
+          platform: input.platform,
+          appVersion: input.appVersion ?? null,
+          notificationEnabled: input.notificationEnabled,
+          lastSeenAt: new Date(),
+          disabledAt: input.notificationEnabled ? null : new Date(),
+          updatedAt: new Date(),
         },
       });
   }
 
-  async deletePushSubscriptionByEndpoint(endpoint: string): Promise<void> {
+  async disableDevicePushTokenForUser(
+    userId: number,
+    token: string,
+  ): Promise<void> {
     await this.db
-      .delete(pushSubscriptions)
-      .where(eq(pushSubscriptions.endpoint, endpoint));
+      .update(devicePushTokens)
+      .set({
+        notificationEnabled: false,
+        disabledAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(devicePushTokens.userId, userId),
+          eq(devicePushTokens.token, token),
+        ),
+      );
   }
 
-  async findAllPushSubscriptions(): Promise<PushSubscriptionRecord[]> {
-    return await this.db.select().from(pushSubscriptions);
-  }
-
-  async findPushSubscriptionsByUserIds(
-    userIds: number[],
-  ): Promise<PushSubscriptionRecord[]> {
-    if (userIds.length === 0) {
-      return [];
+  async disableDevicePushTokens(tokens: string[]): Promise<void> {
+    if (tokens.length === 0) {
+      return;
     }
 
+    await this.db
+      .update(devicePushTokens)
+      .set({
+        notificationEnabled: false,
+        disabledAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(inArray(devicePushTokens.token, tokens));
+  }
+
+  async findAllActiveDevicePushTokens(): Promise<DevicePushTokenRecord[]> {
     return await this.db
       .select()
-      .from(pushSubscriptions)
-      .where(inArray(pushSubscriptions.userId, userIds.map(String)));
+      .from(devicePushTokens)
+      .where(
+        and(
+          eq(devicePushTokens.notificationEnabled, true),
+          isNull(devicePushTokens.disabledAt),
+        ),
+      );
+  }
+
+  async findAllActiveDevicePushTokensWithLocale(): Promise<
+    DevicePushTokenWithLocaleRecord[]
+  > {
+    return (await this.db.query.devicePushTokens.findMany({
+      where: and(
+        eq(devicePushTokens.notificationEnabled, true),
+        isNull(devicePushTokens.disabledAt),
+      ),
+      with: {
+        user: {
+          columns: {
+            locale: true,
+          },
+        },
+      },
+    })) as DevicePushTokenWithLocaleRecord[];
   }
 
   async findUserNotificationSettings(

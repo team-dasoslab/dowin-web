@@ -91,10 +91,6 @@ export const requestNotificationPermission = async () => {
   if (isNativeApp()) {
     return bridge.requestNotificationPermission();
   }
-  if (typeof Notification !== "undefined") {
-    const result = await Notification.requestPermission();
-    return result === "granted" ? "granted" : "denied";
-  }
   return "denied";
 };
 
@@ -105,6 +101,23 @@ export const getPushToken = async () => {
   if (isNativeApp()) {
     return bridge.getPushToken();
   }
-  // Web Push token retrieval would go here if implemented
-  return "";
+  throw new Error("Push token is only available in the native app.");
+};
+
+export const getBridgePlatform = () => {
+  const platform = bridge.store.getState().platform;
+
+  return platform === "android" ? "ANDROID" : "IOS";
+};
+
+export const getBridgeNotificationPermission = () => {
+  return bridge.store.getState().notificationPermission;
+};
+
+export const getAppVersion = async () => {
+  if (isNativeApp()) {
+    return bridge.getAppVersion();
+  }
+
+  return null;
 };

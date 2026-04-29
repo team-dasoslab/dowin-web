@@ -1,35 +1,38 @@
 import { getDb } from "@/db";
 import { DailyReminderPushService } from "@/domain/notification/services/daily-reminder-push.service";
-import { sendWebPushMessages } from "@/domain/notification/services/web-push";
+import { sendFcmMessages } from "@/domain/notification/services/fcm";
 import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 
 export const runDailyReminder = async (env: CloudflareEnv) => {
-  const vapidPublicKey = env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-  const vapidPrivateKey = env.VAPID_PRIVATE_KEY;
-
-  if (!vapidPublicKey || !vapidPrivateKey) {
-    throw new Error("VAPID keys are not configured");
+  if (!env.FCM_PROJECT_ID || !env.FCM_CLIENT_EMAIL || !env.FCM_PRIVATE_KEY) {
+    throw new Error("FCM credentials are not configured");
   }
 
   const db = getDb(env.DB);
-  const service = new DailyReminderPushService(new NotificationStorage(db));
+  const notificationStorage = new NotificationStorage(db);
+  const service = new DailyReminderPushService(notificationStorage);
   const result = await service.buildDailyReminderJobs();
-  const delivery = await sendWebPushMessages(
+  const delivery = await sendFcmMessages(
     result.jobs.map((job) => ({
-      ...job,
+      token: job.token,
+      title: job.title,
+      body: job.body,
+      url: job.url,
       pushType: "daily_reminder",
       campaignId: "daily_reminder_v2",
     })),
     {
-      subject: "mailto:ixio0330@gmail.com",
-      publicKey: vapidPublicKey,
-      privateKey: vapidPrivateKey,
+      projectId: env.FCM_PROJECT_ID,
+      clientEmail: env.FCM_CLIENT_EMAIL,
+      privateKey: env.FCM_PRIVATE_KEY,
     },
   );
+  await notificationStorage.disableDevicePushTokens(delivery.disabledTokens);
 
   return {
     ...result.summary,
     success: delivery.success,
     failed: delivery.failed,
+    disabledTokens: delivery.disabledTokens.length,
   };
 };

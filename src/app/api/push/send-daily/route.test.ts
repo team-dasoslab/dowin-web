@@ -37,13 +37,12 @@ describe("GET /api/push/send-daily", () => {
 
   it("인증되면 공통 실행 결과를 반환한다", async () => {
     mockRunDailyReminder.mockResolvedValue({
-      totalSubscriptions: 2,
-      dueUsers: 1,
-      skippedNoActiveScoreboard: 0,
-      skippedAlreadyCompletedToday: 1,
+      totalDevices: 2,
+      eligibleUsers: 1,
       totalJobs: 1,
       success: 1,
       failed: 0,
+      disabledTokens: 0,
     });
 
     const { GET } = await import("./route");
@@ -57,13 +56,12 @@ describe("GET /api/push/send-daily", () => {
 
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toEqual({
-      totalSubscriptions: 2,
-      dueUsers: 1,
-      skippedNoActiveScoreboard: 0,
-      skippedAlreadyCompletedToday: 1,
+      totalDevices: 2,
+      eligibleUsers: 1,
       totalJobs: 1,
       success: 1,
       failed: 0,
+      disabledTokens: 0,
     });
     expect(mockRunDailyReminder).toHaveBeenCalledWith({
       CRON_SECRET: "cron-secret",

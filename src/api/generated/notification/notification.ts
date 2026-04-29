@@ -25,7 +25,11 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  DeleteNotificationsDevices200,
+  DevicePushTokenDisableRequest,
+  DevicePushTokenRegisterRequest,
   ErrorResponse,
+  PostNotificationsDevices200,
   UnauthorizedErrorResponse,
   UserNotificationSettings,
   UserNotificationSettingsUpdateRequest
@@ -248,5 +252,193 @@ export const usePutPushSettings = <TError = UnauthorizedErrorResponse | ErrorRes
         TContext
       > => {
       return useMutation(getPutPushSettingsMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 현재 기기 알림 토큰 등록
+ */
+export type postNotificationsDevicesResponse200 = {
+  data: PostNotificationsDevices200
+  status: 200
+}
+
+export type postNotificationsDevicesResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postNotificationsDevicesResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postNotificationsDevicesResponseSuccess = (postNotificationsDevicesResponse200) & {
+  headers: Headers;
+};
+export type postNotificationsDevicesResponseError = (postNotificationsDevicesResponse401 | postNotificationsDevicesResponse422) & {
+  headers: Headers;
+};
+
+export type postNotificationsDevicesResponse = (postNotificationsDevicesResponseSuccess | postNotificationsDevicesResponseError)
+
+export const getPostNotificationsDevicesUrl = () => {
+
+
+  
+
+  return `/api/notifications/devices`
+}
+
+export const postNotificationsDevices = async (devicePushTokenRegisterRequest: DevicePushTokenRegisterRequest, options?: RequestInit): Promise<postNotificationsDevicesResponse> => {
+  
+  return customInstance<postNotificationsDevicesResponse>(getPostNotificationsDevicesUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      devicePushTokenRegisterRequest,)
+  }
+);}
+  
+
+
+
+export const getPostNotificationsDevicesMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postNotificationsDevices>>, TError,{data: DevicePushTokenRegisterRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postNotificationsDevices>>, TError,{data: DevicePushTokenRegisterRequest}, TContext> => {
+
+const mutationKey = ['postNotificationsDevices'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postNotificationsDevices>>, {data: DevicePushTokenRegisterRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postNotificationsDevices(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostNotificationsDevicesMutationResult = NonNullable<Awaited<ReturnType<typeof postNotificationsDevices>>>
+    export type PostNotificationsDevicesMutationBody = DevicePushTokenRegisterRequest
+    export type PostNotificationsDevicesMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 현재 기기 알림 토큰 등록
+ */
+export const usePostNotificationsDevices = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postNotificationsDevices>>, TError,{data: DevicePushTokenRegisterRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postNotificationsDevices>>,
+        TError,
+        {data: DevicePushTokenRegisterRequest},
+        TContext
+      > => {
+      return useMutation(getPostNotificationsDevicesMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 현재 기기 알림 토큰 비활성화
+ */
+export type deleteNotificationsDevicesResponse200 = {
+  data: DeleteNotificationsDevices200
+  status: 200
+}
+
+export type deleteNotificationsDevicesResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type deleteNotificationsDevicesResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type deleteNotificationsDevicesResponseSuccess = (deleteNotificationsDevicesResponse200) & {
+  headers: Headers;
+};
+export type deleteNotificationsDevicesResponseError = (deleteNotificationsDevicesResponse401 | deleteNotificationsDevicesResponse422) & {
+  headers: Headers;
+};
+
+export type deleteNotificationsDevicesResponse = (deleteNotificationsDevicesResponseSuccess | deleteNotificationsDevicesResponseError)
+
+export const getDeleteNotificationsDevicesUrl = () => {
+
+
+  
+
+  return `/api/notifications/devices`
+}
+
+export const deleteNotificationsDevices = async (devicePushTokenDisableRequest: DevicePushTokenDisableRequest, options?: RequestInit): Promise<deleteNotificationsDevicesResponse> => {
+  
+  return customInstance<deleteNotificationsDevicesResponse>(getDeleteNotificationsDevicesUrl(),
+  {      
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      devicePushTokenDisableRequest,)
+  }
+);}
+  
+
+
+
+export const getDeleteNotificationsDevicesMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteNotificationsDevices>>, TError,{data: DevicePushTokenDisableRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteNotificationsDevices>>, TError,{data: DevicePushTokenDisableRequest}, TContext> => {
+
+const mutationKey = ['deleteNotificationsDevices'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteNotificationsDevices>>, {data: DevicePushTokenDisableRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  deleteNotificationsDevices(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteNotificationsDevicesMutationResult = NonNullable<Awaited<ReturnType<typeof deleteNotificationsDevices>>>
+    export type DeleteNotificationsDevicesMutationBody = DevicePushTokenDisableRequest
+    export type DeleteNotificationsDevicesMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 현재 기기 알림 토큰 비활성화
+ */
+export const useDeleteNotificationsDevices = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteNotificationsDevices>>, TError,{data: DevicePushTokenDisableRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteNotificationsDevices>>,
+        TError,
+        {data: DevicePushTokenDisableRequest},
+        TContext
+      > => {
+      return useMutation(getDeleteNotificationsDevicesMutationOptions(options), queryClient);
     }
     
