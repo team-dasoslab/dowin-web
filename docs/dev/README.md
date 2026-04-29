@@ -221,7 +221,6 @@ yarn preview
 현재 `src/app/api`와 `openapi.yaml` 기준으로 주요 엔드포인트는 아래 수준까지 구현돼 있다.
 
 - Auth: `/api/auth/signup`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/password`, `/api/auth/recovery-codes/verify`, `/api/auth/password/by-recovery-code`
-- Admin: `/api/admin/users`
 - Workspace: `/api/workspaces`, `/api/workspaces/me`, `/api/workspaces/:id`, `/api/workspaces/join`, `/api/workspaces/join-by-invite`, `/api/workspaces/:id/invites`, `/api/workspaces/:id/invites/:inviteId/status`, `/api/workspaces/:id/members`, `/api/workspaces/:id/members/:memberId`
 - Scoreboard: `/api/scoreboards`, `/api/scoreboards/active`, `/api/scoreboards/:id`, `/api/scoreboards/:id/archive`, `/api/scoreboards/:id/reactivate`
 - Lead Measure: `/api/scoreboards/:id/lead-measures`, `/api/lead-measures/:id`, `/api/lead-measures/:id/archive`, `/api/lead-measures/:id/reactivate`

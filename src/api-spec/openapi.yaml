@@ -403,45 +403,6 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /admin/users:
-    post:
-      summary: "[ADMIN] 새 멤버 추가"
-      tags: [Admin]
-      security: [{ sessionCookie: [] }]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [customId, nickname, password]
-              properties:
-                customId: { type: string }
-                nickname: { type: string }
-                password: { type: string }
-      responses:
-        "201":
-          description: 사용자 생성 성공
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  customId: { type: string }
-                  nickname: { type: string }
-        "403":
-          description: 관리자 권한 없음
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-        "409":
-          description: 이미 사용 중인 ID
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-
   /workspaces/me:
     get:
       summary: 내 워크스페이스 정보 조회

@@ -835,17 +835,6 @@ export type DeleteNotificationsDevices200 = {
   success: boolean;
 };
 
-export type PostAdminUsersBody = {
-  customId: string;
-  nickname: string;
-  password: string;
-};
-
-export type PostAdminUsers201 = {
-  customId?: string;
-  nickname?: string;
-};
-
 export type PostWorkspacesBody = {
   name: string;
 };
