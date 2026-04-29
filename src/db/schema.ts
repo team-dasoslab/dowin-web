@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  index,
   integer,
   sqliteTable,
   text,
@@ -30,6 +31,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   targetedTeamMemos: many(teamMemos, { relationName: "teamMemoTarget" }),
   resolvedTeamMemos: many(teamMemos, { relationName: "teamMemoResolver" }),
   notificationSettings: many(userNotificationSettings),
+  devicePushTokens: many(devicePushTokens),
   ownedWorkspaceBillingStates: many(workspaceBillingState, {
     relationName: "workspaceBillingOwner",
   }),
@@ -79,6 +81,47 @@ export const pushSubscriptions = sqliteTable("push_subscriptions", {
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
 });
+
+export const devicePushTokens = sqliteTable(
+  "device_push_tokens",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    provider: text("provider", { enum: ["FCM"] }).notNull().default("FCM"),
+    platform: text("platform", { enum: ["IOS", "ANDROID"] }).notNull(),
+    token: text("token").notNull(),
+    appVersion: text("app_version"),
+    notificationEnabled: integer("notification_enabled", { mode: "boolean" })
+      .notNull()
+      .default(true),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    lastSeenAt: integer("last_seen_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    disabledAt: integer("disabled_at", { mode: "timestamp" }),
+  },
+  (table) => [
+    uniqueIndex("device_push_tokens_token_unique").on(table.token),
+    index("device_push_tokens_user_idx").on(table.userId),
+  ],
+);
+
+export const devicePushTokensRelations = relations(
+  devicePushTokens,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [devicePushTokens.userId],
+      references: [users.id],
+    }),
+  }),
+);
 
 export const workspaces = sqliteTable("workspaces", {
   id: integer("id").primaryKey({ autoIncrement: true }),

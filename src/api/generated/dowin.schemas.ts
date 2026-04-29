@@ -266,6 +266,35 @@ export interface UserNotificationSettingsUpdateRequest {
   dailyReminderTime: string;
 }
 
+export type DevicePushTokenRegisterRequestProvider = typeof DevicePushTokenRegisterRequestProvider[keyof typeof DevicePushTokenRegisterRequestProvider];
+
+
+export const DevicePushTokenRegisterRequestProvider = {
+  FCM: 'FCM',
+} as const;
+
+export type DevicePushTokenRegisterRequestPlatform = typeof DevicePushTokenRegisterRequestPlatform[keyof typeof DevicePushTokenRegisterRequestPlatform];
+
+
+export const DevicePushTokenRegisterRequestPlatform = {
+  IOS: 'IOS',
+  ANDROID: 'ANDROID',
+} as const;
+
+export interface DevicePushTokenRegisterRequest {
+  provider: DevicePushTokenRegisterRequestProvider;
+  platform: DevicePushTokenRegisterRequestPlatform;
+  /** @minLength 1 */
+  token: string;
+  appVersion?: string;
+  notificationEnabled: boolean;
+}
+
+export interface DevicePushTokenDisableRequest {
+  /** @minLength 1 */
+  token: string;
+}
+
 export type WorkspaceMemberRole = typeof WorkspaceMemberRole[keyof typeof WorkspaceMemberRole];
 
 
@@ -796,6 +825,14 @@ export type PutAuthPasswordByRecoveryCodeBody = {
 
 export type PutAuthPasswordByRecoveryCode200 = {
   message: string;
+};
+
+export type PostNotificationsDevices200 = {
+  success: boolean;
+};
+
+export type DeleteNotificationsDevices200 = {
+  success: boolean;
 };
 
 export type PostAdminUsersBody = {
