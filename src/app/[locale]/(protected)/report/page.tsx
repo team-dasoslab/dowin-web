@@ -420,6 +420,9 @@ function TeamTrendChart({
 }) {
   const t = useTranslations("Report");
   const [activeTooltip, setActiveTooltip] = useState<ChartLegendKey>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
   const data = trends.map((trend, index) => ({
     week:
       index === trends.length - 1
@@ -429,6 +432,8 @@ function TeamTrendChart({
     execRate: trend.executionRate ?? 0,
   }));
   const hasTrendData = data.length > 0;
+
+  if (!isMounted) return null;
 
   return (
     <div className="flex h-full flex-col space-y-4">
@@ -471,7 +476,7 @@ function TeamTrendChart({
 
       <div className="flex-1 min-h-[200px]">
         {hasTrendData ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} initialDimension={{ width: 10, height: 10 }}>
             <AreaChart
               data={data}
               margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
