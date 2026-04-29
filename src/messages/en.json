@@ -38,7 +38,7 @@
     "myProfile": "My Profile",
     "memberSummary": "Team Member Summary",
     "teamWeeklyScoreboard": "Team Weekly Scoreboard",
-    "teamWeeklyScoreboardDesc": "Lead measure achievement for all team members this week.",
+    "teamWeeklyScoreboardDesc": "Action item execution for all team members this week.",
     "noMembers": "No team members yet.",
     "noActiveScoreboards": "No active scoreboards yet.",
     "noWorkspaceTitle": "No Workspace Found",
@@ -59,20 +59,20 @@
     "backToToday": "Back to Today",
     "weekViewDesc": "Shows the week (Mon-Sun) containing the selected date.",
     "monthViewDesc": "Aggregates the entire month containing the selected date.",
-    "weeklyLeadMeasures": "Weekly Lead Measures",
+    "weeklyLeadMeasures": "Weekly Action Items",
     "monthlyAggregation": "Monthly Aggregation",
     "weeklyLeadMeasuresDesc": "Weekly goals ({count}) are tracked for this week, and monthly goals ({monthlyCount}) are tracked as month-to-date.",
     "monthlyAggregationDesc": "Tracks weekly/monthly goals ({count}) based on {month}.",
     "addMeasure": "Add Measure",
-    "leadMeasureHead": "Lead Measure",
+    "leadMeasureHead": "Action Items",
     "achievementTab": "Achieved",
     "addMemoPrompt": "Enter memo content.",
     "addedMemo": "Added memo.",
-    "noActiveMeasures": "No active lead measures.",
+    "noActiveMeasures": "No active action items.",
     "myScoreboard": "My Dashboard",
     "dowinSlogan": "Focus on the wildly important.",
-    "dowinLabel": "DOWIN",
-    "lagMeasureLabel": "Lag Measure",
+    "dowinLabel": "Primary Goal",
+    "lagMeasureLabel": "Success Criteria",
     "weeklyAchievementRate": "Weekly Achievement",
     "monthlyAchievementRate": "Monthly Achievement",
     "monthlyAchievementRateWithMonth": "Monthly Achievement ({month})",
@@ -81,7 +81,7 @@
     "viewAllUpdates": "View all updates",
     "monthlyBoardTitle": "Monthly Board",
     "monthlyBoardDesc": "View all records for the selected month by week.",
-    "noMonthlyMeasures": "No monthly lead measures for this month.",
+    "noMonthlyMeasures": "No monthly action items for this month.",
     "weekNumber": "Week {n}",
     "totalAchieved": "Total {achieved}/{total}",
     "period": "Period",
@@ -100,13 +100,13 @@
     "My": {
       "logSaveFailed": "Failed to save log.",
       "Celebration": {
-        "allSuccess": "100% Achieved for all lead measures this week!",
-        "singleSuccess": "100% Achieved for {measureName} this week!",
-        "singleSuccessFallback": "100% Achieved for lead measure this week!"
+        "allSuccess": "100% achieved for all action items this week!",
+        "singleSuccess": "100% achieved for {measureName} this week!",
+        "singleSuccessFallback": "100% achieved for an action item this week!"
       },
       "Guide": {
-        "ariaLabel": "View lead measure guide",
-        "changeProposal": "Proposal for lead measure change",
+        "ariaLabel": "View action item guide",
+        "changeProposal": "Proposal for action item change",
         "adjustProposal": "Proposal for target adjustment"
       }
     },
@@ -131,7 +131,7 @@
       "activeTitle": "This week, {winningCount} of {activeCount} active members are winning.",
       "noActiveTitle": "No active scoreboards yet, so team win/loss cannot be calculated.",
       "needsCheckDesc": "{notStartedCount} members have not started and {noScoreboardCount} members have no scoreboard. Check them first.",
-      "allStartedDesc": "Everyone has started logging this week. Continue into the team dashboard for lead-measure details."
+      "allStartedDesc": "Everyone has started logging this week. Continue into the team dashboard for action item details."
     },
     "sections": {
       "teamStatus": "Team Status"
@@ -146,7 +146,7 @@
       "winRateLabel": "Win rate",
       "executionRateLabel": "Execution rate",
       "winRateDesc": "The share of active-scoreboard members who are ahead of this week's target pace.",
-      "executionRateDesc": "The share of active-scoreboard members who logged at least one lead measure this week.",
+      "executionRateDesc": "The share of active-scoreboard members who logged at least one action item this week.",
       "shortWeekLabel": "{month}/{day} week"
     },
     "winOverview": {
@@ -266,42 +266,42 @@
     "creating": "Creating scoreboard...",
     "guide": {
       "title": "Measure Setup Guide",
-      "lagTitle": "Lag Measure",
+      "lagTitle": "Success Criteria",
       "lagDesc": "The final target value you want to achieve. (e.g., Lose 5kg)",
-      "leadTitle": "Lead Measure",
-      "leadDesc": "Actionable metrics you can control to reach your goal. (e.g., Exercise 3 times a week)"
+      "leadTitle": "Action Items",
+      "leadDesc": "Repeatable actions you can control to reach your goal. (e.g., Exercise 3 times a week)"
     },
     "saveChanges": "Save Changes",
     "createScoreboard": "Create Scoreboard",
     "manage": "Management",
-    "lagMeasureLabel": "Lag Measure (Result)",
-    "leadMeasureHead": "Lead Measure (Action)",
+    "lagMeasureLabel": "Success Criteria",
+    "leadMeasureHead": "Action Items",
     "archiveLabel": "Archive Scoreboard",
     "archiveDesc": "End the current goal and save it as an execution record.",
     "archiveBtn": "Archive",
     "archivingBtn": "Archiving...",
     "confirmArchive": "Do you want to archive this scoreboard?",
-    "dowinShort": "DOWIN",
+    "dowinShort": "Primary Goal",
     "goalQuestion": "What is your most important goal?",
     "goalPlaceholder": "e.g., Complete a 5km run in 8 weeks",
-    "lagMeasure": "Lag Measure",
+    "lagMeasure": "Success Criteria",
     "lagMeasureQuestion": "How will you measure success? (X → Y)",
     "lagMeasurePlaceholder": "e.g., 5km record from 35min to 28min",
     "metricGuide": "Metric Guide ›",
-    "goodLagTitle": "Good Lag Measure",
+    "goodLagTitle": "Good Success Criteria",
     "lagTip1Label": "Measurable:",
     "lagTip1Text": " Are the start (X) and target (Y) points clear?",
     "lagTip2Label": "Result-oriented:",
     "lagTip2Text": " Does it represent final goal achievement?",
-    "leadMeasure": "Lead Measure",
-    "leadMeasureQuestion": "What actions will you take each week for success?",
+    "leadMeasure": "Action Items",
+    "leadMeasureQuestion": "What repeatable actions will you take for success?",
     "leadMeasurePlaceholder": "e.g., Run 4 times a week for 30 min",
-    "goodLeadTitle": "Good Lead Measure",
+    "goodLeadTitle": "Good Action Items",
     "leadTip1Label": "Predictive:",
-    "leadTip1Text": " Does this action improve the lag measure?",
+    "leadTip1Text": " Does this action improve the success criteria?",
     "leadTip2Label": "Influenceable:",
     "leadTip2Text": " Is it an action you can directly control?",
-    "addLeadMeasure": "Add Lead Measure",
+    "addLeadMeasure": "Add Action Item",
     "decrement": "Decrease Count",
     "increment": "Increase Count",
     "timesPerWeek": "times / Week",
@@ -327,7 +327,7 @@
     "delete": "Delete",
     "newTagPlaceholder": "Add tag (e.g., Morning routine, max {n} chars)",
     "addTag": "Add Tag",
-    "leadMeasureShort": "Action",
+    "leadMeasureShort": "Action Item",
     "tagLabel": "Tag",
     "deleteTagConfirmExtended": "Do you want to delete this tag? It will be removed from all associated measures.",
     "Coachmark": {
@@ -336,13 +336,13 @@
       "last": "Done",
       "next": "Next",
       "skip": "Skip",
-      "goalTitle": "Wildly Important Goal",
-      "goalContent": "A good 'Wildly Important Goal' is about choosing 'what is most important'. Too many goals results in lack of focus. Set only one for this period.",
-      "lagTitle": "Lag Measure",
-      "lagContent": "A lag measure shows the final result. Write a metric measuring 'Wildly Important Goal' achievement in the form 'X to Y by date'.",
-      "leadTitle": "Lead Measure",
-      "leadContent": "Lead measures are predictive actions that change the result. They must be influenceable. Write daily/weekly recurring actions.",
-      "tagsTitle": "Lead Measure Tags",
+      "goalTitle": "Primary Goal",
+      "goalContent": "A good primary goal is about choosing what matters most. Too many goals reduce focus. Set only one for this period.",
+      "lagTitle": "Success Criteria",
+      "lagContent": "Success criteria show the final result. Write a measurable criterion for your primary goal in the form 'X to Y by date'.",
+      "leadTitle": "Action Items",
+      "leadContent": "Action items are repeatable actions that change the result. They must be influenceable. Write daily or weekly recurring actions.",
+      "tagsTitle": "Action Item Tags",
       "tagsContent": "Create and attach tags here to categorize similar actions. These tags will also be shown on your dashboard."
     },
     "Toast": {
@@ -354,7 +354,7 @@
       "tagCreateFailed": "Failed to create tag.",
       "tagUpdateFailed": "Failed to update tag name.",
       "tagDeleteFailed": "Failed to delete tag.",
-      "fillRequiredFields": "Please enter a Wildly Important Goal, lag measure, and at least one lead measure.",
+      "fillRequiredFields": "Please enter a primary goal, success criteria, and at least one action item.",
       "createSuccess": "New scoreboard created successfully.",
       "createFailed": "Failed to create new scoreboard.",
       "saveSuccess": "Scoreboard saved successfully.",
@@ -794,7 +794,7 @@
       },
       "2026-03-25-team-dashboard-memos": {
         "title": "Leave meeting memos directly on the team dashboard",
-        "summary": "You can now write down and check memos or action items next to each team member's weekly scoreboard during DOWIN meetings."
+        "summary": "You can now write down and check memos or action items next to each team member's weekly scoreboard during Dowin meetings."
       },
       "2026-03-22-team-dashboard-me-highlight": {
         "title": "Find your card faster on the team dashboard",
@@ -855,8 +855,8 @@
     "passwordPlaceholder": "Enter your password",
     "subtitle": "Focus on what matters most.",
     "signupSubtitle": "Create an account and start achieving your goals.",
-    "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?",
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Log in",
     "forgotPassword": "Forgot your ID or Password?",
     "continue": "Continue",
     "recovery": {
@@ -866,7 +866,7 @@
       "copied": "Copied",
       "saveTxt": "Save .txt",
       "failedToCopy": "Failed to copy recovery codes. Please save them manually.",
-      "txtHeader": "DOWIN Recovery Codes",
+      "txtHeader": "Dowin Recovery Codes",
       "txtDescription": "The codes below are used for account recovery. Keep them in a safe place."
     },
     "errors": {
@@ -924,70 +924,71 @@
       "start": "Get Started"
     },
     "Hero": {
-      "badge": "Execution rhythm for high-performing teams",
-      "headline": "Busy with tasks,\nbut stuck on results?",
-      "description": "Stop drowning in daily fire-fighting. Focus overwhelmingly on the one wildly important goal that truly matters.",
-      "cta": "Get Started Now"
+      "badge": "Keep the important goal in view",
+      "headline": "Busy every day,\nso why do results stay flat?",
+      "description": "For teams that are busy handling what is right in front of them and losing sight of the goal that matters most.\nDefine the important goal clearly and carry it through to real results.",
+      "cta": "Get Started"
     },
     "Mockup": {
       "workspace": "Our Workspace",
       "stats": {
-        "dowinTitle": "Wildly Important Goal",
-        "dowinGoal": "Retain 40% of customers &\nBuild new pipeline",
-        "leadTitle": "Lead Measure: Actions this week",
+        "dowinTitle": "Primary Goal",
+        "dowinGoal": "Grow signups for\nthe new service",
+        "leadTitle": "Action Items: This Week",
         "week": "Week 4",
-        "action1": "Call 10 customers showing churn signs",
-        "action2": "Deploy Onboarding UX A/B test"
+        "action1": "Review pre-signup drop-off points",
+        "action2": "Prepare customer support responses"
       },
-      "teamStatus": "Transparent team achievement status"
+      "teamStatus": "This week's execution by teammate"
     },
     "MetricBand": {
-      "title": "Proving how we work\nthrough numbers.",
-      "oneTitle": "The only one to focus on",
-      "oneDesc": "Familiar with greedily trying everything but achieving nothing? Boldly drop the trivial. We go all-in on the single goal that can take our team to the next level.",
+      "title": "Help the team move around\na shared goal and flow",
+      "title": "Do not spread the team across many goals.\nFocus on the one that matters most.",
+      "oneTitle": "One goal first",
+      "oneLabel": "Focus on the\nsingle goal that matters most",
+      "oneDesc": "The more goals a team carries, the easier it is for everyone to stay busy in different directions. Start by setting the one goal that matters most so priorities stay aligned.",
       "stat1Value": "80",
-      "stat1Desc": "Team energy invested in\nlead measure actions",
+      "stat1Desc": "Execution being recorded\nfor this week's action items",
       "stat2Value": "10",
-      "stat2Desc": "Overwhelmingly short\nweekly reviews"
+      "stat2Desc": "Weekly check-ins that\nstay short and finish quickly"
     },
     "WhyDowin": {
-      "header": "The most reliable and proactive flow\nto achieve team goals",
-      "description": "Outcome metrics are already in the past; we can't change them immediately.\nBut the 'actions of today' that create those results are planned and 100% controlled by us. Move beyond vague anxiety and gain proactive execution power.",
-      "item1Badge": "The most important one",
-      "item1Title": "Team Milestone,\nWildly Important Goal",
-      "item1Desc": "We'll be your compass so you don't get lost among countless tasks. Focus on the single most important and impactful goal that can change the game for your team.",
-      "item1VisualGoal": "Reach $100k monthly revenue by EO-year",
-      "item1VisualDesc": "Tasks other than this goal will be deprioritized.",
-      "item2Badge": "The only controllable action",
-      "item2Title": "Lead Measures\nthat change behavior",
-      "item2Desc": "Outcome metrics won't change just by staring at them. Be obsessed with daily 'actions' that firmly drive those metrics instead of just looking at results.",
-      "item2VisualTitle": "Core lead measures to perform today",
-      "item2VisualAction": "5 depth interviews with high-value customers"
+      "header": "Success criteria and action items",
+      "description": "",
+      "item1Badge": "The metric that judges the result",
+      "item1Title": "Define the success criteria\nbefore anything else",
+      "item1Desc": "Success criteria are the measure that tells the team whether the goal has been achieved. The team needs that finish line first so everyone can judge the same outcome and see where they stand.",
+      "item1VisualGoal": "Grow monthly signups\nfrom 300 to 1,000",
+      "item2Badge": "The actions that change the result",
+      "item2Title": "Keep checking action items\nrepeatedly",
+      "item2Desc": "Action items are the actions most likely to change the result. The result itself cannot be moved directly today, but the team can choose and repeatedly check the behaviors that influence it.",
+      "item2VisualTitle": "This week's action items",
+      "item2VisualAction": "Review signup conversion metrics"
     },
     "ExecutionLoop": {
-      "title": "The execution flow in 3 stages,\nstripped of complexity.",
-      "description": "Instead of complex templates that make input a burden,\nwe propose a most intuitive flow that all team members can look at comfortably and transparently.",
-      "step1Title": "Zero in on the one goal",
-      "step1Desc": "Fix the goal we need to achieve this week at the very top. Look towards the goal without being shaken.",
-      "step2Title": "Accumulate actions daily",
-      "step2Desc": "Instead of a formal meeting room, fill out your behavior bingo on your dashboard. Achievement builds up daily like breaking seals, creating momentum for execution.",
-      "step3Title": "The scoreboard of no excuses, weekly review",
-      "step3Desc": "No need to wait silently for a month. Review achievement status weekly, quickly supplement blocked parts, and keep the team's rhythm."
+      "title": "See this week's team performance\nright on the scoreboard",
+      "description": "When the primary goal, success criteria, and action items come together in one place, the team can see how far it has progressed without extra prep before a meeting.",
+      "step1Title": "Action-item records build up",
+      "step1Desc": "As each person's action-item records gather in one place, this week's execution flow starts to become visible.",
+      "step2Title": "You can see the team's performance and where it is stuck",
+      "step2Desc": "The scoreboard helps the team quickly see how far it has progressed, what may be getting missed, and where support is needed.",
+      "step3Title": "Weekly check-ins become shorter and clearer",
+      "step3Desc": "Instead of stretching meetings out, the team can quickly align around what the scoreboard already shows."
     },
     "Features": {
-      "title": "Eliminate unnecessary management,\nleave only transparent execution.",
+      "title": "Designed less for storing records,\nand more for keeping execution moving.",
       "item1Title": "Teamwide Scoreboard",
-      "item1Desc": "Shared transparently across the workspace so you can visually see if we are winning or losing.",
+      "item1Desc": "Everyone in the workspace checks the same scoreboard to see this week's execution flow together.",
       "item2Title": "Personal Dashboard",
-      "item2Desc": "Record your flow of actions lightly right after arriving at work every day.",
-      "item3Title": "Regular Weekly Review",
-      "item3Desc": "Review what went well and what was blocked each week, drastically reducing unnecessary meeting time.",
-      "item4Title": "Building Lead Measures",
-      "item4Desc": "Ditch the stiff table views you hate to look at. Clear your remaining actions for today funly, like filling out a bingo card."
+      "item2Desc": "Each person quickly checks the action items they need to record today and keeps their execution moving inside the team flow.",
+      "item3Title": "Weekly Check-in",
+      "item3Desc": "Without stretching meetings out, quickly align on this week's status and what needs follow-up.",
+      "item4Title": "Records that build up naturally",
+      "item4Desc": "Without writing separate reports, daily records naturally build into a visible execution flow for the team."
     },
     "Pricing": {
-      "header": "From light team adoption\nto enterprise-wide expansion.",
-      "description": "We've completely removed the barrier to entry. Start building your core execution flow with the Free plan, and expand reasonably when your team's management needs grow.",
+      "header": "Start with a small team,\nand expand only when needed.",
+      "description": "Try the core execution flow first on the Free plan, then expand when the team needs deeper operating features.",
       "cadence": "/ mo",
       "ctaFree": "Get Started for Free",
       "ctaStandard": "Get Notified",
@@ -995,34 +996,34 @@
       "plans": {
         "FREE": {
           "eyebrow": "Available Now",
-          "description": "Optimized for seeing if this methodology really works for your team as you run a single small team.",
+          "description": "A good place for a small team to start using primary goals and weekly check-ins right away.",
           "price": "$0",
           "features": [
-            "Up to 10 members, enough for a small team",
-            "Last 6 months of history to look back at the past half-year",
-            "Last 4 weeks of reports to quickly see this month's focus",
-            "Full access to the core loop: set goals, record, and weekly reviews",
-            "Check team flow together, not just individual logs"
+            "Start right away with up to 10 members",
+            "View the last 6 months of records",
+            "Check reports for the last 4 weeks",
+            "Primary goals, records, and weekly check-ins included",
+            "See personal records and the team scoreboard together"
           ]
         },
         "STANDARD": {
           "eyebrow": "Coming Soon",
-          "description": "The plan for leaders who want to directly intervene and drive team execution density beyond just viewing records.",
+          "description": "For teams that want tighter operating follow-up, direct support, and more context around execution.",
           "price": "Coming Soon",
           "features": [
-            "Direct reminders sent from leaders to team members",
-            "CSV export for meeting materials or reporting",
-            "Longer history for records and reports than free",
-            "Extended analysis for operational decision-making",
-            "Operational upgrades for tighter team execution management"
+            "Direct reminders to teammates",
+            "CSV export for sharing and meetings",
+            "Longer record and report history",
+            "Extended analysis for operating decisions",
+            "Additional features for team execution management"
           ]
         }
       }
     },
     "Footer": {
-      "headline": "The real flow of execution,\nshall we start now?",
-      "description": "We've removed the worry and time spent on initial setup.\nNow run towards your goals happily with your team members.",
-      "cta": "Start for Free",
+      "headline": "Keep the important goal in view,\nstart now",
+      "description": "Manage your primary goal, success criteria, and action items in one place, and review team performance on the scoreboard.",
+      "cta": "Get Started",
       "contact": "Contact Us",
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
