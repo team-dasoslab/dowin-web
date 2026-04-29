@@ -71,17 +71,6 @@ export const sessions = sqliteTable("sessions", {
     .default(sql`(strftime('%s', 'now'))`),
 });
 
-export const pushSubscriptions = sqliteTable("push_subscriptions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: text("user_id").notNull(),
-  endpoint: text("endpoint").notNull().unique(),
-  p256dh: text("p256dh").notNull(),
-  auth: text("auth").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .default(sql`(strftime('%s', 'now'))`),
-});
-
 export const devicePushTokens = sqliteTable(
   "device_push_tokens",
   {

@@ -229,7 +229,7 @@ yarn preview
 - Dashboard: `/api/dashboard/team`, `/api/dashboard/team/memos`, `/api/dashboard/team/memos/:memoId/resolve`, `/api/dashboard/team/memos/:memoId`
 - Profile: `/api/users/me`
 - Analytics: `/api/analytics/export-data`
-- Push: `/api/push/subscribe`, `/api/push/send-daily`, `/api/push/send-weekly-focus`
+- Push: `/api/notifications/devices`, `/api/push/send-daily`, `/api/push/send-weekly-focus`
 - OpenAPI: `/api/openapi`
 
 주의할 점도 있다.

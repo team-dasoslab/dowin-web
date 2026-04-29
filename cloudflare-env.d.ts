@@ -10,8 +10,6 @@ declare namespace Cloudflare {
     IMAGES: ImagesBinding;
     ASSETS: Fetcher;
     NEXTJS_ENV: string;
-    NEXT_PUBLIC_VAPID_PUBLIC_KEY: string;
-    VAPID_PRIVATE_KEY: string;
     FCM_PROJECT_ID: string;
     FCM_CLIENT_EMAIL: string;
     FCM_PRIVATE_KEY: string;
@@ -37,8 +35,6 @@ declare namespace NodeJS {
     Pick<
       Cloudflare.Env,
       | "NEXTJS_ENV"
-      | "NEXT_PUBLIC_VAPID_PUBLIC_KEY"
-      | "VAPID_PRIVATE_KEY"
       | "FCM_PROJECT_ID"
       | "FCM_CLIENT_EMAIL"
       | "FCM_PRIVATE_KEY"

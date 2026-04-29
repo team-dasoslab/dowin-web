@@ -2,7 +2,6 @@ import { getDb } from "@/db";
 import {
   devicePushTokens,
   leadMeasures,
-  pushSubscriptions,
   scoreboards,
   userNotificationSettings,
   workspaceMembers,
@@ -10,8 +9,6 @@ import {
 import { and, eq, inArray, isNull } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
-
-export type PushSubscriptionRecord = typeof pushSubscriptions.$inferSelect;
 export type DevicePushTokenRecord = typeof devicePushTokens.$inferSelect;
 export type DevicePushTokenWithLocaleRecord = DevicePushTokenRecord & {
   user: {
@@ -29,30 +26,6 @@ export type UserNotificationSettingsWithLocale =
 
 export class NotificationStorage {
   constructor(private db: Db) {}
-
-  async upsertPushSubscription(input: {
-    userId: number;
-    endpoint: string;
-    p256dh: string;
-    auth: string;
-  }): Promise<void> {
-    await this.db
-      .insert(pushSubscriptions)
-      .values({
-        userId: String(input.userId),
-        endpoint: input.endpoint,
-        p256dh: input.p256dh,
-        auth: input.auth,
-      })
-      .onConflictDoUpdate({
-        target: pushSubscriptions.endpoint,
-        set: {
-          userId: String(input.userId),
-          p256dh: input.p256dh,
-          auth: input.auth,
-        },
-      });
-  }
 
   async upsertDevicePushToken(input: {
     userId: number;
@@ -121,29 +94,6 @@ export class NotificationStorage {
         updatedAt: new Date(),
       })
       .where(inArray(devicePushTokens.token, tokens));
-  }
-
-  async deletePushSubscriptionByEndpoint(endpoint: string): Promise<void> {
-    await this.db
-      .delete(pushSubscriptions)
-      .where(eq(pushSubscriptions.endpoint, endpoint));
-  }
-
-  async findAllPushSubscriptions(): Promise<PushSubscriptionRecord[]> {
-    return await this.db.select().from(pushSubscriptions);
-  }
-
-  async findPushSubscriptionsByUserIds(
-    userIds: number[],
-  ): Promise<PushSubscriptionRecord[]> {
-    if (userIds.length === 0) {
-      return [];
-    }
-
-    return await this.db
-      .select()
-      .from(pushSubscriptions)
-      .where(inArray(pushSubscriptions.userId, userIds.map(String)));
   }
 
   async findAllActiveDevicePushTokens(): Promise<DevicePushTokenRecord[]> {
