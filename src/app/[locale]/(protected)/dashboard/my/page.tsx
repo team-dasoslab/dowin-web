@@ -234,7 +234,7 @@ export default function MyDashboardPage() {
           </aside>
 
           {/* ── 우측 메인 콘텐츠 ── */}
-          <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
+          <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-48">
             <section id="overview" className="space-y-5 scroll-mt-28">
               <SectionHeader title={t("recentTrend")} />
               <ScoreboardOverviewSection

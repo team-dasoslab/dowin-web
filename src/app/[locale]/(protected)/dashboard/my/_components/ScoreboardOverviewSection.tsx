@@ -82,7 +82,7 @@ export function ScoreboardOverviewSection({
         {/* ── Consolidated Achievement Card (Vertical Stack) ── */}
         <Card className="flex flex-row divide-x divide-zinc-100 lg:flex-col lg:divide-x-0 lg:divide-y lg:col-span-1">
           {/* Weekly Section */}
-          <div className="flex flex-1 flex-col items-start p-4 gap-4 sm:p-5">
+          <div className="flex flex-1 flex-col items-start p-4 gap-3">
             <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
               {t("weeklyAchievementRate")}
             </p>
@@ -98,7 +98,7 @@ export function ScoreboardOverviewSection({
           </div>
 
           {/* Monthly Section */}
-          <div className="flex flex-1 flex-col items-start p-4 gap-4 sm:p-5">
+          <div className="flex flex-1 flex-col items-start p-4 gap-3">
             <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
               {t("monthlyAchievementRate")}
             </p>
@@ -202,7 +202,7 @@ function DashboardWeeklyTrendSection({
           </p>
         </div>
       ) : (
-        <div className="h-[140px] w-full">
+        <div className="h-[140px] lg:h-auto lg:flex-1 w-full min-h-[140px]">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />
         </div>
       )}
@@ -243,7 +243,7 @@ function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
           axisLine={false}
           tickLine={false}
           tick={{ fontSize: 11, fill: "#9ca3af" }}
-          dy={6}
+          dy={4}
         />
         <YAxis domain={[0, 100]} hide />
         <Area
