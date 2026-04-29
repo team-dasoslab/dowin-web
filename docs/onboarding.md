@@ -53,6 +53,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 푸시 구독 토글 및 개인 기록 리마인드 시간 설정 구현 완료
 - WebView bridge 웹 타입 정리 및 `@webview-bridge/web` 연동 경로 정리 완료
 - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 요청 트리거 추가 완료
+  - 정책: 앱(WebView) 환경에서만 동작하며, 로그인 흐름당 1회만 요청
 - WebView bridge / native-web handoff 전용 로컬 스킬 `frontend-webview` 추가 완료
 - 앱 클라이언트에서는 billing/export/`STANDARD` 중심 유료 노출을 숨기고 무료 핵심 흐름 중심으로 보이도록 앱 전용 UI 분기 적용 완료
 - 선행지표 상세 화면 제거 완료
@@ -86,6 +87,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 랜딩은 용어 치환 1차 반영과 Hero variant 비교 프리뷰까지 완료됐지만, 최종 카피 선택과 본문 전면 다듬기는 아직 남아 있다
 - 웹 푸시 구독이 전제인 만큼 개인 기록 리마인드의 실제 반응률과 후속 기록 재개율은 운영 데이터로 검증이 더 필요하다
 - 로그인 직후 `dashboard/my`에서 수행하는 알림 권한 요청은 현재 권한 prompt까지만 연결돼 있고, 실제 push subscription 자동 등록은 아직 붙지 않았다
+  - 현재 제품 정책상 이 권한 요청은 로그인 후 첫 `dashboard/my` 진입에서 1회만 수행해야 한다
 - 유료 기능 후보는 `달성률 임계치 기반 자동 리마인드`보다 `리더 액션 어시스턴트` 중심으로 재정의했다. 핵심은 자동 꾸짖기가 아니라 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인`이며, 팀원 수용성/알림 피로 가드레일까지 포함해 `docs/planning/2026.04.14-leader-report-reminder-plan.md`를 본다
 - Polar customer portal 진입은 코드에서 `POLAR_ACCESS_TOKEN` fallback 지원까지 반영됐지만, 실제 sandbox 환경에는 `customer_sessions:write` scope가 있는 토큰 설정이 아직 필요하다
 - 환불 악용 방지 문서 기준의 `STANDARD` usage event 저장은 아직 미구현이며, 결제 운영을 계속할 거면 우선순위를 높여 반드시 구현해야 한다
@@ -251,7 +253,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - `src/app/(protected)/dashboard/my/page.tsx`
   - 내 대시보드
 - `src/app/(protected)/dashboard/my/_hooks/usePostLoginNotificationPermissionPrompt.ts`
-  - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 prompt를 1회 트리거하는 훅
+  - 로그인 직후 `dashboard/my` 첫 진입 시 앱(WebView) 환경에서만 알림 권한 prompt를 1회 트리거하는 훅
 - `src/app/(protected)/dashboard/my/_hooks/useDashboardScoreboard.ts`
   - 내 대시보드 API 조회/토글 로직
 - `src/lib/bridge.ts`
