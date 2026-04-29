@@ -12,6 +12,9 @@ declare namespace Cloudflare {
     NEXTJS_ENV: string;
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: string;
     VAPID_PRIVATE_KEY: string;
+    FCM_PROJECT_ID: string;
+    FCM_CLIENT_EMAIL: string;
+    FCM_PRIVATE_KEY: string;
     CRON_SECRET: string;
     GEMINI_API_KEY: string;
     NEXT_PUBLIC_GA_ID: string;
@@ -36,6 +39,9 @@ declare namespace NodeJS {
       | "NEXTJS_ENV"
       | "NEXT_PUBLIC_VAPID_PUBLIC_KEY"
       | "VAPID_PRIVATE_KEY"
+      | "FCM_PROJECT_ID"
+      | "FCM_CLIENT_EMAIL"
+      | "FCM_PRIVATE_KEY"
       | "CRON_SECRET"
       | "GEMINI_API_KEY"
       | "NEXT_PUBLIC_GA_ID"

@@ -3,6 +3,7 @@ import {
   LeadMeasureForPushRecord,
   LeadMeasureStorage,
 } from "@/domain/lead-measure/storage/lead-measure.storage";
+import { DevicePushTokenWithLocaleRecord } from "@/domain/notification/storage/notification.storage";
 import {
   breakWeeklyFocusTie as breakWeeklyFocusTieWithAi,
   createWeeklyFocusAiConfig,
@@ -16,21 +17,11 @@ import {
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 import type { Locale } from "@/i18n/detect-locale";
 
-export type WeeklyFocusPushSubscription = {
-  userId: string;
-  endpoint: string;
-  p256dh: string;
-  auth: string;
-  locale?: string | null;
-};
-
 export type WeeklyFocusPushJob = {
   userId: number;
   scoreboardId: number;
   leadMeasureId: number;
-  endpoint: string;
-  p256dh: string;
-  auth: string;
+  token: string;
   title: string;
   body: string;
   url: `/${Locale}/dashboard/my`;
@@ -39,7 +30,7 @@ export type WeeklyFocusPushJob = {
 export type WeeklyFocusJobsResult = {
   jobs: WeeklyFocusPushJob[];
   summary: {
-    totalSubscriptions: number;
+    totalDevices: number;
     totalJobs: number;
     skippedNoActiveScoreboard: number;
     skippedNoEligibleLeadMeasures: number;
@@ -47,8 +38,10 @@ export type WeeklyFocusJobsResult = {
   };
 };
 
-type PushSubscriptionLookupPort = {
-  findAllPushSubscriptions(): Promise<WeeklyFocusPushSubscription[]>;
+type DevicePushTokenLookupPort = {
+  findAllActiveDevicePushTokensWithLocale(): Promise<
+    DevicePushTokenWithLocaleRecord[]
+  >;
 };
 
 type ScoreboardLookupPort = Pick<
@@ -74,7 +67,7 @@ const PUSH_TITLE = "리마인드";
 
 export class WeeklyFocusPushService {
   constructor(
-    private pushSubscriptionStorage: PushSubscriptionLookupPort,
+    private pushSubscriptionStorage: DevicePushTokenLookupPort,
     private scoreboardStorage: ScoreboardLookupPort,
     private leadMeasureStorage: LeadMeasureLookupPort,
     private dailyLogStorage: DailyLogSummaryPort,
@@ -89,9 +82,9 @@ export class WeeklyFocusPushService {
   }): Promise<WeeklyFocusJobsResult> {
     const now = input?.now ?? new Date();
     const subscriptions =
-      await this.pushSubscriptionStorage.findAllPushSubscriptions();
+      await this.pushSubscriptionStorage.findAllActiveDevicePushTokensWithLocale();
     const summary = {
-      totalSubscriptions: subscriptions.length,
+      totalDevices: subscriptions.length,
       totalJobs: 0,
       skippedNoActiveScoreboard: 0,
       skippedNoEligibleLeadMeasures: 0,
@@ -157,7 +150,7 @@ export class WeeklyFocusPushService {
     const jobs: WeeklyFocusPushJob[] = [];
 
     const subscriptionsByUserId = subscriptions.reduce<
-      Map<number, WeeklyFocusPushSubscription[]>
+      Map<number, DevicePushTokenWithLocaleRecord[]>
     >((map, subscription) => {
       const userId = Number(subscription.userId);
       if (!Number.isInteger(userId)) {
@@ -216,12 +209,10 @@ export class WeeklyFocusPushService {
           userId,
           scoreboardId: scoreboard.id,
           leadMeasureId: selectedCandidate.id,
-          endpoint: subscription.endpoint,
-          p256dh: subscription.p256dh,
-          auth: subscription.auth,
+          token: subscription.token,
           title: PUSH_TITLE,
           body: `오늘은 ${selectedCandidate.name} 해볼까요?`,
-          url: getLocalizedDashboardPath(subscription.locale),
+          url: getLocalizedDashboardPath(subscription.user.locale),
         });
         summary.totalJobs += 1;
       }

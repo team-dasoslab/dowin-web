@@ -4,7 +4,7 @@ import { WeeklyFocusPushService } from "@/domain/notification/services/weekly-fo
 describe("WeeklyFocusPushService", () => {
   const now = new Date("2026-03-19T06:00:00.000Z");
 
-  const findAllPushSubscriptions = vi.fn();
+  const findAllActiveDevicePushTokensWithLocale = vi.fn();
   const findActiveScoreboardsForPush = vi.fn();
   const findActiveLeadMeasuresByScoreboardIds = vi.fn();
   const countTrueLogsForLeadMeasuresInRange = vi.fn();
@@ -13,7 +13,7 @@ describe("WeeklyFocusPushService", () => {
   const createService = () =>
     new WeeklyFocusPushService(
       {
-        findAllPushSubscriptions,
+        findAllActiveDevicePushTokensWithLocale,
       },
       {
         findActiveScoreboardsForPush,
@@ -34,13 +34,11 @@ describe("WeeklyFocusPushService", () => {
   });
 
   it("skips users with no active scoreboard", async () => {
-    findAllPushSubscriptions.mockResolvedValue([
+    findAllActiveDevicePushTokensWithLocale.mockResolvedValue([
       {
-        userId: "1",
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
-        locale: "ko",
+        userId: 1,
+        token: "token-1",
+        user: { locale: "ko" },
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([]);
@@ -51,7 +49,7 @@ describe("WeeklyFocusPushService", () => {
 
     expect(result.jobs).toEqual([]);
     expect(result.summary).toMatchObject({
-      totalSubscriptions: 1,
+      totalDevices: 1,
       totalJobs: 0,
       skippedNoActiveScoreboard: 1,
       skippedNoEligibleLeadMeasures: 0,
@@ -63,12 +61,11 @@ describe("WeeklyFocusPushService", () => {
   });
 
   it("sends direct selection without AI when one lowest candidate exists", async () => {
-    findAllPushSubscriptions.mockResolvedValue([
+    findAllActiveDevicePushTokensWithLocale.mockResolvedValue([
       {
-        userId: "1",
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
+        userId: 1,
+        token: "token-1",
+        user: { locale: "ko" },
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -107,16 +104,14 @@ describe("WeeklyFocusPushService", () => {
         userId: 1,
         scoreboardId: 10,
         leadMeasureId: 101,
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
+        token: "token-1",
         title: "리마인드",
         body: "오늘은 매일 물 2L 해볼까요?",
         url: "/ko/dashboard/my",
       },
     ]);
     expect(result.summary).toMatchObject({
-      totalSubscriptions: 1,
+      totalDevices: 1,
       totalJobs: 1,
       aiTieBreaks: 0,
     });
@@ -129,13 +124,11 @@ describe("WeeklyFocusPushService", () => {
   });
 
   it("supports monthly measures using month-to-date progress", async () => {
-    findAllPushSubscriptions.mockResolvedValue([
+    findAllActiveDevicePushTokensWithLocale.mockResolvedValue([
       {
-        userId: "1",
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
-        locale: "ko",
+        userId: 1,
+        token: "token-1",
+        user: { locale: "ko" },
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -195,20 +188,16 @@ describe("WeeklyFocusPushService", () => {
   });
 
   it("uses AI only when lowest candidates tie", async () => {
-    findAllPushSubscriptions.mockResolvedValue([
+    findAllActiveDevicePushTokensWithLocale.mockResolvedValue([
       {
-        userId: "1",
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
-        locale: "en",
+        userId: 1,
+        token: "token-1",
+        user: { locale: "en" },
       },
       {
-        userId: "1",
-        endpoint: "https://push.example.com/2",
-        p256dh: "p256dh-2",
-        auth: "auth-2",
-        locale: "en",
+        userId: 1,
+        token: "token-2",
+        user: { locale: "en" },
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -257,16 +246,12 @@ describe("WeeklyFocusPushService", () => {
     expect(result.jobs).toEqual([
       expect.objectContaining({
         leadMeasureId: 102,
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
+        token: "token-1",
         body: "오늘은 주 3회 운동 해볼까요?",
       }),
       expect.objectContaining({
         leadMeasureId: 102,
-        endpoint: "https://push.example.com/2",
-        p256dh: "p256dh-2",
-        auth: "auth-2",
+        token: "token-2",
         body: "오늘은 주 3회 운동 해볼까요?",
       }),
     ]);
@@ -289,13 +274,11 @@ describe("WeeklyFocusPushService", () => {
   });
 
   it("skips push when candidate count is zero", async () => {
-    findAllPushSubscriptions.mockResolvedValue([
+    findAllActiveDevicePushTokensWithLocale.mockResolvedValue([
       {
-        userId: "1",
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
-        locale: "ko",
+        userId: 1,
+        token: "token-1",
+        user: { locale: "ko" },
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -313,7 +296,7 @@ describe("WeeklyFocusPushService", () => {
 
     expect(result.jobs).toEqual([]);
     expect(result.summary).toMatchObject({
-      totalSubscriptions: 1,
+      totalDevices: 1,
       totalJobs: 0,
       skippedNoActiveScoreboard: 0,
       skippedNoEligibleLeadMeasures: 1,
@@ -323,13 +306,11 @@ describe("WeeklyFocusPushService", () => {
   });
 
   it("uses the most recent active scoreboard when multiple active scoreboards exist", async () => {
-    findAllPushSubscriptions.mockResolvedValue([
+    findAllActiveDevicePushTokensWithLocale.mockResolvedValue([
       {
-        userId: "1",
-        endpoint: "https://push.example.com/1",
-        p256dh: "p256dh-1",
-        auth: "auth-1",
-        locale: "ko",
+        userId: 1,
+        token: "token-1",
+        user: { locale: "ko" },
       },
     ]);
     findActiveScoreboardsForPush.mockResolvedValue([
@@ -373,6 +354,7 @@ describe("WeeklyFocusPushService", () => {
       expect.objectContaining({
         scoreboardId: 11,
         leadMeasureId: 201,
+        token: "token-1",
         body: "오늘은 현재 선행지표 해볼까요?",
       }),
     ]);
