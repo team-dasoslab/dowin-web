@@ -19,11 +19,6 @@ type ContactInquiryPort = {
     userId: number;
     workspaceId: number | null;
   }): Promise<ContactInquiryRecord>;
-  updateDiscordDelivery(input: {
-    inquiryId: number;
-    status: "SENT" | "FAILED";
-    failureReason?: string | null;
-  }): Promise<ContactInquiryRecord | null>;
   listByUserId(userId: number): Promise<ContactInquiryRecord[]>;
   findByIdAndUserId(
     inquiryId: number,
@@ -82,44 +77,34 @@ export class ContactInquiryService {
       workspaceId: workspace?.id ?? null,
     });
 
-    let finalRecord = created;
-
     try {
-      if (!options.webhookUrl) {
-        throw new Error("CONTACT_DISCORD_WEBHOOK_URL_MISSING");
+      if (options.webhookUrl) {
+        await this.contactDiscordNotifier.send({
+          webhookUrl: options.webhookUrl,
+          input: {
+            inquiryId: created.id,
+            category: created.category,
+            subject: created.subject,
+            message: created.message,
+            replyEmail: created.replyEmail,
+            locale: created.locale,
+            userId: created.userId,
+            workspaceId: created.workspaceId ?? null,
+            workspaceName: workspace?.name ?? null,
+            createdAt: created.createdAt.toISOString(),
+          },
+        });
       }
-
-      await this.contactDiscordNotifier.send({
-        webhookUrl: options.webhookUrl,
-        input: {
-          inquiryId: created.id,
-          category: created.category,
-          subject: created.subject,
-          message: created.message,
-          replyEmail: created.replyEmail,
-          locale: created.locale,
-          userId: created.userId,
-          workspaceId: created.workspaceId ?? null,
-          workspaceName: workspace?.name ?? null,
-          createdAt: created.createdAt.toISOString(),
-        },
-      });
-
-      finalRecord =
-        (await this.contactInquiryStorage.updateDiscordDelivery({
-          inquiryId: created.id,
-          status: "SENT",
-        })) ?? created;
     } catch (error) {
-      finalRecord =
-        (await this.contactInquiryStorage.updateDiscordDelivery({
-          inquiryId: created.id,
-          status: "FAILED",
-          failureReason: toFailureReason(error),
-        })) ?? created;
+      console.error("[contact-inquiry] discord webhook delivery failed", {
+        inquiryId: created.id,
+        userId: created.userId,
+        workspaceId: created.workspaceId ?? null,
+        error: toFailureReason(error),
+      });
     }
 
-    return toContactInquiryDto(finalRecord);
+    return toContactInquiryDto(created);
   }
 
   async listMyInquiries(userId: number) {
@@ -154,7 +139,6 @@ function toContactInquiryDto(record: ContactInquiryRecord, includeMessage = true
     workspaceId: record.workspaceId ?? null,
     answerSummary: record.answerSummary ?? null,
     answeredAt: record.answeredAt?.toISOString() ?? null,
-    discordDeliveryStatus: record.discordDeliveryStatus,
     createdAt: record.createdAt.toISOString(),
   };
 

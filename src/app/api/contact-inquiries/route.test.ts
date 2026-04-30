@@ -122,7 +122,6 @@ describe("GET/POST /api/contact-inquiries", () => {
       source: "CONTACT_PAGE",
       userId: 11,
       workspaceId: 3,
-      discordDeliveryStatus: "SENT",
       createdAt: "2026-05-01T11:00:00.000Z",
     });
 

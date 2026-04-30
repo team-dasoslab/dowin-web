@@ -206,15 +206,6 @@ export const ContactInquirySummarySource = {
   CONTACT_PAGE: 'CONTACT_PAGE',
 } as const;
 
-export type ContactInquirySummaryDiscordDeliveryStatus = typeof ContactInquirySummaryDiscordDeliveryStatus[keyof typeof ContactInquirySummaryDiscordDeliveryStatus];
-
-
-export const ContactInquirySummaryDiscordDeliveryStatus = {
-  PENDING: 'PENDING',
-  SENT: 'SENT',
-  FAILED: 'FAILED',
-} as const;
-
 export interface ContactInquirySummary {
   id: number;
   category: ContactInquirySummaryCategory;
@@ -229,7 +220,6 @@ export interface ContactInquirySummary {
   answerSummary: string | null;
   /** @nullable */
   answeredAt: string | null;
-  discordDeliveryStatus: ContactInquirySummaryDiscordDeliveryStatus;
   createdAt: string;
 }
 

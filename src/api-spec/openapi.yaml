@@ -1992,7 +1992,6 @@ components:
           userId,
           answerSummary,
           answeredAt,
-          discordDeliveryStatus,
           createdAt,
         ]
       properties:
@@ -2023,9 +2022,6 @@ components:
           type: string
           format: date-time
           nullable: true
-        discordDeliveryStatus:
-          type: string
-          enum: [PENDING, SENT, FAILED]
         createdAt:
           type: string
           format: date-time

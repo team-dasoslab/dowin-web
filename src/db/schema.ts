@@ -672,13 +672,6 @@ export const contactInquiries = sqliteTable(
     workspaceId: integer("workspace_id").references(() => workspaces.id, {
       onDelete: "set null",
     }),
-    discordDeliveryStatus: text("discord_delivery_status", {
-      enum: ["PENDING", "SENT", "FAILED"],
-    })
-      .notNull()
-      .default("PENDING"),
-    discordFailureReason: text("discord_failure_reason"),
-    discordDeliveredAt: integer("discord_delivered_at", { mode: "timestamp" }),
     answerSummary: text("answer_summary"),
     answeredAt: integer("answered_at", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" })

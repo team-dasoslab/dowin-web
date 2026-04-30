@@ -10,10 +10,7 @@ type MockDb = {
     };
   };
   insert: ReturnType<typeof vi.fn>;
-  update: ReturnType<typeof vi.fn>;
   values: ReturnType<typeof vi.fn>;
-  set: ReturnType<typeof vi.fn>;
-  where: ReturnType<typeof vi.fn>;
   returning: ReturnType<typeof vi.fn>;
 };
 
@@ -26,10 +23,7 @@ describe("ContactInquiryStorage", () => {
       },
     },
     insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
     returning: vi.fn(),
   } satisfies MockDb;
 
@@ -65,23 +59,6 @@ describe("ContactInquiryStorage", () => {
 
     expect(mockDb.insert).toHaveBeenCalledWith(contactInquiries);
     expect(result.id).toBe(1);
-  });
-
-  it("Discord 전송 상태를 갱신한다", async () => {
-    mockDb.returning.mockResolvedValueOnce([
-      {
-        id: 1,
-        discordDeliveryStatus: "SENT",
-      },
-    ]);
-
-    const result = await storage.updateDiscordDelivery({
-      inquiryId: 1,
-      status: "SENT",
-    });
-
-    expect(mockDb.update).toHaveBeenCalledWith(contactInquiries);
-    expect(result?.discordDeliveryStatus).toBe("SENT");
   });
 
   it("사용자 기준 문의 목록을 조회한다", async () => {

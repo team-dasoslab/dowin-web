@@ -4,14 +4,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 describe("ContactInquiryService", () => {
   const findUserWorkspace = vi.fn();
   const create = vi.fn();
-  const updateDiscordDelivery = vi.fn();
   const listByUserId = vi.fn();
   const findByIdAndUserId = vi.fn();
   const send = vi.fn();
 
   const service = new ContactInquiryService(
     { findUserWorkspace },
-    { create, updateDiscordDelivery, listByUserId, findByIdAndUserId },
+    { create, listByUserId, findByIdAndUserId },
     { send },
   );
 
@@ -31,31 +30,12 @@ describe("ContactInquiryService", () => {
       workspaceId: 3,
       answerSummary: null,
       answeredAt: null,
-      discordDeliveryStatus: "PENDING",
       createdAt: new Date("2026-05-01T11:00:00.000Z"),
       updatedAt: new Date("2026-05-01T11:00:00.000Z"),
     });
   });
 
-  it("문의 저장 후 Discord 알림을 보내고 SENT 상태를 반환한다", async () => {
-    updateDiscordDelivery.mockResolvedValue({
-      id: 7,
-      category: "GENERAL",
-      status: "RECEIVED",
-      subject: "로그인이 안 됩니다",
-      message: "세션이 자주 끊깁니다.",
-      replyEmail: "user@example.com",
-      locale: "ko",
-      source: "CONTACT_PAGE",
-      userId: 11,
-      workspaceId: 3,
-      answerSummary: null,
-      answeredAt: null,
-      discordDeliveryStatus: "SENT",
-      createdAt: new Date("2026-05-01T11:00:00.000Z"),
-      updatedAt: new Date("2026-05-01T11:00:01.000Z"),
-    });
-
+  it("문의 저장 후 Discord 알림을 best-effort로 보낸다", async () => {
     const result = await service.createInquiry(
       11,
       {
@@ -71,32 +51,17 @@ describe("ContactInquiryService", () => {
     );
 
     expect(send).toHaveBeenCalled();
-    expect(updateDiscordDelivery).toHaveBeenCalledWith({
-      inquiryId: 7,
-      status: "SENT",
-    });
-    expect(result.discordDeliveryStatus).toBe("SENT");
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: 7,
+        status: "RECEIVED",
+      }),
+    );
   });
 
-  it("Discord 알림이 실패해도 문의는 생성하고 FAILED 상태를 반환한다", async () => {
+  it("Discord 알림이 실패해도 문의는 생성한다", async () => {
     send.mockRejectedValue(new Error("DISCORD_WEBHOOK_FAILED"));
-    updateDiscordDelivery.mockResolvedValue({
-      id: 7,
-      category: "GENERAL",
-      status: "RECEIVED",
-      subject: "로그인이 안 됩니다",
-      message: "세션이 자주 끊깁니다.",
-      replyEmail: "user@example.com",
-      locale: "ko",
-      source: "CONTACT_PAGE",
-      userId: 11,
-      workspaceId: 3,
-      answerSummary: null,
-      answeredAt: null,
-      discordDeliveryStatus: "FAILED",
-      createdAt: new Date("2026-05-01T11:00:00.000Z"),
-      updatedAt: new Date("2026-05-01T11:00:01.000Z"),
-    });
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
     const result = await service.createInquiry(
       11,
@@ -112,12 +77,21 @@ describe("ContactInquiryService", () => {
       },
     );
 
-    expect(updateDiscordDelivery).toHaveBeenCalledWith({
-      inquiryId: 7,
-      status: "FAILED",
-      failureReason: "DISCORD_WEBHOOK_FAILED",
-    });
-    expect(result.discordDeliveryStatus).toBe("FAILED");
+    expect(consoleError).toHaveBeenCalledWith(
+      "[contact-inquiry] discord webhook delivery failed",
+      expect.objectContaining({
+        inquiryId: 7,
+        userId: 11,
+        error: "DISCORD_WEBHOOK_FAILED",
+      }),
+    );
+    expect(result).toEqual(
+      expect.objectContaining({
+        id: 7,
+        status: "RECEIVED",
+      }),
+    );
+    consoleError.mockRestore();
   });
 
   it("자기 문의 목록을 반환한다", async () => {
@@ -135,7 +109,6 @@ describe("ContactInquiryService", () => {
         workspaceId: 3,
         answerSummary: "재현 중입니다.",
         answeredAt: null,
-        discordDeliveryStatus: "SENT",
         createdAt: new Date("2026-05-01T11:00:00.000Z"),
         updatedAt: new Date("2026-05-01T11:00:01.000Z"),
       },
@@ -167,7 +140,6 @@ describe("ContactInquiryService", () => {
       workspaceId: 3,
       answerSummary: "세션 재발급 로직을 수정했습니다.",
       answeredAt: new Date("2026-05-01T12:00:00.000Z"),
-      discordDeliveryStatus: "SENT",
       createdAt: new Date("2026-05-01T11:00:00.000Z"),
       updatedAt: new Date("2026-05-01T12:00:00.000Z"),
     });

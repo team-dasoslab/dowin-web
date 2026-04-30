@@ -28,26 +28,6 @@ export class ContactInquiryStorage {
     return created;
   }
 
-  async updateDiscordDelivery(input: {
-    inquiryId: number;
-    status: "SENT" | "FAILED";
-    failureReason?: string | null;
-  }): Promise<ContactInquiryRecord | null> {
-    const [updated] = await this.db
-      .update(contactInquiries)
-      .set({
-        discordDeliveryStatus: input.status,
-        discordFailureReason:
-          input.status === "FAILED" ? (input.failureReason ?? null) : null,
-        discordDeliveredAt: input.status === "SENT" ? new Date() : null,
-        updatedAt: new Date(),
-      })
-      .where(eq(contactInquiries.id, input.inquiryId))
-      .returning();
-
-    return updated ?? null;
-  }
-
   async listByUserId(userId: number): Promise<ContactInquiryRecord[]> {
     return this.db.query.contactInquiries.findMany({
       where: eq(contactInquiries.userId, userId),
