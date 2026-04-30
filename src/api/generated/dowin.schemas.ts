@@ -181,6 +181,77 @@ export interface UserDeleteRequest {
   currentPassword: string;
 }
 
+export type ContactInquiryCategory = typeof ContactInquiryCategory[keyof typeof ContactInquiryCategory];
+
+
+export const ContactInquiryCategory = {
+  GENERAL: 'GENERAL',
+  BILLING: 'BILLING',
+  BUG_OR_ACCOUNT: 'BUG_OR_ACCOUNT',
+} as const;
+
+export type ContactInquiryStatus = typeof ContactInquiryStatus[keyof typeof ContactInquiryStatus];
+
+
+export const ContactInquiryStatus = {
+  RECEIVED: 'RECEIVED',
+} as const;
+
+export type ContactInquirySource = typeof ContactInquirySource[keyof typeof ContactInquirySource];
+
+
+export const ContactInquirySource = {
+  CONTACT_PAGE: 'CONTACT_PAGE',
+} as const;
+
+export type ContactInquiryDiscordDeliveryStatus = typeof ContactInquiryDiscordDeliveryStatus[keyof typeof ContactInquiryDiscordDeliveryStatus];
+
+
+export const ContactInquiryDiscordDeliveryStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+} as const;
+
+export interface ContactInquiry {
+  id: number;
+  category: ContactInquiryCategory;
+  status: ContactInquiryStatus;
+  replyEmail: string;
+  subject: string;
+  source: ContactInquirySource;
+  userId: number;
+  /** @nullable */
+  workspaceId?: number | null;
+  discordDeliveryStatus: ContactInquiryDiscordDeliveryStatus;
+  createdAt: string;
+}
+
+export type ContactInquiryCreateRequestCategory = typeof ContactInquiryCreateRequestCategory[keyof typeof ContactInquiryCreateRequestCategory];
+
+
+export const ContactInquiryCreateRequestCategory = {
+  GENERAL: 'GENERAL',
+  BILLING: 'BILLING',
+  BUG_OR_ACCOUNT: 'BUG_OR_ACCOUNT',
+} as const;
+
+export interface ContactInquiryCreateRequest {
+  category: ContactInquiryCreateRequestCategory;
+  replyEmail: string;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  subject: string;
+  /**
+   * @minLength 1
+   * @maxLength 5000
+   */
+  message: string;
+  privacyConsent: boolean;
+}
+
 export type WorkspacePlanCode = typeof WorkspacePlanCode[keyof typeof WorkspacePlanCode];
 
 

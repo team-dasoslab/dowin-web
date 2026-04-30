@@ -310,6 +310,32 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /contact-inquiries:
+    post:
+      summary: 문의 접수 생성
+      tags: [Contact]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInquiryCreateRequest"
+      responses:
+        "201":
+          description: 문의 접수 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactInquiry"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /push/settings:
     get:
       summary: 내 일일 알림 설정 조회
@@ -1912,6 +1938,70 @@ components:
         currentPassword:
           type: string
           format: password
+
+    ContactInquiry:
+      type: object
+      required:
+        [
+          id,
+          category,
+          status,
+          replyEmail,
+          subject,
+          source,
+          userId,
+          discordDeliveryStatus,
+          createdAt,
+        ]
+      properties:
+        id: { type: integer }
+        category:
+          type: string
+          enum: [GENERAL, BILLING, BUG_OR_ACCOUNT]
+        status:
+          type: string
+          enum: [RECEIVED]
+        replyEmail:
+          type: string
+          format: email
+        subject:
+          type: string
+        source:
+          type: string
+          enum: [CONTACT_PAGE]
+        userId:
+          type: integer
+        workspaceId:
+          type: integer
+          nullable: true
+        discordDeliveryStatus:
+          type: string
+          enum: [PENDING, SENT, FAILED]
+        createdAt:
+          type: string
+          format: date-time
+
+    ContactInquiryCreateRequest:
+      type: object
+      required: [category, replyEmail, subject, message, privacyConsent]
+      properties:
+        category:
+          type: string
+          enum: [GENERAL, BILLING, BUG_OR_ACCOUNT]
+        replyEmail:
+          type: string
+          format: email
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 120
+        message:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        privacyConsent:
+          type: boolean
+          enum: [true]
 
     Workspace:
       type: object
