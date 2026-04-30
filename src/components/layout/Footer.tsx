@@ -25,9 +25,6 @@ export function Footer({ className }: FooterProps) {
 
         {/* Legal Links */}
         <div className="flex items-center gap-10 text-[14px] font-bold text-text-muted">
-          <Link href="/contact">
-            {t("contact")}
-          </Link>
           <Link href="/privacy">
             {t("privacy")}
           </Link>

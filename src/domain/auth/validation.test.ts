@@ -1,5 +1,4 @@
 import {
-  adminCreateUserSchema,
   loginSchema,
   passwordChangeSchema,
   signupSchema,
@@ -102,32 +101,6 @@ describe("Auth Validation", () => {
         const result = passwordChangeSchema.safeParse({
           currentPassword: "oldPassword",
           newPassword: "short",
-        });
-        expect(result.success).toBe(false);
-      });
-    });
-
-    describe("adminCreateUserSchema", () => {
-      it("유효한 사용자 생성 요청은 성공한다", () => {
-        const result = adminCreateUserSchema.safeParse({
-          customId: "newuser",
-          nickname: "New User",
-          password: "newSecurePass1!",
-        });
-        expect(result.success).toBe(true);
-      });
-      it("비밀번호 누락 시 실패한다", () => {
-        const result = adminCreateUserSchema.safeParse({
-          customId: "newuser",
-          nickname: "New User",
-        });
-        expect(result.success).toBe(false);
-      });
-      it("닉네임 누락 시 실패한다", () => {
-        const result = adminCreateUserSchema.safeParse({
-          customId: "newuser",
-          nickname: "",
-          password: "newSecurePass1!",
         });
         expect(result.success).toBe(false);
       });

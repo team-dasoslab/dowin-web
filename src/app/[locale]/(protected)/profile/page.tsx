@@ -303,7 +303,7 @@ export default function ProfilePage() {
           icon: <DowinIcon name="domain-chat" className="w-4 h-4" />,
           title: t("contactUs"),
           description: t("contactUsDesc"),
-          href: "/contact",
+          href: "/profile/contact",
         },
       ],
     },

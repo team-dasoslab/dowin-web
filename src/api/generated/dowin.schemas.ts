@@ -181,6 +181,77 @@ export interface UserDeleteRequest {
   currentPassword: string;
 }
 
+export type ContactInquirySummaryCategory = typeof ContactInquirySummaryCategory[keyof typeof ContactInquirySummaryCategory];
+
+
+export const ContactInquirySummaryCategory = {
+  GENERAL: 'GENERAL',
+  BILLING: 'BILLING',
+  BUG_OR_ACCOUNT: 'BUG_OR_ACCOUNT',
+} as const;
+
+export type ContactInquirySummaryStatus = typeof ContactInquirySummaryStatus[keyof typeof ContactInquirySummaryStatus];
+
+
+export const ContactInquirySummaryStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+} as const;
+
+export type ContactInquirySummarySource = typeof ContactInquirySummarySource[keyof typeof ContactInquirySummarySource];
+
+
+export const ContactInquirySummarySource = {
+  CONTACT_PAGE: 'CONTACT_PAGE',
+} as const;
+
+export interface ContactInquirySummary {
+  id: number;
+  category: ContactInquirySummaryCategory;
+  status: ContactInquirySummaryStatus;
+  replyEmail: string;
+  subject: string;
+  source: ContactInquirySummarySource;
+  userId: number;
+  /** @nullable */
+  workspaceId?: number | null;
+  /** @nullable */
+  answerSummary: string | null;
+  /** @nullable */
+  answeredAt: string | null;
+  createdAt: string;
+}
+
+export type ContactInquiryDetail = ContactInquirySummary & {
+  message: string;
+};
+
+export type ContactInquiryCreateRequestCategory = typeof ContactInquiryCreateRequestCategory[keyof typeof ContactInquiryCreateRequestCategory];
+
+
+export const ContactInquiryCreateRequestCategory = {
+  GENERAL: 'GENERAL',
+  BILLING: 'BILLING',
+  BUG_OR_ACCOUNT: 'BUG_OR_ACCOUNT',
+} as const;
+
+export interface ContactInquiryCreateRequest {
+  category: ContactInquiryCreateRequestCategory;
+  replyEmail: string;
+  /**
+   * @minLength 1
+   * @maxLength 120
+   */
+  subject: string;
+  /**
+   * @minLength 1
+   * @maxLength 5000
+   */
+  message: string;
+  privacyConsent: boolean;
+}
+
 export type WorkspacePlanCode = typeof WorkspacePlanCode[keyof typeof WorkspacePlanCode];
 
 
@@ -833,17 +904,6 @@ export type PostNotificationsDevices200 = {
 
 export type DeleteNotificationsDevices200 = {
   success: boolean;
-};
-
-export type PostAdminUsersBody = {
-  customId: string;
-  nickname: string;
-  password: string;
-};
-
-export type PostAdminUsers201 = {
-  customId?: string;
-  nickname?: string;
 };
 
 export type PostWorkspacesBody = {

@@ -284,7 +284,7 @@ export default function ProfileBillingPage() {
             {t("privacyLink")}
           </Link>
           <Link
-            href="/contact"
+            href="/profile/contact"
             className="transition-colors hover:text-zinc-600"
           >
             {t("contactLink")}

@@ -30,6 +30,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   authoredTeamMemos: many(teamMemos, { relationName: "teamMemoAuthor" }),
   targetedTeamMemos: many(teamMemos, { relationName: "teamMemoTarget" }),
   resolvedTeamMemos: many(teamMemos, { relationName: "teamMemoResolver" }),
+  contactInquiries: many(contactInquiries),
   notificationSettings: many(userNotificationSettings),
   devicePushTokens: many(devicePushTokens),
   ownedWorkspaceBillingStates: many(workspaceBillingState, {
@@ -134,6 +135,7 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   tags: many(workspaceTags),
   invites: many(workspaceInvites),
   teamMemos: many(teamMemos),
+  contactInquiries: many(contactInquiries),
   billingEvents: many(billingEvents),
   billingCheckoutEvents: many(billingCheckoutEvents),
   billingStates: many(workspaceBillingState),
@@ -643,3 +645,59 @@ export const teamMemosRelations = relations(teamMemos, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const contactInquiries = sqliteTable(
+  "contact_inquiries",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    category: text("category", {
+      enum: ["GENERAL", "BILLING", "BUG_OR_ACCOUNT"],
+    }).notNull(),
+    status: text("status", {
+      enum: ["RECEIVED", "IN_PROGRESS", "RESOLVED"],
+    })
+      .notNull()
+      .default("RECEIVED"),
+    subject: text("subject").notNull(),
+    message: text("message").notNull(),
+    replyEmail: text("reply_email").notNull(),
+    consentedAt: integer("consented_at", { mode: "timestamp" }).notNull(),
+    locale: text("locale", { enum: ["ko", "en"] }).notNull().default("ko"),
+    source: text("source", { enum: ["CONTACT_PAGE"] })
+      .notNull()
+      .default("CONTACT_PAGE"),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    workspaceId: integer("workspace_id").references(() => workspaces.id, {
+      onDelete: "set null",
+    }),
+    answerSummary: text("answer_summary"),
+    answeredAt: integer("answered_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    index("contact_inquiries_user_idx").on(table.userId),
+    index("contact_inquiries_workspace_idx").on(table.workspaceId),
+    index("contact_inquiries_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const contactInquiriesRelations = relations(
+  contactInquiries,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [contactInquiries.userId],
+      references: [users.id],
+    }),
+    workspace: one(workspaces, {
+      fields: [contactInquiries.workspaceId],
+      references: [workspaces.id],
+    }),
+  }),
+);

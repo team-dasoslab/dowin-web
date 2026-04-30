@@ -220,7 +220,7 @@ export default function PricingPage() {
             {t("privacyLink")}
           </Link>
           <Link
-            href="/contact"
+            href="/profile/contact"
             className="transition-colors hover:text-zinc-600"
           >
             {t("contactLink")}
