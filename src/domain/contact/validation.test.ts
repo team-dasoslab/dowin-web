@@ -1,4 +1,7 @@
-import { contactInquiryCreateSchema } from "@/domain/contact/validation";
+import {
+  contactInquiryCreateSchema,
+  contactInquiryIdParamsSchema,
+} from "@/domain/contact/validation";
 import { describe, expect, it } from "vitest";
 
 describe("contactInquiryCreateSchema", () => {
@@ -29,5 +32,19 @@ describe("contactInquiryCreateSchema", () => {
         "문의 접수를 위해 개인정보 수집·이용 동의가 필요합니다.",
       ]),
     );
+  });
+
+  it("문의 id path params를 파싱한다", () => {
+    const result = contactInquiryIdParamsSchema.safeParse({
+      id: "7",
+    });
+
+    expect(result.success).toBe(true);
+
+    if (!result.success) {
+      throw new Error("expected id params parse to succeed");
+    }
+
+    expect(result.data.id).toBe(7);
   });
 });

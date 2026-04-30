@@ -311,6 +311,21 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /contact-inquiries:
+    get:
+      summary: 내 문의 목록 조회
+      tags: [Contact]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200":
+          description: 문의 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContactInquirySummary"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
     post:
       summary: 문의 접수 생성
       tags: [Contact]
@@ -327,11 +342,36 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ContactInquiry"
+                $ref: "#/components/schemas/ContactInquiryDetail"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "422":
           description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /contact-inquiries/{id}:
+    get:
+      summary: 내 문의 상세 조회
+      tags: [Contact]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: 문의 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactInquiryDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: 문의를 찾을 수 없음
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -1939,7 +1979,7 @@ components:
           type: string
           format: password
 
-    ContactInquiry:
+    ContactInquirySummary:
       type: object
       required:
         [
@@ -1950,6 +1990,8 @@ components:
           subject,
           source,
           userId,
+          answerSummary,
+          answeredAt,
           discordDeliveryStatus,
           createdAt,
         ]
@@ -1960,7 +2002,7 @@ components:
           enum: [GENERAL, BILLING, BUG_OR_ACCOUNT]
         status:
           type: string
-          enum: [RECEIVED]
+          enum: [RECEIVED, IN_PROGRESS, RESOLVED]
         replyEmail:
           type: string
           format: email
@@ -1974,12 +2016,28 @@ components:
         workspaceId:
           type: integer
           nullable: true
+        answerSummary:
+          type: string
+          nullable: true
+        answeredAt:
+          type: string
+          format: date-time
+          nullable: true
         discordDeliveryStatus:
           type: string
           enum: [PENDING, SENT, FAILED]
         createdAt:
           type: string
           format: date-time
+
+    ContactInquiryDetail:
+      allOf:
+        - $ref: "#/components/schemas/ContactInquirySummary"
+        - type: object
+          required: [message]
+          properties:
+            message:
+              type: string
 
     ContactInquiryCreateRequest:
       type: object

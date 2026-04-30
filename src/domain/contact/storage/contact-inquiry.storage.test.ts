@@ -3,6 +3,12 @@ import { ContactInquiryStorage } from "@/domain/contact/storage/contact-inquiry.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 type MockDb = {
+  query: {
+    contactInquiries: {
+      findMany: ReturnType<typeof vi.fn>;
+      findFirst: ReturnType<typeof vi.fn>;
+    };
+  };
   insert: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
   values: ReturnType<typeof vi.fn>;
@@ -13,6 +19,12 @@ type MockDb = {
 
 describe("ContactInquiryStorage", () => {
   const mockDb = {
+    query: {
+      contactInquiries: {
+        findMany: vi.fn(),
+        findFirst: vi.fn(),
+      },
+    },
     insert: vi.fn().mockReturnThis(),
     update: vi.fn().mockReturnThis(),
     values: vi.fn().mockReturnThis(),
@@ -70,5 +82,23 @@ describe("ContactInquiryStorage", () => {
 
     expect(mockDb.update).toHaveBeenCalledWith(contactInquiries);
     expect(result?.discordDeliveryStatus).toBe("SENT");
+  });
+
+  it("사용자 기준 문의 목록을 조회한다", async () => {
+    mockDb.query.contactInquiries.findMany.mockResolvedValue([{ id: 3 }]);
+
+    const result = await storage.listByUserId(11);
+
+    expect(mockDb.query.contactInquiries.findMany).toHaveBeenCalled();
+    expect(result).toHaveLength(1);
+  });
+
+  it("사용자 기준 문의 상세를 조회한다", async () => {
+    mockDb.query.contactInquiries.findFirst.mockResolvedValue({ id: 5 });
+
+    const result = await storage.findByIdAndUserId(5, 11);
+
+    expect(mockDb.query.contactInquiries.findFirst).toHaveBeenCalled();
+    expect(result?.id).toBe(5);
   });
 });

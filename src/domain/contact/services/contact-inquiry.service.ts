@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/lib/server/errors";
 import { ContactInquiryRecord } from "@/domain/contact/storage/contact-inquiry.storage";
 
 type WorkspacePort = {
@@ -23,6 +24,11 @@ type ContactInquiryPort = {
     status: "SENT" | "FAILED";
     failureReason?: string | null;
   }): Promise<ContactInquiryRecord | null>;
+  listByUserId(userId: number): Promise<ContactInquiryRecord[]>;
+  findByIdAndUserId(
+    inquiryId: number,
+    userId: number,
+  ): Promise<ContactInquiryRecord | null>;
 };
 
 type ContactDiscordNotifierPort = {
@@ -115,10 +121,29 @@ export class ContactInquiryService {
 
     return toContactInquiryDto(finalRecord);
   }
+
+  async listMyInquiries(userId: number) {
+    const records = await this.contactInquiryStorage.listByUserId(userId);
+
+    return records.map((record) => toContactInquiryDto(record, false));
+  }
+
+  async getMyInquiry(userId: number, inquiryId: number) {
+    const record = await this.contactInquiryStorage.findByIdAndUserId(
+      inquiryId,
+      userId,
+    );
+
+    if (!record) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return toContactInquiryDto(record, true);
+  }
 }
 
-function toContactInquiryDto(record: ContactInquiryRecord) {
-  return {
+function toContactInquiryDto(record: ContactInquiryRecord, includeMessage = true) {
+  const dto = {
     id: record.id,
     category: record.category,
     status: record.status,
@@ -127,8 +152,19 @@ function toContactInquiryDto(record: ContactInquiryRecord) {
     source: record.source,
     userId: record.userId,
     workspaceId: record.workspaceId ?? null,
+    answerSummary: record.answerSummary ?? null,
+    answeredAt: record.answeredAt?.toISOString() ?? null,
     discordDeliveryStatus: record.discordDeliveryStatus,
     createdAt: record.createdAt.toISOString(),
+  };
+
+  if (!includeMessage) {
+    return dto;
+  }
+
+  return {
+    ...dto,
+    message: record.message,
   };
 }
 

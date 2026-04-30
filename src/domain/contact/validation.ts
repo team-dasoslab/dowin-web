@@ -21,3 +21,7 @@ export const contactInquiryCreateSchema = z.object({
     message: "문의 접수를 위해 개인정보 수집·이용 동의가 필요합니다.",
   }),
 });
+
+export const contactInquiryIdParamsSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});

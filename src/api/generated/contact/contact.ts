@@ -6,18 +6,28 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
-  useMutation
+  useMutation,
+  useQuery
 } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  ContactInquiry,
   ContactInquiryCreateRequest,
+  ContactInquiryDetail,
+  ContactInquirySummary,
   ErrorResponse,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
@@ -30,10 +40,127 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
+ * @summary 내 문의 목록 조회
+ */
+export type getContactInquiriesResponse200 = {
+  data: ContactInquirySummary[]
+  status: 200
+}
+
+export type getContactInquiriesResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type getContactInquiriesResponseSuccess = (getContactInquiriesResponse200) & {
+  headers: Headers;
+};
+export type getContactInquiriesResponseError = (getContactInquiriesResponse401) & {
+  headers: Headers;
+};
+
+export type getContactInquiriesResponse = (getContactInquiriesResponseSuccess | getContactInquiriesResponseError)
+
+export const getGetContactInquiriesUrl = () => {
+
+
+  
+
+  return `/api/contact-inquiries`
+}
+
+export const getContactInquiries = async ( options?: RequestInit): Promise<getContactInquiriesResponse> => {
+  
+  return customInstance<getContactInquiriesResponse>(getGetContactInquiriesUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
+
+
+
+
+export const getGetContactInquiriesQueryKey = () => {
+    return [
+    `/api/contact-inquiries`
+    ] as const;
+    }
+
+    
+export const getGetContactInquiriesQueryOptions = <TData = Awaited<ReturnType<typeof getContactInquiries>>, TError = UnauthorizedErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiries>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetContactInquiriesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getContactInquiries>>> = ({ signal }) => getContactInquiries({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContactInquiries>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetContactInquiriesQueryResult = NonNullable<Awaited<ReturnType<typeof getContactInquiries>>>
+export type GetContactInquiriesQueryError = UnauthorizedErrorResponse
+
+
+export function useGetContactInquiries<TData = Awaited<ReturnType<typeof getContactInquiries>>, TError = UnauthorizedErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiries>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContactInquiries>>,
+          TError,
+          Awaited<ReturnType<typeof getContactInquiries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContactInquiries<TData = Awaited<ReturnType<typeof getContactInquiries>>, TError = UnauthorizedErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiries>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContactInquiries>>,
+          TError,
+          Awaited<ReturnType<typeof getContactInquiries>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContactInquiries<TData = Awaited<ReturnType<typeof getContactInquiries>>, TError = UnauthorizedErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiries>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 내 문의 목록 조회
+ */
+
+export function useGetContactInquiries<TData = Awaited<ReturnType<typeof getContactInquiries>>, TError = UnauthorizedErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiries>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetContactInquiriesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
  * @summary 문의 접수 생성
  */
 export type postContactInquiriesResponse201 = {
-  data: ContactInquiry
+  data: ContactInquiryDetail
   status: 201
 }
 
@@ -123,4 +250,125 @@ export const usePostContactInquiries = <TError = UnauthorizedErrorResponse | Err
       > => {
       return useMutation(getPostContactInquiriesMutationOptions(options), queryClient);
     }
+    /**
+ * @summary 내 문의 상세 조회
+ */
+export type getContactInquiriesIdResponse200 = {
+  data: ContactInquiryDetail
+  status: 200
+}
+
+export type getContactInquiriesIdResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type getContactInquiriesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getContactInquiriesIdResponseSuccess = (getContactInquiriesIdResponse200) & {
+  headers: Headers;
+};
+export type getContactInquiriesIdResponseError = (getContactInquiriesIdResponse401 | getContactInquiriesIdResponse404) & {
+  headers: Headers;
+};
+
+export type getContactInquiriesIdResponse = (getContactInquiriesIdResponseSuccess | getContactInquiriesIdResponseError)
+
+export const getGetContactInquiriesIdUrl = (id: number,) => {
+
+
+  
+
+  return `/api/contact-inquiries/${id}`
+}
+
+export const getContactInquiriesId = async (id: number, options?: RequestInit): Promise<getContactInquiriesIdResponse> => {
+  
+  return customInstance<getContactInquiriesIdResponse>(getGetContactInquiriesIdUrl(id),
+  {      
+    ...options,
+    method: 'GET'
     
+    
+  }
+);}
+  
+
+
+
+
+export const getGetContactInquiriesIdQueryKey = (id: number,) => {
+    return [
+    `/api/contact-inquiries/${id}`
+    ] as const;
+    }
+
+    
+export const getGetContactInquiriesIdQueryOptions = <TData = Awaited<ReturnType<typeof getContactInquiriesId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiriesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetContactInquiriesIdQueryKey(id);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getContactInquiriesId>>> = ({ signal }) => getContactInquiriesId(id, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getContactInquiriesId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetContactInquiriesIdQueryResult = NonNullable<Awaited<ReturnType<typeof getContactInquiriesId>>>
+export type GetContactInquiriesIdQueryError = UnauthorizedErrorResponse | ErrorResponse
+
+
+export function useGetContactInquiriesId<TData = Awaited<ReturnType<typeof getContactInquiriesId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiriesId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContactInquiriesId>>,
+          TError,
+          Awaited<ReturnType<typeof getContactInquiriesId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContactInquiriesId<TData = Awaited<ReturnType<typeof getContactInquiriesId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiriesId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getContactInquiriesId>>,
+          TError,
+          Awaited<ReturnType<typeof getContactInquiriesId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetContactInquiriesId<TData = Awaited<ReturnType<typeof getContactInquiriesId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiriesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 내 문의 상세 조회
+ */
+
+export function useGetContactInquiriesId<TData = Awaited<ReturnType<typeof getContactInquiriesId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getContactInquiriesId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetContactInquiriesIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+

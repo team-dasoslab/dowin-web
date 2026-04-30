@@ -1,6 +1,6 @@
 import { getDb } from "@/db";
 import { contactInquiries } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -46,5 +46,26 @@ export class ContactInquiryStorage {
       .returning();
 
     return updated ?? null;
+  }
+
+  async listByUserId(userId: number): Promise<ContactInquiryRecord[]> {
+    return this.db.query.contactInquiries.findMany({
+      where: eq(contactInquiries.userId, userId),
+      orderBy: [desc(contactInquiries.id)],
+    });
+  }
+
+  async findByIdAndUserId(
+    inquiryId: number,
+    userId: number,
+  ): Promise<ContactInquiryRecord | null> {
+    return (
+      (await this.db.query.contactInquiries.findFirst({
+        where: and(
+          eq(contactInquiries.id, inquiryId),
+          eq(contactInquiries.userId, userId),
+        ),
+      })) ?? null
+    );
   }
 }

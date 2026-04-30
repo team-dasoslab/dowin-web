@@ -14,6 +14,27 @@ type ContactRouteEnv = CloudflareEnv & {
   CONTACT_DISCORD_WEBHOOK_URL?: string;
 };
 
+const createService = (db: ReturnType<typeof getDb>) =>
+  new ContactInquiryService(
+    new WorkspaceStorage(db),
+    new ContactInquiryStorage(db),
+    new ContactDiscordNotifierService(),
+  );
+
+export const GET = withErrorHandler(async () => {
+  const { env } = getCloudflareContext();
+  const db = getDb(env.DB);
+  const session = await getSessionWithRefresh(db);
+
+  if (!session) {
+    return await apiError("UNAUTHORIZED");
+  }
+
+  const result = await createService(db).listMyInquiries(session.userId);
+
+  return apiSuccess(result);
+});
+
 export const POST = withErrorHandler(async (request: Request) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
@@ -30,12 +51,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   }
 
   const locale = await getLocale();
-  const service = new ContactInquiryService(
-    new WorkspaceStorage(db),
-    new ContactInquiryStorage(db),
-    new ContactDiscordNotifierService(),
-  );
-  const result = await service.createInquiry(
+  const result = await createService(db).createInquiry(
     session.userId,
     {
       ...parsed.data,

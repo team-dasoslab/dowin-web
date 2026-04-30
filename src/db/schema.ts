@@ -653,7 +653,11 @@ export const contactInquiries = sqliteTable(
     category: text("category", {
       enum: ["GENERAL", "BILLING", "BUG_OR_ACCOUNT"],
     }).notNull(),
-    status: text("status", { enum: ["RECEIVED"] }).notNull().default("RECEIVED"),
+    status: text("status", {
+      enum: ["RECEIVED", "IN_PROGRESS", "RESOLVED"],
+    })
+      .notNull()
+      .default("RECEIVED"),
     subject: text("subject").notNull(),
     message: text("message").notNull(),
     replyEmail: text("reply_email").notNull(),
@@ -675,6 +679,8 @@ export const contactInquiries = sqliteTable(
       .default("PENDING"),
     discordFailureReason: text("discord_failure_reason"),
     discordDeliveredAt: integer("discord_delivered_at", { mode: "timestamp" }),
+    answerSummary: text("answer_summary"),
+    answeredAt: integer("answered_at", { mode: "timestamp" }),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),

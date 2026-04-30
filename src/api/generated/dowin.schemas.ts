@@ -181,51 +181,61 @@ export interface UserDeleteRequest {
   currentPassword: string;
 }
 
-export type ContactInquiryCategory = typeof ContactInquiryCategory[keyof typeof ContactInquiryCategory];
+export type ContactInquirySummaryCategory = typeof ContactInquirySummaryCategory[keyof typeof ContactInquirySummaryCategory];
 
 
-export const ContactInquiryCategory = {
+export const ContactInquirySummaryCategory = {
   GENERAL: 'GENERAL',
   BILLING: 'BILLING',
   BUG_OR_ACCOUNT: 'BUG_OR_ACCOUNT',
 } as const;
 
-export type ContactInquiryStatus = typeof ContactInquiryStatus[keyof typeof ContactInquiryStatus];
+export type ContactInquirySummaryStatus = typeof ContactInquirySummaryStatus[keyof typeof ContactInquirySummaryStatus];
 
 
-export const ContactInquiryStatus = {
+export const ContactInquirySummaryStatus = {
   RECEIVED: 'RECEIVED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
 } as const;
 
-export type ContactInquirySource = typeof ContactInquirySource[keyof typeof ContactInquirySource];
+export type ContactInquirySummarySource = typeof ContactInquirySummarySource[keyof typeof ContactInquirySummarySource];
 
 
-export const ContactInquirySource = {
+export const ContactInquirySummarySource = {
   CONTACT_PAGE: 'CONTACT_PAGE',
 } as const;
 
-export type ContactInquiryDiscordDeliveryStatus = typeof ContactInquiryDiscordDeliveryStatus[keyof typeof ContactInquiryDiscordDeliveryStatus];
+export type ContactInquirySummaryDiscordDeliveryStatus = typeof ContactInquirySummaryDiscordDeliveryStatus[keyof typeof ContactInquirySummaryDiscordDeliveryStatus];
 
 
-export const ContactInquiryDiscordDeliveryStatus = {
+export const ContactInquirySummaryDiscordDeliveryStatus = {
   PENDING: 'PENDING',
   SENT: 'SENT',
   FAILED: 'FAILED',
 } as const;
 
-export interface ContactInquiry {
+export interface ContactInquirySummary {
   id: number;
-  category: ContactInquiryCategory;
-  status: ContactInquiryStatus;
+  category: ContactInquirySummaryCategory;
+  status: ContactInquirySummaryStatus;
   replyEmail: string;
   subject: string;
-  source: ContactInquirySource;
+  source: ContactInquirySummarySource;
   userId: number;
   /** @nullable */
   workspaceId?: number | null;
-  discordDeliveryStatus: ContactInquiryDiscordDeliveryStatus;
+  /** @nullable */
+  answerSummary: string | null;
+  /** @nullable */
+  answeredAt: string | null;
+  discordDeliveryStatus: ContactInquirySummaryDiscordDeliveryStatus;
   createdAt: string;
 }
+
+export type ContactInquiryDetail = ContactInquirySummary & {
+  message: string;
+};
 
 export type ContactInquiryCreateRequestCategory = typeof ContactInquiryCreateRequestCategory[keyof typeof ContactInquiryCreateRequestCategory];
 

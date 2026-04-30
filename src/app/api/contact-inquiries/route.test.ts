@@ -5,6 +5,7 @@ const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockGetLocale = vi.fn();
 const mockCreateInquiry = vi.fn();
+const mockListMyInquiries = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -25,6 +26,7 @@ vi.mock("@/lib/server/locale", () => ({
 vi.mock("@/domain/contact/services/contact-inquiry.service", () => ({
   ContactInquiryService: vi.fn(function MockContactInquiryService() {
     return {
+      listMyInquiries: mockListMyInquiries,
       createInquiry: mockCreateInquiry,
     };
   }),
@@ -42,7 +44,7 @@ vi.mock("@/domain/contact/services/contact-discord-notifier.service", () => ({
   ContactDiscordNotifierService: vi.fn(),
 }));
 
-describe("POST /api/contact-inquiries", () => {
+describe("GET/POST /api/contact-inquiries", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({
@@ -56,6 +58,26 @@ describe("POST /api/contact-inquiries", () => {
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
+    mockGetSessionWithRefresh.mockResolvedValue(null);
+
+    const { GET } = await import("./route");
+    const response = await GET();
+
+    expect(response.status).toBe(401);
+  });
+
+  it("GET 요청으로 문의 목록을 반환한다", async () => {
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 11 });
+    mockListMyInquiries.mockResolvedValue([{ id: 7 }]);
+
+    const { GET } = await import("./route");
+    const response = await GET();
+
+    expect(response.status).toBe(200);
+    expect(mockListMyInquiries).toHaveBeenCalledWith(11);
+  });
+
+  it("POST 요청에서 세션이 없으면 401을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { POST } = await import("./route");
