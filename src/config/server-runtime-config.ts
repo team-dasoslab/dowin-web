@@ -12,4 +12,5 @@ export const serverRuntimeConfig = Object.freeze({
   protocol,
   appOrigin,
   apiDocsUrl: new URL("/api-docs", appOrigin).toString(),
+  contactDiscordWebhookUrl: process.env.CONTACT_DISCORD_WEBHOOK_URL ?? "",
 });
