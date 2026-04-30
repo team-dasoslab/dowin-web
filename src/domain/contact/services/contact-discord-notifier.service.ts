@@ -33,37 +33,42 @@ export class ContactDiscordNotifierService {
   buildPayload(
     input: ContactDiscordNotificationInput,
   ): ContactDiscordWebhookPayload {
-    const bodyPreview = truncateForDiscord(input.message, 500);
+    const bodyPreview = truncateForDiscord(input.message, 1000);
+    const categoryLabel = getFriendlyCategory(input.category);
+    const localeLabel = input.locale === "ko" ? "🇰🇷 한국어" : "🇺🇸 English";
 
     return {
-      content: `DOWIN 문의 접수 #${input.inquiryId}`,
+      content: "", // Redundant summary removed
       embeds: [
         {
-          title: `[${input.category}] ${truncateForDiscord(input.subject, 120)}`,
-          description: "새 문의가 접수되었습니다.",
+          title: `[${categoryLabel}] ${truncateForDiscord(input.subject, 100)}`,
+          description: "새로운 고객 문의가 접수되었습니다.",
           color: CONTACT_COLOR,
           fields: [
             {
               name: "문의 정보",
               value: [
-                `문의 ID ${input.inquiryId}`,
-                `유형 ${input.category}`,
-                `답변 이메일 ${input.replyEmail}`,
-                `로케일 ${input.locale}`,
+                `**ID:** \`#${input.inquiryId}\``,
+                `**유형:** ${categoryLabel}`,
+                `**언어:** ${localeLabel}`,
               ].join("\n"),
+              inline: true,
             },
             {
-              name: "사용자 맥락",
+              name: "연락처",
+              value: `**이메일:** [${input.replyEmail}](mailto:${input.replyEmail})`,
+              inline: true,
+            },
+            {
+              name: "사용자 정보",
               value: [
-                `userId ${input.userId}`,
-                `workspaceId ${input.workspaceId ?? "없음"}`,
-                `workspace ${input.workspaceName ?? "없음"}`,
-                `접수 시각 ${input.createdAt}`,
+                `**User ID:** \`${input.userId}\``,
+                `**Workspace:** ${input.workspaceName ?? "없음"} (\`${input.workspaceId ?? "none"}\`)`,
               ].join("\n"),
             },
             {
               name: "문의 내용",
-              value: bodyPreview,
+              value: bodyPreview || "_내용 없음_",
             },
           ],
         },
@@ -94,6 +99,19 @@ export class ContactDiscordNotifierService {
     }
 
     return payload;
+  }
+}
+
+function getFriendlyCategory(category: string) {
+  switch (category) {
+    case "BILLING":
+      return "💳 결제/환불";
+    case "BUG_OR_ACCOUNT":
+      return "🐛 버그/계정";
+    case "GENERAL":
+      return "💬 일반 문의";
+    default:
+      return category;
   }
 }
 
