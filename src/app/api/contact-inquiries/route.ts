@@ -58,7 +58,9 @@ export const POST = withErrorHandler(async (request: Request) => {
       locale,
     },
     {
-      webhookUrl: serverRuntimeConfig.contactDiscordWebhookUrl,
+      webhookUrl:
+        env.CONTACT_DISCORD_WEBHOOK_URL ??
+        serverRuntimeConfig.contactDiscordWebhookUrl,
     },
   );
 

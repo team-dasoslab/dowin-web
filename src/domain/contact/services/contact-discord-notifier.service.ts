@@ -38,7 +38,7 @@ export class ContactDiscordNotifierService {
     const localeLabel = input.locale === "ko" ? "🇰🇷 한국어" : "🇺🇸 English";
 
     return {
-      content: "", // Redundant summary removed
+      content: `DOWIN 문의 접수 #${input.inquiryId}`,
       embeds: [
         {
           title: `[${categoryLabel}] ${truncateForDiscord(input.subject, 100)}`,

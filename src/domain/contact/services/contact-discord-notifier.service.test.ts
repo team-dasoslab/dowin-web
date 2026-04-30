@@ -28,11 +28,15 @@ describe("ContactDiscordNotifierService", () => {
       expect.arrayContaining([
         expect.objectContaining({
           name: "문의 정보",
-          value: expect.stringContaining("답변 이메일 user@example.com"),
+          value: expect.stringContaining("#7"),
         }),
         expect.objectContaining({
-          name: "사용자 맥락",
-          value: expect.stringContaining("workspace 러닝 크루"),
+          name: "연락처",
+          value: expect.stringContaining("user@example.com"),
+        }),
+        expect.objectContaining({
+          name: "사용자 정보",
+          value: expect.stringContaining("러닝 크루"),
         }),
       ]),
     );
