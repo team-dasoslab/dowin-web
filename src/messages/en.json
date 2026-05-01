@@ -1145,5 +1145,22 @@
     "copyLinkSuccess": "Service link copied.",
     "copyLinkError": "Failed to copy link. Please try again.",
     "copyLinkButton": "Copy Service Link"
+  },
+  "Admin": {
+    "loginTitle": "Admin Login",
+    "loginDesc": "Enter your admin ID and password to access the operating console.",
+    "loginButton": "Login",
+    "logoutButton": "Logout",
+    "sidebarTitle": "DOWIN Operating Console",
+    "inquiriesTitle": "Contact Center",
+    "billingTitle": "Billing Center",
+    "recoveryTitle": "Recovery Center",
+    "usersTitle": "Admin Accounts",
+    "dashboardTitle": "Admin Home",
+    "idLabel": "Admin ID",
+    "pwLabel": "Password",
+    "idPlaceholder": "Enter ID",
+    "pwPlaceholder": "Enter Password"
   }
 }
+

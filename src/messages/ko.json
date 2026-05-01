@@ -1146,5 +1146,22 @@
     "copyLinkSuccess": "서비스 링크를 복사했어요.",
     "copyLinkError": "링크 복사에 실패했어요. 다시 시도해주세요.",
     "copyLinkButton": "서비스 링크 복사하기"
+  },
+  "Admin": {
+    "loginTitle": "운영자 로그인",
+    "loginDesc": "운영 콘솔에 접속하려면 운영자 아이디와 비밀번호를 입력하세요.",
+    "loginButton": "로그인",
+    "logoutButton": "로그아웃",
+    "sidebarTitle": "DOWIN 운영 콘솔",
+    "inquiriesTitle": "문의 처리 센터",
+    "billingTitle": "결제 지원 센터",
+    "recoveryTitle": "데이터 복구 센터",
+    "usersTitle": "운영 계정",
+    "dashboardTitle": "어드민 홈",
+    "idLabel": "운영자 아이디",
+    "pwLabel": "비밀번호",
+    "idPlaceholder": "아이디를 입력하세요",
+    "pwPlaceholder": "비밀번호를 입력하세요"
   }
 }
+
