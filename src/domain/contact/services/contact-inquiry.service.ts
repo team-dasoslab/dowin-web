@@ -24,6 +24,21 @@ type ContactInquiryPort = {
     inquiryId: number,
     userId: number,
   ): Promise<ContactInquiryRecord | null>;
+  listForAdmin(filters?: {
+    status?: "RECEIVED" | "IN_PROGRESS" | "RESOLVED";
+    category?: "GENERAL" | "BILLING" | "BUG_OR_ACCOUNT";
+    userId?: number;
+    workspaceId?: number;
+  }): Promise<ContactInquiryRecord[]>;
+  findByIdForAdmin(inquiryId: number): Promise<ContactInquiryRecord | null>;
+  updateForAdmin(
+    inquiryId: number,
+    input: {
+      status?: "RECEIVED" | "IN_PROGRESS" | "RESOLVED";
+      answerSummary?: string | null;
+      answeredAt?: Date | null;
+    },
+  ): Promise<ContactInquiryRecord | null>;
 };
 
 type ContactDiscordNotifierPort = {
@@ -125,6 +140,68 @@ export class ContactInquiryService {
 
     return toContactInquiryDto(record, true);
   }
+
+  async listAdminInquiries(filters?: {
+    status?: "RECEIVED" | "IN_PROGRESS" | "RESOLVED";
+    category?: "GENERAL" | "BILLING" | "BUG_OR_ACCOUNT";
+    userId?: number;
+    workspaceId?: number;
+  }) {
+    const records = await this.contactInquiryStorage.listForAdmin(filters);
+
+    return records.map((record) => toContactInquiryDto(record, false));
+  }
+
+  async getAdminInquiry(inquiryId: number) {
+    const record = await this.contactInquiryStorage.findByIdForAdmin(inquiryId);
+
+    if (!record) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return toContactInquiryDto(record, true);
+  }
+
+  async updateAdminInquiry(
+    inquiryId: number,
+    input: {
+      status?: "RECEIVED" | "IN_PROGRESS" | "RESOLVED";
+      answerSummary?: string | null;
+    },
+  ) {
+    const existing = await this.contactInquiryStorage.findByIdForAdmin(inquiryId);
+
+    if (!existing) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const nextStatus = input.status ?? existing.status;
+    const nextAnswerSummary =
+      input.answerSummary !== undefined
+        ? normalizeNullableText(input.answerSummary)
+        : existing.answerSummary ?? null;
+
+    const answeredAt =
+      nextStatus === "RESOLVED" && nextAnswerSummary
+        ? new Date()
+        : input.status === "RECEIVED"
+          ? null
+          : existing.answeredAt ?? null;
+
+    const updated = await this.contactInquiryStorage.updateForAdmin(inquiryId, {
+      ...(input.status !== undefined ? { status: input.status } : {}),
+      ...(input.answerSummary !== undefined
+        ? { answerSummary: nextAnswerSummary }
+        : {}),
+      answeredAt,
+    });
+
+    if (!updated) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    return toContactInquiryDto(updated, true);
+  }
 }
 
 function toContactInquiryDto(record: ContactInquiryRecord, includeMessage = true) {
@@ -158,4 +235,13 @@ function toFailureReason(error: unknown) {
   }
 
   return "UNKNOWN_DISCORD_DELIVERY_FAILURE";
+}
+
+function normalizeNullableText(value: string | null) {
+  if (value === null) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }

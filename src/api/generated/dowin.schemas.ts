@@ -68,6 +68,29 @@ export interface AdminLoginRequest {
   password: string;
 }
 
+export type AdminContactInquiryUpdateRequestStatus = typeof AdminContactInquiryUpdateRequestStatus[keyof typeof AdminContactInquiryUpdateRequestStatus];
+
+
+export const AdminContactInquiryUpdateRequestStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+} as const;
+
+export interface AdminContactInquiryUpdateRequest {
+  status?: AdminContactInquiryUpdateRequestStatus;
+  /**
+   * @maxLength 5000
+   * @nullable
+   */
+  answerSummary?: string | null;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
+  changeReason: string;
+}
+
 /**
  * @nullable
  */
@@ -945,6 +968,31 @@ export type PostAdminAuthLogin200 = {
   adminUser: AdminUser;
   roles: PostAdminAuthLogin200RolesItem[];
 };
+
+export type GetAdminContactInquiriesParams = {
+status?: GetAdminContactInquiriesStatus;
+category?: GetAdminContactInquiriesCategory;
+userId?: number;
+workspaceId?: number;
+};
+
+export type GetAdminContactInquiriesStatus = typeof GetAdminContactInquiriesStatus[keyof typeof GetAdminContactInquiriesStatus];
+
+
+export const GetAdminContactInquiriesStatus = {
+  RECEIVED: 'RECEIVED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+} as const;
+
+export type GetAdminContactInquiriesCategory = typeof GetAdminContactInquiriesCategory[keyof typeof GetAdminContactInquiriesCategory];
+
+
+export const GetAdminContactInquiriesCategory = {
+  GENERAL: 'GENERAL',
+  BILLING: 'BILLING',
+  BUG_OR_ACCOUNT: 'BUG_OR_ACCOUNT',
+} as const;
 
 export type PutAuthPasswordByRecoveryCodeBody = {
   /** 대소문자/하이픈/공백 무시, 10자리 복원코드 */
