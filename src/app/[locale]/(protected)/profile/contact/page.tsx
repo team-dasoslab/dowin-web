@@ -81,40 +81,14 @@ export default function ProfileContactPage() {
               />
             ) : (
               <div className="grid gap-3">
-                {inquiries.map((inquiry) => {
-                  return (
-                    <div
-                      key={inquiry.id}
-                      className="w-full rounded-content border border-zinc-200 bg-white p-4 text-left transition"
-                    >
-                      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                        <div className="min-w-0 space-y-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <CategoryPill category={inquiry.category} t={t} />
-                            <StatusPill status={inquiry.status} t={t} />
-                          </div>
-                          <p className="truncate text-[15px] font-black tracking-tight text-zinc-900">
-                            {inquiry.subject}
-                          </p>
-                          <p className="text-sm leading-6 text-zinc-500">
-                            {inquiry.answerSummary?.trim()
-                              ? inquiry.answerSummary
-                              : t("answerPending")}
-                          </p>
-                        </div>
-
-                        <div className="shrink-0 text-right">
-                          <p className="text-xs font-bold text-zinc-400">
-                            #{inquiry.id}
-                          </p>
-                          <p className="mt-1 text-xs font-medium text-zinc-500">
-                            {formatDateTime(inquiry.createdAt, locale)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                {inquiries.map((inquiry) => (
+                  <InquiryCard
+                    key={inquiry.id}
+                    inquiry={inquiry}
+                    t={t}
+                    locale={locale}
+                  />
+                ))}
               </div>
             )}
           </section>
@@ -530,4 +504,59 @@ function formatDateTime(value: string | null, locale: string) {
   } catch {
     return value;
   }
+}
+
+function InquiryCard({
+  inquiry,
+  t,
+  locale,
+}: {
+  inquiry: ContactInquirySummary;
+  t: ReturnType<typeof useTranslations<"ProfileContact">>;
+  locale: string;
+}) {
+  return (
+    <div className="w-full rounded-content border border-zinc-200 bg-white p-4 text-left transition">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <CategoryPill category={inquiry.category} t={t} />
+            <StatusPill status={inquiry.status} t={t} />
+          </div>
+          <p className="text-[15px] font-black tracking-tight text-zinc-900 break-words">
+            {inquiry.subject}
+          </p>
+
+          {inquiry.message ? (
+            <div className="mt-3 space-y-1">
+              <span className="text-[11px] font-black text-zinc-700 tracking-wide uppercase select-none">
+                {t("myMessage")}
+              </span>
+              <p className="text-sm font-medium leading-6 text-zinc-600 whitespace-pre-wrap">
+                {inquiry.message}
+              </p>
+            </div>
+          ) : null}
+
+          <div className="mt-3 space-y-1">
+            <span className="text-[11px] font-black text-primary tracking-wide uppercase select-none">
+              {t("answerLabel")}
+            </span>
+            <p className="text-sm font-medium leading-6 text-zinc-700 whitespace-pre-wrap">
+              {inquiry.answerSummary?.trim()
+                ? inquiry.answerSummary
+                : t("answerPending")}
+            </p>
+          </div>
+        </div>
+
+        <div className="shrink-0 text-right">
+          <p className="text-xs font-bold text-zinc-400">#{inquiry.id}</p>
+          <p className="mt-1 text-xs font-medium text-zinc-500">
+            {formatDateTime(inquiry.createdAt, locale)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
