@@ -25,6 +25,49 @@ export interface RecoveryAccount {
   nickname: string;
 }
 
+export type AdminUserStatus = typeof AdminUserStatus[keyof typeof AdminUserStatus];
+
+
+export const AdminUserStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  DISABLED: 'DISABLED',
+} as const;
+
+export interface AdminUser {
+  id: number;
+  loginId: string;
+  displayName: string;
+  status: AdminUserStatus;
+  mfaEnabled: boolean;
+  /** @nullable */
+  lastLoginAt?: string | null;
+}
+
+export type AdminSessionProfileRolesItem = typeof AdminSessionProfileRolesItem[keyof typeof AdminSessionProfileRolesItem];
+
+
+export const AdminSessionProfileRolesItem = {
+  SUPPORT_ADMIN: 'SUPPORT_ADMIN',
+  BILLING_ADMIN: 'BILLING_ADMIN',
+  RECOVERY_ADMIN: 'RECOVERY_ADMIN',
+  SYSTEM_ADMIN: 'SYSTEM_ADMIN',
+} as const;
+
+export interface AdminSessionProfile {
+  adminUser: AdminUser;
+  roles: AdminSessionProfileRolesItem[];
+}
+
+export interface AdminLoginRequest {
+  /**
+   * @minLength 3
+   * @maxLength 100
+   */
+  loginId: string;
+  password: string;
+}
+
 /**
  * @nullable
  */
@@ -886,6 +929,21 @@ export type PostAuthRecoveryCodesVerifyBody = {
 
 export type PostAuthRecoveryCodesVerify200 = {
   user: RecoveryAccount;
+};
+
+export type PostAdminAuthLogin200RolesItem = typeof PostAdminAuthLogin200RolesItem[keyof typeof PostAdminAuthLogin200RolesItem];
+
+
+export const PostAdminAuthLogin200RolesItem = {
+  SUPPORT_ADMIN: 'SUPPORT_ADMIN',
+  BILLING_ADMIN: 'BILLING_ADMIN',
+  RECOVERY_ADMIN: 'RECOVERY_ADMIN',
+  SYSTEM_ADMIN: 'SYSTEM_ADMIN',
+} as const;
+
+export type PostAdminAuthLogin200 = {
+  adminUser: AdminUser;
+  roles: PostAdminAuthLogin200RolesItem[];
 };
 
 export type PutAuthPasswordByRecoveryCodeBody = {

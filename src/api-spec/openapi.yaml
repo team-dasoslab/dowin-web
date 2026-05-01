@@ -192,6 +192,82 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /admin/auth/login:
+    post:
+      summary: 운영자 로그인
+      tags: [AdminAuth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginRequest"
+      responses:
+        "200":
+          description: 운영자 로그인 성공
+          headers:
+            Set-Cookie:
+              schema:
+                {
+                  type: string,
+                  example: "dowin_admin_sid=abc; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=14400",
+                }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [adminUser, roles]
+                properties:
+                  adminUser: { $ref: "#/components/schemas/AdminUser" }
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                      enum: [SUPPORT_ADMIN, BILLING_ADMIN, RECOVERY_ADMIN, SYSTEM_ADMIN]
+        "401":
+          description: 아이디 또는 비밀번호 불일치
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/auth/logout:
+    post:
+      summary: 운영자 로그아웃
+      tags: [AdminAuth]
+      security: [{ adminSessionCookie: [] }]
+      responses:
+        "204":
+          description: 운영자 로그아웃 성공
+          headers:
+            Set-Cookie:
+              schema:
+                {
+                  type: string,
+                  example: "dowin_admin_sid=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0",
+                }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /admin/auth/me:
+    get:
+      summary: 현재 운영자 세션 조회
+      tags: [AdminAuth]
+      security: [{ adminSessionCookie: [] }]
+      responses:
+        "200":
+          description: 운영자 세션 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSessionProfile"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
   /auth/password/by-recovery-code:
     put:
       summary: 복원코드로 비밀번호 재설정
@@ -1852,6 +1928,47 @@ components:
         customId: { type: string }
         nickname: { type: string }
 
+    AdminUser:
+      type: object
+      required: [id, loginId, displayName, status, mfaEnabled]
+      properties:
+        id: { type: integer }
+        loginId: { type: string }
+        displayName: { type: string }
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED, DISABLED]
+        mfaEnabled:
+          type: boolean
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    AdminSessionProfile:
+      type: object
+      required: [adminUser, roles]
+      properties:
+        adminUser:
+          $ref: "#/components/schemas/AdminUser"
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [SUPPORT_ADMIN, BILLING_ADMIN, RECOVERY_ADMIN, SYSTEM_ADMIN]
+
+    AdminLoginRequest:
+      type: object
+      required: [loginId, password]
+      properties:
+        loginId:
+          type: string
+          minLength: 3
+          maxLength: 100
+        password:
+          type: string
+          format: password
+
     UserProfile:
       type: object
       properties:
@@ -2670,3 +2787,7 @@ components:
       type: apiKey
       in: cookie
       name: dowin_sid
+    adminSessionCookie:
+      type: apiKey
+      in: cookie
+      name: dowin_admin_sid
