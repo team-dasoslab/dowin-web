@@ -91,6 +91,155 @@ export interface AdminContactInquiryUpdateRequest {
   changeReason: string;
 }
 
+export type AdminBillingWorkspaceSummaryPlanCode = typeof AdminBillingWorkspaceSummaryPlanCode[keyof typeof AdminBillingWorkspaceSummaryPlanCode];
+
+
+export const AdminBillingWorkspaceSummaryPlanCode = {
+  FREE: 'FREE',
+  STANDARD: 'STANDARD',
+} as const;
+
+export type AdminBillingWorkspaceSummaryBillingStatus = typeof AdminBillingWorkspaceSummaryBillingStatus[keyof typeof AdminBillingWorkspaceSummaryBillingStatus];
+
+
+export const AdminBillingWorkspaceSummaryBillingStatus = {
+  NONE: 'NONE',
+  ACTIVE: 'ACTIVE',
+  CANCELED: 'CANCELED',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type AdminBillingWorkspaceSummaryProvider = typeof AdminBillingWorkspaceSummaryProvider[keyof typeof AdminBillingWorkspaceSummaryProvider] | null;
+
+
+export const AdminBillingWorkspaceSummaryProvider = {
+  POLAR: 'POLAR',
+} as const;
+
+export interface AdminBillingWorkspaceSummary {
+  workspaceId: number;
+  workspaceName: string;
+  planCode: AdminBillingWorkspaceSummaryPlanCode;
+  billingStatus: AdminBillingWorkspaceSummaryBillingStatus;
+  /** @nullable */
+  provider?: AdminBillingWorkspaceSummaryProvider;
+  /** @nullable */
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd: boolean;
+  /** @nullable */
+  billingOwnerUserId?: number | null;
+  /** @nullable */
+  customerKey?: string | null;
+  /** @nullable */
+  subscriptionKey?: string | null;
+  /** @nullable */
+  billingCustomerExternalRef?: string | null;
+  /** @nullable */
+  lastEventOccurredAt?: string | null;
+  /** @nullable */
+  updatedAt?: string | null;
+  /** @minimum 0 */
+  recentRefundCount: number;
+  /** @minimum 0 */
+  recentRevokedCount: number;
+  requiresManualReview: boolean;
+}
+
+export type AdminBillingEventProvider = typeof AdminBillingEventProvider[keyof typeof AdminBillingEventProvider];
+
+
+export const AdminBillingEventProvider = {
+  POLAR: 'POLAR',
+} as const;
+
+export type AdminBillingEventStatus = typeof AdminBillingEventStatus[keyof typeof AdminBillingEventStatus];
+
+
+export const AdminBillingEventStatus = {
+  ACCEPTED: 'ACCEPTED',
+  IGNORED: 'IGNORED',
+  FAILED: 'FAILED',
+} as const;
+
+export type AdminBillingEventSource = typeof AdminBillingEventSource[keyof typeof AdminBillingEventSource];
+
+
+export const AdminBillingEventSource = {
+  WEBHOOK: 'WEBHOOK',
+  RECONCILIATION: 'RECONCILIATION',
+  MANUAL_CORRECTION: 'MANUAL_CORRECTION',
+} as const;
+
+export interface AdminBillingEvent {
+  id: number;
+  provider: AdminBillingEventProvider;
+  /** @nullable */
+  providerEventId?: string | null;
+  eventType: string;
+  /** @nullable */
+  subscriptionKey?: string | null;
+  /** @nullable */
+  customerKey?: string | null;
+  occurredAt: string;
+  recordedAt: string;
+  status: AdminBillingEventStatus;
+  /** @nullable */
+  failureReason?: string | null;
+  source: AdminBillingEventSource;
+}
+
+export type AdminBillingWorkspaceDetail = AdminBillingWorkspaceSummary & {
+  events: AdminBillingEvent[];
+};
+
+export type AdminBillingManualOverrideRequestPlanCode = typeof AdminBillingManualOverrideRequestPlanCode[keyof typeof AdminBillingManualOverrideRequestPlanCode];
+
+
+export const AdminBillingManualOverrideRequestPlanCode = {
+  FREE: 'FREE',
+  STANDARD: 'STANDARD',
+} as const;
+
+export type AdminBillingManualOverrideRequestBillingStatus = typeof AdminBillingManualOverrideRequestBillingStatus[keyof typeof AdminBillingManualOverrideRequestBillingStatus];
+
+
+export const AdminBillingManualOverrideRequestBillingStatus = {
+  NONE: 'NONE',
+  ACTIVE: 'ACTIVE',
+  CANCELED: 'CANCELED',
+  EXPIRED: 'EXPIRED',
+  REVOKED: 'REVOKED',
+} as const;
+
+export interface AdminBillingManualOverrideRequest {
+  planCode: AdminBillingManualOverrideRequestPlanCode;
+  billingStatus: AdminBillingManualOverrideRequestBillingStatus;
+  /**
+   * @maxLength 255
+   * @nullable
+   */
+  customerKey?: string | null;
+  /**
+   * @maxLength 255
+   * @nullable
+   */
+  subscriptionKey?: string | null;
+  /** @nullable */
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd?: boolean;
+  /** @nullable */
+  billingOwnerUserId?: number | null;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
+  changeReason: string;
+}
+
 /**
  * @nullable
  */
@@ -993,6 +1142,11 @@ export const GetAdminContactInquiriesCategory = {
   BILLING: 'BILLING',
   BUG_OR_ACCOUNT: 'BUG_OR_ACCOUNT',
 } as const;
+
+export type GetAdminBillingWorkspacesParams = {
+workspaceId?: number;
+workspaceName?: string;
+};
 
 export type PutAuthPasswordByRecoveryCodeBody = {
   /** 대소문자/하이픈/공백 무시, 10자리 복원코드 */
