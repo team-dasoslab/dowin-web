@@ -15,6 +15,7 @@
 6. [Production Deployment Flow](/docs/dev/common/2026.04.19-production-deployment-flow.md)
 7. [Incident Communication Template](/docs/dev/operations/2026.04.19-incident-communication-template.md)
 8. [Partial Data Recovery Guide](/docs/dev/operations/2026.04.20-partial-data-recovery-guide.md)
+9. [Admin User Bootstrap Runbook](/docs/dev/operations/2026.05.01-admin-user-bootstrap-runbook.md)
 
 ## 2. 문서 역할
 
@@ -28,6 +29,8 @@
   - 내부 공유, 외부 공지, 복구 공지, 사후 공유 템플릿
 - [2026.04.20-partial-data-recovery-guide.md](/docs/dev/operations/2026.04.20-partial-data-recovery-guide.md)
   - 시점 A~B 사이 신규 데이터를 보존하면서 손실 데이터만 선별 복구하는 전략과 사전 준비 항목
+- [2026.05.01-admin-user-bootstrap-runbook.md](/docs/dev/operations/2026.05.01-admin-user-bootstrap-runbook.md)
+  - 운영 콘솔 첫 계정을 로컬 D1에 수동 bootstrap하는 절차
 
 ## 3. 운영 중 기본 원칙
 
