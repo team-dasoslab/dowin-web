@@ -30,8 +30,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   authoredTeamMemos: many(teamMemos, { relationName: "teamMemoAuthor" }),
   targetedTeamMemos: many(teamMemos, { relationName: "teamMemoTarget" }),
   resolvedTeamMemos: many(teamMemos, { relationName: "teamMemoResolver" }),
+  contactInquiries: many(contactInquiries),
   notificationSettings: many(userNotificationSettings),
   devicePushTokens: many(devicePushTokens),
+  auditLogs: many(auditLogs),
   ownedWorkspaceBillingStates: many(workspaceBillingState, {
     relationName: "workspaceBillingOwner",
   }),
@@ -70,6 +72,141 @@ export const sessions = sqliteTable("sessions", {
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
 });
+
+export const adminUsers = sqliteTable(
+  "admin_users",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    loginId: text("login_id").notNull(),
+    passwordHash: text("password_hash").notNull(),
+    displayName: text("display_name").notNull(),
+    status: text("status", {
+      enum: ["ACTIVE", "SUSPENDED", "DISABLED"],
+    })
+      .notNull()
+      .default("ACTIVE"),
+    mfaEnabled: integer("mfa_enabled", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    lastLoginAt: integer("last_login_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("admin_users_login_id_unique").on(table.loginId),
+    index("admin_users_status_idx").on(table.status),
+  ],
+);
+
+export const adminUsersRelations = relations(adminUsers, ({ many }) => ({
+  sessions: many(adminSessions),
+  roleGrants: many(adminRoleGrants, { relationName: "adminRoleGrantTarget" }),
+  grantedRoleGrants: many(adminRoleGrants, {
+    relationName: "adminRoleGrantGranter",
+  }),
+  revokedRoleGrants: many(adminRoleGrants, {
+    relationName: "adminRoleGrantRevoker",
+  }),
+  auditLogs: many(auditLogs),
+}));
+
+export const adminSessions = sqliteTable(
+  "admin_sessions",
+  {
+    id: text("id").primaryKey(),
+    adminUserId: integer("admin_user_id")
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: "cascade" }),
+    sessionTokenHash: text("session_token_hash").notNull(),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    lastAccessedAt: integer("last_accessed_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+  },
+  (table) => [
+    uniqueIndex("admin_sessions_token_hash_unique").on(table.sessionTokenHash),
+    index("admin_sessions_admin_user_idx").on(table.adminUserId),
+    index("admin_sessions_expires_at_idx").on(table.expiresAt),
+  ],
+);
+
+export const adminSessionsRelations = relations(adminSessions, ({ one }) => ({
+  adminUser: one(adminUsers, {
+    fields: [adminSessions.adminUserId],
+    references: [adminUsers.id],
+  }),
+}));
+
+export const adminRoleGrants = sqliteTable(
+  "admin_role_grants",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    adminUserId: integer("admin_user_id")
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: "cascade" }),
+    role: text("role", {
+      enum: [
+        "SUPPORT_ADMIN",
+        "BILLING_ADMIN",
+        "RECOVERY_ADMIN",
+        "SYSTEM_ADMIN",
+      ],
+    }).notNull(),
+    grantedByAdminUserId: integer("granted_by_admin_user_id").references(
+      () => adminUsers.id,
+      { onDelete: "set null" },
+    ),
+    grantReason: text("grant_reason"),
+    grantedAt: integer("granted_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    revokedAt: integer("revoked_at", { mode: "timestamp" }),
+    revokedByAdminUserId: integer("revoked_by_admin_user_id").references(
+      () => adminUsers.id,
+      { onDelete: "set null" },
+    ),
+    revokeReason: text("revoke_reason"),
+  },
+  (table) => [
+    index("admin_role_grants_admin_user_idx").on(table.adminUserId),
+    index("admin_role_grants_role_idx").on(table.role),
+    index("admin_role_grants_active_lookup_idx").on(
+      table.adminUserId,
+      table.role,
+      table.revokedAt,
+    ),
+  ],
+);
+
+export const adminRoleGrantsRelations = relations(
+  adminRoleGrants,
+  ({ one }) => ({
+    adminUser: one(adminUsers, {
+      relationName: "adminRoleGrantTarget",
+      fields: [adminRoleGrants.adminUserId],
+      references: [adminUsers.id],
+    }),
+    grantedByAdminUser: one(adminUsers, {
+      relationName: "adminRoleGrantGranter",
+      fields: [adminRoleGrants.grantedByAdminUserId],
+      references: [adminUsers.id],
+    }),
+    revokedByAdminUser: one(adminUsers, {
+      relationName: "adminRoleGrantRevoker",
+      fields: [adminRoleGrants.revokedByAdminUserId],
+      references: [adminUsers.id],
+    }),
+  }),
+);
 
 export const devicePushTokens = sqliteTable(
   "device_push_tokens",
@@ -134,6 +271,8 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   tags: many(workspaceTags),
   invites: many(workspaceInvites),
   teamMemos: many(teamMemos),
+  contactInquiries: many(contactInquiries),
+  auditLogs: many(auditLogs),
   billingEvents: many(billingEvents),
   billingCheckoutEvents: many(billingCheckoutEvents),
   billingStates: many(workspaceBillingState),
@@ -643,3 +782,152 @@ export const teamMemosRelations = relations(teamMemos, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const auditLogs = sqliteTable(
+  "audit_logs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    actorType: text("actor_type", { enum: ["USER", "ADMIN"] }).notNull(),
+    actorUserId: integer("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    actorAdminUserId: integer("actor_admin_user_id").references(
+      () => adminUsers.id,
+      { onDelete: "set null" },
+    ),
+    workspaceId: integer("workspace_id").references(() => workspaces.id, {
+      onDelete: "set null",
+    }),
+    entityType: text("entity_type", {
+      enum: [
+        "WORKSPACE",
+        "WORKSPACE_MEMBER",
+        "WORKSPACE_INVITE",
+        "WORKSPACE_TAG",
+        "SCOREBOARD",
+        "LEAD_MEASURE",
+        "DAILY_LOG",
+        "TEAM_MEMO",
+        "USER",
+        "CONTACT_INQUIRY",
+        "ADMIN_USER",
+        "ADMIN_ROLE_GRANT",
+      ],
+    }).notNull(),
+    entityId: integer("entity_id"),
+    actionType: text("action_type", {
+      enum: [
+        "CREATE",
+        "UPDATE",
+        "DELETE",
+        "ARCHIVE",
+        "REACTIVATE",
+        "RESTORE",
+        "REMOVE_MEMBER",
+        "LEAVE_WORKSPACE",
+        "TRANSFER_ADMIN",
+        "STATUS_CHANGE",
+        "GRANT_ROLE",
+        "REVOKE_ROLE",
+      ],
+    }).notNull(),
+    metadata: text("metadata"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    index("audit_logs_workspace_created_idx").on(
+      table.workspaceId,
+      table.createdAt,
+    ),
+    index("audit_logs_entity_created_idx").on(
+      table.entityType,
+      table.entityId,
+      table.createdAt,
+    ),
+    index("audit_logs_actor_user_created_idx").on(
+      table.actorUserId,
+      table.createdAt,
+    ),
+    index("audit_logs_actor_admin_created_idx").on(
+      table.actorAdminUserId,
+      table.createdAt,
+    ),
+    index("audit_logs_actor_type_created_idx").on(
+      table.actorType,
+      table.createdAt,
+    ),
+  ],
+);
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  actorUser: one(users, {
+    fields: [auditLogs.actorUserId],
+    references: [users.id],
+  }),
+  actorAdminUser: one(adminUsers, {
+    fields: [auditLogs.actorAdminUserId],
+    references: [adminUsers.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [auditLogs.workspaceId],
+    references: [workspaces.id],
+  }),
+}));
+
+export const contactInquiries = sqliteTable(
+  "contact_inquiries",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    category: text("category", {
+      enum: ["GENERAL", "BILLING", "BUG_OR_ACCOUNT"],
+    }).notNull(),
+    status: text("status", {
+      enum: ["RECEIVED", "IN_PROGRESS", "RESOLVED"],
+    })
+      .notNull()
+      .default("RECEIVED"),
+    subject: text("subject").notNull(),
+    message: text("message").notNull(),
+    replyEmail: text("reply_email").notNull(),
+    consentedAt: integer("consented_at", { mode: "timestamp" }).notNull(),
+    locale: text("locale", { enum: ["ko", "en"] }).notNull().default("ko"),
+    source: text("source", { enum: ["CONTACT_PAGE"] })
+      .notNull()
+      .default("CONTACT_PAGE"),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    workspaceId: integer("workspace_id").references(() => workspaces.id, {
+      onDelete: "set null",
+    }),
+    answerSummary: text("answer_summary"),
+    answeredAt: integer("answered_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    index("contact_inquiries_user_idx").on(table.userId),
+    index("contact_inquiries_workspace_idx").on(table.workspaceId),
+    index("contact_inquiries_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const contactInquiriesRelations = relations(
+  contactInquiries,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [contactInquiries.userId],
+      references: [users.id],
+    }),
+    workspace: one(workspaces, {
+      fields: [contactInquiries.workspaceId],
+      references: [workspaces.id],
+    }),
+  }),
+);

@@ -6,7 +6,7 @@ import {
   workspaceBillingState,
   workspaces,
 } from "@/db/schema";
-import { and, desc, eq, gte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -101,9 +101,125 @@ export class BillingStorage {
     };
   }
 
+  async getRecentBillingRiskSummaries(workspaceIds: number[], since: Date) {
+    if (workspaceIds.length === 0) {
+      return new Map<
+        number,
+        { recentRefundCount: number; recentRevokedCount: number }
+      >();
+    }
+
+    const results = await this.db
+      .select({
+        workspaceId: billingEvents.workspaceId,
+        recentRefundCount:
+          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'order.refunded' then 1 else 0 end), 0)`,
+        recentRevokedCount:
+          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
+      })
+      .from(billingEvents)
+      .where(
+        and(
+          inArray(billingEvents.workspaceId, workspaceIds),
+          eq(billingEvents.status, "ACCEPTED"),
+          gte(billingEvents.occurredAt, since),
+        ),
+      )
+      .groupBy(billingEvents.workspaceId);
+
+    return new Map(
+      results.map((result) => [
+        result.workspaceId,
+        {
+          recentRefundCount: Number(result.recentRefundCount ?? 0),
+          recentRevokedCount: Number(result.recentRevokedCount ?? 0),
+        },
+      ]),
+    );
+  }
+
+  async searchAdminBillingWorkspaces(filters?: {
+    workspaceId?: number;
+    workspaceName?: string;
+  }) {
+    const conditions = [];
+
+    if (filters?.workspaceId) {
+      conditions.push(eq(workspaces.id, filters.workspaceId));
+    }
+    if (filters?.workspaceName) {
+      conditions.push(like(workspaces.name, `%${filters.workspaceName}%`));
+    }
+
+    return this.db
+      .select({
+        workspaceId: workspaces.id,
+        workspaceName: workspaces.name,
+        planCode: sql<"FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        billingStatus:
+          sql<
+            "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
+          >`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
+        provider: workspaceBillingState.provider,
+        currentPeriodEnd: workspaceBillingState.currentPeriodEnd,
+        cancelAtPeriodEnd: sql<boolean>`coalesce(${workspaceBillingState.cancelAtPeriodEnd}, false)`,
+        billingOwnerUserId: sql<number | null>`coalesce(${workspaceBillingState.billingOwnerUserId}, ${workspaces.billingOwnerUserId})`,
+        customerKey: workspaceBillingState.customerKey,
+        subscriptionKey: workspaceBillingState.subscriptionKey,
+        billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
+        lastEventOccurredAt: workspaceBillingState.lastEventOccurredAt,
+        updatedAt: workspaceBillingState.updatedAt,
+      })
+      .from(workspaces)
+      .leftJoin(
+        workspaceBillingState,
+        eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(desc(workspaces.id));
+  }
+
+  async findWorkspaceBillingAdminDetail(workspaceId: number) {
+    const [workspace] = await this.db
+      .select({
+        workspaceId: workspaces.id,
+        workspaceName: workspaces.name,
+        planCode: sql<"FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        billingStatus:
+          sql<
+            "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
+          >`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
+        provider: workspaceBillingState.provider,
+        currentPeriodEnd: workspaceBillingState.currentPeriodEnd,
+        cancelAtPeriodEnd: sql<boolean>`coalesce(${workspaceBillingState.cancelAtPeriodEnd}, false)`,
+        billingOwnerUserId: sql<number | null>`coalesce(${workspaceBillingState.billingOwnerUserId}, ${workspaces.billingOwnerUserId})`,
+        customerKey: workspaceBillingState.customerKey,
+        subscriptionKey: workspaceBillingState.subscriptionKey,
+        billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
+        lastEventOccurredAt: workspaceBillingState.lastEventOccurredAt,
+        updatedAt: workspaceBillingState.updatedAt,
+      })
+      .from(workspaces)
+      .leftJoin(
+        workspaceBillingState,
+        eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .where(eq(workspaces.id, workspaceId));
+
+    return workspace ?? null;
+  }
+
+  async listBillingEventsForWorkspace(workspaceId: number, limit = 50) {
+    return this.db.query.billingEvents.findMany({
+      where: eq(billingEvents.workspaceId, workspaceId),
+      orderBy: [desc(billingEvents.occurredAt), desc(billingEvents.id)],
+      limit,
+    });
+  }
+
   async appendBillingEvent(input: {
     workspaceId: number;
-    providerEventId: string;
+    providerEventId: string | null;
     eventType: string;
     subscriptionKey: string | null;
     customerKey: string | null;
@@ -111,6 +227,7 @@ export class BillingStorage {
     payloadJson: string;
     status?: "ACCEPTED" | "IGNORED" | "FAILED";
     failureReason?: string | null;
+    source?: "WEBHOOK" | "RECONCILIATION" | "MANUAL_CORRECTION";
   }) {
     const [event] = await this.db
       .insert(billingEvents)
@@ -125,7 +242,7 @@ export class BillingStorage {
         payloadJson: input.payloadJson,
         status: input.status ?? "ACCEPTED",
         failureReason: input.failureReason ?? null,
-        source: "WEBHOOK",
+        source: input.source ?? "WEBHOOK",
       })
       .returning();
 
