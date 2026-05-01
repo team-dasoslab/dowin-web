@@ -427,6 +427,7 @@ export interface ContactInquirySummary {
   status: ContactInquirySummaryStatus;
   replyEmail: string;
   subject: string;
+  message: string;
   source: ContactInquirySummarySource;
   userId: number;
   /** @nullable */

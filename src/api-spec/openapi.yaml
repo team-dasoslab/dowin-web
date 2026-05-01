@@ -2475,6 +2475,7 @@ components:
           status,
           replyEmail,
           subject,
+          message,
           source,
           userId,
           answerSummary,
@@ -2493,6 +2494,8 @@ components:
           type: string
           format: email
         subject:
+          type: string
+        message:
           type: string
         source:
           type: string

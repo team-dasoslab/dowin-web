@@ -1106,6 +1106,8 @@
     "unauthorizedTitle": "Login required",
     "unauthorizedDescription": "If your session expired, please log in again to review your inquiry history.",
     "answerPending": "No response summary has been added yet.",
+    "myMessage": "My Inquiry Details",
+    "answerLabel": "Answer",
     "category": {
       "general": "General inquiry",
       "billing": "Billing and refunds",

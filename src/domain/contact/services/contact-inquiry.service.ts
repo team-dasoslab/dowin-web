@@ -125,7 +125,7 @@ export class ContactInquiryService {
   async listMyInquiries(userId: number) {
     const records = await this.contactInquiryStorage.listByUserId(userId);
 
-    return records.map((record) => toContactInquiryDto(record, false));
+    return records.map((record) => toContactInquiryDto(record, true));
   }
 
   async getMyInquiry(userId: number, inquiryId: number) {
@@ -149,7 +149,7 @@ export class ContactInquiryService {
   }) {
     const records = await this.contactInquiryStorage.listForAdmin(filters);
 
-    return records.map((record) => toContactInquiryDto(record, false));
+    return records.map((record) => toContactInquiryDto(record, true));
   }
 
   async getAdminInquiry(inquiryId: number) {

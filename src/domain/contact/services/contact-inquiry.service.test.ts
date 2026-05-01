@@ -133,7 +133,7 @@ describe("ContactInquiryService", () => {
         answerSummary: "재현 중입니다.",
       }),
     ]);
-    expect(result[0]).not.toHaveProperty("message");
+    expect(result[0]).toHaveProperty("message");
   });
 
   it("자기 문의 상세를 반환한다", async () => {
@@ -196,7 +196,7 @@ describe("ContactInquiryService", () => {
         status: "RECEIVED",
       }),
     );
-    expect(result[0]).not.toHaveProperty("message");
+    expect(result[0]).toHaveProperty("message");
   });
 
   it("운영자 문의 상세를 반환한다", async () => {
