@@ -41,13 +41,22 @@ export function middleware(request: NextRequest) {
   // 1. Handle locale routing
   const response = intlMiddleware(request);
 
+  const segments = pathname.split("/");
+  const isNextIntlLocale = isSupportedLocale(segments[1]);
+  const pathWithoutLocale = isNextIntlLocale
+    ? "/" + segments.slice(2).join("/")
+    : pathname;
+
+  if (pathWithoutLocale.startsWith("/admin")) {
+    return response;
+  }
+
   // 2. Handle auth
   const hasSessionCookie = Boolean(request.cookies.get(SESSION_COOKIE)?.value);
 
   const nextLocaleCookie = request.cookies.get("NEXT_LOCALE")?.value;
 
   // Identify internal locale for redirects
-  const segments = pathname.split("/");
   const localeInPath = isSupportedLocale(segments[1]) ? segments[1] : null;
   const locale = localeInPath
     ? segments[1]

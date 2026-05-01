@@ -192,6 +192,296 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /admin/auth/login:
+    post:
+      summary: 운영자 로그인
+      tags: [AdminAuth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginRequest"
+      responses:
+        "200":
+          description: 운영자 로그인 성공
+          headers:
+            Set-Cookie:
+              schema:
+                {
+                  type: string,
+                  example: "dowin_admin_sid=abc; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=14400",
+                }
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [adminUser, roles]
+                properties:
+                  adminUser: { $ref: "#/components/schemas/AdminUser" }
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                      enum: [SUPPORT_ADMIN, BILLING_ADMIN, RECOVERY_ADMIN, SYSTEM_ADMIN]
+        "401":
+          description: 아이디 또는 비밀번호 불일치
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/auth/logout:
+    post:
+      summary: 운영자 로그아웃
+      tags: [AdminAuth]
+      security: [{ adminSessionCookie: [] }]
+      responses:
+        "204":
+          description: 운영자 로그아웃 성공
+          headers:
+            Set-Cookie:
+              schema:
+                {
+                  type: string,
+                  example: "dowin_admin_sid=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0",
+                }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /admin/auth/me:
+    get:
+      summary: 현재 운영자 세션 조회
+      tags: [AdminAuth]
+      security: [{ adminSessionCookie: [] }]
+      responses:
+        "200":
+          description: 운영자 세션 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSessionProfile"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /admin/contact-inquiries:
+    get:
+      summary: 운영자 문의 목록 조회
+      tags: [AdminContact]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [RECEIVED, IN_PROGRESS, RESOLVED]
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [GENERAL, BILLING, BUG_OR_ACCOUNT]
+        - name: userId
+          in: query
+          schema:
+            type: integer
+        - name: workspaceId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 운영자 문의 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContactInquirySummary"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/contact-inquiries/{id}:
+    get:
+      summary: 운영자 문의 상세 조회
+      tags: [AdminContact]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: 운영자 문의 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactInquiryDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 문의를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+    patch:
+      summary: 운영자 문의 상태/답변 수정
+      tags: [AdminContact]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminContactInquiryUpdateRequest"
+      responses:
+        "200":
+          description: 운영자 문의 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactInquiryDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 문의를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/billing/workspaces:
+    get:
+      summary: 운영자 billing 워크스페이스 목록 조회
+      tags: [AdminBilling]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: query
+          schema:
+            type: integer
+        - name: workspaceName
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 운영자 billing 워크스페이스 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminBillingWorkspaceSummary"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/billing/workspaces/{workspaceId}:
+    get:
+      summary: 운영자 billing 워크스페이스 상세 조회
+      tags: [AdminBilling]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 운영자 billing 워크스페이스 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminBillingWorkspaceDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/billing/workspaces/{workspaceId}/manual-override:
+    post:
+      summary: 운영자 billing 수동 보정
+      tags: [AdminBilling]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBillingManualOverrideRequest"
+      responses:
+        "200":
+          description: 운영자 billing 수동 보정 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminBillingWorkspaceDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /auth/password/by-recovery-code:
     put:
       summary: 복원코드로 비밀번호 재설정
@@ -1852,6 +2142,203 @@ components:
         customId: { type: string }
         nickname: { type: string }
 
+    AdminUser:
+      type: object
+      required: [id, loginId, displayName, status, mfaEnabled]
+      properties:
+        id: { type: integer }
+        loginId: { type: string }
+        displayName: { type: string }
+        status:
+          type: string
+          enum: [ACTIVE, SUSPENDED, DISABLED]
+        mfaEnabled:
+          type: boolean
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    AdminSessionProfile:
+      type: object
+      required: [adminUser, roles]
+      properties:
+        adminUser:
+          $ref: "#/components/schemas/AdminUser"
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [SUPPORT_ADMIN, BILLING_ADMIN, RECOVERY_ADMIN, SYSTEM_ADMIN]
+
+    AdminLoginRequest:
+      type: object
+      required: [loginId, password]
+      properties:
+        loginId:
+          type: string
+          minLength: 3
+          maxLength: 100
+        password:
+          type: string
+          format: password
+
+    AdminContactInquiryUpdateRequest:
+      type: object
+      required: [changeReason]
+      properties:
+        status:
+          type: string
+          enum: [RECEIVED, IN_PROGRESS, RESOLVED]
+        answerSummary:
+          type: string
+          nullable: true
+          maxLength: 5000
+        changeReason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
+    AdminBillingWorkspaceSummary:
+      type: object
+      required:
+        [
+          workspaceId,
+          workspaceName,
+          planCode,
+          billingStatus,
+          cancelAtPeriodEnd,
+          recentRefundCount,
+          recentRevokedCount,
+          requiresManualReview,
+        ]
+      properties:
+        workspaceId: { type: integer }
+        workspaceName: { type: string }
+        planCode:
+          type: string
+          enum: [FREE, STANDARD]
+        billingStatus:
+          type: string
+          enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
+        provider:
+          type: string
+          enum: [POLAR]
+          nullable: true
+        currentPeriodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        cancelAtPeriodEnd:
+          type: boolean
+        billingOwnerUserId:
+          type: integer
+          nullable: true
+        customerKey:
+          type: string
+          nullable: true
+        subscriptionKey:
+          type: string
+          nullable: true
+        billingCustomerExternalRef:
+          type: string
+          nullable: true
+        lastEventOccurredAt:
+          type: string
+          format: date-time
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        recentRefundCount:
+          type: integer
+          minimum: 0
+        recentRevokedCount:
+          type: integer
+          minimum: 0
+        requiresManualReview:
+          type: boolean
+
+    AdminBillingEvent:
+      type: object
+      required:
+        [id, provider, eventType, occurredAt, recordedAt, status, source]
+      properties:
+        id: { type: integer }
+        provider:
+          type: string
+          enum: [POLAR]
+        providerEventId:
+          type: string
+          nullable: true
+        eventType:
+          type: string
+        subscriptionKey:
+          type: string
+          nullable: true
+        customerKey:
+          type: string
+          nullable: true
+        occurredAt:
+          type: string
+          format: date-time
+        recordedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [ACCEPTED, IGNORED, FAILED]
+        failureReason:
+          type: string
+          nullable: true
+        source:
+          type: string
+          enum: [WEBHOOK, RECONCILIATION, MANUAL_CORRECTION]
+
+    AdminBillingWorkspaceDetail:
+      allOf:
+        - $ref: "#/components/schemas/AdminBillingWorkspaceSummary"
+        - type: object
+          required: [events]
+          properties:
+            events:
+              type: array
+              items:
+                $ref: "#/components/schemas/AdminBillingEvent"
+
+    AdminBillingManualOverrideRequest:
+      type: object
+      required: [planCode, billingStatus, changeReason]
+      properties:
+        planCode:
+          type: string
+          enum: [FREE, STANDARD]
+        billingStatus:
+          type: string
+          enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
+        customerKey:
+          type: string
+          nullable: true
+          maxLength: 255
+        subscriptionKey:
+          type: string
+          nullable: true
+          maxLength: 255
+        currentPeriodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        cancelAtPeriodEnd:
+          type: boolean
+        billingOwnerUserId:
+          type: integer
+          nullable: true
+        changeReason:
+          type: string
+          minLength: 1
+          maxLength: 500
+
     UserProfile:
       type: object
       properties:
@@ -1988,6 +2475,7 @@ components:
           status,
           replyEmail,
           subject,
+          message,
           source,
           userId,
           answerSummary,
@@ -2006,6 +2494,8 @@ components:
           type: string
           format: email
         subject:
+          type: string
+        message:
           type: string
         source:
           type: string
@@ -2670,3 +3160,7 @@ components:
       type: apiKey
       in: cookie
       name: dowin_sid
+    adminSessionCookie:
+      type: apiKey
+      in: cookie
+      name: dowin_admin_sid
