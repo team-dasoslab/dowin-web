@@ -43,6 +43,11 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "429":
+          description: 로그인 시도 제한 초과
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
         "422":
           description: 입력값 유효성 오류
           content:
@@ -135,6 +140,13 @@ paths:
       responses:
         "200":
           description: 비밀번호 변경 성공
+          headers:
+            Set-Cookie:
+              schema:
+                {
+                  type: string,
+                  example: "dowin_sid=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
+                }
           content:
             application/json:
               schema:

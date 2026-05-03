@@ -3,10 +3,11 @@ import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { passwordChangeSchema } from "@/domain/auth/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
+import { getSessionWithRefresh, SESSION_COOKIE } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { cookies } from "next/headers";
 
 export const PUT = withErrorHandler(async (request: Request) => {
   const { env } = getCloudflareContext();
@@ -43,6 +44,10 @@ export const PUT = withErrorHandler(async (request: Request) => {
       parsed.data.currentPassword,
       parsed.data.newPassword,
     );
+
+    const cookieStore = await cookies();
+    cookieStore.delete(SESSION_COOKIE);
+
     return apiSuccess({ message: "비밀번호가 변경되었습니다." });
   } catch (error: unknown) {
     if (

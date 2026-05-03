@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
@@ -528,9 +529,11 @@ export function RootLandingPage() {
               rel="noopener noreferrer"
               className="transition-transform duration-200"
             >
-              <img
+              <Image
                 src="/assets/store/appstore.png"
                 alt={t("Download.appStore")}
+                width={182}
+                height={54}
                 className="h-12 md:h-[54px] w-auto object-contain select-none"
               />
             </a>
@@ -540,9 +543,11 @@ export function RootLandingPage() {
               rel="noopener noreferrer"
               className="transition-transform duration-200"
             >
-              <img
+              <Image
                 src="/assets/store/playstore.png"
                 alt={t("Download.playStore")}
+                width={182}
+                height={54}
                 className="h-12 md:h-[54px] w-auto object-contain select-none"
               />
             </a>

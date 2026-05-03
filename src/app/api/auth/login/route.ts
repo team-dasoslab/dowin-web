@@ -9,6 +9,11 @@ import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies } from "next/headers";
 
+const getClientIp = (request: Request) =>
+  request.headers.get("cf-connecting-ip")?.split(",")[0]?.trim() ??
+  request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+  "";
+
 export const POST = withErrorHandler(async (request: Request) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
@@ -26,6 +31,7 @@ export const POST = withErrorHandler(async (request: Request) => {
     const { user, sessionId } = await service.login(
       parsed.data.customId,
       parsed.data.password,
+      getClientIp(request),
     );
 
     const cookieStore = await cookies();
