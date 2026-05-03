@@ -1039,6 +1039,12 @@
       "privacy": "개인정보처리방침",
       "terms": "이용약관",
       "billingPolicy": "결제 및 환불 정책"
+    },
+    "Download": {
+      "title": "앱 다운로드하기",
+      "desc": "언제 어디서나 팀의 핵심 목표와 액션 아이템을 실시간으로 확인하고 기록하세요.",
+      "appStore": "App Store",
+      "playStore": "Google Play"
     }
   },
   "ContactPage": {
