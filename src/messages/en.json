@@ -828,6 +828,7 @@
     "VALIDATION_ERROR": "Invalid input values.",
     "INTERNAL_ERROR": "Server error. Please try again later.",
     "INVALID_CREDENTIALS": "Invalid ID or password.",
+    "LOGIN_RATE_LIMITED": "Too many login attempts. Please try again in 15 minutes.",
     "INVALID_RECOVERY_CODE": "Invalid recovery code.",
     "SESSION_EXPIRED": "Session expired. Please log in again.",
     "WRONG_PASSWORD": "Current password is incorrect.",
@@ -1171,4 +1172,3 @@
     "pwPlaceholder": "Enter Password"
   }
 }
-
