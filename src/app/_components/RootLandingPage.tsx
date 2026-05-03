@@ -504,6 +504,52 @@ export function RootLandingPage() {
         </div>
       </section>
 
+      {/* 8. App Download Section */}
+      <section className="bg-zinc-950 py-20 md:py-32 text-white relative overflow-hidden border-t border-zinc-800">
+        <div className="absolute inset-0 bg-dowin-grid-pattern bg-[size:32px_32px] opacity-10 pointer-events-none" />
+        <div className="absolute left-1/2 top-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-[140px] pointer-events-none" />
+
+        <div className="mx-auto max-w-[1100px] px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12 md:gap-16 relative z-10">
+          {/* Left Column: Text Content */}
+          <div className="max-w-xl text-center md:text-left space-y-4">
+            <h3 className="text-[36px] md:text-[52px] font-black tracking-tight text-white leading-[1.1] break-keep">
+              {t("Download.title")}
+            </h3>
+            <p className="text-[16px] md:text-[18px] text-zinc-400 font-medium leading-relaxed break-keep">
+              {t("Download.desc")}
+            </p>
+          </div>
+
+          {/* Right Column: Stacked Store Buttons */}
+          <div className="flex flex-col items-center md:items-end gap-4 shrink-0">
+            <a
+              href="https://apps.apple.com/kr/app/dowin/id6764197512"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-transform duration-200"
+            >
+              <img
+                src="/assets/store/appstore.png"
+                alt={t("Download.appStore")}
+                className="h-12 md:h-[54px] w-auto object-contain select-none"
+              />
+            </a>
+            <a
+              href="https://play.google.com/store/apps/details?id=com.dasoslab.dowin"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-transform duration-200"
+            >
+              <img
+                src="/assets/store/playstore.png"
+                alt={t("Download.playStore")}
+                className="h-12 md:h-[54px] w-auto object-contain select-none"
+              />
+            </a>
+          </div>
+        </div>
+      </section>
+
       <Footer className="border-t border-border" />
     </main>
   );
