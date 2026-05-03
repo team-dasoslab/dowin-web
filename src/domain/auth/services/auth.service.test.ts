@@ -3,6 +3,7 @@ import {
   AuthService,
   type AuthStoragePort,
 } from "@/domain/auth/services/auth.service";
+import { TooManyRequestsError } from "@/lib/server/errors";
 import bcrypt from "bcryptjs";
 import {
   beforeEach,
@@ -22,11 +23,16 @@ const createMockStorage = (): MockStorage => ({
   findUserById: vi.fn(),
   createUser: vi.fn(),
   updateUserPassword: vi.fn(),
+  deleteSessionsByUserId: vi.fn(),
   createSession: vi.fn(),
   createRecoveryCodes: vi.fn(),
   findRecoveryCodeWithUser: vi.fn(),
   consumeRecoveryCode: vi.fn(),
   deleteSession: vi.fn(),
+  findLoginAttempt: vi.fn(),
+  createLoginAttempt: vi.fn(),
+  updateLoginAttempt: vi.fn(),
+  deleteLoginAttempt: vi.fn(),
 });
 
 describe("Auth Service - login", () => {
@@ -49,6 +55,7 @@ describe("Auth Service - login", () => {
       createdAt: new Date(),
     };
 
+    mockStorage.findLoginAttempt.mockResolvedValue(null);
     mockStorage.findUserByCustomId.mockResolvedValue(mockUser);
 
     const result = await service.login("john123", "password123");
@@ -63,6 +70,7 @@ describe("Auth Service - login", () => {
         expiresAt: expect.any(Date),
       }),
     );
+    expect(mockStorage.deleteLoginAttempt).toHaveBeenCalledWith("john123", "");
 
     const expiresAt = mockStorage.createSession.mock.calls[0]?.[0]?.expiresAt;
     expect(expiresAt.getTime()).toBeGreaterThan(
@@ -71,10 +79,18 @@ describe("Auth Service - login", () => {
   });
 
   it("아이디가 존재하지 않으면 에러를 던진다", async () => {
+    mockStorage.findLoginAttempt.mockResolvedValue(null);
     mockStorage.findUserByCustomId.mockResolvedValue(undefined);
 
     await expect(service.login("unknown", "pass")).rejects.toThrow(
       "아이디 또는 비밀번호가 올바르지 않습니다",
+    );
+    expect(mockStorage.createLoginAttempt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customId: "unknown",
+        ipAddress: "",
+        failureCount: 1,
+      }),
     );
   });
 
@@ -89,11 +105,77 @@ describe("Auth Service - login", () => {
       locale: "ko",
       createdAt: new Date(),
     };
+    mockStorage.findLoginAttempt.mockResolvedValue(null);
     mockStorage.findUserByCustomId.mockResolvedValue(mockUser);
 
     await expect(service.login("john123", "wrong-pass")).rejects.toThrow(
       "아이디 또는 비밀번호가 올바르지 않습니다",
     );
+    expect(mockStorage.createLoginAttempt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customId: "john123",
+        ipAddress: "",
+        failureCount: 1,
+      }),
+    );
+  });
+
+  it("같은 아이디와 IP에서 10회 실패하면 로그인 시도를 차단한다", async () => {
+    const mockUser = {
+      id: 1,
+      customId: "john123",
+      passwordHash: await bcrypt.hash("correct-pass", 10),
+      nickname: "John",
+      avatarKey: null,
+      isFirstLogin: true,
+      locale: "ko",
+      createdAt: new Date(),
+    };
+
+    mockStorage.findLoginAttempt.mockResolvedValue({
+      id: 3,
+      customId: "john123",
+      ipAddress: "1.2.3.4",
+      failureCount: 9,
+      firstFailedAt: new Date(Date.now() - 60_000),
+      lastFailedAt: new Date(Date.now() - 30_000),
+      blockedUntil: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    mockStorage.findUserByCustomId.mockResolvedValue(mockUser);
+
+    await expect(
+      service.login("john123", "wrong-pass", "1.2.3.4"),
+    ).rejects.toBeInstanceOf(TooManyRequestsError);
+
+    expect(mockStorage.updateLoginAttempt).toHaveBeenCalledWith(
+      3,
+      expect.objectContaining({
+        failureCount: 10,
+        blockedUntil: expect.any(Date),
+      }),
+    );
+  });
+
+  it("차단 시간이 남아 있으면 비밀번호를 보지 않고 429를 반환한다", async () => {
+    mockStorage.findLoginAttempt.mockResolvedValue({
+      id: 9,
+      customId: "john123",
+      ipAddress: "1.2.3.4",
+      failureCount: 10,
+      firstFailedAt: new Date(Date.now() - 60_000),
+      lastFailedAt: new Date(Date.now() - 30_000),
+      blockedUntil: new Date(Date.now() + 60_000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await expect(
+      service.login("john123", "password123", "1.2.3.4"),
+    ).rejects.toBeInstanceOf(TooManyRequestsError);
+
+    expect(mockStorage.findUserByCustomId).not.toHaveBeenCalled();
   });
 });
 
@@ -188,6 +270,7 @@ describe("Auth Service - changePassword", () => {
     await service.changePassword(1, "old-pass", "new-pass-123!");
 
     expect(mockStorage.updateUserPassword).toHaveBeenCalled();
+    expect(mockStorage.deleteSessionsByUserId).toHaveBeenCalledWith(1);
   });
 
   it("현재 비밀번호가 일치하지 않으면 에러를 던진다", async () => {
@@ -329,6 +412,7 @@ describe("Auth Service - resetPasswordByRecoveryCode", () => {
       7,
       expect.any(String),
     );
+    expect(mockStorage.deleteSessionsByUserId).toHaveBeenCalledWith(7);
   });
 
   it("복원코드가 유효하지 않으면 에러를 던진다", async () => {
