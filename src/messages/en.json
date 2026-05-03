@@ -1038,6 +1038,12 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "billingPolicy": "Billing & Refund Policy"
+    },
+    "Download": {
+      "title": "Download the app",
+      "desc": "Stay on top of your team's goals and action items from anywhere.",
+      "appStore": "App Store",
+      "playStore": "Google Play"
     }
   },
   "ContactPage": {
