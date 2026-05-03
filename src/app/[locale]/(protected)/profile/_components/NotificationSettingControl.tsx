@@ -51,7 +51,8 @@ export function NotificationSettingControl({
   const isNativeApp = useNativeApp();
   const { showToast } = useToast();
   const { mutateAsync: registerDevice } = usePostNotificationsDevices();
-  const { mutateAsync: disableDevice, isPending: isDisablePending } = useDeleteNotificationsDevices();
+  const { mutateAsync: disableDevice, isPending: isDisablePending } =
+    useDeleteNotificationsDevices();
   const [isRegisterPending, setIsRegisterPending] = useState(false);
   const initialPreference = getInitialNotificationPreference();
   const [isRegistered, setIsRegistered] = useState(initialPreference);
@@ -88,7 +89,7 @@ export function NotificationSettingControl({
     async ({ silent }: { silent: boolean }) => {
       const token = await getPushToken();
       const appVersion = await getAppVersion();
-      
+
       setIsRegisterPending(true);
       try {
         const response = await registerDevice({
@@ -154,14 +155,7 @@ export function NotificationSettingControl({
     return () => {
       cancelled = true;
     };
-  }, [
-    isNativeApp,
-    hasSyncedOnLoad,
-    isSyncing,
-    permission,
-    registerCurrentDevice,
-    shouldResyncOnLoad,
-  ]);
+  }, [isNativeApp, hasSyncedOnLoad, permission, shouldResyncOnLoad]);
 
   const handleEnable = async () => {
     try {
