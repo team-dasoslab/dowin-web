@@ -24,6 +24,7 @@ import { Card } from "@/components/ui/Card";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { useNativeApp } from "@/context/NativeAppContext";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -64,6 +65,7 @@ export default function ProfilePage() {
       ? workspaceResponse.data
       : null;
   const workspacePlanCode = workspace?.planCode ?? "FREE";
+  const showBillingSurface = publicRuntimeConfig.isDevelopment && !isNativeApp;
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const nickname = user?.nickname ?? t("defaultNickname");
   const customId = user?.customId ?? "";
@@ -165,7 +167,7 @@ export default function ProfilePage() {
       items: hasWorkspace
         ? isWorkspaceAdmin
           ? [
-              ...(!isNativeApp
+              ...(showBillingSurface
                 ? [
                     {
                       id: workspacePlanCode === "STANDARD" ? "billing" : "pricing",
