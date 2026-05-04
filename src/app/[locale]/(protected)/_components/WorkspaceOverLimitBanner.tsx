@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -19,6 +20,7 @@ export function WorkspaceOverLimitBanner({
 }: WorkspaceOverLimitBannerProps) {
   const t = useTranslations("WorkspaceOverLimit");
   const isNativeApp = useNativeApp();
+  const showBillingSurface = publicRuntimeConfig.isDevelopment && !isNativeApp;
   const count = memberCount ?? 0;
   const limit = freeMemberLimit ?? 10;
 
@@ -53,7 +55,7 @@ export function WorkspaceOverLimitBanner({
                   {t("manageMembers")}
                 </Link>
               </Button>
-              {!isNativeApp ? (
+              {showBillingSurface ? (
                 <Button
                   asChild
                   className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-600 px-3 text-[11px] font-bold text-white hover:bg-red-700"
