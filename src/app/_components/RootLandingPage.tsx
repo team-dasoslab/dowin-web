@@ -513,7 +513,7 @@ export function RootLandingPage() {
         <div className="mx-auto max-w-[1100px] px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12 md:gap-16 relative z-10">
           {/* Left Column: Text Content */}
           <div className="max-w-xl text-center md:text-left space-y-4">
-            <h3 className="text-[36px] md:text-[52px] font-black tracking-tight text-white leading-[1.1] break-keep">
+            <h3 className="text-[28px] md:text-[40px] font-black tracking-tight text-white leading-[1.1] break-keep">
               {t("Download.title")}
             </h3>
             <p className="text-[16px] md:text-[18px] text-zinc-400 font-medium leading-relaxed break-keep">

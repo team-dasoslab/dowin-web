@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-DOWIN is a goal-management service built around 4DX concepts. This repository uses Next.js, React 19, Tailwind CSS 4, Cloudflare D1, Orval, TanStack Query, Zod, Vitest, and Storybook.
+Dowin is a goal-management service built around 4DX concepts. This repository uses Next.js, React 19, Tailwind CSS 4, Cloudflare D1, Orval, TanStack Query, Zod, Vitest, and Storybook.
 
 ## Core Reading Order
 
