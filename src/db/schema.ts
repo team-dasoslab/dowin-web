@@ -62,6 +62,37 @@ export const authRecoveryCodesRelations = relations(
   }),
 );
 
+export const authLoginAttempts = sqliteTable(
+  "auth_login_attempts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    customId: text("custom_id").notNull(),
+    ipAddress: text("ip_address").notNull().default(""),
+    failureCount: integer("failure_count").notNull().default(0),
+    firstFailedAt: integer("first_failed_at", { mode: "timestamp" }).notNull(),
+    lastFailedAt: integer("last_failed_at", { mode: "timestamp" }).notNull(),
+    blockedUntil: integer("blocked_until", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("auth_login_attempts_custom_id_ip_unique").on(
+      table.customId,
+      table.ipAddress,
+    ),
+    index("auth_login_attempts_blocked_until_idx").on(table.blockedUntil),
+  ],
+);
+
+export const authLoginAttemptsRelations = relations(
+  authLoginAttempts,
+  () => ({}),
+);
+
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(), // nanoid
   userId: integer("user_id")

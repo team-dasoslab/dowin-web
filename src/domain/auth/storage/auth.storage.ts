@@ -1,5 +1,10 @@
 import { getDb } from "@/db";
-import { authRecoveryCodes, sessions, users } from "@/db/schema";
+import {
+  authLoginAttempts,
+  authRecoveryCodes,
+  sessions,
+  users,
+} from "@/db/schema";
 import { and, eq, isNull } from "drizzle-orm";
 
 export class AuthStorage {
@@ -36,6 +41,10 @@ export class AuthStorage {
         isFirstLogin: false,
       })
       .where(eq(users.id, userId));
+  }
+
+  async deleteSessionsByUserId(userId: number) {
+    await this.db.delete(sessions).where(eq(sessions.userId, userId));
   }
 
   async createSession(data: { id: string; userId: number; expiresAt: Date }) {
@@ -81,5 +90,64 @@ export class AuthStorage {
 
   async deleteSession(sessionId: string) {
     await this.db.delete(sessions).where(eq(sessions.id, sessionId));
+  }
+
+  async findLoginAttempt(customId: string, ipAddress: string) {
+    return (
+      (await this.db.query.authLoginAttempts.findFirst({
+        where: and(
+          eq(authLoginAttempts.customId, customId),
+          eq(authLoginAttempts.ipAddress, ipAddress),
+        ),
+      })) ?? null
+    );
+  }
+
+  async createLoginAttempt(input: {
+    customId: string;
+    ipAddress: string;
+    failureCount: number;
+    firstFailedAt: Date;
+    lastFailedAt: Date;
+    blockedUntil: Date | null;
+  }) {
+    const [created] = await this.db
+      .insert(authLoginAttempts)
+      .values(input)
+      .returning();
+
+    return created;
+  }
+
+  async updateLoginAttempt(
+    id: number,
+    input: {
+      failureCount: number;
+      firstFailedAt: Date;
+      lastFailedAt: Date;
+      blockedUntil: Date | null;
+    },
+  ) {
+    const [updated] = await this.db
+      .update(authLoginAttempts)
+      .set({
+        ...input,
+        updatedAt: new Date(),
+      })
+      .where(eq(authLoginAttempts.id, id))
+      .returning();
+
+    return updated ?? null;
+  }
+
+  async deleteLoginAttempt(customId: string, ipAddress: string) {
+    await this.db
+      .delete(authLoginAttempts)
+      .where(
+        and(
+          eq(authLoginAttempts.customId, customId),
+          eq(authLoginAttempts.ipAddress, ipAddress),
+        ),
+      );
   }
 }

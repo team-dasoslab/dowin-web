@@ -155,7 +155,14 @@ export function NotificationSettingControl({
     return () => {
       cancelled = true;
     };
-  }, [isNativeApp, hasSyncedOnLoad, permission, shouldResyncOnLoad]);
+  }, [
+    isNativeApp,
+    hasSyncedOnLoad,
+    permission,
+    shouldResyncOnLoad,
+    isSyncing,
+    registerCurrentDevice,
+  ]);
 
   const handleEnable = async () => {
     try {

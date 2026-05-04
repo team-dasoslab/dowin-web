@@ -23,6 +23,11 @@ export class UnauthorizedError extends PlatformError {
   public readonly statusCode = 401;
 }
 
+// 429 Too Many Requests
+export class TooManyRequestsError extends PlatformError {
+  public readonly statusCode = 429;
+}
+
 // 403 Forbidden
 export class ForbiddenError extends PlatformError {
   public readonly statusCode = 403;

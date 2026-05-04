@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
@@ -512,7 +513,7 @@ export function RootLandingPage() {
         <div className="mx-auto max-w-[1100px] px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12 md:gap-16 relative z-10">
           {/* Left Column: Text Content */}
           <div className="max-w-xl text-center md:text-left space-y-4">
-            <h3 className="text-[36px] md:text-[52px] font-black tracking-tight text-white leading-[1.1] break-keep">
+            <h3 className="text-[28px] md:text-[40px] font-black tracking-tight text-white leading-[1.1] break-keep">
               {t("Download.title")}
             </h3>
             <p className="text-[16px] md:text-[18px] text-zinc-400 font-medium leading-relaxed break-keep">
@@ -528,9 +529,11 @@ export function RootLandingPage() {
               rel="noopener noreferrer"
               className="transition-transform duration-200"
             >
-              <img
+              <Image
                 src="/assets/store/appstore.png"
                 alt={t("Download.appStore")}
+                width={182}
+                height={54}
                 className="h-12 md:h-[54px] w-auto object-contain select-none"
               />
             </a>
@@ -540,9 +543,11 @@ export function RootLandingPage() {
               rel="noopener noreferrer"
               className="transition-transform duration-200"
             >
-              <img
+              <Image
                 src="/assets/store/playstore.png"
                 alt={t("Download.playStore")}
+                width={182}
+                height={54}
                 className="h-12 md:h-[54px] w-auto object-contain select-none"
               />
             </a>

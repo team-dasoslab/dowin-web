@@ -828,6 +828,7 @@
     "VALIDATION_ERROR": "Invalid input values.",
     "INTERNAL_ERROR": "Server error. Please try again later.",
     "INVALID_CREDENTIALS": "Invalid ID or password.",
+    "LOGIN_RATE_LIMITED": "Too many login attempts. Please try again in 15 minutes.",
     "INVALID_RECOVERY_CODE": "Invalid recovery code.",
     "SESSION_EXPIRED": "Session expired. Please log in again.",
     "WRONG_PASSWORD": "Current password is incorrect.",
@@ -935,9 +936,9 @@
     },
     "Hero": {
       "badge": "Keep the important goal in view",
-      "headline": "Busy every day,\nso why do results stay flat?",
-      "description": "For teams that are busy handling what is right in front of them and losing sight of the goal that matters most.\nDefine the important goal clearly and carry it through to real results.",
-      "cta": "Get Started"
+      "headline": "Are you really focused on\nthe goal that matters most?",
+      "description": "Everyone is busy, yet the goal stays flat.\nDowin aligns your team from the primary goal down to weekly execution — so everyone moves in the same direction.",
+      "cta": "Get Started Now"
     },
     "Mockup": {
       "workspace": "Our Workspace",
@@ -952,38 +953,37 @@
       "teamStatus": "This week's execution by teammate"
     },
     "MetricBand": {
-      "title": "Help the team move around\na shared goal and flow",
       "title": "Do not spread the team across many goals.\nFocus on the one that matters most.",
-      "oneTitle": "One goal first",
-      "oneLabel": "Focus on the\nsingle goal that matters most",
-      "oneDesc": "The more goals a team carries, the easier it is for everyone to stay busy in different directions. Start by setting the one goal that matters most so priorities stay aligned.",
+      "oneTitle": "Primary Goal",
+      "oneLabel": "The single goal\nthat must be achieved",
+      "oneDesc": "When a team chases everything at once, nothing gets done. Defining the one goal that must be achieved is where execution begins.",
       "stat1Value": "80",
-      "stat1Desc": "Execution being recorded\nfor this week's action items",
+      "stat1Desc": "Execution rate of action items\nbeing recorded this week",
       "stat2Value": "10",
-      "stat2Desc": "Weekly check-ins that\nstay short and finish quickly"
+      "stat2Desc": "Weekly check-ins that stay\nshort and finish quickly"
     },
     "WhyDowin": {
-      "header": "Success criteria and action items",
+      "header": "A different way to set goals",
       "description": "",
-      "item1Badge": "The metric that judges the result",
-      "item1Title": "Define the success criteria\nbefore anything else",
-      "item1Desc": "Success criteria are the measure that tells the team whether the goal has been achieved. The team needs that finish line first so everyone can judge the same outcome and see where they stand.",
+      "item1Badge": "Success Criteria",
+      "item1Title": "Define success criteria\nwith a clear number",
+      "item1Desc": "Without a finish line, teams can look at the same result and draw different conclusions. Define exactly how far you need to go for it to count as success, and keep everyone pointed the same way.",
       "item1VisualGoal": "Grow monthly signups\nfrom 300 to 1,000",
-      "item2Badge": "The actions that change the result",
-      "item2Title": "Keep checking action items\nrepeatedly",
-      "item2Desc": "Action items are the actions most likely to change the result. The result itself cannot be moved directly today, but the team can choose and repeatedly check the behaviors that influence it.",
+      "item2Badge": "Action Items",
+      "item2Title": "Execute the actions\nthat move the result",
+      "item2Desc": "Results cannot be moved directly today. But the behaviors that drive those results can be defined and acted on right now. Lead measures are what make goals move.",
       "item2VisualTitle": "This week's action items",
       "item2VisualAction": "Review signup conversion metrics"
     },
     "ExecutionLoop": {
-      "title": "See this week's team performance\nright on the scoreboard",
-      "description": "When the primary goal, success criteria, and action items come together in one place, the team can see how far it has progressed without extra prep before a meeting.",
-      "step1Title": "Action-item records build up",
-      "step1Desc": "As each person's action-item records gather in one place, this week's execution flow starts to become visible.",
-      "step2Title": "You can see the team's performance and where it is stuck",
-      "step2Desc": "The scoreboard helps the team quickly see how far it has progressed, what may be getting missed, and where support is needed.",
-      "step3Title": "Weekly check-ins become shorter and clearer",
-      "step3Desc": "Instead of stretching meetings out, the team can quickly align around what the scoreboard already shows."
+      "title": "Manage execution\non the scoreboard",
+      "description": "When the primary goal, success criteria, and action items come together in one place, the team's position becomes unmistakably clear. No more pre-meeting prep.",
+      "step1Title": "Daily action item recording",
+      "step1Desc": "As each person's daily records build up, the team's overall execution flow forms automatically.",
+      "step2Title": "Full team status at a glance",
+      "step2Desc": "The scoreboard shows who is executing and where things are stalling — no separate report, no need to ask.",
+      "step3Title": "Weekly direction alignment",
+      "step3Desc": "Review this week's results on the scoreboard and adjust next steps quickly. No long meeting required."
     },
     "Features": {
       "title": "Designed less for storing records,\nand more for keeping execution moving.",
@@ -1000,7 +1000,7 @@
       "header": "Start with a small team,\nand expand only when needed.",
       "description": "Try the core execution flow first on the Free plan, then expand when the team needs deeper operating features.",
       "cadence": "/ mo",
-      "ctaFree": "Get Started for Free",
+      "ctaFree": "Get Started",
       "ctaStandard": "Get Notified",
       "standardOnly": "STANDARD Only",
       "plans": {
@@ -1031,8 +1031,8 @@
       }
     },
     "Footer": {
-      "headline": "Keep the important goal in view,\nstart now",
-      "description": "Manage your primary goal, success criteria, and action items in one place, and review team performance on the scoreboard.",
+      "headline": "Now it's time to focus\non what matters most",
+      "description": "Primary goal, success criteria, action items. Dowin connects your team's execution into a single flow.",
       "cta": "Get Started",
       "contact": "Contact Us",
       "privacy": "Privacy Policy",
@@ -1040,8 +1040,8 @@
       "billingPolicy": "Billing & Refund Policy"
     },
     "Download": {
-      "title": "Download the app",
-      "desc": "Stay on top of your team's goals and action items from anywhere.",
+      "title": "Keep execution going\nfrom anywhere",
+      "desc": "Check and log your team's primary goal and action items in real time from the app.",
       "appStore": "App Store",
       "playStore": "Google Play"
     }
@@ -1171,4 +1171,3 @@
     "pwPlaceholder": "Enter Password"
   }
 }
-
