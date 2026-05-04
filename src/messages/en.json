@@ -937,7 +937,7 @@
     "Hero": {
       "badge": "Keep the important goal in view",
       "headline": "Are you really focused on\nthe goal that matters most?",
-      "description": "Everyone is busy, yet the goal stays flat.\nDowin aligns your team from the primary goal down to weekly execution — so everyone moves in the same direction.",
+      "description": "For teams that stay busy but struggle to see their progress clearly.\nDowin aligns your team from the primary goal down to weekly execution, so everyone moves in the same direction.",
       "cta": "Get Started Now"
     },
     "Mockup": {
@@ -1040,7 +1040,7 @@
       "billingPolicy": "Billing & Refund Policy"
     },
     "Download": {
-      "title": "Keep execution going\nfrom anywhere",
+      "title": "Download the app",
       "desc": "Check and log your team's primary goal and action items in real time from the app.",
       "appStore": "App Store",
       "playStore": "Google Play"
