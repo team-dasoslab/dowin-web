@@ -38,7 +38,7 @@
     "myProfile": "내 프로필",
     "memberSummary": "팀원 현황 요약",
     "teamWeeklyScoreboard": "팀 주간 점수판",
-    "teamWeeklyScoreboardDesc": "팀원 전체의 이번 주 액션 아이템 실행 현황",
+    "teamWeeklyScoreboardDesc": "선택한 주차 기준으로 팀원 전체의 액션 아이템 실행 현황을 확인합니다.",
     "noMembers": "아직 팀원이 없습니다.",
     "noActiveScoreboards": "아직 활성화된 점수판이 없습니다.",
     "noWorkspaceTitle": "아직 워크스페이스가 없습니다",
