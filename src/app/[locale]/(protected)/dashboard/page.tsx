@@ -6,6 +6,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { TeamPeriodControls } from "@/app/[locale]/(protected)/dashboard/_components/TeamPeriodControls";
 import { MemberCard } from "@/app/[locale]/(protected)/dashboard/_components/MemberCard";
 import { WeeklyTable } from "@/app/[locale]/(protected)/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/[locale]/(protected)/dashboard/_hooks/useTeamDashboard";
@@ -20,7 +21,6 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { EmptyStatePanel } from "../_components/EmptyStatePanel";
-import { formatWeekLabel } from "./_lib/dashboard";
 
 type ActiveMemoState = {
   memberId: number;
@@ -29,8 +29,22 @@ type ActiveMemoState = {
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
-  const { dashboard, hasNoWorkspace, isLoading, weekDates } =
-    useTeamDashboard();
+  const {
+    dashboard,
+    hasNoWorkspace,
+    historyLimitDate,
+    isHistoryLimited,
+    isLoading,
+    isPeriodLoading,
+    isPreviousDisabled,
+    isResetVisible,
+    movePeriod,
+    resetToToday,
+    selectedDate,
+    setSelectedDate,
+    weekDates,
+    weekLabel,
+  } = useTeamDashboard();
   const { data: profileResponse } = useGetUsersMe();
   const [activeMemoState, setActiveMemoState] = useState<ActiveMemoState>(null);
   const myUserId =
@@ -119,7 +133,6 @@ export default function DashboardPage() {
     return <DashboardNoScoreboardState />;
   }
 
-  const weekLabel = formatWeekLabel(dashboard?.weekStart, dashboard?.weekEnd);
   const currentUserRole =
     members.find((member) => member.userId === myUserId)?.role ?? null;
 
@@ -223,12 +236,27 @@ export default function DashboardPage() {
               id="scoreboard"
               className="space-y-6 overflow-visible scroll-mt-28"
             >
-              <div>
-                <SectionHeader
-                  title={t("teamWeeklyScoreboard")}
-                  description={t("teamWeeklyScoreboardDesc")}
-                />
-              </div>
+              <SectionHeader
+                title={t("teamWeeklyScoreboard")}
+                description={t("teamWeeklyScoreboardDesc")}
+              />
+              <TeamPeriodControls
+                historyLimitDate={historyLimitDate}
+                isPeriodLoading={isPeriodLoading}
+                isPreviousDisabled={isPreviousDisabled}
+                isResetVisible={isResetVisible}
+                movePeriod={movePeriod}
+                resetToToday={resetToToday}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                weekLabel={weekLabel}
+              />
+
+              {isHistoryLimited ? (
+                <div className="rounded-content border border-border bg-white p-8 text-center text-sm text-text-muted">
+                  {t("historyLimitMessage")}
+                </div>
+              ) : null}
 
               {isLoading ? (
                 <div className="space-y-6">
@@ -239,7 +267,7 @@ export default function DashboardPage() {
                     />
                   ))}
                 </div>
-              ) : (
+              ) : !isHistoryLimited ? (
                 membersWithScoreboard.map((member) => (
                   <WeeklyTable
                     key={member.userId}
@@ -281,7 +309,7 @@ export default function DashboardPage() {
                     currentUserRole={currentUserRole}
                   />
                 ))
-              )}
+              ) : null}
             </section>
           </div>
         </div>

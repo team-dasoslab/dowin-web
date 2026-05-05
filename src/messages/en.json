@@ -38,7 +38,7 @@
     "myProfile": "My Profile",
     "memberSummary": "Team Member Summary",
     "teamWeeklyScoreboard": "Team Weekly Scoreboard",
-    "teamWeeklyScoreboardDesc": "Action item execution for all team members this week.",
+    "teamWeeklyScoreboardDesc": "Shows action item execution for all team members in the selected week.",
     "noMembers": "No team members yet.",
     "noActiveScoreboards": "No active scoreboards yet.",
     "noWorkspaceTitle": "No Workspace Found",

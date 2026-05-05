@@ -61,6 +61,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - `getSession(db)`는 실제 Drizzle DB 타입 기준으로 동작하도록 정리 완료
 - 대시보드 주간 날짜 계산은 클라이언트 KST 기준으로 보정 완료
 - `dashboard/my` 기간 탐색(`view`, `date` query)과 축하 confetti 인터랙션 구현 완료
+- `dashboard` 팀 뷰 주간 히스토리 탐색 및 Free 6개월 / 유료 전체 기간 정책 연동 완료
 - Setup 선행지표 횟수 입력 제한 적용 완료 (`WEEKLY` 최대 7회, `MONTHLY`는 점수판 시작월 최대 일수 기준)
 - Setup 점수판 생성 화면에 4DX 용어 코치마크(가중목/후행지표/선행지표) 적용 완료
   - `react-joyride` 기반 3단계 안내
