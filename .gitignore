@@ -57,3 +57,6 @@ next-env.d.ts
 storybook-static
 
 temp/
+
+# Added by code-review-graph
+.code-review-graph/
