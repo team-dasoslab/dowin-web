@@ -1,4 +1,4 @@
-# DOWIN Harness Security Rules
+# Dowin Harness Security Rules
 
 ## Read Order
 

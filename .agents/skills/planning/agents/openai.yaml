@@ -1,7 +1,7 @@
 interface:
-  display_name: "DOWIN Planning"
-  short_description: "DOWIN planning and documentation"
-  default_prompt: "Use $dowin-planning to turn a DOWIN feature idea into a repository-aligned planning update and action list."
+  display_name: "Dowin Planning"
+  short_description: "Dowin planning and documentation"
+  default_prompt: "Use $dowin-planning to turn a Dowin feature idea into a repository-aligned planning update and action list."
 
 policy:
   allow_implicit_invocation: true

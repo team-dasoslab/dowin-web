@@ -1,13 +1,13 @@
 ---
 name: dowin-orchestrator
-description: Use this skill as the top-level DOWIN router when a request needs workflow selection, stage orchestration, multi-step handoff, or review-gate coordination across planning, backend, frontend, quality, performance, and security skills. Trigger it for broad feature work, cross-domain changes, ambiguous requests, or when DOWIN should act like an orchestrator rather than a single implementation worker.
+description: Use this skill as the top-level Dowin router when a request needs workflow selection, stage orchestration, multi-step handoff, or review-gate coordination across planning, backend, frontend, quality, performance, and security skills. Trigger it for broad feature work, cross-domain changes, ambiguous requests, or when Dowin should act like an orchestrator rather than a single implementation worker.
 ---
 
 # Dowin Orchestrator
 
 ## Overview
 
-Use this skill as the top-level controller for DOWIN work.
+Use this skill as the top-level controller for Dowin work.
 
 This skill does not replace domain skills.
 It selects them, sequences them, and enforces handoff and review rules.
@@ -22,7 +22,7 @@ Start with:
 
 If docs conflict with live implementation, verify the implementation and use the active code path as the baseline.
 
-## DOWIN Orchestrator Facts
+## Dowin Orchestrator Facts
 
 - The orchestrator is the top-level working mode, not a separate product runtime.
 - Default to a single-session orchestration loop unless splitting work materially reduces context or risk.

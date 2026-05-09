@@ -1,6 +1,6 @@
 ---
 name: dowin-performance-check
-description: Use this skill when reviewing DOWIN code for likely performance regressions without relying on manual runtime measurement. Trigger it for requests about backend aggregation cost, query expansion, repeated scans, list endpoints, expensive loops, unnecessary data loading, or whether a code change is likely to slow down under scale.
+description: Use this skill when reviewing Dowin code for likely performance regressions without relying on manual runtime measurement. Trigger it for requests about backend aggregation cost, query expansion, repeated scans, list endpoints, expensive loops, unnecessary data loading, or whether a code change is likely to slow down under scale.
 ---
 
 # Dowin Performance Check
@@ -17,11 +17,11 @@ Start with:
 
 If docs conflict with code, verify the implementation and use the active code path as the baseline.
 
-## DOWIN Performance Facts
+## Dowin Performance Facts
 
 - This skill is for code-based performance review, not benchmark execution.
 - It should identify likely regression points from code structure even when runtime measurements are unavailable.
-- DOWIN performance risk is usually concentrated in aggregation services, repeated array scans, wide DB reads, and workspace-wide list or summary endpoints.
+- Dowin performance risk is usually concentrated in aggregation services, repeated array scans, wide DB reads, and workspace-wide list or summary endpoints.
 - Backend paths such as dashboard aggregation and weekly or monthly log calculation deserve extra scrutiny.
 - This skill should work independently even when no separate performance planning doc is available.
 - When recommending follow-up commits, follow `docs/planning/2026.04.09-commit-convention.md`.

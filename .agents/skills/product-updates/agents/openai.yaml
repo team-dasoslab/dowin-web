@@ -1,7 +1,7 @@
 interface:
-  display_name: "DOWIN Product Updates"
-  short_description: "DOWIN update hub and promo card content"
-  default_prompt: "Use $dowin-product-updates to add or refine DOWIN product update entries, promo card copy, and update hub metadata."
+  display_name: "Dowin Product Updates"
+  short_description: "Dowin update hub and promo card content"
+  default_prompt: "Use $dowin-product-updates to add or refine Dowin product update entries, promo card copy, and update hub metadata."
 
 policy:
   allow_implicit_invocation: true

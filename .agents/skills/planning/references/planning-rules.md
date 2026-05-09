@@ -1,4 +1,4 @@
-# DOWIN Planning Rules
+# Dowin Planning Rules
 
 ## Read Order
 
@@ -14,7 +14,7 @@
 - Use the established planning sections when applicable.
 - Produce concrete action items, not only abstract discussion.
 - Follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`.
-- Use current DOWIN product language and avoid treating external books/frameworks as product authority.
+- Use current Dowin product language and avoid treating external books/frameworks as product authority.
 - Update `docs/onboarding.md` when planning changes alter the project's current state or working model.
 
 ## Common Outputs

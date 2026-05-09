@@ -1,4 +1,4 @@
-# DOWIN Security Rules
+# Dowin Security Rules
 
 ## Read Order
 

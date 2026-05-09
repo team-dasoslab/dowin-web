@@ -31,7 +31,7 @@ If documents conflict with code, verify the implementation and prefer the curren
 - Auth currently uses the `dowin_sid` session cookie pattern in active code.
 - Update `src/api-spec/openapi.yaml` first when API contracts change.
 - Consider `docs/onboarding.md` and matching `docs/dev/` files for material skill, process, or architecture changes.
-- For planning or documentation work, follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md` and do not describe DOWIN as a book-based/framework-based product in current-facing docs.
+- For planning or documentation work, follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md` and do not describe Dowin as a book-based/framework-based product in current-facing docs.
 
 ## Collaboration Style
 

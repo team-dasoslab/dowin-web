@@ -1,6 +1,6 @@
 ---
 name: dowin-quality-check
-description: Use this skill when verifying DOWIN code quality before completion, review, or deploy. Trigger it for requests about tests, quality gates, regression checks, backend or frontend verification, security checks, mobile checks, release readiness, or validating whether a DOWIN change is safe to merge.
+description: Use this skill when verifying Dowin code quality before completion, review, or deploy. Trigger it for requests about tests, quality gates, regression checks, backend or frontend verification, security checks, mobile checks, release readiness, or validating whether a Dowin change is safe to merge.
 ---
 
 # Dowin Quality Check
@@ -18,9 +18,9 @@ Start with:
 
 If the quality doc conflicts with current implementation, verify the code and use the active implementation as the baseline.
 
-## DOWIN Quality Facts
+## Dowin Quality Facts
 
-- DOWIN quality work should focus on business-rule correctness, auth and ownership safety, regression risk, and release readiness.
+- Dowin quality work should focus on business-rule correctness, auth and ownership safety, regression risk, and release readiness.
 - Use the smallest useful verification set first, then broaden.
 - Backend verification should include business rules, auth, ownership, and error cases.
 - Frontend verification should include loading, empty, error, responsive, and rollback behavior where relevant.

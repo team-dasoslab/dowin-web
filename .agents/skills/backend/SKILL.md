@@ -1,6 +1,6 @@
 ---
 name: dowin-backend
-description: Use this skill when adding or changing DOWIN backend APIs, route handlers, services, storage code, validation, auth, or database-backed business rules. Trigger it for requests about API implementation, backend refactors, auth/session logic, storage changes, TDD-first backend work, or backend bug fixes in this repository.
+description: Use this skill when adding or changing Dowin backend APIs, route handlers, services, storage code, validation, auth, or database-backed business rules. Trigger it for requests about API implementation, backend refactors, auth/session logic, storage changes, TDD-first backend work, or backend bug fixes in this repository.
 ---
 
 # Dowin Backend
@@ -22,7 +22,7 @@ Start with:
 
 If docs conflict with code, verify the implementation and trust the current code path.
 
-## DOWIN Backend Facts
+## Dowin Backend Facts
 
 - Auth currently uses the `dowin_sid` session cookie in active code paths.
 - Route handlers should use `withErrorHandler` from `src/lib/server/with-error-handler.ts`.

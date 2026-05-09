@@ -1,4 +1,4 @@
-# DOWIN (Wildly Important Goals)
+# Dowin (Wildly Important Goals)
 
 DOWIN는 개인/팀의 목표 실행과 주간 운영을 관리하는 서비스입니다.
 기록을 쌓는 데서 끝나지 않고, 이번 주 승패(Win/Loss)를 점수판으로 명확하게 보여주도록 설계했습니다.

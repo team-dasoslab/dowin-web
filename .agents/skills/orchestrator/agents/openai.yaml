@@ -1,7 +1,7 @@
 interface:
-  display_name: "DOWIN Orchestrator"
-  short_description: "DOWIN top-level workflow router"
-  default_prompt: "Use $dowin-orchestrator to classify a DOWIN request, choose the right skill workflow, and coordinate planning, implementation, and review handoffs."
+  display_name: "Dowin Orchestrator"
+  short_description: "Dowin top-level workflow router"
+  default_prompt: "Use $dowin-orchestrator to classify a Dowin request, choose the right skill workflow, and coordinate planning, implementation, and review handoffs."
 
 policy:
   allow_implicit_invocation: true

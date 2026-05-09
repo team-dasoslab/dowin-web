@@ -1,7 +1,7 @@
 interface:
-  display_name: "DOWIN Quality Check"
-  short_description: "DOWIN verification and quality gates"
-  default_prompt: "Use $dowin-quality-check to verify a DOWIN change against tests, quality gates, and regression checks before completion."
+  display_name: "Dowin Quality Check"
+  short_description: "Dowin verification and quality gates"
+  default_prompt: "Use $dowin-quality-check to verify a Dowin change against tests, quality gates, and regression checks before completion."
 
 policy:
   allow_implicit_invocation: true

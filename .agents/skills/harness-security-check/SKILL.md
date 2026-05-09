@@ -1,6 +1,6 @@
 ---
 name: dowin-harness-security-check
-description: Use this skill when reviewing DOWIN's agent harness and AI tooling configuration for security risks. Trigger it for requests about AGENTS.md, codex.md, local skill prompts, approval boundaries, secret handling in instructions, risky shell guidance, or whether the repository's AI operating layer is safe to use.
+description: Use this skill when reviewing Dowin's agent harness and AI tooling configuration for security risks. Trigger it for requests about AGENTS.md, codex.md, local skill prompts, approval boundaries, secret handling in instructions, risky shell guidance, or whether the repository's AI operating layer is safe to use.
 ---
 
 # Dowin Harness Security Check
@@ -19,7 +19,7 @@ Start with:
 
 If docs and active files disagree, verify the active files and use that as the security baseline.
 
-## DOWIN Harness Security Facts
+## Dowin Harness Security Facts
 
 - This skill is for agent operating-layer security, not API or application-code security.
 - Prioritize secret exposure, permission overreach, risky automation, unsafe shell guidance, and misleading prompts that could normalize destructive actions.

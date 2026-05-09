@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: DOWIN API
-  description: DOWIN(가중목) 서비스 API 명세서
+  title: Dowin API
+  description: Dowin(가중목) 서비스 API 명세서
   version: 0.1.0
 servers:
   - url: /api
@@ -68,7 +68,8 @@ paths:
               properties:
                 customId: { type: string, example: john123 }
                 nickname: { type: string, example: 존 }
-                password: { type: string, format: password, example: "newSecurePass1!" }
+                password:
+                  { type: string, format: password, example: "newSecurePass1!" }
       responses:
         "201":
           description: 회원가입 성공
@@ -235,7 +236,13 @@ paths:
                     type: array
                     items:
                       type: string
-                      enum: [SUPPORT_ADMIN, BILLING_ADMIN, RECOVERY_ADMIN, SYSTEM_ADMIN]
+                      enum:
+                        [
+                          SUPPORT_ADMIN,
+                          BILLING_ADMIN,
+                          RECOVERY_ADMIN,
+                          SYSTEM_ADMIN,
+                        ]
         "401":
           description: 아이디 또는 비밀번호 불일치
           content:
@@ -840,7 +847,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  message: { type: string, example: "워크스페이스에 참가했습니다." }
+                  message:
+                    { type: string, example: "워크스페이스에 참가했습니다." }
         "404":
           description: 존재하지 않는 워크스페이스
           content:
@@ -878,7 +886,8 @@ paths:
               schema:
                 type: object
                 properties:
-                  message: { type: string, example: "워크스페이스에 참가했습니다." }
+                  message:
+                    { type: string, example: "워크스페이스에 참가했습니다." }
         "404":
           description: 존재하지 않는 초대코드
           content:
@@ -1095,7 +1104,8 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/WorkspaceInviteCreateRequest" }
+            schema:
+              { $ref: "#/components/schemas/WorkspaceInviteCreateRequest" }
       responses:
         "201":
           description: 생성 성공
@@ -3048,15 +3058,7 @@ components:
     DashboardTeamMemo:
       type: object
       required:
-        [
-          id,
-          workspaceId,
-          targetUserId,
-          author,
-          content,
-          isResolved,
-          createdAt,
-        ]
+        [id, workspaceId, targetUserId, author, content, isResolved, createdAt]
       properties:
         id: { type: integer }
         workspaceId: { type: integer }

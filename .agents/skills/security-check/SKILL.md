@@ -1,6 +1,6 @@
 ---
 name: dowin-security-check
-description: Use this skill when reviewing DOWIN changes for security risks before merge, release, or sensitive backend/frontend updates. Trigger it for requests about auth/session safety, authorization, ownership checks, secret handling, input validation, or whether a change introduces a security regression.
+description: Use this skill when reviewing Dowin changes for security risks before merge, release, or sensitive backend/frontend updates. Trigger it for requests about auth/session safety, authorization, ownership checks, secret handling, input validation, or whether a change introduces a security regression.
 ---
 
 # Dowin Security Check
@@ -18,10 +18,10 @@ Start with:
 
 If the security doc conflicts with current implementation, verify the code and use the active implementation as the baseline.
 
-## DOWIN Security Facts
+## Dowin Security Facts
 
 - Current auth implementation uses the `dowin_sid` session cookie pattern.
-- DOWIN security review should prioritize auth, authorization, ownership filtering, validation coverage, and sensitive data handling.
+- Dowin security review should prioritize auth, authorization, ownership filtering, validation coverage, and sensitive data handling.
 - Backend review usually matters most, but frontend changes can still expose secrets, leak privileged actions, or bypass expected guards.
 - Query-level ownership filtering is preferred over fetching by ID first and checking later.
 - Zod validation is the default input-validation path for API work.

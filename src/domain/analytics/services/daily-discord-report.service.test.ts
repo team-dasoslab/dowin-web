@@ -44,7 +44,7 @@ describe("DailyDiscordReportService", () => {
     const payload = service.buildPayload(input);
 
     expect(payload.content).toBe(
-      "DOWIN Daily Report · 2026-04-18 (Asia/Seoul)",
+      "Dowin Daily Report · 2026-04-18 (Asia/Seoul)",
     );
     expect(payload.embeds).toHaveLength(1);
     expect(payload.embeds[0].fields).toEqual(

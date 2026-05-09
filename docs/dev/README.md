@@ -1,8 +1,8 @@
-# DOWIN Developer Onboarding
+# Dowin Developer Onboarding
 
 최종 확인일: 2026-04-03
 
-이 문서는 DOWIN 저장소에 처음 들어온 개발자나 에이전트가 "무엇을 먼저 읽고, 어디를 고치고, 무엇을 조심해야 하는지"를 빠르게 파악하도록 만든 개발자용 시작 문서다. 기존 [`docs/onboarding.md`](/docs/onboarding.md)를 대체하지 않고, 현재 구현 기준으로 더 촘촘한 작업 안내를 보강한다.
+이 문서는 Dowin 저장소에 처음 들어온 개발자나 에이전트가 "무엇을 먼저 읽고, 어디를 고치고, 무엇을 조심해야 하는지"를 빠르게 파악하도록 만든 개발자용 시작 문서다. 기존 [`docs/onboarding.md`](/docs/onboarding.md)를 대체하지 않고, 현재 구현 기준으로 더 촘촘한 작업 안내를 보강한다.
 
 ## 1. 서비스와 현재 범위
 
