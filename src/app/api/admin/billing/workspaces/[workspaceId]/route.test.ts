@@ -47,7 +47,7 @@ describe("GET /api/admin/billing/workspaces/[workspaceId]", () => {
   it("운영 billing 상세를 반환한다", async () => {
     mockGetWorkspaceDetail.mockResolvedValue({
       workspaceId: 3,
-      workspaceName: "DOWIN",
+      workspaceName: "Dowin",
       planCode: "STANDARD",
       billingStatus: "ACTIVE",
       events: [],

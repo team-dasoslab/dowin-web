@@ -8,7 +8,7 @@ import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 const steps = [
   {
     step: "STEP 1",
-    title: "Safari에서 DOWIN 링크 열기",
+    title: "Safari에서 Dowin 링크 열기",
     description:
       "iPhone에서는 Safari에서만 DOWIN를 홈 화면에 설치할 수 있어요. 다른 브라우저에서 열었다면 Safari로 다시 열어 진행해주세요.",
     iconName: "domain-phone",
@@ -51,10 +51,10 @@ const steps = [
     step: "STEP 6",
     title: "설치 완료",
     description:
-      "홈 화면에 DOWIN 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
+      "홈 화면에 Dowin 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
     iconName: "nav-home",
     imageSrc: "/assets/guide/guide04.png",
-    imageAlt: "홈 화면에 설치된 DOWIN 예시",
+    imageAlt: "홈 화면에 설치된 Dowin 예시",
   },
 ] as const;
 

@@ -1,7 +1,7 @@
 interface:
-  display_name: "DOWIN Backend"
-  short_description: "DOWIN backend API and repository backend rules"
-  default_prompt: "Use $dowin-backend to implement or change a DOWIN backend API with the repository's backend rules."
+  display_name: "Dowin Backend"
+  short_description: "Dowin backend API and repository backend rules"
+  default_prompt: "Use $dowin-backend to implement or change a Dowin backend API with the repository's backend rules."
 
 policy:
   allow_implicit_invocation: true

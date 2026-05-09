@@ -1,7 +1,7 @@
 interface:
-  display_name: "DOWIN Frontend"
-  short_description: "DOWIN frontend and API integration"
-  default_prompt: "Use $dowin-frontend to build or update DOWIN frontend code with the repository's UI and API integration conventions."
+  display_name: "Dowin Frontend"
+  short_description: "Dowin frontend and API integration"
+  default_prompt: "Use $dowin-frontend to build or update Dowin frontend code with the repository's UI and API integration conventions."
 
 policy:
   allow_implicit_invocation: true

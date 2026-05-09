@@ -1,4 +1,4 @@
-# DOWIN Backend Rules
+# Dowin Backend Rules
 
 ## Read Order
 

@@ -59,7 +59,7 @@ export function NotFoundPage({
 
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-                DOWIN
+                Dowin
               </p>
               <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
                 {copy.title}

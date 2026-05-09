@@ -1,7 +1,7 @@
 interface:
-  display_name: "DOWIN Frontend WebView"
-  short_description: "DOWIN WebView bridge and native-web frontend integration"
-  default_prompt: "Use $frontend-webview to update DOWIN's WebView bridge types, bridge consumers, deep-link or notification handoff, and browser-vs-native fallback behavior."
+  display_name: "Dowin Frontend WebView"
+  short_description: "Dowin WebView bridge and native-web frontend integration"
+  default_prompt: "Use $frontend-webview to update Dowin's WebView bridge types, bridge consumers, deep-link or notification handoff, and browser-vs-native fallback behavior."
 
 policy:
   allow_implicit_invocation: true

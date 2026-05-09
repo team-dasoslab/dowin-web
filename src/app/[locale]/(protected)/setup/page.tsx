@@ -210,7 +210,7 @@ export default function SetupPage() {
             onSubmit={handleSubmit}
             className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]"
           >
-            {/* DOWIN 섹션 */}
+            {/* Dowin 섹션 */}
             <section id="dowin" className="space-y-5 scroll-mt-28">
               <SectionHeader title={t("dowinShort")} />
               <GoalSection

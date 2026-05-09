@@ -1,13 +1,13 @@
 ---
 name: frontend-webview
-description: Use this skill when changing DOWIN's WebView bridge integration, native-web client detection, bridge store consumption, deep link or push notification handoff, safe-area syncing, or browser-vs-native fallback behavior in the web frontend. Trigger it for requests about `src/lib/bridge.ts`, `src/types/bridge.ts`, `BridgeInitializer`, post-login notification permission prompts in `dashboard/my`, or docs under `docs/dev/app-webview/`.
+description: Use this skill when changing Dowin's WebView bridge integration, native-web client detection, bridge store consumption, deep link or push notification handoff, safe-area syncing, or browser-vs-native fallback behavior in the web frontend. Trigger it for requests about `src/lib/bridge.ts`, `src/types/bridge.ts`, `BridgeInitializer`, post-login notification permission prompts in `dashboard/my`, or docs under `docs/dev/app-webview/`.
 ---
 
 # Frontend WebView
 
 ## Overview
 
-Use this skill for DOWIN web-frontend work that depends on the native app WebView shell or the `@webview-bridge/web` client.
+Use this skill for Dowin web-frontend work that depends on the native app WebView shell or the `@webview-bridge/web` client.
 
 Read only the files needed for the task.
 
@@ -20,7 +20,7 @@ Start with:
 
 If the WebView doc and current code differ, verify the active code path and then sync the docs.
 
-## DOWIN WebView Facts
+## Dowin WebView Facts
 
 - `src/lib/bridge.ts` is the main bridge entry for the web app.
 - `src/types/bridge.ts` is the web copy of the shared native bridge type contract.

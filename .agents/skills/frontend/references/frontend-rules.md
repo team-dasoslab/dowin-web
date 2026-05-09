@@ -1,4 +1,4 @@
-# DOWIN Frontend Rules
+# Dowin Frontend Rules
 
 ## Read Order
 

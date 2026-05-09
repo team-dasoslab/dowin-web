@@ -120,7 +120,7 @@ export class DailyDiscordReportService {
     }
 
     return {
-      content: `DOWIN Daily Report · ${input.reportDate} (${input.timezone})`,
+      content: `Dowin Daily Report · ${input.reportDate} (${input.timezone})`,
       embeds: [
         {
           title: "무료 가치 / 리텐션 일일 리포트",

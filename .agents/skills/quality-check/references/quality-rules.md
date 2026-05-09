@@ -1,4 +1,4 @@
-# DOWIN Quality Rules
+# Dowin Quality Rules
 
 ## Read Order
 

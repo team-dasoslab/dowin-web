@@ -8,7 +8,7 @@ describe("AdminBillingService", () => {
         searchAdminBillingWorkspaces: vi.fn().mockResolvedValue([
           {
             workspaceId: 3,
-            workspaceName: "DOWIN",
+            workspaceName: "Dowin",
             planCode: "STANDARD",
             billingStatus: "ACTIVE",
             provider: "POLAR",
@@ -36,7 +36,7 @@ describe("AdminBillingService", () => {
       { create: vi.fn() },
     );
 
-    const result = await service.listWorkspaces({ workspaceName: "DOWIN" });
+    const result = await service.listWorkspaces({ workspaceName: "Dowin" });
 
     expect(result).toEqual([
       expect.objectContaining({
@@ -56,7 +56,7 @@ describe("AdminBillingService", () => {
       .fn()
       .mockResolvedValueOnce({
         workspaceId: 3,
-        workspaceName: "DOWIN",
+        workspaceName: "Dowin",
         planCode: "FREE",
         billingStatus: "NONE",
         provider: null,
@@ -71,7 +71,7 @@ describe("AdminBillingService", () => {
       })
       .mockResolvedValueOnce({
         workspaceId: 3,
-        workspaceName: "DOWIN",
+        workspaceName: "Dowin",
         planCode: "STANDARD",
         billingStatus: "ACTIVE",
         provider: "POLAR",

@@ -112,7 +112,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
   - 기준 문서: `docs/planning/2026.05.01-in-product-contact-plan.md`
 - 다국어(i18n)는 `next-intl` + URL locale 세그먼트 방식으로 동작한다
   - 서버 locale 우선순위:
-    - `X-DOWIN-Locale`
+    - `X-Dowin-Locale`
     - `NEXT_LOCALE`
     - `Accept-Language`
     - 기본값 `ko`
@@ -213,10 +213,12 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
    - 하네스 보안 점검: `.agents/skills/harness-security-check/SKILL.md`
    - 제품 업데이트: `.agents/skills/product-updates/SKILL.md`
 3. 전체 도메인 개요
-  - `docs/dev/common/2026.03.12-domain-overview.md`
-  - `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`
-  - 운영 사고 대응 준비: `docs/planning/2026.04.19-production-incident-readiness-plan.md`
-  - 운영 문서 시작점: `docs/dev/operations/README.md`
+
+- `docs/dev/common/2026.03.12-domain-overview.md`
+- `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`
+- 운영 사고 대응 준비: `docs/planning/2026.04.19-production-incident-readiness-plan.md`
+- 운영 문서 시작점: `docs/dev/operations/README.md`
+
 4. 관련 도메인 설계 문서
    - 예: `docs/dev/daily-log/2026.03.12-domain-daily-log.md`
    - 예: `docs/dev/dashboard/2026.03.12-domain-dashboard.md`
