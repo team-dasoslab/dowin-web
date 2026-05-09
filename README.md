@@ -1,18 +1,18 @@
 # DOWIN (Wildly Important Goals)
 
-DOWIN는 4DX(실행의 4가지 원칙)를 기반으로 개인/팀의 목표 실행을 관리하는 서비스입니다.
+DOWIN는 개인/팀의 목표 실행과 주간 운영을 관리하는 서비스입니다.
 기록을 쌓는 데서 끝나지 않고, 이번 주 승패(Win/Loss)를 점수판으로 명확하게 보여주도록 설계했습니다.
 
 ## 핵심 기능
 
 - 인증 및 세션 기반 로그인 (`dowin_sid` 쿠키)
 - 워크스페이스 생성/참가, 이름 변경, 멤버 관리
-- DOWIN(가중목) 점수판 생성, 보관, 재활성화
-- 선행지표(Lead Measure) 생성/관리
+- 핵심 목표 점수판 생성, 보관, 재활성화
+- 액션 아이템 생성/관리
 - 일일 O/X 기록 및 주간/월간 달성률 집계
 - 내 대시보드 / 팀 대시보드 조회
 - 프로필 조회/수정, preset avatar 선택, 푸시 알림 토글 및 개인 리마인드 시간 설정
-- 선행지표 CSV export
+- 액션 아이템 CSV export
 
 ## 기술 스택
 
@@ -153,5 +153,6 @@ yarn wrangler secret put <KEY_NAME>
 
 - 온보딩: `docs/onboarding.md`
 - 개발자 시작 문서: `docs/dev/README.md`
+- 제품 포지셔닝/문서 기준: `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`
 - 도메인 개요: `docs/dev/common/2026.03.12-domain-overview.md`
 - 스킬: `.agents/skills/frontend/SKILL.md`, `.agents/skills/backend/SKILL.md`, `.agents/skills/planning/SKILL.md`, `.agents/skills/quality-check/SKILL.md`, `.agents/skills/security-check/SKILL.md`, `.agents/skills/harness-security-check/SKILL.md`, `.agents/skills/product-updates/SKILL.md`
