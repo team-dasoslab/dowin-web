@@ -13,7 +13,8 @@
 - Keep YAML frontmatter on planning docs.
 - Use the established planning sections when applicable.
 - Produce concrete action items, not only abstract discussion.
-- Keep 4DX terminology aligned with the rest of the repository.
+- Follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`.
+- Use current DOWIN product language and avoid treating external books/frameworks as product authority.
 - Update `docs/onboarding.md` when planning changes alter the project's current state or working model.
 
 ## Common Outputs

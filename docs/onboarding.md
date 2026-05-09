@@ -5,15 +5,22 @@
 
 ## 1. 프로젝트 한 줄 요약
 
-Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또는 소규모 팀의 목표 실행을 관리하는 서비스다.  
+Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리하는 서비스다.  
 핵심 사용자 흐름은 다음과 같다.
 
 1. 로그인
 2. 워크스페이스 생성 또는 참가
 3. 활성 점수판 생성
-4. 선행지표 추가
+4. 액션 아이템 추가
 5. 대시보드에서 날짜별 O/X 기록
 6. 이번 주 승패를 점수판 형태로 확인
+
+### 1.1. 문서 작성 기준
+
+- DOWIN는 외부 도서/방법론을 설명하는 제품이 아니라 독립적인 팀 실행 운영 제품으로 다룬다.
+- 새 문서나 갱신 문서에서는 책/방법론을 현재형 제품 정의의 근거로 사용하지 않는다.
+- 공통 기준 문서:
+  - `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`
 
 ## 2. 현재 상태 요약 (2026-04-28 기준)
 
@@ -44,7 +51,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - 프로필에서 ADMIN 기준 워크스페이스 삭제 가능
 - 멤버 관리 화면에서 관리자 권한 이전 가능
 - `/updates` 새 기능 모아보기 허브 구현 완료
-- 비로그인 사용자용 서비스 소개형 루트 랜딩 페이지(`/`)의 카피 전면 개편 완료 (B2B 지향적이고 후킹한 어조 도입, 4DX 전문 용어 거부감 최소화, '시작하기'로 CTA 간결화)
+- 비로그인 사용자용 서비스 소개형 루트 랜딩 페이지(`/`)의 카피 전면 개편 완료 (B2B 지향적이고 후킹한 어조 도입, 외부 방법론 용어 의존도 축소, '시작하기'로 CTA 간결화)
 - 제품 전반 용어 기준을 `핵심 목표 / 성공 기준 / 액션 아이템 / 점수판`으로 정리 완료
 - Setup / 대시보드 / 리포트 / 랜딩 핵심 번역 카피에 위 용어 기준 1차 반영 완료
 - 랜딩 Hero 비교용 variant preview 지원 완료
@@ -63,7 +70,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - `dashboard/my` 기간 탐색(`view`, `date` query)과 축하 confetti 인터랙션 구현 완료
 - `dashboard` 팀 뷰 주간 히스토리 탐색 및 Free 6개월 / 유료 전체 기간 정책 연동 완료
 - Setup 선행지표 횟수 입력 제한 적용 완료 (`WEEKLY` 최대 7회, `MONTHLY`는 점수판 시작월 최대 일수 기준)
-- Setup 점수판 생성 화면에 4DX 용어 코치마크(가중목/후행지표/선행지표) 적용 완료
+- Setup 점수판 생성 화면에 입력 품질 가이드용 코치마크 적용 완료
   - `react-joyride` 기반 3단계 안내
   - 로컬 스토리지(`dowin.setup.coachmark.v1.dismissed`) 기준 1회 노출
 - Free 플랜 기록 조회 6개월 제한 백엔드/프론트엔드 동시 적용 완료
@@ -118,7 +125,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 ### 2.3. 현재 우선순위 (2026-04-30 기준)
 
 - 단기 우선순위는 `강한 Free 제한 추가`보다 `STANDARD 유료 가치 강화`다.
-- 그 범용화에는 제품 전반의 4DX 책 용어를 책 비독자도 이해할 수 있는 범용 제품 언어로 재정리하는 작업이 포함된다.
+- 그 범용화에는 제품 전반의 내부 초기 용어를 독립적인 제품 언어로 재정리하고, 외부 방법론 의존 설명을 끊어내는 작업이 포함된다.
 - 공개 회원가입과 워크스페이스 셀프서브 진입은 현재 동작 중이며, 다음 우선순위는 운영 마감 기능과 무료 가치 측정 체계를 보강하는 것이다.
 - 현재 기준에서는 모든 워크스페이스를 `FREE`로 운영하되, 제한을 더 세게 늘리기보다 `STANDARD`의 핵심 결제 이유를 선명하게 만드는 쪽을 우선한다.
 - 그 핵심은 `리더 액션 어시스턴트` 계열 기능이며, 구체적으로는 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인` 흐름이다.
@@ -206,9 +213,10 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
    - 하네스 보안 점검: `.agents/skills/harness-security-check/SKILL.md`
    - 제품 업데이트: `.agents/skills/product-updates/SKILL.md`
 3. 전체 도메인 개요
-   - `docs/dev/common/2026.03.12-domain-overview.md`
-   - 운영 사고 대응 준비: `docs/planning/2026.04.19-production-incident-readiness-plan.md`
-   - 운영 문서 시작점: `docs/dev/operations/README.md`
+  - `docs/dev/common/2026.03.12-domain-overview.md`
+  - `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`
+  - 운영 사고 대응 준비: `docs/planning/2026.04.19-production-incident-readiness-plan.md`
+  - 운영 문서 시작점: `docs/dev/operations/README.md`
 4. 관련 도메인 설계 문서
    - 예: `docs/dev/daily-log/2026.03.12-domain-daily-log.md`
    - 예: `docs/dev/dashboard/2026.03.12-domain-dashboard.md`
@@ -277,7 +285,7 @@ Dowin는 4DX(가중목, 선행지표, 점수판, 책무) 개념으로 개인 또
 - `src/app/(protected)/dashboard/page.tsx`
   - 팀 대시보드, 실제 API 연동 완료
 - `src/app/(protected)/setup/page.tsx`
-  - 점수판/선행지표 설정 화면, 4DX 용어 코치마크와 선행지표 태그 관리 포함
+  - 점수판/선행지표 설정 화면, 입력 품질 가이드 코치마크와 선행지표 태그 관리 포함
 - `src/app/(protected)/setup/_hooks/useScoreboardSetup.ts`
   - 점수판 설정, 선행지표 태그 생성/수정/삭제, 낙관적 업데이트 로직
 - `src/app/(protected)/profile/page.tsx`
