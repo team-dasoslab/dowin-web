@@ -1,9 +1,7 @@
 import {
-  getGetScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetScoreboardsScoreboardIdLogsWeeklyQueryKey,
   getScoreboardsScoreboardIdLogsWeeklyResponse200,
 } from "@/api/generated/daily-log/daily-log";
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { getWeekDates } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
 
@@ -21,10 +19,6 @@ export type ToggleLogContext = {
   weeklyLogsQueryKey: ReturnType<
     typeof getGetScoreboardsScoreboardIdLogsWeeklyQueryKey
   > | null;
-  monthlyLogsQueryKey: ReturnType<
-    typeof getGetScoreboardsScoreboardIdLogsMonthlyQueryKey
-  > | null;
-  dashboardTeamQueryKey: ReturnType<typeof getGetDashboardTeamQueryKey>;
 };
 
 export type WeeklyTrendPoint = {
