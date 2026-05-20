@@ -399,7 +399,7 @@ function MemoCard({
                 className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 ${
                   memo.isResolved
                     ? "border-primary/25 bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-sub-background hover:text-text-primary"
+                    : "text-text-muted"
                 }`}
                 aria-label={t("verifyMemo")}
               >
@@ -411,9 +411,7 @@ function MemoCard({
                 type="button"
                 onClick={() => void onDelete(memo.id)}
                 disabled={isDeletePending || isOptimisticMemo}
-                className={`inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors hover:bg-sub-background hover:text-red-500 disabled:opacity-50 ${
-                  canResolveMemo ? "border-l border-border" : ""
-                }`}
+                className={`inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors disabled:opacity-50 ${ canResolveMemo ? "border-l border-border" : "" }`}
                 aria-label={t("deleteMemo")}
               >
                 <DowinIcon name="action-delete" size="16px" />

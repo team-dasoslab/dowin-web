@@ -1,13 +1,13 @@
 ---
 name: dowin-product-updates
-description: Use this skill when adding, editing, curating, or reviewing DOWIN product update entries for the in-app "새 기능 모아보기" hub or dashboard update card. Trigger it for requests about new feature announcement copy, product update metadata, update ordering, 14-day NEW rules, dashboard promo card content, or maintaining the product updates TS template.
+description: Use this skill when adding, editing, curating, or reviewing Dowin product update entries for the in-app "새 기능 모아보기" hub or dashboard update card. Trigger it for requests about new feature announcement copy, product update metadata, update ordering, 14-day NEW rules, dashboard promo card content, or maintaining the product updates TS template.
 ---
 
 # Dowin Product Updates
 
 ## Overview
 
-Use this skill for DOWIN's product update content system.
+Use this skill for Dowin's product update content system.
 
 Read only what is needed.
 

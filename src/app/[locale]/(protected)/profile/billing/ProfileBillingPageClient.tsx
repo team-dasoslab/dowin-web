@@ -105,7 +105,7 @@ export function ProfileBillingPageClient() {
       billing.billingStatus === "CANCELED");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <ProtectedPageContainer className="space-y-8 lg:space-y-12">
         <ProtectedPageHeader title={t("header")} />
 
@@ -132,7 +132,7 @@ export function ProfileBillingPageClient() {
                 <Button
                   type="button"
                   onClick={() => void openPortal()}
-                  className="h-10 rounded-button border border-zinc-200 bg-white px-5 text-sm font-black text-zinc-600 transition-colors hover:bg-zinc-50"
+                  className="h-10 rounded-button border border-zinc-200 bg-white px-5 text-sm font-black text-zinc-600 transition-colors"
                 >
                   {t("portalButton")}
                 </Button>
@@ -221,7 +221,7 @@ export function ProfileBillingPageClient() {
                 <Button
                   type="button"
                   onClick={() => void refetch()}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-button border border-primary/20 bg-white px-4 text-[12px] font-bold text-primary transition-all hover:bg-primary/5"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-button border border-primary/20 bg-white px-4 text-[12px] font-bold text-primary transition-all"
                 >
                   <DowinIcon
                     name="action-refresh"
@@ -267,22 +267,22 @@ export function ProfileBillingPageClient() {
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
           <Link
             href="/billing-policy"
-            className="transition-colors hover:text-zinc-600"
+            className="transition-colors"
           >
             {t("billingPolicyLink")}
           </Link>
-          <Link href="/terms" className="transition-colors hover:text-zinc-600">
+          <Link href="/terms" className="transition-colors">
             {t("termsLink")}
           </Link>
           <Link
             href="/privacy"
-            className="transition-colors hover:text-zinc-600"
+            className="transition-colors"
           >
             {t("privacyLink")}
           </Link>
           <Link
             href="/profile/contact"
-            className="transition-colors hover:text-zinc-600"
+            className="transition-colors"
           >
             {t("contactLink")}
           </Link>
@@ -296,7 +296,7 @@ function BillingUnavailableInAppState() {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <EmptyStatePanel
           title={t("appUnavailableTitle")}
@@ -304,7 +304,7 @@ function BillingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors hover:bg-zinc-50"
+              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
             >
               <Link href="/profile">{t("appUnavailableAction")}</Link>
             </Button>
@@ -377,7 +377,7 @@ function getStatusDescription({
 
 function ProfileBillingSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <ProtectedPageContainer isLoading>
         <div className="h-10 w-48 rounded-content bg-zinc-100" />
         <div className="h-32 rounded-content bg-zinc-100" />
@@ -398,7 +398,7 @@ function NoWorkspaceState() {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -425,7 +425,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">

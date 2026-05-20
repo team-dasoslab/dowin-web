@@ -301,6 +301,13 @@
     "leadTip1Text": " Does this action improve the success criteria?",
     "leadTip2Label": "Influenceable:",
     "leadTip2Text": " Is it an action you can directly control?",
+    "archiveMeasure": "Archive",
+    "reactivateMeasure": "Reactivate",
+    "archivedMeasuresTitle": "Archived Action Items",
+    "archivedMeasuresDesc": "These stay in your history but are excluded from the current scoreboard.",
+    "noArchivedMeasures": "No archived action items yet.",
+    "unnamedArchivedMeasure": "Unnamed Action Item",
+    "archivedBadge": "Archived",
     "addLeadMeasure": "Add Action Item",
     "decrement": "Decrease Count",
     "increment": "Increase Count",
@@ -313,6 +320,10 @@
     "modeAtLeast": "At least",
     "modeExactly": "Exactly",
     "deleteTagConfirm": "Do you want to delete this tag?",
+    "deleteConfirmTitle": "The following action items will be deleted:",
+    "deleteConfirmWarning": "Deleting them will also delete all existing execution records and cannot be recovered. Do you want to proceed?",
+    "deletedBadge": "To be deleted",
+    "cancelDelete": "Restore",
     "tagName": "Tag Name",
     "rename": "Rename",
     "tagNamePlaceholder": "e.g., Exercise",
@@ -848,6 +859,8 @@
     "ACTIVE_SCOREBOARD_EXISTS": "An active scoreboard already exists.",
     "SCOREBOARD_ALREADY_ACTIVE": "This scoreboard is already active.",
     "SCOREBOARD_ARCHIVED": "Archived scoreboards cannot be modified.",
+    "LEAD_MEASURE_ALREADY_ACTIVE": "This action item is already active.",
+    "LEAD_MEASURE_ALREADY_ARCHIVED": "This action item is already archived.",
     "LEAD_MEASURE_ARCHIVED": "Cannot add logs to archived lead measures.",
     "FUTURE_DATE_NOT_ALLOWED": "Cannot record data for future dates.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
@@ -1159,7 +1172,7 @@
     "loginDesc": "Enter your admin ID and password to access the operating console.",
     "loginButton": "Login",
     "logoutButton": "Logout",
-    "sidebarTitle": "DOWIN Operating Console",
+    "sidebarTitle": "Dowin Operating Console",
     "inquiriesTitle": "Contact Center",
     "billingTitle": "Billing Center",
     "recoveryTitle": "Recovery Center",
@@ -1169,5 +1182,140 @@
     "pwLabel": "Password",
     "idPlaceholder": "Enter ID",
     "pwPlaceholder": "Enter Password"
+  },
+  "DocsViewer": {
+    "eyebrow": "Docs Viewer Prototype",
+    "title": "A Dowin document viewer built around planning readability",
+    "description": "Browse Dowin docs by topic, status, and linkage instead of raw file names. The first pass is intentionally biased toward reducing planning-document search cost and making side-by-side reading easy.",
+    "searchPlaceholder": "Search by title, path, or heading",
+    "searchButton": "Search",
+    "empty": "No documents match these filters. Reduce the topic or lens scope.",
+    "cta": {
+      "apiDocs": "Open API Docs",
+      "keepReading": "Keep reading current doc"
+    },
+    "stats": {
+      "planningDocs": "Planning docs",
+      "planningDocsDesc": "Based on docs/planning",
+      "recentPlanning": "Recent 14-day docs",
+      "recentPlanningDesc": "New planning threads",
+      "focusDocs": "Focus docs",
+      "focusDocsDesc": "{count} lightly connected docs included"
+    },
+    "sections": {
+      "planning": "Planning",
+      "design": "Design",
+      "dev": "Dev",
+      "operations": "Operations",
+      "reference": "Reference",
+      "all": "All Docs"
+    },
+    "topics": {
+      "all": "All",
+      "onboarding-entry": "Onboarding / Entry",
+      "dashboard-report": "Dashboard / Report",
+      "monetization-plan": "Monetization / Plan",
+      "operations-admin": "Operations / Admin",
+      "notification-reminder": "Notifications / Reminders",
+      "policy-legal": "Policy / Legal",
+      "auth-workspace": "Auth / Workspace",
+      "platform-infra": "Platform / Infra",
+      "other": "Other"
+    },
+    "lenses": {
+      "all": "All lenses",
+      "focus": "Read now",
+      "recent": "Recently updated",
+      "connected": "Has follow-up links",
+      "history": "Historical context"
+    },
+    "sidebar": {
+      "topicTitle": "Topic Lanes",
+      "topicDescription": "Narrow the document set by planning theme first.",
+      "lensTitle": "Status Lenses",
+      "lensDescription": "Quickly separate current, recent, and historical docs."
+    },
+    "tree": {
+      "title": "Docs Tree",
+      "description": "Browse the full document set with a folder-style tree."
+    },
+    "feed": {
+      "title": "Document Feed",
+      "description": "Showing {count} docs in {section}."
+    },
+    "card": {
+      "relations": "Relations",
+      "noDate": "No date",
+      "open": "Open",
+      "compare": "Compare side by side"
+    },
+    "compare": {
+      "eyebrow": "Compare Mode",
+      "title": "Read two documents side by side and spot structural differences fast.",
+      "clear": "Clear compare",
+      "leftLabel": "Document",
+      "focusThis": "Focus this doc"
+    },
+    "detail": {
+      "title": "Document Meta",
+      "description": "Read context before diving into the body.",
+      "date": "Date",
+      "inbound": "Inbound links",
+      "outbound": "Outbound links",
+      "readGuide": "Reading guide",
+      "path": "Path"
+    },
+    "outline": {
+      "title": "Outline",
+      "description": "Skim the extracted document structure.",
+      "empty": "No headings were extracted."
+    },
+    "guides": {
+      "onboarding-entry": {
+        "when": "Start here before changing onboarding copy, landing flow, or first-entry paths.",
+        "why": "These docs concentrate the first impression and entry-rule decisions.",
+        "next": "Continue into related dev docs or the current implementation screens."
+      },
+      "dashboard-report": {
+        "when": "Read this set before changing dashboard structure or reporting flow.",
+        "why": "It contains the core user scenes and performance-review mechanics.",
+        "next": "Continue into dashboard/report implementation docs and current pages."
+      },
+      "monetization-plan": {
+        "when": "Start here when refining plans, billing, or value proposition.",
+        "why": "Pricing and upgrade rationale are already accumulated in planning docs.",
+        "next": "Continue into billing APIs and profile/pricing UI."
+      },
+      "operations-admin": {
+        "when": "Read these first for admin tools, incidents, or operations workflows.",
+        "why": "These docs usually carry concrete follow-up work for real operations.",
+        "next": "Continue into runbooks, admin screens, and operations APIs."
+      },
+      "notification-reminder": {
+        "when": "Start here before changing push, reminders, or check-in flows.",
+        "why": "These docs directly affect revisit behavior and operating intervention cost.",
+        "next": "Continue into notification domain docs and app/WebView flows."
+      },
+      "policy-legal": {
+        "when": "Read these before touching policies, terms, or legal notice flows.",
+        "why": "Copy changes often ripple into billing, contact, and public screens.",
+        "next": "Continue into actual legal content and public page implementation."
+      },
+      "auth-workspace": {
+        "when": "Start here before changing signup, login, or workspace-entry rules.",
+        "why": "Small policy differences here can directly change user drop-off.",
+        "next": "Continue into auth/workspace docs and route implementations."
+      },
+      "platform-infra": {
+        "when": "Read these first when you need API, schema, or infrastructure constraints.",
+        "why": "These docs often act as anchor references with many cross-links.",
+        "next": "Continue into related common docs, schema files, or API contracts."
+      },
+      "other": {
+        "when": "Use this for documents that do not yet fit a stronger theme.",
+        "why": "You can still navigate them effectively through title and link density.",
+        "next": "Follow the most connected related docs from here."
+      }
+    }
   }
 }

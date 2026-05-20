@@ -25,7 +25,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
       className={`bg-white border border-zinc-200 rounded-content p-6 space-y-4 transition-colors ${
         isMe
           ? "border-primary/40 ring-1 ring-primary/20"
-          : "hover:border-zinc-300"
+          : ""
       }`}
     >
       <div className="flex items-start justify-between gap-3">

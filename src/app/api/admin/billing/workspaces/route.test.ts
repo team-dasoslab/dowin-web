@@ -48,7 +48,7 @@ describe("GET /api/admin/billing/workspaces", () => {
     mockListWorkspaces.mockResolvedValue([
       {
         workspaceId: 3,
-        workspaceName: "DOWIN",
+        workspaceName: "Dowin",
         planCode: "STANDARD",
         billingStatus: "ACTIVE",
       },
@@ -56,14 +56,14 @@ describe("GET /api/admin/billing/workspaces", () => {
 
     const { GET } = await import("./route");
     const response = await GET(
-      new Request("https://example.com/api/admin/billing/workspaces?workspaceName=DOWIN"),
+      new Request("https://example.com/api/admin/billing/workspaces?workspaceName=Dowin"),
     );
     const body = (await response.json()) as Array<{ workspaceId: number }>;
 
     expect(response.status).toBe(200);
     expect(body[0]?.workspaceId).toBe(3);
     expect(mockListWorkspaces).toHaveBeenCalledWith({
-      workspaceName: "DOWIN",
+      workspaceName: "Dowin",
     });
   });
 });

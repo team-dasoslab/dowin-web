@@ -1,6 +1,6 @@
 ---
 name: dowin-frontend
-description: Use this skill when building or changing DOWIN frontend pages, domain components, UI composition, form validation, Orval API integration, TanStack Query state updates, Storybook stories, or mobile-responsive dashboard flows. Trigger it for requests about page UI, component refactors, API-to-UI wiring, dashboard interactions, or shared UI work in this repository.
+description: Use this skill when building or changing Dowin frontend pages, domain components, UI composition, form validation, Orval API integration, TanStack Query state updates, Storybook stories, or mobile-responsive dashboard flows. Trigger it for requests about page UI, component refactors, API-to-UI wiring, dashboard interactions, or shared UI work in this repository.
 ---
 
 # Dowin Frontend
@@ -20,7 +20,7 @@ Start with:
 
 If current code and docs differ, verify the implementation and preserve established patterns.
 
-## DOWIN Frontend Facts
+## Dowin Frontend Facts
 
 - Prefer `src/components/ui` shared components before creating new ones.
 - Shared UI should remain unopinionated; inject styling at usage sites.
@@ -68,7 +68,7 @@ When contracts change, regenerate the client.
 
 ### 3. Implement with the existing visual language
 
-- preserve the current DOWIN aesthetic and utility patterns
+- preserve the current Dowin aesthetic and utility patterns
 - keep loading, empty, error, and success states explicit
 - prefer keeping skeleton, empty, and similar fallback UIs as page-local helpers in the same file instead of splitting them into separate top-level files too early
 - keep page components focused on composition and rendering; move form state and server-state orchestration into domain hooks when the logic is non-trivial

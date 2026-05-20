@@ -30,7 +30,7 @@ export default function ProfilePasswordPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50/50 ">
+    <div className="min-h-screen bg-slate-50/50">
       <ProtectedPageContainer>
         <ProtectedPageHeader title={t("header")} />
 
@@ -108,7 +108,7 @@ function PasswordField({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         className="h-11 w-full rounded-content border border-border bg-white px-3 pr-20 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-primary"
-        toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors hover:text-text-primary"
+        toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors"
       />
       {hint ? <p className="text-[11px] text-text-muted">{hint}</p> : null}
     </label>

@@ -58,7 +58,7 @@ export function WorkspaceOverLimitBanner({
               {showBillingSurface ? (
                 <Button
                   asChild
-                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-600 px-3 text-[11px] font-bold text-white hover:bg-red-700"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-600 px-3 text-[11px] font-bold text-white"
                 >
                   <Link href="/pricing">
                     <DowinIcon name="domain-payment" size="14px" />

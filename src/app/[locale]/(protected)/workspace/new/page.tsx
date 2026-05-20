@@ -40,7 +40,7 @@ export default function NewWorkspacePage() {
       <div className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-10 animate-dowin-in">
         {/* 상단 내비게이션 */}
         <div className="flex items-center gap-3">
-          <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 hover:border-zinc-300 hover:text-zinc-600 transition-colors shrink-0" />
+          <SmartBackButton className="w-8 h-8 rounded-button border border-zinc-200 flex items-center justify-center text-zinc-400 transition-colors shrink-0" />
           <span className="text-xs font-bold text-zinc-400">{tCommon("back")}</span>
         </div>
 

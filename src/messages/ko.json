@@ -303,6 +303,13 @@
     "leadTip1Text": " 이 행동이 성공 기준을 개선하나요?",
     "leadTip2Label": "영향력:",
     "leadTip2Text": " 직접 통제할 수 있는 행동인가요?",
+    "archiveMeasure": "보관",
+    "reactivateMeasure": "다시 활성화",
+    "archivedMeasuresTitle": "보관된 액션 아이템",
+    "archivedMeasuresDesc": "기록은 남기고 현재 점수판 집계에서만 제외한 항목입니다.",
+    "noArchivedMeasures": "아직 보관된 액션 아이템이 없습니다.",
+    "unnamedArchivedMeasure": "이름 없는 액션 아이템",
+    "archivedBadge": "보관됨",
     "addLeadMeasure": "액션 아이템 추가",
     "decrement": "횟수 감소",
     "increment": "횟수 증가",
@@ -315,6 +322,10 @@
     "modeAtLeast": "이상",
     "modeExactly": "딱",
     "deleteTagConfirm": "이 태그를 삭제하시겠습니까?",
+    "deleteConfirmTitle": "다음 액션 아이템이 삭제됩니다:",
+    "deleteConfirmWarning": "삭제 시 기존 실행 기록도 모두 삭제되며 복구할 수 없습니다. 계속하시겠습니까?",
+    "deletedBadge": "삭제 예정",
+    "cancelDelete": "삭제 취소",
     "tagName": "태그 이름",
     "rename": "이름 변경",
     "tagNamePlaceholder": "예: 운동",
@@ -851,6 +862,8 @@
     "ACTIVE_SCOREBOARD_EXISTS": "이미 활성화된 점수판이 있습니다.",
     "SCOREBOARD_ALREADY_ACTIVE": "이미 활성화된 점수판입니다.",
     "SCOREBOARD_ARCHIVED": "보관된 점수판은 수정할 수 없습니다.",
+    "LEAD_MEASURE_ALREADY_ACTIVE": "이미 활성화된 액션 아이템입니다.",
+    "LEAD_MEASURE_ALREADY_ARCHIVED": "이미 보관된 액션 아이템입니다.",
     "LEAD_MEASURE_ARCHIVED": "보관된 액션 아이템에는 기록을 추가할 수 없습니다.",
     "FUTURE_DATE_NOT_ALLOWED": "미래 날짜에는 기록할 수 없습니다.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
@@ -1161,7 +1174,7 @@
     "loginDesc": "운영 콘솔에 접속하려면 운영자 아이디와 비밀번호를 입력하세요.",
     "loginButton": "로그인",
     "logoutButton": "로그아웃",
-    "sidebarTitle": "DOWIN 운영 콘솔",
+    "sidebarTitle": "Dowin 운영 콘솔",
     "inquiriesTitle": "문의 처리 센터",
     "billingTitle": "결제 지원 센터",
     "recoveryTitle": "데이터 복구 센터",
@@ -1171,5 +1184,140 @@
     "pwLabel": "비밀번호",
     "idPlaceholder": "아이디를 입력하세요",
     "pwPlaceholder": "비밀번호를 입력하세요"
+  },
+  "DocsViewer": {
+    "eyebrow": "Docs Viewer Prototype",
+    "title": "Planning 문서를 한눈에 읽는 Dowin 문서 뷰어",
+    "description": "날짜와 파일명 대신 주제, 상태, 연결 관계 중심으로 Dowin 문서를 탐색합니다. 첫 화면은 planning 문서 밀도를 낮추는 데 맞췄고, 바로 비교 읽기까지 이어집니다.",
+    "searchPlaceholder": "문서 제목, 경로, 헤더로 검색",
+    "searchButton": "검색",
+    "empty": "조건에 맞는 문서가 없습니다. 토픽이나 렌즈를 줄여보세요.",
+    "cta": {
+      "apiDocs": "API 문서 보기",
+      "keepReading": "현재 문서 계속 읽기"
+    },
+    "stats": {
+      "planningDocs": "Planning 문서 수",
+      "planningDocsDesc": "docs/planning 기준",
+      "recentPlanning": "최근 14일 문서",
+      "recentPlanningDesc": "새로 생긴 planning 스레드",
+      "focusDocs": "핵심 기준 문서",
+      "focusDocsDesc": "연결이 약한 문서 {count}개 포함"
+    },
+    "sections": {
+      "planning": "Planning",
+      "design": "Design",
+      "dev": "Dev",
+      "operations": "Operations",
+      "reference": "Reference",
+      "all": "All Docs"
+    },
+    "topics": {
+      "all": "전체",
+      "onboarding-entry": "온보딩/진입",
+      "dashboard-report": "대시보드/리포트",
+      "monetization-plan": "수익화/플랜",
+      "operations-admin": "운영/관리도구",
+      "notification-reminder": "알림/리마인드",
+      "policy-legal": "정책/법률",
+      "auth-workspace": "인증/워크스페이스",
+      "platform-infra": "플랫폼/인프라",
+      "other": "기타"
+    },
+    "lenses": {
+      "all": "전체 렌즈",
+      "focus": "지금 읽을 것",
+      "recent": "최근 업데이트",
+      "connected": "후속 연결 있음",
+      "history": "히스토리 참고"
+    },
+    "sidebar": {
+      "topicTitle": "Topic Lanes",
+      "topicDescription": "planning 문서를 주제 기준으로 먼저 좁힙니다.",
+      "lensTitle": "Status Lenses",
+      "lensDescription": "지금 읽을 문서인지, 최근 문서인지 빠르게 거릅니다."
+    },
+    "tree": {
+      "title": "Docs Tree",
+      "description": "파일시스템처럼 전체 문서를 폴더 단위로 펼쳐봅니다."
+    },
+    "feed": {
+      "title": "Document Feed",
+      "description": "{section}에서 {count}개 문서를 보여줍니다."
+    },
+    "card": {
+      "relations": "연결 수",
+      "noDate": "날짜 없음",
+      "open": "바로 보기",
+      "compare": "나란히 비교"
+    },
+    "compare": {
+      "eyebrow": "Compare Mode",
+      "title": "두 문서를 나란히 읽고 구조 차이를 빠르게 봅니다.",
+      "clear": "비교 해제",
+      "leftLabel": "문서",
+      "focusThis": "이 문서 중심으로 보기"
+    },
+    "detail": {
+      "title": "Document Meta",
+      "description": "본문보다 먼저 읽기 맥락을 정리합니다.",
+      "date": "작성일",
+      "inbound": "들어오는 연결",
+      "outbound": "나가는 연결",
+      "readGuide": "읽기 가이드",
+      "path": "경로"
+    },
+    "outline": {
+      "title": "Outline",
+      "description": "문서 헤더와 TOC를 바로 훑습니다.",
+      "empty": "추출된 헤더가 없습니다."
+    },
+    "guides": {
+      "onboarding-entry": {
+        "when": "온보딩 문구, 랜딩, 첫 진입 흐름을 정리할 때 먼저 봅니다.",
+        "why": "사용자 첫 인상을 결정하는 카피와 화면 경로가 모여 있습니다.",
+        "next": "이후 관련 dev 문서나 현재 구현 화면으로 이어서 확인합니다."
+      },
+      "dashboard-report": {
+        "when": "대시보드 구조나 리포트 흐름을 바꾸기 전 먼저 봅니다.",
+        "why": "핵심 사용자 장면과 성과 확인 구조가 집중된 문서군입니다.",
+        "next": "관련 dashboard/report 구현 문서와 실제 페이지를 함께 봅니다."
+      },
+      "monetization-plan": {
+        "when": "플랜, 결제, 가치 제안 정리를 시작할 때 먼저 봅니다.",
+        "why": "요금제와 업그레이드 근거가 planning 기준으로 정리돼 있습니다.",
+        "next": "billing 관련 API와 profile/pricing 화면 구현으로 연결합니다."
+      },
+      "operations-admin": {
+        "when": "운영 도구, 장애 대응, 관리자 기능을 검토할 때 먼저 봅니다.",
+        "why": "실서비스 운영 관점의 후속 액션이 많은 문서군입니다.",
+        "next": "ops runbook, admin 화면, 운영 API 구현 상태를 이어서 봅니다."
+      },
+      "notification-reminder": {
+        "when": "푸시, 리마인드, 체크인 흐름을 바꾸기 전에 먼저 봅니다.",
+        "why": "사용자 재방문과 운영 개입 비용에 직접 연결되는 문서군입니다.",
+        "next": "notification 도메인 문서와 WebView/app 경로를 같이 확인합니다."
+      },
+      "policy-legal": {
+        "when": "약관, 정책, 법률 고지 흐름을 손볼 때 먼저 봅니다.",
+        "why": "문구 변경이 화면, 결제, 문의 처리 정책과 엮이기 쉽습니다.",
+        "next": "실제 content/legal 문서와 public 페이지 반영 상태를 점검합니다."
+      },
+      "auth-workspace": {
+        "when": "가입, 로그인, 워크스페이스 진입 규칙을 건드릴 때 먼저 봅니다.",
+        "why": "인증과 참여 흐름의 정책 차이가 사용자 이탈에 바로 연결됩니다.",
+        "next": "auth/workspace 도메인 문서와 라우트 구현을 연달아 확인합니다."
+      },
+      "platform-infra": {
+        "when": "API, 스키마, 공통 인프라 제약을 파악할 때 먼저 봅니다.",
+        "why": "문서 간 연결이 많아 기준 문서 역할을 하는 경우가 많습니다.",
+        "next": "관련 dev/common 문서와 실제 스키마 또는 API 계약을 확인합니다."
+      },
+      "other": {
+        "when": "아직 주제 분류가 약한 문서를 빠르게 훑을 때 봅니다.",
+        "why": "후속 분류 전이라도 제목과 연결 관계로 충분히 탐색할 수 있습니다.",
+        "next": "관련 링크 수가 높은 문서를 우선으로 이어서 읽습니다."
+      }
+    }
   }
 }

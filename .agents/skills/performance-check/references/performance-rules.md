@@ -1,4 +1,4 @@
-# DOWIN Performance Rules
+# Dowin Performance Rules
 
 ## Read Order
 
@@ -34,7 +34,7 @@ Flag code when it:
 - builds derived maps but still keeps rescanning raw arrays
 - combines member, measure, and log loops without a clear bound
 
-Typical DOWIN hot paths:
+Typical Dowin hot paths:
 
 - dashboard services
 - daily-log summary services

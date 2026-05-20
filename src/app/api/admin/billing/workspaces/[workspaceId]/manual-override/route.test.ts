@@ -47,7 +47,7 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/manual-override", () 
   it("system admin이 billing 수동 보정을 실행한다", async () => {
     mockApplyManualOverride.mockResolvedValue({
       workspaceId: 3,
-      workspaceName: "DOWIN",
+      workspaceName: "Dowin",
       planCode: "STANDARD",
       billingStatus: "ACTIVE",
       events: [],

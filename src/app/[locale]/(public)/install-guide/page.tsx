@@ -8,7 +8,7 @@ import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
 const steps = [
   {
     step: "STEP 1",
-    title: "Safari에서 DOWIN 링크 열기",
+    title: "Safari에서 Dowin 링크 열기",
     description:
       "iPhone에서는 Safari에서만 DOWIN를 홈 화면에 설치할 수 있어요. 다른 브라우저에서 열었다면 Safari로 다시 열어 진행해주세요.",
     iconName: "domain-phone",
@@ -51,19 +51,19 @@ const steps = [
     step: "STEP 6",
     title: "설치 완료",
     description:
-      "홈 화면에 DOWIN 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
+      "홈 화면에 Dowin 아이콘이 생기면 완료입니다. 이후에는 앱처럼 바로 열 수 있습니다.",
     iconName: "nav-home",
     imageSrc: "/assets/guide/guide04.png",
-    imageAlt: "홈 화면에 설치된 DOWIN 예시",
+    imageAlt: "홈 화면에 설치된 Dowin 예시",
   },
 ] as const;
 
 export default function InstallGuidePage() {
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto flex max-w-[560px] flex-col gap-6 p-4 pb-10 animate-dowin-in md:p-8">
         <header className="flex items-center justify-between">
-          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors hover:border-[rgba(205,207,213,1)] hover:text-text-primary" />
+          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors" />
           <p className="text-xs text-text-muted">iPhone 설치 가이드</p>
           <div className="w-8" />
         </header>

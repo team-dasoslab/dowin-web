@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Dowin is a goal-management service built around 4DX concepts. This repository uses Next.js, React 19, Tailwind CSS 4, Cloudflare D1, Orval, TanStack Query, Zod, Vitest, and Storybook.
+Dowin is a goal-execution and weekly operations service for individuals and teams. This repository uses Next.js, React 19, Tailwind CSS 4, Cloudflare D1, Orval, TanStack Query, Zod, Vitest, and Storybook.
 
 ## Core Reading Order
 
@@ -31,6 +31,7 @@ If documents conflict with code, verify the implementation and prefer the curren
 - Auth currently uses the `dowin_sid` session cookie pattern in active code.
 - Update `src/api-spec/openapi.yaml` first when API contracts change.
 - Consider `docs/onboarding.md` and matching `docs/dev/` files for material skill, process, or architecture changes.
+- For planning or documentation work, follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md` and do not describe Dowin as a book-based/framework-based product in current-facing docs.
 
 ## Collaboration Style
 

@@ -23,7 +23,7 @@ describe("ContactDiscordNotifierService", () => {
   it("Discord 전송용 문의 payload를 만든다", () => {
     const payload = service.buildPayload(input);
 
-    expect(payload.content).toBe("DOWIN 문의 접수 #7");
+    expect(payload.content).toBe("Dowin 문의 접수 #7");
     expect(payload.embeds[0].fields).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

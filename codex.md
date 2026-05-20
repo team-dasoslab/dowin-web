@@ -1,8 +1,8 @@
-# Codex 운영 계획 for DOWIN
+# Codex 운영 계획 for Dowin
 
 ## 1. 목적
 
-이 문서는 DOWIN 저장소에서 Codex를 사용할 때의 작업 기준, 명령 규칙, 검증 루틴, 문서 우선순위를 고정하기 위한 운영 계획이다.  
+이 문서는 Dowin 저장소에서 Codex를 사용할 때의 작업 기준, 명령 규칙, 검증 루틴, 문서 우선순위를 고정하기 위한 운영 계획이다.  
 Claude Code에 익숙한 흐름을 최대한 유지하되, 이 저장소의 실제 구현 상태와 Codex의 작업 습관에 맞게 표준화한다.
 
 > 참고: 이 저장소의 에이전트 운영 가이드는 `.agents/workflows/*`가 아니라 `.agents/skills/*/SKILL.md`에 정리되어 있다.

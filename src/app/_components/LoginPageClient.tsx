@@ -282,7 +282,7 @@ export default function LoginPageClient() {
           </div>
         </Card>
 
-        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest ">
+        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
           © 2026 Dasoslab. All rights reserved.
         </p>
       </div>
@@ -421,7 +421,7 @@ export default function LoginPageClient() {
         </form>
       </Card>
 
-      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest ">
+      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
         © 2026 Dasoslab. All rights reserved.
       </p>
     </div>

@@ -1,6 +1,6 @@
 ---
 name: dowin-planning
-description: Use this skill when planning new DOWIN features, refining product flows, updating onboarding or planning docs, creating a new planning document, or turning rough ideas into repository-aligned action items. Trigger it for requests about feature planning, documentation updates, scoping MVP versus Post-MVP, or creating planning artifacts in this repository.
+description: Use this skill when planning new Dowin features, refining product flows, updating onboarding or planning docs, creating a new planning document, or turning rough ideas into repository-aligned action items. Trigger it for requests about feature planning, documentation updates, scoping MVP versus Post-MVP, or creating planning artifacts in this repository.
 ---
 
 # Dowin Planning
@@ -26,7 +26,8 @@ Read implementation only when feasibility or current status matters.
 - Prefer extending the primary planning document for the feature or milestone.
 - Keep YAML frontmatter at the top of planning docs.
 - Planning should produce concrete action items, not only abstract ideas.
-- Respect the 4DX framing already used across DOWIN documents.
+- Follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`.
+- Treat Dowin as an independent product. Do not justify current product direction by external books or frameworks in planning docs.
 - Keep `docs/onboarding.md` current enough that another agent can start work quickly.
 - When creating commits for planning/doc changes, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `docs: <변경 요약>` unless the change is clearly another type.
 
@@ -77,7 +78,7 @@ A good planning update should leave behind:
 - Is the frontmatter present and valid?
 - Does the plan distinguish MVP from Post-MVP?
 - Are action items concrete enough for engineering work?
-- Does the plan align with existing domain rules and 4DX terminology?
+- Does the plan align with existing domain rules and current Dowin product language?
 - Should `docs/onboarding.md` also be updated?
 
 ## Output Contract

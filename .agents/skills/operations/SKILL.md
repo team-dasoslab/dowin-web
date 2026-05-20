@@ -1,13 +1,13 @@
 ---
 name: dowin-operations
-description: Use this skill when handling DOWIN production operations work such as incident readiness, runbook creation, restore or rollback planning, outage response, incident communication, release smoke checks, or operational documentation for Cloudflare Workers and D1. Trigger it for requests about 운영 문서, 장애 대응, 복구 절차, 배포 롤백, DB restore, Cloudflare 장애 대응, release readiness runbooks, or 운영 체크리스트.
+description: Use this skill when handling Dowin production operations work such as incident readiness, runbook creation, restore or rollback planning, outage response, incident communication, release smoke checks, or operational documentation for Cloudflare Workers and D1. Trigger it for requests about 운영 문서, 장애 대응, 복구 절차, 배포 롤백, DB restore, Cloudflare 장애 대응, release readiness runbooks, or 운영 체크리스트.
 ---
 
 # Dowin Operations
 
 ## Overview
 
-Use this skill for DOWIN operational readiness and incident-response documentation or execution guidance.
+Use this skill for Dowin operational readiness and incident-response documentation or execution guidance.
 
 Start with:
 
@@ -18,14 +18,14 @@ Start with:
 
 Read implementation only when the request depends on the current Cloudflare, D1, or deployment setup.
 
-## DOWIN Operations Facts
+## Dowin Operations Facts
 
-- DOWIN runs on `Cloudflare Workers + D1 + OpenNext`.
+- Dowin runs on `Cloudflare Workers + D1 + OpenNext`.
 - Code rollback and DB restore are separate decisions.
 - Cloudflare Worker rollback does not revert D1 schema or data state.
 - Operational docs should be short, executable, and easy to scan during incidents.
 - Prefer putting execution runbooks in `docs/dev/operations/`.
-- When the work changes DOWIN's operating model or entry points, update `docs/onboarding.md` and relevant indexes.
+- When the work changes Dowin's operating model or entry points, update `docs/onboarding.md` and relevant indexes.
 
 ## Workflow
 
@@ -49,7 +49,7 @@ Prefer the narrowest document that fits:
 - deployment rollback runbook for bad deploy scenarios
 - incident communication template for internal or user-facing messaging
 
-### 3. Ground the answer in current DOWIN infra
+### 3. Ground the answer in current Dowin infra
 
 Cross-check against:
 
@@ -72,7 +72,7 @@ A good operations result should leave behind:
 
 - Is the document or answer executable during an incident?
 - Does it clearly separate rollback vs restore?
-- Does it reflect DOWIN's current Cloudflare Workers + D1 setup?
+- Does it reflect Dowin's current Cloudflare Workers + D1 setup?
 - Is user or internal communication included when relevant?
 - Should `docs/onboarding.md`, `docs/dev/README.md`, or `docs/dev/operations/README.md` also be updated?
 

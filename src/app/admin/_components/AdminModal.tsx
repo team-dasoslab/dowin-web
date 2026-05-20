@@ -58,7 +58,7 @@ export default function AdminModal({
           )}
           <button
             onClick={onClose}
-            className="text-text-muted hover:text-text-primary transition-all p-2 rounded-full hover:bg-zinc-100"
+            className="text-text-muted transition-all p-2 rounded-full"
             aria-label="Close"
           >
             <svg
