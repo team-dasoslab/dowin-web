@@ -3,6 +3,8 @@ import { generateId } from "@/lib/utils";
 export type MeasureInput = {
   id: string;
   existingId: number | null;
+  initialStatus: "ACTIVE" | "ARCHIVED" | null;
+  status: "ACTIVE" | "ARCHIVED";
   name: string;
   period: "WEEKLY" | "MONTHLY";
   targetValue: number;
@@ -36,7 +38,12 @@ export const getDaysInMonthFromIsoDate = (isoDate: string): number => {
   const year = Number(yearText);
   const month = Number(monthText);
 
-  if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) {
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(month) ||
+    month < 1 ||
+    month > 12
+  ) {
     return 31;
   }
 
@@ -60,6 +67,8 @@ export const clampMeasureTargetValue = (
 export const createEmptyMeasure = (): MeasureInput => ({
   id: generateId(),
   existingId: null,
+  initialStatus: null,
+  status: "ACTIVE",
   name: "",
   period: "WEEKLY",
   targetValue: 3,
