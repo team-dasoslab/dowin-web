@@ -2239,6 +2239,7 @@ components:
           workspaceName,
           planCode,
           billingStatus,
+          entitlementSource,
           cancelAtPeriodEnd,
           recentRefundCount,
           recentRevokedCount,
@@ -2253,6 +2254,10 @@ components:
         billingStatus:
           type: string
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
+        entitlementSource:
+          type: string
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST]
+          nullable: true
         provider:
           type: string
           enum: [POLAR]
@@ -2349,6 +2354,10 @@ components:
         billingStatus:
           type: string
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
+        entitlementSource:
+          type: string
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST]
+          nullable: true
         customerKey:
           type: string
           nullable: true
@@ -2605,6 +2614,7 @@ components:
           workspaceName,
           planCode,
           billingStatus,
+          entitlementSource,
           cancelAtPeriodEnd,
           recentRefundCount,
           recentRevokedCount,
@@ -2620,6 +2630,10 @@ components:
         billingStatus:
           type: string
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
+        entitlementSource:
+          type: string
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST]
+          nullable: true
         provider:
           type: string
           enum: [POLAR]
