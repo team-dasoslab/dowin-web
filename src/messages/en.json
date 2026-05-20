@@ -848,6 +848,8 @@
     "ACTIVE_SCOREBOARD_EXISTS": "An active scoreboard already exists.",
     "SCOREBOARD_ALREADY_ACTIVE": "This scoreboard is already active.",
     "SCOREBOARD_ARCHIVED": "Archived scoreboards cannot be modified.",
+    "LEAD_MEASURE_ALREADY_ACTIVE": "This action item is already active.",
+    "LEAD_MEASURE_ALREADY_ARCHIVED": "This action item is already archived.",
     "LEAD_MEASURE_ARCHIVED": "Cannot add logs to archived lead measures.",
     "FUTURE_DATE_NOT_ALLOWED": "Cannot record data for future dates.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",

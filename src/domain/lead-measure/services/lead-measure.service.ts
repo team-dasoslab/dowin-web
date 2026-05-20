@@ -115,16 +115,26 @@ export class LeadMeasureService {
   }
 
   async archiveLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
-    await this.getOwnedLeadMeasure(id, userId);
+    const measure = await this.getOwnedLeadMeasure(id, userId);
     const workspace = await this.getWorkspace(userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+
+    if (measure.status === "ARCHIVED") {
+      throw new BadRequestError("LEAD_MEASURE_ALREADY_ARCHIVED");
+    }
+
     return await this.leadMeasureStorage.archiveLeadMeasure(id);
   }
 
   async reactivateLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
-    await this.getOwnedLeadMeasure(id, userId);
+    const measure = await this.getOwnedLeadMeasure(id, userId);
     const workspace = await this.getWorkspace(userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+
+    if (measure.status === "ACTIVE") {
+      throw new BadRequestError("LEAD_MEASURE_ALREADY_ACTIVE");
+    }
+
     return await this.leadMeasureStorage.reactivateLeadMeasure(id);
   }
 
