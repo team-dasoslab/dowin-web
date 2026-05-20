@@ -138,7 +138,7 @@ export default function SetupPage() {
   const isMutating = isSubmitPending || isArchivePending;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <SetupCoachmark
         isRunning={isCoachmarkRunning}
         mode={coachmarkMode}
@@ -186,7 +186,7 @@ export default function SetupPage() {
                     className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
                       isActive
                         ? "text-primary"
-                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                        : "text-zinc-400"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -290,7 +290,7 @@ export default function SetupPage() {
 
 function SetupSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-12 rounded-content bg-sub-background" />

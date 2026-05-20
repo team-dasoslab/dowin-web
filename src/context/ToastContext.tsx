@@ -112,7 +112,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <span className="text-sm font-medium">{toast.message}</span>
             <button
               onClick={() => removeToast(toast.id)}
-              className="p-1 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
+              className="p-1 rounded-lg transition-colors flex-shrink-0"
             >
               <DowinIcon name="action-dismiss" size="16px" />
             </button>

@@ -457,7 +457,7 @@ export default async function DocsViewerPage({
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 asChild
-                className="min-h-10 border border-zinc-200 bg-white px-4 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50"
+                className="min-h-10 border border-zinc-200 bg-white px-4 text-sm font-bold text-zinc-700 transition-colors"
               >
                 <NextLink href="/">
                   {locale === "ko" ? "← 앱으로 돌아가기" : "← Back to app"}
@@ -474,7 +474,7 @@ export default async function DocsViewerPage({
             <div className="flex items-center gap-2">
               <Button
                 asChild
-                className="min-h-10 border border-zinc-200 bg-white px-4 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50"
+                className="min-h-10 border border-zinc-200 bg-white px-4 text-sm font-bold text-zinc-700 transition-colors"
               >
                 <NextLink href="/api-docs">{t("cta.apiDocs")}</NextLink>
               </Button>
@@ -531,7 +531,7 @@ export default async function DocsViewerPage({
                               "min-h-8 px-3 text-xs font-medium transition-colors rounded-lg",
                               active
                                 ? "bg-zinc-900 text-white"
-                                : "border border-zinc-200 bg-zinc-50 text-zinc-600 hover:border-zinc-300 hover:bg-white hover:text-zinc-900",
+                                : "border border-zinc-200 bg-zinc-50 text-zinc-600",
                             )}
                           >
                             <NextLink
@@ -566,7 +566,7 @@ export default async function DocsViewerPage({
                               "min-h-8 px-3 text-xs font-medium transition-colors rounded-lg",
                               active
                                 ? "bg-primary text-white"
-                                : "border border-zinc-200 bg-zinc-50 text-zinc-600 hover:border-zinc-300 hover:bg-white hover:text-zinc-900",
+                                : "border border-zinc-200 bg-zinc-50 text-zinc-600",
                             )}
                           >
                             <NextLink
@@ -602,7 +602,7 @@ export default async function DocsViewerPage({
                               "min-h-8 px-3 text-xs font-medium transition-colors rounded-lg",
                               active
                                 ? "bg-zinc-900 text-white"
-                                : "border border-zinc-200 bg-zinc-50 text-zinc-600 hover:border-zinc-300 hover:bg-white hover:text-zinc-900",
+                                : "border border-zinc-200 bg-zinc-50 text-zinc-600",
                             )}
                           >
                             <NextLink
@@ -654,7 +654,7 @@ export default async function DocsViewerPage({
                 />
                 <Button
                   type="submit"
-                  className="min-h-11 bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+                  className="min-h-11 bg-primary px-4 text-sm font-semibold text-white transition-colors"
                 >
                   {t("searchButton")}
                 </Button>
@@ -675,7 +675,7 @@ export default async function DocsViewerPage({
                   "px-4 py-2 text-sm font-bold transition-colors border-b-2",
                   tab === "doc"
                     ? "border-zinc-900 text-zinc-900"
-                    : "border-transparent text-zinc-500 hover:text-zinc-800",
+                    : "border-transparent text-zinc-500",
                 )}
               >
                 Current Document
@@ -693,7 +693,7 @@ export default async function DocsViewerPage({
                   "px-4 py-2 text-sm font-bold transition-colors border-b-2",
                   tab === "feed"
                     ? "border-zinc-900 text-zinc-900"
-                    : "border-transparent text-zinc-500 hover:text-zinc-800",
+                    : "border-transparent text-zinc-500",
                 )}
               >
                 Document Feed{" "}
@@ -714,7 +714,7 @@ export default async function DocsViewerPage({
                   "px-4 py-2 text-sm font-bold transition-colors border-b-2",
                   tab === "todos"
                     ? "border-zinc-900 text-zinc-900"
-                    : "border-transparent text-zinc-500 hover:text-zinc-800",
+                    : "border-transparent text-zinc-500",
                 )}
               >
                 Open Todos{" "}
@@ -807,7 +807,7 @@ function DocumentCard({
         "group relative flex flex-col gap-3 rounded-xl border p-5 transition-colors",
         isSelected
           ? "border-zinc-900 bg-zinc-50 ring-1 ring-zinc-900"
-          : "border-zinc-200 bg-white hover:border-zinc-300",
+          : "border-zinc-200 bg-white",
       )}
     >
       <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
@@ -835,7 +835,7 @@ function DocumentCard({
               doc: doc.relativePath,
               tab: "doc",
             })}
-            className="text-lg font-black text-zinc-900 hover:underline hover:underline-offset-4"
+            className="text-lg font-black text-zinc-900"
           >
             {doc.title}
           </NextLink>
@@ -847,7 +847,7 @@ function DocumentCard({
         <div className="shrink-0 flex flex-col items-end gap-2">
           {doc.relationCount > 0 ? (
             <details className="group/details relative">
-              <summary className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-zinc-100 px-2 py-1 text-xs font-bold text-zinc-600 transition-colors hover:bg-zinc-200 list-none [&::-webkit-details-marker]:hidden">
+              <summary className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-zinc-100 px-2 py-1 text-xs font-bold text-zinc-600 transition-colors list-none [&::-webkit-details-marker]:hidden">
                 <Link2 className="h-3.5 w-3.5" />
                 {doc.relationCount}
               </summary>
@@ -870,7 +870,7 @@ function DocumentCard({
                               doc: link,
                               tab: "doc",
                             })}
-                            className="truncate rounded px-2 py-1 text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                            className="truncate rounded px-2 py-1 text-[11px] font-medium text-zinc-700 transition-colors"
                             title={link}
                           >
                             {link}
@@ -896,7 +896,7 @@ function DocumentCard({
                               doc: link,
                               tab: "doc",
                             })}
-                            className="truncate rounded px-2 py-1 text-[11px] font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                            className="truncate rounded px-2 py-1 text-[11px] font-medium text-zinc-700 transition-colors"
                             title={link}
                           >
                             {link}
@@ -986,7 +986,7 @@ function FormattedText({ text }: { text: string }) {
                 <NextLink
                   key={i}
                   href={`/docs-viewer?doc=${encodeURIComponent(docPath)}&tab=doc`}
-                  className="font-semibold text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary"
+                  className="font-semibold text-primary underline decoration-primary/30 underline-offset-4 transition-colors"
                 >
                   {linkText}
                 </NextLink>
@@ -999,7 +999,7 @@ function FormattedText({ text }: { text: string }) {
                 href={url}
                 target={url.startsWith("http") ? "_blank" : undefined}
                 rel={url.startsWith("http") ? "noreferrer" : undefined}
-                className="font-semibold text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary"
+                className="font-semibold text-primary underline decoration-primary/30 underline-offset-4 transition-colors"
               >
                 {linkText}
               </a>
@@ -1251,7 +1251,7 @@ function DocsTreeNodeItem({
           "flex min-h-8 w-full justify-start rounded-lg px-3 text-left text-[13px] font-medium transition-colors",
           isSelected
             ? "bg-primary/10 text-primary font-bold"
-            : "bg-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+            : "bg-transparent text-zinc-600",
         )}
         style={{ paddingLeft: `${depth * 14 + 12}px` }}
       >
@@ -1276,7 +1276,7 @@ function DocsTreeNodeItem({
   return (
     <details open={isOpen} className="group">
       <summary
-        className="flex min-h-8 cursor-pointer list-none items-center rounded-lg px-3 text-[13px] font-medium text-zinc-700 hover:bg-zinc-100"
+        className="flex min-h-8 cursor-pointer list-none items-center rounded-lg px-3 text-[13px] font-medium text-zinc-700"
         style={{ paddingLeft: `${depth * 14 + 12}px` }}
       >
         <span className="mr-2 text-[11px] text-text-muted transition-transform group-open:rotate-90">

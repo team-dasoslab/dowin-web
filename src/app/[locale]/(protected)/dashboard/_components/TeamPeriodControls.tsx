@@ -31,7 +31,7 @@ export function TeamPeriodControls({
     <div className="flex flex-col gap-2 py-2 select-none">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
         <div className="flex items-center gap-5 sm:gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all hover:border-primary/30 focus-within:border-primary/30">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all focus-within:border-primary/30">
             <DowinIcon
               name="domain-calendar"
               size="16px"
@@ -52,7 +52,7 @@ export function TeamPeriodControls({
               type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
@@ -65,7 +65,7 @@ export function TeamPeriodControls({
               type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
@@ -79,7 +79,7 @@ export function TeamPeriodControls({
                 type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary hover:bg-zinc-100 hover:text-primary"
+                className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
               >
                 <DowinIcon name="action-refresh" size="10px" />
                 <span>{t("backToToday")}</span>

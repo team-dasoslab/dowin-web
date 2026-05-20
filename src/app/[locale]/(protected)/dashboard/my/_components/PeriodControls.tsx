@@ -57,7 +57,7 @@ export function PeriodControls({
                   className={`rounded-button px-3 py-1 text-[11px] font-bold transition-all ${
                     isActive
                       ? "bg-white text-primary border border-border shadow-sm"
-                      : "text-text-secondary hover:text-text-primary"
+                      : "text-text-secondary"
                   }`}
                 >
                   {view === "week" ? t("weekView") : t("monthView")}
@@ -68,7 +68,7 @@ export function PeriodControls({
 
           <Button
             asChild
-            className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all hover:bg-primary/10 shrink-0"
+            className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all shrink-0"
           >
             <Link href="/setup?mode=update">
               <DowinIcon name="action-add" size="14px" />
@@ -78,7 +78,7 @@ export function PeriodControls({
         </div>
 
         <div className="flex items-center gap-5">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all hover:border-primary/30 focus-within:border-primary/30 shrink-0">
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all focus-within:border-primary/30 shrink-0">
             <DowinIcon
               name="domain-calendar"
               size="16px"
@@ -99,7 +99,7 @@ export function PeriodControls({
               type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
@@ -112,7 +112,7 @@ export function PeriodControls({
               type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
@@ -126,7 +126,7 @@ export function PeriodControls({
                 type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary hover:bg-zinc-100 hover:text-primary"
+                className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
               >
                 <DowinIcon name="action-refresh" size="10px" />
                 <span>{t("backToToday")}</span>
@@ -148,7 +148,7 @@ export function PeriodControls({
 
           <Button
             asChild
-            className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all hover:bg-primary/10 lg:h-8 lg:px-3 lg:text-[11px]"
+            className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all lg:h-8 lg:px-3 lg:text-[11px]"
           >
             <Link href="/setup?mode=update">
               <DowinIcon name="action-add" size="14px" />
@@ -161,7 +161,7 @@ export function PeriodControls({
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
           <div className="flex items-center gap-2">
             {/* Utility: Calendar Picker */}
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all hover:border-primary/30 focus-within:border-primary/30">
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all focus-within:border-primary/30">
               <DowinIcon
                 name="domain-calendar"
                 size="16px"
@@ -183,7 +183,7 @@ export function PeriodControls({
                 type="button"
                 onClick={() => movePeriod(-1)}
                 disabled={isPreviousDisabled || isPeriodLoading}
-                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
               >
                 <DowinIcon name="nav-chevron-left" size="14px" />
               </Button>
@@ -196,7 +196,7 @@ export function PeriodControls({
                 type="button"
                 onClick={() => movePeriod(1)}
                 disabled={isPeriodLoading}
-                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary hover:bg-zinc-100 hover:text-primary disabled:opacity-30"
+                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
               >
                 <DowinIcon name="nav-chevron-right" size="14px" />
               </Button>
@@ -210,7 +210,7 @@ export function PeriodControls({
                   type="button"
                   onClick={resetToToday}
                   disabled={isPeriodLoading}
-                  className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary hover:bg-zinc-100 hover:text-primary"
+                  className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
                 >
                   <DowinIcon name="action-refresh" size="10px" />
                   <span>{t("backToToday")}</span>
@@ -232,7 +232,7 @@ export function PeriodControls({
                   className={`rounded-button px-3 py-1 text-[11px] font-bold transition-all ${
                     isActive
                       ? "bg-white text-primary border border-border shadow-sm"
-                      : "text-text-secondary hover:text-text-primary"
+                      : "text-text-secondary"
                   }`}
                 >
                   {view === "week" ? t("weekView") : t("monthView")}

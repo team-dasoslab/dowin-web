@@ -190,7 +190,7 @@ export default function AdminBillingPageClient() {
                   {workspaces.map((ws: AdminBillingWorkspaceSummary) => (
                     <tr
                       key={ws.workspaceId}
-                      className="hover:bg-sub-background/40 cursor-pointer transition-colors"
+                      className="cursor-pointer transition-colors"
                       onClick={() => setSelectedWorkspaceId(ws.workspaceId)}
                     >
                       <td className="px-6 py-4">

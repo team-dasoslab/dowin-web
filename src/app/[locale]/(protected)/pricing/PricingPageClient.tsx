@@ -62,7 +62,7 @@ export function PricingPageClient() {
       billing.billingStatus === "REVOKED");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <ProtectedPageContainer className="space-y-8 lg:space-y-12">
         <ProtectedPageHeader
           title={t("header")}
@@ -201,22 +201,22 @@ export function PricingPageClient() {
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
           <Link
             href="/billing-policy"
-            className="transition-colors hover:text-zinc-600"
+            className="transition-colors"
           >
             {t("billingPolicyLink")}
           </Link>
-          <Link href="/terms" className="transition-colors hover:text-zinc-600">
+          <Link href="/terms" className="transition-colors">
             {t("termsLink")}
           </Link>
           <Link
             href="/privacy"
-            className="transition-colors hover:text-zinc-600"
+            className="transition-colors"
           >
             {t("privacyLink")}
           </Link>
           <Link
             href="/profile/contact"
-            className="transition-colors hover:text-zinc-600"
+            className="transition-colors"
           >
             {t("contactLink")}
           </Link>
@@ -322,7 +322,7 @@ function PricingUnavailableInAppState() {
   const t = useTranslations("Pricing");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <EmptyStatePanel
           title={t("appUnavailableTitle")}
@@ -330,7 +330,7 @@ function PricingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors hover:bg-zinc-50"
+              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
             >
               <Link href="/profile">{t("appUnavailableAction")}</Link>
             </Button>
@@ -348,7 +348,7 @@ function NoWorkspaceState() {
   const t = useTranslations("Pricing");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -375,7 +375,7 @@ function PricingErrorState() {
   const t = useTranslations("Pricing");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -397,7 +397,7 @@ function PricingErrorState() {
 
 function PricingSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <ProtectedPageContainer isLoading>
         <div className="h-10 w-48 rounded-content bg-zinc-100" />
         <div className="h-32 rounded-content bg-zinc-100" />

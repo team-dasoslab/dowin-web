@@ -100,7 +100,7 @@ export function Sidebar() {
           <Link
             href="/workspace/new"
             className={cn(
-              "mb-6 flex h-10 w-full items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all hover:bg-primary/10",
+              "mb-6 flex h-10 w-full items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all",
               isCollapsed ? "justify-center gap-0 px-0" : "justify-center gap-3 lg:justify-start lg:px-4",
             )}
           >
@@ -130,7 +130,7 @@ export function Sidebar() {
                     "flex h-11 w-full items-center rounded-button transition-all",
                     isActive
                       ? "bg-zinc-100 text-zinc-950"
-                      : "text-zinc-400 hover:bg-zinc-100/50 hover:text-zinc-600",
+                      : "text-zinc-400",
                     isCollapsed ? "justify-center gap-0 px-0" : "gap-3 px-4",
                   )}
                 >
@@ -161,7 +161,7 @@ export function Sidebar() {
           <button
             onClick={toggleSidebar}
             className={cn(
-              "flex h-11 items-center rounded-button text-zinc-400 transition-all hover:bg-zinc-100/50 hover:text-zinc-600",
+              "flex h-11 items-center rounded-button text-zinc-400 transition-all",
               isCollapsed ? "w-full justify-center px-0" : "ml-auto w-11 justify-center",
             )}
             title={isCollapsed ? commonT("open") : commonT("close")}

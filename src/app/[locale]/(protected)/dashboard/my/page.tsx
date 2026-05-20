@@ -164,7 +164,7 @@ export default function MyDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       {celebrationLevel ? (
         <DashboardCelebrationOverlay level={celebrationLevel} />
       ) : null}
@@ -216,7 +216,7 @@ export default function MyDashboardPage() {
                     className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
                       isActive
                         ? "text-primary"
-                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                        : "text-zinc-400"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -323,7 +323,7 @@ function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
 
 function MyDashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-16 rounded-content bg-sub-background" />
         <div className="h-24 rounded-content bg-sub-background" />
@@ -340,7 +340,7 @@ function MyDashboardSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}
@@ -358,7 +358,7 @@ function NoWorkspaceState() {
 function NoScoreboardState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}
