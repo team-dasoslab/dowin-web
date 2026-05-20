@@ -1,0 +1,1 @@
+ALTER TABLE `workspace_billing_state` ADD `entitlement_source` text;

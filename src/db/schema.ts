@@ -450,6 +450,9 @@ export const workspaceBillingState = sqliteTable("workspace_billing_state", {
   planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
     .notNull()
     .default("FREE"),
+  entitlementSource: text("entitlement_source", {
+    enum: ["POLAR", "MANUAL_GRANT", "PARTNER", "INTERNAL_TEST"],
+  }),
   customerKey: text("customer_key"),
   subscriptionKey: text("subscription_key"),
   currentPeriodEnd: integer("current_period_end", { mode: "timestamp" }),
