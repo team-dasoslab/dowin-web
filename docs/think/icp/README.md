@@ -32,16 +32,19 @@
 
 - Dowin 제품 기준으로 고객 정의를 다시 좁힌 문서
 - 현재 1차 핵심 사용자 가설과 덜 맞는 사용자 가설을 함께 본다
+- 현재 기준 1순위 검증 세그먼트는 `소규모 운영/기획 혼합 팀`이다
 
 ### 4. [22-2026-05-09-dowin-founder-exec-team-problem-statements.md](./22-2026-05-09-dowin-founder-exec-team-problem-statements.md)
 
 - `대표 직속 실행팀` 세그먼트 문제 문장 초안
 - founder/COO/Chief of Staff 계열 세그먼트를 볼 때 쓴다
+- 현재 1순위 검증 세그먼트와 가장 가깝다
 
 ### 5. [24-2026-05-09-dowin-franchise-hq-supervisor-problem-statements.md](./24-2026-05-09-dowin-franchise-hq-supervisor-problem-statements.md)
 
 - `프랜차이즈 본사/슈퍼바이저 운영팀` 세그먼트 문제 문장 초안
 - 다점포/다지점 운영 세그먼트를 볼 때 쓴다
+- 현재는 3순위 검증 세그먼트로 읽는 편이 맞다
 
 ### 6. [31-2026-05-13-online-pain-log-founder-led-teams.md](./31-2026-05-13-online-pain-log-founder-led-teams.md)
 
@@ -52,11 +55,16 @@
 
 - founder-led 소규모 팀 가설을 Amazon 6-pager 스타일로 정리한 문서
 - 고객 가설, 문제, 의미, 잠재 가치, 미확정 요소, 다음 단계까지 한 번에 본다
+- 현재는 `확정 ICP`가 아니라 `1순위 후보를 가장 길게 풀어쓴 문서`로 읽는다
 
 ## 현재 운영 원칙
 
 - 이 폴더의 문서는 `확정된 ICP 결론`이 아니다
 - 모두 `직접 인터뷰 전/중에 쓰는 가설 자산`으로 다룬다
+- 다만 우선순위는 있다
+- 1순위: founder-led 또는 대표 직속 운영/기획 혼합 팀
+- 2순위: 반복 프로젝트 운영 팀
+- 3순위: 다점포/다지점 본사 운영 팀
 - 새로운 문서를 추가할 때도 `Dowin ICP 탐색`에 직접 필요한 경우만 남긴다
 - 폴더 이름 `consulting`은 과거 히스토리 때문에 유지할 뿐, 현재 목적을 설명하는 이름은 아니다
 

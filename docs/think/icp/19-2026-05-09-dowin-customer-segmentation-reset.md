@@ -4,8 +4,11 @@
 
 ## 이 문서의 목적
 
-이 문서는 `docs/consulting/dowin.md`를 기준으로,  
+이 문서는 아래 현재 기준 문서를 바탕으로,  
 지금까지의 고객 탐색 방향을 Dowin 제품 관점에서 다시 정리하는 문서다.
+
+- `docs/planning/2026.05.19-dowin-monetization-strategy-v1.md`
+- `docs/onboarding.md`
 
 핵심 목적은 아래 세 가지다.
 
@@ -38,8 +41,8 @@
 - 운영팀 중심
 - 구조 진단과 파일럿 개입
 
-하지만 [dowin.md](./dowin.md)를 보면,  
-현재 Dowin의 정체성은 조금 다르다.
+하지만 현재 기준 문서를 보면,  
+Dowin의 정체성은 조금 다르다.
 
 Dowin의 현재 정의:
 
@@ -175,7 +178,7 @@ Dowin가 특히 잘 맞는 팀은 아래 특성이 있어야 한다.
 
 현 시점에서 아래 세그먼트가 더 유력해 보인다.
 
-### 1. 소규모 운영/기획 혼합 팀
+### 1. 1순위 검증 세그먼트: 소규모 운영/기획 혼합 팀
 
 예:
 
@@ -187,21 +190,9 @@ Dowin가 특히 잘 맞는 팀은 아래 특성이 있어야 한다.
 
 - 주간 목표와 실행 점검이 중요하다
 - 문서와 메신저 분산 관리 pain가 클 수 있다
+- 현재 Dowin의 제품 언어와 도입 흐름을 가장 짧게 검증하기 좋다
 
-### 2. 다점포/다지점 본사 소규모 운영팀
-
-예:
-
-- 학원 본사 운영팀
-- 프랜차이즈 본사 운영팀
-- 개인서비스 체인 본사 운영팀
-
-이유:
-
-- 본사에서 주간 상태를 빨리 파악하고 개입해야 한다
-- 실행 현황이 흩어질 가능성이 높다
-
-### 3. 프로젝트성 반복 운영 팀
+### 2. 2순위 검증 세그먼트: 프로젝트성 반복 운영 팀
 
 예:
 
@@ -213,6 +204,31 @@ Dowin가 특히 잘 맞는 팀은 아래 특성이 있어야 한다.
 
 - 목표, 액션, 후속 확인이 계속 반복된다
 - 회의 직전 정리 피로가 강할 수 있다
+- 운영 리듬이 있다면 리더 개입 가치 검증이 가능하다
+
+### 3. 3순위 검증 세그먼트: 다점포/다지점 본사 소규모 운영팀
+
+예:
+
+- 학원 본사 운영팀
+- 프랜차이즈 본사 운영팀
+- 개인서비스 체인 본사 운영팀
+
+이유:
+
+- 본사에서 주간 상태를 빨리 파악하고 개입해야 한다
+- 실행 현황이 흩어질 가능성이 높다
+- 현장/지점 특성상 제품 도입 장벽과 커스터마이즈 요구가 더 클 수 있어 1차 검증 뒤로 둔다
+
+### 지금 바로 제외하지는 않지만 후순위로 둘 세그먼트
+
+- 완전 오프라인 현장형 조직
+- 이미 강한 PM 툴과 운영 루프가 있는 IT 팀
+- 개인 생산성 중심 사용자
+
+이유:
+
+- 현재 Dowin의 첫 결제 이유와 첫 주 가치 체감 흐름을 가장 빠르게 검증하기 어렵다
 
 ## Dowin 기준으로 다시 써야 할 핵심 문제 문장
 
@@ -230,21 +246,19 @@ Dowin 기준으로 더 맞는 문장:
 
 ## 기존 문서에 미치는 영향
 
-### 바로 수정이 필요한 문서
+### 바로 수정하거나 후속 기준으로 연결해야 하는 문서
 
-- [09-2026-05-09-ideal-client-profile.md](./09-2026-05-09-ideal-client-profile.md)
-- [13-2026-05-09-initial-client-channel-map.md](./13-2026-05-09-initial-client-channel-map.md)
-- [15-2026-05-09-non-it-ideal-client-longlist.md](./15-2026-05-09-non-it-ideal-client-longlist.md)
-- [16-2026-05-09-non-it-priority-shortlist.md](./16-2026-05-09-non-it-priority-shortlist.md)
-- [18-2026-05-09-shortlist-pain-language-map.md](./18-2026-05-09-shortlist-pain-language-map.md)
+- [29-2026-05-09-customer-research-reset-around-structure-not-industry.md](./29-2026-05-09-customer-research-reset-around-structure-not-industry.md)
+- [30-2026-05-13-dowin-icp-research-audit.md](./30-2026-05-13-dowin-icp-research-audit.md)
+- [32-2026-05-13-founder-led-team-icp-six-pager.md](./32-2026-05-13-founder-led-team-icp-six-pager.md)
+- [31-2026-05-13-online-pain-log-founder-led-teams.md](./31-2026-05-13-online-pain-log-founder-led-teams.md)
+- [22-2026-05-09-dowin-founder-exec-team-problem-statements.md](./22-2026-05-09-dowin-founder-exec-team-problem-statements.md)
+- [24-2026-05-09-dowin-franchise-hq-supervisor-problem-statements.md](./24-2026-05-09-dowin-franchise-hq-supervisor-problem-statements.md)
 
-### 보정해서 재사용 가능한 문서
+### 후속에서 참고 가능한 문서
 
-- [04-2026-05-09-consulting-diagnostic-questionnaire.md](./04-2026-05-09-consulting-diagnostic-questionnaire.md)
-- [10-2026-05-09-first-sales-conversation-guide.md](./10-2026-05-09-first-sales-conversation-guide.md)
-- [11-2026-05-09-success-metrics-and-proof.md](./11-2026-05-09-success-metrics-and-proof.md)
-
-이 문서들은 `컨설팅` 언어를 덜고 `제품 리서치` 언어로 바꾸면 쓸 수 있다.
+- 현재 폴더에는 대표 직속 실행팀과 founder-led 소규모 팀 쪽 가설 자산이 상대적으로 더 많이 남아 있다.
+- 별도 레거시 자료가 더 필요하면 `컨설팅` 언어를 직접 끌어오기보다, 현재 ICP 기준으로 다시 번역해서 재사용해야 한다.
 
 ## 다음 단계
 
@@ -254,6 +268,10 @@ Dowin 기준으로 더 맞는 문장:
 2. longlist를 Dowin 적합도 기준으로 다시 분류하기
 3. shortlist를 `주간 운영 루프 pain` 기준으로 다시 뽑기
 4. pain 언어 맵도 제품 도입/활용 질문 중심으로 다시 쓰기
+
+## 현재 기준 우선 검증 문장
+
+`가장 먼저 검증할 세그먼트는 3~15인 규모의 소규모 운영/기획 혼합 팀이며, 이 팀의 리더나 운영 담당자가 회의 전 상태 정리와 개입 준비에 반복적으로 시간을 쓰는 장면을 Dowin의 첫 구매 이유로 본다.`
 
 ## 현재 기준 최종 문장
 
