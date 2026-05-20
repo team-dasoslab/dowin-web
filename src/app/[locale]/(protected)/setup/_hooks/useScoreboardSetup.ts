@@ -57,13 +57,13 @@ export const useScoreboardSetup = () => {
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const t = useTranslations("Setup.Toast");
+  const setupT = useTranslations("Setup");
   const queryClient = useQueryClient();
   const mode = searchParams.get("mode");
 
   const [goalName, setGoalName] = useState("");
   const [lagMeasure, setLagMeasure] = useState("");
   const [measures, setMeasures] = useState<MeasureInput[]>([]);
-  const [deletedExistingMeasureIds, setDeletedExistingMeasureIds] = useState<number[]>([]);
   const [activeTooltip, setActiveTooltip] = useState<"lag" | "lead" | null>(
     null,
   );
@@ -157,7 +157,6 @@ export const useScoreboardSetup = () => {
 
       setGoalName(activeScoreboard.goalName ?? "");
       setLagMeasure(activeScoreboard.lagMeasure ?? "");
-      setDeletedExistingMeasureIds([]);
       setMeasures(
         nextLeadMeasures.map((leadMeasure) => ({
           id: String(leadMeasure.id ?? generateId()),
@@ -184,7 +183,6 @@ export const useScoreboardSetup = () => {
     if (!isEditMode) {
       setGoalName("");
       setLagMeasure("");
-      setDeletedExistingMeasureIds([]);
       setMeasures([createEmptyMeasure()]);
     }
   }, [activeScoreboard, isEditMode, leadMeasuresResponse, monthlyTargetMax]);
@@ -234,28 +232,37 @@ export const useScoreboardSetup = () => {
 
   const removeMeasureRow = (id: string) => {
     const targetMeasure = measures.find((measure) => measure.id === id);
+    if (!targetMeasure) return;
+
+    const isExisting = targetMeasure.existingId !== null;
     const activeMeasuresCount = measures.filter(
-      (measure) => measure.status === "ACTIVE",
+      (measure) => measure.status === "ACTIVE" && !measure.isDeleted,
     ).length;
 
-    if (targetMeasure && targetMeasure.existingId !== null) {
-      const existingId = targetMeasure.existingId;
-      setDeletedExistingMeasureIds((previous) =>
-        previous.includes(existingId)
-          ? previous
-          : [...previous, existingId],
-      );
+    if (targetMeasure.status === "ACTIVE" && !isExisting && activeMeasuresCount <= 1) {
+      return;
+    }
+
+    if (isExisting) {
       setMeasures((previous) =>
-        previous.filter((measure) => measure.id !== id),
+        previous.map((measure) =>
+          measure.id === id ? { ...measure, isDeleted: true } : measure,
+        ),
       );
       return;
     }
 
-    if (activeMeasuresCount > 1) {
-      setMeasures((previous) =>
-        previous.filter((measure) => measure.id !== id),
-      );
-    }
+    setMeasures((previous) =>
+      previous.filter((measure) => measure.id !== id),
+    );
+  };
+
+  const restoreMeasureRow = (id: string) => {
+    setMeasures((previous) =>
+      previous.map((measure) =>
+        measure.id === id ? { ...measure, isDeleted: false } : measure,
+      ),
+    );
   };
 
   const archiveMeasureRow = (id: string) => {
@@ -604,7 +611,7 @@ export const useScoreboardSetup = () => {
 
   const submit = async () => {
     const activeMeasures = measures.filter(
-      (measure) => measure.status === "ACTIVE",
+      (measure) => measure.status === "ACTIVE" && !measure.isDeleted,
     );
     const validMeasures = activeMeasures.filter(
       (measure) => measure.name.trim() !== "",
@@ -613,6 +620,20 @@ export const useScoreboardSetup = () => {
     if (!goalName.trim() || !lagMeasure.trim() || validMeasures.length === 0) {
       showToast("error", t("fillRequiredFields"));
       return false;
+    }
+
+    const deletedExistingMeasures = measures.filter(
+      (measure) => measure.existingId !== null && measure.isDeleted,
+    );
+
+    if (deletedExistingMeasures.length > 0) {
+      const deletedNames = deletedExistingMeasures
+        .map((m) => `- ${m.name || setupT("unnamedArchivedMeasure")}`)
+        .join("\n");
+      const confirmMsg = `${setupT("deleteConfirmTitle")}\n${deletedNames}\n\n${setupT("deleteConfirmWarning")}`;
+      if (!window.confirm(confirmMsg)) {
+        return false;
+      }
     }
 
     try {
@@ -745,10 +766,12 @@ export const useScoreboardSetup = () => {
           }
         }
 
-        for (const deletedExistingMeasureId of deletedExistingMeasureIds) {
-          await deleteLeadMeasureMutation.mutateAsync({
-            id: deletedExistingMeasureId,
-          });
+        for (const deletedMeasure of deletedExistingMeasures) {
+          if (deletedMeasure.existingId !== null) {
+            await deleteLeadMeasureMutation.mutateAsync({
+              id: deletedMeasure.existingId,
+            });
+          }
         }
 
         await invalidateScoreboardQueries(scoreboardId);
@@ -818,6 +841,7 @@ export const useScoreboardSetup = () => {
     renameTag,
     reactivateMeasureRow,
     removeMeasureRow,
+    restoreMeasureRow,
     setActiveTooltip,
     setGoalName,
     setLagMeasure,

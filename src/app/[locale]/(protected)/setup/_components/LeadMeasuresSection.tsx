@@ -30,6 +30,7 @@ interface LeadMeasuresSectionProps {
   reactivateMeasureRow: (id: string) => void;
   renameTag: (tagId: number, rawName: string) => Promise<boolean>;
   removeMeasureRow: (id: string) => void;
+  restoreMeasureRow: (id: string) => void;
   toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }
 
@@ -48,6 +49,7 @@ export function LeadMeasuresSection({
   reactivateMeasureRow,
   renameTag,
   removeMeasureRow,
+  restoreMeasureRow,
   toggleMeasureTag,
 }: LeadMeasuresSectionProps) {
   const t = useTranslations("Setup");
@@ -55,6 +57,9 @@ export function LeadMeasuresSection({
   const archivedMeasures = measures.filter(
     (measure) => measure.status === "ARCHIVED",
   );
+  const activeCount = measures.filter(
+    (measure) => measure.status === "ACTIVE" && !measure.isDeleted,
+  ).length;
 
   return (
     <Card data-coachmark="setup-lead">
@@ -74,9 +79,10 @@ export function LeadMeasuresSection({
             }
             isTagMutationPending={isTagMutationPending}
             measure={measure}
-            measuresCount={activeMeasures.length}
+            measuresCount={activeCount}
             monthlyTargetMax={monthlyTargetMax}
             removeMeasureRow={removeMeasureRow}
+            restoreMeasureRow={restoreMeasureRow}
             renameTag={renameTag}
             toggleMeasureTag={toggleMeasureTag}
           />
@@ -100,6 +106,7 @@ export function LeadMeasuresSection({
         isMutating={isMutating}
         reactivateMeasureRow={reactivateMeasureRow}
         removeMeasureRow={removeMeasureRow}
+        restoreMeasureRow={restoreMeasureRow}
       />
     </Card>
   );
@@ -119,6 +126,7 @@ function LeadMeasureRow({
   measuresCount,
   monthlyTargetMax,
   removeMeasureRow,
+  restoreMeasureRow,
   renameTag,
   toggleMeasureTag,
 }: {
@@ -135,6 +143,7 @@ function LeadMeasureRow({
   measuresCount: number;
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
+  restoreMeasureRow: (id: string) => void;
   renameTag: (tagId: number, rawName: string) => Promise<boolean>;
   toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }) {
@@ -152,6 +161,29 @@ function LeadMeasureRow({
 
   const t = useTranslations("Setup");
   const canArchive = measure.existingId !== null;
+
+  if (measure.isDeleted) {
+    return (
+      <div className="flex flex-col gap-4 p-4 sm:p-8 bg-zinc-50/50 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full shrink-0">
+            {t("deletedBadge")}
+          </span>
+          <span className="text-sm font-semibold text-zinc-400 truncate max-w-[200px] sm:max-w-[400px]">
+            {measure.name || t("unnamedArchivedMeasure")}
+          </span>
+        </div>
+        <Button
+          type="button"
+          disabled={isMutating}
+          onClick={() => restoreMeasureRow(measure.id)}
+          className="w-full sm:w-auto rounded-content border border-zinc-200 bg-white px-4 py-2 text-xs font-bold text-zinc-600 transition-all hover:bg-zinc-50 hover:border-zinc-300 hover:text-primary active:scale-95 shrink-0"
+        >
+          {t("cancelDelete")}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5 p-4 sm:space-y-6 sm:p-8">
@@ -522,6 +554,7 @@ interface ArchivedMeasuresSectionProps {
   isMutating: boolean;
   reactivateMeasureRow: (id: string) => void;
   removeMeasureRow: (id: string) => void;
+  restoreMeasureRow: (id: string) => void;
 }
 
 function ArchivedMeasuresSection({
@@ -529,6 +562,7 @@ function ArchivedMeasuresSection({
   isMutating,
   reactivateMeasureRow,
   removeMeasureRow,
+  restoreMeasureRow,
 }: ArchivedMeasuresSectionProps) {
   const t = useTranslations("Setup");
 
@@ -554,69 +588,97 @@ function ArchivedMeasuresSection({
         </div>
       ) : (
         <div className="mt-4 overflow-hidden rounded-xl border border-zinc-200/80 bg-white divide-y divide-zinc-100">
-          {archivedMeasures.map((measure) => (
-            <div
-              key={measure.id}
-              className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 transition-colors hover:bg-zinc-50/30"
-            >
-              <div className="min-w-0 space-y-1.5 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-bold text-zinc-600">
-                    {measure.name || t("unnamedArchivedMeasure")}
-                  </p>
+          {archivedMeasures.map((measure) => {
+            if (measure.isDeleted) {
+              return (
+                <div
+                  key={measure.id}
+                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 bg-zinc-50/50"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full shrink-0">
+                      {t("deletedBadge")}
+                    </span>
+                    <span className="text-sm font-semibold text-zinc-400 truncate max-w-[200px] sm:max-w-[400px]">
+                      {measure.name || t("unnamedArchivedMeasure")}
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    disabled={isMutating}
+                    onClick={() => restoreMeasureRow(measure.id)}
+                    className="flex h-8 items-center gap-1 rounded-button border border-zinc-200 bg-white px-3 text-xs font-bold text-zinc-600 transition-all hover:bg-zinc-50 hover:border-zinc-300 hover:text-primary active:scale-95 disabled:opacity-55"
+                  >
+                    <span>{t("cancelDelete")}</span>
+                  </Button>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400 font-medium">
-                  <span className="bg-zinc-50 px-1.5 py-0.5 rounded text-[11px]">
-                    {measure.period === "WEEKLY"
-                      ? t("modeWeekly")
-                      : t("modeMonthly")}
-                  </span>
-                  <span>·</span>
-                  <span>
-                    {measure.targetValue}
-                    {measure.period === "WEEKLY"
-                      ? t("timesPerWeek")
-                      : t("timesPerMonth")}
-                  </span>
-                  {measure.tags.length > 0 && (
-                    <>
-                      <span>·</span>
-                      <div className="flex flex-wrap gap-1">
-                        {measure.tags.map((tag) => (
-                          <span
-                            key={tag.id}
-                            className="rounded-full bg-zinc-50 border border-zinc-200/30 px-2 py-0.5 text-[10px] font-semibold text-zinc-400"
-                          >
-                            #{tag.name}
-                          </span>
-                        ))}
-                      </div>
-                    </>
-                  )}
+              );
+            }
+
+            return (
+              <div
+                key={measure.id}
+                className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 transition-colors hover:bg-zinc-50/30"
+              >
+                <div className="min-w-0 space-y-1.5 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-bold text-zinc-600">
+                      {measure.name || t("unnamedArchivedMeasure")}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-400 font-medium">
+                    <span className="bg-zinc-50 px-1.5 py-0.5 rounded text-[11px]">
+                      {measure.period === "WEEKLY"
+                        ? t("modeWeekly")
+                        : t("modeMonthly")}
+                    </span>
+                    <span>·</span>
+                    <span>
+                      {measure.targetValue}
+                      {measure.period === "WEEKLY"
+                        ? t("timesPerWeek")
+                        : t("timesPerMonth")}
+                    </span>
+                    {measure.tags.length > 0 && (
+                      <>
+                        <span>·</span>
+                        <div className="flex flex-wrap gap-1">
+                          {measure.tags.map((tag) => (
+                            <span
+                              key={tag.id}
+                              className="rounded-full bg-zinc-50 border border-zinc-200/30 px-2 py-0.5 text-[10px] font-semibold text-zinc-400"
+                            >
+                              #{tag.name}
+                            </span>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end">
+                  <Button
+                    type="button"
+                    disabled={isMutating}
+                    onClick={() => reactivateMeasureRow(measure.id)}
+                    className="flex h-8 items-center gap-1 rounded-button border border-zinc-200 bg-white px-3 text-xs font-bold text-zinc-600 transition-all hover:bg-zinc-50 hover:border-zinc-300 hover:text-primary active:scale-95 disabled:opacity-55"
+                  >
+                    <DowinIcon name="action-undo" size="12px" />
+                    <span>{t("reactivateMeasure")}</span>
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={isMutating}
+                    onClick={() => removeMeasureRow(measure.id)}
+                    className="flex h-8 items-center gap-1 rounded-button border border-transparent bg-transparent px-3 text-xs font-bold text-red-500 transition-all hover:bg-red-50 active:scale-95 disabled:opacity-55"
+                  >
+                    <DowinIcon name="action-delete" size="12px" className="text-red-400" />
+                    <span>{t("delete")}</span>
+                  </Button>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 justify-end">
-                <Button
-                  type="button"
-                  disabled={isMutating}
-                  onClick={() => reactivateMeasureRow(measure.id)}
-                  className="flex h-8 items-center gap-1 rounded-button border border-zinc-200 bg-white px-3 text-xs font-bold text-zinc-600 transition-all hover:bg-zinc-50 hover:border-zinc-300 hover:text-primary active:scale-95 disabled:opacity-55"
-                >
-                  <DowinIcon name="action-undo" size="12px" />
-                  <span>{t("reactivateMeasure")}</span>
-                </Button>
-                <Button
-                  type="button"
-                  disabled={isMutating}
-                  onClick={() => removeMeasureRow(measure.id)}
-                  className="flex h-8 items-center gap-1 rounded-button border border-transparent bg-transparent px-3 text-xs font-bold text-red-500 transition-all hover:bg-red-50 active:scale-95 disabled:opacity-55"
-                >
-                  <DowinIcon name="action-delete" size="12px" className="text-red-400" />
-                  <span>{t("delete")}</span>
-                </Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

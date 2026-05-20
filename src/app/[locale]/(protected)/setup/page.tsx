@@ -49,6 +49,7 @@ export default function SetupPage() {
     reactivateMeasureRow,
     renameTag,
     removeMeasureRow,
+    restoreMeasureRow,
     setGoalName,
     setLagMeasure,
     isSubmitPending,
@@ -255,6 +256,7 @@ export default function SetupPage() {
                 reactivateMeasureRow={reactivateMeasureRow}
                 renameTag={renameTag}
                 removeMeasureRow={removeMeasureRow}
+                restoreMeasureRow={restoreMeasureRow}
                 toggleMeasureTag={toggleMeasureTag}
               />
             </section>

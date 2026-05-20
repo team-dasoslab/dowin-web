@@ -9,6 +9,7 @@ export type MeasureInput = {
   period: "WEEKLY" | "MONTHLY";
   targetValue: number;
   tags: SetupTag[];
+  isDeleted?: boolean;
 };
 
 export type SetupTag = {
