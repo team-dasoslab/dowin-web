@@ -70,7 +70,7 @@ export function PeriodControls({
             asChild
             className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all hover:bg-primary/10 shrink-0"
           >
-            <Link href="/setup?mode=addMeasure">
+            <Link href="/setup?mode=update">
               <DowinIcon name="action-add" size="14px" />
               <span className="inline">{t("addMeasure")}</span>
             </Link>
@@ -150,7 +150,7 @@ export function PeriodControls({
             asChild
             className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all hover:bg-primary/10 lg:h-8 lg:px-3 lg:text-[11px]"
           >
-            <Link href="/setup?mode=addMeasure">
+            <Link href="/setup?mode=update">
               <DowinIcon name="action-add" size="14px" />
               <span className="sm:inline">{t("addMeasure")}</span>
             </Link>
