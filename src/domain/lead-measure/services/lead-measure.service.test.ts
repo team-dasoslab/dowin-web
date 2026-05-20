@@ -193,6 +193,59 @@ describe("LeadMeasureService", () => {
     expect(result.tags).toEqual([{ id: 4, name: "건강" }]);
   });
 
+  it("이미 보관된 선행지표를 다시 보관할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ARCHIVED",
+      scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
+    });
+
+    await expect(service.archiveLeadMeasure(10, 100)).rejects.toThrow(
+      "LEAD_MEASURE_ALREADY_ARCHIVED",
+    );
+    expect(archiveLeadMeasure).not.toHaveBeenCalled();
+  });
+
+  it("활성 선행지표를 바로 재활성화할 수 없다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
+    });
+
+    await expect(service.reactivateLeadMeasure(10, 100)).rejects.toThrow(
+      "LEAD_MEASURE_ALREADY_ACTIVE",
+    );
+    expect(reactivateLeadMeasure).not.toHaveBeenCalled();
+  });
+
+  it("보관된 선행지표는 재활성화할 수 있다", async () => {
+    findUserWorkspace.mockResolvedValue({ id: 1 });
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ARCHIVED",
+      scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
+    });
+    reactivateLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      archivedAt: null,
+      tags: [],
+    });
+
+    const result = await service.reactivateLeadMeasure(10, 100);
+
+    expect(reactivateLeadMeasure).toHaveBeenCalledWith(10);
+    expect(result).toEqual({
+      id: 10,
+      status: "ACTIVE",
+      archivedAt: null,
+      tags: [],
+    });
+  });
+
   it("선행지표 삭제 시 연결된 로그 수를 포함한 경고를 반환한다", async () => {
     findUserWorkspace.mockResolvedValue({ id: 1 });
     findOwnedLeadMeasure.mockResolvedValue({

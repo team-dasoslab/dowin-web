@@ -127,7 +127,7 @@ export function WeeklyTable({
                   className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
                     memoMode === "view"
                       ? "border-primary/25 bg-primary/10 text-primary"
-                      : "border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                      : "border-border bg-white text-text-secondary"
                   }`}
                 >
                   {t("viewMemos")}
@@ -139,7 +139,7 @@ export function WeeklyTable({
                 className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
                   memoMode === "compose"
                     ? "border-primary/25 bg-primary/10 text-primary"
-                    : "border-border bg-white text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+                    : "border-border bg-white text-text-secondary"
                 }`}
               >
                 {t("memoButton")}

@@ -61,7 +61,7 @@ export default function UpdatesPage() {
           <div className="flex flex-wrap items-center gap-2 pt-1">
             <Button
               asChild
-              className="rounded-button bg-primary px-3 py-2 text-xs font-bold text-white hover:bg-primary/90"
+              className="rounded-button bg-primary px-3 py-2 text-xs font-bold text-white"
             >
               <Link href={latestMajorUpdate.ctaHref}>{t("ctaLabel")}</Link>
             </Button>

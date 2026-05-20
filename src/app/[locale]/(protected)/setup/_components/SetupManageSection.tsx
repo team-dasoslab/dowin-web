@@ -31,7 +31,7 @@ export function SetupManageSection({
                 void archive();
               }
             }}
-            className="flex shrink-0 items-center gap-1.5 rounded-content border border-zinc-200 px-3 py-1.5 text-xs font-bold text-text-secondary transition-colors hover:border-[rgba(205,207,213,1)]"
+            className="flex shrink-0 items-center gap-1.5 rounded-content border border-zinc-200 px-3 py-1.5 text-xs font-bold text-text-secondary transition-colors"
           >
             {isArchivePending ? (
               <InlineSpinner

@@ -68,7 +68,7 @@ export default function ProfileExportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 ">
+    <div className="min-h-screen bg-slate-50/50">
       <ProtectedPageContainer>
         <ProtectedPageHeader title="데이터 내보내기" />
 
@@ -150,7 +150,7 @@ export default function ProfileExportPage() {
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                className="h-7 rounded-lg border border-border bg-white px-2.5 text-[11px] font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-primary"
+                className="h-7 rounded-lg border border-border bg-white px-2.5 text-[11px] font-bold text-text-secondary"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -195,7 +195,7 @@ export default function ProfileExportPage() {
               type="button"
               onClick={() => void exportCsv()}
               disabled={isExporting || !isStandardPlan}
-              className="h-9 w-full rounded-content bg-primary px-4 text-xs font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
+              className="h-9 w-full rounded-content bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
               <DowinIcon name="action-download" size="14px" />
               {isStandardPlan
@@ -215,7 +215,7 @@ function ExportUnavailableInAppState() {
   const t = useTranslations("ProfileExport");
 
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-background">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
@@ -238,7 +238,7 @@ function ExportUnavailableInAppState() {
 function ProfileExportHeader() {
   return (
     <header className="flex items-center justify-between">
-      <SmartBackButton className="w-8 h-8 rounded-content border border-border flex items-center justify-center text-text-muted hover:border-[rgba(205,207,213,1)] hover:text-text-primary transition-colors" />
+      <SmartBackButton className="w-8 h-8 rounded-content border border-border flex items-center justify-center text-text-muted transition-colors" />
       <p className="text-xs text-text-muted">데이터 내보내기</p>
       <div className="w-8" />
     </header>
@@ -247,7 +247,7 @@ function ProfileExportHeader() {
 
 function ExportSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50/50 ">
+    <div className="min-h-screen bg-slate-50/50">
       <ProtectedPageContainer isLoading>
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-24 rounded-content bg-sub-background" />
@@ -259,7 +259,7 @@ function ExportSkeleton() {
 
 function NoWorkspaceState() {
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-background">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
@@ -280,7 +280,7 @@ function NoWorkspaceState() {
 
 function NoScoreboardState() {
   return (
-    <div className="min-h-screen bg-background ">
+    <div className="min-h-screen bg-background">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel

@@ -1661,6 +1661,11 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/LeadMeasure" }
+        "400":
+          description: 이미 보관된 선행지표
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
         "404":
           description: 선행지표를 찾을 수 없음
           content:
@@ -1685,6 +1690,11 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/LeadMeasure" }
+        "400":
+          description: 이미 활성화된 선행지표
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
         "404":
           description: 선행지표를 찾을 수 없음
           content:

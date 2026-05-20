@@ -495,6 +495,11 @@ export type postLeadMeasuresIdArchiveResponse200 = {
   status: 200
 }
 
+export type postLeadMeasuresIdArchiveResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
 export type postLeadMeasuresIdArchiveResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
@@ -508,7 +513,7 @@ export type postLeadMeasuresIdArchiveResponse404 = {
 export type postLeadMeasuresIdArchiveResponseSuccess = (postLeadMeasuresIdArchiveResponse200) & {
   headers: Headers;
 };
-export type postLeadMeasuresIdArchiveResponseError = (postLeadMeasuresIdArchiveResponse401 | postLeadMeasuresIdArchiveResponse404) & {
+export type postLeadMeasuresIdArchiveResponseError = (postLeadMeasuresIdArchiveResponse400 | postLeadMeasuresIdArchiveResponse401 | postLeadMeasuresIdArchiveResponse404) & {
   headers: Headers;
 };
 
@@ -536,7 +541,7 @@ export const postLeadMeasuresIdArchive = async (id: number, options?: RequestIni
 
 
 
-export const getPostLeadMeasuresIdArchiveMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+export const getPostLeadMeasuresIdArchiveMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>, TError,{id: number}, TContext> => {
 
@@ -565,12 +570,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type PostLeadMeasuresIdArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>>
     
-    export type PostLeadMeasuresIdArchiveMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PostLeadMeasuresIdArchiveMutationError = ErrorResponse | UnauthorizedErrorResponse
 
     /**
  * @summary 선행지표 보관
  */
-export const usePostLeadMeasuresIdArchive = <TError = UnauthorizedErrorResponse | ErrorResponse,
+export const usePostLeadMeasuresIdArchive = <TError = ErrorResponse | UnauthorizedErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>,
@@ -588,6 +593,11 @@ export type postLeadMeasuresIdReactivateResponse200 = {
   status: 200
 }
 
+export type postLeadMeasuresIdReactivateResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
 export type postLeadMeasuresIdReactivateResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
@@ -601,7 +611,7 @@ export type postLeadMeasuresIdReactivateResponse404 = {
 export type postLeadMeasuresIdReactivateResponseSuccess = (postLeadMeasuresIdReactivateResponse200) & {
   headers: Headers;
 };
-export type postLeadMeasuresIdReactivateResponseError = (postLeadMeasuresIdReactivateResponse401 | postLeadMeasuresIdReactivateResponse404) & {
+export type postLeadMeasuresIdReactivateResponseError = (postLeadMeasuresIdReactivateResponse400 | postLeadMeasuresIdReactivateResponse401 | postLeadMeasuresIdReactivateResponse404) & {
   headers: Headers;
 };
 
@@ -629,7 +639,7 @@ export const postLeadMeasuresIdReactivate = async (id: number, options?: Request
 
 
 
-export const getPostLeadMeasuresIdReactivateMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+export const getPostLeadMeasuresIdReactivateMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>, TError,{id: number}, TContext> => {
 
@@ -658,12 +668,12 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type PostLeadMeasuresIdReactivateMutationResult = NonNullable<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>>
     
-    export type PostLeadMeasuresIdReactivateMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PostLeadMeasuresIdReactivateMutationError = ErrorResponse | UnauthorizedErrorResponse
 
     /**
  * @summary 선행지표 재활성화
  */
-export const usePostLeadMeasuresIdReactivate = <TError = UnauthorizedErrorResponse | ErrorResponse,
+export const usePostLeadMeasuresIdReactivate = <TError = ErrorResponse | UnauthorizedErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>,
