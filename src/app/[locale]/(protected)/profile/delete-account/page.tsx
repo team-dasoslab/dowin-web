@@ -28,7 +28,7 @@ export default function ProfileDeleteAccountPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50/50 ">
+    <div className="min-h-screen bg-slate-50/50">
       <ProtectedPageContainer>
         <ProtectedPageHeader title={t("header")} />
 
@@ -68,7 +68,7 @@ export default function ProfileDeleteAccountPage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => void submit()}
-            className="h-11 w-full rounded-content bg-red-600 text-sm font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-11 w-full rounded-content bg-red-600 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>
@@ -101,7 +101,7 @@ function PasswordField({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         className="h-11 w-full rounded-content border border-border bg-white px-3 pr-20 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-red-300"
-        toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors hover:text-text-primary"
+        toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors"
       />
     </label>
   );

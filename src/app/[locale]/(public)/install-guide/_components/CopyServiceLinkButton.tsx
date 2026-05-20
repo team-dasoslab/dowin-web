@@ -31,7 +31,7 @@ export function CopyServiceLinkButton() {
 
   return (
     <Button
-      className="inline-flex items-center gap-2 rounded-xl border border-border bg-sub-background px-3 py-2 text-[12px] font-semibold text-text-primary transition-colors hover:bg-white"
+      className="inline-flex items-center gap-2 rounded-xl border border-border bg-sub-background px-3 py-2 text-[12px] font-semibold text-text-primary transition-colors"
       onClick={() => {
         void handleCopy();
       }}

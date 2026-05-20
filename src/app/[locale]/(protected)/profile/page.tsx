@@ -371,7 +371,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <ProfileCoachmark
         isRunning={isCoachmarkRunning}
         setIsRunning={setIsCoachmarkRunning}
@@ -421,7 +421,7 @@ export default function ProfilePage() {
                     className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
                       isActive
                         ? "text-primary"
-                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                        : "text-zinc-400"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -604,7 +604,7 @@ function MenuItemRow({
 
 function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-slate-50/50 ">
+    <div className="min-h-screen bg-slate-50/50">
       <ProtectedPageContainer isLoading>
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-24 rounded-content bg-sub-background" />

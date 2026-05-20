@@ -48,7 +48,7 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="px-3 py-1.5 border border-border text-text-secondary hover:border-[rgba(205,207,213,1)] rounded-lg text-xs font-bold transition-colors whitespace-nowrap flex-shrink-0"
+              className="px-3 py-1.5 border border-border text-text-secondary rounded-lg text-xs font-bold transition-colors whitespace-nowrap flex-shrink-0"
             >
               {pendingActionId === activeScoreboardId && (
                 <InlineSpinner
@@ -74,7 +74,7 @@ function EmptyActiveScoreboardCard() {
   const td = useTranslations("Dashboard");
   return (
     <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center space-y-4">
-      <div className="w-12 h-12 bg-primary/10 rounded-content  mx-auto flex items-center justify-center">
+      <div className="w-12 h-12 bg-primary/10 rounded-content mx-auto flex items-center justify-center">
          <Logo size="24px" className="text-primary" />
       </div>
       <div className="space-y-1">

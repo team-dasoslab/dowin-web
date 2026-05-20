@@ -192,7 +192,7 @@ export default function AdminInquiriesPageClient() {
                   {inquiries.map((inquiry: ContactInquirySummary) => (
                     <tr
                       key={inquiry.id}
-                      className="hover:bg-sub-background/40 cursor-pointer transition-colors"
+                      className="cursor-pointer transition-colors"
                       onClick={() => handleOpenEdit(inquiry)}
                     >
                       <td className="px-6 py-4">

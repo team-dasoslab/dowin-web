@@ -33,14 +33,14 @@ export const AllIcons: Story = {
       {(Object.keys(ICON_MAP) as IconName[]).sort().map((name) => (
         <div
           key={name}
-          className="flex flex-col items-center justify-center p-4 border border-zinc-100 rounded-content bg-white hover:border-primary/20 hover:bg-primary/5 transition-all group"
+          className="flex flex-col items-center justify-center p-4 border border-zinc-100 rounded-content bg-white transition-all group"
         >
           <DowinIcon
             name={name}
             size="24px"
-            className="mb-2 text-zinc-400 group-hover:text-primary transition-colors"
+            className="mb-2 text-zinc-400 transition-colors"
           />
-          <span className="text-[10px] font-mono text-zinc-500 group-hover:text-primary transition-colors truncate w-full text-center">
+          <span className="text-[10px] font-mono text-zinc-500 transition-colors truncate w-full text-center">
             {name}
           </span>
         </div>

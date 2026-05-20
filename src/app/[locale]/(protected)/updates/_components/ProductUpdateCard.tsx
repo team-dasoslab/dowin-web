@@ -50,7 +50,7 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
 
         <Button
           asChild
-          className="shrink-0 self-start rounded-button border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary sm:self-auto"
+          className="shrink-0 self-start rounded-button border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary sm:self-auto"
         >
           <Link
             href={item.ctaHref}

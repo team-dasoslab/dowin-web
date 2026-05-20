@@ -53,7 +53,7 @@ export function DocumentOutlineClient({
                 "block rounded-lg px-3 py-1.5 text-[13.5px] transition-colors",
                 activeId === heading.id
                   ? "bg-zinc-100 text-zinc-900 font-bold"
-                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50",
+                  : "text-zinc-600",
                 heading.depth === 1 && "font-bold text-zinc-900",
                 heading.depth === 2 && "pl-5 text-[13px]",
                 heading.depth === 3 && "pl-8 text-[13px]",

@@ -60,6 +60,6 @@ export const IconButton: Story = {
   args: {
     children: <DowinIcon name="action-add" size="16px" />,
     className:
-      "w-8 h-8 border border-border flex items-center justify-center text-text-muted hover:border-border-hover transition-colors",
+      "w-8 h-8 border border-border flex items-center justify-center text-text-muted transition-colors",
   },
 };

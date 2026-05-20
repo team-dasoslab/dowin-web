@@ -228,7 +228,7 @@ export default function ReportPage() {
   const hasMembers = summary.totalCount > 0;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50 ">
+    <div className="min-h-screen bg-zinc-50/50">
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={tDashboard("weeklyReport")}
@@ -266,7 +266,7 @@ export default function ReportPage() {
                     className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
                       isActive
                         ? "text-primary"
-                        : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100/50"
+                        : "text-zinc-400"
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -385,7 +385,7 @@ function ChartLegendTooltip({
         onClick={onToggle}
         onMouseEnter={onToggle}
         onMouseLeave={onClose}
-        className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted transition-colors hover:text-text-primary"
+        className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted transition-colors"
       >
         <span
           className="inline-block h-2 w-2 rounded-full"
@@ -724,7 +724,7 @@ function WinRateOverview({
                       onClick={() => setShowInfo(!showInfo)}
                       onMouseEnter={() => setShowInfo(true)}
                       onMouseLeave={() => setShowInfo(false)}
-                      className="text-zinc-400 transition-colors hover:text-zinc-600 outline-none"
+                      className="text-zinc-400 transition-colors outline-none"
                     >
                       <DowinIcon name="status-info" size={12} />
                     </button>
@@ -818,7 +818,7 @@ function StatusBoardCard({
                 <button
                   type="button"
                   onClick={() => setExpanded(true)}
-                  className="rounded bg-zinc-50 px-1.5 py-0.5 text-[11px] font-bold text-text-muted hover:bg-zinc-100"
+                  className="rounded bg-zinc-50 px-1.5 py-0.5 text-[11px] font-bold text-text-muted"
                 >
                   +{names.length - COLLAPSED_MAX}
                 </button>
@@ -833,7 +833,7 @@ function StatusBoardCard({
             <button
               type="button"
               onClick={() => setExpanded(false)}
-              className="mt-2 text-[11px] font-bold text-primary hover:underline"
+              className="mt-2 text-[11px] font-bold text-primary"
             >
               {t("common.collapse")}
             </button>
@@ -1010,7 +1010,7 @@ function ReportErrorState({ onRetry }: { onRetry: () => void }) {
             </Button>
             <Button
               asChild
-              className="rounded-content border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors hover:border-zinc-300"
+              className="rounded-content border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors"
             >
               <Link href="/dashboard">{t("states.backToDashboard")}</Link>
             </Button>

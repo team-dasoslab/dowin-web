@@ -31,7 +31,7 @@ export type DocsViewerLens =
   | "history";
 
 export interface DocsViewerHeading {
-  depth: 1 | 2 | 3;
+  depth: 1 | 2 | 3 | 4;
   text: string;
   id: string;
 }

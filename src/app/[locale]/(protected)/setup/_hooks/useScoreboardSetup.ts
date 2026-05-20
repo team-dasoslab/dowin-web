@@ -4,6 +4,8 @@ import {
   getGetScoreboardsScoreboardIdLeadMeasuresQueryKey,
   useDeleteLeadMeasuresId,
   useGetScoreboardsScoreboardIdLeadMeasures,
+  usePostLeadMeasuresIdArchive,
+  usePostLeadMeasuresIdReactivate,
   usePostScoreboardsScoreboardIdLeadMeasures,
   usePutLeadMeasuresId,
 } from "@/api/generated/lead-measure/lead-measure";
@@ -55,6 +57,7 @@ export const useScoreboardSetup = () => {
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const t = useTranslations("Setup.Toast");
+  const setupT = useTranslations("Setup");
   const queryClient = useQueryClient();
   const mode = searchParams.get("mode");
 
@@ -114,21 +117,23 @@ export const useScoreboardSetup = () => {
 
 
   const { data: leadMeasuresResponse, isLoading: isLeadMeasuresLoading } =
-    useGetScoreboardsScoreboardIdLeadMeasures(scoreboardId ?? 0, undefined, {
-      query: {
-        enabled: scoreboardId !== null,
+    useGetScoreboardsScoreboardIdLeadMeasures(
+      scoreboardId ?? 0,
+      isEditMode ? { status: "all" } : undefined,
+      {
+        query: {
+          enabled: scoreboardId !== null,
+        },
       },
-    });
-
-  const leadMeasures =
-    leadMeasuresResponse?.status === 200 ? leadMeasuresResponse.data : [];
-
+    );
   const createScoreboardMutation = usePostScoreboards();
   const updateScoreboardMutation = usePutScoreboardsId();
   const archiveScoreboardMutation = usePostScoreboardsIdArchive();
   const createLeadMeasureMutation =
     usePostScoreboardsScoreboardIdLeadMeasures();
   const updateLeadMeasureMutation = usePutLeadMeasuresId();
+  const archiveLeadMeasureMutation = usePostLeadMeasuresIdArchive();
+  const reactivateLeadMeasureMutation = usePostLeadMeasuresIdReactivate();
   const deleteLeadMeasureMutation = useDeleteLeadMeasuresId();
   const createWorkspaceTagMutation = usePostWorkspacesIdTags();
   const updateWorkspaceTagMutation = usePutWorkspacesIdTagsTagId();
@@ -156,6 +161,8 @@ export const useScoreboardSetup = () => {
         nextLeadMeasures.map((leadMeasure) => ({
           id: String(leadMeasure.id ?? generateId()),
           existingId: toNumberId(leadMeasure.id),
+          initialStatus: leadMeasure.status ?? "ACTIVE",
+          status: leadMeasure.status ?? "ACTIVE",
           name: leadMeasure.name ?? "",
           period: leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
           targetValue: clampMeasureTargetValue(
@@ -224,11 +231,56 @@ export const useScoreboardSetup = () => {
   };
 
   const removeMeasureRow = (id: string) => {
-    if (measures.length > 1) {
-      setMeasures((previous) =>
-        previous.filter((measure) => measure.id !== id),
-      );
+    const targetMeasure = measures.find((measure) => measure.id === id);
+    if (!targetMeasure) return;
+
+    const isExisting = targetMeasure.existingId !== null;
+    const activeMeasuresCount = measures.filter(
+      (measure) => measure.status === "ACTIVE" && !measure.isDeleted,
+    ).length;
+
+    if (targetMeasure.status === "ACTIVE" && !isExisting && activeMeasuresCount <= 1) {
+      return;
     }
+
+    if (isExisting) {
+      setMeasures((previous) =>
+        previous.map((measure) =>
+          measure.id === id ? { ...measure, isDeleted: true } : measure,
+        ),
+      );
+      return;
+    }
+
+    setMeasures((previous) =>
+      previous.filter((measure) => measure.id !== id),
+    );
+  };
+
+  const restoreMeasureRow = (id: string) => {
+    setMeasures((previous) =>
+      previous.map((measure) =>
+        measure.id === id ? { ...measure, isDeleted: false } : measure,
+      ),
+    );
+  };
+
+  const archiveMeasureRow = (id: string) => {
+    setMeasures((previous) =>
+      previous.map((measure) =>
+        measure.id === id && measure.existingId !== null
+          ? { ...measure, status: "ARCHIVED" }
+          : measure,
+      ),
+    );
+  };
+
+  const reactivateMeasureRow = (id: string) => {
+    setMeasures((previous) =>
+      previous.map((measure) =>
+        measure.id === id ? { ...measure, status: "ACTIVE" } : measure,
+      ),
+    );
   };
 
   const toggleMeasureTag = (measureId: string, tag: SetupTag) => {
@@ -548,17 +600,40 @@ export const useScoreboardSetup = () => {
           undefined,
         ),
       });
+      await queryClient.invalidateQueries({
+        queryKey: getGetScoreboardsScoreboardIdLeadMeasuresQueryKey(
+          targetScoreboardId,
+          { status: "all" },
+        ),
+      });
     }
   };
 
   const submit = async () => {
-    const validMeasures = measures.filter(
+    const activeMeasures = measures.filter(
+      (measure) => measure.status === "ACTIVE" && !measure.isDeleted,
+    );
+    const validMeasures = activeMeasures.filter(
       (measure) => measure.name.trim() !== "",
     );
 
     if (!goalName.trim() || !lagMeasure.trim() || validMeasures.length === 0) {
       showToast("error", t("fillRequiredFields"));
       return false;
+    }
+
+    const deletedExistingMeasures = measures.filter(
+      (measure) => measure.existingId !== null && measure.isDeleted,
+    );
+
+    if (deletedExistingMeasures.length > 0) {
+      const deletedNames = deletedExistingMeasures
+        .map((m) => `- ${m.name || setupT("unnamedArchivedMeasure")}`)
+        .join("\n");
+      const confirmMsg = `${setupT("deleteConfirmTitle")}\n${deletedNames}\n\n${setupT("deleteConfirmWarning")}`;
+      if (!window.confirm(confirmMsg)) {
+        return false;
+      }
     }
 
     try {
@@ -632,6 +707,12 @@ export const useScoreboardSetup = () => {
 
         for (const measure of validMeasures) {
           if (measure.existingId !== null) {
+            if (measure.initialStatus === "ARCHIVED") {
+              await reactivateLeadMeasureMutation.mutateAsync({
+                id: measure.existingId,
+              });
+            }
+
             nextExistingIds.add(measure.existingId);
             await updateLeadMeasureMutation.mutateAsync({
               id: measure.existingId,
@@ -672,11 +753,24 @@ export const useScoreboardSetup = () => {
           }
         }
 
-        for (const leadMeasure of leadMeasures) {
-          const leadMeasureId = toNumberId(leadMeasure.id);
+        for (const measure of measures) {
+          if (
+            measure.existingId !== null &&
+            measure.initialStatus === "ACTIVE" &&
+            measure.status === "ARCHIVED" &&
+            !nextExistingIds.has(measure.existingId)
+          ) {
+            await archiveLeadMeasureMutation.mutateAsync({
+              id: measure.existingId,
+            });
+          }
+        }
 
-          if (leadMeasureId !== null && !nextExistingIds.has(leadMeasureId)) {
-            await deleteLeadMeasureMutation.mutateAsync({ id: leadMeasureId });
+        for (const deletedMeasure of deletedExistingMeasures) {
+          if (deletedMeasure.existingId !== null) {
+            await deleteLeadMeasureMutation.mutateAsync({
+              id: deletedMeasure.existingId,
+            });
           }
         }
 
@@ -716,6 +810,7 @@ export const useScoreboardSetup = () => {
     addMeasureRow,
     availableTags,
     archive,
+    archiveMeasureRow,
     createTag,
     goalName,
     handleMeasureChange,
@@ -729,6 +824,8 @@ export const useScoreboardSetup = () => {
       updateScoreboardMutation.isPending ||
       createLeadMeasureMutation.isPending ||
       updateLeadMeasureMutation.isPending ||
+      archiveLeadMeasureMutation.isPending ||
+      reactivateLeadMeasureMutation.isPending ||
       deleteLeadMeasureMutation.isPending,
     isTagMutationPending:
       createWorkspaceTagMutation.isPending ||
@@ -742,7 +839,9 @@ export const useScoreboardSetup = () => {
 
     monthlyTargetMax,
     renameTag,
+    reactivateMeasureRow,
     removeMeasureRow,
+    restoreMeasureRow,
     setActiveTooltip,
     setGoalName,
     setLagMeasure,

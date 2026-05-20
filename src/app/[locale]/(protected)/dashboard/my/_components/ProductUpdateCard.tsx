@@ -23,7 +23,7 @@ export function ProductUpdateCard({
         <Button
           type="button"
           onClick={onDismiss}
-          className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md border border-white/70 bg-white/80 text-text-muted hover:text-text-primary"
+          className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md border border-white/70 bg-white/80 text-text-muted"
           aria-label={t("dismissUpdate")}
         >
           <DowinIcon name="action-dismiss" size="14px" />
@@ -55,13 +55,13 @@ export function ProductUpdateCard({
           <div className="flex flex-row flex-wrap items-center gap-2 pt-0.5">
             <Button
               asChild
-              className="justify-center rounded-lg bg-primary px-3 py-2 text-xs font-bold text-white hover:bg-primary/90"
+              className="justify-center rounded-lg bg-primary px-3 py-2 text-xs font-bold text-white"
             >
               <Link href={update.ctaHref}>{updateT("ctaLabel")}</Link>
             </Button>
             <Button
               asChild
-              className="justify-center rounded-lg border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary hover:border-[rgba(205,207,213,1)] hover:text-text-primary"
+              className="justify-center rounded-lg border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary"
             >
               <Link href="/updates">{t("viewAllUpdates")}</Link>
             </Button>

@@ -17,12 +17,12 @@ const guideStyles = {
   [WeeklyLogGuideKind.change]: {
     icon: "nav-compass",
     iconClassName: "text-rose-600",
-    triggerClassName: "text-rose-600 hover:text-rose-700",
+    triggerClassName: "text-rose-600",
   },
   [WeeklyLogGuideKind.adjust]: {
     icon: "nav-settings",
     iconClassName: "text-amber-500",
-    triggerClassName: "text-amber-500 hover:text-amber-600",
+    triggerClassName: "text-amber-500",
   },
 } as const;
 
