@@ -431,12 +431,6 @@ export default async function DocsViewerPage({
     docs[0] ??
     null;
 
-  const planningDocs = filterDocsBySection(docs, "planning");
-  const recentPlanningDocs = planningDocs.filter((doc) => doc.isRecent).length;
-  const focusPlanningDocs = planningDocs.filter((doc) => doc.isFocus).length;
-  const unconnectedPlanningDocs = planningDocs.filter(
-    (doc) => doc.relationCount <= 1,
-  ).length;
   const docsTree = buildDocsTree(docs);
 
   const topicCounts = TOPIC_IDS.map((topicId) => ({
@@ -738,10 +732,6 @@ export default async function DocsViewerPage({
                 {selectedDoc ? (
                   <DocumentPanel
                     activeDoc={selectedDoc}
-                    query={query}
-                    section={section}
-                    topic={topic}
-                    lens={lens}
                     t={t}
                   />
                 ) : (
@@ -1025,17 +1015,9 @@ function FormattedText({ text }: { text: string }) {
 
 function DocumentPanel({
   activeDoc,
-  section,
-  topic,
-  lens,
-  query,
   t,
 }: {
   activeDoc: DocsViewerDoc;
-  section: DocsViewerSection | "all";
-  topic: DocsViewerTopic;
-  lens: DocsViewerLens;
-  query: string;
   t: Translate;
 }) {
   const blocks = parseContentBlocks(activeDoc.content);
