@@ -11,6 +11,7 @@ describe("AdminBillingService", () => {
             workspaceName: "Dowin",
             planCode: "STANDARD",
             billingStatus: "ACTIVE",
+            entitlementSource: "POLAR",
             provider: "POLAR",
             currentPeriodEnd: new Date("2026-05-31T00:00:00.000Z"),
             cancelAtPeriodEnd: false,
@@ -59,6 +60,7 @@ describe("AdminBillingService", () => {
         workspaceName: "Dowin",
         planCode: "FREE",
         billingStatus: "NONE",
+        entitlementSource: null,
         provider: null,
         currentPeriodEnd: null,
         cancelAtPeriodEnd: false,
@@ -74,6 +76,7 @@ describe("AdminBillingService", () => {
         workspaceName: "Dowin",
         planCode: "STANDARD",
         billingStatus: "ACTIVE",
+        entitlementSource: "MANUAL_GRANT",
         provider: "POLAR",
         currentPeriodEnd: new Date("2026-05-31T00:00:00.000Z"),
         cancelAtPeriodEnd: false,
@@ -118,6 +121,7 @@ describe("AdminBillingService", () => {
     const result = await service.applyManualOverride(1, 3, {
       planCode: "STANDARD",
       billingStatus: "ACTIVE",
+      entitlementSource: "MANUAL_GRANT",
       customerKey: "cus_123",
       subscriptionKey: "sub_123",
       currentPeriodEnd: "2026-05-31T00:00:00.000Z",
@@ -137,6 +141,7 @@ describe("AdminBillingService", () => {
         workspaceId: 3,
         planCode: "STANDARD",
         billingStatus: "ACTIVE",
+        entitlementSource: "MANUAL_GRANT",
       }),
     );
     expect(createAuditLog).toHaveBeenCalledWith(
@@ -152,6 +157,7 @@ describe("AdminBillingService", () => {
         workspaceId: 3,
         planCode: "STANDARD",
         billingStatus: "ACTIVE",
+        entitlementSource: "MANUAL_GRANT",
         events: [
           expect.objectContaining({
             id: 77,

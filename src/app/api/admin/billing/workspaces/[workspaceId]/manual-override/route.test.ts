@@ -50,6 +50,7 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/manual-override", () 
       workspaceName: "Dowin",
       planCode: "STANDARD",
       billingStatus: "ACTIVE",
+      entitlementSource: "MANUAL_GRANT",
       events: [],
     });
 
@@ -60,6 +61,7 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/manual-override", () 
         body: JSON.stringify({
           planCode: "STANDARD",
           billingStatus: "ACTIVE",
+          entitlementSource: "MANUAL_GRANT",
           customerKey: "cus_123",
           subscriptionKey: "sub_123",
           currentPeriodEnd: "2026-05-31T00:00:00.000Z",
@@ -77,6 +79,7 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/manual-override", () 
     expect(mockApplyManualOverride).toHaveBeenCalledWith(1, 3, {
       planCode: "STANDARD",
       billingStatus: "ACTIVE",
+      entitlementSource: "MANUAL_GRANT",
       customerKey: "cus_123",
       subscriptionKey: "sub_123",
       currentPeriodEnd: "2026-05-31T00:00:00.000Z",
