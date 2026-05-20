@@ -238,11 +238,12 @@ export const useScoreboardSetup = () => {
       (measure) => measure.status === "ACTIVE",
     ).length;
 
-    if (targetMeasure?.existingId !== null) {
+    if (targetMeasure && targetMeasure.existingId !== null) {
+      const existingId = targetMeasure.existingId;
       setDeletedExistingMeasureIds((previous) =>
-        previous.includes(targetMeasure.existingId as number)
+        previous.includes(existingId)
           ? previous
-          : [...previous, targetMeasure.existingId as number],
+          : [...previous, existingId],
       );
       setMeasures((previous) =>
         previous.filter((measure) => measure.id !== id),
