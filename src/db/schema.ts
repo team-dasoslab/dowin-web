@@ -246,7 +246,9 @@ export const devicePushTokens = sqliteTable(
     userId: integer("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    provider: text("provider", { enum: ["FCM"] }).notNull().default("FCM"),
+    provider: text("provider", { enum: ["FCM"] })
+      .notNull()
+      .default("FCM"),
     platform: text("platform", { enum: ["IOS", "ANDROID"] }).notNull(),
     token: text("token").notNull(),
     appVersion: text("app_version"),
@@ -319,9 +321,7 @@ export const billingProviderProducts = sqliteTable(
     }).notNull(),
     planCode: text("plan_code", { enum: ["STANDARD"] }).notNull(),
     providerProductId: text("provider_product_id").notNull(),
-    isActive: integer("is_active", { mode: "boolean" })
-      .notNull()
-      .default(true),
+    isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),
@@ -441,7 +441,7 @@ export const workspaceBillingState = sqliteTable("workspace_billing_state", {
   workspaceId: integer("workspace_id")
     .primaryKey()
     .references(() => workspaces.id, { onDelete: "cascade" }),
-  provider: text("provider", { enum: ["POLAR"] }).notNull(),
+  provider: text("provider", { enum: ["POLAR"] }),
   billingStatus: text("billing_status", {
     enum: ["NONE", "ACTIVE", "CANCELED", "EXPIRED", "REVOKED"],
   })
@@ -450,6 +450,9 @@ export const workspaceBillingState = sqliteTable("workspace_billing_state", {
   planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
     .notNull()
     .default("FREE"),
+  entitlementSource: text("entitlement_source", {
+    enum: ["POLAR", "MANUAL_GRANT", "PARTNER", "INTERNAL_TEST"],
+  }),
   customerKey: text("customer_key"),
   subscriptionKey: text("subscription_key"),
   currentPeriodEnd: integer("current_period_end", { mode: "timestamp" }),
@@ -547,7 +550,12 @@ export const workspaceMembers = sqliteTable(
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),
   },
-  (table) => [uniqueIndex("workspace_members_user_unique").on(table.userId)],
+  (table) => [
+    uniqueIndex("workspace_members_workspace_user_unique").on(
+      table.workspaceId,
+      table.userId,
+    ),
+  ],
 );
 
 export const workspaceMembersRelations = relations(
@@ -923,7 +931,9 @@ export const contactInquiries = sqliteTable(
     message: text("message").notNull(),
     replyEmail: text("reply_email").notNull(),
     consentedAt: integer("consented_at", { mode: "timestamp" }).notNull(),
-    locale: text("locale", { enum: ["ko", "en"] }).notNull().default("ko"),
+    locale: text("locale", { enum: ["ko", "en"] })
+      .notNull()
+      .default("ko"),
     source: text("source", { enum: ["CONTACT_PAGE"] })
       .notNull()
       .default("CONTACT_PAGE"),

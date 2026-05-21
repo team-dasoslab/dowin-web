@@ -19,6 +19,13 @@ import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 
+type EntitlementSource =
+  | "POLAR"
+  | "MANUAL_GRANT"
+  | "PARTNER"
+  | "INTERNAL_TEST"
+  | null;
+
 export function PricingPageClient() {
   const t = useTranslations("Pricing");
   const isNativeApp = useNativeApp();
@@ -49,6 +56,7 @@ export function PricingPageClient() {
   }
 
   const isAdmin = billing.canManageBilling;
+  const isPolarEntitlement = billing.entitlementSource === "POLAR";
   const isStandard =
     billing.planCode === "STANDARD" ||
     billing.billingStatus === "ACTIVE" ||
@@ -96,6 +104,17 @@ export function PricingPageClient() {
           {billing.requiresManualReview ? (
             <div className="rounded-content border border-red-200 bg-red-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-red-700/80">
               {t("reviewRequiredNotice")}
+            </div>
+          ) : null}
+
+          {isStandard && !isPolarEntitlement ? (
+            <div className="rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+              {t("nonPolarEntitlementNotice", {
+                source: getPricingEntitlementSourceLabel(
+                  billing.entitlementSource,
+                  t,
+                ),
+              })}
             </div>
           ) : null}
         </Card>
@@ -149,7 +168,11 @@ export function PricingPageClient() {
                     asChild
                     className="h-11 w-full border border-primary/15 bg-primary/10 text-sm font-black text-primary"
                   >
-                    <Link href="/profile/billing">{t("manageButton")}</Link>
+                    <Link href="/profile/billing">
+                      {isPolarEntitlement
+                        ? t("manageButton")
+                        : t("viewGrantButton")}
+                    </Link>
                   </Button>
                 ) : canCheckout ? (
                   <Button
@@ -224,6 +247,24 @@ export function PricingPageClient() {
       </ProtectedPageContainer>
     </div>
   );
+}
+
+function getPricingEntitlementSourceLabel(
+  source: EntitlementSource,
+  t: ReturnType<typeof useTranslations<"Pricing">>,
+) {
+  switch (source) {
+    case "POLAR":
+      return t("entitlementSourcePolar");
+    case "MANUAL_GRANT":
+      return t("entitlementSourceManualGrant");
+    case "PARTNER":
+      return t("entitlementSourcePartner");
+    case "INTERNAL_TEST":
+      return t("entitlementSourceInternalTest");
+    default:
+      return t("freeTitle");
+  }
 }
 
 function PlanCard({

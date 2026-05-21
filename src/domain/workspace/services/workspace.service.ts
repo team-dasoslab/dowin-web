@@ -18,6 +18,14 @@ type WorkspaceWithPlanLimits = Workspace & {
   isOverFreeMemberLimit: boolean;
   memberCount: number;
 };
+type WorkspaceListItem = {
+  id: number;
+  name: string;
+  planCode: "FREE" | "STANDARD";
+  role: "ADMIN" | "MEMBER";
+  isCurrent: boolean;
+  createdAt: Date;
+};
 type WorkspaceMemberListItem = {
   id: number;
   nickname: string;
@@ -40,7 +48,9 @@ const generateWorkspaceInviteCode = customAlphabet(
 
 const isWorkspaceMembershipUniqueViolation = (error: unknown) =>
   error instanceof Error &&
-  (error.message.includes("workspace_members.user_id") ||
+  (error.message.includes("workspace_members.workspace_id") ||
+    error.message.includes("workspace_members.user_id") ||
+    error.message.includes("workspace_members_workspace_user_unique") ||
     error.message.includes("workspace_members_user_unique"));
 
 const collectErrorMessages = (error: unknown): string[] => {
@@ -75,6 +85,7 @@ const isWorkspaceTagUniqueViolation = (error: unknown) => {
 export interface WorkspaceStoragePort {
   findWorkspaceById: WorkspaceStorage["findWorkspaceById"];
   findUserWorkspace: WorkspaceStorage["findUserWorkspace"];
+  listUserWorkspaces: WorkspaceStorage["listUserWorkspaces"];
   createWorkspace: WorkspaceStorage["createWorkspace"];
   updateWorkspaceName: WorkspaceStorage["updateWorkspaceName"];
   addMember: WorkspaceStorage["addMember"];
@@ -104,6 +115,24 @@ export interface WorkspaceStoragePort {
 export class WorkspaceService {
   constructor(private storage: WorkspaceStoragePort) {}
 
+  async listMyWorkspaces(
+    userId: number,
+    currentWorkspaceId?: number | null,
+  ): Promise<WorkspaceListItem[]> {
+    const memberships = await this.storage.listUserWorkspaces(userId);
+    const resolvedCurrentWorkspaceId =
+      currentWorkspaceId ?? memberships[0]?.workspace.id ?? null;
+
+    return memberships.map((membership) => ({
+      id: membership.workspace.id,
+      name: membership.workspace.name,
+      planCode: membership.workspace.planCode,
+      role: membership.role,
+      isCurrent: membership.workspace.id === resolvedCurrentWorkspaceId,
+      createdAt: membership.workspace.createdAt,
+    }));
+  }
+
   async getMyWorkspace(userId: number): Promise<WorkspaceWithPlanLimits> {
     const workspace = await this.storage.findUserWorkspace(userId);
     if (!workspace) {
@@ -124,11 +153,6 @@ export class WorkspaceService {
   }
 
   async createWorkspace(userId: number, name: string): Promise<Workspace> {
-    const existing = await this.storage.findUserWorkspace(userId);
-    if (existing) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
     const workspace = await this.storage.createWorkspace(name);
     try {
       await this.storage.addMember(workspace.id, userId, "ADMIN");
@@ -162,11 +186,6 @@ export class WorkspaceService {
   }
 
   async joinWorkspace(workspaceId: number, userId: number): Promise<void> {
-    const existing = await this.storage.findUserWorkspace(userId);
-    if (existing) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
     const workspace = await this.storage.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
@@ -308,11 +327,6 @@ export class WorkspaceService {
 
   async joinWorkspaceByInvite(code: string, userId: number): Promise<void> {
     const normalizedCode = code.trim().toUpperCase();
-    const existing = await this.storage.findUserWorkspace(userId);
-    if (existing) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
     const invite = await this.storage.findInviteByCode(normalizedCode);
     if (!invite) {
       throw new NotFoundError("INVALID_INVITE_CODE");

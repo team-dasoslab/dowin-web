@@ -29,7 +29,6 @@ export const useDashboardScoreboard = () => {
   const {
     activeLeadMeasures,
     activeScoreboard,
-    dashboardTeamQueryKey,
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
@@ -41,7 +40,6 @@ export const useDashboardScoreboard = () => {
     monthLabel,
     monthlyLeadMeasures,
     monthlyLogsError,
-    monthlyLogsQueryKey,
     monthlyOverallRate,
     monthlySummary,
     scoreboardError,
@@ -58,6 +56,7 @@ export const useDashboardScoreboard = () => {
   } = useDashboardScoreboardQueries({
     currentWeekDates,
     selectedMonthStart,
+    selectedView: selectedView as DashboardView,
     selectedWeekStart,
     weekDates,
   });
@@ -143,8 +142,6 @@ export const useDashboardScoreboard = () => {
   }, [isFreePlan, selectedWeekStart, checkHistoryLimit]);
 
   const { isLogPending, pendingLogKeys, toggleLog } = useDashboardLogMutation({
-    dashboardTeamQueryKey,
-    monthlyLogsQueryKey,
     scoreboardId,
     selectedView: selectedView as DashboardView,
     showToast,

@@ -34,6 +34,7 @@ describe("BillingService", () => {
       workspaceName: "Dowin",
       planCode: "FREE",
       billingStatus: "NONE",
+      entitlementSource: null,
       provider: null,
       currentPeriodEnd: null,
       cancelAtPeriodEnd: false,
@@ -245,6 +246,84 @@ describe("BillingService", () => {
     expect(createCheckoutSession).toHaveBeenCalled();
   });
 
+  it("manual grant 상태에서는 portal을 열 수 없다", async () => {
+    const createCustomerSession = vi.fn();
+    const service = new BillingService(
+      {
+        findUserWorkspace: vi.fn().mockResolvedValue({
+          id: 1,
+          name: "Dowin",
+          planCode: "STANDARD",
+          billingCustomerExternalRef: null,
+        }),
+        findMembershipByUserId: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          entitlementSource: "MANUAL_GRANT",
+          customerKey: null,
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+        findCheckoutSessionCreatedEvent: vi.fn(),
+        appendCheckoutEvent: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession,
+      },
+    );
+
+    await expect(service.getPortalUrl(7)).rejects.toEqual(
+      expect.objectContaining<Partial<ConflictError>>({
+        code: "BILLING_NOT_READY",
+      }),
+    );
+    expect(createCustomerSession).not.toHaveBeenCalled();
+  });
+
+  it("Polar entitlementSource면 portal session을 생성한다", async () => {
+    const createCustomerSession = vi.fn().mockResolvedValue({
+      customerPortalUrl: "https://polar.sh/portal",
+    });
+    const service = new BillingService(
+      {
+        findUserWorkspace: vi.fn().mockResolvedValue({
+          id: 1,
+          name: "Dowin",
+          planCode: "STANDARD",
+          billingCustomerExternalRef: "workspace:1",
+        }),
+        findMembershipByUserId: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          entitlementSource: "POLAR",
+          customerKey: "cus_123",
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+        findCheckoutSessionCreatedEvent: vi.fn(),
+        appendCheckoutEvent: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession,
+      },
+    );
+
+    await expect(service.getPortalUrl(7)).resolves.toBe(
+      "https://polar.sh/portal",
+    );
+    expect(createCustomerSession).toHaveBeenCalledWith({
+      customerId: "cus_123",
+    });
+  });
+
   it("활성 Polar product 매핑이 없으면 checkout을 시작할 수 없다", async () => {
     const service = new BillingService(
       {
@@ -336,6 +415,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          entitlementSource: "POLAR",
           customerKey: "cus_123",
         }),
         getRecentBillingRiskSummary: vi.fn().mockResolvedValue({

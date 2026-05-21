@@ -3,6 +3,7 @@ import {
   isPolarRecoverableError,
 } from "@/domain/billing/polar";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
+import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 
@@ -24,6 +25,7 @@ export type BillingOverview = {
   workspaceName: string;
   planCode: "FREE" | "STANDARD";
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  entitlementSource: NullableEntitlementSource;
   provider: "POLAR" | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
@@ -86,6 +88,7 @@ export class BillingService {
       workspaceName: workspace.name,
       planCode: billingState?.planCode ?? workspace.planCode,
       billingStatus: billingState?.billingStatus ?? "NONE",
+      entitlementSource: billingState?.entitlementSource ?? null,
       provider: billingState?.provider ?? null,
       currentPeriodEnd: billingState?.currentPeriodEnd?.toISOString() ?? null,
       cancelAtPeriodEnd: billingState?.cancelAtPeriodEnd ?? false,
@@ -241,6 +244,10 @@ export class BillingService {
     }
 
     if (!this.polarClient) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    if (billingState && billingState.entitlementSource !== "POLAR") {
       throw new ConflictError("BILLING_NOT_READY");
     }
 

@@ -56,6 +56,7 @@ describe("GET /api/billing/me", () => {
       workspaceName: "Dowin",
       planCode: "FREE",
       billingStatus: "NONE",
+      entitlementSource: null,
       provider: null,
       currentPeriodEnd: null,
       cancelAtPeriodEnd: false,

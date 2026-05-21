@@ -45,6 +45,13 @@ export const MY_DASHBOARD_LINKS: {
     translationKey: "manageScoreboard",
   },
   {
+    href: "/workspace/settings",
+    iconName: "nav-settings",
+    iconNameActive: "nav-settings-active",
+    label: "워크스페이스 설정",
+    translationKey: "workspaceSettings",
+  },
+  {
     href: "/profile",
     iconName: "nav-profile",
     iconNameActive: "nav-profile-active",

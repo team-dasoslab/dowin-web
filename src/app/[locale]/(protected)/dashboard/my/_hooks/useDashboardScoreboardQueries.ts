@@ -26,6 +26,7 @@ import { useQueries } from "@tanstack/react-query";
 type UseDashboardScoreboardQueriesParams = {
   currentWeekDates: string[];
   selectedMonthStart: string;
+  selectedView: "week" | "month";
   selectedWeekStart: string;
   weekDates: string[];
 };
@@ -33,6 +34,7 @@ type UseDashboardScoreboardQueriesParams = {
 export const useDashboardScoreboardQueries = ({
   currentWeekDates,
   selectedMonthStart,
+  selectedView,
   selectedWeekStart,
   weekDates,
 }: UseDashboardScoreboardQueriesParams) => {
@@ -103,7 +105,7 @@ export const useDashboardScoreboardQueries = ({
     weeklyLogsParams,
     {
       query: {
-        enabled: scoreboardId !== null,
+        enabled: scoreboardId !== null && selectedView === "week",
         retry: (failureCount, error) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
@@ -119,7 +121,7 @@ export const useDashboardScoreboardQueries = ({
     monthlyLogsParams,
     {
       query: {
-        enabled: scoreboardId !== null,
+        enabled: scoreboardId !== null && selectedView === "month",
         retry: (failureCount, error) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },

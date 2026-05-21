@@ -6,12 +6,19 @@ import {
   workspaceBillingState,
   workspaces,
 } from "@/db/schema";
+import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { and, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
 export class BillingStorage {
   constructor(private db: Db) {}
+
+  private resolveProviderFromEntitlementSource(
+    entitlementSource: NullableEntitlementSource,
+  ): "POLAR" | null {
+    return entitlementSource === "POLAR" ? "POLAR" : null;
+  }
 
   async findWorkspaceBillingState(workspaceId: number) {
     return (
@@ -160,6 +167,7 @@ export class BillingStorage {
           sql<
             "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
           >`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
+        entitlementSource: workspaceBillingState.entitlementSource,
         provider: workspaceBillingState.provider,
         currentPeriodEnd: workspaceBillingState.currentPeriodEnd,
         cancelAtPeriodEnd: sql<boolean>`coalesce(${workspaceBillingState.cancelAtPeriodEnd}, false)`,
@@ -189,6 +197,7 @@ export class BillingStorage {
           sql<
             "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
           >`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
+        entitlementSource: workspaceBillingState.entitlementSource,
         provider: workspaceBillingState.provider,
         currentPeriodEnd: workspaceBillingState.currentPeriodEnd,
         cancelAtPeriodEnd: sql<boolean>`coalesce(${workspaceBillingState.cancelAtPeriodEnd}, false)`,
@@ -285,6 +294,7 @@ export class BillingStorage {
     workspaceId: number;
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
     planCode: "FREE" | "STANDARD";
+    entitlementSource: NullableEntitlementSource;
     customerKey: string | null;
     subscriptionKey: string | null;
     currentPeriodEnd: Date | null;
@@ -297,9 +307,12 @@ export class BillingStorage {
       .insert(workspaceBillingState)
       .values({
         workspaceId: input.workspaceId,
-        provider: "POLAR",
+        provider: this.resolveProviderFromEntitlementSource(
+          input.entitlementSource,
+        ),
         billingStatus: input.billingStatus,
         planCode: input.planCode,
+        entitlementSource: input.entitlementSource,
         customerKey: input.customerKey,
         subscriptionKey: input.subscriptionKey,
         currentPeriodEnd: input.currentPeriodEnd,
@@ -312,9 +325,12 @@ export class BillingStorage {
       .onConflictDoUpdate({
         target: workspaceBillingState.workspaceId,
         set: {
-          provider: "POLAR",
+          provider: this.resolveProviderFromEntitlementSource(
+            input.entitlementSource,
+          ),
           billingStatus: input.billingStatus,
           planCode: input.planCode,
+          entitlementSource: input.entitlementSource,
           customerKey: input.customerKey,
           subscriptionKey: input.subscriptionKey,
           currentPeriodEnd: input.currentPeriodEnd,

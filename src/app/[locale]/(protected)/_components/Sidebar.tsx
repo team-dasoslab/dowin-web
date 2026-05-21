@@ -5,9 +5,9 @@ import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Logo } from "@/components/ui/Logo";
 import { useSidebar } from "@/context/SidebarContext";
 import { useTranslations } from "next-intl";
+import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 
 export function Sidebar() {
   const t = useTranslations("Dashboard");
@@ -23,7 +23,6 @@ export function Sidebar() {
   const role = profile?.role;
 
   const filteredLinks = MY_DASHBOARD_LINKS.filter((link) => {
-    if (isProfileLoading) return true;
     if (link.adminOnly && role !== "ADMIN") return false;
     return true;
   });
@@ -80,22 +79,7 @@ export function Sidebar() {
             )}
           />
         ) : workspaceName ? (
-          <div
-            className={cn(
-              "mb-6 flex h-10 w-full items-center rounded-content bg-primary/10 transition-all",
-              isCollapsed ? "justify-center gap-0 px-0" : "justify-center gap-3 lg:justify-start lg:px-4",
-            )}
-          >
-            <Logo size="20px" className="text-primary" />
-            <span
-              className={cn(
-                "hidden truncate text-sm font-bold text-primary lg:block whitespace-nowrap transition-all duration-300",
-                isCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100",
-              )}
-            >
-              {workspaceName}
-            </span>
-          </div>
+          <WorkspaceSwitcher isCollapsed={isCollapsed} />
         ) : (
           <Link
             href="/workspace/new"

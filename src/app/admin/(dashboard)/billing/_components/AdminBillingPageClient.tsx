@@ -15,8 +15,31 @@ import AdminModal from "@/app/admin/_components/AdminModal";
 import {
   AdminBillingManualOverrideRequestPlanCode,
   AdminBillingManualOverrideRequestBillingStatus,
+  AdminBillingManualOverrideRequestEntitlementSource,
   AdminBillingWorkspaceSummary,
 } from "@/api/generated/dowin.schemas";
+
+type EditableEntitlementSource =
+  | Exclude<AdminBillingManualOverrideRequestEntitlementSource, null>
+  | "";
+
+const FREE_BILLING_STATUSES: AdminBillingManualOverrideRequestBillingStatus[] = [
+  "NONE",
+  "EXPIRED",
+  "REVOKED",
+];
+
+const STANDARD_BILLING_STATUSES: AdminBillingManualOverrideRequestBillingStatus[] = [
+  "ACTIVE",
+  "CANCELED",
+];
+
+const STANDARD_ENTITLEMENT_SOURCES: EditableEntitlementSource[] = [
+  "MANUAL_GRANT",
+  "PARTNER",
+  "INTERNAL_TEST",
+  "POLAR",
+];
 
 export default function AdminBillingPageClient() {
   const [workspaceId, setWorkspaceId] = useState<string>("");
@@ -26,6 +49,7 @@ export default function AdminBillingPageClient() {
   // Manual Override Form States
   const [editPlanCode, setEditPlanCode] = useState<AdminBillingManualOverrideRequestPlanCode>("FREE");
   const [editBillingStatus, setEditBillingStatus] = useState<AdminBillingManualOverrideRequestBillingStatus>("NONE");
+  const [editEntitlementSource, setEditEntitlementSource] = useState<EditableEntitlementSource>("");
   const [editPeriodEnd, setEditPeriodEnd] = useState<string>("");
   const [editCancelAtEnd, setEditCancelAtEnd] = useState<boolean>(false);
   const [editCustomerKey, setEditCustomerKey] = useState<string>("");
@@ -55,6 +79,12 @@ export default function AdminBillingPageClient() {
       const d = detailData.data as AdminBillingWorkspaceSummary;
       setEditPlanCode(d.planCode || "FREE");
       setEditBillingStatus(d.billingStatus || "NONE");
+      setEditEntitlementSource(
+        normalizeEntitlementSource(
+          d.planCode || "FREE",
+          d.entitlementSource || "",
+        ),
+      );
       setEditPeriodEnd(d.currentPeriodEnd ? d.currentPeriodEnd.split("T")[0] : "");
       setEditCancelAtEnd(d.cancelAtPeriodEnd || false);
       setEditCustomerKey(d.customerKey || "");
@@ -66,12 +96,42 @@ export default function AdminBillingPageClient() {
     setSelectedWorkspaceId(workspace.workspaceId);
     setEditPlanCode(workspace.planCode || "FREE");
     setEditBillingStatus(workspace.billingStatus || "NONE");
+    setEditEntitlementSource(
+      normalizeEntitlementSource(
+        workspace.planCode || "FREE",
+        workspace.entitlementSource || "",
+      ),
+    );
     setEditPeriodEnd(workspace.currentPeriodEnd ? workspace.currentPeriodEnd.split("T")[0] : "");
     setEditCancelAtEnd(workspace.cancelAtPeriodEnd || false);
     setEditCustomerKey(workspace.customerKey || "");
     setEditSubscriptionKey(workspace.subscriptionKey || "");
     setChangeReason("워크스페이스 결제 정보 보정");
   };
+
+  useEffect(() => {
+    const nextStatusOptions =
+      editPlanCode === "STANDARD"
+        ? STANDARD_BILLING_STATUSES
+        : FREE_BILLING_STATUSES;
+
+    if (!nextStatusOptions.includes(editBillingStatus)) {
+      setEditBillingStatus(nextStatusOptions[0] ?? "NONE");
+    }
+
+    const normalizedSource = normalizeEntitlementSource(
+      editPlanCode,
+      editEntitlementSource,
+    );
+
+    if (normalizedSource !== editEntitlementSource) {
+      setEditEntitlementSource(normalizedSource);
+    }
+
+    if (editPlanCode === "FREE") {
+      setEditCancelAtEnd(false);
+    }
+  }, [editPlanCode, editBillingStatus, editEntitlementSource]);
 
   const handleSaveOverride = async () => {
     if (!selectedWorkspaceId) return;
@@ -86,6 +146,7 @@ export default function AdminBillingPageClient() {
         data: {
           planCode: editPlanCode,
           billingStatus: editBillingStatus,
+          entitlementSource: editEntitlementSource || null,
           currentPeriodEnd: editPeriodEnd ? new Date(editPeriodEnd).toISOString() : null,
           cancelAtPeriodEnd: editCancelAtEnd,
           customerKey: editCustomerKey || null,
@@ -115,6 +176,14 @@ export default function AdminBillingPageClient() {
     : [];
 
   const detail = detailData?.data as AdminBillingWorkspaceSummary | undefined;
+  const availableStatuses =
+    editPlanCode === "STANDARD"
+      ? STANDARD_BILLING_STATUSES
+      : FREE_BILLING_STATUSES;
+  const availableEntitlementSources: EditableEntitlementSource[] =
+    editPlanCode === "STANDARD"
+      ? STANDARD_ENTITLEMENT_SOURCES
+      : ["", "POLAR"];
 
   return (
     <div className="space-y-8 animate-dowin-in">
@@ -181,6 +250,9 @@ export default function AdminBillingPageClient() {
                     <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
                       Status
                     </th>
+                    <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
+                      Source
+                    </th>
                     <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase text-right">
                       Action
                     </th>
@@ -222,6 +294,11 @@ export default function AdminBillingPageClient() {
                           }`}
                         >
                           {ws.billingStatus}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[13px] font-bold text-text-primary">
+                          {ws.entitlementSource || "없음 (None)"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -275,13 +352,21 @@ export default function AdminBillingPageClient() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-zinc-50 p-4 rounded-content border border-border">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-zinc-50 p-4 rounded-content border border-border">
               <div>
                 <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
                   제공업체 (PG)
                 </span>
                 <span className="text-sm font-bold text-zinc-900">
                   {detail?.provider || "없음 (None)"}
+                </span>
+              </div>
+              <div>
+                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                  권한 출처
+                </span>
+                <span className="text-sm font-bold text-zinc-900">
+                  {detail?.entitlementSource || "없음 (None)"}
                 </span>
               </div>
               <div>
@@ -309,7 +394,7 @@ export default function AdminBillingPageClient() {
                 결제 정보 수동 보정
               </h4>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-zinc-600 ml-1">
                     보정 요금제
@@ -341,12 +426,37 @@ export default function AdminBillingPageClient() {
                     }
                     className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
                   >
-                    <option value="NONE">NONE</option>
-                    <option value="ACTIVE">ACTIVE</option>
-                    <option value="CANCELED">CANCELED</option>
-                    <option value="EXPIRED">EXPIRED</option>
-                    <option value="REVOKED">REVOKED</option>
+                    {availableStatuses.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
                   </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-600 ml-1">
+                    권한 출처
+                  </label>
+                  <select
+                    value={editEntitlementSource}
+                    onChange={(e) =>
+                      setEditEntitlementSource(
+                        e.target.value as EditableEntitlementSource
+                      )
+                    }
+                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                  >
+                    {availableEntitlementSources.map((source) => (
+                      <option key={source || "none"} value={source}>
+                        {source || "없음 (None)"}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="px-1 text-[11px] font-medium leading-relaxed text-zinc-500">
+                    {editPlanCode === "STANDARD"
+                      ? "수동 권한 지급은 기본적으로 MANUAL_GRANT를 사용하세요. POLAR는 실제 결제 정합성 보정에만 사용합니다."
+                      : "FREE 상태에서는 source를 비우거나 POLAR만 유지하세요."}
+                  </p>
                 </div>
               </div>
 
@@ -367,12 +477,17 @@ export default function AdminBillingPageClient() {
                   type="checkbox"
                   checked={editCancelAtEnd}
                   onChange={(e) => setEditCancelAtEnd(e.target.checked)}
+                  disabled={editPlanCode !== "STANDARD"}
                   className="rounded border-border text-primary focus:ring-primary h-4 w-4"
                   id="cancel-at-end-root"
                 />
                 <label
                   htmlFor="cancel-at-end-root"
-                  className="text-[13px] font-bold text-text-primary select-none cursor-pointer"
+                  className={`text-[13px] font-bold select-none ${
+                    editPlanCode === "STANDARD"
+                      ? "text-text-primary cursor-pointer"
+                      : "text-zinc-400 cursor-not-allowed"
+                  }`}
                 >
                   종료 시 자동 해지
                 </label>
@@ -438,4 +553,19 @@ export default function AdminBillingPageClient() {
       </AdminModal>
     </div>
   );
+}
+
+function normalizeEntitlementSource(
+  planCode: AdminBillingManualOverrideRequestPlanCode,
+  source: EditableEntitlementSource,
+): EditableEntitlementSource {
+  if (planCode === "STANDARD") {
+    if (STANDARD_ENTITLEMENT_SOURCES.includes(source)) {
+      return source;
+    }
+
+    return "MANUAL_GRANT";
+  }
+
+  return source === "POLAR" ? "POLAR" : "";
 }

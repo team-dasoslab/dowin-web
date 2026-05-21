@@ -51,6 +51,7 @@ describe("GET /api/admin/billing/workspaces", () => {
         workspaceName: "Dowin",
         planCode: "STANDARD",
         billingStatus: "ACTIVE",
+        entitlementSource: "POLAR",
       },
     ]);
 

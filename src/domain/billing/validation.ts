@@ -1,4 +1,7 @@
 import { z } from "zod";
+import { entitlementSourceValues } from "@/domain/billing/types";
+
+export const entitlementSourceSchema = z.enum(entitlementSourceValues);
 
 export const billingCheckoutHeaderSchema = z.object({
   idempotencyKey: z.string().trim().min(1).max(255),
@@ -32,6 +35,7 @@ export const adminBillingManualOverrideSchema = z
       "EXPIRED",
       "REVOKED",
     ]),
+    entitlementSource: entitlementSourceSchema.nullable().optional(),
     customerKey: z
       .string()
       .trim()
@@ -66,6 +70,19 @@ export const adminBillingManualOverrideSchema = z
         message:
           "플랜과 billing 상태 조합이 올바르지 않습니다. FREE는 NONE/EXPIRED/REVOKED만, STANDARD는 ACTIVE/CANCELED만 허용됩니다.",
         path: ["billingStatus"],
+      });
+    }
+
+    if (
+      value.planCode === "FREE" &&
+      value.entitlementSource &&
+      value.entitlementSource !== "POLAR"
+    ) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "FREE 상태에서는 POLAR entitlementSource만 유지할 수 있습니다.",
+        path: ["entitlementSource"],
       });
     }
   });
