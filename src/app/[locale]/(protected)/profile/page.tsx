@@ -7,7 +7,6 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
 import {
@@ -24,7 +23,6 @@ import { Card } from "@/components/ui/Card";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { useNativeApp } from "@/context/NativeAppContext";
-import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -65,14 +63,11 @@ export default function ProfilePage() {
       ? workspaceResponse.data
       : null;
   const workspacePlanCode = workspace?.planCode ?? "FREE";
-  const showBillingSurface = publicRuntimeConfig.isDevelopment && !isNativeApp;
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const nickname = user?.nickname ?? t("defaultNickname");
   const customId = user?.customId ?? "";
   const avatarKey = user?.avatarKey ?? null;
   const [isPushSubscribed, setIsPushSubscribed] = useState(false);
-  const hasWorkspace = workspace !== null;
-  const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
   const {
     dailySettings,
     isDailyLoading,
@@ -82,10 +77,7 @@ export default function ProfilePage() {
   } = useNotificationSettings();
   const {
     changeNickname,
-    changeWorkspaceName,
-    deleteWorkspace,
     isActionPending,
-    leaveWorkspace,
     logout,
     pendingAction,
   } = useProfileActions({
@@ -161,82 +153,7 @@ export default function ProfilePage() {
         },
       ],
     },
-    {
-      id: "workspace",
-      label: t("workspaceSection"),
-      items: hasWorkspace
-        ? isWorkspaceAdmin
-          ? [
-              ...(showBillingSurface
-                ? [
-                    {
-                      id: workspacePlanCode === "STANDARD" ? "billing" : "pricing",
-                      icon: (
-                        <DowinIcon name="domain-payment" className="w-4 h-4" />
-                      ),
-                      title:
-                        workspacePlanCode === "STANDARD"
-                          ? t("billingTitle")
-                          : t("pricingTitle"),
-                      description:
-                        workspacePlanCode === "STANDARD"
-                          ? t("billingDesc")
-                          : t("pricingDesc"),
-                      href:
-                        workspacePlanCode === "STANDARD"
-                          ? "/profile/billing"
-                          : "/pricing",
-                    },
-                  ]
-                : []),
-              {
-                id: "workspace-name",
-                icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
-                title: t("changeWorkspaceName"),
-                description: t("changeWorkspaceNameDesc"),
-                onClick: () => {
-                  void changeWorkspaceName();
-                },
-              },
-              {
-                id: "members",
-                icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
-                title: t("manageMembers"),
-                description: t("manageMembersDesc"),
-                href: "/profile/members",
-              },
-              {
-                id: "invites",
-                icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
-                title: t("manageInvites"),
-                description: t("manageInvitesDesc"),
-                href: "/profile/invites",
-              },
-              {
-                id: "workspace-delete",
-                icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
-                title: t("workspaceDelete"),
-                description: t("workspaceDeleteDescFull"),
-                danger: true,
-                onClick: () => {
-                  void deleteWorkspace();
-                },
-              },
-            ]
-          : [
-              {
-                id: "workspace-leave",
-                icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
-                title: t("workspaceLeave"),
-                description: t("workspaceLeaveDescFull"),
-                danger: true,
-                onClick: () => {
-                  void leaveWorkspace();
-                },
-              },
-            ]
-        : [],
-    },
+
     {
       id: "data",
       label: t("dataSection"),
@@ -381,9 +298,7 @@ export default function ProfilePage() {
           message={
             pendingAction === "nickname"
               ? t("loadingNickname")
-              : pendingAction === "workspace-name"
-                ? t("loadingWorkspaceName")
-                : pendingAction === "LOGOUT"
+              : pendingAction === "LOGOUT"
                   ? t("loadingLogout")
                   : t("processing")
           }
@@ -459,13 +374,7 @@ export default function ProfilePage() {
                 </div>
               </Card>
 
-              {workspace?.isOverFreeMemberLimit && (
-                <WorkspaceOverLimitBanner
-                  freeMemberLimit={workspace.freeMemberLimit}
-                  isAdmin={isWorkspaceAdmin}
-                  memberCount={workspace.memberCount}
-                />
-              )}
+
             </div>
 
             {/* 설정 그룹들 */}
@@ -483,31 +392,7 @@ export default function ProfilePage() {
                   >
                     <SectionHeader title={group.label} className="mb-4" />
 
-                    {group.id === "workspace" && workspace && (
-                      <div className="mb-4 rounded-content border border-zinc-200 bg-white px-4 py-4 flex items-center justify-between gap-3 sm:px-8 sm:py-7">
-                        <div className="flex flex-col min-w-0 text-left">
-                          <p className="text-lg font-bold text-text-primary truncate tracking-tight">
-                            {workspace.name}
-                          </p>
-                          <p className="text-xs font-medium text-text-secondary mt-1">
-                            {isWorkspaceAdmin
-                              ? t("workspaceAdmin")
-                              : t("workspaceMember")}
-                          </p>
-                        </div>
-                        {!isNativeApp ? (
-                          <span
-                            className={`inline-flex items-center h-6 rounded-button px-2.5 text-[10px] font-black tracking-wider border ${
-                              workspacePlanCode === "STANDARD"
-                                ? "border-primary/20 bg-primary/5 text-primary"
-                                : "border-zinc-200 bg-zinc-50 text-zinc-500"
-                            }`}
-                          >
-                            {workspacePlanCode}
-                          </span>
-                        ) : null}
-                      </div>
-                    )}
+
 
                     <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
                       {group.items.map((item, index) => (

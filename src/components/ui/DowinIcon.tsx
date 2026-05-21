@@ -8,6 +8,7 @@ import {
   Calendar,
   ChartBar,
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   CircleAlert,
@@ -79,6 +80,7 @@ export const ICON_MAP = {
   "nav-back": ChevronLeft,
   "nav-chevron-right": ChevronRight,
   "nav-chevron-left": ChevronLeft,
+  "nav-chevron-down": ChevronDown,
   "nav-compass": Compass,
   "domain-language": Languages,
 

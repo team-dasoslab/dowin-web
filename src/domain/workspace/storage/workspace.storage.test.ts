@@ -2,6 +2,10 @@ import { workspaceMembers, workspaceTags, workspaces } from "@/db/schema";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("@/lib/server/active-workspace", () => ({
+  getActiveWorkspaceIdFromCookies: vi.fn(),
+}));
+
 type MockDb = {
   query: {
     workspaces: {
@@ -177,6 +181,29 @@ describe("WorkspaceStorage", () => {
 
       expect(result).toEqual(mockMembership);
       expect(mockDb.query.workspaceMembers.findFirst).toHaveBeenCalled();
+    });
+  });
+
+  describe("listUserWorkspaces", () => {
+    it("사용자의 워크스페이스 멤버십 목록을 반환한다", async () => {
+      const mockMemberships = [
+        {
+          id: 1,
+          workspaceId: 3,
+          userId: 123,
+          role: "ADMIN",
+          workspace: { id: 3, name: "운영팀", planCode: "STANDARD" },
+        },
+      ];
+      mockDb.query.workspaceMembers = {
+        findFirst: vi.fn(),
+        findMany: vi.fn().mockResolvedValue(mockMemberships),
+      };
+
+      const result = await storage.listUserWorkspaces(123);
+
+      expect(result).toEqual(mockMemberships);
+      expect(mockDb.query.workspaceMembers.findMany).toHaveBeenCalled();
     });
   });
 

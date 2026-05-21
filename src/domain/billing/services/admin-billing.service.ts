@@ -1,4 +1,8 @@
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
+import {
+  type EntitlementSource,
+  type NullableEntitlementSource,
+} from "@/domain/billing/types";
 import { AuditLogStorage } from "@/domain/audit/storage/audit-log.storage";
 import { NotFoundError } from "@/lib/server/errors";
 
@@ -30,6 +34,7 @@ type AdminBillingWorkspaceBase = {
   workspaceName: string;
   planCode: PlanCode;
   billingStatus: BillingState;
+  entitlementSource: NullableEntitlementSource;
   provider: "POLAR" | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
@@ -122,6 +127,7 @@ export class AdminBillingService {
     input: {
       planCode: PlanCode;
       billingStatus: BillingState;
+      entitlementSource?: NullableEntitlementSource;
       customerKey?: string | null;
       subscriptionKey?: string | null;
       currentPeriodEnd?: string | null;
@@ -141,6 +147,12 @@ export class AdminBillingService {
     const currentPeriodEnd = input.currentPeriodEnd
       ? new Date(input.currentPeriodEnd)
       : null;
+    const nextEntitlementSource =
+      input.entitlementSource !== undefined
+        ? input.entitlementSource
+        : input.planCode === "STANDARD"
+          ? ("MANUAL_GRANT" as EntitlementSource)
+          : existing.entitlementSource ?? null;
     const nextBillingOwnerUserId =
       input.billingOwnerUserId !== undefined
         ? input.billingOwnerUserId
@@ -159,6 +171,7 @@ export class AdminBillingService {
         nextState: {
           planCode: input.planCode,
           billingStatus: input.billingStatus,
+          entitlementSource: nextEntitlementSource,
           customerKey: normalizeNullableText(input.customerKey),
           subscriptionKey: normalizeNullableText(input.subscriptionKey),
           currentPeriodEnd: currentPeriodEnd?.toISOString() ?? null,
@@ -175,6 +188,7 @@ export class AdminBillingService {
       workspaceId,
       billingStatus: input.billingStatus,
       planCode: input.planCode,
+      entitlementSource: nextEntitlementSource,
       customerKey: normalizeNullableText(input.customerKey),
       subscriptionKey: normalizeNullableText(input.subscriptionKey),
       currentPeriodEnd,
@@ -205,6 +219,7 @@ export class AdminBillingService {
         nextState: {
           planCode: input.planCode,
           billingStatus: input.billingStatus,
+          entitlementSource: nextEntitlementSource,
           customerKey: normalizeNullableText(input.customerKey),
           subscriptionKey: normalizeNullableText(input.subscriptionKey),
           currentPeriodEnd: currentPeriodEnd?.toISOString() ?? null,
@@ -256,6 +271,7 @@ function toAdminBillingWorkspaceSummary(
     workspaceName: workspace.workspaceName,
     planCode: workspace.planCode,
     billingStatus: workspace.billingStatus,
+    entitlementSource: workspace.entitlementSource ?? null,
     provider: workspace.provider,
     currentPeriodEnd: workspace.currentPeriodEnd?.toISOString() ?? null,
     cancelAtPeriodEnd: workspace.cancelAtPeriodEnd,
@@ -292,6 +308,7 @@ function snapshotBillingState(
   return {
     planCode: workspace.planCode,
     billingStatus: workspace.billingStatus,
+    entitlementSource: workspace.entitlementSource ?? null,
     provider: workspace.provider,
     currentPeriodEnd: workspace.currentPeriodEnd?.toISOString() ?? null,
     cancelAtPeriodEnd: workspace.cancelAtPeriodEnd,

@@ -18,6 +18,10 @@ export const workspaceJoinSchema = z.object({
   workspaceId: z.number(),
 });
 
+export const workspaceCurrentUpdateSchema = z.object({
+  workspaceId: z.number().int().positive(),
+});
+
 export const workspaceJoinByInviteSchema = z.object({
   code: z
     .string()

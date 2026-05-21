@@ -3,6 +3,7 @@ import { WorkspaceService } from "@/domain/workspace/services/workspace.service"
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { workspaceJoinSchema } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { setActiveWorkspaceCookie } from "@/lib/server/active-workspace";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
@@ -37,5 +38,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   }
 
   await service.joinWorkspace(parsed.data.workspaceId, session.userId);
+  await setActiveWorkspaceCookie(parsed.data.workspaceId);
+
   return apiSuccess({ message: "워크스페이스에 참가했습니다." });
 });

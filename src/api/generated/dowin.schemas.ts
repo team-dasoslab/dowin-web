@@ -113,6 +113,19 @@ export const AdminBillingWorkspaceSummaryBillingStatus = {
 /**
  * @nullable
  */
+export type AdminBillingWorkspaceSummaryEntitlementSource = typeof AdminBillingWorkspaceSummaryEntitlementSource[keyof typeof AdminBillingWorkspaceSummaryEntitlementSource] | null;
+
+
+export const AdminBillingWorkspaceSummaryEntitlementSource = {
+  POLAR: 'POLAR',
+  MANUAL_GRANT: 'MANUAL_GRANT',
+  PARTNER: 'PARTNER',
+  INTERNAL_TEST: 'INTERNAL_TEST',
+} as const;
+
+/**
+ * @nullable
+ */
 export type AdminBillingWorkspaceSummaryProvider = typeof AdminBillingWorkspaceSummaryProvider[keyof typeof AdminBillingWorkspaceSummaryProvider] | null;
 
 
@@ -125,6 +138,8 @@ export interface AdminBillingWorkspaceSummary {
   workspaceName: string;
   planCode: AdminBillingWorkspaceSummaryPlanCode;
   billingStatus: AdminBillingWorkspaceSummaryBillingStatus;
+  /** @nullable */
+  entitlementSource: AdminBillingWorkspaceSummaryEntitlementSource;
   /** @nullable */
   provider?: AdminBillingWorkspaceSummaryProvider;
   /** @nullable */
@@ -215,9 +230,24 @@ export const AdminBillingManualOverrideRequestBillingStatus = {
   REVOKED: 'REVOKED',
 } as const;
 
+/**
+ * @nullable
+ */
+export type AdminBillingManualOverrideRequestEntitlementSource = typeof AdminBillingManualOverrideRequestEntitlementSource[keyof typeof AdminBillingManualOverrideRequestEntitlementSource] | null;
+
+
+export const AdminBillingManualOverrideRequestEntitlementSource = {
+  POLAR: 'POLAR',
+  MANUAL_GRANT: 'MANUAL_GRANT',
+  PARTNER: 'PARTNER',
+  INTERNAL_TEST: 'INTERNAL_TEST',
+} as const;
+
 export interface AdminBillingManualOverrideRequest {
   planCode: AdminBillingManualOverrideRequestPlanCode;
   billingStatus: AdminBillingManualOverrideRequestBillingStatus;
+  /** @nullable */
+  entitlementSource?: AdminBillingManualOverrideRequestEntitlementSource;
   /**
    * @maxLength 255
    * @nullable
@@ -488,6 +518,36 @@ export interface Workspace {
   createdAt?: string;
 }
 
+export type WorkspaceListItemPlanCode = typeof WorkspaceListItemPlanCode[keyof typeof WorkspaceListItemPlanCode];
+
+
+export const WorkspaceListItemPlanCode = {
+  FREE: 'FREE',
+  STANDARD: 'STANDARD',
+} as const;
+
+export type WorkspaceListItemRole = typeof WorkspaceListItemRole[keyof typeof WorkspaceListItemRole];
+
+
+export const WorkspaceListItemRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
+export interface WorkspaceListItem {
+  id: number;
+  name: string;
+  planCode: WorkspaceListItemPlanCode;
+  role: WorkspaceListItemRole;
+  isCurrent: boolean;
+  createdAt: string;
+}
+
+export interface WorkspaceCurrentUpdateRequest {
+  /** @minimum 1 */
+  workspaceId: number;
+}
+
 export type BillingOverviewPlanCode = typeof BillingOverviewPlanCode[keyof typeof BillingOverviewPlanCode];
 
 
@@ -510,6 +570,19 @@ export const BillingOverviewBillingStatus = {
 /**
  * @nullable
  */
+export type BillingOverviewEntitlementSource = typeof BillingOverviewEntitlementSource[keyof typeof BillingOverviewEntitlementSource] | null;
+
+
+export const BillingOverviewEntitlementSource = {
+  POLAR: 'POLAR',
+  MANUAL_GRANT: 'MANUAL_GRANT',
+  PARTNER: 'PARTNER',
+  INTERNAL_TEST: 'INTERNAL_TEST',
+} as const;
+
+/**
+ * @nullable
+ */
 export type BillingOverviewProvider = typeof BillingOverviewProvider[keyof typeof BillingOverviewProvider] | null;
 
 
@@ -522,6 +595,8 @@ export interface BillingOverview {
   workspaceName: string;
   planCode: BillingOverviewPlanCode;
   billingStatus: BillingOverviewBillingStatus;
+  /** @nullable */
+  entitlementSource: BillingOverviewEntitlementSource;
   /** @nullable */
   provider?: BillingOverviewProvider;
   /** @nullable */

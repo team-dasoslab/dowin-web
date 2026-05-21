@@ -2,14 +2,11 @@
 
 import {
   deleteLeadMeasuresLeadMeasureIdLogsDate,
-  getGetScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetScoreboardsScoreboardIdLogsWeeklyQueryKey,
   putLeadMeasuresLeadMeasureIdLogsDate,
   useDeleteLeadMeasuresLeadMeasureIdLogsDate,
   usePutLeadMeasuresLeadMeasureIdLogsDate,
 } from "@/api/generated/daily-log/daily-log";
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
-import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import {
   DailyLogValue,
   DashboardView,
@@ -27,10 +24,6 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseDashboardLogMutationParams = {
-  dashboardTeamQueryKey: ReturnType<typeof getGetDashboardTeamQueryKey>;
-  monthlyLogsQueryKey: ReturnType<
-    typeof getGetScoreboardsScoreboardIdLogsMonthlyQueryKey
-  > | null;
   scoreboardId: number | null;
   selectedView: DashboardView;
   showToast: (type: "success" | "error", message: string) => void;
@@ -41,8 +34,6 @@ type UseDashboardLogMutationParams = {
 };
 
 export const useDashboardLogMutation = ({
-  dashboardTeamQueryKey,
-  monthlyLogsQueryKey,
   scoreboardId,
   selectedView,
   showToast,
@@ -72,24 +63,13 @@ export const useDashboardLogMutation = ({
   };
 
   const invalidateToggleQueries = async (context?: ToggleLogContext) => {
-    await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: getGetScoreboardsActiveQueryKey(),
-      }),
-      context?.weeklyLogsQueryKey
-        ? queryClient.invalidateQueries({
-            queryKey: context.weeklyLogsQueryKey,
-          })
-        : Promise.resolve(),
-      context?.monthlyLogsQueryKey
-        ? queryClient.invalidateQueries({
-            queryKey: context.monthlyLogsQueryKey,
-          })
-        : Promise.resolve(),
-      queryClient.invalidateQueries({
-        queryKey: context?.dashboardTeamQueryKey ?? dashboardTeamQueryKey,
-      }),
-    ]);
+    if (!context?.weeklyLogsQueryKey) {
+      return;
+    }
+
+    await queryClient.invalidateQueries({
+      queryKey: context.weeklyLogsQueryKey,
+    });
   };
 
   const createToggleLogContext = (
@@ -114,8 +94,6 @@ export const useDashboardLogMutation = ({
 
     return {
       currentLogKey,
-      dashboardTeamQueryKey,
-      monthlyLogsQueryKey,
       previousWeeklyLogs,
       weeklyLogsQueryKey,
     };

@@ -1,12 +1,30 @@
 import { getDb } from "@/db";
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { getActiveWorkspaceIdFromCookies, setActiveWorkspaceCookie } from "@/lib/server/active-workspace";
 import { workspaceCreateSchema } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+
+export const GET = withErrorHandler(async () => {
+  const { env } = getCloudflareContext();
+  const db = getDb(env.DB);
+  const storage = new WorkspaceStorage(db);
+  const service = new WorkspaceService(storage);
+
+  const session = await getSessionWithRefresh(db);
+  if (!session) {
+    return await apiError("UNAUTHORIZED");
+  }
+
+  const activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
+  const workspaces = await service.listMyWorkspaces(session.userId, activeWorkspaceId);
+
+  return apiSuccess(workspaces);
+});
 
 export const POST = withErrorHandler(async (request: Request) => {
   const { env } = getCloudflareContext();
@@ -40,5 +58,7 @@ export const POST = withErrorHandler(async (request: Request) => {
     session.userId,
     parsed.data.name,
   );
+  await setActiveWorkspaceCookie(workspace.id);
+
   return apiSuccess(workspace, 201);
 });

@@ -60,6 +60,7 @@ describe("PolarWebhookService", () => {
         workspaceId: 3,
         billingStatus: "ACTIVE",
         planCode: "STANDARD",
+        entitlementSource: "POLAR",
         billingOwnerUserId: 9,
       }),
     );
@@ -136,6 +137,7 @@ describe("PolarWebhookService", () => {
         workspaceId: 5,
         billingStatus: "EXPIRED",
         planCode: "FREE",
+        entitlementSource: "POLAR",
       }),
     );
     expect(updateWorkspaceBillingProjection).toHaveBeenCalledWith({
@@ -195,6 +197,7 @@ describe("PolarWebhookService", () => {
         workspaceId: 6,
         billingStatus: "EXPIRED",
         planCode: "FREE",
+        entitlementSource: "POLAR",
       }),
     );
   });
@@ -248,6 +251,7 @@ describe("PolarWebhookService", () => {
         workspaceId: 7,
         billingStatus: "EXPIRED",
         planCode: "FREE",
+        entitlementSource: "POLAR",
       }),
     );
   });
@@ -296,6 +300,7 @@ describe("PolarWebhookService", () => {
         workspaceId: 8,
         billingStatus: "ACTIVE",
         planCode: "STANDARD",
+        entitlementSource: "POLAR",
         cancelAtPeriodEnd: false,
       }),
     );
@@ -346,6 +351,7 @@ describe("PolarWebhookService", () => {
         workspaceId: 9,
         billingStatus: "ACTIVE",
         planCode: "STANDARD",
+        entitlementSource: "POLAR",
       }),
     );
   });

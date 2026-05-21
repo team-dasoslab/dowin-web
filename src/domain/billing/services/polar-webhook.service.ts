@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
+import { type EntitlementSource } from "@/domain/billing/types";
 
 type BillingPort = Pick<
   BillingStorage,
@@ -22,6 +23,7 @@ type WebhookEnvelope = z.infer<typeof polarWebhookEnvelopeSchema>;
 type BillingProjection = {
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
   planCode: "FREE" | "STANDARD";
+  entitlementSource: EntitlementSource;
   customerKey: string | null;
   customerExternalRef: string | null;
   subscriptionKey: string | null;
@@ -140,6 +142,7 @@ function resolveProjection(
       return {
         billingStatus: "EXPIRED",
         planCode: "FREE",
+        entitlementSource: "POLAR",
         customerKey: asString(payload.data.id),
         customerExternalRef,
         subscriptionKey: null,
@@ -164,6 +167,7 @@ function resolveProjection(
         cancelAtPeriodEnd && currentPeriodEnd && currentPeriodEnd <= now
           ? "FREE"
           : "STANDARD",
+      entitlementSource: "POLAR",
       customerKey: asString(payload.data.id),
       customerExternalRef,
       subscriptionKey: asString(activeSubscription.id),
@@ -183,6 +187,7 @@ function resolveProjection(
       return {
         billingStatus: "ACTIVE",
         planCode: "STANDARD",
+        entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
         subscriptionKey,
@@ -196,6 +201,7 @@ function resolveProjection(
           currentPeriodEnd && currentPeriodEnd <= now ? "EXPIRED" : "CANCELED",
         planCode:
           currentPeriodEnd && currentPeriodEnd <= now ? "FREE" : "STANDARD",
+        entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
         subscriptionKey,
@@ -207,6 +213,7 @@ function resolveProjection(
       return {
         billingStatus: "ACTIVE",
         planCode: "STANDARD",
+        entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
         subscriptionKey,
@@ -218,6 +225,7 @@ function resolveProjection(
       return {
         billingStatus: "EXPIRED",
         planCode: "FREE",
+        entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
         subscriptionKey,
@@ -233,6 +241,7 @@ function resolveProjection(
         return {
           billingStatus: "REVOKED",
           planCode: "FREE",
+          entitlementSource: "POLAR",
           customerKey,
           customerExternalRef,
           subscriptionKey,
@@ -246,6 +255,7 @@ function resolveProjection(
         return {
           billingStatus: "EXPIRED",
           planCode: "FREE",
+          entitlementSource: "POLAR",
           customerKey,
           customerExternalRef,
           subscriptionKey,
@@ -259,6 +269,7 @@ function resolveProjection(
         return {
           billingStatus: "ACTIVE",
           planCode: "STANDARD",
+          entitlementSource: "POLAR",
           customerKey,
           customerExternalRef,
           subscriptionKey,
@@ -271,6 +282,7 @@ function resolveProjection(
       return {
         billingStatus: cancelAtPeriodEnd ? "CANCELED" : "ACTIVE",
         planCode: "STANDARD",
+        entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
         subscriptionKey,
@@ -283,6 +295,7 @@ function resolveProjection(
       return {
         billingStatus: "REVOKED",
         planCode: "FREE",
+        entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
         subscriptionKey,
@@ -298,6 +311,7 @@ function resolveProjection(
         return {
           billingStatus: "REVOKED",
           planCode: "FREE",
+          entitlementSource: "POLAR",
           customerKey,
           customerExternalRef,
           subscriptionKey,
@@ -407,6 +421,7 @@ export class PolarWebhookService {
       workspaceId: workspace.id,
       billingStatus: projection.billingStatus,
       planCode: projection.planCode,
+      entitlementSource: projection.entitlementSource,
       customerKey: projection.customerKey,
       subscriptionKey: projection.subscriptionKey,
       currentPeriodEnd: projection.currentPeriodEnd,
