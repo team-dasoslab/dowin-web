@@ -6,6 +6,7 @@ import {
   userNotificationSettings,
   workspaceMembers,
 } from "@/db/schema";
+import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
@@ -181,9 +182,24 @@ export class NotificationStorage {
   }
 
   async findMembershipForUser(userId: number) {
+    const activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
+    const membership = activeWorkspaceId
+      ? await this.db.query.workspaceMembers.findFirst({
+          where: and(
+            eq(workspaceMembers.userId, userId),
+            eq(workspaceMembers.workspaceId, activeWorkspaceId),
+          ),
+        })
+      : null;
+
+    if (membership) {
+      return membership;
+    }
+
     return (
       (await this.db.query.workspaceMembers.findFirst({
         where: eq(workspaceMembers.userId, userId),
+        orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
       })) ?? null
     );
   }
