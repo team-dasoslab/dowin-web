@@ -23,7 +23,6 @@ export function Sidebar() {
   const role = profile?.role;
 
   const filteredLinks = MY_DASHBOARD_LINKS.filter((link) => {
-    if (isProfileLoading) return true;
     if (link.adminOnly && role !== "ADMIN") return false;
     return true;
   });
