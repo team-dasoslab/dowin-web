@@ -1,6 +1,6 @@
 # Dowin Operations Docs
 
-최종 확인일: 2026-04-19
+최종 확인일: 2026-05-21
 
 이 폴더는 Dowin 운영 준비와 장애 대응에 직접 쓰는 문서를 모아둔 곳이다.  
 `common`이 공통 설계/규약 문서라면, `operations`는 실제 운영 사고에서 바로 펼쳐보는 실행 문서에 가깝다.
@@ -16,6 +16,7 @@
 7. [Incident Communication Template](/docs/dev/operations/2026.04.19-incident-communication-template.md)
 8. [Partial Data Recovery Guide](/docs/dev/operations/2026.04.20-partial-data-recovery-guide.md)
 9. [Admin User Bootstrap Runbook](/docs/dev/operations/2026.05.01-admin-user-bootstrap-runbook.md)
+10. [Cloudflare WAF Scanner Path Blocklist](/docs/dev/operations/2026.05.21-cloudflare-waf-scanner-path-blocklist.md)
 
 ## 2. 문서 역할
 
@@ -31,6 +32,8 @@
   - 시점 A~B 사이 신규 데이터를 보존하면서 손실 데이터만 선별 복구하는 전략과 사전 준비 항목
 - [2026.05.01-admin-user-bootstrap-runbook.md](/docs/dev/operations/2026.05.01-admin-user-bootstrap-runbook.md)
   - 운영 콘솔 첫 계정을 로컬 D1에 수동 bootstrap하는 절차
+- [2026.05.21-cloudflare-waf-scanner-path-blocklist.md](/docs/dev/operations/2026.05.21-cloudflare-waf-scanner-path-blocklist.md)
+  - Cloudflare WAF custom rule에서 `matches` 없이 스캐너가 자주 때리는 고신뢰 path를 차단하는 기준
 
 ## 3. 운영 중 기본 원칙
 

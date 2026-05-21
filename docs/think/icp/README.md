@@ -57,6 +57,51 @@
 - 고객 가설, 문제, 의미, 잠재 가치, 미확정 요소, 다음 단계까지 한 번에 본다
 - 현재는 `확정 ICP`가 아니라 `1순위 후보를 가장 길게 풀어쓴 문서`로 읽는다
 
+### 8. [33-2026-05-20-korean-interview-candidate-search-guide.md](./target/33-2026-05-20-korean-interview-candidate-search-guide.md)
+
+- 한국인 인터뷰 후보를 어디서 찾고, 어떤 키워드로 검색할지 정리한 실행 가이드
+
+### 9. [34-detached-2026-05-20-korean-public-signal-scouting.md](./target/34-detached-2026-05-20-korean-public-signal-scouting.md)
+
+- 한국 공개 웹에서 실제로 어떤 역할/팀/툴 조합이 보이는지 정리한 리서치 메모
+- 현재는 `detached 참고 자료`로만 읽는다
+
+### 10. [35-detached-2026-05-20-korean-prospect-shortlist-v0.md](./target/35-detached-2026-05-20-korean-prospect-shortlist-v0.md)
+
+- 실제로 인터뷰 요청을 보낼 한국 타깃 계정 shortlist
+- 현재는 `채용/공개 신호 기반 탐색용 가설 리스트`로만 읽는다
+- 실제 접촉 대상은 `1인칭 pain 표현 기반 shortlist`로 다시 좁혀야 한다
+
+### 11. [36-detached-2026-05-20-direct-pain-based-korean-targets-v1.md](./target/36-detached-2026-05-20-direct-pain-based-korean-targets-v1.md)
+
+- 한국 공개 웹에서 직접 pain를 말한 사람만 기준으로 다시 뽑은 인터뷰 타깃
+- 현재는 `detached된 직접 pain 후보 v1`로 읽는다
+
+### 12. [37-2026-05-20-public-channel-scan-notes.md](./target/37-2026-05-20-public-channel-scan-notes.md)
+
+- 브런치, LinkedIn, X, Threads, Facebook 공개 영역을 실제로 스캔한 결과 메모
+- 현재는 `추가 10회 이상 탐색 후에도 어떤 채널이 유효했는지`를 남긴 작업 로그로 읽는다
+
+### 13. [38-2026-05-20-dowin-attraction-hypotheses-for-target-selection.md](./target/38-2026-05-20-dowin-attraction-hypotheses-for-target-selection.md)
+
+- `누가 아픈가`보다 먼저 `왜 Dowin이 필요해 보이는가`를 고정한 기준 문서
+- 앞으로 후보를 더 찾기 전에 먼저 읽어야 할 현재 기준 문서다
+
+### 14. [39-2026-05-21-reevaluation-of-detached-targets-against-dowin-attraction.md](./target/39-2026-05-21-reevaluation-of-detached-targets-against-dowin-attraction.md)
+
+- detached 후보 문서 `36`을 현재 Dowin 매력 포인트 기준으로 다시 판정한 메모
+- 어떤 후보를 남기고, 왜 보류/제외하는지 빠르게 확인할 때 먼저 본다
+
+### 15. [40-2026-05-21-broad-korean-target-research-v2.md](./target/40-2026-05-21-broad-korean-target-research-v2.md)
+
+- 브런치, Eopla, LinkedIn, X, Threads, Facebook 공개 영역을 다시 폭넓게 훑은 후 남긴 리서치 v2
+- `강한 사람 후보`, `강한 조직 신호`, `맥락 신호`, `버릴 채널`을 분리해서 볼 때 사용한다
+
+### 16. [41-2026-05-21-brunch-deep-dive-target-research.md](./target/41-2026-05-21-brunch-deep-dive-target-research.md)
+
+- 브런치만 더 깊게 파서 `대표 머릿속`, `관제탑`, `액션 아이템`, `미리 적어둔다` 같은 표현을 기준으로 다시 본 리서치
+- 브런치 전용 검색 규칙과 강한/약한 신호를 빠르게 확인할 때 사용한다
+
 ## 현재 운영 원칙
 
 - 이 폴더의 문서는 `확정된 ICP 결론`이 아니다
