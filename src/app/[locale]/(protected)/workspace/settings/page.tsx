@@ -106,7 +106,7 @@ export default function WorkspaceSettingsPage() {
   const menuGroups: { id: string; label: string; items: MenuItem[] }[] = [
     {
       id: "general",
-      label: t("workspaceSection"),
+      label: t("workspaceManagement"),
       items: hasWorkspace
         ? isWorkspaceAdmin
           ? [
@@ -200,8 +200,8 @@ export default function WorkspaceSettingsPage() {
           {/* ── 좌측 사이드바 내비게이션 ── */}
           <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-sub-background/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             {[
-              { id: "general", label: t("workspaceSection") },
-              { id: "workspaces", label: commonT("Workspace") },
+              { id: "general", label: t("workspaceManagement") },
+              { id: "workspaces", label: t("workspaceList") },
             ].map((group) => {
               const isActive = activeSection === group.id;
               return (
@@ -295,7 +295,7 @@ export default function WorkspaceSettingsPage() {
                     sectionRefs.current["workspaces"] = el;
                   }}
                 >
-                  <SectionHeader title={commonT("Workspace")} className="mb-4" />
+                  <SectionHeader title={t("workspaceList")} className="mb-4" />
                   <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
                     {workspaces.map((ws, index) => (
                       <div
