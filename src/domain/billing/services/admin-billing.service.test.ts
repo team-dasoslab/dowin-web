@@ -77,7 +77,7 @@ describe("AdminBillingService", () => {
         planCode: "STANDARD",
         billingStatus: "ACTIVE",
         entitlementSource: "MANUAL_GRANT",
-        provider: "POLAR",
+        provider: null,
         currentPeriodEnd: new Date("2026-05-31T00:00:00.000Z"),
         cancelAtPeriodEnd: false,
         billingOwnerUserId: 9,

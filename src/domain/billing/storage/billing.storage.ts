@@ -14,6 +14,12 @@ type Db = ReturnType<typeof getDb>;
 export class BillingStorage {
   constructor(private db: Db) {}
 
+  private resolveProviderFromEntitlementSource(
+    entitlementSource: NullableEntitlementSource,
+  ): "POLAR" | null {
+    return entitlementSource === "POLAR" ? "POLAR" : null;
+  }
+
   async findWorkspaceBillingState(workspaceId: number) {
     return (
       (await this.db.query.workspaceBillingState.findFirst({
@@ -301,7 +307,9 @@ export class BillingStorage {
       .insert(workspaceBillingState)
       .values({
         workspaceId: input.workspaceId,
-        provider: "POLAR",
+        provider: this.resolveProviderFromEntitlementSource(
+          input.entitlementSource,
+        ),
         billingStatus: input.billingStatus,
         planCode: input.planCode,
         entitlementSource: input.entitlementSource,
@@ -317,7 +325,9 @@ export class BillingStorage {
       .onConflictDoUpdate({
         target: workspaceBillingState.workspaceId,
         set: {
-          provider: "POLAR",
+          provider: this.resolveProviderFromEntitlementSource(
+            input.entitlementSource,
+          ),
           billingStatus: input.billingStatus,
           planCode: input.planCode,
           entitlementSource: input.entitlementSource,

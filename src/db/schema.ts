@@ -441,7 +441,7 @@ export const workspaceBillingState = sqliteTable("workspace_billing_state", {
   workspaceId: integer("workspace_id")
     .primaryKey()
     .references(() => workspaces.id, { onDelete: "cascade" }),
-  provider: text("provider", { enum: ["POLAR"] }).notNull(),
+  provider: text("provider", { enum: ["POLAR"] }),
   billingStatus: text("billing_status", {
     enum: ["NONE", "ACTIVE", "CANCELED", "EXPIRED", "REVOKED"],
   })
