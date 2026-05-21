@@ -518,6 +518,36 @@ export interface Workspace {
   createdAt?: string;
 }
 
+export type WorkspaceListItemPlanCode = typeof WorkspaceListItemPlanCode[keyof typeof WorkspaceListItemPlanCode];
+
+
+export const WorkspaceListItemPlanCode = {
+  FREE: 'FREE',
+  STANDARD: 'STANDARD',
+} as const;
+
+export type WorkspaceListItemRole = typeof WorkspaceListItemRole[keyof typeof WorkspaceListItemRole];
+
+
+export const WorkspaceListItemRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
+export interface WorkspaceListItem {
+  id: number;
+  name: string;
+  planCode: WorkspaceListItemPlanCode;
+  role: WorkspaceListItemRole;
+  isCurrent: boolean;
+  createdAt: string;
+}
+
+export interface WorkspaceCurrentUpdateRequest {
+  /** @minimum 1 */
+  workspaceId: number;
+}
+
 export type BillingOverviewPlanCode = typeof BillingOverviewPlanCode[keyof typeof BillingOverviewPlanCode];
 
 

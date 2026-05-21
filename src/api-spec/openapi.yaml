@@ -778,9 +778,9 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /workspaces/me:
+  /workspaces:
     get:
-      summary: 내 워크스페이스 정보 조회
+      summary: 내 워크스페이스 목록 조회
       tags: [Workspace]
       security: [{ sessionCookie: [] }]
       responses:
@@ -788,16 +788,12 @@ paths:
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Workspace" }
-        "404":
-          description: 소속된 워크스페이스 없음
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/WorkspaceListItem" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /workspaces:
     post:
       summary: "[ADMIN] 새 워크스페이스 생성"
       tags: [Workspace]
@@ -824,6 +820,55 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/me:
+    get:
+      summary: 현재 active 워크스페이스 정보 조회
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Workspace" }
+        "404":
+          description: 소속된 워크스페이스 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/current:
+    put:
+      summary: 현재 active 워크스페이스 전환
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceCurrentUpdateRequest"
+      responses:
+        "200":
+          description: 전환 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceListItem" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 해당 워크스페이스 멤버가 아님
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
 
   /workspaces/join:
     post:
@@ -2605,6 +2650,30 @@ components:
         isOverFreeMemberLimit:
           type: boolean
         createdAt: { type: string, format: date-time }
+
+    WorkspaceListItem:
+      type: object
+      required: [id, name, planCode, role, isCurrent, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        planCode:
+          type: string
+          enum: [FREE, STANDARD]
+        role:
+          type: string
+          enum: [ADMIN, MEMBER]
+        isCurrent:
+          type: boolean
+        createdAt: { type: string, format: date-time }
+
+    WorkspaceCurrentUpdateRequest:
+      type: object
+      required: [workspaceId]
+      properties:
+        workspaceId:
+          type: integer
+          minimum: 1
 
     BillingOverview:
       type: object
