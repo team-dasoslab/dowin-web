@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 import { useGetWorkspaces, useGetWorkspacesMe, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
 import { Logo } from "@/components/ui/Logo";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -11,6 +13,7 @@ interface WorkspaceSwitcherProps {
 }
 
 export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
+  const commonT = useTranslations("Common");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -98,6 +101,15 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
               <span className="truncate">{ws.name}</span>
             </button>
           ))}
+          <div className="border-t border-zinc-100 my-1" />
+          <Link
+            href="/workspace/new"
+            onClick={() => setIsOpen(false)}
+            className="flex w-full items-center px-4 py-2 text-sm transition-colors hover:bg-zinc-100 text-primary font-medium gap-2"
+          >
+            <DowinIcon name="action-add-active" size="14px" />
+            <span>{commonT("createWorkspace")}</span>
+          </Link>
         </div>
       )}
     </div>
