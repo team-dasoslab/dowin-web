@@ -20,7 +20,9 @@ export function ProtectedPageContainer({
     <div
       className={cn(
         "mx-auto max-w-[1200px] px-4 pb-6 md:px-10 md:pb-10 lg:px-12 lg:pb-12",
-        topPadding === "compact" ? "pt-2 md:pt-4 lg:pt-4" : "pt-4 md:pt-10 lg:pt-12",
+        topPadding === "compact"
+          ? "pt-2 md:pt-4 lg:pt-4"
+          : "pt-4 md:pt-10 lg:pt-12",
         spacing === "compact" ? "space-y-4" : "space-y-10",
         isLoading ? "animate-pulse" : "animate-dowin-in",
         className,
@@ -40,7 +42,6 @@ type ProtectedPageHeaderProps = {
 
 export function ProtectedPageHeader({
   title,
-  description,
   rightElement,
   className,
 }: ProtectedPageHeaderProps) {
@@ -55,11 +56,6 @@ export function ProtectedPageHeader({
         <h1 className="text-xl font-black tracking-tight text-slate-900">
           {title}
         </h1>
-        {description ? (
-          <div className="mt-1 text-sm font-medium text-zinc-500">
-            {description}
-          </div>
-        ) : null}
       </div>
       {rightElement ? (
         <div className="flex shrink-0 items-center gap-2">{rightElement}</div>
@@ -67,4 +63,3 @@ export function ProtectedPageHeader({
     </header>
   );
 }
-
