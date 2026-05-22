@@ -1,6 +1,6 @@
 "use client";
 
-import { getAnalyticsExportData } from "@/api/generated/analytics/analytics";
+import { getWorkspacesWorkspaceIdAnalyticsExportData } from "@/api/generated/analytics/analytics";
 import {
   buildExportCsv,
   downloadCsv,
@@ -15,6 +15,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseProfileExportActionParams = {
+  workspaceId?: number;
   exportFrom: string;
   exportTo: string;
   selectedExportMeasureIds: number[];
@@ -22,6 +23,7 @@ type UseProfileExportActionParams = {
 };
 
 export const useProfileExportAction = ({
+  workspaceId,
   exportFrom,
   exportTo,
   selectedExportMeasureIds,
@@ -50,10 +52,15 @@ export const useProfileExportAction = ({
       return;
     }
 
+    if (!workspaceId) {
+      showToast("error", t("failed"));
+      return;
+    }
+
     setIsExporting(true);
 
     try {
-      const response = await getAnalyticsExportData({
+      const response = await getWorkspacesWorkspaceIdAnalyticsExportData(workspaceId, {
         from: exportFrom,
         to: exportTo,
         leadMeasureIds: selectedExportMeasureIds,

@@ -99,7 +99,7 @@ export default function WorkspaceSettingsPage() {
   useEffect(() => {
     if ((!isProfileLoading && !isWorkspaceLoading) && !hasWorkspace) {
       showToast("error", t("noWorkspaceTitle"));
-      router.replace("/dashboard/my");
+      router.replace("/");
     }
   }, [isProfileLoading, isWorkspaceLoading, hasWorkspace, router, showToast, t]);
 
