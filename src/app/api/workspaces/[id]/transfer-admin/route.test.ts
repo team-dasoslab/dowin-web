@@ -85,7 +85,7 @@ describe("POST /api/workspaces/:id/transfer-admin", () => {
   it("관리자면 권한을 이전하고 200을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       role: "ADMIN",
     });
 

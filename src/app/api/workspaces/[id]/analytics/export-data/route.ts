@@ -1,6 +1,7 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
-import { DashboardService } from "@/domain/dashboard/services/dashboard.service";
-import { dashboardTeamQuerySchema } from "@/domain/dashboard/validation";
+import { AnalyticsService } from "@/domain/analytics/services/analytics.service";
+import { analyticsExportQuerySchema } from "@/domain/analytics/validation";
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
@@ -8,10 +9,9 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const GET = withErrorHandler(
-  async (request: Request, contextParams: { params: Promise<{ workspaceId: string }> }) => {
+  async (request: Request, contextParams: { params: Promise<{ id: string }> }) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
@@ -20,9 +20,13 @@ export const GET = withErrorHandler(
     return await apiError("UNAUTHORIZED");
   }
 
-  const query = dashboardTeamQuerySchema.safeParse(
-    Object.fromEntries(new URL(request.url).searchParams.entries()),
-  );
+  const searchParams = new URL(request.url).searchParams;
+  const query = analyticsExportQuerySchema.safeParse({
+    from: searchParams.get("from"),
+    to: searchParams.get("to"),
+    leadMeasureIds: searchParams.get("leadMeasureIds") ?? undefined,
+    view: searchParams.get("view") ?? undefined,
+  });
 
   if (!query.success) {
     return await apiError("VALIDATION_ERROR", query.error.flatten().fieldErrors);
@@ -30,7 +34,7 @@ export const GET = withErrorHandler(
 
   const workspaceStorage = new WorkspaceStorage(db);
   const params = await contextParams.params;
-  const activeWorkspaceId = Number(params.workspaceId);
+  const activeWorkspaceId = Number(params.id);
 
   if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
     return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
@@ -38,15 +42,17 @@ export const GET = withErrorHandler(
 
   const context = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
 
-  const service = new DashboardService(
+  const service = new AnalyticsService(
     workspaceStorage,
     new ScoreboardStorage(db),
     new DailyLogStorage(db),
   );
-  const result = await service.getTeamDashboard(
-    context,
-    query.data.weekStart,
-  );
+
+  const result = await service.getExportData(context, {
+    from: query.data.from,
+    to: query.data.to,
+    leadMeasureIds: query.data.leadMeasureIds,
+  });
 
   return apiSuccess(result);
 });

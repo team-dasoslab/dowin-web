@@ -88,7 +88,7 @@ describe("PUT /api/workspaces/[id]/tags/[tagId]", () => {
   it("워크스페이스 멤버면 태그 이름을 수정한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 5 });
     mockRequireWorkspaceMember.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       userId: 5,
       role: "MEMBER",
     });
@@ -136,7 +136,7 @@ describe("DELETE /api/workspaces/[id]/tags/[tagId]", () => {
   it("워크스페이스 멤버면 태그를 삭제한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 5 });
     mockRequireWorkspaceMember.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       userId: 5,
       role: "MEMBER",
     });

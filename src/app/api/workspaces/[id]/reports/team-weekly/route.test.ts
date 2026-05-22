@@ -61,7 +61,7 @@ describe("GET /api/reports/team-weekly", () => {
     const { GET } = await import("./route");
     const response = await GET(
       new Request("http://localhost/api/workspaces/7/reports/team-weekly"),
-      { params: Promise.resolve({ workspaceId: "7" }) }
+      { params: Promise.resolve({ id: "7" }) }
     );
 
     expect(response.status).toBe(401);
@@ -75,7 +75,7 @@ describe("GET /api/reports/team-weekly", () => {
     const { GET } = await import("./route");
     const response = await GET(
       new Request("http://localhost/api/workspaces/7/reports/team-weekly"),
-      { params: Promise.resolve({ workspaceId: "7" }) }
+      { params: Promise.resolve({ id: "7" }) }
     );
 
     expect(response.status).toBe(404);
@@ -93,7 +93,7 @@ describe("GET /api/reports/team-weekly", () => {
     const { GET } = await import("./route");
     const response = await GET(
       new Request("http://localhost/api/workspaces/7/reports/team-weekly"),
-      { params: Promise.resolve({ workspaceId: "7" }) }
+      { params: Promise.resolve({ id: "7" }) }
     );
 
     expect(response.status).toBe(403);
@@ -106,7 +106,7 @@ describe("GET /api/reports/team-weekly", () => {
     const { GET } = await import("./route");
     const response = await GET(
       new Request("http://localhost/api/workspaces/7/reports/team-weekly?weeks=99"),
-      { params: Promise.resolve({ workspaceId: "7" }) }
+      { params: Promise.resolve({ id: "7" }) }
     );
 
     expect(response.status).toBe(422);
@@ -122,7 +122,7 @@ describe("GET /api/reports/team-weekly", () => {
       billingState: null,
     });
     mockGetTeamWeeklyReport.mockResolvedValue({
-      workspaceId: 7,
+      id: 7,
       workspaceName: "팀",
       weekStart: "2026-04-20",
       weekEnd: "2026-04-26",
@@ -135,12 +135,12 @@ describe("GET /api/reports/team-weekly", () => {
       new Request(
         "http://localhost/api/workspaces/7/reports/team-weekly?weekStart=2026-04-20&weeks=5",
       ),
-      { params: Promise.resolve({ workspaceId: "7" }) }
+      { params: Promise.resolve({ id: "7" }) }
     );
 
     expect(response.status).toBe(200);
     expect(mockGetTeamWeeklyReport).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: 1, workspaceId: 7 }),
+      expect.objectContaining({ userId: 1, id: 7 }),
       "2026-04-20",
       5,
     );

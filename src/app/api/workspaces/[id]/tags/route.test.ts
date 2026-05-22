@@ -71,7 +71,7 @@ describe("GET /api/workspaces/[id]/tags", () => {
   it("워크스페이스 멤버면 태그 목록을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceMember.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       userId: 1,
       role: "MEMBER",
     });
@@ -113,7 +113,7 @@ describe("POST /api/workspaces/[id]/tags", () => {
   it("워크스페이스 멤버면 태그를 생성하고 201을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 7 });
     mockRequireWorkspaceMember.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       userId: 7,
       role: "MEMBER",
     });

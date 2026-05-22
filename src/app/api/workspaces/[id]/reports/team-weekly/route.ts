@@ -11,7 +11,7 @@ import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export const GET = withErrorHandler(
-  async (request: Request, contextParams: { params: Promise<{ workspaceId: string }> }) => {
+  async (request: Request, contextParams: { params: Promise<{ id: string }> }) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
@@ -30,7 +30,7 @@ export const GET = withErrorHandler(
 
   const workspaceStorage = new WorkspaceStorage(db);
   const params = await contextParams.params;
-  const activeWorkspaceId = Number(params.workspaceId);
+  const activeWorkspaceId = Number(params.id);
 
   if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
     return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
