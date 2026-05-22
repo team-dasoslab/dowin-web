@@ -1,17 +1,17 @@
 import { getDb } from "@/db";
 import { DashboardService } from "@/domain/dashboard/services/dashboard.service";
-import { dashboardTeamQuerySchema } from "@/domain/dashboard/validation";
+import { teamWeeklyReportQuerySchema } from "@/domain/dashboard/validation";
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
-import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
 import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-export const GET = withErrorHandler(async (request: Request) => {
+export const GET = withErrorHandler(
+  async (request: Request, contextParams: { params: Promise<{ workspaceId: string }> }) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
@@ -20,7 +20,7 @@ export const GET = withErrorHandler(async (request: Request) => {
     return await apiError("UNAUTHORIZED");
   }
 
-  const query = dashboardTeamQuerySchema.safeParse(
+  const query = teamWeeklyReportQuerySchema.safeParse(
     Object.fromEntries(new URL(request.url).searchParams.entries()),
   );
 
@@ -29,26 +29,28 @@ export const GET = withErrorHandler(async (request: Request) => {
   }
 
   const workspaceStorage = new WorkspaceStorage(db);
-  let activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
+  const params = await contextParams.params;
+  const activeWorkspaceId = Number(params.workspaceId);
 
-  if (!activeWorkspaceId) {
-    const defaultWorkspace = await workspaceStorage.findUserWorkspace(session.userId);
-    if (!defaultWorkspace) {
-      return await apiError("NOT_FOUND");
-    }
-    activeWorkspaceId = defaultWorkspace.id;
+  if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
+    return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
   }
 
   const context = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
+
+  if (context.role !== "ADMIN") {
+    return await apiError("FORBIDDEN");
+  }
 
   const service = new DashboardService(
     workspaceStorage,
     new ScoreboardStorage(db),
     new DailyLogStorage(db),
   );
-  const result = await service.getTeamDashboard(
+  const result = await service.getTeamWeeklyReport(
     context,
     query.data.weekStart,
+    query.data.weeks,
   );
 
   return apiSuccess(result);

@@ -4,6 +4,11 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockResolveTeamMemo = vi.fn();
+const mockRequireWorkspaceAccess = vi.fn();
+
+vi.mock("@/lib/server/workspace-context", () => ({
+  requireWorkspaceAccess: () => mockRequireWorkspaceAccess(),
+}));
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -33,7 +38,7 @@ vi.mock("@/domain/dashboard/storage/team-memo.storage", () => ({
   TeamMemoStorage: vi.fn(),
 }));
 
-describe("PATCH /api/dashboard/team/memos/:memoId/resolve", () => {
+describe("PATCH /api/workspaces/:workspaceId/dashboard/team/memos/:memoId/resolve", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
@@ -45,11 +50,11 @@ describe("PATCH /api/dashboard/team/memos/:memoId/resolve", () => {
 
     const { PATCH } = await import("./route");
     const response = await PATCH(
-      new Request("http://localhost/api/dashboard/team/memos/1/resolve", {
+      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1/resolve", {
         method: "PATCH",
         body: JSON.stringify({ isResolved: true }),
       }),
-      { params: Promise.resolve({ memoId: "1" }) },
+      { params: Promise.resolve({ workspaceId: "7", memoId: "1" }) },
     );
 
     expect(response.status).toBe(401);
@@ -57,18 +62,23 @@ describe("PATCH /api/dashboard/team/memos/:memoId/resolve", () => {
 
   it("완료 상태 변경 요청을 처리한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 11 });
+    mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 7, userId: 11, role: "MEMBER" });
     mockResolveTeamMemo.mockResolvedValue({ id: 1, isResolved: true });
 
     const { PATCH } = await import("./route");
     const response = await PATCH(
-      new Request("http://localhost/api/dashboard/team/memos/1/resolve", {
+      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1/resolve", {
         method: "PATCH",
         body: JSON.stringify({ isResolved: true }),
       }),
-      { params: Promise.resolve({ memoId: "1" }) },
+      { params: Promise.resolve({ workspaceId: "7", memoId: "1" }) },
     );
 
     expect(response.status).toBe(200);
-    expect(mockResolveTeamMemo).toHaveBeenCalledWith(11, 1, true);
+    expect(mockResolveTeamMemo).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: 7 }),
+      1,
+      true
+    );
   });
 });

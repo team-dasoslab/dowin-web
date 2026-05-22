@@ -7,11 +7,11 @@ import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storag
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
-import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
 import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 
-export const GET = withErrorHandler(async (request: Request) => {
+export const GET = withErrorHandler(
+  async (request: Request, contextParams: { params: Promise<{ workspaceId: string }> }) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
@@ -33,14 +33,11 @@ export const GET = withErrorHandler(async (request: Request) => {
   }
 
   const workspaceStorage = new WorkspaceStorage(db);
-  let activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
+  const params = await contextParams.params;
+  const activeWorkspaceId = Number(params.workspaceId);
 
-  if (!activeWorkspaceId) {
-    const defaultWorkspace = await workspaceStorage.findUserWorkspace(session.userId);
-    if (!defaultWorkspace) {
-      return await apiError("NOT_FOUND");
-    }
-    activeWorkspaceId = defaultWorkspace.id;
+  if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
+    return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
   }
 
   const context = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);

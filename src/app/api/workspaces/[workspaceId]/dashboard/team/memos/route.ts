@@ -8,13 +8,12 @@ import {
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
+import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const createService = (db: ReturnType<typeof getDb>) =>
-  new TeamMemoService(new WorkspaceStorage(db), new TeamMemoStorage(db));
-
-export const GET = withErrorHandler(async (request: Request) => {
+export const GET = withErrorHandler(
+  async (request: Request, contextParams: { params: Promise<{ workspaceId: string }> }) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
@@ -31,15 +30,27 @@ export const GET = withErrorHandler(async (request: Request) => {
     return await apiError("VALIDATION_ERROR", query.error.flatten().fieldErrors);
   }
 
-  const result = await createService(db).listTeamMemos(
-    session.userId,
+  const workspaceStorage = new WorkspaceStorage(db);
+  const params = await contextParams.params;
+  const activeWorkspaceId = Number(params.workspaceId);
+
+  if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
+    return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
+  }
+
+  const context = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
+
+  const service = new TeamMemoService(workspaceStorage, new TeamMemoStorage(db));
+  const result = await service.listTeamMemos(
+    context,
     query.data.targetUserId,
   );
 
   return apiSuccess(result);
 });
 
-export const POST = withErrorHandler(async (request: Request) => {
+export const POST = withErrorHandler(
+  async (request: Request, contextParams: { params: Promise<{ workspaceId: string }> }) => {
   const { env } = getCloudflareContext();
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
@@ -54,7 +65,18 @@ export const POST = withErrorHandler(async (request: Request) => {
     return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
-  const result = await createService(db).createTeamMemo(session.userId, parsed.data);
+  const workspaceStorage = new WorkspaceStorage(db);
+  const params = await contextParams.params;
+  const activeWorkspaceId = Number(params.workspaceId);
+
+  if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
+    return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
+  }
+
+  const context = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
+
+  const service = new TeamMemoService(workspaceStorage, new TeamMemoStorage(db));
+  const result = await service.createTeamMemo(context, parsed.data);
 
   return apiSuccess(result, 201);
 });

@@ -4,6 +4,11 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockDeleteTeamMemo = vi.fn();
+const mockRequireWorkspaceAccess = vi.fn();
+
+vi.mock("@/lib/server/workspace-context", () => ({
+  requireWorkspaceAccess: () => mockRequireWorkspaceAccess(),
+}));
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -33,7 +38,7 @@ vi.mock("@/domain/dashboard/storage/team-memo.storage", () => ({
   TeamMemoStorage: vi.fn(),
 }));
 
-describe("DELETE /api/dashboard/team/memos/:memoId", () => {
+describe("DELETE /api/workspaces/:workspaceId/dashboard/team/memos/:memoId", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
@@ -45,10 +50,10 @@ describe("DELETE /api/dashboard/team/memos/:memoId", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/dashboard/team/memos/1", {
+      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1", {
         method: "DELETE",
       }),
-      { params: Promise.resolve({ memoId: "1" }) },
+      { params: Promise.resolve({ workspaceId: "7", memoId: "1" }) },
     );
 
     expect(response.status).toBe(401);
@@ -56,16 +61,20 @@ describe("DELETE /api/dashboard/team/memos/:memoId", () => {
 
   it("삭제 요청을 처리한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 11 });
+    mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 7, userId: 11, role: "MEMBER" });
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/dashboard/team/memos/1", {
+      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1", {
         method: "DELETE",
       }),
-      { params: Promise.resolve({ memoId: "1" }) },
+      { params: Promise.resolve({ workspaceId: "7", memoId: "1" }) },
     );
 
     expect(response.status).toBe(204);
-    expect(mockDeleteTeamMemo).toHaveBeenCalledWith(11, 1);
+    expect(mockDeleteTeamMemo).toHaveBeenCalledWith(
+      expect.objectContaining({ workspaceId: 7 }),
+      1
+    );
   });
 });

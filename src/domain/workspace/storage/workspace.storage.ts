@@ -8,7 +8,6 @@ import {
   workspaces,
   workspaceBillingState,
 } from "@/db/schema";
-import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
 import { and, eq, gt, inArray, lt, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
@@ -60,32 +59,13 @@ export class WorkspaceStorage {
   }
 
   async findUserWorkspace(userId: number): Promise<Workspace | null> {
-    const activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
-    const workspaceMember = activeWorkspaceId
-      ? await this.db.query.workspaceMembers.findFirst({
-          where: and(
-            eq(workspaceMembers.userId, userId),
-            eq(workspaceMembers.workspaceId, activeWorkspaceId),
-          ),
-          with: {
-            workspace: true,
-          },
-        })
-      : null;
-
-    if (workspaceMember) {
-      return workspaceMember.workspace;
-    }
-
-    const fallbackWorkspaceMember = await this.db.query.workspaceMembers.findFirst({
+    const firstMembership = await this.db.query.workspaceMembers.findFirst({
       where: eq(workspaceMembers.userId, userId),
       with: {
         workspace: true,
       },
-      orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
     });
-
-    return fallbackWorkspaceMember?.workspace ?? null;
+    return firstMembership?.workspace ?? null;
   }
 
   async createWorkspace(name: string): Promise<Workspace> {
@@ -124,20 +104,6 @@ export class WorkspaceStorage {
   async findMembershipByUserId(
     userId: number,
   ): Promise<WorkspaceMember | null> {
-    const activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
-    const membership = activeWorkspaceId
-      ? await this.db.query.workspaceMembers.findFirst({
-          where: and(
-            eq(workspaceMembers.userId, userId),
-            eq(workspaceMembers.workspaceId, activeWorkspaceId),
-          ),
-        })
-      : null;
-
-    if (membership) {
-      return membership;
-    }
-
     return (
       (await this.db.query.workspaceMembers.findFirst({
         where: eq(workspaceMembers.userId, userId),

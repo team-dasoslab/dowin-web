@@ -5,16 +5,14 @@ import { dashboardTeamMemoResolveSchema } from "@/domain/dashboard/validation";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
+import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-
-const createService = (db: ReturnType<typeof getDb>) =>
-  new TeamMemoService(new WorkspaceStorage(db), new TeamMemoStorage(db));
 
 export const PATCH = withErrorHandler(
   async (
     request: Request,
-    context: { params: Promise<{ memoId: string }> },
+    contextParams: { params: Promise<{ workspaceId: string; memoId: string }> },
   ) => {
     const { env } = getCloudflareContext();
     const db = getDb(env.DB);
@@ -24,9 +22,14 @@ export const PATCH = withErrorHandler(
       return await apiError("UNAUTHORIZED");
     }
 
-    const { memoId } = await context.params;
+    const { workspaceId, memoId } = await contextParams.params;
     const memoIdValue = Number(memoId);
+    const activeWorkspaceId = Number(workspaceId);
     const parsed = dashboardTeamMemoResolveSchema.safeParse(await request.json());
+
+    if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
+      return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
+    }
 
     if (!Number.isInteger(memoIdValue) || memoIdValue <= 0) {
       return await apiError("VALIDATION_ERROR", {
@@ -38,8 +41,12 @@ export const PATCH = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
-    const result = await createService(db).resolveTeamMemo(
-      session.userId,
+    const workspaceStorage = new WorkspaceStorage(db);
+    const contextAccess = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
+
+    const service = new TeamMemoService(workspaceStorage, new TeamMemoStorage(db));
+    const result = await service.resolveTeamMemo(
+      contextAccess,
       memoIdValue,
       parsed.data.isResolved,
     );
