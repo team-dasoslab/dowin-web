@@ -1,7 +1,8 @@
 "use client";
+import { useParams } from "next/navigation";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { MY_DASHBOARD_LINKS } from "@/app/[locale]/(protected)/dashboard/my/_lib/dashboard-links";
+import { getDashboardLinks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-links";
 import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -13,6 +14,8 @@ export function Sidebar() {
   const t = useTranslations("Dashboard");
   const commonT = useTranslations("Common");
   const pathname = usePathname();
+  const params = useParams();
+  const workspaceId = params.workspaceId as string | undefined;
   const { isCollapsed, toggleSidebar } = useSidebar();
 
   const { data: profileResponse, isLoading: isProfileLoading } =
@@ -22,10 +25,10 @@ export function Sidebar() {
   const workspaceName = profile?.workspaceName;
   const role = profile?.role;
 
-  const filteredLinks = MY_DASHBOARD_LINKS.filter((link) => {
+  const filteredLinks = workspaceId ? getDashboardLinks(workspaceId).filter((link) => {
     if (link.adminOnly && role !== "ADMIN") return false;
     return true;
-  });
+  }) : [];
 
   const mobileLinks = filteredLinks.filter(
     (link) => link.translationKey !== "weeklyReport",
