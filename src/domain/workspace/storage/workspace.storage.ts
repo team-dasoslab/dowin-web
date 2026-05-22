@@ -6,6 +6,7 @@ import {
   workspaceMembers,
   workspaceTags,
   workspaces,
+  workspaceBillingState,
 } from "@/db/schema";
 import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
 import { and, eq, gt, inArray, lt, sql } from "drizzle-orm";
@@ -24,6 +25,31 @@ type WorkspaceMembershipWithWorkspace = WorkspaceMember & {
 
 export class WorkspaceStorage {
   constructor(private db: Db) {}
+
+  async getAccessContextData(workspaceId: number, userId: number) {
+    const result = await this.db
+      .select({
+        workspace: workspaces,
+        member: workspaceMembers,
+        billingState: workspaceBillingState,
+      })
+      .from(workspaces)
+      .innerJoin(
+        workspaceMembers,
+        and(
+          eq(workspaces.id, workspaceMembers.workspaceId),
+          eq(workspaceMembers.userId, userId),
+        ),
+      )
+      .leftJoin(
+        workspaceBillingState,
+        eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .where(eq(workspaces.id, workspaceId))
+      .limit(1);
+
+    return result[0] ?? null;
+  }
 
   async findWorkspaceById(workspaceId: number): Promise<Workspace | null> {
     return (
