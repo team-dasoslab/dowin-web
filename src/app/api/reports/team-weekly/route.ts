@@ -6,6 +6,8 @@ import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storag
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
+import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
+import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -14,7 +16,7 @@ export const GET = withErrorHandler(async (request: Request) => {
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
 
-  if (!session) {
+  if (!session || !session.userId) {
     return await apiError("UNAUTHORIZED");
   }
 
@@ -27,18 +29,19 @@ export const GET = withErrorHandler(async (request: Request) => {
   }
 
   const workspaceStorage = new WorkspaceStorage(db);
-  const workspace = await workspaceStorage.findUserWorkspace(session.userId);
+  let activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
 
-  if (!workspace) {
-    return await apiError("NOT_FOUND");
+  if (!activeWorkspaceId) {
+    const defaultWorkspace = await workspaceStorage.findUserWorkspace(session.userId);
+    if (!defaultWorkspace) {
+      return await apiError("NOT_FOUND");
+    }
+    activeWorkspaceId = defaultWorkspace.id;
   }
 
-  const membership = await workspaceStorage.findMembership(
-    workspace.id,
-    session.userId,
-  );
+  const context = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
 
-  if (membership?.role !== "ADMIN") {
+  if (context.role !== "ADMIN") {
     return await apiError("FORBIDDEN");
   }
 
@@ -48,7 +51,7 @@ export const GET = withErrorHandler(async (request: Request) => {
     new DailyLogStorage(db),
   );
   const result = await service.getTeamWeeklyReport(
-    session.userId,
+    context,
     query.data.weekStart,
     query.data.weeks,
   );

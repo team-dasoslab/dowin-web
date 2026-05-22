@@ -5,7 +5,13 @@ const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockFindUserWorkspace = vi.fn();
 const mockFindMembership = vi.fn();
+const mockGetAccessContextData = vi.fn();
 const mockGetTeamWeeklyReport = vi.fn();
+const mockGetActiveWorkspaceIdFromCookies = vi.fn();
+
+vi.mock("@/lib/server/active-workspace", () => ({
+  getActiveWorkspaceIdFromCookies: () => mockGetActiveWorkspaceIdFromCookies(),
+}));
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -24,6 +30,7 @@ vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
     return {
       findUserWorkspace: mockFindUserWorkspace,
       findMembership: mockFindMembership,
+      getAccessContextData: mockGetAccessContextData,
     };
   }),
 }));
@@ -50,6 +57,7 @@ describe("GET /api/reports/team-weekly", () => {
     vi.resetModules();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockGetActiveWorkspaceIdFromCookies.mockResolvedValue(null);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
@@ -66,7 +74,8 @@ describe("GET /api/reports/team-weekly", () => {
 
   it("워크스페이스가 없으면 404를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
-    mockFindUserWorkspace.mockResolvedValue(null);
+    mockGetActiveWorkspaceIdFromCookies.mockResolvedValue(7);
+    mockGetAccessContextData.mockResolvedValue(null);
 
     const { GET } = await import("./route");
     const response = await GET(
@@ -79,11 +88,11 @@ describe("GET /api/reports/team-weekly", () => {
 
   it("워크스페이스 ADMIN이 아니면 403을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
-    mockFindUserWorkspace.mockResolvedValue({ id: 7, name: "팀" });
-    mockFindMembership.mockResolvedValue({
-      workspaceId: 7,
-      userId: 1,
-      role: "MEMBER",
+    mockGetActiveWorkspaceIdFromCookies.mockResolvedValue(7);
+    mockGetAccessContextData.mockResolvedValue({
+      workspace: { id: 7, name: "팀", planCode: "FREE" },
+      member: { id: 100, workspaceId: 7, userId: 1, role: "MEMBER" },
+      billingState: null,
     });
 
     const { GET } = await import("./route");
@@ -110,11 +119,11 @@ describe("GET /api/reports/team-weekly", () => {
 
   it("워크스페이스 ADMIN이면 주간 리포트를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
-    mockFindUserWorkspace.mockResolvedValue({ id: 7, name: "팀" });
-    mockFindMembership.mockResolvedValue({
-      workspaceId: 7,
-      userId: 1,
-      role: "ADMIN",
+    mockGetActiveWorkspaceIdFromCookies.mockResolvedValue(7);
+    mockGetAccessContextData.mockResolvedValue({
+      workspace: { id: 7, name: "팀", planCode: "FREE" },
+      member: { id: 100, workspaceId: 7, userId: 1, role: "ADMIN" },
+      billingState: null,
     });
     mockGetTeamWeeklyReport.mockResolvedValue({
       workspaceId: 7,
@@ -134,7 +143,7 @@ describe("GET /api/reports/team-weekly", () => {
 
     expect(response.status).toBe(200);
     expect(mockGetTeamWeeklyReport).toHaveBeenCalledWith(
-      1,
+      expect.objectContaining({ userId: 1, workspaceId: 7 }),
       "2026-04-20",
       5,
     );

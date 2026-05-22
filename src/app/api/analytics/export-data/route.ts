@@ -7,6 +7,8 @@ import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storag
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
+import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
+import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 
 export const GET = withErrorHandler(async (request: Request) => {
@@ -14,7 +16,7 @@ export const GET = withErrorHandler(async (request: Request) => {
   const db = getDb(env.DB);
   const session = await getSessionWithRefresh(db);
 
-  if (!session) {
+  if (!session || !session.userId) {
     return await apiError("UNAUTHORIZED");
   }
 
@@ -30,13 +32,26 @@ export const GET = withErrorHandler(async (request: Request) => {
     return await apiError("VALIDATION_ERROR", query.error.flatten().fieldErrors);
   }
 
+  const workspaceStorage = new WorkspaceStorage(db);
+  let activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
+
+  if (!activeWorkspaceId) {
+    const defaultWorkspace = await workspaceStorage.findUserWorkspace(session.userId);
+    if (!defaultWorkspace) {
+      return await apiError("NOT_FOUND");
+    }
+    activeWorkspaceId = defaultWorkspace.id;
+  }
+
+  const context = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
+
   const service = new AnalyticsService(
-    new WorkspaceStorage(db),
+    workspaceStorage,
     new ScoreboardStorage(db),
     new DailyLogStorage(db),
   );
 
-  const result = await service.getExportData(session.userId, {
+  const result = await service.getExportData(context, {
     from: query.data.from,
     to: query.data.to,
     leadMeasureIds: query.data.leadMeasureIds,
