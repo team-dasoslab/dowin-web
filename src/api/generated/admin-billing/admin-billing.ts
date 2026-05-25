@@ -201,7 +201,7 @@ export type getAdminBillingWorkspacesWorkspaceIdResponseError = (getAdminBilling
 
 export type getAdminBillingWorkspacesWorkspaceIdResponse = (getAdminBillingWorkspacesWorkspaceIdResponseSuccess | getAdminBillingWorkspacesWorkspaceIdResponseError)
 
-export const getGetAdminBillingWorkspacesWorkspaceIdUrl = (workspaceId: number,) => {
+export const getGetAdminBillingWorkspacesWorkspaceIdUrl = (workspaceId: string,) => {
 
 
   
@@ -209,7 +209,7 @@ export const getGetAdminBillingWorkspacesWorkspaceIdUrl = (workspaceId: number,)
   return `/api/admin/billing/workspaces/${workspaceId}`
 }
 
-export const getAdminBillingWorkspacesWorkspaceId = async (workspaceId: number, options?: RequestInit): Promise<getAdminBillingWorkspacesWorkspaceIdResponse> => {
+export const getAdminBillingWorkspacesWorkspaceId = async (workspaceId: string, options?: RequestInit): Promise<getAdminBillingWorkspacesWorkspaceIdResponse> => {
   
   return customInstance<getAdminBillingWorkspacesWorkspaceIdResponse>(getGetAdminBillingWorkspacesWorkspaceIdUrl(workspaceId),
   {      
@@ -224,14 +224,14 @@ export const getAdminBillingWorkspacesWorkspaceId = async (workspaceId: number, 
 
 
 
-export const getGetAdminBillingWorkspacesWorkspaceIdQueryKey = (workspaceId: number,) => {
+export const getGetAdminBillingWorkspacesWorkspaceIdQueryKey = (workspaceId: string,) => {
     return [
     `/api/admin/billing/workspaces/${workspaceId}`
     ] as const;
     }
 
     
-export const getGetAdminBillingWorkspacesWorkspaceIdQueryOptions = <TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetAdminBillingWorkspacesWorkspaceIdQueryOptions = <TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -254,7 +254,7 @@ export type GetAdminBillingWorkspacesWorkspaceIdQueryError = UnauthorizedErrorRe
 
 
 export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>> & Pick<
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>,
           TError,
@@ -264,7 +264,7 @@ export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnTy
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>> & Pick<
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>,
           TError,
@@ -274,7 +274,7 @@ export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnTy
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -282,7 +282,7 @@ export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnTy
  */
 
 export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -333,7 +333,7 @@ export type postAdminBillingWorkspacesWorkspaceIdManualOverrideResponseError = (
 
 export type postAdminBillingWorkspacesWorkspaceIdManualOverrideResponse = (postAdminBillingWorkspacesWorkspaceIdManualOverrideResponseSuccess | postAdminBillingWorkspacesWorkspaceIdManualOverrideResponseError)
 
-export const getPostAdminBillingWorkspacesWorkspaceIdManualOverrideUrl = (workspaceId: number,) => {
+export const getPostAdminBillingWorkspacesWorkspaceIdManualOverrideUrl = (workspaceId: string,) => {
 
 
   
@@ -341,7 +341,7 @@ export const getPostAdminBillingWorkspacesWorkspaceIdManualOverrideUrl = (worksp
   return `/api/admin/billing/workspaces/${workspaceId}/manual-override`
 }
 
-export const postAdminBillingWorkspacesWorkspaceIdManualOverride = async (workspaceId: number,
+export const postAdminBillingWorkspacesWorkspaceIdManualOverride = async (workspaceId: string,
     adminBillingManualOverrideRequest: AdminBillingManualOverrideRequest, options?: RequestInit): Promise<postAdminBillingWorkspacesWorkspaceIdManualOverrideResponse> => {
   
   return customInstance<postAdminBillingWorkspacesWorkspaceIdManualOverrideResponse>(getPostAdminBillingWorkspacesWorkspaceIdManualOverrideUrl(workspaceId),
@@ -358,8 +358,8 @@ export const postAdminBillingWorkspacesWorkspaceIdManualOverride = async (worksp
 
 
 export const getPostAdminBillingWorkspacesWorkspaceIdManualOverrideMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, TError,{workspaceId: number;data: AdminBillingManualOverrideRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, TError,{workspaceId: number;data: AdminBillingManualOverrideRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, TError,{workspaceId: string;data: AdminBillingManualOverrideRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, TError,{workspaceId: string;data: AdminBillingManualOverrideRequest}, TContext> => {
 
 const mutationKey = ['postAdminBillingWorkspacesWorkspaceIdManualOverride'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -371,7 +371,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, {workspaceId: number;data: AdminBillingManualOverrideRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, {workspaceId: string;data: AdminBillingManualOverrideRequest}> = (props) => {
           const {workspaceId,data} = props ?? {};
 
           return  postAdminBillingWorkspacesWorkspaceIdManualOverride(workspaceId,data,requestOptions)
@@ -392,11 +392,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary 운영자 billing 수동 보정
  */
 export const usePostAdminBillingWorkspacesWorkspaceIdManualOverride = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, TError,{workspaceId: number;data: AdminBillingManualOverrideRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, TError,{workspaceId: string;data: AdminBillingManualOverrideRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>,
         TError,
-        {workspaceId: number;data: AdminBillingManualOverrideRequest},
+        {workspaceId: string;data: AdminBillingManualOverrideRequest},
         TContext
       > => {
       return useMutation(getPostAdminBillingWorkspacesWorkspaceIdManualOverrideMutationOptions(options), queryClient);

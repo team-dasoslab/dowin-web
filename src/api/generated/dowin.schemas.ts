@@ -507,7 +507,7 @@ export const WorkspacePlanCode = {
 } as const;
 
 export interface Workspace {
-  id?: number;
+  id?: string;
   name?: string;
   planCode?: WorkspacePlanCode;
   /** @minimum 0 */
@@ -535,7 +535,7 @@ export const WorkspaceListItemRole = {
 } as const;
 
 export interface WorkspaceListItem {
-  id: number;
+  id: string;
   name: string;
   planCode: WorkspaceListItemPlanCode;
   role: WorkspaceListItemRole;
@@ -544,8 +544,7 @@ export interface WorkspaceListItem {
 }
 
 export interface WorkspaceCurrentUpdateRequest {
-  /** @minimum 1 */
-  workspaceId: number;
+  workspaceId: string;
 }
 
 export type BillingOverviewPlanCode = typeof BillingOverviewPlanCode[keyof typeof BillingOverviewPlanCode];
@@ -591,7 +590,7 @@ export const BillingOverviewProvider = {
 } as const;
 
 export interface BillingOverview {
-  workspaceId: number;
+  workspaceId: string;
   workspaceName: string;
   planCode: BillingOverviewPlanCode;
   billingStatus: BillingOverviewBillingStatus;
@@ -1198,7 +1197,7 @@ export type GetAdminContactInquiriesParams = {
 status?: GetAdminContactInquiriesStatus;
 category?: GetAdminContactInquiriesCategory;
 userId?: number;
-workspaceId?: number;
+workspaceId?: string;
 };
 
 export type GetAdminContactInquiriesStatus = typeof GetAdminContactInquiriesStatus[keyof typeof GetAdminContactInquiriesStatus];
@@ -1220,7 +1219,7 @@ export const GetAdminContactInquiriesCategory = {
 } as const;
 
 export type GetAdminBillingWorkspacesParams = {
-workspaceId?: number;
+workspaceId?: string;
 workspaceName?: string;
 };
 
