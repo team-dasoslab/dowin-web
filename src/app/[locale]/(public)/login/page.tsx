@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { redirect } from "@/i18n/routing";
+import { redirectToDefaultWorkspace } from "@/lib/server/workspace-redirect";
 
 export default async function LoginPage({
   params,
@@ -15,7 +16,7 @@ export default async function LoginPage({
   const session = await getSession(db);
 
   if (session) {
-    redirect({ href: "/dashboard/my", locale });
+    await redirectToDefaultWorkspace(session.userId, locale);
   }
 
   return <LoginPageClient />;

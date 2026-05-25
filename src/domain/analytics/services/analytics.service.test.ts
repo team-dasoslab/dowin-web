@@ -2,12 +2,11 @@ import { AnalyticsService } from "@/domain/analytics/services/analytics.service"
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("AnalyticsService", () => {
-  const findUserWorkspace = vi.fn();
-  const findActiveScoreboard = vi.fn();
+    const findActiveScoreboard = vi.fn();
   const findLogsForLeadMeasures = vi.fn();
 
   const service = new AnalyticsService(
-    { findUserWorkspace },
+    {},
     { findActiveScoreboard },
     { findLogsForLeadMeasures },
   );
@@ -16,33 +15,23 @@ describe("AnalyticsService", () => {
     vi.clearAllMocks();
   });
 
-  it("워크스페이스가 없으면 404 에러를 던진다", async () => {
-    findUserWorkspace.mockResolvedValue(null);
-
-    await expect(
-      service.getExportData(11, { from: "2026-03-01", to: "2026-03-31" }),
-    ).rejects.toThrow("NOT_FOUND");
-  });
+  // 워크스페이스 없는 경우는 API 라우트/context 계층에서 처리하므로 이 테스트는 삭제함
 
   it("활성 점수판이 없으면 404 에러를 던진다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "STANDARD" });
     findActiveScoreboard.mockResolvedValue(undefined);
 
     await expect(
-      service.getExportData(11, { from: "2026-03-01", to: "2026-03-31" }),
+      service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } as any } as any, { from: "2026-03-01", to: "2026-03-31" }),
     ).rejects.toThrow("NOT_FOUND");
   });
 
   it("FREE 플랜에서는 export 데이터를 조회할 수 없다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "FREE" });
-
     await expect(
-      service.getExportData(11, { from: "2026-03-01", to: "2026-03-31" }),
+      service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: false, entitlementSource: null, billingStatus: "NONE", planCode: "FREE" } as any } as any, { from: "2026-03-01", to: "2026-03-31" }),
     ).rejects.toThrow("STANDARD_PLAN_REQUIRED");
   });
 
   it("기간/지표 기준 export 데이터를 집계해 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "STANDARD" });
     findActiveScoreboard.mockResolvedValue({
       id: 21,
       leadMeasures: [
@@ -93,7 +82,7 @@ describe("AnalyticsService", () => {
       { leadMeasureId: 3, logDate: "2026-03-06", value: true },
     ]);
 
-    const result = await service.getExportData(11, {
+    const result = await service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } as any } as any, {
       from: "2026-03-01",
       to: "2026-03-10",
     });
@@ -150,7 +139,6 @@ describe("AnalyticsService", () => {
   });
 
   it("선택 지표만 필터링해 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, planCode: "STANDARD" });
     findActiveScoreboard.mockResolvedValue({
       id: 21,
       leadMeasures: [
@@ -172,7 +160,7 @@ describe("AnalyticsService", () => {
     });
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getExportData(11, {
+    const result = await service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } as any } as any, {
       from: "2026-03-01",
       to: "2026-03-02",
       leadMeasureIds: [2],

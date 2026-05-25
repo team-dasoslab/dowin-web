@@ -45,6 +45,7 @@ export default function ProfileExportPage() {
     exportMeasureOptions,
   });
   const { exportCsv, isExporting } = useProfileExportAction({
+    workspaceId: workspace?.id,
     exportFrom,
     exportTo,
     selectedExportMeasureIds,

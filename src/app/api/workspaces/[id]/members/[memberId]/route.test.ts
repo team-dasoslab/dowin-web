@@ -73,7 +73,7 @@ describe("DELETE /api/workspaces/:id/members/:memberId", () => {
   it("ADMIN이면 멤버를 퇴출하고 204를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       userId: 1,
       role: "ADMIN",
     });

@@ -5,6 +5,7 @@ import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { setRequestLocale } from "next-intl/server";
 import { headers } from "next/headers";
+import { redirectToDefaultWorkspace } from "@/lib/server/workspace-redirect";
 
 export default async function HomePage({
   params,
@@ -19,7 +20,7 @@ export default async function HomePage({
   const session = await getSession(db);
 
   if (session) {
-    redirect({ href: "/dashboard/my", locale: locale });
+    await redirectToDefaultWorkspace(session.userId, locale);
   }
 
   const userAgent = (await headers()).get("user-agent") || "";

@@ -17,8 +17,13 @@ vi.mock("@/lib/server/auth", () => ({
   getSessionWithRefresh: mockGetSession,
 }));
 
+const mockFindInviteByCode = vi.fn();
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
+    return {
+      findInviteByCode: mockFindInviteByCode,
+    };
+  }),
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({

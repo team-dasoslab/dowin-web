@@ -1,6 +1,6 @@
 "use client";
 
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+
 import { getGetUsersMeQueryKey } from "@/api/generated/profile/profile";
 import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import {
@@ -42,7 +42,7 @@ export const useCreateWorkspaceMutation = ({
             queryKey: getGetScoreboardsActiveQueryKey(),
           }),
           queryClient.invalidateQueries({
-            queryKey: getGetDashboardTeamQueryKey(undefined),
+            predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
           }),
         ]);
  
@@ -54,7 +54,7 @@ export const useCreateWorkspaceMutation = ({
  
         // Refresh server components to update layout state if needed
         router.refresh();
-        router.push("/dashboard/my");
+        router.push("/");
       },
       onError: (error: WorkspaceCreateError) => {
         onError(

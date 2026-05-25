@@ -1870,12 +1870,16 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /analytics/export-data:
+  /workspaces/{workspaceId}/analytics/export-data:
     get:
       summary: 내 대시보드 export 데이터 조회
       tags: [Analytics]
       security: [{ sessionCookie: [] }]
       parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: integer }
         - name: from
           in: query
           required: true
@@ -2013,12 +2017,16 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /dashboard/team:
+  /workspaces/{workspaceId}/dashboard/team:
     get:
       summary: 팀 대시보드 조회
       tags: [Dashboard]
       security: [{ sessionCookie: [] }]
       parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: integer }
         - name: weekStart
           in: query
           required: false
@@ -2041,12 +2049,16 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /reports/team-weekly:
+  /workspaces/{workspaceId}/reports/team-weekly:
     get:
       summary: 리더용 주간 팀 리포트 조회
       tags: [Reports]
       security: [{ sessionCookie: [] }]
       parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: integer }
         - name: weekStart
           in: query
           required: false
@@ -2078,12 +2090,16 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /dashboard/team/memos:
+  /workspaces/{workspaceId}/dashboard/team/memos:
     get:
       summary: 팀 대시보드 사용자 메모 조회
       tags: [Dashboard]
       security: [{ sessionCookie: [] }]
       parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: integer }
         - name: targetUserId
           in: query
           required: true
@@ -2108,9 +2124,14 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
     post:
-      summary: 팀 대시보드 사용자 메모 생성
+      summary: 팀 대시보드 사용자 메모 작성
       tags: [Dashboard]
       security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: integer }
       requestBody:
         required: true
         content:
@@ -2136,12 +2157,16 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /dashboard/team/memos/{memoId}/resolve:
+  /workspaces/{workspaceId}/dashboard/team/memos/{memoId}/resolve:
     patch:
       summary: 팀 대시보드 사용자 메모 완료 상태 변경
       tags: [Dashboard]
       security: [{ sessionCookie: [] }]
       parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: integer }
         - name: memoId
           in: path
           required: true
@@ -2176,12 +2201,16 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /dashboard/team/memos/{memoId}:
+  /workspaces/{workspaceId}/dashboard/team/memos/{memoId}:
     delete:
       summary: 팀 대시보드 사용자 메모 삭제
       tags: [Dashboard]
       security: [{ sessionCookie: [] }]
       parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: integer }
         - name: memoId
           in: path
           required: true

@@ -188,7 +188,7 @@ export default function LoginPageClient() {
       }
 
       const nextPath = searchParams.get("next");
-      router.push(nextPath || "/dashboard/my");
+      router.push(nextPath || "/");
     } catch (loginError) {
       const status = getApiErrorStatus(loginError);
       if (status === 401) {
@@ -273,7 +273,7 @@ export default function LoginPageClient() {
               type="button"
               onClick={() => {
                 const nextPath = searchParams.get("next");
-                router.push(nextPath || "/dashboard/my");
+                router.push(nextPath || "/");
               }}
               className="w-full rounded-button py-4 text-[13px] font-black bg-text-primary text-white transition-all"
             >

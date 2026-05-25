@@ -1,6 +1,6 @@
 "use client";
 
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+
 import {
   getGetUsersMeQueryKey,
   useGetUsersMe,
@@ -33,7 +33,7 @@ export const useProfileAvatar = () => {
 
     hasHandledMissingUserRef.current = true;
     showToast("error", t("profileLoadFailedDashboard"));
-    router.replace("/dashboard/my");
+    router.replace("/");
   }, [isLoading, router, showToast, user, t]);
 
   const updateAvatar = async (
@@ -65,7 +65,7 @@ export const useProfileAvatar = () => {
           queryKey: getGetUsersMeQueryKey(),
         }),
         queryClient.invalidateQueries({
-          queryKey: getGetDashboardTeamQueryKey(undefined),
+          predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
         }),
       ]);
       showToast("success", t("avatarChanged"));

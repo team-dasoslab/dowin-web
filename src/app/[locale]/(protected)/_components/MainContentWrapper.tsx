@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "@/i18n/routing";
+import { useParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import React from "react";
 
@@ -10,15 +11,17 @@ interface MainContentWrapperProps {
 
 export function MainContentWrapper({ children }: MainContentWrapperProps) {
   const pathname = usePathname();
+  const params = useParams();
+  const workspaceId = params.workspaceId as string | undefined;
 
   // Main tab paths where the bottom navigation is visible
   const mainTabPaths = [
     "/",
-    "/dashboard",
-    "/dashboard/my",
-    "/report",
+    workspaceId ? `/${workspaceId}/dashboard` : "/dashboard",
+    workspaceId ? `/${workspaceId}/dashboard/my` : "/dashboard/my",
+    workspaceId ? `/${workspaceId}/report` : "/report",
     "/setup",
-    "/scoreboards",
+    workspaceId ? `/${workspaceId}/scoreboards` : "/scoreboards",
     "/profile",
   ];
 

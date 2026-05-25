@@ -5,13 +5,9 @@ import {
   workspaceParamsSchema,
   workspaceUpdateSchema,
 } from "@/domain/workspace/validation";
-import { apiError, apiSuccess } from "@/lib/server/api-response";
-import {
-  clearActiveWorkspaceCookie,
-  getActiveWorkspaceIdFromCookies,
-} from "@/lib/server/active-workspace";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { requireWorkspaceAdminInWorkspace } from "@/lib/server/authz";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -101,10 +97,6 @@ export const DELETE = withErrorHandler(
 
     await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
     await service.deleteWorkspace(parsedParams.data.id);
-    const activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
-    if (activeWorkspaceId === parsedParams.data.id) {
-      await clearActiveWorkspaceCookie();
-    }
 
     return new NextResponse(null, { status: 204 });
   },

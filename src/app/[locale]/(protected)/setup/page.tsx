@@ -61,7 +61,7 @@ export default function SetupPage() {
     e.preventDefault();
     void submit().then((isSuccess) => {
       if (isSuccess) {
-        router.push("/dashboard/my");
+        router.push("/");
       }
     });
   };

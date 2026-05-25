@@ -92,7 +92,7 @@ export default function ProfilePage() {
 
     hasHandledMissingUserRef.current = true;
     showToast("error", t("profileLoadFailedDashboard"));
-    router.replace("/dashboard/my");
+    router.replace("/");
   }, [isProfileLoading, router, showToast, user, t]);
 
   const [activeSection, setActiveSection] = useState<string>("general");

@@ -87,7 +87,7 @@ describe("PUT /api/workspaces/[id]", () => {
   it("관리자면 워크스페이스 이름을 수정하고 200을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       role: "ADMIN",
     });
     mockUpdateWorkspaceName.mockResolvedValue({
@@ -156,7 +156,7 @@ describe("DELETE /api/workspaces/[id]", () => {
   it("관리자면 워크스페이스를 삭제하고 204를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       role: "ADMIN",
     });
 
