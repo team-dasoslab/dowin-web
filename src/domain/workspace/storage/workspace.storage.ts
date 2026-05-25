@@ -1,4 +1,10 @@
 import { getDb } from "@/db";
+import { customAlphabet } from "nanoid";
+
+const generateUid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  12
+);
 import {
   billingPlanLimits,
   users,
@@ -69,9 +75,10 @@ export class WorkspaceStorage {
   }
 
   async createWorkspace(name: string): Promise<Workspace> {
+    const uid = generateUid();
     const [newWorkspace] = await this.db
       .insert(workspaces)
-      .values({ name })
+      .values({ name, uid })
       .returning();
     return newWorkspace;
   }
