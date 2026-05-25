@@ -1,6 +1,6 @@
 "use client";
 
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+
 import {
   getGetWorkspacesIdMembersQueryKey,
   getGetWorkspacesMeQueryKey,
@@ -36,7 +36,7 @@ export const useRemoveWorkspaceMember = ({
         queryKey: getGetWorkspacesIdMembersQueryKey(workspaceId),
       }),
       queryClient.invalidateQueries({
-        queryKey: getGetDashboardTeamQueryKey(undefined),
+        predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
       }),
     ]);
   };

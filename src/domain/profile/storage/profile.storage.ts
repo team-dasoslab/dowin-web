@@ -1,6 +1,5 @@
-import { getDb } from "@/db";
 import { users, workspaceMembers, workspaces } from "@/db/schema";
-import { getActiveWorkspaceIdFromCookies } from "@/lib/server/active-workspace";
+import { getDb } from "@/db";
 import { and, eq } from "drizzle-orm";
 
 export type ProfileRecord = {
@@ -124,20 +123,6 @@ export class ProfileStorage {
   }
 
   private async findCurrentMembershipByUserId(userId: number) {
-    const activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
-    const membership = activeWorkspaceId
-      ? await this.db.query.workspaceMembers.findFirst({
-          where: and(
-            eq(workspaceMembers.userId, userId),
-            eq(workspaceMembers.workspaceId, activeWorkspaceId),
-          ),
-        })
-      : null;
-
-    if (membership) {
-      return membership;
-    }
-
     return (
       (await this.db.query.workspaceMembers.findFirst({
         where: eq(workspaceMembers.userId, userId),

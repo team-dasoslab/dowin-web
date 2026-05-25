@@ -1,7 +1,7 @@
 "use client";
 
 import { usePostAuthLogout } from "@/api/generated/auth/auth";
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+
 import {
   getGetUsersMeQueryKey,
   usePutUsersMe,
@@ -66,7 +66,7 @@ export const useProfileActions = ({
         queryKey: getGetScoreboardsActiveQueryKey(),
       }),
       queryClient.invalidateQueries({
-        queryKey: getGetDashboardTeamQueryKey(undefined),
+        predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
       }),
     ]);
   };
@@ -209,7 +209,7 @@ export const useProfileActions = ({
       await invalidateWorkspaceQueries();
       showToast("success", t("workspaceLeft"));
       router.refresh();
-      router.replace("/dashboard/my");
+      router.replace("/");
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("workspaceLeaveFailed")));
     } finally {
@@ -260,7 +260,7 @@ export const useProfileActions = ({
       await invalidateWorkspaceQueries();
       showToast("success", t("workspaceDeleted"));
       router.refresh();
-      router.replace("/dashboard/my");
+      router.replace("/");
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("workspaceDeleteFailed")));
     } finally {

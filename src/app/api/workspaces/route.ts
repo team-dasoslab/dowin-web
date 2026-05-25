@@ -1,7 +1,6 @@
 import { getDb } from "@/db";
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { getActiveWorkspaceIdFromCookies, setActiveWorkspaceCookie } from "@/lib/server/active-workspace";
 import { workspaceCreateSchema } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
@@ -20,8 +19,7 @@ export const GET = withErrorHandler(async () => {
     return await apiError("UNAUTHORIZED");
   }
 
-  const activeWorkspaceId = await getActiveWorkspaceIdFromCookies();
-  const workspaces = await service.listMyWorkspaces(session.userId, activeWorkspaceId);
+  const workspaces = await service.listMyWorkspaces(session.userId);
 
   return apiSuccess(workspaces);
 });
@@ -58,7 +56,6 @@ export const POST = withErrorHandler(async (request: Request) => {
     session.userId,
     parsed.data.name,
   );
-  await setActiveWorkspaceCookie(workspace.id);
 
   return apiSuccess(workspace, 201);
 });

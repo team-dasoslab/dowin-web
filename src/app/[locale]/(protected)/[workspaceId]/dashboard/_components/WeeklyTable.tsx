@@ -1,0 +1,358 @@
+"use client";
+
+import { TeamDashboardMember, TeamDashboardMemberRole } from "@/api/generated/dowin.schemas";
+import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
+import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
+import { TeamMemberMemoPanel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberMemoPanel";
+import { useTeamMemos } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamMemos";
+import { UserAvatar } from "@/components/UserAvatar";
+import { Button } from "@/components/ui/Button";
+import { useToast } from "@/context/ToastContext";
+import { toNumberId } from "@/lib/client/frontend-api";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+
+const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
+
+type WeeklyTableProps = {
+  member: TeamDashboardMember;
+  weekDates: string[];
+  isMe?: boolean;
+  memoMode?: "compose" | "view" | null;
+  onToggleCompose?: () => void;
+  onToggleView?: () => void;
+  onCloseMemo?: () => void;
+  currentUserId?: number | null;
+  currentUserNickname?: string | null;
+  currentUserAvatarKey?: string | null;
+  currentUserRole?: TeamDashboardMemberRole | null;
+};
+
+export function WeeklyTable({
+  member,
+  weekDates,
+  isMe = false,
+  memoMode = null,
+  onToggleCompose,
+  onToggleView,
+  onCloseMemo,
+  currentUserId,
+  currentUserNickname,
+  currentUserAvatarKey,
+  currentUserRole,
+}: WeeklyTableProps) {
+  const t = useTranslations("Dashboard");
+  const tc = useTranslations("Common");
+  const memberUserId = toNumberId(member.userId);
+  const params = useParams();
+  const workspaceId = Number(params.workspaceId);
+  const { showToast } = useToast();
+  const {
+    memos,
+    isLoading: isMemosLoading,
+    isError: isMemosError,
+    isCreatePending,
+    isResolvePending,
+    isDeletePending,
+    createMemo,
+    resolveMemo,
+    deleteMemo,
+  } = useTeamMemos({
+    workspaceId,
+    targetUserId: memberUserId,
+    enabled: true,
+    currentUser: {
+      id: currentUserId,
+      nickname: currentUserNickname,
+      avatarKey: currentUserAvatarKey,
+    },
+  });
+
+  if (
+    !(member.hasScoreboard ?? false) ||
+    (member.leadMeasures?.length ?? 0) === 0
+  ) {
+    return null;
+  }
+
+  const today = new Date().toISOString().split("T")[0];
+  const hasMemos = memos.length > 0;
+
+  const handleComposeClick = () => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+      const content = window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
+
+      if (!content) {
+        return;
+      }
+
+      void (async () => {
+        const isSuccess = await createMemo(content);
+
+        if (isSuccess) {
+          showToast("success", t("addedMemo"));
+        }
+      })();
+      return;
+    }
+
+    onToggleCompose?.();
+  };
+
+  return (
+    <div className="relative space-y-2 xl:pr-0">
+      <div className="px-1">
+        <div className="flex flex-col gap-1.5 sm:gap-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <UserAvatar
+                avatarKey={member.avatarKey}
+                avatarSeed={member.nickname}
+                alt={`${member.nickname ?? "사용자"} 아바타`}
+                size={20}
+              />
+              <span className="truncate text-xs font-bold text-text-primary">
+                {member.nickname}
+              </span>
+              {isMe ? (
+                <span className="shrink-0 rounded-content border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+                  {tc("me")}
+                </span>
+              ) : null}
+              <span className="hidden truncate text-xs text-text-secondary sm:inline">
+                — {member.goalName}
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              {hasMemos ? (
+                <Button
+                  type="button"
+                  onClick={onToggleView}
+                  className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                    memoMode === "view"
+                      ? "border-primary/25 bg-primary/10 text-primary"
+                      : "border-border bg-white text-text-secondary"
+                  }`}
+                >
+                  {t("viewMemos")}
+                </Button>
+              ) : null}
+              <Button
+                type="button"
+                onClick={handleComposeClick}
+                className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                  memoMode === "compose"
+                    ? "border-primary/25 bg-primary/10 text-primary"
+                    : "border-border bg-white text-text-secondary"
+                }`}
+              >
+                {t("memoButton")}
+              </Button>
+            </div>
+          </div>
+          <div className="sm:hidden">
+            <p className="text-[11px] leading-relaxed text-text-secondary">
+              {member.goalName}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="min-w-0 space-y-3">
+        <div className="space-y-3 md:hidden">
+          {member.leadMeasures?.map((leadMeasure) => {
+            const achievedCount = leadMeasure.achieved ?? 0;
+            const targetValue = leadMeasure.targetValue ?? 0;
+
+            return (
+              <div
+                key={`${member.userId}-${leadMeasure.id}-mobile`}
+                className="rounded-content border border-zinc-200 bg-white p-5"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <LeadMeasureSummary name={leadMeasure.name} />
+                  <AchievementProgress
+                    achievedCount={achievedCount}
+                    periodLabel={
+                      leadMeasure.period === "MONTHLY"
+                        ? t("monthView")
+                        : t("weekView")
+                    }
+                    targetValue={targetValue}
+                  />
+                </div>
+
+                <div className="mt-3 grid grid-cols-7 gap-1.5">
+                  {weekDates.map((date, index) => {
+                    const value = leadMeasure.logs?.[date] ?? null;
+
+                    return (
+                      <div
+                        key={`${member.userId}-${leadMeasure.id}-${date}-mobile`}
+                        className="space-y-1 text-center"
+                      >
+                        <p
+                          className={`text-[10px] font-bold ${
+                            date === today ? "text-primary" : "text-text-muted"
+                          }`}
+                        >
+                          {DAY_LABELS[index]}
+                        </p>
+                        <span
+                          className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                            value === true
+                              ? "text-green-600"
+                              : date === today
+                                ? "text-primary/50"
+                                : "text-text-muted"
+                          }`}
+                        >
+                          {value === true ? "○" : ""}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="hidden overflow-hidden rounded-content border border-zinc-200 md:block">
+          <div className="overflow-x-auto">
+            <div className="min-w-[600px]">
+              <div className="bg-zinc-50/50 border-b border-zinc-200">
+                <table className="w-full table-fixed text-xs">
+                  <colgroup>
+                    <col className="w-[38%]" />
+                    {DAY_LABELS.map((day) => (
+                      <col key={day} className="w-[8%]" />
+                    ))}
+                    <col className="w-[14%]" />
+                  </colgroup>
+                  <thead>
+                    <tr>
+                      <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                        {t("leadMeasureHead")}
+                      </th>
+                      {DAY_LABELS.map((day, index) => (
+                        <th
+                          key={day}
+                          className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
+                            weekDates[index] === today
+                              ? "text-primary"
+                              : weekDates[index] > today
+                                ? "text-text-muted/50"
+                                : "text-text-muted"
+                          }`}
+                        >
+                          {day}
+                        </th>
+                      ))}
+                      <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                        {t("achievementTab")}
+                      </th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+
+              <table className="w-full table-fixed text-xs">
+                <colgroup>
+                  <col className="w-[38%]" />
+                  {DAY_LABELS.map((day) => (
+                    <col key={day} className="w-[8%]" />
+                  ))}
+                  <col className="w-[14%]" />
+                </colgroup>
+                <tbody className="divide-y divide-border">
+                  {member.leadMeasures?.map((leadMeasure) => {
+                    const achievedCount = leadMeasure.achieved ?? 0;
+                    const targetValue = leadMeasure.targetValue ?? 0;
+                    const rate =
+                      targetValue > 0
+                        ? Math.round((achievedCount / targetValue) * 100)
+                        : 0;
+
+                    return (
+                      <tr key={leadMeasure.id} className="bg-white">
+                        <td className="py-4 px-5">
+                          <LeadMeasureSummary
+                            name={leadMeasure.name}
+                            nameClassName="block text-sm font-semibold text-text-primary"
+                          />
+                        </td>
+                        {weekDates.map((date) => {
+                          const value = leadMeasure.logs?.[date] ?? null;
+
+                          return (
+                            <td key={date} className="py-3 text-center">
+                              <span
+                                className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                                  value === true
+                                    ? "text-green-600"
+                                    : date === today
+                                      ? "text-primary/50"
+                                      : "text-text-muted"
+                                }`}
+                              >
+                                {value === true ? "○" : ""}
+                              </span>
+                            </td>
+                          );
+                        })}
+                        <td className="py-4 px-3 text-center">
+                          <div className="flex flex-col items-center gap-1.5">
+                            <span className="text-[10px] text-text-muted">
+                              {leadMeasure.period === "MONTHLY"
+                                ? t("monthView")
+                                : t("weekView")}
+                            </span>
+                            <div className="h-1 w-10 overflow-hidden rounded-full border border-border bg-sub-background">
+                              <div
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  rate >= 100 ? "bg-green-500" : "bg-primary"
+                                }`}
+                                style={{ width: `${Math.min(rate, 100)}%` }}
+                              />
+                            </div>
+                            <span
+                              className={`font-mono text-[10px] font-bold ${
+                                rate >= 100
+                                  ? "text-green-600"
+                                  : "text-text-secondary"
+                              }`}
+                            >
+                              {achievedCount}/{targetValue}
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <TeamMemberMemoPanel
+        member={member}
+        memoMode={memoMode}
+        onCloseMemo={onCloseMemo}
+        memos={memos}
+        isMemosLoading={isMemosLoading}
+        isMemosError={isMemosError}
+        isCreatePending={isCreatePending}
+        isResolvePending={isResolvePending}
+        isDeletePending={isDeletePending}
+        createMemo={createMemo}
+        resolveMemo={resolveMemo}
+        deleteMemo={deleteMemo}
+        currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
+      />
+    </div>
+  );
+}

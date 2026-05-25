@@ -71,7 +71,7 @@ describe("GET /api/workspaces/:id/members", () => {
   it("해당 워크스페이스 ADMIN이면 목록을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
-      workspaceId: 1,
+      id: 1,
       userId: 1,
       role: "ADMIN",
     });

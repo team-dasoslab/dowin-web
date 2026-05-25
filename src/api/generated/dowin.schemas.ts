@@ -1303,7 +1303,7 @@ export type GetScoreboardsScoreboardIdLogsMonthlyParams = {
 monthStart?: string;
 };
 
-export type GetAnalyticsExportDataParams = {
+export type GetWorkspacesWorkspaceIdAnalyticsExportDataParams = {
 /**
  * 조회 시작일 (YYYY-MM-DD)
  */
@@ -1319,13 +1319,13 @@ leadMeasureIds?: number[];
 /**
  * 기간 라벨링/기본값 추론용 보기 단위
  */
-view?: GetAnalyticsExportDataView;
+view?: GetWorkspacesWorkspaceIdAnalyticsExportDataView;
 };
 
-export type GetAnalyticsExportDataView = typeof GetAnalyticsExportDataView[keyof typeof GetAnalyticsExportDataView];
+export type GetWorkspacesWorkspaceIdAnalyticsExportDataView = typeof GetWorkspacesWorkspaceIdAnalyticsExportDataView[keyof typeof GetWorkspacesWorkspaceIdAnalyticsExportDataView];
 
 
-export const GetAnalyticsExportDataView = {
+export const GetWorkspacesWorkspaceIdAnalyticsExportDataView = {
   week: 'week',
   month: 'month',
 } as const;
@@ -1346,12 +1346,12 @@ export type PostBillingCheckoutBody = {
   locale: PostBillingCheckoutBodyLocale;
 };
 
-export type GetDashboardTeamParams = {
+export type GetWorkspacesWorkspaceIdDashboardTeamParams = {
 weekStart?: string;
 cursor?: string;
 };
 
-export type GetReportsTeamWeeklyParams = {
+export type GetWorkspacesWorkspaceIdReportsTeamWeeklyParams = {
 weekStart?: string;
 /**
  * @minimum 1
@@ -1360,7 +1360,7 @@ weekStart?: string;
 weeks?: number;
 };
 
-export type GetDashboardTeamMemosParams = {
+export type GetWorkspacesWorkspaceIdDashboardTeamMemosParams = {
 targetUserId: number;
 };
 

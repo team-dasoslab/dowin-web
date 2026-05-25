@@ -1,6 +1,7 @@
 import AccountRecoveryPageClient from "@/app/_components/AccountRecoveryPageClient";
 import { getDb } from "@/db";
 import { redirect } from "@/i18n/routing";
+import { redirectToDefaultWorkspace } from "@/lib/server/workspace-redirect";
 import { getSession } from "@/lib/server/auth";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
@@ -15,7 +16,7 @@ export default async function AccountRecoveryPage({
   const session = await getSession(db);
 
   if (session) {
-    redirect({ href: "/dashboard/my", locale });
+    await redirectToDefaultWorkspace(session.userId, locale);
   }
 
   return <AccountRecoveryPageClient />;

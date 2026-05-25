@@ -3,9 +3,7 @@ import { ForbiddenError, NotFoundError } from "@/lib/server/errors";
 const MS_PER_DAY = 86_400_000;
 
 type WorkspacePort = {
-  findUserWorkspace(
-    userId: number,
-  ): Promise<{ id: number; planCode: "FREE" | "STANDARD" } | null>;
+  // Empty for now, but kept for future use or can be removed if not needed.
 };
 
 type ActiveLeadMeasure = {
@@ -49,6 +47,8 @@ type ExportRow = {
   status: ExportStatus;
 };
 
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+
 export class AnalyticsService {
   constructor(
     private workspaceStorage: WorkspacePort,
@@ -57,7 +57,7 @@ export class AnalyticsService {
   ) {}
 
   async getExportData(
-    userId: number,
+    context: WorkspaceAccessContext,
     input: { from: string; to: string; leadMeasureIds?: number[] },
   ): Promise<{
     periodMeta: { from: string; to: string; dayCount: number };
@@ -70,18 +70,13 @@ export class AnalyticsService {
     leadMeasureBreakdown: ExportMeasureBreakdown[];
     dailyRows: ExportRow[];
   }> {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    if (workspace.planCode !== "STANDARD") {
+    if (!context.entitlement.canAccessStandardFeatures) {
       throw new ForbiddenError("STANDARD_PLAN_REQUIRED");
     }
 
     const scoreboard = await this.scoreboardStorage.findActiveScoreboard(
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
