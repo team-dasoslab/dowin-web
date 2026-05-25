@@ -310,7 +310,7 @@ paths:
         - name: workspaceId
           in: query
           schema:
-            type: integer
+            type: string
       responses:
         "200":
           description: 운영자 문의 목록 조회 성공
@@ -406,7 +406,7 @@ paths:
         - name: workspaceId
           in: query
           schema:
-            type: integer
+            type: string
         - name: workspaceName
           in: query
           schema:
@@ -438,7 +438,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         "200":
           description: 운영자 billing 워크스페이스 상세 조회 성공
@@ -469,7 +469,7 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
       requestBody:
         required: true
         content:
@@ -1879,7 +1879,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: from
           in: query
           required: true
@@ -2026,7 +2026,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: weekStart
           in: query
           required: false
@@ -2058,7 +2058,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: weekStart
           in: query
           required: false
@@ -2099,7 +2099,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: targetUserId
           in: query
           required: true
@@ -2131,7 +2131,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -2166,7 +2166,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: memoId
           in: path
           required: true
@@ -2210,7 +2210,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: memoId
           in: path
           required: true
@@ -2665,7 +2665,7 @@ components:
     Workspace:
       type: object
       properties:
-        id: { type: integer }
+        id: { type: string }
         name: { type: string }
         planCode:
           type: string
@@ -2684,7 +2684,7 @@ components:
       type: object
       required: [id, name, planCode, role, isCurrent, createdAt]
       properties:
-        id: { type: integer }
+        id: { type: string }
         name: { type: string }
         planCode:
           type: string
@@ -2701,8 +2701,7 @@ components:
       required: [workspaceId]
       properties:
         workspaceId:
-          type: integer
-          minimum: 1
+          type: string
 
     BillingOverview:
       type: object
@@ -2720,7 +2719,7 @@ components:
           canManageBilling,
         ]
       properties:
-        workspaceId: { type: integer }
+        workspaceId: { type: string }
         workspaceName: { type: string }
         planCode:
           type: string
