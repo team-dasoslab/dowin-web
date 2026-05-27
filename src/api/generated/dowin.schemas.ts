@@ -220,6 +220,80 @@ export interface AdminBillingWorkspaceSummary {
   requiresManualReview: boolean;
 }
 
+export type AdminBillingProviderProductProvider = typeof AdminBillingProviderProductProvider[keyof typeof AdminBillingProviderProductProvider];
+
+
+export const AdminBillingProviderProductProvider = {
+  POLAR: 'POLAR',
+} as const;
+
+export type AdminBillingProviderProductEnvironment = typeof AdminBillingProviderProductEnvironment[keyof typeof AdminBillingProviderProductEnvironment];
+
+
+export const AdminBillingProviderProductEnvironment = {
+  sandbox: 'sandbox',
+  production: 'production',
+} as const;
+
+export type AdminBillingProviderProductPlanCode = typeof AdminBillingProviderProductPlanCode[keyof typeof AdminBillingProviderProductPlanCode];
+
+
+export const AdminBillingProviderProductPlanCode = {
+  BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
+} as const;
+
+export interface AdminBillingProviderProduct {
+  id: number;
+  provider: AdminBillingProviderProductProvider;
+  environment: AdminBillingProviderProductEnvironment;
+  planCode: AdminBillingProviderProductPlanCode;
+  providerProductId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AdminBillingProviderProductUpsertRequestProvider = typeof AdminBillingProviderProductUpsertRequestProvider[keyof typeof AdminBillingProviderProductUpsertRequestProvider];
+
+
+export const AdminBillingProviderProductUpsertRequestProvider = {
+  POLAR: 'POLAR',
+} as const;
+
+export type AdminBillingProviderProductUpsertRequestEnvironment = typeof AdminBillingProviderProductUpsertRequestEnvironment[keyof typeof AdminBillingProviderProductUpsertRequestEnvironment];
+
+
+export const AdminBillingProviderProductUpsertRequestEnvironment = {
+  sandbox: 'sandbox',
+  production: 'production',
+} as const;
+
+export type AdminBillingProviderProductUpsertRequestPlanCode = typeof AdminBillingProviderProductUpsertRequestPlanCode[keyof typeof AdminBillingProviderProductUpsertRequestPlanCode];
+
+
+export const AdminBillingProviderProductUpsertRequestPlanCode = {
+  BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
+} as const;
+
+export interface AdminBillingProviderProductUpsertRequest {
+  provider: AdminBillingProviderProductUpsertRequestProvider;
+  environment: AdminBillingProviderProductUpsertRequestEnvironment;
+  planCode: AdminBillingProviderProductUpsertRequestPlanCode;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  providerProductId: string;
+  isActive?: boolean;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
+  changeReason: string;
+}
+
 export type AdminBillingEventProvider = typeof AdminBillingEventProvider[keyof typeof AdminBillingEventProvider];
 
 

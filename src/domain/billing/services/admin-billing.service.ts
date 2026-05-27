@@ -16,6 +16,8 @@ type PlanCode = "BASIC" | "FREE" | "STANDARD";
 
 type BillingPort = Pick<
   BillingStorage,
+  | "listProviderProducts"
+  | "upsertProviderProduct"
   | "searchAdminBillingWorkspaces"
   | "findWorkspaceBillingAdminDetail"
   | "listBillingEventsForWorkspace"
@@ -67,6 +69,17 @@ export type AdminBillingWorkspaceDetail = AdminBillingWorkspaceBase & {
   }>;
 };
 
+export type AdminBillingProviderProduct = {
+  id: number;
+  provider: "POLAR";
+  environment: "sandbox" | "production";
+  planCode: "BASIC" | "STANDARD";
+  providerProductId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type BillingWorkspaceSearchResult = Awaited<
   ReturnType<BillingStorage["searchAdminBillingWorkspaces"]>
 >[number];
@@ -79,6 +92,50 @@ export class AdminBillingService {
     private billingStorage: BillingPort,
     private auditLogStorage: AuditLogPort,
   ) {}
+
+  async listProviderProducts(): Promise<AdminBillingProviderProduct[]> {
+    const products = await this.billingStorage.listProviderProducts();
+    return products.map(toAdminBillingProviderProduct);
+  }
+
+  async upsertProviderProduct(
+    adminUserId: number,
+    input: {
+      provider: "POLAR";
+      environment: "sandbox" | "production";
+      planCode: "BASIC" | "STANDARD";
+      providerProductId: string;
+      isActive?: boolean;
+      changeReason: string;
+    },
+  ): Promise<AdminBillingProviderProduct> {
+    const product = await this.billingStorage.upsertProviderProduct({
+      provider: input.provider,
+      environment: input.environment,
+      planCode: input.planCode,
+      providerProductId: input.providerProductId,
+      isActive: input.isActive ?? true,
+    });
+
+    await this.auditLogStorage.create({
+      actorType: "ADMIN",
+      actorAdminUserId: adminUserId,
+      entityType: "BILLING_PROVIDER_PRODUCT",
+      entityId: product.id,
+      actionType: "UPDATE",
+      metadata: JSON.stringify({
+        domain: "BILLING",
+        reason: input.changeReason,
+        provider: input.provider,
+        environment: input.environment,
+        planCode: input.planCode,
+        providerProductId: input.providerProductId,
+        isActive: input.isActive ?? true,
+      }),
+    });
+
+    return toAdminBillingProviderProduct(product);
+  }
 
   async listWorkspaces(filters?: {
     workspaceId?: number;
@@ -284,6 +341,28 @@ function toAdminBillingWorkspaceSummary(
     recentRefundCount: riskSummary.recentRefundCount,
     recentRevokedCount: riskSummary.recentRevokedCount,
     requiresManualReview: totalRiskEvents >= BILLING_RISK_REVIEW_THRESHOLD,
+  };
+}
+
+function toAdminBillingProviderProduct(product: {
+  id: number;
+  provider: "POLAR";
+  environment: "sandbox" | "production";
+  planCode: "BASIC" | "STANDARD";
+  providerProductId: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}): AdminBillingProviderProduct {
+  return {
+    id: product.id,
+    provider: product.provider,
+    environment: product.environment,
+    planCode: product.planCode,
+    providerProductId: product.providerProductId,
+    isActive: product.isActive,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
   };
 }
 

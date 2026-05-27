@@ -7,7 +7,7 @@ import {
   workspaces,
 } from "@/db/schema";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
-import { and, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -70,6 +70,50 @@ export class BillingStorage {
         ),
       })) ?? null
     );
+  }
+
+  async listProviderProducts() {
+    return await this.db.query.billingProviderProducts.findMany({
+      orderBy: [
+        asc(billingProviderProducts.environment),
+        asc(billingProviderProducts.planCode),
+      ],
+    });
+  }
+
+  async upsertProviderProduct(input: {
+    provider: "POLAR";
+    environment: "sandbox" | "production";
+    planCode: "BASIC" | "STANDARD";
+    providerProductId: string;
+    isActive: boolean;
+  }) {
+    const now = new Date();
+    const [product] = await this.db
+      .insert(billingProviderProducts)
+      .values({
+        provider: input.provider,
+        environment: input.environment,
+        planCode: input.planCode,
+        providerProductId: input.providerProductId,
+        isActive: input.isActive,
+        updatedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [
+          billingProviderProducts.provider,
+          billingProviderProducts.environment,
+          billingProviderProducts.planCode,
+        ],
+        set: {
+          providerProductId: input.providerProductId,
+          isActive: input.isActive,
+          updatedAt: now,
+        },
+      })
+      .returning();
+
+    return product;
   }
 
   async findCheckoutSessionCreatedEvent(workspaceId: number, requestId: string) {

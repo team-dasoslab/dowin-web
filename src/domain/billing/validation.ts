@@ -25,6 +25,23 @@ export const adminBillingWorkspaceParamsSchema = z.object({
   workspaceId: z.coerce.number().int().positive(),
 });
 
+export const adminBillingProviderProductUpsertSchema = z.object({
+  provider: z.enum(["POLAR"]),
+  environment: z.enum(["sandbox", "production"]),
+  planCode: z.enum(["BASIC", "STANDARD"]),
+  providerProductId: z
+    .string()
+    .trim()
+    .min(1, "Provider product ID를 입력해주세요.")
+    .max(255, "Provider product ID는 255자 이하여야 합니다."),
+  isActive: z.boolean().optional(),
+  changeReason: z
+    .string()
+    .trim()
+    .min(1, "변경 사유를 입력해주세요.")
+    .max(500, "변경 사유는 500자 이하여야 합니다."),
+});
+
 export const adminBillingManualOverrideSchema = z
   .object({
     planCode: z.enum(["BASIC", "FREE", "STANDARD"]),

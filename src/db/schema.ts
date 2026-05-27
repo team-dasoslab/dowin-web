@@ -922,6 +922,7 @@ export const auditLogs = sqliteTable(
         "CONTACT_INQUIRY",
         "ADMIN_USER",
         "ADMIN_ROLE_GRANT",
+        "BILLING_PROVIDER_PRODUCT",
       ],
     }).notNull(),
     entityId: integer("entity_id"),

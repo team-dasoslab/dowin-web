@@ -499,6 +499,57 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /admin/billing/provider-products:
+    get:
+      summary: 운영자 billing provider product 매핑 목록 조회
+      tags: [AdminBilling]
+      security: [{ adminSessionCookie: [] }]
+      responses:
+        "200":
+          description: 운영자 billing provider product 매핑 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AdminBillingProviderProduct"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+    post:
+      summary: 운영자 billing provider product 매핑 upsert
+      tags: [AdminBilling]
+      security: [{ adminSessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBillingProviderProductUpsertRequest"
+      responses:
+        "200":
+          description: 운영자 billing provider product 매핑 upsert 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminBillingProviderProduct"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /admin/billing/workspaces/{workspaceId}:
     get:
       summary: 운영자 billing 워크스페이스 상세 조회
@@ -2629,6 +2680,65 @@ components:
           minimum: 0
         requiresManualReview:
           type: boolean
+
+    AdminBillingProviderProduct:
+      type: object
+      required:
+        [
+          id,
+          provider,
+          environment,
+          planCode,
+          providerProductId,
+          isActive,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id: { type: integer }
+        provider:
+          type: string
+          enum: [POLAR]
+        environment:
+          type: string
+          enum: [sandbox, production]
+        planCode:
+          type: string
+          enum: [BASIC, STANDARD]
+        providerProductId:
+          type: string
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AdminBillingProviderProductUpsertRequest:
+      type: object
+      required: [provider, environment, planCode, providerProductId, changeReason]
+      properties:
+        provider:
+          type: string
+          enum: [POLAR]
+        environment:
+          type: string
+          enum: [sandbox, production]
+        planCode:
+          type: string
+          enum: [BASIC, STANDARD]
+        providerProductId:
+          type: string
+          minLength: 1
+          maxLength: 255
+        isActive:
+          type: boolean
+        changeReason:
+          type: string
+          minLength: 1
+          maxLength: 500
 
     AdminBillingEvent:
       type: object
