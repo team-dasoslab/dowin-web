@@ -1,0 +1,84 @@
+import { ForbiddenError, ConflictError } from "@/lib/server/errors";
+
+type WorkspacePlanSummary = {
+  id: number;
+  planCode?: "FREE" | "STANDARD" | string | null;
+};
+
+type MemberCapacityPort = {
+  countMembers(workspaceId: number): Promise<number>;
+  findPlanLimit(
+    planCode: "FREE" | "STANDARD",
+  ): Promise<{ memberLimit: number } | null>;
+};
+
+export type WorkspaceMemberCapacity = {
+  workspaceId: number;
+  planCode: string | null;
+  memberCount: number;
+  memberLimit: number | null;
+  hasLimit: boolean;
+  hasAvailableMemberSlot: boolean;
+  isOverLimit: boolean;
+};
+
+export async function getPlanMemberLimitFromStorage(
+  planCode: string | null | undefined,
+  storage: Pick<MemberCapacityPort, "findPlanLimit">,
+): Promise<number | null> {
+  if (planCode !== "FREE" && planCode !== "STANDARD") {
+    return null;
+  }
+
+  const planLimit = await storage.findPlanLimit(planCode);
+  return planLimit?.memberLimit ?? null;
+}
+
+export class CapacityPolicy {
+  constructor(private storage: MemberCapacityPort) {}
+
+  async getPlanMemberLimit(
+    planCode: string | null | undefined,
+  ): Promise<number | null> {
+    return await getPlanMemberLimitFromStorage(planCode, this.storage);
+  }
+
+  async getWorkspaceMemberCapacity(
+    workspace: WorkspacePlanSummary,
+  ): Promise<WorkspaceMemberCapacity> {
+    const memberLimit = await this.getPlanMemberLimit(workspace.planCode);
+    const memberCount = await this.storage.countMembers(workspace.id);
+
+    return {
+      workspaceId: workspace.id,
+      planCode: workspace.planCode ?? null,
+      memberCount,
+      memberLimit,
+      hasLimit: memberLimit !== null,
+      hasAvailableMemberSlot: memberLimit === null || memberCount < memberLimit,
+      isOverLimit: memberLimit !== null && memberCount > memberLimit,
+    };
+  }
+
+  async assertCanAddMember(workspace: WorkspacePlanSummary): Promise<void> {
+    const capacity = await this.getWorkspaceMemberCapacity(workspace);
+
+    if (!capacity.hasAvailableMemberSlot) {
+      throw new ConflictError("WORKSPACE_MEMBER_LIMIT_REACHED");
+    }
+  }
+
+  async assertWorkspaceUsageAllowed(
+    workspace: WorkspacePlanSummary,
+  ): Promise<void> {
+    if (workspace.planCode !== "FREE") {
+      return;
+    }
+
+    const capacity = await this.getWorkspaceMemberCapacity(workspace);
+
+    if (capacity.isOverLimit) {
+      throw new ForbiddenError("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+    }
+  }
+}

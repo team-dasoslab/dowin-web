@@ -1,6 +1,7 @@
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import {
   assertFreePlanWithinMemberLimit,
+  assertWorkspaceHasMemberCapacity,
   getPlanMemberLimit,
 } from "@/domain/workspace/plan-limits";
 import {
@@ -426,15 +427,7 @@ export class WorkspaceService {
   }
 
   private async ensureWorkspaceHasMemberCapacity(workspace: Workspace) {
-    const memberLimit = await getPlanMemberLimit(workspace.planCode, this.storage);
-    if (memberLimit === null) {
-      return;
-    }
-
-    const memberCount = await this.storage.countMembers(workspace.id);
-    if (memberCount >= memberLimit) {
-      throw new ConflictError("WORKSPACE_MEMBER_LIMIT_REACHED");
-    }
+    await assertWorkspaceHasMemberCapacity(workspace, this.storage);
   }
 
   async getMembers(

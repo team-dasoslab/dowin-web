@@ -1,4 +1,7 @@
-import { ForbiddenError } from "@/lib/server/errors";
+import {
+  CapacityPolicy,
+  getPlanMemberLimitFromStorage,
+} from "@/domain/workspace/capacity-policy";
 
 type WorkspacePlanSummary = {
   id: number;
@@ -16,29 +19,19 @@ export async function getPlanMemberLimit(
   planCode: string | null | undefined,
   storage: Pick<MemberCountPort, "findPlanLimit">,
 ): Promise<number | null> {
-  if (planCode !== "FREE" && planCode !== "STANDARD") {
-    return null;
-  }
-
-  const planLimit = await storage.findPlanLimit(planCode);
-  return planLimit?.memberLimit ?? null;
+  return await getPlanMemberLimitFromStorage(planCode, storage);
 }
 
 export async function assertFreePlanWithinMemberLimit(
   workspace: WorkspacePlanSummary,
   storage: MemberCountPort,
 ) {
-  if (workspace.planCode !== "FREE") {
-    return;
-  }
+  await new CapacityPolicy(storage).assertWorkspaceUsageAllowed(workspace);
+}
 
-  const memberLimit = await getPlanMemberLimit(workspace.planCode, storage);
-  if (memberLimit === null) {
-    return;
-  }
-
-  const memberCount = await storage.countMembers(workspace.id);
-  if (memberCount > memberLimit) {
-    throw new ForbiddenError("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
-  }
+export async function assertWorkspaceHasMemberCapacity(
+  workspace: WorkspacePlanSummary,
+  storage: MemberCountPort,
+) {
+  await new CapacityPolicy(storage).assertCanAddMember(workspace);
 }
