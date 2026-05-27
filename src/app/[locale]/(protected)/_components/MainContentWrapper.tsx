@@ -20,9 +20,9 @@ export function MainContentWrapper({ children }: MainContentWrapperProps) {
     workspaceId ? `/${workspaceId}/dashboard` : "/dashboard",
     workspaceId ? `/${workspaceId}/dashboard/my` : "/dashboard/my",
     workspaceId ? `/${workspaceId}/report` : "/report",
-    "/setup",
+    workspaceId ? `/${workspaceId}/setup` : "/setup",
     workspaceId ? `/${workspaceId}/scoreboards` : "/scoreboards",
-    "/profile",
+    workspaceId ? `/${workspaceId}/profile` : "/profile",
   ];
 
   const isMainTab = mainTabPaths.includes(pathname);

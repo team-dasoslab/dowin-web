@@ -16,7 +16,9 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useLocale, useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
@@ -33,6 +35,7 @@ export function ProfileBillingPageClient() {
   const isNativeApp = useNativeApp();
   const locale = useLocale();
   const router = useRouter();
+  const workspaceId = useParams().workspaceId as string | undefined;
   const {
     data: billingResponse,
     error,
@@ -75,8 +78,8 @@ export function ProfileBillingPageClient() {
       return;
     }
 
-    router.replace("/pricing");
-  }, [billing, isNativeApp, router]);
+    router.replace(getWorkspacePath(workspaceId, "/pricing"));
+  }, [billing, isNativeApp, router, workspaceId]);
 
   if (isLoading) {
     return <ProfileBillingSkeleton />;
@@ -309,7 +312,7 @@ export function ProfileBillingPageClient() {
             {t("privacyLink")}
           </Link>
           <Link
-            href="/profile/contact"
+            href={getWorkspacePath(workspaceId, "/profile/contact")}
             className="transition-colors"
           >
             {t("contactLink")}
@@ -322,6 +325,7 @@ export function ProfileBillingPageClient() {
 
 function BillingUnavailableInAppState() {
   const t = useTranslations("ProfileBilling");
+  const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
@@ -334,7 +338,7 @@ function BillingUnavailableInAppState() {
               asChild
               className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
             >
-              <Link href="/profile">{t("appUnavailableAction")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
             </Button>
           }
           icon={

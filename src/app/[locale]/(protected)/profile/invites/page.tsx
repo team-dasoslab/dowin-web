@@ -20,9 +20,11 @@ import { useNativeApp } from "@/context/NativeAppContext";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { useMemo } from "react";
+import { useParams } from "next/navigation";
 
 import { useTranslations } from "next-intl";
 
@@ -383,6 +385,7 @@ function NoWorkspaceState() {
 
 function NoAccessState() {
   const t = useTranslations("ProfileInvites");
+  const workspaceId = useParams().workspaceId as string | undefined;
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
@@ -400,7 +403,7 @@ function NoAccessState() {
             asChild
             className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
           >
-            <Link href="/profile">{t("backToSettings")}</Link>
+            <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
           </Button>
         </Card>
       </div>

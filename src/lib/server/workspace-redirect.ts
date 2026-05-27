@@ -27,3 +27,17 @@ export async function redirectToDefaultWorkspace(userId: number, locale: string)
     redirect({ href: "/workspace/new", locale });
   }
 }
+
+export async function redirectToDefaultWorkspacePath(
+  userId: number,
+  locale: string,
+  path: string,
+) {
+  const defaultWorkspacePublicId = await getDefaultWorkspacePublicId(userId);
+  if (defaultWorkspacePublicId) {
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    redirect({ href: `/${defaultWorkspacePublicId}${normalizedPath}`, locale });
+  } else {
+    redirect({ href: "/workspace/new", locale });
+  }
+}

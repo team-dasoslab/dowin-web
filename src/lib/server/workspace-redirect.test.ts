@@ -68,6 +68,21 @@ describe("workspace redirect", () => {
     });
   });
 
+  it("기본 워크스페이스가 있으면 uid 기반 하위 경로로 보낸다", async () => {
+    mockFindUserWorkspace.mockResolvedValue({
+      id: 1,
+      uid: "ws_public",
+    });
+
+    const { redirectToDefaultWorkspacePath } = await import("./workspace-redirect");
+    await redirectToDefaultWorkspacePath(10, "ko", "/setup?mode=create");
+
+    expect(mockRedirect).toHaveBeenCalledWith({
+      href: "/ws_public/setup?mode=create",
+      locale: "ko",
+    });
+  });
+
   it("워크스페이스 uid가 없으면 숫자 id로 fallback하지 않는다", async () => {
     mockFindUserWorkspace.mockResolvedValue({
       id: 1,
