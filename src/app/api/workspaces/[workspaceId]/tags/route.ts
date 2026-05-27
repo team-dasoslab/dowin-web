@@ -29,7 +29,7 @@ export const GET = withErrorHandler(
       return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    const resolvedId = await service.resolveWorkspaceIdByUid(validatedParams.data.id);
+    const resolvedId = await service.resolveWorkspaceIdByUid(validatedParams.data.workspaceId);
     if (!resolvedId) {
       return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }
@@ -67,7 +67,7 @@ export const POST = withErrorHandler(
       return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    const resolvedId = await service.resolveWorkspaceIdByUid(validatedParams.data.id);
+    const resolvedId = await service.resolveWorkspaceIdByUid(validatedParams.data.workspaceId);
     if (!resolvedId) {
       return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }

@@ -39,7 +39,7 @@ export const DELETE = withErrorHandler(
     }
 
     const service = new WorkspaceService(new WorkspaceStorage(db));
-    const resolvedId = await service.resolveWorkspaceIdByUid(parsed.data.id);
+    const resolvedId = await service.resolveWorkspaceIdByUid(parsed.data.workspaceId);
     if (!resolvedId) {
       return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }
