@@ -72,7 +72,7 @@ export const productUpdates = [
     slug: "team-dashboard-memos",
     title: "팀 대시보드에서 회의 메모를 바로 남길 수 있어요",
     summary:
-      "가중목 회의 중 나온 메모나 확인할 일을 팀원별 주간 점수판 옆에 바로 적어두고 이어서 확인할 수 있습니다.",
+      "핵심 목표 회의 중 나온 메모나 확인할 일을 팀원별 주간 점수판 옆에 바로 적어두고 이어서 확인할 수 있습니다.",
     publishedAt: "2026.03.25",
     tag: "Dashboard",
     ctaLabel: "바로 써보기",

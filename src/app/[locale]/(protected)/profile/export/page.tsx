@@ -289,7 +289,7 @@ function NoScoreboardState() {
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
-          title="아직 가중목이 없어요"
+          title="아직 핵심 목표가 없어요"
           description={
             <>
               먼저 점수판을 만들고 선행지표를 기록하면
