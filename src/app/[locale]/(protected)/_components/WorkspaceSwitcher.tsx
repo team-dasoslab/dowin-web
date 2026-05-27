@@ -7,6 +7,8 @@ import { useGetWorkspaces, useGetWorkspacesMe, usePutWorkspacesCurrent } from "@
 import { Logo } from "@/components/ui/Logo";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useLocale } from "next-intl";
 
 interface WorkspaceSwitcherProps {
   isCollapsed: boolean;
@@ -17,13 +19,21 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const params = useParams();
+  const locale = useLocale();
+  const currentWorkspaceId = params.workspaceId as string | undefined;
+
   const { data: meResponse, isLoading: isMeLoading } = useGetWorkspacesMe();
   const { data: workspacesResponse } = useGetWorkspaces();
   const { mutate: switchWorkspace, isPending } = usePutWorkspacesCurrent({
     mutation: {
-      onSuccess: () => {
-        // Hard reload to ensure all states are reset for the new workspace context
-        window.location.reload();
+      onSuccess: (_, variables) => {
+        const newWorkspaceId = variables.data.workspaceId;
+        if (currentWorkspaceId) {
+          window.location.href = window.location.href.replace(`/${currentWorkspaceId}`, `/${newWorkspaceId}`);
+        } else {
+          window.location.href = `/${locale}/${newWorkspaceId}/dashboard/my`;
+        }
       },
     },
   });

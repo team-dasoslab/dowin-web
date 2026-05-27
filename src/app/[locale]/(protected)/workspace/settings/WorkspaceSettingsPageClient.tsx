@@ -19,6 +19,7 @@ import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 interface MenuItem {
@@ -39,6 +40,7 @@ export default function WorkspaceSettingsPage() {
   const isNativeApp = useNativeApp();
   const router = useRouter();
   const workspaceId = useParams().workspaceId as string | undefined;
+  const locale = useLocale();
   const { showToast } = useToast();
   
   const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
@@ -48,7 +50,14 @@ export default function WorkspaceSettingsPage() {
   const { data: allWorkspacesResponse } = useGetWorkspaces();
   const { mutate: switchWorkspace, isPending: isSwitching } = usePutWorkspacesCurrent({
     mutation: {
-      onSuccess: () => window.location.reload(),
+      onSuccess: (_, variables) => {
+        const newWorkspaceId = variables.data.workspaceId;
+        if (workspaceId) {
+          window.location.href = window.location.href.replace(`/${workspaceId}`, `/${newWorkspaceId}`);
+        } else {
+          window.location.href = `/${locale}/${newWorkspaceId}/dashboard/my`;
+        }
+      },
     },
   });
 
