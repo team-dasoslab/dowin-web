@@ -10,6 +10,7 @@ import { useRouter } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocale } from "next-intl";
 
 type WorkspaceCreateError = {
   data?: {
@@ -26,6 +27,7 @@ export const useCreateWorkspaceMutation = ({
 }: UseCreateWorkspaceMutationParams) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const locale = useLocale();
 
   const { mutate: createWorkspace, isPending } = usePostWorkspaces({
     mutation: {
@@ -51,9 +53,12 @@ export const useCreateWorkspaceMutation = ({
           workspace_id_hash: hashId(workspaceId),
         });
  
-        // Refresh server components to update layout state if needed
-        router.refresh();
-        router.push("/");
+        if (workspaceId) {
+          window.location.href = `/${locale}/${workspaceId}/dashboard/my`;
+        } else {
+          router.refresh();
+          router.push("/");
+        }
       },
       onError: (error: WorkspaceCreateError) => {
         onError(
