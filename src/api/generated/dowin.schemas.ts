@@ -1040,7 +1040,7 @@ export interface DashboardTeamMemoAuthor {
 
 export interface DashboardTeamMemo {
   id: number;
-  workspaceId: number;
+  workspaceId: string;
   targetUserId: number;
   author: DashboardTeamMemoAuthor;
   content: string;
@@ -1053,7 +1053,7 @@ export interface DashboardTeamMemo {
 }
 
 export interface DashboardTeamMemoListResponse {
-  workspaceId: number;
+  workspaceId: string;
   targetUserId: number;
   memos: DashboardTeamMemo[];
 }
@@ -1197,7 +1197,7 @@ export type GetAdminContactInquiriesParams = {
 status?: GetAdminContactInquiriesStatus;
 category?: GetAdminContactInquiriesCategory;
 userId?: number;
-workspaceId?: string;
+workspaceId?: number;
 };
 
 export type GetAdminContactInquiriesStatus = typeof GetAdminContactInquiriesStatus[keyof typeof GetAdminContactInquiriesStatus];
@@ -1219,7 +1219,7 @@ export const GetAdminContactInquiriesCategory = {
 } as const;
 
 export type GetAdminBillingWorkspacesParams = {
-workspaceId?: string;
+workspaceId?: number;
 workspaceName?: string;
 };
 
@@ -1246,7 +1246,7 @@ export type PostWorkspacesBody = {
 };
 
 export type PostWorkspacesJoinBody = {
-  workspaceId: number;
+  workspaceId: string;
 };
 
 export type PostWorkspacesJoin200 = {

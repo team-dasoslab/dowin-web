@@ -5,6 +5,7 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceMember = vi.fn();
+const mockResolveWorkspaceIdByUid = vi.fn();
 const mockUpdateTag = vi.fn();
 const mockDeleteTag = vi.fn();
 
@@ -38,6 +39,7 @@ vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
   WorkspaceService: vi.fn(function MockWorkspaceService() {
     return {
+      resolveWorkspaceIdByUid: mockResolveWorkspaceIdByUid,
       updateTag: mockUpdateTag,
       deleteTag: mockDeleteTag,
     };
@@ -49,6 +51,7 @@ describe("PUT /api/workspaces/[id]/tags/[tagId]", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveWorkspaceIdByUid.mockResolvedValue(1);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
@@ -117,6 +120,7 @@ describe("DELETE /api/workspaces/[id]/tags/[tagId]", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveWorkspaceIdByUid.mockResolvedValue(1);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {

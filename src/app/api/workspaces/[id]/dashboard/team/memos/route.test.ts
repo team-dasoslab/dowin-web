@@ -6,6 +6,7 @@ const mockGetSessionWithRefresh = vi.fn();
 const mockListTeamMemos = vi.fn();
 const mockCreateTeamMemo = vi.fn();
 const mockRequireWorkspaceAccess = vi.fn();
+const mockResolveIdByUid = vi.fn();
 
 vi.mock("@/lib/server/workspace-context", () => ({
   requireWorkspaceAccess: () => mockRequireWorkspaceAccess(),
@@ -33,7 +34,11 @@ vi.mock("@/domain/dashboard/services/team-memo.service", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
+    return {
+      resolveIdByUid: mockResolveIdByUid,
+    };
+  }),
 }));
 
 vi.mock("@/domain/dashboard/storage/team-memo.storage", () => ({
@@ -45,6 +50,7 @@ describe("GET/POST /api/workspaces/:workspaceId/dashboard/team/memos", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(7);
   });
 
   it("GET 요청에서 세션이 없으면 401을 반환한다", async () => {

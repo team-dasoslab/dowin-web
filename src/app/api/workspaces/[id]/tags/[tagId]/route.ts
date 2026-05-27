@@ -43,14 +43,19 @@ export const PUT = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceMember(db, parsedParams.data.id, session.userId);
+    const resolvedId = await service.resolveWorkspaceIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await requireWorkspaceMember(db, resolvedId, session.userId);
 
     const parsedBody = workspaceTagUpdateSchema.safeParse(await request.json());
     if (!parsedBody.success) {
       return await apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
     }
 
-    const tag = await service.updateTag(parsedParams.data.id, parsedParams.data.tagId, {
+    const tag = await service.updateTag(resolvedId, parsedParams.data.tagId, {
       name: parsedBody.data.name.trim(),
       normalizedName: normalizeWorkspaceTagName(parsedBody.data.name),
     });
@@ -88,8 +93,13 @@ export const DELETE = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceMember(db, parsedParams.data.id, session.userId);
-    await service.deleteTag(parsedParams.data.id, parsedParams.data.tagId);
+    const resolvedId = await service.resolveWorkspaceIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await requireWorkspaceMember(db, resolvedId, session.userId);
+    await service.deleteTag(resolvedId, parsedParams.data.tagId);
 
     return new NextResponse(null, { status: 204 });
   },

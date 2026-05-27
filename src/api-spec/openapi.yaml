@@ -310,7 +310,7 @@ paths:
         - name: workspaceId
           in: query
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: 운영자 문의 목록 조회 성공
@@ -406,7 +406,7 @@ paths:
         - name: workspaceId
           in: query
           schema:
-            type: string
+            type: integer
         - name: workspaceName
           in: query
           schema:
@@ -438,7 +438,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: 운영자 billing 워크스페이스 상세 조회 성공
@@ -469,7 +469,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
         required: true
         content:
@@ -883,7 +883,7 @@ paths:
               type: object
               required: [workspaceId]
               properties:
-                workspaceId: { type: integer, example: 1 }
+                workspaceId: { type: string }
       responses:
         "200":
           description: 참가 성공
@@ -955,7 +955,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "200":
           description: 조회 성공
@@ -981,7 +981,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "200":
           description: 조회 성공
@@ -1005,7 +1005,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1044,7 +1044,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: tagId
           in: path
           required: true
@@ -1090,7 +1090,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: tagId
           in: path
           required: true
@@ -1120,7 +1120,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "200":
           description: 조회 성공
@@ -1144,7 +1144,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1179,7 +1179,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: inviteId
           in: path
           required: true
@@ -1223,7 +1223,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1259,7 +1259,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "204":
           description: 삭제 성공
@@ -1285,7 +1285,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "204":
           description: 탈퇴 성공
@@ -1316,7 +1316,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1362,7 +1362,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: memberId
           in: path
           required: true
@@ -3182,7 +3182,7 @@ components:
         [id, workspaceId, targetUserId, author, content, isResolved, createdAt]
       properties:
         id: { type: integer }
-        workspaceId: { type: integer }
+        workspaceId: { type: string }
         targetUserId: { type: integer }
         author:
           $ref: "#/components/schemas/DashboardTeamMemoAuthor"
@@ -3203,7 +3203,7 @@ components:
       type: object
       required: [workspaceId, targetUserId, memos]
       properties:
-        workspaceId: { type: integer }
+        workspaceId: { type: string }
         targetUserId: { type: integer }
         memos:
           type: array

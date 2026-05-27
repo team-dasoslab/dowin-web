@@ -24,11 +24,12 @@ export const PATCH = withErrorHandler(
 
     const { id: workspaceId, memoId } = await contextParams.params;
     const memoIdValue = Number(memoId);
-    const activeWorkspaceId = Number(workspaceId);
     const parsed = dashboardTeamMemoResolveSchema.safeParse(await request.json());
+    const workspaceStorage = new WorkspaceStorage(db);
+    const activeWorkspaceId = await workspaceStorage.resolveIdByUid(workspaceId);
 
-    if (!activeWorkspaceId || isNaN(activeWorkspaceId)) {
-      return await apiError("VALIDATION_ERROR", { workspaceId: ["유효하지 않은 워크스페이스 ID입니다."] });
+    if (!activeWorkspaceId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }
 
     if (!Number.isInteger(memoIdValue) || memoIdValue <= 0) {
@@ -41,7 +42,6 @@ export const PATCH = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
-    const workspaceStorage = new WorkspaceStorage(db);
     const contextAccess = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
 
     const service = new TeamMemoService(workspaceStorage, new TeamMemoStorage(db));

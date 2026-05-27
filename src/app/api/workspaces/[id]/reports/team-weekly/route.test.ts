@@ -6,6 +6,7 @@ const mockGetSessionWithRefresh = vi.fn();
 const mockFindUserWorkspace = vi.fn();
 const mockFindMembership = vi.fn();
 const mockGetAccessContextData = vi.fn();
+const mockResolveIdByUid = vi.fn();
 const mockGetTeamWeeklyReport = vi.fn();
 // removed cookie mock
 
@@ -27,6 +28,7 @@ vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
       findUserWorkspace: mockFindUserWorkspace,
       findMembership: mockFindMembership,
       getAccessContextData: mockGetAccessContextData,
+      resolveIdByUid: mockResolveIdByUid,
     };
   }),
 }));
@@ -53,6 +55,7 @@ describe("GET /api/reports/team-weekly", () => {
     vi.resetModules();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(7);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
@@ -70,6 +73,7 @@ describe("GET /api/reports/team-weekly", () => {
 
   it("워크스페이스가 없으면 404를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
+    mockResolveIdByUid.mockResolvedValue(null);
     mockGetAccessContextData.mockResolvedValue(null);
 
     const { GET } = await import("./route");
@@ -85,7 +89,7 @@ describe("GET /api/reports/team-weekly", () => {
   it("워크스페이스 ADMIN이 아니면 403을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockGetAccessContextData.mockResolvedValue({
-      workspace: { id: 7, name: "팀", planCode: "FREE" },
+      workspace: { id: 7, uid: "ws_7", name: "팀", planCode: "FREE" },
       member: { id: 100, workspaceId: 7, userId: 1, role: "MEMBER" },
       billingState: null,
     });
@@ -117,7 +121,7 @@ describe("GET /api/reports/team-weekly", () => {
   it("워크스페이스 ADMIN이면 주간 리포트를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockGetAccessContextData.mockResolvedValue({
-      workspace: { id: 7, name: "팀", planCode: "FREE" },
+      workspace: { id: 7, uid: "ws_7", name: "팀", planCode: "FREE" },
       member: { id: 100, workspaceId: 7, userId: 1, role: "ADMIN" },
       billingState: null,
     });
@@ -140,7 +144,7 @@ describe("GET /api/reports/team-weekly", () => {
 
     expect(response.status).toBe(200);
     expect(mockGetTeamWeeklyReport).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: 1, id: 7 }),
+      expect.objectContaining({ userId: 1, workspaceId: 7 }),
       "2026-04-20",
       5,
     );

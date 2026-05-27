@@ -4,6 +4,7 @@ import { ConflictError } from "@/lib/server/errors";
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
+const mockResolveIdByUid = vi.fn();
 const mockLeaveWorkspace = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -19,7 +20,11 @@ vi.mock("@/lib/server/auth", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
+    return {
+      resolveIdByUid: mockResolveIdByUid,
+    };
+  }),
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
@@ -35,6 +40,7 @@ describe("DELETE /api/workspaces/:id/leave", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(1);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {

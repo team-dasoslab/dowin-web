@@ -41,7 +41,12 @@ export const DELETE = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await service.leaveWorkspace(parsedParams.data.id, session.userId);
+    const resolvedId = await storage.resolveIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await service.leaveWorkspace(resolvedId, session.userId);
 
     return new NextResponse(null, { status: 204 });
   },

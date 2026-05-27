@@ -41,7 +41,12 @@ export const PATCH = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
+    const resolvedId = await service.resolveWorkspaceIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await requireWorkspaceAdminInWorkspace(db, resolvedId, session.userId);
 
     const body = await request.json();
     const parsedBody = workspaceInviteStatusUpdateSchema.safeParse(body);
@@ -51,7 +56,7 @@ export const PATCH = withErrorHandler(
     }
 
     const invite = await service.updateInviteStatus(
-      parsedParams.data.id,
+      resolvedId,
       parsedParams.data.inviteId,
       parsedBody.data.status,
     );

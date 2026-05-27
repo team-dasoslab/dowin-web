@@ -38,13 +38,17 @@ export const DELETE = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
-    const workspaceId = parsed.data.id;
+    const service = new WorkspaceService(new WorkspaceStorage(db));
+    const resolvedId = await service.resolveWorkspaceIdByUid(parsed.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
     const memberId = parsed.data.memberId;
 
-    await requireWorkspaceAdminInWorkspace(db, workspaceId, session.userId);
+    await requireWorkspaceAdminInWorkspace(db, resolvedId, session.userId);
 
-    const service = new WorkspaceService(new WorkspaceStorage(db));
-    await service.removeMember(workspaceId, session.userId, memberId);
+    await service.removeMember(resolvedId, session.userId, memberId);
 
     return new NextResponse(null, { status: 204 });
   },

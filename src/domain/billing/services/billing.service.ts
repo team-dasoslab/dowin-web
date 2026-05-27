@@ -21,7 +21,7 @@ const BILLING_RISK_REVIEW_THRESHOLD = 2;
 const BILLING_RISK_LOOKBACK_DAYS = 30;
 
 export type BillingOverview = {
-  workspaceId: number;
+  workspaceId: string;
   workspaceName: string;
   planCode: "FREE" | "STANDARD";
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
@@ -64,6 +64,14 @@ function getBillingRiskLookbackStart(now: Date): Date {
   return lookback;
 }
 
+function getWorkspacePublicId(workspace: { id: number; uid: string | null }) {
+  if (!workspace.uid) {
+    throw new Error(`WORKSPACE_UID_MISSING:${workspace.id}`);
+  }
+
+  return workspace.uid;
+}
+
 export class BillingService {
   constructor(
     private workspaceStorage: WorkspacePort,
@@ -84,7 +92,7 @@ export class BillingService {
     const riskSummary = await this.getBillingRiskSummary(workspace.id);
 
     return {
-      workspaceId: workspace.id,
+      workspaceId: getWorkspacePublicId(workspace),
       workspaceName: workspace.name,
       planCode: billingState?.planCode ?? workspace.planCode,
       billingStatus: billingState?.billingStatus ?? "NONE",

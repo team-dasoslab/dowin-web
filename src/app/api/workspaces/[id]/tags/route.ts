@@ -29,9 +29,14 @@ export const GET = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceMember(db, parsedParams.data.id, session.userId);
+    const resolvedId = await service.resolveWorkspaceIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
 
-    const tags = await service.listTags(parsedParams.data.id);
+    await requireWorkspaceMember(db, resolvedId, session.userId);
+
+    const tags = await service.listTags(resolvedId);
     return apiSuccess(tags);
   },
 );
@@ -62,14 +67,19 @@ export const POST = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceMember(db, parsedParams.data.id, session.userId);
+    const resolvedId = await service.resolveWorkspaceIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await requireWorkspaceMember(db, resolvedId, session.userId);
 
     const parsedBody = workspaceTagCreateSchema.safeParse(await request.json());
     if (!parsedBody.success) {
       return await apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
     }
 
-    const tag = await service.createTag(parsedParams.data.id, session.userId, {
+    const tag = await service.createTag(resolvedId, session.userId, {
       name: parsedBody.data.name.trim(),
       normalizedName: normalizeWorkspaceTagName(parsedBody.data.name),
     });

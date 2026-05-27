@@ -64,6 +64,14 @@ export class WorkspaceStorage {
     );
   }
 
+  async resolveIdByUid(uid: string): Promise<number | null> {
+    const workspace = await this.db.query.workspaces.findFirst({
+      where: eq(workspaces.uid, uid),
+      columns: { id: true },
+    });
+    return workspace?.id ?? null;
+  }
+
   async findUserWorkspace(userId: number): Promise<Workspace | null> {
     const firstMembership = await this.db.query.workspaceMembers.findFirst({
       where: eq(workspaceMembers.userId, userId),

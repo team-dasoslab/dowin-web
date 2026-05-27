@@ -5,6 +5,7 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceAdminInWorkspace = vi.fn();
+const mockResolveIdByUid = vi.fn();
 const mockUpdateWorkspaceName = vi.fn();
 const mockDeleteWorkspace = vi.fn();
 
@@ -21,7 +22,11 @@ vi.mock("@/lib/server/auth", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
+    return {
+      resolveIdByUid: mockResolveIdByUid,
+    };
+  }),
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
@@ -42,6 +47,7 @@ describe("PUT /api/workspaces/[id]", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(1);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
@@ -119,6 +125,7 @@ describe("DELETE /api/workspaces/[id]", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(1);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {

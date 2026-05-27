@@ -49,7 +49,7 @@ describe("GET /api/workspaces/me", () => {
   it("워크스페이스 멤버 한도 상태를 포함해 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 7 });
     mockGetMyWorkspace.mockResolvedValue({
-      id: 3,
+      id: "ws_ops",
       name: "운영팀",
       planCode: "FREE",
       memberCount: 11,
@@ -65,7 +65,7 @@ describe("GET /api/workspaces/me", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual(
       expect.objectContaining({
-        id: 3,
+        id: "ws_ops",
         memberCount: 11,
         freeMemberLimit: 10,
         isOverFreeMemberLimit: true,

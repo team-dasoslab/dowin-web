@@ -1,4 +1,5 @@
 import { TeamMemoService } from "@/domain/dashboard/services/team-memo.service";
+import { WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("TeamMemoService", () => {
@@ -12,21 +13,31 @@ describe("TeamMemoService", () => {
   const deleteById = vi.fn();
 
   const service = new TeamMemoService(
-    { findMembership, countMembers, findPlanLimit } as any,
-    { listByWorkspaceAndTarget, create, findById, updateResolved, deleteById } as any,
+    { findMembership, countMembers, findPlanLimit },
+    { listByWorkspaceAndTarget, create, findById, updateResolved, deleteById },
   );
 
   beforeEach(() => {
     vi.clearAllMocks();
+    findMembership.mockResolvedValue({ userId: 12, role: "MEMBER" });
     countMembers.mockResolvedValue(1);
     findPlanLimit.mockResolvedValue({ memberLimit: 10 });
   });
 
   const mockContext = {
     workspaceId: 3,
+    workspacePublicId: "ws_3",
+    workspaceName: "팀",
     userId: 11,
     role: "MEMBER" as const,
-  };
+    membershipId: 100,
+    entitlement: {
+      canAccessStandardFeatures: false,
+      entitlementSource: null,
+      billingStatus: "NONE" as const,
+      planCode: "FREE" as const,
+    },
+  } satisfies WorkspaceAccessContext;
 
   it("대상 사용자 메모 목록을 반환한다", async () => {
     listByWorkspaceAndTarget.mockResolvedValue([
@@ -47,15 +58,15 @@ describe("TeamMemoService", () => {
       },
     ]);
 
-    const result = await service.listTeamMemos(mockContext as any, 12);
+    const result = await service.listTeamMemos(mockContext, 12);
 
     expect(result).toEqual({
-      workspaceId: 3,
+      workspaceId: "ws_3",
       targetUserId: 12,
       memos: [
         {
           id: 1,
-          workspaceId: 3,
+          workspaceId: "ws_3",
           targetUserId: 12,
           author: {
             userId: 11,
@@ -89,7 +100,7 @@ describe("TeamMemoService", () => {
       },
     });
 
-    const result = await service.createTeamMemo(mockContext as any, {
+    const result = await service.createTeamMemo(mockContext, {
       targetUserId: 12,
       content: "  다음 액션 정리 ",
     });
@@ -109,7 +120,11 @@ describe("TeamMemoService", () => {
   });
 
   it("작성자 또는 ADMIN은 메모 완료 상태를 변경할 수 있다", async () => {
-    const adminContext = { workspaceId: 3, userId: 1, role: "ADMIN" as const };
+    const adminContext = {
+      ...mockContext,
+      userId: 1,
+      role: "ADMIN" as const,
+    } satisfies WorkspaceAccessContext;
     findById.mockResolvedValue({
       id: 5,
       workspaceId: 3,
@@ -141,7 +156,7 @@ describe("TeamMemoService", () => {
       },
     });
 
-    const result = await service.resolveTeamMemo(adminContext as any, 5, true);
+    const result = await service.resolveTeamMemo(adminContext, 5, true);
 
     expect(updateResolved).toHaveBeenCalledWith({
       memoId: 5,
@@ -174,7 +189,7 @@ describe("TeamMemoService", () => {
       },
     });
 
-    await expect(service.resolveTeamMemo(mockContext as any, 5, true)).rejects.toThrow(
+    await expect(service.resolveTeamMemo(mockContext, 5, true)).rejects.toThrow(
       "FORBIDDEN",
     );
   });
@@ -197,13 +212,17 @@ describe("TeamMemoService", () => {
     });
     deleteById.mockResolvedValue(true);
 
-    await service.deleteTeamMemo(mockContext as any, 8);
+    await service.deleteTeamMemo(mockContext, 8);
 
     expect(deleteById).toHaveBeenCalledWith(8);
   });
 
   it("작성자가 아니면 ADMIN이어도 메모를 삭제할 수 없다", async () => {
-    const adminContext = { workspaceId: 3, userId: 1, role: "ADMIN" as const };
+    const adminContext = {
+      ...mockContext,
+      userId: 1,
+      role: "ADMIN" as const,
+    } satisfies WorkspaceAccessContext;
     findById.mockResolvedValue({
       id: 8,
       workspaceId: 3,
@@ -220,6 +239,6 @@ describe("TeamMemoService", () => {
       },
     });
 
-    await expect(service.deleteTeamMemo(adminContext as any, 8)).rejects.toThrow("FORBIDDEN");
+    await expect(service.deleteTeamMemo(adminContext, 8)).rejects.toThrow("FORBIDDEN");
   });
 });

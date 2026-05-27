@@ -8,6 +8,7 @@ describe("BillingService", () => {
       {
         findUserWorkspace: vi.fn().mockResolvedValue({
           id: 1,
+          uid: "ws_1",
           name: "Dowin",
           planCode: "FREE",
         }),
@@ -30,7 +31,7 @@ describe("BillingService", () => {
     );
 
     await expect(service.getMyBilling(7)).resolves.toEqual({
-      workspaceId: 1,
+      workspaceId: "ws_1",
       workspaceName: "Dowin",
       planCode: "FREE",
       billingStatus: "NONE",

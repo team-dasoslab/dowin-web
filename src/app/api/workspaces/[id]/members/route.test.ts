@@ -5,6 +5,7 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceAdminInWorkspace = vi.fn();
+const mockResolveIdByUid = vi.fn();
 const mockGetMembers = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -28,7 +29,11 @@ vi.mock("@/domain/workspace/services/workspace.service", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
+    return {
+      resolveIdByUid: mockResolveIdByUid,
+    };
+  }),
 }));
 
 vi.mock("@/lib/server/authz", () => ({
@@ -40,6 +45,7 @@ describe("GET /api/workspaces/:id/members", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(1);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {

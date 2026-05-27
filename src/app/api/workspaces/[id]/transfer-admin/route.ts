@@ -44,7 +44,12 @@ export const POST = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
+    const resolvedId = await storage.resolveIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await requireWorkspaceAdminInWorkspace(db, resolvedId, session.userId);
 
     const body = await request.json();
     const parsedBody = workspaceTransferAdminSchema.safeParse(body);
@@ -54,7 +59,7 @@ export const POST = withErrorHandler(
     }
 
     await service.transferAdmin(
-      parsedParams.data.id,
+      resolvedId,
       session.userId,
       parsedBody.data.memberId,
     );

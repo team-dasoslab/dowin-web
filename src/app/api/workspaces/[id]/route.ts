@@ -45,7 +45,12 @@ export const PUT = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
+    const resolvedId = await storage.resolveIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await requireWorkspaceAdminInWorkspace(db, resolvedId, session.userId);
 
     const body = await request.json();
     const parsedBody = workspaceUpdateSchema.safeParse(body);
@@ -55,7 +60,7 @@ export const PUT = withErrorHandler(
     }
 
     const workspace = await service.updateWorkspaceName(
-      parsedParams.data.id,
+      resolvedId,
       parsedBody.data.name,
     );
 
@@ -95,8 +100,13 @@ export const DELETE = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
     }
 
-    await requireWorkspaceAdminInWorkspace(db, parsedParams.data.id, session.userId);
-    await service.deleteWorkspace(parsedParams.data.id);
+    const resolvedId = await storage.resolveIdByUid(parsedParams.data.id);
+    if (!resolvedId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
+
+    await requireWorkspaceAdminInWorkspace(db, resolvedId, session.userId);
+    await service.deleteWorkspace(resolvedId);
 
     return new NextResponse(null, { status: 204 });
   },

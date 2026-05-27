@@ -48,9 +48,9 @@ export class TeamMemoService {
     );
 
     return {
-      workspaceId: context.workspaceId,
+      workspaceId: context.workspacePublicId,
       targetUserId,
-      memos: memos.map(toTeamMemoDto),
+      memos: memos.map((memo) => toTeamMemoDto(memo, context.workspacePublicId)),
     };
   }
 
@@ -68,7 +68,7 @@ export class TeamMemoService {
       content: input.content.trim(),
     });
 
-    return toTeamMemoDto(memo);
+    return toTeamMemoDto(memo, context.workspacePublicId);
   }
 
   async resolveTeamMemo(
@@ -96,7 +96,7 @@ export class TeamMemoService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return toTeamMemoDto(updated);
+    return toTeamMemoDto(updated, context.workspacePublicId);
   }
 
   async deleteTeamMemo(context: WorkspaceAccessContext, memoId: number) {
@@ -131,10 +131,10 @@ export class TeamMemoService {
   }
 }
 
-function toTeamMemoDto(memo: TeamMemoRecord) {
+function toTeamMemoDto(memo: TeamMemoRecord, workspacePublicId: string) {
   return {
     id: memo.id,
-    workspaceId: memo.workspaceId,
+    workspaceId: workspacePublicId,
     targetUserId: memo.targetUserId,
     author: {
       userId: memo.authorUser?.id ?? memo.authorUserId,
