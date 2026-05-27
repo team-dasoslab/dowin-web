@@ -45,7 +45,7 @@ export default function DashboardPage() {
     setSelectedDate,
     weekDates,
     weekLabel,
-  } = useTeamDashboard(Number(useParams().workspaceId));
+  } = useTeamDashboard(useParams().workspaceId as string);
   const { data: profileResponse } = useGetUsersMe();
   const [activeMemoState, setActiveMemoState] = useState<ActiveMemoState>(null);
   const myUserId =

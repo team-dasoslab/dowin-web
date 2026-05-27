@@ -312,7 +312,7 @@ export default function WorkspaceSettingsPage() {
                         </div>
                         {ws.id !== workspace?.id && (
                           <button
-                            onClick={() => switchWorkspace({ data: { workspaceId: ws.id ?? 0 } })}
+                            onClick={() => switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
                             disabled={isSwitching}
                             className="text-xs font-bold text-zinc-500 hover:text-zinc-800 transition-colors bg-zinc-100 px-3 py-1.5 rounded-button"
                           >

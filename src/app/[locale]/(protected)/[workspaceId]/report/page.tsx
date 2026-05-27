@@ -145,7 +145,7 @@ export default function ReportPage() {
   const params = useParams();
   const workspaceId = params.workspaceId as string;
   const { report, hasNoWorkspace, isError, isForbidden, isLoading, refetch } =
-    useTeamWeeklyReport(Number(workspaceId));
+    useTeamWeeklyReport(workspaceId);
   const hasTrackedViewRef = useRef(false);
 
   const [activeSection, setActiveSection] = useState("status");

@@ -30,7 +30,7 @@ const getWeekDatesFromStart = (weekStart?: string) => {
   });
 };
 
-export const useTeamDashboard = (workspaceId: number) => {
+export const useTeamDashboard = (workspaceId: string) => {
   const today = getTodayInKst();
   const [selectedDate, setSelectedDateState] = useState(today);
   const selectedWeekStart = getWeekDates(selectedDate)[0] ?? today;

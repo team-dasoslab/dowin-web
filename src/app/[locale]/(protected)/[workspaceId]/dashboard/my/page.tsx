@@ -33,7 +33,7 @@ export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
   const { showToast } = useToast();
   const params = useParams();
-  const workspaceId = Number(params.workspaceId);
+  const workspaceId = params.workspaceId as string;
   const {
     activeLeadMeasures,
     activeScoreboard,

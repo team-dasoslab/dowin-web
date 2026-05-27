@@ -24,7 +24,7 @@ import { getApiErrorStatus, toNumberId } from "@/lib/client/frontend-api";
 import { useQueries } from "@tanstack/react-query";
 
 type UseDashboardScoreboardQueriesParams = {
-  workspaceId: number;
+  workspaceId: string;
   currentWeekDates: string[];
   selectedMonthStart: string;
   selectedView: "week" | "month";

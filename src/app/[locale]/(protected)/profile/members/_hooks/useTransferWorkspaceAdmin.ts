@@ -15,7 +15,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseTransferWorkspaceAdminParams = {
-  workspaceId: number;
+  workspaceId: string;
 };
 
 export const useTransferWorkspaceAdmin = ({

@@ -44,13 +44,13 @@ export default function ProfileMembersPage() {
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
-  const workspaceId = workspace?.id ?? 0;
+  const workspaceId = workspace?.id ?? "";
   const isWorkspaceAdmin = user?.role === "ADMIN";
 
   const { data: membersResponse, isLoading: isMembersLoading } =
     useGetWorkspacesIdMembers(workspaceId, {
       query: {
-        enabled: workspaceId > 0 && isWorkspaceAdmin,
+        enabled: Boolean(workspaceId) && isWorkspaceAdmin,
         retry: false,
       },
     });

@@ -4,7 +4,7 @@ import { useGetWorkspacesWorkspaceIdReportsTeamWeekly } from "@/api/generated/re
 import { getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 
-export const useTeamWeeklyReport = (workspaceId: number) => {
+export const useTeamWeeklyReport = (workspaceId: string) => {
   const currentWeekDates = getWeekDates();
   const weekStart = currentWeekDates[0];
   const { data, isError, isLoading, error, refetch } = useGetWorkspacesWorkspaceIdReportsTeamWeekly(

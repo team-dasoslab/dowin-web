@@ -75,18 +75,18 @@ export const useScoreboardSetup = () => {
     });
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
-  const workspaceId = toNumberId(workspace?.id);
+  const workspaceId = workspace?.id ?? "";
   const { data: workspaceTagsResponse, isLoading: isWorkspaceTagsLoading } =
-    useGetWorkspacesIdTags(workspaceId ?? 0, {
+    useGetWorkspacesIdTags(workspaceId, {
       query: {
-        enabled: workspaceId !== null,
+        enabled: Boolean(workspaceId),
         retry: false,
       },
     });
   const availableTags: SetupTag[] =
     workspaceTagsResponse?.status === 200 ? workspaceTagsResponse.data : [];
   const workspaceTagsQueryKey =
-    workspaceId !== null ? getGetWorkspacesIdTagsQueryKey(workspaceId) : null;
+    workspaceId ? getGetWorkspacesIdTagsQueryKey(workspaceId) : null;
 
   const {
     data: activeScoreboardResponse,
@@ -356,7 +356,7 @@ export const useScoreboardSetup = () => {
       return true;
     }
 
-    if (workspaceId === null) {
+    if (!workspaceId) {
       showToast("error", t("workspaceInfoNotFound"));
       return false;
     }
@@ -458,7 +458,7 @@ export const useScoreboardSetup = () => {
       return false;
     }
 
-    if (workspaceId === null) {
+    if (!workspaceId) {
       showToast("error", t("workspaceInfoNotFound"));
       return false;
     }
@@ -529,7 +529,7 @@ export const useScoreboardSetup = () => {
   };
 
   const deleteTag = async (tagId: number) => {
-    if (workspaceId === null) {
+    if (!workspaceId) {
       showToast("error", t("workspaceInfoNotFound"));
       return false;
     }
@@ -677,8 +677,7 @@ export const useScoreboardSetup = () => {
         await invalidateScoreboardQueries(createdScoreboardId);
         trackEvent("scoreboard_created", {
           lead_measure_count: validMeasures.length,
-          scoreboard_id_hash: hashId(createdScoreboardId),
-          workspace_id_hash: hashId(workspaceId),
+          workspace_id_hash: workspaceId,
         });
 
         validMeasures.forEach((measure, index) => {
