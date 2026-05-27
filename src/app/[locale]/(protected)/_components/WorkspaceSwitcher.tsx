@@ -66,7 +66,7 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
           isCollapsed ? "justify-center gap-0 px-0" : "justify-between gap-3 lg:px-4",
         )}
       >
-        <div className="flex items-center gap-3 overflow-hidden">
+        <div className={cn("flex items-center overflow-hidden", isCollapsed ? "gap-0" : "gap-3")}>
           <Logo size="20px" className="text-primary shrink-0" />
           <span
             className={cn(
