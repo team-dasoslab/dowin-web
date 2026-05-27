@@ -139,6 +139,44 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /auth/signup/complete:
+    post:
+      summary: Basic seat 결제 검증 후 회원가입 완료
+      tags: [Auth, Billing]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SignupCompleteRequest" }
+      responses:
+        "201":
+          description: 결제 검증 및 회원가입 완료
+          headers:
+            Set-Cookie:
+              schema:
+                {
+                  type: string,
+                  example: "dowin_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000",
+                }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SignupCompleteResponse" }
+        "404":
+          description: 가입 intent를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 결제가 아직 완료되지 않았거나 이미 가입 완료된 intent
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /auth/logout:
     post:
       summary: 로그아웃
@@ -2435,6 +2473,33 @@ components:
           format: uri
           description: Polar Basic seat checkout URL
 
+    SignupCompleteRequest:
+      type: object
+      required: [signupIntentId, checkoutId]
+      properties:
+        signupIntentId:
+          type: string
+          minLength: 1
+          description: /auth/signup/checkout 응답으로 받은 pending signup intent ID
+        checkoutId:
+          type: string
+          minLength: 1
+          description: Polar checkout 성공 callback에서 전달된 checkout ID
+
+    SignupCompleteResponse:
+      type: object
+      required: [user, recoveryCodes]
+      properties:
+        user: { $ref: "#/components/schemas/User" }
+        recoveryCodes:
+          type: array
+          description: 가입 직후 1회 노출되는 복원 코드 목록
+          minItems: 8
+          maxItems: 8
+          items:
+            type: string
+            example: 6JYSB959TK
+
     RecoveryAccount:
       type: object
       required: [customId, nickname]
@@ -2518,7 +2583,7 @@ components:
         workspaceName: { type: string }
         planCode:
           type: string
-          enum: [FREE, STANDARD]
+          enum: [BASIC, FREE, STANDARD]
         billingStatus:
           type: string
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
@@ -2618,7 +2683,7 @@ components:
       properties:
         planCode:
           type: string
-          enum: [FREE, STANDARD]
+          enum: [BASIC, FREE, STANDARD]
         billingStatus:
           type: string
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
@@ -2863,7 +2928,7 @@ components:
         name: { type: string }
         planCode:
           type: string
-          enum: [FREE, STANDARD]
+          enum: [BASIC, FREE, STANDARD]
         memberCount:
           type: integer
           minimum: 0
@@ -2882,7 +2947,7 @@ components:
         name: { type: string }
         planCode:
           type: string
-          enum: [FREE, STANDARD]
+          enum: [BASIC, FREE, STANDARD]
         role:
           type: string
           enum: [ADMIN, MEMBER]
@@ -2917,7 +2982,7 @@ components:
         workspaceName: { type: string }
         planCode:
           type: string
-          enum: [FREE, STANDARD]
+          enum: [BASIC, FREE, STANDARD]
         billingStatus:
           type: string
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]

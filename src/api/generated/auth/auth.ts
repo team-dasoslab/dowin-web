@@ -29,6 +29,8 @@ import type {
   PutAuthPasswordByRecoveryCodeBody,
   SignupCheckoutRequest,
   SignupCheckoutResponse,
+  SignupCompleteRequest,
+  SignupCompleteResponse,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
 
@@ -74,15 +76,15 @@ export type postAuthLoginResponse = (postAuthLoginResponseSuccess | postAuthLogi
 export const getPostAuthLoginUrl = () => {
 
 
-  
+
 
   return `/api/auth/login`
 }
 
 export const postAuthLogin = async (postAuthLoginBody: PostAuthLoginBody, options?: RequestInit): Promise<postAuthLoginResponse> => {
-  
+
   return customInstance<postAuthLoginResponse>(getPostAuthLoginUrl(),
-  {      
+  {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -90,7 +92,7 @@ export const postAuthLogin = async (postAuthLoginBody: PostAuthLoginBody, option
       postAuthLoginBody,)
   }
 );}
-  
+
 
 
 
@@ -105,7 +107,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthLogin>>, {data: PostAuthLoginBody}> = (props) => {
@@ -116,7 +118,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -168,15 +170,15 @@ export type postAuthSignupResponse = (postAuthSignupResponseSuccess | postAuthSi
 export const getPostAuthSignupUrl = () => {
 
 
-  
+
 
   return `/api/auth/signup`
 }
 
 export const postAuthSignup = async (postAuthSignupBody: PostAuthSignupBody, options?: RequestInit): Promise<postAuthSignupResponse> => {
-  
+
   return customInstance<postAuthSignupResponse>(getPostAuthSignupUrl(),
-  {      
+  {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -184,7 +186,7 @@ export const postAuthSignup = async (postAuthSignupBody: PostAuthSignupBody, opt
       postAuthSignupBody,)
   }
 );}
-  
+
 
 
 
@@ -199,7 +201,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthSignup>>, {data: PostAuthSignupBody}> = (props) => {
@@ -210,7 +212,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -262,15 +264,15 @@ export type postAuthSignupCheckoutResponse = (postAuthSignupCheckoutResponseSucc
 export const getPostAuthSignupCheckoutUrl = () => {
 
 
-  
+
 
   return `/api/auth/signup/checkout`
 }
 
 export const postAuthSignupCheckout = async (signupCheckoutRequest: SignupCheckoutRequest, options?: RequestInit): Promise<postAuthSignupCheckoutResponse> => {
-  
+
   return customInstance<postAuthSignupCheckoutResponse>(getPostAuthSignupCheckoutUrl(),
-  {      
+  {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -278,7 +280,7 @@ export const postAuthSignupCheckout = async (signupCheckoutRequest: SignupChecko
       signupCheckoutRequest,)
   }
 );}
-  
+
 
 
 
@@ -293,7 +295,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthSignupCheckout>>, {data: SignupCheckoutRequest}> = (props) => {
@@ -304,7 +306,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -325,6 +327,105 @@ export const usePostAuthSignupCheckout = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPostAuthSignupCheckoutMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Basic seat 결제 검증 후 회원가입 완료
+ */
+export type postAuthSignupCompleteResponse201 = {
+  data: SignupCompleteResponse
+  status: 201
+}
+
+export type postAuthSignupCompleteResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postAuthSignupCompleteResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postAuthSignupCompleteResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postAuthSignupCompleteResponseSuccess = (postAuthSignupCompleteResponse201) & {
+  headers: Headers;
+};
+export type postAuthSignupCompleteResponseError = (postAuthSignupCompleteResponse404 | postAuthSignupCompleteResponse409 | postAuthSignupCompleteResponse422) & {
+  headers: Headers;
+};
+
+export type postAuthSignupCompleteResponse = (postAuthSignupCompleteResponseSuccess | postAuthSignupCompleteResponseError)
+
+export const getPostAuthSignupCompleteUrl = () => {
+
+
+
+
+  return `/api/auth/signup/complete`
+}
+
+export const postAuthSignupComplete = async (signupCompleteRequest: SignupCompleteRequest, options?: RequestInit): Promise<postAuthSignupCompleteResponse> => {
+
+  return customInstance<postAuthSignupCompleteResponse>(getPostAuthSignupCompleteUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      signupCompleteRequest,)
+  }
+);}
+
+
+
+
+export const getPostAuthSignupCompleteMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignupComplete>>, TError,{data: SignupCompleteRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAuthSignupComplete>>, TError,{data: SignupCompleteRequest}, TContext> => {
+
+const mutationKey = ['postAuthSignupComplete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthSignupComplete>>, {data: SignupCompleteRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postAuthSignupComplete(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAuthSignupCompleteMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthSignupComplete>>>
+    export type PostAuthSignupCompleteMutationBody = SignupCompleteRequest
+    export type PostAuthSignupCompleteMutationError = ErrorResponse
+
+    /**
+ * @summary Basic seat 결제 검증 후 회원가입 완료
+ */
+export const usePostAuthSignupComplete = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignupComplete>>, TError,{data: SignupCompleteRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAuthSignupComplete>>,
+        TError,
+        {data: SignupCompleteRequest},
+        TContext
+      > => {
+      return useMutation(getPostAuthSignupCompleteMutationOptions(options), queryClient);
     }
     /**
  * @summary 로그아웃
@@ -351,22 +452,22 @@ export type postAuthLogoutResponse = (postAuthLogoutResponseSuccess | postAuthLo
 export const getPostAuthLogoutUrl = () => {
 
 
-  
+
 
   return `/api/auth/logout`
 }
 
 export const postAuthLogout = async ( options?: RequestInit): Promise<postAuthLogoutResponse> => {
-  
+
   return customInstance<postAuthLogoutResponse>(getPostAuthLogoutUrl(),
-  {      
+  {
     ...options,
     method: 'POST'
-    
-    
+
+
   }
 );}
-  
+
 
 
 
@@ -381,24 +482,24 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthLogout>>, void> = () => {
-          
+
 
           return  postAuthLogout(requestOptions)
         }
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type PostAuthLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthLogout>>>
-    
+
     export type PostAuthLogoutMutationError = UnauthorizedErrorResponse
 
     /**
@@ -449,15 +550,15 @@ export type putAuthPasswordResponse = (putAuthPasswordResponseSuccess | putAuthP
 export const getPutAuthPasswordUrl = () => {
 
 
-  
+
 
   return `/api/auth/password`
 }
 
 export const putAuthPassword = async (putAuthPasswordBody: PutAuthPasswordBody, options?: RequestInit): Promise<putAuthPasswordResponse> => {
-  
+
   return customInstance<putAuthPasswordResponse>(getPutAuthPasswordUrl(),
-  {      
+  {
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -465,7 +566,7 @@ export const putAuthPassword = async (putAuthPasswordBody: PutAuthPasswordBody, 
       putAuthPasswordBody,)
   }
 );}
-  
+
 
 
 
@@ -480,7 +581,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof putAuthPassword>>, {data: PutAuthPasswordBody}> = (props) => {
@@ -491,7 +592,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -543,15 +644,15 @@ export type postAuthRecoveryCodesVerifyResponse = (postAuthRecoveryCodesVerifyRe
 export const getPostAuthRecoveryCodesVerifyUrl = () => {
 
 
-  
+
 
   return `/api/auth/recovery-codes/verify`
 }
 
 export const postAuthRecoveryCodesVerify = async (postAuthRecoveryCodesVerifyBody: PostAuthRecoveryCodesVerifyBody, options?: RequestInit): Promise<postAuthRecoveryCodesVerifyResponse> => {
-  
+
   return customInstance<postAuthRecoveryCodesVerifyResponse>(getPostAuthRecoveryCodesVerifyUrl(),
-  {      
+  {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -559,7 +660,7 @@ export const postAuthRecoveryCodesVerify = async (postAuthRecoveryCodesVerifyBod
       postAuthRecoveryCodesVerifyBody,)
   }
 );}
-  
+
 
 
 
@@ -574,7 +675,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthRecoveryCodesVerify>>, {data: PostAuthRecoveryCodesVerifyBody}> = (props) => {
@@ -585,7 +686,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -637,15 +738,15 @@ export type putAuthPasswordByRecoveryCodeResponse = (putAuthPasswordByRecoveryCo
 export const getPutAuthPasswordByRecoveryCodeUrl = () => {
 
 
-  
+
 
   return `/api/auth/password/by-recovery-code`
 }
 
 export const putAuthPasswordByRecoveryCode = async (putAuthPasswordByRecoveryCodeBody: PutAuthPasswordByRecoveryCodeBody, options?: RequestInit): Promise<putAuthPasswordByRecoveryCodeResponse> => {
-  
+
   return customInstance<putAuthPasswordByRecoveryCodeResponse>(getPutAuthPasswordByRecoveryCodeUrl(),
-  {      
+  {
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -653,7 +754,7 @@ export const putAuthPasswordByRecoveryCode = async (putAuthPasswordByRecoveryCod
       putAuthPasswordByRecoveryCodeBody,)
   }
 );}
-  
+
 
 
 
@@ -668,7 +769,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof putAuthPasswordByRecoveryCode>>, {data: PutAuthPasswordByRecoveryCodeBody}> = (props) => {
@@ -679,7 +780,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -701,4 +802,3 @@ export const usePutAuthPasswordByRecoveryCode = <TError = ErrorResponse,
       > => {
       return useMutation(getPutAuthPasswordByRecoveryCodeMutationOptions(options), queryClient);
     }
-    

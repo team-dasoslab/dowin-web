@@ -52,6 +52,29 @@ export interface SignupCheckoutResponse {
   checkoutUrl: string;
 }
 
+export interface SignupCompleteRequest {
+  /**
+   * /auth/signup/checkout 응답으로 받은 pending signup intent ID
+   * @minLength 1
+   */
+  signupIntentId: string;
+  /**
+   * Polar checkout 성공 callback에서 전달된 checkout ID
+   * @minLength 1
+   */
+  checkoutId: string;
+}
+
+export interface SignupCompleteResponse {
+  user: User;
+  /**
+   * 가입 직후 1회 노출되는 복원 코드 목록
+   * @minItems 8
+   * @maxItems 8
+   */
+  recoveryCodes: string[];
+}
+
 export interface RecoveryAccount {
   customId: string;
   nickname: string;
@@ -127,6 +150,7 @@ export type AdminBillingWorkspaceSummaryPlanCode = typeof AdminBillingWorkspaceS
 
 
 export const AdminBillingWorkspaceSummaryPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -247,6 +271,7 @@ export type AdminBillingManualOverrideRequestPlanCode = typeof AdminBillingManua
 
 
 export const AdminBillingManualOverrideRequestPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -534,6 +559,7 @@ export type WorkspacePlanCode = typeof WorkspacePlanCode[keyof typeof WorkspaceP
 
 
 export const WorkspacePlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -554,6 +580,7 @@ export type WorkspaceListItemPlanCode = typeof WorkspaceListItemPlanCode[keyof t
 
 
 export const WorkspaceListItemPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -583,6 +610,7 @@ export type BillingOverviewPlanCode = typeof BillingOverviewPlanCode[keyof typeo
 
 
 export const BillingOverviewPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
