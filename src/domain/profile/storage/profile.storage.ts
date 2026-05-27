@@ -1,6 +1,6 @@
-import { getDb } from "@/db";
 import { users, workspaceMembers, workspaces } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getDb } from "@/db";
+import { and, eq } from "drizzle-orm";
 
 export type ProfileRecord = {
   id: number;
@@ -65,9 +65,7 @@ export class ProfileStorage {
       return null;
     }
 
-    const membership = await this.db.query.workspaceMembers.findFirst({
-      where: eq(workspaceMembers.userId, userId),
-    });
+    const membership = await this.findCurrentMembershipByUserId(userId);
 
     return {
       id: user.id,
@@ -97,24 +95,39 @@ export class ProfileStorage {
   private async findProfileRowByUserId(
     userId: number,
   ): Promise<ProfileRecord | null> {
-    const [profile] = await this.db
-      .select({
-        id: users.id,
-        customId: users.customId,
-        nickname: users.nickname,
-        avatarKey: users.avatarKey,
-        locale: users.locale,
-        role: workspaceMembers.role,
-        workspaceId: workspaceMembers.workspaceId,
-        workspaceName: workspaces.name,
-        createdAt: users.createdAt,
-      })
-      .from(users)
-      .leftJoin(workspaceMembers, eq(workspaceMembers.userId, users.id))
-      .leftJoin(workspaces, eq(workspaces.id, workspaceMembers.workspaceId))
-      .where(eq(users.id, userId))
-      .limit(1);
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+    if (!user) {
+      return null;
+    }
 
-    return profile ?? null;
+    const membership = await this.findCurrentMembershipByUserId(userId);
+    const workspace = membership
+      ? await this.db.query.workspaces.findFirst({
+          where: eq(workspaces.id, membership.workspaceId),
+        })
+      : null;
+
+    return {
+      id: user.id,
+      customId: user.customId,
+      nickname: user.nickname,
+      avatarKey: user.avatarKey,
+      locale: user.locale,
+      role: membership?.role ?? null,
+      workspaceId: membership?.workspaceId ?? null,
+      workspaceName: workspace?.name ?? null,
+      createdAt: user.createdAt,
+    };
+  }
+
+  private async findCurrentMembershipByUserId(userId: number) {
+    return (
+      (await this.db.query.workspaceMembers.findFirst({
+        where: eq(workspaceMembers.userId, userId),
+        orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
+      })) ?? null
+    );
   }
 }

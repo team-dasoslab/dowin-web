@@ -1,8 +1,7 @@
 "use client";
 
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+
 import { getGetUsersMeQueryKey } from "@/api/generated/profile/profile";
-import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import {
   getGetWorkspacesMeQueryKey,
   usePostWorkspacesJoinByInvite,
@@ -38,10 +37,10 @@ export const useJoinWorkspaceMutation = ({
             queryKey: getGetWorkspacesMeQueryKey(),
           }),
           queryClient.invalidateQueries({
-            queryKey: getGetScoreboardsActiveQueryKey(),
+            queryKey: ['workspaces'],
           }),
           queryClient.invalidateQueries({
-            queryKey: getGetDashboardTeamQueryKey(undefined),
+            predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
           }),
         ]);
  
@@ -53,7 +52,7 @@ export const useJoinWorkspaceMutation = ({
  
         // Refresh server components to update layout state if needed
         router.refresh();
-        router.push("/dashboard/my");
+        router.push("/");
       },
       onError: (error) => {
         const message = getApiErrorMessage(error, t("joinFailed"));

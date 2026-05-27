@@ -180,10 +180,24 @@ export class NotificationStorage {
     return record;
   }
 
-  async findMembershipForUser(userId: number) {
+  async findMembershipForUser(userId: number, workspaceId?: number) {
+    const membership = workspaceId
+      ? await this.db.query.workspaceMembers.findFirst({
+          where: and(
+            eq(workspaceMembers.userId, userId),
+            eq(workspaceMembers.workspaceId, workspaceId),
+          ),
+        })
+      : null;
+
+    if (membership) {
+      return membership;
+    }
+
     return (
       (await this.db.query.workspaceMembers.findFirst({
         where: eq(workspaceMembers.userId, userId),
+        orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
       })) ?? null
     );
   }

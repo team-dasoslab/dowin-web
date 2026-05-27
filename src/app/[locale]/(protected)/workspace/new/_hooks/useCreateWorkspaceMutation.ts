@@ -1,8 +1,7 @@
 "use client";
 
-import { getGetDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
+
 import { getGetUsersMeQueryKey } from "@/api/generated/profile/profile";
-import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import {
   getGetWorkspacesMeQueryKey,
   usePostWorkspaces,
@@ -11,6 +10,7 @@ import { useRouter } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocale } from "next-intl";
 
 type WorkspaceCreateError = {
   data?: {
@@ -27,6 +27,7 @@ export const useCreateWorkspaceMutation = ({
 }: UseCreateWorkspaceMutationParams) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const locale = useLocale();
 
   const { mutate: createWorkspace, isPending } = usePostWorkspaces({
     mutation: {
@@ -39,10 +40,10 @@ export const useCreateWorkspaceMutation = ({
             queryKey: getGetWorkspacesMeQueryKey(),
           }),
           queryClient.invalidateQueries({
-            queryKey: getGetScoreboardsActiveQueryKey(),
+            queryKey: ['workspaces'],
           }),
           queryClient.invalidateQueries({
-            queryKey: getGetDashboardTeamQueryKey(undefined),
+            predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
           }),
         ]);
  
@@ -52,9 +53,12 @@ export const useCreateWorkspaceMutation = ({
           workspace_id_hash: hashId(workspaceId),
         });
  
-        // Refresh server components to update layout state if needed
-        router.refresh();
-        router.push("/dashboard/my");
+        if (workspaceId) {
+          window.location.href = `/${locale}/${workspaceId}/dashboard/my`;
+        } else {
+          router.refresh();
+          router.push("/");
+        }
       },
       onError: (error: WorkspaceCreateError) => {
         onError(

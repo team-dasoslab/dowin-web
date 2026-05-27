@@ -34,10 +34,12 @@ import type {
   PutWorkspacesIdBody,
   UnauthorizedErrorResponse,
   Workspace,
+  WorkspaceCurrentUpdateRequest,
   WorkspaceInvite,
   WorkspaceInviteCreateRequest,
   WorkspaceInviteStatusUpdateRequest,
   WorkspaceJoinByInviteRequest,
+  WorkspaceListItem,
   WorkspaceMember,
   WorkspaceTag,
   WorkspaceTagCreateRequest,
@@ -53,43 +55,38 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary 내 워크스페이스 정보 조회
+ * @summary 내 워크스페이스 목록 조회
  */
-export type getWorkspacesMeResponse200 = {
-  data: Workspace
+export type getWorkspacesResponse200 = {
+  data: WorkspaceListItem[]
   status: 200
 }
 
-export type getWorkspacesMeResponse401 = {
+export type getWorkspacesResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getWorkspacesMeResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getWorkspacesMeResponseSuccess = (getWorkspacesMeResponse200) & {
+export type getWorkspacesResponseSuccess = (getWorkspacesResponse200) & {
   headers: Headers;
 };
-export type getWorkspacesMeResponseError = (getWorkspacesMeResponse401 | getWorkspacesMeResponse404) & {
+export type getWorkspacesResponseError = (getWorkspacesResponse401) & {
   headers: Headers;
 };
 
-export type getWorkspacesMeResponse = (getWorkspacesMeResponseSuccess | getWorkspacesMeResponseError)
+export type getWorkspacesResponse = (getWorkspacesResponseSuccess | getWorkspacesResponseError)
 
-export const getGetWorkspacesMeUrl = () => {
+export const getGetWorkspacesUrl = () => {
 
 
   
 
-  return `/api/workspaces/me`
+  return `/api/workspaces`
 }
 
-export const getWorkspacesMe = async ( options?: RequestInit): Promise<getWorkspacesMeResponse> => {
+export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspacesResponse> => {
   
-  return customInstance<getWorkspacesMeResponse>(getGetWorkspacesMeUrl(),
+  return customInstance<getWorkspacesResponse>(getGetWorkspacesUrl(),
   {      
     ...options,
     method: 'GET'
@@ -102,69 +99,69 @@ export const getWorkspacesMe = async ( options?: RequestInit): Promise<getWorksp
 
 
 
-export const getGetWorkspacesMeQueryKey = () => {
+export const getGetWorkspacesQueryKey = () => {
     return [
-    `/api/workspaces/me`
+    `/api/workspaces`
     ] as const;
     }
 
     
-export const getGetWorkspacesMeQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = UnauthorizedErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesMeQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesMe>>> = ({ signal }) => getWorkspacesMe({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaces>>> = ({ signal }) => getWorkspaces({ signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetWorkspacesMeQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesMe>>>
-export type GetWorkspacesMeQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspaces>>>
+export type GetWorkspacesQueryError = UnauthorizedErrorResponse
 
 
-export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>> & Pick<
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = UnauthorizedErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWorkspacesMe>>,
+          Awaited<ReturnType<typeof getWorkspaces>>,
           TError,
-          Awaited<ReturnType<typeof getWorkspacesMe>>
+          Awaited<ReturnType<typeof getWorkspaces>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>> & Pick<
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = UnauthorizedErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getWorkspacesMe>>,
+          Awaited<ReturnType<typeof getWorkspaces>>,
           TError,
-          Awaited<ReturnType<typeof getWorkspacesMe>>
+          Awaited<ReturnType<typeof getWorkspaces>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = UnauthorizedErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary 내 워크스페이스 정보 조회
+ * @summary 내 워크스페이스 목록 조회
  */
 
-export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = UnauthorizedErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetWorkspacesMeQueryOptions(options)
+  const queryOptions = getGetWorkspacesQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -267,6 +264,227 @@ export const usePostWorkspaces = <TError = UnauthorizedErrorResponse | ErrorResp
         TContext
       > => {
       return useMutation(getPostWorkspacesMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 현재 active 워크스페이스 정보 조회
+ */
+export type getWorkspacesMeResponse200 = {
+  data: Workspace
+  status: 200
+}
+
+export type getWorkspacesMeResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type getWorkspacesMeResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getWorkspacesMeResponseSuccess = (getWorkspacesMeResponse200) & {
+  headers: Headers;
+};
+export type getWorkspacesMeResponseError = (getWorkspacesMeResponse401 | getWorkspacesMeResponse404) & {
+  headers: Headers;
+};
+
+export type getWorkspacesMeResponse = (getWorkspacesMeResponseSuccess | getWorkspacesMeResponseError)
+
+export const getGetWorkspacesMeUrl = () => {
+
+
+  
+
+  return `/api/workspaces/me`
+}
+
+export const getWorkspacesMe = async ( options?: RequestInit): Promise<getWorkspacesMeResponse> => {
+  
+  return customInstance<getWorkspacesMeResponse>(getGetWorkspacesMeUrl(),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
+
+
+
+
+export const getGetWorkspacesMeQueryKey = () => {
+    return [
+    `/api/workspaces/me`
+    ] as const;
+    }
+
+    
+export const getGetWorkspacesMeQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesMeQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesMe>>> = ({ signal }) => getWorkspacesMe({ signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetWorkspacesMeQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesMe>>>
+export type GetWorkspacesMeQueryError = UnauthorizedErrorResponse | ErrorResponse
+
+
+export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesMe>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesMe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesMe>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesMe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 현재 active 워크스페이스 정보 조회
+ */
+
+export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetWorkspacesMeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * @summary 현재 active 워크스페이스 전환
+ */
+export type putWorkspacesCurrentResponse200 = {
+  data: WorkspaceListItem
+  status: 200
+}
+
+export type putWorkspacesCurrentResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type putWorkspacesCurrentResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putWorkspacesCurrentResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type putWorkspacesCurrentResponseSuccess = (putWorkspacesCurrentResponse200) & {
+  headers: Headers;
+};
+export type putWorkspacesCurrentResponseError = (putWorkspacesCurrentResponse401 | putWorkspacesCurrentResponse403 | putWorkspacesCurrentResponse422) & {
+  headers: Headers;
+};
+
+export type putWorkspacesCurrentResponse = (putWorkspacesCurrentResponseSuccess | putWorkspacesCurrentResponseError)
+
+export const getPutWorkspacesCurrentUrl = () => {
+
+
+  
+
+  return `/api/workspaces/current`
+}
+
+export const putWorkspacesCurrent = async (workspaceCurrentUpdateRequest: WorkspaceCurrentUpdateRequest, options?: RequestInit): Promise<putWorkspacesCurrentResponse> => {
+  
+  return customInstance<putWorkspacesCurrentResponse>(getPutWorkspacesCurrentUrl(),
+  {      
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      workspaceCurrentUpdateRequest,)
+  }
+);}
+  
+
+
+
+export const getPutWorkspacesCurrentMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesCurrent>>, TError,{data: WorkspaceCurrentUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesCurrent>>, TError,{data: WorkspaceCurrentUpdateRequest}, TContext> => {
+
+const mutationKey = ['putWorkspacesCurrent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesCurrent>>, {data: WorkspaceCurrentUpdateRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  putWorkspacesCurrent(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutWorkspacesCurrentMutationResult = NonNullable<Awaited<ReturnType<typeof putWorkspacesCurrent>>>
+    export type PutWorkspacesCurrentMutationBody = WorkspaceCurrentUpdateRequest
+    export type PutWorkspacesCurrentMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 현재 active 워크스페이스 전환
+ */
+export const usePutWorkspacesCurrent = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesCurrent>>, TError,{data: WorkspaceCurrentUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putWorkspacesCurrent>>,
+        TError,
+        {data: WorkspaceCurrentUpdateRequest},
+        TContext
+      > => {
+      return useMutation(getPutWorkspacesCurrentMutationOptions(options), queryClient);
     }
     /**
  * @summary 워크스페이스 참가
@@ -498,7 +716,7 @@ export type getWorkspacesIdMembersResponseError = (getWorkspacesIdMembersRespons
 
 export type getWorkspacesIdMembersResponse = (getWorkspacesIdMembersResponseSuccess | getWorkspacesIdMembersResponseError)
 
-export const getGetWorkspacesIdMembersUrl = (id: number,) => {
+export const getGetWorkspacesIdMembersUrl = (id: string,) => {
 
 
   
@@ -506,7 +724,7 @@ export const getGetWorkspacesIdMembersUrl = (id: number,) => {
   return `/api/workspaces/${id}/members`
 }
 
-export const getWorkspacesIdMembers = async (id: number, options?: RequestInit): Promise<getWorkspacesIdMembersResponse> => {
+export const getWorkspacesIdMembers = async (id: string, options?: RequestInit): Promise<getWorkspacesIdMembersResponse> => {
   
   return customInstance<getWorkspacesIdMembersResponse>(getGetWorkspacesIdMembersUrl(id),
   {      
@@ -521,14 +739,14 @@ export const getWorkspacesIdMembers = async (id: number, options?: RequestInit):
 
 
 
-export const getGetWorkspacesIdMembersQueryKey = (id: number,) => {
+export const getGetWorkspacesIdMembersQueryKey = (id: string,) => {
     return [
     `/api/workspaces/${id}/members`
     ] as const;
     }
 
     
-export const getGetWorkspacesIdMembersQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesIdMembersQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -551,7 +769,7 @@ export type GetWorkspacesIdMembersQueryError = UnauthorizedErrorResponse | Error
 
 
 export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>> & Pick<
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesIdMembers>>,
           TError,
@@ -561,7 +779,7 @@ export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getW
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>> & Pick<
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesIdMembers>>,
           TError,
@@ -571,7 +789,7 @@ export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getW
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -579,7 +797,7 @@ export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getW
  */
 
 export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -620,7 +838,7 @@ export type getWorkspacesIdTagsResponseError = (getWorkspacesIdTagsResponse401 |
 
 export type getWorkspacesIdTagsResponse = (getWorkspacesIdTagsResponseSuccess | getWorkspacesIdTagsResponseError)
 
-export const getGetWorkspacesIdTagsUrl = (id: number,) => {
+export const getGetWorkspacesIdTagsUrl = (id: string,) => {
 
 
   
@@ -628,7 +846,7 @@ export const getGetWorkspacesIdTagsUrl = (id: number,) => {
   return `/api/workspaces/${id}/tags`
 }
 
-export const getWorkspacesIdTags = async (id: number, options?: RequestInit): Promise<getWorkspacesIdTagsResponse> => {
+export const getWorkspacesIdTags = async (id: string, options?: RequestInit): Promise<getWorkspacesIdTagsResponse> => {
   
   return customInstance<getWorkspacesIdTagsResponse>(getGetWorkspacesIdTagsUrl(id),
   {      
@@ -643,14 +861,14 @@ export const getWorkspacesIdTags = async (id: number, options?: RequestInit): Pr
 
 
 
-export const getGetWorkspacesIdTagsQueryKey = (id: number,) => {
+export const getGetWorkspacesIdTagsQueryKey = (id: string,) => {
     return [
     `/api/workspaces/${id}/tags`
     ] as const;
     }
 
     
-export const getGetWorkspacesIdTagsQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesIdTagsQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -673,7 +891,7 @@ export type GetWorkspacesIdTagsQueryError = UnauthorizedErrorResponse | ErrorRes
 
 
 export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>> & Pick<
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesIdTags>>,
           TError,
@@ -683,7 +901,7 @@ export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWork
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>> & Pick<
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesIdTags>>,
           TError,
@@ -693,7 +911,7 @@ export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWork
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -701,7 +919,7 @@ export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWork
  */
 
 export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -752,7 +970,7 @@ export type postWorkspacesIdTagsResponseError = (postWorkspacesIdTagsResponse401
 
 export type postWorkspacesIdTagsResponse = (postWorkspacesIdTagsResponseSuccess | postWorkspacesIdTagsResponseError)
 
-export const getPostWorkspacesIdTagsUrl = (id: number,) => {
+export const getPostWorkspacesIdTagsUrl = (id: string,) => {
 
 
   
@@ -760,7 +978,7 @@ export const getPostWorkspacesIdTagsUrl = (id: number,) => {
   return `/api/workspaces/${id}/tags`
 }
 
-export const postWorkspacesIdTags = async (id: number,
+export const postWorkspacesIdTags = async (id: string,
     workspaceTagCreateRequest: WorkspaceTagCreateRequest, options?: RequestInit): Promise<postWorkspacesIdTagsResponse> => {
   
   return customInstance<postWorkspacesIdTagsResponse>(getPostWorkspacesIdTagsUrl(id),
@@ -777,8 +995,8 @@ export const postWorkspacesIdTags = async (id: number,
 
 
 export const getPostWorkspacesIdTagsMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: number;data: WorkspaceTagCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: number;data: WorkspaceTagCreateRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: string;data: WorkspaceTagCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: string;data: WorkspaceTagCreateRequest}, TContext> => {
 
 const mutationKey = ['postWorkspacesIdTags'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -790,7 +1008,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTags>>, {id: number;data: WorkspaceTagCreateRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTags>>, {id: string;data: WorkspaceTagCreateRequest}> = (props) => {
           const {id,data} = props ?? {};
 
           return  postWorkspacesIdTags(id,data,requestOptions)
@@ -811,11 +1029,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary 워크스페이스 태그 생성
  */
 export const usePostWorkspacesIdTags = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: number;data: WorkspaceTagCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTags>>, TError,{id: string;data: WorkspaceTagCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postWorkspacesIdTags>>,
         TError,
-        {id: number;data: WorkspaceTagCreateRequest},
+        {id: string;data: WorkspaceTagCreateRequest},
         TContext
       > => {
       return useMutation(getPostWorkspacesIdTagsMutationOptions(options), queryClient);
@@ -862,7 +1080,7 @@ export type putWorkspacesIdTagsTagIdResponseError = (putWorkspacesIdTagsTagIdRes
 
 export type putWorkspacesIdTagsTagIdResponse = (putWorkspacesIdTagsTagIdResponseSuccess | putWorkspacesIdTagsTagIdResponseError)
 
-export const getPutWorkspacesIdTagsTagIdUrl = (id: number,
+export const getPutWorkspacesIdTagsTagIdUrl = (id: string,
     tagId: number,) => {
 
 
@@ -871,7 +1089,7 @@ export const getPutWorkspacesIdTagsTagIdUrl = (id: number,
   return `/api/workspaces/${id}/tags/${tagId}`
 }
 
-export const putWorkspacesIdTagsTagId = async (id: number,
+export const putWorkspacesIdTagsTagId = async (id: string,
     tagId: number,
     workspaceTagUpdateRequest: WorkspaceTagUpdateRequest, options?: RequestInit): Promise<putWorkspacesIdTagsTagIdResponse> => {
   
@@ -889,8 +1107,8 @@ export const putWorkspacesIdTagsTagId = async (id: number,
 
 
 export const getPutWorkspacesIdTagsTagIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number;data: WorkspaceTagUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number;data: WorkspaceTagUpdateRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: string;tagId: number;data: WorkspaceTagUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: string;tagId: number;data: WorkspaceTagUpdateRequest}, TContext> => {
 
 const mutationKey = ['putWorkspacesIdTagsTagId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -902,7 +1120,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, {id: number;tagId: number;data: WorkspaceTagUpdateRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, {id: string;tagId: number;data: WorkspaceTagUpdateRequest}> = (props) => {
           const {id,tagId,data} = props ?? {};
 
           return  putWorkspacesIdTagsTagId(id,tagId,data,requestOptions)
@@ -923,11 +1141,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary 워크스페이스 태그 이름 수정
  */
 export const usePutWorkspacesIdTagsTagId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number;data: WorkspaceTagUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, TError,{id: string;tagId: number;data: WorkspaceTagUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>,
         TError,
-        {id: number;tagId: number;data: WorkspaceTagUpdateRequest},
+        {id: string;tagId: number;data: WorkspaceTagUpdateRequest},
         TContext
       > => {
       return useMutation(getPutWorkspacesIdTagsTagIdMutationOptions(options), queryClient);
@@ -964,7 +1182,7 @@ export type deleteWorkspacesIdTagsTagIdResponseError = (deleteWorkspacesIdTagsTa
 
 export type deleteWorkspacesIdTagsTagIdResponse = (deleteWorkspacesIdTagsTagIdResponseSuccess | deleteWorkspacesIdTagsTagIdResponseError)
 
-export const getDeleteWorkspacesIdTagsTagIdUrl = (id: number,
+export const getDeleteWorkspacesIdTagsTagIdUrl = (id: string,
     tagId: number,) => {
 
 
@@ -973,7 +1191,7 @@ export const getDeleteWorkspacesIdTagsTagIdUrl = (id: number,
   return `/api/workspaces/${id}/tags/${tagId}`
 }
 
-export const deleteWorkspacesIdTagsTagId = async (id: number,
+export const deleteWorkspacesIdTagsTagId = async (id: string,
     tagId: number, options?: RequestInit): Promise<deleteWorkspacesIdTagsTagIdResponse> => {
   
   return customInstance<deleteWorkspacesIdTagsTagIdResponse>(getDeleteWorkspacesIdTagsTagIdUrl(id,tagId),
@@ -989,8 +1207,8 @@ export const deleteWorkspacesIdTagsTagId = async (id: number,
 
 
 export const getDeleteWorkspacesIdTagsTagIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: string;tagId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: string;tagId: number}, TContext> => {
 
 const mutationKey = ['deleteWorkspacesIdTagsTagId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1002,7 +1220,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, {id: number;tagId: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, {id: string;tagId: number}> = (props) => {
           const {id,tagId} = props ?? {};
 
           return  deleteWorkspacesIdTagsTagId(id,tagId,requestOptions)
@@ -1023,11 +1241,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary 워크스페이스 태그 삭제
  */
 export const useDeleteWorkspacesIdTagsTagId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: number;tagId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, TError,{id: string;tagId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>,
         TError,
-        {id: number;tagId: number},
+        {id: string;tagId: number},
         TContext
       > => {
       return useMutation(getDeleteWorkspacesIdTagsTagIdMutationOptions(options), queryClient);
@@ -1059,7 +1277,7 @@ export type getWorkspacesIdInvitesResponseError = (getWorkspacesIdInvitesRespons
 
 export type getWorkspacesIdInvitesResponse = (getWorkspacesIdInvitesResponseSuccess | getWorkspacesIdInvitesResponseError)
 
-export const getGetWorkspacesIdInvitesUrl = (id: number,) => {
+export const getGetWorkspacesIdInvitesUrl = (id: string,) => {
 
 
   
@@ -1067,7 +1285,7 @@ export const getGetWorkspacesIdInvitesUrl = (id: number,) => {
   return `/api/workspaces/${id}/invites`
 }
 
-export const getWorkspacesIdInvites = async (id: number, options?: RequestInit): Promise<getWorkspacesIdInvitesResponse> => {
+export const getWorkspacesIdInvites = async (id: string, options?: RequestInit): Promise<getWorkspacesIdInvitesResponse> => {
   
   return customInstance<getWorkspacesIdInvitesResponse>(getGetWorkspacesIdInvitesUrl(id),
   {      
@@ -1082,14 +1300,14 @@ export const getWorkspacesIdInvites = async (id: number, options?: RequestInit):
 
 
 
-export const getGetWorkspacesIdInvitesQueryKey = (id: number,) => {
+export const getGetWorkspacesIdInvitesQueryKey = (id: string,) => {
     return [
     `/api/workspaces/${id}/invites`
     ] as const;
     }
 
     
-export const getGetWorkspacesIdInvitesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesIdInvitesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1112,7 +1330,7 @@ export type GetWorkspacesIdInvitesQueryError = UnauthorizedErrorResponse | Error
 
 
 export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>> & Pick<
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesIdInvites>>,
           TError,
@@ -1122,7 +1340,7 @@ export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getW
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>> & Pick<
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesIdInvites>>,
           TError,
@@ -1132,7 +1350,7 @@ export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getW
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
@@ -1140,7 +1358,7 @@ export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getW
  */
 
 export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
@@ -1186,7 +1404,7 @@ export type postWorkspacesIdInvitesResponseError = (postWorkspacesIdInvitesRespo
 
 export type postWorkspacesIdInvitesResponse = (postWorkspacesIdInvitesResponseSuccess | postWorkspacesIdInvitesResponseError)
 
-export const getPostWorkspacesIdInvitesUrl = (id: number,) => {
+export const getPostWorkspacesIdInvitesUrl = (id: string,) => {
 
 
   
@@ -1194,7 +1412,7 @@ export const getPostWorkspacesIdInvitesUrl = (id: number,) => {
   return `/api/workspaces/${id}/invites`
 }
 
-export const postWorkspacesIdInvites = async (id: number,
+export const postWorkspacesIdInvites = async (id: string,
     workspaceInviteCreateRequest: WorkspaceInviteCreateRequest, options?: RequestInit): Promise<postWorkspacesIdInvitesResponse> => {
   
   return customInstance<postWorkspacesIdInvitesResponse>(getPostWorkspacesIdInvitesUrl(id),
@@ -1211,8 +1429,8 @@ export const postWorkspacesIdInvites = async (id: number,
 
 
 export const getPostWorkspacesIdInvitesMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, TError,{id: number;data: WorkspaceInviteCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, TError,{id: number;data: WorkspaceInviteCreateRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, TError,{id: string;data: WorkspaceInviteCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, TError,{id: string;data: WorkspaceInviteCreateRequest}, TContext> => {
 
 const mutationKey = ['postWorkspacesIdInvites'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1224,7 +1442,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, {id: number;data: WorkspaceInviteCreateRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, {id: string;data: WorkspaceInviteCreateRequest}> = (props) => {
           const {id,data} = props ?? {};
 
           return  postWorkspacesIdInvites(id,data,requestOptions)
@@ -1245,11 +1463,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary [ADMIN] 워크스페이스 초대코드 생성
  */
 export const usePostWorkspacesIdInvites = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, TError,{id: number;data: WorkspaceInviteCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, TError,{id: string;data: WorkspaceInviteCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postWorkspacesIdInvites>>,
         TError,
-        {id: number;data: WorkspaceInviteCreateRequest},
+        {id: string;data: WorkspaceInviteCreateRequest},
         TContext
       > => {
       return useMutation(getPostWorkspacesIdInvitesMutationOptions(options), queryClient);
@@ -1291,7 +1509,7 @@ export type patchWorkspacesIdInvitesInviteIdStatusResponseError = (patchWorkspac
 
 export type patchWorkspacesIdInvitesInviteIdStatusResponse = (patchWorkspacesIdInvitesInviteIdStatusResponseSuccess | patchWorkspacesIdInvitesInviteIdStatusResponseError)
 
-export const getPatchWorkspacesIdInvitesInviteIdStatusUrl = (id: number,
+export const getPatchWorkspacesIdInvitesInviteIdStatusUrl = (id: string,
     inviteId: number,) => {
 
 
@@ -1300,7 +1518,7 @@ export const getPatchWorkspacesIdInvitesInviteIdStatusUrl = (id: number,
   return `/api/workspaces/${id}/invites/${inviteId}/status`
 }
 
-export const patchWorkspacesIdInvitesInviteIdStatus = async (id: number,
+export const patchWorkspacesIdInvitesInviteIdStatus = async (id: string,
     inviteId: number,
     workspaceInviteStatusUpdateRequest: WorkspaceInviteStatusUpdateRequest, options?: RequestInit): Promise<patchWorkspacesIdInvitesInviteIdStatusResponse> => {
   
@@ -1318,8 +1536,8 @@ export const patchWorkspacesIdInvitesInviteIdStatus = async (id: number,
 
 
 export const getPatchWorkspacesIdInvitesInviteIdStatusMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, TError,{id: number;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, TError,{id: number;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, TError,{id: string;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, TError,{id: string;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}, TContext> => {
 
 const mutationKey = ['patchWorkspacesIdInvitesInviteIdStatus'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1331,7 +1549,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, {id: number;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, {id: string;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}> = (props) => {
           const {id,inviteId,data} = props ?? {};
 
           return  patchWorkspacesIdInvitesInviteIdStatus(id,inviteId,data,requestOptions)
@@ -1352,11 +1570,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary [ADMIN] 워크스페이스 초대코드 활성화 상태 변경
  */
 export const usePatchWorkspacesIdInvitesInviteIdStatus = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, TError,{id: number;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, TError,{id: string;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>,
         TError,
-        {id: number;inviteId: number;data: WorkspaceInviteStatusUpdateRequest},
+        {id: string;inviteId: number;data: WorkspaceInviteStatusUpdateRequest},
         TContext
       > => {
       return useMutation(getPatchWorkspacesIdInvitesInviteIdStatusMutationOptions(options), queryClient);
@@ -1393,7 +1611,7 @@ export type putWorkspacesIdResponseError = (putWorkspacesIdResponse401 | putWork
 
 export type putWorkspacesIdResponse = (putWorkspacesIdResponseSuccess | putWorkspacesIdResponseError)
 
-export const getPutWorkspacesIdUrl = (id: number,) => {
+export const getPutWorkspacesIdUrl = (id: string,) => {
 
 
   
@@ -1401,7 +1619,7 @@ export const getPutWorkspacesIdUrl = (id: number,) => {
   return `/api/workspaces/${id}`
 }
 
-export const putWorkspacesId = async (id: number,
+export const putWorkspacesId = async (id: string,
     putWorkspacesIdBody: PutWorkspacesIdBody, options?: RequestInit): Promise<putWorkspacesIdResponse> => {
   
   return customInstance<putWorkspacesIdResponse>(getPutWorkspacesIdUrl(id),
@@ -1418,8 +1636,8 @@ export const putWorkspacesId = async (id: number,
 
 
 export const getPutWorkspacesIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesId>>, TError,{id: number;data: PutWorkspacesIdBody}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesId>>, TError,{id: number;data: PutWorkspacesIdBody}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesId>>, TError,{id: string;data: PutWorkspacesIdBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesId>>, TError,{id: string;data: PutWorkspacesIdBody}, TContext> => {
 
 const mutationKey = ['putWorkspacesId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1431,7 +1649,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesId>>, {id: number;data: PutWorkspacesIdBody}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesId>>, {id: string;data: PutWorkspacesIdBody}> = (props) => {
           const {id,data} = props ?? {};
 
           return  putWorkspacesId(id,data,requestOptions)
@@ -1452,11 +1670,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary [ADMIN] 워크스페이스 이름 변경
  */
 export const usePutWorkspacesId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesId>>, TError,{id: number;data: PutWorkspacesIdBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesId>>, TError,{id: string;data: PutWorkspacesIdBody}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof putWorkspacesId>>,
         TError,
-        {id: number;data: PutWorkspacesIdBody},
+        {id: string;data: PutWorkspacesIdBody},
         TContext
       > => {
       return useMutation(getPutWorkspacesIdMutationOptions(options), queryClient);
@@ -1493,7 +1711,7 @@ export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | d
 
 export type deleteWorkspacesIdResponse = (deleteWorkspacesIdResponseSuccess | deleteWorkspacesIdResponseError)
 
-export const getDeleteWorkspacesIdUrl = (id: number,) => {
+export const getDeleteWorkspacesIdUrl = (id: string,) => {
 
 
   
@@ -1501,7 +1719,7 @@ export const getDeleteWorkspacesIdUrl = (id: number,) => {
   return `/api/workspaces/${id}`
 }
 
-export const deleteWorkspacesId = async (id: number, options?: RequestInit): Promise<deleteWorkspacesIdResponse> => {
+export const deleteWorkspacesId = async (id: string, options?: RequestInit): Promise<deleteWorkspacesIdResponse> => {
   
   return customInstance<deleteWorkspacesIdResponse>(getDeleteWorkspacesIdUrl(id),
   {      
@@ -1516,8 +1734,8 @@ export const deleteWorkspacesId = async (id: number, options?: RequestInit): Pro
 
 
 export const getDeleteWorkspacesIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['deleteWorkspacesId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1529,7 +1747,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesId>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesId>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
           return  deleteWorkspacesId(id,requestOptions)
@@ -1550,11 +1768,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary [ADMIN] 워크스페이스 삭제
  */
 export const useDeleteWorkspacesId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesId>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorkspacesId>>,
         TError,
-        {id: number},
+        {id: string},
         TContext
       > => {
       return useMutation(getDeleteWorkspacesIdMutationOptions(options), queryClient);
@@ -1596,7 +1814,7 @@ export type deleteWorkspacesIdLeaveResponseError = (deleteWorkspacesIdLeaveRespo
 
 export type deleteWorkspacesIdLeaveResponse = (deleteWorkspacesIdLeaveResponseSuccess | deleteWorkspacesIdLeaveResponseError)
 
-export const getDeleteWorkspacesIdLeaveUrl = (id: number,) => {
+export const getDeleteWorkspacesIdLeaveUrl = (id: string,) => {
 
 
   
@@ -1604,7 +1822,7 @@ export const getDeleteWorkspacesIdLeaveUrl = (id: number,) => {
   return `/api/workspaces/${id}/leave`
 }
 
-export const deleteWorkspacesIdLeave = async (id: number, options?: RequestInit): Promise<deleteWorkspacesIdLeaveResponse> => {
+export const deleteWorkspacesIdLeave = async (id: string, options?: RequestInit): Promise<deleteWorkspacesIdLeaveResponse> => {
   
   return customInstance<deleteWorkspacesIdLeaveResponse>(getDeleteWorkspacesIdLeaveUrl(id),
   {      
@@ -1619,8 +1837,8 @@ export const deleteWorkspacesIdLeave = async (id: number, options?: RequestInit)
 
 
 export const getDeleteWorkspacesIdLeaveMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: string}, TContext> => {
 
 const mutationKey = ['deleteWorkspacesIdLeave'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1632,7 +1850,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, {id: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
           return  deleteWorkspacesIdLeave(id,requestOptions)
@@ -1653,11 +1871,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary 워크스페이스 탈퇴
  */
 export const useDeleteWorkspacesIdLeave = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>,
         TError,
-        {id: number},
+        {id: string},
         TContext
       > => {
       return useMutation(getDeleteWorkspacesIdLeaveMutationOptions(options), queryClient);
@@ -1699,7 +1917,7 @@ export type postWorkspacesIdTransferAdminResponseError = (postWorkspacesIdTransf
 
 export type postWorkspacesIdTransferAdminResponse = (postWorkspacesIdTransferAdminResponseSuccess | postWorkspacesIdTransferAdminResponseError)
 
-export const getPostWorkspacesIdTransferAdminUrl = (id: number,) => {
+export const getPostWorkspacesIdTransferAdminUrl = (id: string,) => {
 
 
   
@@ -1707,7 +1925,7 @@ export const getPostWorkspacesIdTransferAdminUrl = (id: number,) => {
   return `/api/workspaces/${id}/transfer-admin`
 }
 
-export const postWorkspacesIdTransferAdmin = async (id: number,
+export const postWorkspacesIdTransferAdmin = async (id: string,
     workspaceTransferAdminRequest: WorkspaceTransferAdminRequest, options?: RequestInit): Promise<postWorkspacesIdTransferAdminResponse> => {
   
   return customInstance<postWorkspacesIdTransferAdminResponse>(getPostWorkspacesIdTransferAdminUrl(id),
@@ -1724,8 +1942,8 @@ export const postWorkspacesIdTransferAdmin = async (id: number,
 
 
 export const getPostWorkspacesIdTransferAdminMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: number;data: WorkspaceTransferAdminRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: number;data: WorkspaceTransferAdminRequest}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: string;data: WorkspaceTransferAdminRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: string;data: WorkspaceTransferAdminRequest}, TContext> => {
 
 const mutationKey = ['postWorkspacesIdTransferAdmin'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1737,7 +1955,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, {id: number;data: WorkspaceTransferAdminRequest}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, {id: string;data: WorkspaceTransferAdminRequest}> = (props) => {
           const {id,data} = props ?? {};
 
           return  postWorkspacesIdTransferAdmin(id,data,requestOptions)
@@ -1758,11 +1976,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary [ADMIN] 워크스페이스 관리자 권한 이전
  */
 export const usePostWorkspacesIdTransferAdmin = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: number;data: WorkspaceTransferAdminRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, TError,{id: string;data: WorkspaceTransferAdminRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>,
         TError,
-        {id: number;data: WorkspaceTransferAdminRequest},
+        {id: string;data: WorkspaceTransferAdminRequest},
         TContext
       > => {
       return useMutation(getPostWorkspacesIdTransferAdminMutationOptions(options), queryClient);
@@ -1799,7 +2017,7 @@ export type deleteWorkspacesIdMembersMemberIdResponseError = (deleteWorkspacesId
 
 export type deleteWorkspacesIdMembersMemberIdResponse = (deleteWorkspacesIdMembersMemberIdResponseSuccess | deleteWorkspacesIdMembersMemberIdResponseError)
 
-export const getDeleteWorkspacesIdMembersMemberIdUrl = (id: number,
+export const getDeleteWorkspacesIdMembersMemberIdUrl = (id: string,
     memberId: number,) => {
 
 
@@ -1808,7 +2026,7 @@ export const getDeleteWorkspacesIdMembersMemberIdUrl = (id: number,
   return `/api/workspaces/${id}/members/${memberId}`
 }
 
-export const deleteWorkspacesIdMembersMemberId = async (id: number,
+export const deleteWorkspacesIdMembersMemberId = async (id: string,
     memberId: number, options?: RequestInit): Promise<deleteWorkspacesIdMembersMemberIdResponse> => {
   
   return customInstance<deleteWorkspacesIdMembersMemberIdResponse>(getDeleteWorkspacesIdMembersMemberIdUrl(id,memberId),
@@ -1824,8 +2042,8 @@ export const deleteWorkspacesIdMembersMemberId = async (id: number,
 
 
 export const getDeleteWorkspacesIdMembersMemberIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, TError,{id: number;memberId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, TError,{id: number;memberId: number}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, TError,{id: string;memberId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, TError,{id: string;memberId: number}, TContext> => {
 
 const mutationKey = ['deleteWorkspacesIdMembersMemberId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -1837,7 +2055,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, {id: number;memberId: number}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, {id: string;memberId: number}> = (props) => {
           const {id,memberId} = props ?? {};
 
           return  deleteWorkspacesIdMembersMemberId(id,memberId,requestOptions)
@@ -1858,11 +2076,11 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
  * @summary [ADMIN] 워크스페이스 멤버 강제 퇴출
  */
 export const useDeleteWorkspacesIdMembersMemberId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, TError,{id: number;memberId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, TError,{id: string;memberId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>,
         TError,
-        {id: number;memberId: number},
+        {id: string;memberId: number},
         TContext
       > => {
       return useMutation(getDeleteWorkspacesIdMembersMemberIdMutationOptions(options), queryClient);

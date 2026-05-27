@@ -1,11 +1,8 @@
 import { ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { TeamMemoRecord } from "@/domain/dashboard/storage/team-memo.storage";
-import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
+import { WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type WorkspacePort = {
-  findUserWorkspace(
-    userId: number,
-  ): Promise<{ id: number; name: string; planCode?: string | null } | null>;
   findMembership(
     workspaceId: number,
     userId: number,
@@ -42,82 +39,74 @@ export class TeamMemoService {
     private teamMemoStorage: TeamMemoPort,
   ) {}
 
-  async listTeamMemos(userId: number, targetUserId: number) {
-    const workspace = await this.getWorkspaceOrThrow(userId);
-    await this.requireWorkspaceMember(workspace.id, targetUserId);
+  async listTeamMemos(context: WorkspaceAccessContext, targetUserId: number) {
+    await this.requireWorkspaceMember(context.workspaceId, targetUserId);
 
     const memos = await this.teamMemoStorage.listByWorkspaceAndTarget(
-      workspace.id,
+      context.workspaceId,
       targetUserId,
     );
 
     return {
-      workspaceId: workspace.id,
+      workspaceId: context.workspacePublicId,
       targetUserId,
-      memos: memos.map(toTeamMemoDto),
+      memos: memos.map((memo) => toTeamMemoDto(memo, context.workspacePublicId)),
     };
   }
 
   async createTeamMemo(
-    userId: number,
+    context: WorkspaceAccessContext,
     input: { targetUserId: number; content: string },
   ) {
-    const workspace = await this.getWorkspaceOrThrow(userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
-    await this.requireWorkspaceMember(workspace.id, input.targetUserId);
+    // FREE 플랜 제한 등은 생략하거나 나중에 추가. 일단 메모 기능 자체의 제한은 없음
+    await this.requireWorkspaceMember(context.workspaceId, input.targetUserId);
 
     const memo = await this.teamMemoStorage.create({
-      workspaceId: workspace.id,
+      workspaceId: context.workspaceId,
       targetUserId: input.targetUserId,
-      authorUserId: userId,
+      authorUserId: context.userId,
       content: input.content.trim(),
     });
 
-    return toTeamMemoDto(memo);
+    return toTeamMemoDto(memo, context.workspacePublicId);
   }
 
   async resolveTeamMemo(
-    userId: number,
+    context: WorkspaceAccessContext,
     memoId: number,
     isResolved: boolean,
   ) {
-    const workspace = await this.getWorkspaceOrThrow(userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
-    const actorMembership = await this.requireWorkspaceMember(workspace.id, userId);
     const memo = await this.teamMemoStorage.findById(memoId);
 
-    if (!memo || memo.workspaceId !== workspace.id) {
+    if (!memo || memo.workspaceId !== context.workspaceId) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    if (memo.authorUserId !== userId && actorMembership.role !== "ADMIN") {
+    if (memo.authorUserId !== context.userId && context.role !== "ADMIN") {
       throw new ForbiddenError("FORBIDDEN");
     }
 
     const updated = await this.teamMemoStorage.updateResolved({
       memoId,
       isResolved,
-      resolvedByUserId: isResolved ? userId : null,
+      resolvedByUserId: isResolved ? context.userId : null,
     });
 
     if (!updated) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return toTeamMemoDto(updated);
+    return toTeamMemoDto(updated, context.workspacePublicId);
   }
 
-  async deleteTeamMemo(userId: number, memoId: number) {
-    const workspace = await this.getWorkspaceOrThrow(userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
-    await this.requireWorkspaceMember(workspace.id, userId);
+  async deleteTeamMemo(context: WorkspaceAccessContext, memoId: number) {
     const memo = await this.teamMemoStorage.findById(memoId);
 
-    if (!memo || memo.workspaceId !== workspace.id) {
+    if (!memo || memo.workspaceId !== context.workspaceId) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    if (memo.authorUserId !== userId) {
+    if (memo.authorUserId !== context.userId) {
       throw new ForbiddenError("FORBIDDEN");
     }
 
@@ -126,16 +115,6 @@ export class TeamMemoService {
     if (!deleted) {
       throw new NotFoundError("NOT_FOUND");
     }
-  }
-
-  private async getWorkspaceOrThrow(userId: number) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    return workspace;
   }
 
   private async requireWorkspaceMember(workspaceId: number, userId: number) {
@@ -152,10 +131,10 @@ export class TeamMemoService {
   }
 }
 
-function toTeamMemoDto(memo: TeamMemoRecord) {
+function toTeamMemoDto(memo: TeamMemoRecord, workspacePublicId: string) {
   return {
     id: memo.id,
-    workspaceId: memo.workspaceId,
+    workspaceId: workspacePublicId,
     targetUserId: memo.targetUserId,
     author: {
       userId: memo.authorUser?.id ?? memo.authorUserId,

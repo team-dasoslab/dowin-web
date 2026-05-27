@@ -15,7 +15,11 @@ export const workspaceUpdateSchema = z.object({
 });
 
 export const workspaceJoinSchema = z.object({
-  workspaceId: z.number(),
+  workspaceId: z.string().min(1, "워크스페이스 ID를 입력해주세요."),
+});
+
+export const workspaceCurrentUpdateSchema = z.object({
+  workspaceId: z.string().min(1, "워크스페이스 ID를 입력해주세요."),
 });
 
 export const workspaceJoinByInviteSchema = z.object({
@@ -43,16 +47,16 @@ export const workspaceTransferAdminSchema = z.object({
 });
 
 export const workspaceParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  workspaceId: z.string().min(1, "워크스페이스 ID를 입력해주세요."),
 });
 
 export const workspaceMemberParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  workspaceId: z.string().min(1, "워크스페이스 ID를 입력해주세요."),
   memberId: z.coerce.number().int().positive(),
 });
 
 export const workspaceInviteParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  workspaceId: z.string().min(1, "워크스페이스 ID를 입력해주세요."),
   inviteId: z.coerce.number().int().positive(),
 });
 
@@ -65,7 +69,7 @@ export const workspaceTagUpdateSchema = z.object({
 });
 
 export const workspaceTagParamsSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  workspaceId: z.string().min(1, "워크스페이스 ID를 입력해주세요."),
   tagId: z.coerce.number().int().positive(),
 });
 

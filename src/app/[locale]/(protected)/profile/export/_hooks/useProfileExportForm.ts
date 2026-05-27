@@ -1,6 +1,6 @@
 "use client";
 
-import { getTodayInKst, getWeekDates } from "@/app/[locale]/(protected)/dashboard/my/_lib/week";
+import { getTodayInKst, getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { useEffect, useState } from "react";
 
 type ExportMeasureOption = {

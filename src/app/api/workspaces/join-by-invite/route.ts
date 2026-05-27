@@ -37,6 +37,9 @@ export const POST = withErrorHandler(async (request: Request) => {
   }
 
   await service.joinWorkspaceByInvite(parsed.data.code, session.userId);
+  const invite = await storage.findInviteByCode(parsed.data.code.trim().toUpperCase());
+  if (invite) {
+  }
 
   return apiSuccess({ message: "워크스페이스에 참가했습니다." });
 });

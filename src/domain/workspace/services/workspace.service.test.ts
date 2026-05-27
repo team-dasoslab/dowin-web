@@ -3,8 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("WorkspaceService", () => {
   const mockStorage = {
+    resolveIdByUid: vi.fn(),
     findWorkspaceById: vi.fn(),
     findUserWorkspace: vi.fn(),
+    listUserWorkspaces: vi.fn(),
     createWorkspace: vi.fn(),
     updateWorkspaceName: vi.fn(),
     addMember: vi.fn(),
@@ -41,13 +43,15 @@ describe("WorkspaceService", () => {
 
   describe("getMyWorkspace", () => {
     it("사용자가 속한 워크스페이스가 있으면 이를 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "Workspace", planCode: "FREE" };
+      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: "FREE" };
       mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
 
       const result = await service.getMyWorkspace(123);
 
       expect(result).toEqual({
-        ...mockWorkspace,
+        id: "ws_1",
+        name: "Workspace",
+        planCode: "FREE",
         freeMemberLimit: 10,
         isOverFreeMemberLimit: false,
         memberCount: 1,
@@ -55,14 +59,16 @@ describe("WorkspaceService", () => {
     });
 
     it("FREE 플랜 멤버 한도 초과 상태를 함께 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "Workspace", planCode: "FREE" };
+      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: "FREE" };
       mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
       mockStorage.countMembers.mockResolvedValue(11);
 
       const result = await service.getMyWorkspace(123);
 
       expect(result).toEqual({
-        ...mockWorkspace,
+        id: "ws_1",
+        name: "Workspace",
+        planCode: "FREE",
         freeMemberLimit: 10,
         isOverFreeMemberLimit: true,
         memberCount: 11,
@@ -76,14 +82,60 @@ describe("WorkspaceService", () => {
     });
   });
 
+  describe("listMyWorkspaces", () => {
+    it("현재 워크스페이스 표시와 함께 목록을 반환한다", async () => {
+      mockStorage.listUserWorkspaces.mockResolvedValue([
+        {
+          role: "MEMBER",
+          workspace: {
+            id: 3,
+            uid: "ws_ops",
+            name: "운영팀",
+            planCode: "STANDARD",
+            createdAt: new Date("2026-05-01T00:00:00.000Z"),
+          },
+        },
+        {
+          role: "ADMIN",
+          workspace: {
+            id: 7,
+            uid: "ws_personal",
+            name: "개인",
+            planCode: "FREE",
+            createdAt: new Date("2026-04-01T00:00:00.000Z"),
+          },
+        },
+      ]);
+
+      const result = await service.listMyWorkspaces(123, 7);
+
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: "ws_ops",
+          role: "MEMBER",
+          isCurrent: false,
+        }),
+        expect.objectContaining({
+          id: "ws_personal",
+          role: "ADMIN",
+          isCurrent: true,
+        }),
+      ]);
+    });
+  });
+
   describe("createWorkspace", () => {
     it("새 워크스페이스를 생성하고 생성자를 ADMIN으로 추가한다", async () => {
-      const mockWorkspace = { id: 1, name: "New", planCode: "FREE" };
+      const mockWorkspace = { id: 1, uid: "ws_new", name: "New", planCode: "FREE" };
       mockStorage.createWorkspace.mockResolvedValue(mockWorkspace);
 
       const result = await service.createWorkspace(123, "New");
 
-      expect(result).toEqual(mockWorkspace);
+      expect(result).toEqual({
+        id: "ws_new",
+        name: "New",
+        planCode: "FREE",
+      });
       expect(mockStorage.createWorkspace).toHaveBeenCalledWith("New");
       expect(mockStorage.addMember).toHaveBeenCalledWith(1, 123, "ADMIN");
     });
@@ -95,7 +147,9 @@ describe("WorkspaceService", () => {
         planCode: "FREE",
       });
       mockStorage.addMember.mockRejectedValue(
-        new Error("UNIQUE constraint failed: workspace_members.user_id"),
+        new Error(
+          "UNIQUE constraint failed: workspace_members.workspace_id, workspace_members.user_id",
+        ),
       );
 
       await expect(service.createWorkspace(123, "New")).rejects.toThrow(
@@ -132,7 +186,9 @@ describe("WorkspaceService", () => {
       });
       mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMember.mockRejectedValue(
-        new Error("UNIQUE constraint failed: workspace_members.user_id"),
+        new Error(
+          "UNIQUE constraint failed: workspace_members.workspace_id, workspace_members.user_id",
+        ),
       );
 
       await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
@@ -159,6 +215,7 @@ describe("WorkspaceService", () => {
     it("기존 워크스페이스 이름을 수정해 반환한다", async () => {
       const mockWorkspace = {
         id: 1,
+        uid: "ws_1",
         name: "기존 이름",
         planCode: "FREE",
         createdAt: new Date("2026-03-18T00:00:00.000Z"),
@@ -173,7 +230,12 @@ describe("WorkspaceService", () => {
 
       const result = await service.updateWorkspaceName(1, "새 이름");
 
-      expect(result).toEqual(updatedWorkspace);
+      expect(result).toEqual({
+        id: "ws_1",
+        name: "새 이름",
+        planCode: "FREE",
+        createdAt: new Date("2026-03-18T00:00:00.000Z"),
+      });
       expect(mockStorage.updateWorkspaceName).toHaveBeenCalledWith(1, "새 이름");
     });
 
@@ -352,7 +414,9 @@ describe("WorkspaceService", () => {
       });
       mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMemberByInvite.mockRejectedValue(
-        new Error("UNIQUE constraint failed: workspace_members.user_id"),
+        new Error(
+          "UNIQUE constraint failed: workspace_members.workspace_id, workspace_members.user_id",
+        ),
       );
 
       await expect(service.joinWorkspaceByInvite("ABCD123456", 7)).rejects.toThrow(

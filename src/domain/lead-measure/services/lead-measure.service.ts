@@ -40,11 +40,12 @@ export class LeadMeasureService {
   ) {}
 
   async getLeadMeasures(
+    workspaceUid: string,
     scoreboardId: number,
     userId: number,
     status: "active" | "all",
   ): Promise<Array<LeadMeasureRecordWithTags & { weeklyAchievement: { achieved: number; total: number } }>> {
-    await this.getOwnedScoreboard(scoreboardId, userId);
+    await this.getOwnedScoreboard(workspaceUid, scoreboardId, userId);
     const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       status,
@@ -66,12 +67,13 @@ export class LeadMeasureService {
   }
 
   async createLeadMeasure(
+    workspaceUid: string,
     scoreboardId: number,
     userId: number,
     input: Omit<CreateLeadMeasureInput, "scoreboardId">,
   ): Promise<LeadMeasureRecordWithTags> {
-    const scoreboard = await this.getOwnedScoreboard(scoreboardId, userId);
-    const workspace = await this.getWorkspace(userId);
+    const scoreboard = await this.getOwnedScoreboard(workspaceUid, scoreboardId, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
@@ -88,12 +90,13 @@ export class LeadMeasureService {
   }
 
   async updateLeadMeasure(
+    workspaceUid: string,
     id: number,
     userId: number,
     input: UpdateLeadMeasureInput,
   ): Promise<LeadMeasureRecordWithTags> {
-    const measure = await this.getOwnedLeadMeasure(id, userId);
-    const workspace = await this.getWorkspace(userId);
+    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
@@ -114,9 +117,9 @@ export class LeadMeasureService {
     return await this.leadMeasureStorage.updateLeadMeasure(id, input);
   }
 
-  async archiveLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
-    const measure = await this.getOwnedLeadMeasure(id, userId);
-    const workspace = await this.getWorkspace(userId);
+  async archiveLeadMeasure(workspaceUid: string, id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
+    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
@@ -126,9 +129,9 @@ export class LeadMeasureService {
     return await this.leadMeasureStorage.archiveLeadMeasure(id);
   }
 
-  async reactivateLeadMeasure(id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
-    const measure = await this.getOwnedLeadMeasure(id, userId);
-    const workspace = await this.getWorkspace(userId);
+  async reactivateLeadMeasure(workspaceUid: string, id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
+    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (measure.status === "ACTIVE") {
@@ -139,11 +142,12 @@ export class LeadMeasureService {
   }
 
   async deleteLeadMeasure(
+    workspaceUid: string,
     id: number,
     userId: number,
   ): Promise<{ warning: string; deleted: boolean }> {
-    const measure = await this.getOwnedLeadMeasure(id, userId);
-    const workspace = await this.getWorkspace(userId);
+    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
@@ -159,11 +163,8 @@ export class LeadMeasureService {
     };
   }
 
-  private async getOwnedScoreboard(scoreboardId: number, userId: number) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
+  private async getOwnedScoreboard(workspaceUid: string, scoreboardId: number, userId: number) {
+    const workspace = await this.getWorkspace(workspaceUid, userId);
 
     const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       scoreboardId,
@@ -177,8 +178,18 @@ export class LeadMeasureService {
     return scoreboard;
   }
 
-  private async getWorkspace(userId: number) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+  private async getWorkspace(workspaceUid: string, userId: number) {
+    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
+    if (!internalId) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const membership = await this.workspaceStorage.findMembership(internalId, userId);
+    if (!membership) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -187,13 +198,11 @@ export class LeadMeasureService {
   }
 
   private async getOwnedLeadMeasure(
+    workspaceUid: string,
     id: number,
     userId: number,
   ): Promise<LeadMeasureWithScoreboard> {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
+    const workspace = await this.getWorkspace(workspaceUid, userId);
 
     const measure = await this.leadMeasureStorage.findOwnedLeadMeasure(
       id,

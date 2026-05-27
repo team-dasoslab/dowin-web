@@ -36,6 +36,16 @@ export const POST = withErrorHandler(async (request: Request) => {
     return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
-  await service.joinWorkspace(parsed.data.workspaceId, session.userId);
+  const resolvedWorkspaceId = await service.resolveWorkspaceIdByUid(
+    parsed.data.workspaceId,
+  );
+  if (!resolvedWorkspaceId) {
+    return await apiError("NOT_FOUND", {
+      detail: "워크스페이스를 찾을 수 없습니다.",
+    });
+  }
+
+  await service.joinWorkspace(resolvedWorkspaceId, session.userId);
+
   return apiSuccess({ message: "워크스페이스에 참가했습니다." });
 });

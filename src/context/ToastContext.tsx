@@ -2,6 +2,7 @@
 
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { usePathname } from "@/i18n/routing";
+import { useParams } from "next/navigation";
 import {
   createContext,
   ReactNode,
@@ -28,16 +29,18 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const pathname = usePathname();
+  const params = useParams();
+  const workspaceId = params.workspaceId as string | undefined;
 
   // Main tab paths where the bottom navigation is visible
   const mainTabPaths = [
     "/",
-    "/dashboard",
-    "/dashboard/my",
-    "/report",
-    "/setup",
-    "/scoreboards",
-    "/profile",
+    workspaceId ? `/${workspaceId}/dashboard` : "/dashboard",
+    workspaceId ? `/${workspaceId}/dashboard/my` : "/dashboard/my",
+    workspaceId ? `/${workspaceId}/report` : "/report",
+    workspaceId ? `/${workspaceId}/setup` : "/setup",
+    workspaceId ? `/${workspaceId}/scoreboards` : "/scoreboards",
+    workspaceId ? `/${workspaceId}/profile` : "/profile",
   ];
 
   const isMainTab = mainTabPaths.includes(pathname);

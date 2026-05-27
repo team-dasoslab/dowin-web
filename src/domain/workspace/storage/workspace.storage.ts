@@ -1,4 +1,10 @@
 import { getDb } from "@/db";
+import { customAlphabet } from "nanoid";
+
+const generateUid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  12
+);
 import {
   billingPlanLimits,
   users,
@@ -6,6 +12,7 @@ import {
   workspaceMembers,
   workspaceTags,
   workspaces,
+  workspaceBillingState,
 } from "@/db/schema";
 import { and, eq, gt, inArray, lt, sql } from "drizzle-orm";
 
@@ -17,9 +24,37 @@ type WorkspaceTag = typeof workspaceTags.$inferSelect;
 type WorkspaceMemberWithUser = WorkspaceMember & {
   user: typeof users.$inferSelect;
 };
+type WorkspaceMembershipWithWorkspace = WorkspaceMember & {
+  workspace: Workspace;
+};
 
 export class WorkspaceStorage {
   constructor(private db: Db) {}
+
+  async getAccessContextData(workspaceId: number, userId: number) {
+    const result = await this.db
+      .select({
+        workspace: workspaces,
+        member: workspaceMembers,
+        billingState: workspaceBillingState,
+      })
+      .from(workspaces)
+      .innerJoin(
+        workspaceMembers,
+        and(
+          eq(workspaces.id, workspaceMembers.workspaceId),
+          eq(workspaceMembers.userId, userId),
+        ),
+      )
+      .leftJoin(
+        workspaceBillingState,
+        eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .where(eq(workspaces.id, workspaceId))
+      .limit(1);
+
+    return result[0] ?? null;
+  }
 
   async findWorkspaceById(workspaceId: number): Promise<Workspace | null> {
     return (
@@ -29,20 +64,29 @@ export class WorkspaceStorage {
     );
   }
 
+  async resolveIdByUid(uid: string): Promise<number | null> {
+    const workspace = await this.db.query.workspaces.findFirst({
+      where: eq(workspaces.uid, uid),
+      columns: { id: true },
+    });
+    return workspace?.id ?? null;
+  }
+
   async findUserWorkspace(userId: number): Promise<Workspace | null> {
-    const workspaceMember = await this.db.query.workspaceMembers.findFirst({
+    const firstMembership = await this.db.query.workspaceMembers.findFirst({
       where: eq(workspaceMembers.userId, userId),
       with: {
         workspace: true,
       },
     });
-    return workspaceMember?.workspace ?? null;
+    return firstMembership?.workspace ?? null;
   }
 
   async createWorkspace(name: string): Promise<Workspace> {
+    const uid = generateUid();
     const [newWorkspace] = await this.db
       .insert(workspaces)
-      .values({ name })
+      .values({ name, uid })
       .returning();
     return newWorkspace;
   }
@@ -78,8 +122,21 @@ export class WorkspaceStorage {
     return (
       (await this.db.query.workspaceMembers.findFirst({
         where: eq(workspaceMembers.userId, userId),
+        orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
       })) ?? null
     );
+  }
+
+  async listUserWorkspaces(
+    userId: number,
+  ): Promise<WorkspaceMembershipWithWorkspace[]> {
+    return await this.db.query.workspaceMembers.findMany({
+      where: eq(workspaceMembers.userId, userId),
+      with: {
+        workspace: true,
+      },
+      orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
+    });
   }
 
   async findMembershipById(

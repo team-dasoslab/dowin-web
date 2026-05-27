@@ -7,6 +7,23 @@ import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { cookies } from "next/headers";
+
+export const GET = withErrorHandler(async () => {
+  const { env } = getCloudflareContext();
+  const db = getDb(env.DB);
+  const storage = new WorkspaceStorage(db);
+  const service = new WorkspaceService(storage);
+
+  const session = await getSessionWithRefresh(db);
+  if (!session) {
+    return await apiError("UNAUTHORIZED");
+  }
+
+  const workspaces = await service.listMyWorkspaces(session.userId);
+
+  return apiSuccess(workspaces);
+});
 
 export const POST = withErrorHandler(async (request: Request) => {
   const { env } = getCloudflareContext();
@@ -40,5 +57,15 @@ export const POST = withErrorHandler(async (request: Request) => {
     session.userId,
     parsed.data.name,
   );
+
+  const cookieStore = await cookies();
+  cookieStore.set("dowin_workspace_id", workspace.id, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  });
+
   return apiSuccess(workspace, 201);
 });

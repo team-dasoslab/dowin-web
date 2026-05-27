@@ -1,7 +1,6 @@
 import { NotFoundError, ForbiddenError } from "@/lib/server/errors";
 
 type WorkspaceLookupPort = {
-  findUserWorkspace(userId: number): Promise<{ id: number; name: string; planCode?: string } | null>;
   findMembers(workspaceId: number): Promise<
     Array<{
       userId: number;
@@ -48,6 +47,8 @@ type DailyLogLookup = Awaited<
   ReturnType<DailyLogLookupPort["findLogsForLeadMeasures"]>
 >[number];
 
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+
 export class DashboardService {
   constructor(
     private workspaceStorage: WorkspaceLookupPort,
@@ -55,18 +56,13 @@ export class DashboardService {
     private dailyLogStorage: DailyLogLookupPort,
   ) {}
 
-  async getTeamDashboard(userId: number, weekStart?: string) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
+  async getTeamDashboard(context: WorkspaceAccessContext, weekStart?: string) {
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
-    assertHistoryLimit(workspace.planCode ?? "FREE", normalizedWeekStart);
+    assertHistoryLimit(context, normalizedWeekStart);
 
-    const members = await this.workspaceStorage.findMembers(workspace.id);
+    const members = await this.workspaceStorage.findMembers(context.workspaceId);
     const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
-      workspace.id,
+      context.workspaceId,
     );
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
     const logRange = getDashboardLogRange(normalizedWeekStart);
@@ -77,8 +73,8 @@ export class DashboardService {
     );
 
     return buildTeamDashboard({
-      workspace,
-      userId,
+      workspace: { id: context.workspaceId, name: context.workspaceName },
+      userId: context.userId,
       normalizedWeekStart,
       members,
       scoreboards,
@@ -86,12 +82,7 @@ export class DashboardService {
     });
   }
 
-  async getTeamWeeklyReport(userId: number, weekStart?: string, weeks = 5) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
+  async getTeamWeeklyReport(context: WorkspaceAccessContext, weekStart?: string, weeks = 5) {
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     const boundedWeeks = Math.min(Math.max(weeks, 1), 12);
     const trendWeekStarts = getPreviousWeekStarts(
@@ -100,11 +91,11 @@ export class DashboardService {
     );
     const earliestWeekStart = trendWeekStarts[0] ?? normalizedWeekStart;
 
-    assertHistoryLimit(workspace.planCode ?? "FREE", earliestWeekStart);
+    assertHistoryLimit(context, earliestWeekStart);
 
-    const members = await this.workspaceStorage.findMembers(workspace.id);
+    const members = await this.workspaceStorage.findMembers(context.workspaceId);
     const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
-      workspace.id,
+      context.workspaceId,
     );
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
     const currentDashboardLogRange = getDashboardLogRange(normalizedWeekStart);
@@ -119,8 +110,8 @@ export class DashboardService {
         : currentDashboardLogRange.end,
     );
     const dashboard = buildTeamDashboard({
-      workspace,
-      userId,
+      workspace: { id: context.workspaceId, name: context.workspaceName },
+      userId: context.userId,
       normalizedWeekStart,
       members,
       scoreboards,
@@ -440,8 +431,8 @@ function getCurrentWeekStart() {
   return monday.toISOString().slice(0, 10);
 }
 
-function assertHistoryLimit(planCode: string, requestedDate: string) {
-  if (planCode !== "FREE") return;
+function assertHistoryLimit(context: WorkspaceAccessContext, requestedDate: string) {
+  if (context.entitlement.canAccessStandardFeatures) return;
 
   const now = new Date();
   const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);

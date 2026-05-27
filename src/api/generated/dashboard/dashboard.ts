@@ -30,8 +30,8 @@ import type {
   DashboardTeamMemoListResponse,
   DashboardTeamMemoResolveRequest,
   ErrorResponse,
-  GetDashboardTeamMemosParams,
-  GetDashboardTeamParams,
+  GetWorkspacesWorkspaceIdDashboardTeamMemosParams,
+  GetWorkspacesWorkspaceIdDashboardTeamParams,
   TeamDashboardResponse,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
@@ -46,31 +46,32 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 팀 대시보드 조회
  */
-export type getDashboardTeamResponse200 = {
+export type getWorkspacesWorkspaceIdDashboardTeamResponse200 = {
   data: TeamDashboardResponse
   status: 200
 }
 
-export type getDashboardTeamResponse401 = {
+export type getWorkspacesWorkspaceIdDashboardTeamResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getDashboardTeamResponse404 = {
+export type getWorkspacesWorkspaceIdDashboardTeamResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getDashboardTeamResponseSuccess = (getDashboardTeamResponse200) & {
+export type getWorkspacesWorkspaceIdDashboardTeamResponseSuccess = (getWorkspacesWorkspaceIdDashboardTeamResponse200) & {
   headers: Headers;
 };
-export type getDashboardTeamResponseError = (getDashboardTeamResponse401 | getDashboardTeamResponse404) & {
+export type getWorkspacesWorkspaceIdDashboardTeamResponseError = (getWorkspacesWorkspaceIdDashboardTeamResponse401 | getWorkspacesWorkspaceIdDashboardTeamResponse404) & {
   headers: Headers;
 };
 
-export type getDashboardTeamResponse = (getDashboardTeamResponseSuccess | getDashboardTeamResponseError)
+export type getWorkspacesWorkspaceIdDashboardTeamResponse = (getWorkspacesWorkspaceIdDashboardTeamResponseSuccess | getWorkspacesWorkspaceIdDashboardTeamResponseError)
 
-export const getGetDashboardTeamUrl = (params?: GetDashboardTeamParams,) => {
+export const getGetWorkspacesWorkspaceIdDashboardTeamUrl = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -82,12 +83,13 @@ export const getGetDashboardTeamUrl = (params?: GetDashboardTeamParams,) => {
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/dashboard/team?${stringifiedParams}` : `/api/dashboard/team`
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/dashboard/team?${stringifiedParams}` : `/api/workspaces/${workspaceId}/dashboard/team`
 }
 
-export const getDashboardTeam = async (params?: GetDashboardTeamParams, options?: RequestInit): Promise<getDashboardTeamResponse> => {
+export const getWorkspacesWorkspaceIdDashboardTeam = async (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdDashboardTeamResponse> => {
   
-  return customInstance<getDashboardTeamResponse>(getGetDashboardTeamUrl(params),
+  return customInstance<getWorkspacesWorkspaceIdDashboardTeamResponse>(getGetWorkspacesWorkspaceIdDashboardTeamUrl(workspaceId,params),
   {      
     ...options,
     method: 'GET'
@@ -100,69 +102,75 @@ export const getDashboardTeam = async (params?: GetDashboardTeamParams, options?
 
 
 
-export const getGetDashboardTeamQueryKey = (params?: GetDashboardTeamParams,) => {
+export const getGetWorkspacesWorkspaceIdDashboardTeamQueryKey = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamParams,) => {
     return [
-    `/api/dashboard/team`, ...(params ? [params] : [])
+    `/api/workspaces/${workspaceId}/dashboard/team`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getGetDashboardTeamQueryOptions = <TData = Awaited<ReturnType<typeof getDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(params?: GetDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdDashboardTeamQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetDashboardTeamQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdDashboardTeamQueryKey(workspaceId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDashboardTeam>>> = ({ signal }) => getDashboardTeam(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>> = ({ signal }) => getWorkspacesWorkspaceIdDashboardTeam(workspaceId,params, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeam>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetDashboardTeamQueryResult = NonNullable<Awaited<ReturnType<typeof getDashboardTeam>>>
-export type GetDashboardTeamQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdDashboardTeamQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>>
+export type GetWorkspacesWorkspaceIdDashboardTeamQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetDashboardTeam<TData = Awaited<ReturnType<typeof getDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params: undefined |  GetDashboardTeamParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeam>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdDashboardTeam<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: undefined |  GetWorkspacesWorkspaceIdDashboardTeamParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getDashboardTeam>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>,
           TError,
-          Awaited<ReturnType<typeof getDashboardTeam>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetDashboardTeam<TData = Awaited<ReturnType<typeof getDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params?: GetDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeam>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdDashboardTeam<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getDashboardTeam>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>,
           TError,
-          Awaited<ReturnType<typeof getDashboardTeam>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetDashboardTeam<TData = Awaited<ReturnType<typeof getDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params?: GetDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdDashboardTeam<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 팀 대시보드 조회
  */
 
-export function useGetDashboardTeam<TData = Awaited<ReturnType<typeof getDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params?: GetDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdDashboardTeam<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetDashboardTeamQueryOptions(params,options)
+  const queryOptions = getGetWorkspacesWorkspaceIdDashboardTeamQueryOptions(workspaceId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -175,36 +183,37 @@ export function useGetDashboardTeam<TData = Awaited<ReturnType<typeof getDashboa
 /**
  * @summary 팀 대시보드 사용자 메모 조회
  */
-export type getDashboardTeamMemosResponse200 = {
+export type getWorkspacesWorkspaceIdDashboardTeamMemosResponse200 = {
   data: DashboardTeamMemoListResponse
   status: 200
 }
 
-export type getDashboardTeamMemosResponse401 = {
+export type getWorkspacesWorkspaceIdDashboardTeamMemosResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getDashboardTeamMemosResponse404 = {
+export type getWorkspacesWorkspaceIdDashboardTeamMemosResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getDashboardTeamMemosResponse422 = {
+export type getWorkspacesWorkspaceIdDashboardTeamMemosResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type getDashboardTeamMemosResponseSuccess = (getDashboardTeamMemosResponse200) & {
+export type getWorkspacesWorkspaceIdDashboardTeamMemosResponseSuccess = (getWorkspacesWorkspaceIdDashboardTeamMemosResponse200) & {
   headers: Headers;
 };
-export type getDashboardTeamMemosResponseError = (getDashboardTeamMemosResponse401 | getDashboardTeamMemosResponse404 | getDashboardTeamMemosResponse422) & {
+export type getWorkspacesWorkspaceIdDashboardTeamMemosResponseError = (getWorkspacesWorkspaceIdDashboardTeamMemosResponse401 | getWorkspacesWorkspaceIdDashboardTeamMemosResponse404 | getWorkspacesWorkspaceIdDashboardTeamMemosResponse422) & {
   headers: Headers;
 };
 
-export type getDashboardTeamMemosResponse = (getDashboardTeamMemosResponseSuccess | getDashboardTeamMemosResponseError)
+export type getWorkspacesWorkspaceIdDashboardTeamMemosResponse = (getWorkspacesWorkspaceIdDashboardTeamMemosResponseSuccess | getWorkspacesWorkspaceIdDashboardTeamMemosResponseError)
 
-export const getGetDashboardTeamMemosUrl = (params: GetDashboardTeamMemosParams,) => {
+export const getGetWorkspacesWorkspaceIdDashboardTeamMemosUrl = (workspaceId: string,
+    params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -216,12 +225,13 @@ export const getGetDashboardTeamMemosUrl = (params: GetDashboardTeamMemosParams,
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/dashboard/team/memos?${stringifiedParams}` : `/api/dashboard/team/memos`
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/dashboard/team/memos?${stringifiedParams}` : `/api/workspaces/${workspaceId}/dashboard/team/memos`
 }
 
-export const getDashboardTeamMemos = async (params: GetDashboardTeamMemosParams, options?: RequestInit): Promise<getDashboardTeamMemosResponse> => {
+export const getWorkspacesWorkspaceIdDashboardTeamMemos = async (workspaceId: string,
+    params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdDashboardTeamMemosResponse> => {
   
-  return customInstance<getDashboardTeamMemosResponse>(getGetDashboardTeamMemosUrl(params),
+  return customInstance<getWorkspacesWorkspaceIdDashboardTeamMemosResponse>(getGetWorkspacesWorkspaceIdDashboardTeamMemosUrl(workspaceId,params),
   {      
     ...options,
     method: 'GET'
@@ -234,69 +244,75 @@ export const getDashboardTeamMemos = async (params: GetDashboardTeamMemosParams,
 
 
 
-export const getGetDashboardTeamMemosQueryKey = (params?: GetDashboardTeamMemosParams,) => {
+export const getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryKey = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardTeamMemosParams,) => {
     return [
-    `/api/dashboard/team/memos`, ...(params ? [params] : [])
+    `/api/workspaces/${workspaceId}/dashboard/team/memos`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getGetDashboardTeamMemosQueryOptions = <TData = Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(params: GetDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetDashboardTeamMemosQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryKey(workspaceId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDashboardTeamMemos>>> = ({ signal }) => getDashboardTeamMemos(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>> = ({ signal }) => getWorkspacesWorkspaceIdDashboardTeamMemos(workspaceId,params, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetDashboardTeamMemosQueryResult = NonNullable<Awaited<ReturnType<typeof getDashboardTeamMemos>>>
-export type GetDashboardTeamMemosQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdDashboardTeamMemosQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>>
+export type GetWorkspacesWorkspaceIdDashboardTeamMemosQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetDashboardTeamMemos<TData = Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params: GetDashboardTeamMemosParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdDashboardTeamMemos<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getDashboardTeamMemos>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>,
           TError,
-          Awaited<ReturnType<typeof getDashboardTeamMemos>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetDashboardTeamMemos<TData = Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params: GetDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdDashboardTeamMemos<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getDashboardTeamMemos>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>,
           TError,
-          Awaited<ReturnType<typeof getDashboardTeamMemos>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetDashboardTeamMemos<TData = Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params: GetDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdDashboardTeamMemos<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 팀 대시보드 사용자 메모 조회
  */
 
-export function useGetDashboardTeamMemos<TData = Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params: GetDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdDashboardTeamMemos<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetDashboardTeamMemosQueryOptions(params,options)
+  const queryOptions = getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryOptions(workspaceId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -307,48 +323,49 @@ export function useGetDashboardTeamMemos<TData = Awaited<ReturnType<typeof getDa
 
 
 /**
- * @summary 팀 대시보드 사용자 메모 생성
+ * @summary 팀 대시보드 사용자 메모 작성
  */
-export type postDashboardTeamMemosResponse201 = {
+export type postWorkspacesWorkspaceIdDashboardTeamMemosResponse201 = {
   data: DashboardTeamMemo
   status: 201
 }
 
-export type postDashboardTeamMemosResponse401 = {
+export type postWorkspacesWorkspaceIdDashboardTeamMemosResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postDashboardTeamMemosResponse404 = {
+export type postWorkspacesWorkspaceIdDashboardTeamMemosResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type postDashboardTeamMemosResponse422 = {
+export type postWorkspacesWorkspaceIdDashboardTeamMemosResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type postDashboardTeamMemosResponseSuccess = (postDashboardTeamMemosResponse201) & {
+export type postWorkspacesWorkspaceIdDashboardTeamMemosResponseSuccess = (postWorkspacesWorkspaceIdDashboardTeamMemosResponse201) & {
   headers: Headers;
 };
-export type postDashboardTeamMemosResponseError = (postDashboardTeamMemosResponse401 | postDashboardTeamMemosResponse404 | postDashboardTeamMemosResponse422) & {
+export type postWorkspacesWorkspaceIdDashboardTeamMemosResponseError = (postWorkspacesWorkspaceIdDashboardTeamMemosResponse401 | postWorkspacesWorkspaceIdDashboardTeamMemosResponse404 | postWorkspacesWorkspaceIdDashboardTeamMemosResponse422) & {
   headers: Headers;
 };
 
-export type postDashboardTeamMemosResponse = (postDashboardTeamMemosResponseSuccess | postDashboardTeamMemosResponseError)
+export type postWorkspacesWorkspaceIdDashboardTeamMemosResponse = (postWorkspacesWorkspaceIdDashboardTeamMemosResponseSuccess | postWorkspacesWorkspaceIdDashboardTeamMemosResponseError)
 
-export const getPostDashboardTeamMemosUrl = () => {
+export const getPostWorkspacesWorkspaceIdDashboardTeamMemosUrl = (workspaceId: string,) => {
 
 
   
 
-  return `/api/dashboard/team/memos`
+  return `/api/workspaces/${workspaceId}/dashboard/team/memos`
 }
 
-export const postDashboardTeamMemos = async (dashboardTeamMemoCreateRequest: DashboardTeamMemoCreateRequest, options?: RequestInit): Promise<postDashboardTeamMemosResponse> => {
+export const postWorkspacesWorkspaceIdDashboardTeamMemos = async (workspaceId: string,
+    dashboardTeamMemoCreateRequest: DashboardTeamMemoCreateRequest, options?: RequestInit): Promise<postWorkspacesWorkspaceIdDashboardTeamMemosResponse> => {
   
-  return customInstance<postDashboardTeamMemosResponse>(getPostDashboardTeamMemosUrl(),
+  return customInstance<postWorkspacesWorkspaceIdDashboardTeamMemosResponse>(getPostWorkspacesWorkspaceIdDashboardTeamMemosUrl(workspaceId),
   {      
     ...options,
     method: 'POST',
@@ -361,11 +378,11 @@ export const postDashboardTeamMemos = async (dashboardTeamMemoCreateRequest: Das
 
 
 
-export const getPostDashboardTeamMemosMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postDashboardTeamMemos>>, TError,{data: DashboardTeamMemoCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postDashboardTeamMemos>>, TError,{data: DashboardTeamMemoCreateRequest}, TContext> => {
+export const getPostWorkspacesWorkspaceIdDashboardTeamMemosMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdDashboardTeamMemos>>, TError,{workspaceId: string;data: DashboardTeamMemoCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdDashboardTeamMemos>>, TError,{workspaceId: string;data: DashboardTeamMemoCreateRequest}, TContext> => {
 
-const mutationKey = ['postDashboardTeamMemos'];
+const mutationKey = ['postWorkspacesWorkspaceIdDashboardTeamMemos'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -375,10 +392,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postDashboardTeamMemos>>, {data: DashboardTeamMemoCreateRequest}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdDashboardTeamMemos>>, {workspaceId: string;data: DashboardTeamMemoCreateRequest}> = (props) => {
+          const {workspaceId,data} = props ?? {};
 
-          return  postDashboardTeamMemos(data,requestOptions)
+          return  postWorkspacesWorkspaceIdDashboardTeamMemos(workspaceId,data,requestOptions)
         }
 
 
@@ -388,72 +405,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostDashboardTeamMemosMutationResult = NonNullable<Awaited<ReturnType<typeof postDashboardTeamMemos>>>
-    export type PostDashboardTeamMemosMutationBody = DashboardTeamMemoCreateRequest
-    export type PostDashboardTeamMemosMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PostWorkspacesWorkspaceIdDashboardTeamMemosMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdDashboardTeamMemos>>>
+    export type PostWorkspacesWorkspaceIdDashboardTeamMemosMutationBody = DashboardTeamMemoCreateRequest
+    export type PostWorkspacesWorkspaceIdDashboardTeamMemosMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary 팀 대시보드 사용자 메모 생성
+ * @summary 팀 대시보드 사용자 메모 작성
  */
-export const usePostDashboardTeamMemos = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postDashboardTeamMemos>>, TError,{data: DashboardTeamMemoCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdDashboardTeamMemos = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdDashboardTeamMemos>>, TError,{workspaceId: string;data: DashboardTeamMemoCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postDashboardTeamMemos>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdDashboardTeamMemos>>,
         TError,
-        {data: DashboardTeamMemoCreateRequest},
+        {workspaceId: string;data: DashboardTeamMemoCreateRequest},
         TContext
       > => {
-      return useMutation(getPostDashboardTeamMemosMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdDashboardTeamMemosMutationOptions(options), queryClient);
     }
     /**
  * @summary 팀 대시보드 사용자 메모 완료 상태 변경
  */
-export type patchDashboardTeamMemosMemoIdResolveResponse200 = {
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse200 = {
   data: DashboardTeamMemo
   status: 200
 }
 
-export type patchDashboardTeamMemosMemoIdResolveResponse401 = {
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type patchDashboardTeamMemosMemoIdResolveResponse403 = {
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type patchDashboardTeamMemosMemoIdResolveResponse404 = {
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type patchDashboardTeamMemosMemoIdResolveResponse422 = {
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type patchDashboardTeamMemosMemoIdResolveResponseSuccess = (patchDashboardTeamMemosMemoIdResolveResponse200) & {
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponseSuccess = (patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse200) & {
   headers: Headers;
 };
-export type patchDashboardTeamMemosMemoIdResolveResponseError = (patchDashboardTeamMemosMemoIdResolveResponse401 | patchDashboardTeamMemosMemoIdResolveResponse403 | patchDashboardTeamMemosMemoIdResolveResponse404 | patchDashboardTeamMemosMemoIdResolveResponse422) & {
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponseError = (patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse401 | patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse403 | patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse404 | patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse422) & {
   headers: Headers;
 };
 
-export type patchDashboardTeamMemosMemoIdResolveResponse = (patchDashboardTeamMemosMemoIdResolveResponseSuccess | patchDashboardTeamMemosMemoIdResolveResponseError)
+export type patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse = (patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponseSuccess | patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponseError)
 
-export const getPatchDashboardTeamMemosMemoIdResolveUrl = (memoId: number,) => {
+export const getPatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveUrl = (workspaceId: string,
+    memoId: number,) => {
 
 
   
 
-  return `/api/dashboard/team/memos/${memoId}/resolve`
+  return `/api/workspaces/${workspaceId}/dashboard/team/memos/${memoId}/resolve`
 }
 
-export const patchDashboardTeamMemosMemoIdResolve = async (memoId: number,
-    dashboardTeamMemoResolveRequest: DashboardTeamMemoResolveRequest, options?: RequestInit): Promise<patchDashboardTeamMemosMemoIdResolveResponse> => {
+export const patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve = async (workspaceId: string,
+    memoId: number,
+    dashboardTeamMemoResolveRequest: DashboardTeamMemoResolveRequest, options?: RequestInit): Promise<patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse> => {
   
-  return customInstance<patchDashboardTeamMemosMemoIdResolveResponse>(getPatchDashboardTeamMemosMemoIdResolveUrl(memoId),
+  return customInstance<patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse>(getPatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveUrl(workspaceId,memoId),
   {      
     ...options,
     method: 'PATCH',
@@ -466,11 +485,11 @@ export const patchDashboardTeamMemosMemoIdResolve = async (memoId: number,
 
 
 
-export const getPatchDashboardTeamMemosMemoIdResolveMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchDashboardTeamMemosMemoIdResolve>>, TError,{memoId: number;data: DashboardTeamMemoResolveRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof patchDashboardTeamMemosMemoIdResolve>>, TError,{memoId: number;data: DashboardTeamMemoResolveRequest}, TContext> => {
+export const getPatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve>>, TError,{workspaceId: string;memoId: number;data: DashboardTeamMemoResolveRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve>>, TError,{workspaceId: string;memoId: number;data: DashboardTeamMemoResolveRequest}, TContext> => {
 
-const mutationKey = ['patchDashboardTeamMemosMemoIdResolve'];
+const mutationKey = ['patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -480,10 +499,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchDashboardTeamMemosMemoIdResolve>>, {memoId: number;data: DashboardTeamMemoResolveRequest}> = (props) => {
-          const {memoId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve>>, {workspaceId: string;memoId: number;data: DashboardTeamMemoResolveRequest}> = (props) => {
+          const {workspaceId,memoId,data} = props ?? {};
 
-          return  patchDashboardTeamMemosMemoIdResolve(memoId,data,requestOptions)
+          return  patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve(workspaceId,memoId,data,requestOptions)
         }
 
 
@@ -493,66 +512,68 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PatchDashboardTeamMemosMemoIdResolveMutationResult = NonNullable<Awaited<ReturnType<typeof patchDashboardTeamMemosMemoIdResolve>>>
-    export type PatchDashboardTeamMemosMemoIdResolveMutationBody = DashboardTeamMemoResolveRequest
-    export type PatchDashboardTeamMemosMemoIdResolveMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveMutationResult = NonNullable<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve>>>
+    export type PatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveMutationBody = DashboardTeamMemoResolveRequest
+    export type PatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 팀 대시보드 사용자 메모 완료 상태 변경
  */
-export const usePatchDashboardTeamMemosMemoIdResolve = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchDashboardTeamMemosMemoIdResolve>>, TError,{memoId: number;data: DashboardTeamMemoResolveRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve>>, TError,{workspaceId: string;memoId: number;data: DashboardTeamMemoResolveRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof patchDashboardTeamMemosMemoIdResolve>>,
+        Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve>>,
         TError,
-        {memoId: number;data: DashboardTeamMemoResolveRequest},
+        {workspaceId: string;memoId: number;data: DashboardTeamMemoResolveRequest},
         TContext
       > => {
-      return useMutation(getPatchDashboardTeamMemosMemoIdResolveMutationOptions(options), queryClient);
+      return useMutation(getPatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveMutationOptions(options), queryClient);
     }
     /**
  * @summary 팀 대시보드 사용자 메모 삭제
  */
-export type deleteDashboardTeamMemosMemoIdResponse204 = {
+export type deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse204 = {
   data: void
   status: 204
 }
 
-export type deleteDashboardTeamMemosMemoIdResponse401 = {
+export type deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type deleteDashboardTeamMemosMemoIdResponse403 = {
+export type deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type deleteDashboardTeamMemosMemoIdResponse404 = {
+export type deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type deleteDashboardTeamMemosMemoIdResponseSuccess = (deleteDashboardTeamMemosMemoIdResponse204) & {
+export type deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponseSuccess = (deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse204) & {
   headers: Headers;
 };
-export type deleteDashboardTeamMemosMemoIdResponseError = (deleteDashboardTeamMemosMemoIdResponse401 | deleteDashboardTeamMemosMemoIdResponse403 | deleteDashboardTeamMemosMemoIdResponse404) & {
+export type deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponseError = (deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse401 | deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse403 | deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse404) & {
   headers: Headers;
 };
 
-export type deleteDashboardTeamMemosMemoIdResponse = (deleteDashboardTeamMemosMemoIdResponseSuccess | deleteDashboardTeamMemosMemoIdResponseError)
+export type deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse = (deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponseSuccess | deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponseError)
 
-export const getDeleteDashboardTeamMemosMemoIdUrl = (memoId: number,) => {
+export const getDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdUrl = (workspaceId: string,
+    memoId: number,) => {
 
 
   
 
-  return `/api/dashboard/team/memos/${memoId}`
+  return `/api/workspaces/${workspaceId}/dashboard/team/memos/${memoId}`
 }
 
-export const deleteDashboardTeamMemosMemoId = async (memoId: number, options?: RequestInit): Promise<deleteDashboardTeamMemosMemoIdResponse> => {
+export const deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId = async (workspaceId: string,
+    memoId: number, options?: RequestInit): Promise<deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse> => {
   
-  return customInstance<deleteDashboardTeamMemosMemoIdResponse>(getDeleteDashboardTeamMemosMemoIdUrl(memoId),
+  return customInstance<deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse>(getDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdUrl(workspaceId,memoId),
   {      
     ...options,
     method: 'DELETE'
@@ -564,11 +585,11 @@ export const deleteDashboardTeamMemosMemoId = async (memoId: number, options?: R
 
 
 
-export const getDeleteDashboardTeamMemosMemoIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDashboardTeamMemosMemoId>>, TError,{memoId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteDashboardTeamMemosMemoId>>, TError,{memoId: number}, TContext> => {
+export const getDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>, TError,{workspaceId: string;memoId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>, TError,{workspaceId: string;memoId: number}, TContext> => {
 
-const mutationKey = ['deleteDashboardTeamMemosMemoId'];
+const mutationKey = ['deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -578,10 +599,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDashboardTeamMemosMemoId>>, {memoId: number}> = (props) => {
-          const {memoId} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>, {workspaceId: string;memoId: number}> = (props) => {
+          const {workspaceId,memoId} = props ?? {};
 
-          return  deleteDashboardTeamMemosMemoId(memoId,requestOptions)
+          return  deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId(workspaceId,memoId,requestOptions)
         }
 
 
@@ -591,21 +612,21 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DeleteDashboardTeamMemosMemoIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDashboardTeamMemosMemoId>>>
+    export type DeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>>
     
-    export type DeleteDashboardTeamMemosMemoIdMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type DeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 팀 대시보드 사용자 메모 삭제
  */
-export const useDeleteDashboardTeamMemosMemoId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDashboardTeamMemosMemoId>>, TError,{memoId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>, TError,{workspaceId: string;memoId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteDashboardTeamMemosMemoId>>,
+        Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>,
         TError,
-        {memoId: number},
+        {workspaceId: string;memoId: number},
         TContext
       > => {
-      return useMutation(getDeleteDashboardTeamMemosMemoIdMutationOptions(options), queryClient);
+      return useMutation(getDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdMutationOptions(options), queryClient);
     }
     

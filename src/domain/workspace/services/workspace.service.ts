@@ -13,10 +13,21 @@ import { customAlphabet } from "nanoid";
 type Workspace = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["findUserWorkspace"]>>
 >;
-type WorkspaceWithPlanLimits = Workspace & {
+type PublicWorkspace = Omit<Workspace, "id" | "uid"> & {
+  id: string;
+};
+type WorkspaceWithPlanLimits = PublicWorkspace & {
   freeMemberLimit: number;
   isOverFreeMemberLimit: boolean;
   memberCount: number;
+};
+type WorkspaceListItem = {
+  id: string;
+  name: string;
+  planCode: "FREE" | "STANDARD";
+  role: "ADMIN" | "MEMBER";
+  isCurrent: boolean;
+  createdAt: Date;
 };
 type WorkspaceMemberListItem = {
   id: number;
@@ -40,7 +51,9 @@ const generateWorkspaceInviteCode = customAlphabet(
 
 const isWorkspaceMembershipUniqueViolation = (error: unknown) =>
   error instanceof Error &&
-  (error.message.includes("workspace_members.user_id") ||
+  (error.message.includes("workspace_members.workspace_id") ||
+    error.message.includes("workspace_members.user_id") ||
+    error.message.includes("workspace_members_workspace_user_unique") ||
     error.message.includes("workspace_members_user_unique"));
 
 const collectErrorMessages = (error: unknown): string[] => {
@@ -72,9 +85,30 @@ const isWorkspaceTagUniqueViolation = (error: unknown) => {
   );
 };
 
+const getWorkspacePublicId = (workspace: Pick<Workspace, "id" | "uid">) => {
+  if (!workspace.uid) {
+    throw new Error(`WORKSPACE_UID_MISSING:${workspace.id}`);
+  }
+
+  return workspace.uid;
+};
+
+const toPublicWorkspace = (workspace: Workspace): PublicWorkspace => {
+  return {
+    id: getWorkspacePublicId(workspace),
+    name: workspace.name,
+    planCode: workspace.planCode,
+    billingCustomerExternalRef: workspace.billingCustomerExternalRef,
+    billingOwnerUserId: workspace.billingOwnerUserId,
+    createdAt: workspace.createdAt,
+  };
+};
+
 export interface WorkspaceStoragePort {
+  resolveIdByUid: WorkspaceStorage["resolveIdByUid"];
   findWorkspaceById: WorkspaceStorage["findWorkspaceById"];
   findUserWorkspace: WorkspaceStorage["findUserWorkspace"];
+  listUserWorkspaces: WorkspaceStorage["listUserWorkspaces"];
   createWorkspace: WorkspaceStorage["createWorkspace"];
   updateWorkspaceName: WorkspaceStorage["updateWorkspaceName"];
   addMember: WorkspaceStorage["addMember"];
@@ -104,8 +138,45 @@ export interface WorkspaceStoragePort {
 export class WorkspaceService {
   constructor(private storage: WorkspaceStoragePort) {}
 
-  async getMyWorkspace(userId: number): Promise<WorkspaceWithPlanLimits> {
-    const workspace = await this.storage.findUserWorkspace(userId);
+  async resolveWorkspaceIdByUid(uid: string): Promise<number | null> {
+    return await this.storage.resolveIdByUid(uid);
+  }
+
+  async listMyWorkspaces(
+    userId: number,
+    currentWorkspaceId?: number | null,
+  ): Promise<WorkspaceListItem[]> {
+    const memberships = await this.storage.listUserWorkspaces(userId);
+    const resolvedCurrentWorkspaceId =
+      currentWorkspaceId ?? memberships[0]?.workspace.id ?? null;
+
+    return memberships.map((membership) => ({
+      id: getWorkspacePublicId(membership.workspace),
+      name: membership.workspace.name,
+      planCode: membership.workspace.planCode,
+      role: membership.role,
+      isCurrent: membership.workspace.id === resolvedCurrentWorkspaceId,
+      createdAt: membership.workspace.createdAt,
+    }));
+  }
+
+  async getMyWorkspace(userId: number, currentWorkspaceUid?: string): Promise<WorkspaceWithPlanLimits> {
+    let workspace = null;
+
+    if (currentWorkspaceUid) {
+      const internalId = await this.storage.resolveIdByUid(currentWorkspaceUid);
+      if (internalId) {
+        const membership = await this.storage.findMembership(internalId, userId);
+        if (membership) {
+          workspace = await this.storage.findWorkspaceById(internalId);
+        }
+      }
+    }
+
+    if (!workspace) {
+      workspace = await this.storage.findUserWorkspace(userId);
+    }
+
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -113,7 +184,7 @@ export class WorkspaceService {
     const freeMemberLimit = await getPlanMemberLimit("FREE", this.storage);
 
     return {
-      ...workspace,
+      ...toPublicWorkspace(workspace),
       freeMemberLimit: freeMemberLimit ?? 10,
       isOverFreeMemberLimit:
         workspace.planCode === "FREE" &&
@@ -123,12 +194,7 @@ export class WorkspaceService {
     };
   }
 
-  async createWorkspace(userId: number, name: string): Promise<Workspace> {
-    const existing = await this.storage.findUserWorkspace(userId);
-    if (existing) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
+  async createWorkspace(userId: number, name: string): Promise<PublicWorkspace> {
     const workspace = await this.storage.createWorkspace(name);
     try {
       await this.storage.addMember(workspace.id, userId, "ADMIN");
@@ -138,13 +204,13 @@ export class WorkspaceService {
       }
       throw error;
     }
-    return workspace;
+    return toPublicWorkspace(workspace);
   }
 
   async updateWorkspaceName(
     workspaceId: number,
     name: string,
-  ): Promise<Workspace> {
+  ): Promise<PublicWorkspace> {
     const workspace = await this.storage.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
@@ -158,15 +224,10 @@ export class WorkspaceService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return updatedWorkspace;
+    return toPublicWorkspace(updatedWorkspace);
   }
 
   async joinWorkspace(workspaceId: number, userId: number): Promise<void> {
-    const existing = await this.storage.findUserWorkspace(userId);
-    if (existing) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
     const workspace = await this.storage.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
@@ -308,11 +369,6 @@ export class WorkspaceService {
 
   async joinWorkspaceByInvite(code: string, userId: number): Promise<void> {
     const normalizedCode = code.trim().toUpperCase();
-    const existing = await this.storage.findUserWorkspace(userId);
-    if (existing) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
     const invite = await this.storage.findInviteByCode(normalizedCode);
     if (!invite) {
       throw new NotFoundError("INVALID_INVITE_CODE");

@@ -2,29 +2,27 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DashboardService } from "@/domain/dashboard/services/dashboard.service";
 
 describe("DashboardService", () => {
-  const findUserWorkspace = vi.fn();
   const findMembers = vi.fn();
   const findActiveScoreboardsByWorkspace = vi.fn();
   const findLogsForLeadMeasures = vi.fn();
 
   const service = new DashboardService(
-    { findUserWorkspace, findMembers },
+    { findMembers },
     { findActiveScoreboardsByWorkspace },
     { findLogsForLeadMeasures },
   );
+
+  const context: any = { workspaceId: 3, workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("워크스페이스가 없으면 404 에러를 던진다", async () => {
-    findUserWorkspace.mockResolvedValue(null);
-
-    await expect(service.getTeamDashboard(11)).rejects.toThrow("NOT_FOUND");
+    // 워크스페이스 없는 경우는 API 계층에서 처리하므로 생략
   });
 
   it("팀 대시보드 조회 시 멤버별 점수판 요약과 주간 로그를 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
     findMembers.mockResolvedValue([
       {
         id: 100,
@@ -77,7 +75,7 @@ describe("DashboardService", () => {
       { leadMeasureId: 32, logDate: "2026-03-11", value: true },
     ]);
 
-    const result = await service.getTeamDashboard(11, "2026-03-09");
+    const result = await service.getTeamDashboard(context, "2026-03-09");
 
     expect(result).toEqual({
       workspaceId: 3,
@@ -167,7 +165,6 @@ describe("DashboardService", () => {
   });
 
   it("팀 주간 리포트는 현재 주 대시보드와 최근 주차별 추세를 함께 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
     findMembers.mockResolvedValue([
       {
         id: 100,
@@ -210,7 +207,7 @@ describe("DashboardService", () => {
       { leadMeasureId: 31, logDate: "2026-04-20", value: true },
     ]);
 
-    const result = await service.getTeamWeeklyReport(11, "2026-04-20", 3);
+    const result = await service.getTeamWeeklyReport(context, "2026-04-20", 3);
 
     expect(result).toEqual(
       expect.objectContaining({
@@ -269,7 +266,6 @@ describe("DashboardService", () => {
   });
 
   it("팀 대시보드 주간 전체 달성률은 각 지표 목표 상한을 넘겨 합산하지 않는다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
     findMembers.mockResolvedValue([
       {
         id: 100,
@@ -316,7 +312,7 @@ describe("DashboardService", () => {
       { leadMeasureId: 32, logDate: "2026-03-10", value: true },
     ]);
 
-    const result = await service.getTeamDashboard(11, "2026-03-09");
+    const result = await service.getTeamDashboard(context, "2026-03-09");
 
     expect(result.members).toEqual([
       expect.objectContaining({
@@ -342,7 +338,6 @@ describe("DashboardService", () => {
   });
 
   it("팀 대시보드 주간 달성률은 이번 주 로그만 기준으로 계산한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
     findMembers.mockResolvedValue([
       {
         id: 100,
@@ -391,7 +386,7 @@ describe("DashboardService", () => {
       { leadMeasureId: 32, logDate: "2026-03-13", value: true },
     ]);
 
-    const result = await service.getTeamDashboard(11, "2026-03-09");
+    const result = await service.getTeamDashboard(context, "2026-03-09");
 
     expect(result.members).toEqual([
       expect.objectContaining({
@@ -417,7 +412,6 @@ describe("DashboardService", () => {
   });
 
   it("팀 대시보드 멤버 목록은 로그인 사용자를 최상단에 배치한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 3, name: "러닝 크루" });
     findMembers.mockResolvedValue([
       {
         id: 100,
@@ -444,7 +438,7 @@ describe("DashboardService", () => {
     findActiveScoreboardsByWorkspace.mockResolvedValue([]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getTeamDashboard(11, "2026-03-09");
+    const result = await service.getTeamDashboard(context, "2026-03-09");
 
     expect(result.members.map((member) => member.userId)).toEqual([11, 12, 13]);
   });

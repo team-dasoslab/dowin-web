@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetBillingMe } from "@/api/generated/billing/billing";
+import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
@@ -16,24 +16,33 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useLocale, useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
 type PlanCode = "FREE" | "STANDARD";
+type EntitlementSource =
+  | "POLAR"
+  | "MANUAL_GRANT"
+  | "PARTNER"
+  | "INTERNAL_TEST"
+  | null;
 
 export function ProfileBillingPageClient() {
   const t = useTranslations("ProfileBilling");
   const isNativeApp = useNativeApp();
   const locale = useLocale();
   const router = useRouter();
+  const workspaceId = useParams().workspaceId as string | undefined;
   const {
     data: billingResponse,
     error,
     isLoading,
     isFetching,
     refetch,
-  } = useGetBillingMe({
+  } = useGetWorkspacesWorkspaceIdBillingMe(workspaceId ?? "", {
     query: {
       retry: false,
     },
@@ -69,8 +78,8 @@ export function ProfileBillingPageClient() {
       return;
     }
 
-    router.replace("/pricing");
-  }, [billing, isNativeApp, router]);
+    router.replace(getWorkspacePath(workspaceId, "/pricing"));
+  }, [billing, isNativeApp, router, workspaceId]);
 
   if (isLoading) {
     return <ProfileBillingSkeleton />;
@@ -98,8 +107,10 @@ export function ProfileBillingPageClient() {
 
   const isAdmin = billing.canManageBilling;
   const requiresManualReview = billing.requiresManualReview;
+  const isPolarEntitlement = billing.entitlementSource === "POLAR";
   const canOpenPortal =
     isAdmin &&
+    isPolarEntitlement &&
     (billing.planCode === "STANDARD" ||
       billing.billingStatus === "ACTIVE" ||
       billing.billingStatus === "CANCELED");
@@ -124,6 +135,12 @@ export function ProfileBillingPageClient() {
                     ? t("standardPlanName")
                     : t("freePlanName")}
                 </p>
+                {billing.entitlementSource ? (
+                  <p className="mt-1 text-[11px] font-bold text-zinc-500">
+                    {t("entitlementSourceLabel")}:{" "}
+                    {getEntitlementSourceLabel(billing.entitlementSource, t)}
+                  </p>
+                ) : null}
               </div>
             </div>
 
@@ -148,6 +165,19 @@ export function ProfileBillingPageClient() {
                 className="mt-0.5 shrink-0"
               />
               {t("memberNotice")}
+            </div>
+          ) : null}
+
+          {billing.planCode === "STANDARD" && !isPolarEntitlement ? (
+            <div className="flex items-start gap-2.5 rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+              <DowinIcon
+                name="status-info"
+                size="14px"
+                className="mt-0.5 shrink-0"
+              />
+              {t("nonPolarEntitlementNotice", {
+                source: getEntitlementSourceLabel(billing.entitlementSource, t),
+              })}
             </div>
           ) : null}
         </div>
@@ -198,6 +228,7 @@ export function ProfileBillingPageClient() {
                 {getStatusDescription({
                   status: billing.billingStatus,
                   planCode: billing.planCode,
+                  entitlementSource: billing.entitlementSource,
                   currentPeriodEnd: billing.currentPeriodEnd,
                   locale,
                   t,
@@ -281,7 +312,7 @@ export function ProfileBillingPageClient() {
             {t("privacyLink")}
           </Link>
           <Link
-            href="/profile/contact"
+            href={getWorkspacePath(workspaceId, "/profile/contact")}
             className="transition-colors"
           >
             {t("contactLink")}
@@ -294,6 +325,7 @@ export function ProfileBillingPageClient() {
 
 function BillingUnavailableInAppState() {
   const t = useTranslations("ProfileBilling");
+  const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
@@ -306,7 +338,7 @@ function BillingUnavailableInAppState() {
               asChild
               className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
             >
-              <Link href="/profile">{t("appUnavailableAction")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
             </Button>
           }
           icon={
@@ -342,12 +374,14 @@ function formatDateLabel(
 function getStatusDescription({
   status,
   planCode,
+  entitlementSource,
   currentPeriodEnd,
   locale,
   t,
 }: {
   status: BillingStatus;
   planCode: PlanCode;
+  entitlementSource: EntitlementSource;
   currentPeriodEnd: string | null | undefined;
   locale: string;
   t: ReturnType<typeof useTranslations<"ProfileBilling">>;
@@ -360,6 +394,11 @@ function getStatusDescription({
 
   switch (status) {
     case "ACTIVE":
+      if (entitlementSource && entitlementSource !== "POLAR") {
+        return t("statusDescNonPolarActive", {
+          source: getEntitlementSourceLabel(entitlementSource, t),
+        });
+      }
       return t("statusDescActive", { date: formattedDate });
     case "CANCELED":
       return t("statusDescCanceled", { date: formattedDate });
@@ -372,6 +411,24 @@ function getStatusDescription({
       return planCode === "STANDARD"
         ? t("statusDescStandardFallback")
         : t("statusDescFree");
+  }
+}
+
+function getEntitlementSourceLabel(
+  source: EntitlementSource,
+  t: ReturnType<typeof useTranslations<"ProfileBilling">>,
+) {
+  switch (source) {
+    case "POLAR":
+      return t("entitlementSourcePolar");
+    case "MANUAL_GRANT":
+      return t("entitlementSourceManualGrant");
+    case "PARTNER":
+      return t("entitlementSourcePartner");
+    case "INTERNAL_TEST":
+      return t("entitlementSourceInternalTest");
+    default:
+      return t("notAvailable");
   }
 }
 

@@ -22,7 +22,7 @@ import type {
 
 import type {
   ErrorResponse,
-  GetReportsTeamWeeklyParams,
+  GetWorkspacesWorkspaceIdReportsTeamWeeklyParams,
   TeamWeeklyReportResponse,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
@@ -37,36 +37,37 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 리더용 주간 팀 리포트 조회
  */
-export type getReportsTeamWeeklyResponse200 = {
+export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponse200 = {
   data: TeamWeeklyReportResponse
   status: 200
 }
 
-export type getReportsTeamWeeklyResponse401 = {
+export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getReportsTeamWeeklyResponse403 = {
+export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type getReportsTeamWeeklyResponse404 = {
+export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getReportsTeamWeeklyResponseSuccess = (getReportsTeamWeeklyResponse200) & {
+export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponseSuccess = (getWorkspacesWorkspaceIdReportsTeamWeeklyResponse200) & {
   headers: Headers;
 };
-export type getReportsTeamWeeklyResponseError = (getReportsTeamWeeklyResponse401 | getReportsTeamWeeklyResponse403 | getReportsTeamWeeklyResponse404) & {
+export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponseError = (getWorkspacesWorkspaceIdReportsTeamWeeklyResponse401 | getWorkspacesWorkspaceIdReportsTeamWeeklyResponse403 | getWorkspacesWorkspaceIdReportsTeamWeeklyResponse404) & {
   headers: Headers;
 };
 
-export type getReportsTeamWeeklyResponse = (getReportsTeamWeeklyResponseSuccess | getReportsTeamWeeklyResponseError)
+export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponse = (getWorkspacesWorkspaceIdReportsTeamWeeklyResponseSuccess | getWorkspacesWorkspaceIdReportsTeamWeeklyResponseError)
 
-export const getGetReportsTeamWeeklyUrl = (params?: GetReportsTeamWeeklyParams,) => {
+export const getGetWorkspacesWorkspaceIdReportsTeamWeeklyUrl = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamWeeklyParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -78,12 +79,13 @@ export const getGetReportsTeamWeeklyUrl = (params?: GetReportsTeamWeeklyParams,)
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/reports/team-weekly?${stringifiedParams}` : `/api/reports/team-weekly`
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/reports/team-weekly?${stringifiedParams}` : `/api/workspaces/${workspaceId}/reports/team-weekly`
 }
 
-export const getReportsTeamWeekly = async (params?: GetReportsTeamWeeklyParams, options?: RequestInit): Promise<getReportsTeamWeeklyResponse> => {
+export const getWorkspacesWorkspaceIdReportsTeamWeekly = async (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamWeeklyParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdReportsTeamWeeklyResponse> => {
   
-  return customInstance<getReportsTeamWeeklyResponse>(getGetReportsTeamWeeklyUrl(params),
+  return customInstance<getWorkspacesWorkspaceIdReportsTeamWeeklyResponse>(getGetWorkspacesWorkspaceIdReportsTeamWeeklyUrl(workspaceId,params),
   {      
     ...options,
     method: 'GET'
@@ -96,69 +98,75 @@ export const getReportsTeamWeekly = async (params?: GetReportsTeamWeeklyParams, 
 
 
 
-export const getGetReportsTeamWeeklyQueryKey = (params?: GetReportsTeamWeeklyParams,) => {
+export const getGetWorkspacesWorkspaceIdReportsTeamWeeklyQueryKey = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamWeeklyParams,) => {
     return [
-    `/api/reports/team-weekly`, ...(params ? [params] : [])
+    `/api/workspaces/${workspaceId}/reports/team-weekly`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getGetReportsTeamWeeklyQueryOptions = <TData = Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(params?: GetReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdReportsTeamWeeklyQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetReportsTeamWeeklyQueryKey(params);
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdReportsTeamWeeklyQueryKey(workspaceId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReportsTeamWeekly>>> = ({ signal }) => getReportsTeamWeekly(params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>> = ({ signal }) => getWorkspacesWorkspaceIdReportsTeamWeekly(workspaceId,params, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetReportsTeamWeeklyQueryResult = NonNullable<Awaited<ReturnType<typeof getReportsTeamWeekly>>>
-export type GetReportsTeamWeeklyQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdReportsTeamWeeklyQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>>
+export type GetWorkspacesWorkspaceIdReportsTeamWeeklyQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetReportsTeamWeekly<TData = Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params: undefined |  GetReportsTeamWeeklyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdReportsTeamWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: undefined |  GetWorkspacesWorkspaceIdReportsTeamWeeklyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getReportsTeamWeekly>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>,
           TError,
-          Awaited<ReturnType<typeof getReportsTeamWeekly>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetReportsTeamWeekly<TData = Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params?: GetReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdReportsTeamWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getReportsTeamWeekly>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>,
           TError,
-          Awaited<ReturnType<typeof getReportsTeamWeekly>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetReportsTeamWeekly<TData = Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params?: GetReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdReportsTeamWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 리더용 주간 팀 리포트 조회
  */
 
-export function useGetReportsTeamWeekly<TData = Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- params?: GetReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportsTeamWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdReportsTeamWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetReportsTeamWeeklyQueryOptions(params,options)
+  const queryOptions = getGetWorkspacesWorkspaceIdReportsTeamWeeklyQueryOptions(workspaceId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

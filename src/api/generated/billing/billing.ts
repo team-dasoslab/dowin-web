@@ -28,7 +28,7 @@ import type {
   BillingCheckoutResponse,
   BillingOverview,
   ErrorResponse,
-  PostBillingCheckoutBody,
+  PostWorkspacesWorkspaceIdBillingCheckoutBody,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
 
@@ -42,41 +42,41 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 현재 워크스페이스 billing 상태 조회
  */
-export type getBillingMeResponse200 = {
+export type getWorkspacesWorkspaceIdBillingMeResponse200 = {
   data: BillingOverview
   status: 200
 }
 
-export type getBillingMeResponse401 = {
+export type getWorkspacesWorkspaceIdBillingMeResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getBillingMeResponse404 = {
+export type getWorkspacesWorkspaceIdBillingMeResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getBillingMeResponseSuccess = (getBillingMeResponse200) & {
+export type getWorkspacesWorkspaceIdBillingMeResponseSuccess = (getWorkspacesWorkspaceIdBillingMeResponse200) & {
   headers: Headers;
 };
-export type getBillingMeResponseError = (getBillingMeResponse401 | getBillingMeResponse404) & {
+export type getWorkspacesWorkspaceIdBillingMeResponseError = (getWorkspacesWorkspaceIdBillingMeResponse401 | getWorkspacesWorkspaceIdBillingMeResponse404) & {
   headers: Headers;
 };
 
-export type getBillingMeResponse = (getBillingMeResponseSuccess | getBillingMeResponseError)
+export type getWorkspacesWorkspaceIdBillingMeResponse = (getWorkspacesWorkspaceIdBillingMeResponseSuccess | getWorkspacesWorkspaceIdBillingMeResponseError)
 
-export const getGetBillingMeUrl = () => {
+export const getGetWorkspacesWorkspaceIdBillingMeUrl = (workspaceId: string,) => {
 
 
   
 
-  return `/api/billing/me`
+  return `/api/workspaces/${workspaceId}/billing/me`
 }
 
-export const getBillingMe = async ( options?: RequestInit): Promise<getBillingMeResponse> => {
+export const getWorkspacesWorkspaceIdBillingMe = async (workspaceId: string, options?: RequestInit): Promise<getWorkspacesWorkspaceIdBillingMeResponse> => {
   
-  return customInstance<getBillingMeResponse>(getGetBillingMeUrl(),
+  return customInstance<getWorkspacesWorkspaceIdBillingMeResponse>(getGetWorkspacesWorkspaceIdBillingMeUrl(workspaceId),
   {      
     ...options,
     method: 'GET'
@@ -89,69 +89,69 @@ export const getBillingMe = async ( options?: RequestInit): Promise<getBillingMe
 
 
 
-export const getGetBillingMeQueryKey = () => {
+export const getGetWorkspacesWorkspaceIdBillingMeQueryKey = (workspaceId: string,) => {
     return [
-    `/api/billing/me`
+    `/api/workspaces/${workspaceId}/billing/me`
     ] as const;
     }
 
     
-export const getGetBillingMeQueryOptions = <TData = Awaited<ReturnType<typeof getBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdBillingMeQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetBillingMeQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdBillingMeQueryKey(workspaceId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBillingMe>>> = ({ signal }) => getBillingMe({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>> = ({ signal }) => getWorkspacesWorkspaceIdBillingMe(workspaceId, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBillingMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetBillingMeQueryResult = NonNullable<Awaited<ReturnType<typeof getBillingMe>>>
-export type GetBillingMeQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdBillingMeQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>>
+export type GetWorkspacesWorkspaceIdBillingMeQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetBillingMe<TData = Awaited<ReturnType<typeof getBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingMe>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBillingMe>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>,
           TError,
-          Awaited<ReturnType<typeof getBillingMe>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBillingMe<TData = Awaited<ReturnType<typeof getBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingMe>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBillingMe>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>,
           TError,
-          Awaited<ReturnType<typeof getBillingMe>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBillingMe<TData = Awaited<ReturnType<typeof getBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 현재 워크스페이스 billing 상태 조회
  */
 
-export function useGetBillingMe<TData = Awaited<ReturnType<typeof getBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetBillingMeQueryOptions(options)
+  const queryOptions = getGetWorkspacesWorkspaceIdBillingMeQueryOptions(workspaceId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -164,68 +164,69 @@ export function useGetBillingMe<TData = Awaited<ReturnType<typeof getBillingMe>>
 /**
  * @summary STANDARD checkout 시작
  */
-export type postBillingCheckoutResponse200 = {
+export type postWorkspacesWorkspaceIdBillingCheckoutResponse200 = {
   data: BillingCheckoutResponse
   status: 200
 }
 
-export type postBillingCheckoutResponse401 = {
+export type postWorkspacesWorkspaceIdBillingCheckoutResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postBillingCheckoutResponse403 = {
+export type postWorkspacesWorkspaceIdBillingCheckoutResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type postBillingCheckoutResponse409 = {
+export type postWorkspacesWorkspaceIdBillingCheckoutResponse409 = {
   data: ErrorResponse
   status: 409
 }
 
-export type postBillingCheckoutResponse422 = {
+export type postWorkspacesWorkspaceIdBillingCheckoutResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type postBillingCheckoutResponseSuccess = (postBillingCheckoutResponse200) & {
+export type postWorkspacesWorkspaceIdBillingCheckoutResponseSuccess = (postWorkspacesWorkspaceIdBillingCheckoutResponse200) & {
   headers: Headers;
 };
-export type postBillingCheckoutResponseError = (postBillingCheckoutResponse401 | postBillingCheckoutResponse403 | postBillingCheckoutResponse409 | postBillingCheckoutResponse422) & {
+export type postWorkspacesWorkspaceIdBillingCheckoutResponseError = (postWorkspacesWorkspaceIdBillingCheckoutResponse401 | postWorkspacesWorkspaceIdBillingCheckoutResponse403 | postWorkspacesWorkspaceIdBillingCheckoutResponse409 | postWorkspacesWorkspaceIdBillingCheckoutResponse422) & {
   headers: Headers;
 };
 
-export type postBillingCheckoutResponse = (postBillingCheckoutResponseSuccess | postBillingCheckoutResponseError)
+export type postWorkspacesWorkspaceIdBillingCheckoutResponse = (postWorkspacesWorkspaceIdBillingCheckoutResponseSuccess | postWorkspacesWorkspaceIdBillingCheckoutResponseError)
 
-export const getPostBillingCheckoutUrl = () => {
+export const getPostWorkspacesWorkspaceIdBillingCheckoutUrl = (workspaceId: string,) => {
 
 
   
 
-  return `/api/billing/checkout`
+  return `/api/workspaces/${workspaceId}/billing/checkout`
 }
 
-export const postBillingCheckout = async (postBillingCheckoutBody: PostBillingCheckoutBody, options?: RequestInit): Promise<postBillingCheckoutResponse> => {
+export const postWorkspacesWorkspaceIdBillingCheckout = async (workspaceId: string,
+    postWorkspacesWorkspaceIdBillingCheckoutBody: PostWorkspacesWorkspaceIdBillingCheckoutBody, options?: RequestInit): Promise<postWorkspacesWorkspaceIdBillingCheckoutResponse> => {
   
-  return customInstance<postBillingCheckoutResponse>(getPostBillingCheckoutUrl(),
+  return customInstance<postWorkspacesWorkspaceIdBillingCheckoutResponse>(getPostWorkspacesWorkspaceIdBillingCheckoutUrl(workspaceId),
   {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      postBillingCheckoutBody,)
+      postWorkspacesWorkspaceIdBillingCheckoutBody,)
   }
 );}
   
 
 
 
-export const getPostBillingCheckoutMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postBillingCheckout>>, TError,{data: PostBillingCheckoutBody}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postBillingCheckout>>, TError,{data: PostBillingCheckoutBody}, TContext> => {
+export const getPostWorkspacesWorkspaceIdBillingCheckoutMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, TError,{workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, TError,{workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}, TContext> => {
 
-const mutationKey = ['postBillingCheckout'];
+const mutationKey = ['postWorkspacesWorkspaceIdBillingCheckout'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -235,10 +236,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postBillingCheckout>>, {data: PostBillingCheckoutBody}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, {workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}> = (props) => {
+          const {workspaceId,data} = props ?? {};
 
-          return  postBillingCheckout(data,requestOptions)
+          return  postWorkspacesWorkspaceIdBillingCheckout(workspaceId,data,requestOptions)
         }
 
 
@@ -248,64 +249,64 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostBillingCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof postBillingCheckout>>>
-    export type PostBillingCheckoutMutationBody = PostBillingCheckoutBody
-    export type PostBillingCheckoutMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PostWorkspacesWorkspaceIdBillingCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>>
+    export type PostWorkspacesWorkspaceIdBillingCheckoutMutationBody = PostWorkspacesWorkspaceIdBillingCheckoutBody
+    export type PostWorkspacesWorkspaceIdBillingCheckoutMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary STANDARD checkout 시작
  */
-export const usePostBillingCheckout = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postBillingCheckout>>, TError,{data: PostBillingCheckoutBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdBillingCheckout = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, TError,{workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postBillingCheckout>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>,
         TError,
-        {data: PostBillingCheckoutBody},
+        {workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody},
         TContext
       > => {
-      return useMutation(getPostBillingCheckoutMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdBillingCheckoutMutationOptions(options), queryClient);
     }
     /**
  * @summary customer portal 진입
  */
-export type getBillingPortalResponse307 = {
+export type getWorkspacesWorkspaceIdBillingPortalResponse307 = {
   data: void
   status: 307
 }
 
-export type getBillingPortalResponse401 = {
+export type getWorkspacesWorkspaceIdBillingPortalResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getBillingPortalResponse403 = {
+export type getWorkspacesWorkspaceIdBillingPortalResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type getBillingPortalResponse409 = {
+export type getWorkspacesWorkspaceIdBillingPortalResponse409 = {
   data: ErrorResponse
   status: 409
 }
 
 ;
-export type getBillingPortalResponseError = (getBillingPortalResponse307 | getBillingPortalResponse401 | getBillingPortalResponse403 | getBillingPortalResponse409) & {
+export type getWorkspacesWorkspaceIdBillingPortalResponseError = (getWorkspacesWorkspaceIdBillingPortalResponse307 | getWorkspacesWorkspaceIdBillingPortalResponse401 | getWorkspacesWorkspaceIdBillingPortalResponse403 | getWorkspacesWorkspaceIdBillingPortalResponse409) & {
   headers: Headers;
 };
 
-export type getBillingPortalResponse = (getBillingPortalResponseError)
+export type getWorkspacesWorkspaceIdBillingPortalResponse = (getWorkspacesWorkspaceIdBillingPortalResponseError)
 
-export const getGetBillingPortalUrl = () => {
+export const getGetWorkspacesWorkspaceIdBillingPortalUrl = (workspaceId: string,) => {
 
 
   
 
-  return `/api/billing/portal`
+  return `/api/workspaces/${workspaceId}/billing/portal`
 }
 
-export const getBillingPortal = async ( options?: RequestInit): Promise<getBillingPortalResponse> => {
+export const getWorkspacesWorkspaceIdBillingPortal = async (workspaceId: string, options?: RequestInit): Promise<getWorkspacesWorkspaceIdBillingPortalResponse> => {
   
-  return customInstance<getBillingPortalResponse>(getGetBillingPortalUrl(),
+  return customInstance<getWorkspacesWorkspaceIdBillingPortalResponse>(getGetWorkspacesWorkspaceIdBillingPortalUrl(workspaceId),
   {      
     ...options,
     method: 'GET'
@@ -318,69 +319,69 @@ export const getBillingPortal = async ( options?: RequestInit): Promise<getBilli
 
 
 
-export const getGetBillingPortalQueryKey = () => {
+export const getGetWorkspacesWorkspaceIdBillingPortalQueryKey = (workspaceId: string,) => {
     return [
-    `/api/billing/portal`
+    `/api/workspaces/${workspaceId}/billing/portal`
     ] as const;
     }
 
     
-export const getGetBillingPortalQueryOptions = <TData = Awaited<ReturnType<typeof getBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdBillingPortalQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetBillingPortalQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdBillingPortalQueryKey(workspaceId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBillingPortal>>> = ({ signal }) => getBillingPortal({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>> = ({ signal }) => getWorkspacesWorkspaceIdBillingPortal(workspaceId, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBillingPortal>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetBillingPortalQueryResult = NonNullable<Awaited<ReturnType<typeof getBillingPortal>>>
-export type GetBillingPortalQueryError = void | UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdBillingPortalQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>>
+export type GetWorkspacesWorkspaceIdBillingPortalQueryError = void | UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetBillingPortal<TData = Awaited<ReturnType<typeof getBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPortal>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdBillingPortal<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBillingPortal>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>,
           TError,
-          Awaited<ReturnType<typeof getBillingPortal>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBillingPortal<TData = Awaited<ReturnType<typeof getBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPortal>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdBillingPortal<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getBillingPortal>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>,
           TError,
-          Awaited<ReturnType<typeof getBillingPortal>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetBillingPortal<TData = Awaited<ReturnType<typeof getBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdBillingPortal<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary customer portal 진입
  */
 
-export function useGetBillingPortal<TData = Awaited<ReturnType<typeof getBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdBillingPortal<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetBillingPortalQueryOptions(options)
+  const queryOptions = getGetWorkspacesWorkspaceIdBillingPortalQueryOptions(workspaceId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
