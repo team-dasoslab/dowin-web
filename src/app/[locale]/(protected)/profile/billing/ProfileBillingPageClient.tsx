@@ -22,7 +22,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-type PlanCode = "FREE" | "STANDARD";
+type PlanCode = "BASIC" | "FREE" | "STANDARD";
 type EntitlementSource =
   | "POLAR"
   | "MANUAL_GRANT"

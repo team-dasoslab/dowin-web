@@ -22,7 +22,7 @@ type WebhookEnvelope = z.infer<typeof polarWebhookEnvelopeSchema>;
 
 type BillingProjection = {
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-  planCode: "FREE" | "STANDARD";
+  planCode: "BASIC" | "FREE" | "STANDARD";
   entitlementSource: EntitlementSource;
   customerKey: string | null;
   customerExternalRef: string | null;
@@ -122,6 +122,15 @@ function pickBillingOwnerUserId(payload: WebhookEnvelope): number | null {
   );
 }
 
+function pickPaidPlanCode(
+  payload: WebhookEnvelope,
+  subscription?: Record<string, unknown> | null,
+): "BASIC" | "STANDARD" {
+  const metadata =
+    asRecord(payload.data.metadata) ?? asRecord(subscription?.metadata);
+  return metadata?.targetPlanCode === "BASIC" ? "BASIC" : "STANDARD";
+}
+
 function resolveProjection(
   payload: WebhookEnvelope,
   now: Date,
@@ -155,6 +164,7 @@ function resolveProjection(
     const currentPeriodEnd = asDate(activeSubscription.current_period_end);
     const cancelAtPeriodEnd =
       asBoolean(activeSubscription.cancel_at_period_end) ?? false;
+    const paidPlanCode = pickPaidPlanCode(payload, activeSubscription);
 
     return {
       billingStatus:
@@ -166,7 +176,7 @@ function resolveProjection(
       planCode:
         cancelAtPeriodEnd && currentPeriodEnd && currentPeriodEnd <= now
           ? "FREE"
-          : "STANDARD",
+          : paidPlanCode,
       entitlementSource: "POLAR",
       customerKey: asString(payload.data.id),
       customerExternalRef,
@@ -181,12 +191,13 @@ function resolveProjection(
   const cancelAtPeriodEnd = asBoolean(payload.data.cancel_at_period_end) ?? false;
   const subscriptionKey =
     asString(payload.data.subscription_id) ?? asString(payload.data.id) ?? null;
+  const paidPlanCode = pickPaidPlanCode(payload);
 
   switch (payload.type) {
     case "subscription.active":
       return {
         billingStatus: "ACTIVE",
-        planCode: "STANDARD",
+        planCode: paidPlanCode,
         entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
@@ -200,7 +211,7 @@ function resolveProjection(
         billingStatus:
           currentPeriodEnd && currentPeriodEnd <= now ? "EXPIRED" : "CANCELED",
         planCode:
-          currentPeriodEnd && currentPeriodEnd <= now ? "FREE" : "STANDARD",
+          currentPeriodEnd && currentPeriodEnd <= now ? "FREE" : paidPlanCode,
         entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
@@ -212,7 +223,7 @@ function resolveProjection(
     case "subscription.uncanceled":
       return {
         billingStatus: "ACTIVE",
-        planCode: "STANDARD",
+        planCode: paidPlanCode,
         entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,

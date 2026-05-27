@@ -2,13 +2,16 @@ import { ForbiddenError, ConflictError } from "@/lib/server/errors";
 
 type WorkspacePlanSummary = {
   id: number;
-  planCode?: "FREE" | "STANDARD" | string | null;
+  planCode?: "BASIC" | "FREE" | "STANDARD" | string | null;
 };
 
 type MemberCapacityPort = {
   countMembers(workspaceId: number): Promise<number>;
+  findSeatEntitlement?(
+    workspaceId: number,
+  ): Promise<{ purchasedSeatCount: number } | null>;
   findPlanLimit(
-    planCode: "FREE" | "STANDARD",
+    planCode: "BASIC" | "FREE" | "STANDARD",
   ): Promise<{ memberLimit: number } | null>;
 };
 
@@ -26,7 +29,7 @@ export async function getPlanMemberLimitFromStorage(
   planCode: string | null | undefined,
   storage: Pick<MemberCapacityPort, "findPlanLimit">,
 ): Promise<number | null> {
-  if (planCode !== "FREE" && planCode !== "STANDARD") {
+  if (planCode !== "BASIC" && planCode !== "FREE" && planCode !== "STANDARD") {
     return null;
   }
 
@@ -37,6 +40,18 @@ export async function getPlanMemberLimitFromStorage(
 export class CapacityPolicy {
   constructor(private storage: MemberCapacityPort) {}
 
+  private async getWorkspaceMemberLimit(
+    workspace: WorkspacePlanSummary,
+  ): Promise<number | null> {
+    if (workspace.planCode === "BASIC") {
+      const seatEntitlement =
+        await this.storage.findSeatEntitlement?.(workspace.id);
+      return seatEntitlement?.purchasedSeatCount ?? 0;
+    }
+
+    return await this.getPlanMemberLimit(workspace.planCode);
+  }
+
   async getPlanMemberLimit(
     planCode: string | null | undefined,
   ): Promise<number | null> {
@@ -46,7 +61,7 @@ export class CapacityPolicy {
   async getWorkspaceMemberCapacity(
     workspace: WorkspacePlanSummary,
   ): Promise<WorkspaceMemberCapacity> {
-    const memberLimit = await this.getPlanMemberLimit(workspace.planCode);
+    const memberLimit = await this.getWorkspaceMemberLimit(workspace);
     const memberCount = await this.storage.countMembers(workspace.id);
 
     return {

@@ -121,6 +121,14 @@ export const pendingSignupCheckouts = sqliteTable(
     })
       .notNull()
       .default("PENDING"),
+    completedUserId: integer("completed_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    completedWorkspaceId: integer("completed_workspace_id").references(
+      () => workspaces.id,
+      { onDelete: "set null" },
+    ),
+    completedAt: integer("completed_at", { mode: "timestamp" }),
     expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
@@ -333,7 +341,7 @@ export const workspaces = sqliteTable("workspaces", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   uid: text("uid").unique(),
   name: text("name").notNull(),
-  planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
+  planCode: text("plan_code", { enum: ["BASIC", "FREE", "STANDARD"] })
     .notNull()
     .default("FREE"),
   billingCustomerExternalRef: text("billing_customer_external_ref"),
@@ -387,7 +395,7 @@ export const billingProviderProducts = sqliteTable(
 );
 
 export const billingPlanLimits = sqliteTable("billing_plan_limits", {
-  planCode: text("plan_code", { enum: ["FREE", "STANDARD"] }).primaryKey(),
+  planCode: text("plan_code", { enum: ["BASIC", "FREE", "STANDARD"] }).primaryKey(),
   memberLimit: integer("member_limit").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
@@ -451,7 +459,7 @@ export const billingCheckoutEvents = sqliteTable(
       .references(() => users.id, { onDelete: "cascade" }),
     requestId: text("request_id").notNull(),
     targetPlanCode: text("target_plan_code", {
-      enum: ["FREE", "STANDARD"],
+      enum: ["BASIC", "FREE", "STANDARD"],
     }).notNull(),
     provider: text("provider", { enum: ["POLAR"] }).notNull(),
     providerCheckoutId: text("provider_checkout_id"),
@@ -495,7 +503,7 @@ export const workspaceBillingState = sqliteTable("workspace_billing_state", {
   })
     .notNull()
     .default("NONE"),
-  planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
+  planCode: text("plan_code", { enum: ["BASIC", "FREE", "STANDARD"] })
     .notNull()
     .default("FREE"),
   entitlementSource: text("entitlement_source", {
@@ -519,6 +527,21 @@ export const workspaceBillingState = sqliteTable("workspace_billing_state", {
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
 });
+
+export const workspaceSeatEntitlements = sqliteTable(
+  "workspace_seat_entitlements",
+  {
+    workspaceId: integer("workspace_id")
+      .primaryKey()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    planCode: text("plan_code", { enum: ["BASIC"] }).notNull(),
+    purchasedSeatCount: integer("purchased_seat_count").notNull(),
+    seatSource: text("seat_source", { enum: ["POLAR"] }).notNull(),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+);
 
 export const workspaceBillingStateRelations = relations(
   workspaceBillingState,

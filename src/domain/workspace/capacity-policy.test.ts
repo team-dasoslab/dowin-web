@@ -5,11 +5,17 @@ import { ConflictError, ForbiddenError } from "@/lib/server/errors";
 function createPolicy(input: {
   memberCount: number;
   memberLimit: number | null;
+  purchasedSeatCount?: number | null;
 }) {
   const storage = {
     countMembers: vi.fn().mockResolvedValue(input.memberCount),
     findPlanLimit: vi.fn().mockResolvedValue(
       input.memberLimit === null ? null : { memberLimit: input.memberLimit },
+    ),
+    findSeatEntitlement: vi.fn().mockResolvedValue(
+      input.purchasedSeatCount === undefined || input.purchasedSeatCount === null
+        ? null
+        : { purchasedSeatCount: input.purchasedSeatCount },
     ),
   };
 
@@ -39,6 +45,20 @@ describe("CapacityPolicy", () => {
     await expect(
       policy.assertCanAddMember({ id: 1, planCode: "FREE" }),
     ).rejects.toBeInstanceOf(ConflictError);
+  });
+
+  it("BASIC workspace는 구매 seat 수를 멤버 한도로 사용한다", async () => {
+    const { policy, storage } = createPolicy({
+      memberCount: 5,
+      memberLimit: null,
+      purchasedSeatCount: 5,
+    });
+
+    await expect(
+      policy.assertCanAddMember({ id: 1, planCode: "BASIC" }),
+    ).rejects.toBeInstanceOf(ConflictError);
+    expect(storage.findSeatEntitlement).toHaveBeenCalledWith(1);
+    expect(storage.findPlanLimit).not.toHaveBeenCalled();
   });
 
   it("FREE workspace가 limit을 초과하면 feature 사용을 차단한다", async () => {

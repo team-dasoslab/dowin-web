@@ -25,7 +25,7 @@ type WorkspaceWithPlanLimits = PublicWorkspace & {
 type WorkspaceListItem = {
   id: string;
   name: string;
-  planCode: "FREE" | "STANDARD";
+  planCode: "BASIC" | "FREE" | "STANDARD";
   role: "ADMIN" | "MEMBER";
   isCurrent: boolean;
   createdAt: Date;

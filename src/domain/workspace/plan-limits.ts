@@ -5,13 +5,13 @@ import {
 
 type WorkspacePlanSummary = {
   id: number;
-  planCode?: "FREE" | "STANDARD" | string | null;
+  planCode?: "BASIC" | "FREE" | "STANDARD" | string | null;
 };
 
 type MemberCountPort = {
   countMembers(workspaceId: number): Promise<number>;
   findPlanLimit(
-    planCode: "FREE" | "STANDARD",
+    planCode: "BASIC" | "FREE" | "STANDARD",
   ): Promise<{ memberLimit: number } | null>;
 };
 

@@ -23,7 +23,7 @@ const BILLING_RISK_LOOKBACK_DAYS = 30;
 export type BillingOverview = {
   workspaceId: string;
   workspaceName: string;
-  planCode: "FREE" | "STANDARD";
+  planCode: "BASIC" | "FREE" | "STANDARD";
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
   entitlementSource: NullableEntitlementSource;
   provider: "POLAR" | null;

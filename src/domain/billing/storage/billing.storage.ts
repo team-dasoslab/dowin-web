@@ -162,7 +162,7 @@ export class BillingStorage {
       .select({
         workspaceId: workspaces.id,
         workspaceName: workspaces.name,
-        planCode: sql<"FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        planCode: sql<"BASIC" | "FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
         billingStatus:
           sql<
             "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
@@ -192,7 +192,7 @@ export class BillingStorage {
       .select({
         workspaceId: workspaces.id,
         workspaceName: workspaces.name,
-        planCode: sql<"FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        planCode: sql<"BASIC" | "FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
         billingStatus:
           sql<
             "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
@@ -293,7 +293,7 @@ export class BillingStorage {
   async upsertWorkspaceBillingState(input: {
     workspaceId: number;
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    planCode: "FREE" | "STANDARD";
+    planCode: "BASIC" | "FREE" | "STANDARD";
     entitlementSource: NullableEntitlementSource;
     customerKey: string | null;
     subscriptionKey: string | null;
@@ -345,7 +345,7 @@ export class BillingStorage {
 
   async updateWorkspaceBillingProjection(input: {
     workspaceId: number;
-    planCode: "FREE" | "STANDARD";
+    planCode: "BASIC" | "FREE" | "STANDARD";
     billingCustomerExternalRef: string | null;
     billingOwnerUserId: number | null;
   }) {

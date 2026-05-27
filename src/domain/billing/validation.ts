@@ -27,7 +27,7 @@ export const adminBillingWorkspaceParamsSchema = z.object({
 
 export const adminBillingManualOverrideSchema = z
   .object({
-    planCode: z.enum(["FREE", "STANDARD"]),
+    planCode: z.enum(["BASIC", "FREE", "STANDARD"]),
     billingStatus: z.enum([
       "NONE",
       "ACTIVE",
@@ -61,14 +61,14 @@ export const adminBillingManualOverrideSchema = z
     const validCombo =
       (value.planCode === "FREE" &&
         ["NONE", "EXPIRED", "REVOKED"].includes(value.billingStatus)) ||
-      (value.planCode === "STANDARD" &&
+      (["BASIC", "STANDARD"].includes(value.planCode) &&
         ["ACTIVE", "CANCELED"].includes(value.billingStatus));
 
     if (!validCombo) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "플랜과 billing 상태 조합이 올바르지 않습니다. FREE는 NONE/EXPIRED/REVOKED만, STANDARD는 ACTIVE/CANCELED만 허용됩니다.",
+          "플랜과 billing 상태 조합이 올바르지 않습니다. FREE는 NONE/EXPIRED/REVOKED만, BASIC/STANDARD는 ACTIVE/CANCELED만 허용됩니다.",
         path: ["billingStatus"],
       });
     }

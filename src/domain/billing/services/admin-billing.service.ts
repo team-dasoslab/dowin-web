@@ -12,7 +12,7 @@ type BillingState =
   | "CANCELED"
   | "EXPIRED"
   | "REVOKED";
-type PlanCode = "FREE" | "STANDARD";
+type PlanCode = "BASIC" | "FREE" | "STANDARD";
 
 type BillingPort = Pick<
   BillingStorage,
@@ -150,7 +150,7 @@ export class AdminBillingService {
     const nextEntitlementSource =
       input.entitlementSource !== undefined
         ? input.entitlementSource
-        : input.planCode === "STANDARD"
+        : input.planCode === "BASIC" || input.planCode === "STANDARD"
           ? ("MANUAL_GRANT" as EntitlementSource)
           : existing.entitlementSource ?? null;
     const nextBillingOwnerUserId =

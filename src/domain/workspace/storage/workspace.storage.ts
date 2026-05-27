@@ -10,6 +10,7 @@ import {
   users,
   workspaceInvites,
   workspaceMembers,
+  workspaceSeatEntitlements,
   workspaceTags,
   workspaces,
   workspaceBillingState,
@@ -185,10 +186,18 @@ export class WorkspaceStorage {
     return Number(result?.count ?? 0);
   }
 
-  async findPlanLimit(planCode: "FREE" | "STANDARD") {
+  async findPlanLimit(planCode: "BASIC" | "FREE" | "STANDARD") {
     return (
       (await this.db.query.billingPlanLimits.findFirst({
         where: eq(billingPlanLimits.planCode, planCode),
+      })) ?? null
+    );
+  }
+
+  async findSeatEntitlement(workspaceId: number) {
+    return (
+      (await this.db.query.workspaceSeatEntitlements.findFirst({
+        where: eq(workspaceSeatEntitlements.workspaceId, workspaceId),
       })) ?? null
     );
   }

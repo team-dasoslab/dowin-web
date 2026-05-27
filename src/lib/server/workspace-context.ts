@@ -6,7 +6,7 @@ type WorkspaceStoragePort = {
       id: number;
       uid: string | null;
       name: string;
-      planCode: "FREE" | "STANDARD";
+      planCode: "BASIC" | "FREE" | "STANDARD";
     };
     member: {
       id: number;
@@ -14,7 +14,7 @@ type WorkspaceStoragePort = {
       role: "ADMIN" | "MEMBER";
     };
     billingState: {
-      planCode: "FREE" | "STANDARD";
+      planCode: "BASIC" | "FREE" | "STANDARD";
       billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
       entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
     } | null;
@@ -32,7 +32,7 @@ export type WorkspaceAccessContext = {
     canAccessStandardFeatures: boolean;
     entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    planCode: "FREE" | "STANDARD";
+    planCode: "BASIC" | "FREE" | "STANDARD";
   };
 };
 

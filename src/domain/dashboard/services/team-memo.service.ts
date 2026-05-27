@@ -9,7 +9,7 @@ type WorkspacePort = {
   ): Promise<{ userId: number; role: "ADMIN" | "MEMBER" } | null>;
   countMembers(workspaceId: number): Promise<number>;
   findPlanLimit(
-    planCode: "FREE" | "STANDARD",
+    planCode: "BASIC" | "FREE" | "STANDARD",
   ): Promise<{ memberLimit: number } | null>;
 };
 
