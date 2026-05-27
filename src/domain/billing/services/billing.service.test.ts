@@ -6,13 +6,14 @@ describe("BillingService", () => {
   it("billing state가 없으면 workspace planCode와 NONE 상태를 반환한다", async () => {
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
-          uid: "ws_1",
+          uid: "ws_abc",
           name: "Dowin",
           planCode: "FREE",
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -30,8 +31,8 @@ describe("BillingService", () => {
       } as never,
     );
 
-    await expect(service.getMyBilling(7)).resolves.toEqual({
-      workspaceId: "ws_1",
+    await expect(service.getMyBilling("ws_abc", 7)).resolves.toEqual({
+      workspaceId: "ws_abc",
       workspaceName: "Dowin",
       planCode: "FREE",
       billingStatus: "NONE",
@@ -50,12 +51,13 @@ describe("BillingService", () => {
   it("admin이 아니면 checkout을 시작할 수 없다", async () => {
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
           name: "Dowin",
           planCode: "FREE",
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "MEMBER",
         }),
       } as never,
@@ -70,7 +72,7 @@ describe("BillingService", () => {
       } as never,
     );
 
-    await expect(service.prepareCheckout(7, "k1", "ko")).rejects.toBeInstanceOf(
+    await expect(service.prepareCheckout("ws_abc", 7, "k1", "ko")).rejects.toBeInstanceOf(
       ForbiddenError,
     );
   });
@@ -78,12 +80,13 @@ describe("BillingService", () => {
   it("admin이어도 Polar 연동 전에는 billing not ready를 반환한다", async () => {
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
           name: "Dowin",
           planCode: "FREE",
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -98,7 +101,7 @@ describe("BillingService", () => {
       } as never,
     );
 
-    await expect(service.prepareCheckout(7, "k1", "ko")).rejects.toEqual(
+    await expect(service.prepareCheckout("ws_abc", 7, "k1", "ko")).rejects.toEqual(
       expect.objectContaining<Partial<ConflictError>>({
         code: "BILLING_NOT_READY",
       }),
@@ -120,13 +123,14 @@ describe("BillingService", () => {
     const appendCheckoutEvent = vi.fn().mockResolvedValue(null);
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
           name: "Dowin",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -149,7 +153,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.prepareCheckout(7, "k1", "ko")).resolves.toEqual({
+    await expect(service.prepareCheckout("ws_abc", 7, "k1", "ko")).resolves.toEqual({
       checkoutUrl: "https://polar.sh/checkout",
     });
     expect(createCheckoutSession).toHaveBeenCalledWith(
@@ -165,13 +169,14 @@ describe("BillingService", () => {
     const createCheckoutSession = vi.fn();
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
           name: "Dowin",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -198,7 +203,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.prepareCheckout(7, "k1", "ko")).resolves.toEqual({
+    await expect(service.prepareCheckout("ws_abc", 7, "k1", "ko")).resolves.toEqual({
       checkoutUrl: "https://polar.sh/existing",
     });
     expect(createCheckoutSession).not.toHaveBeenCalled();
@@ -210,13 +215,14 @@ describe("BillingService", () => {
     });
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
           name: "Dowin",
           planCode: "STANDARD",
           billingCustomerExternalRef: "workspace:1",
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -241,7 +247,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.prepareCheckout(7, "k2", "ko")).resolves.toEqual({
+    await expect(service.prepareCheckout("ws_abc", 7, "k2", "ko")).resolves.toEqual({
       checkoutUrl: "https://polar.sh/checkout",
     });
     expect(createCheckoutSession).toHaveBeenCalled();
@@ -251,13 +257,14 @@ describe("BillingService", () => {
     const createCustomerSession = vi.fn();
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
           name: "Dowin",
           planCode: "STANDARD",
           billingCustomerExternalRef: null,
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -277,7 +284,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl(7)).rejects.toEqual(
+    await expect(service.getPortalUrl("ws_abc", 7)).rejects.toEqual(
       expect.objectContaining<Partial<ConflictError>>({
         code: "BILLING_NOT_READY",
       }),
@@ -317,7 +324,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl(7)).resolves.toBe(
+    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
       "https://polar.sh/portal",
     );
     expect(createCustomerSession).toHaveBeenCalledWith({
@@ -355,7 +362,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.prepareCheckout(7, "k1", "ko")).rejects.toEqual(
+    await expect(service.prepareCheckout("ws_abc", 7, "k1", "ko")).rejects.toEqual(
       expect.objectContaining<Partial<ConflictError>>({
         code: "BILLING_NOT_READY",
       }),
@@ -391,7 +398,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.prepareCheckout(7, "k1", "ko")).rejects.toEqual(
+    await expect(service.prepareCheckout("ws_abc", 7, "k1", "ko")).rejects.toEqual(
       expect.objectContaining<Partial<ConflictError>>({
         code: "BILLING_REVIEW_REQUIRED",
       }),
@@ -433,7 +440,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl(7)).resolves.toBe(
+    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
       "https://polar.sh/portal",
     );
     expect(createCustomerSession).toHaveBeenCalledWith({
@@ -473,7 +480,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl(7)).resolves.toBe(
+    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
       "https://polar.sh/portal",
     );
     expect(createCustomerSession).toHaveBeenCalledWith({

@@ -9,7 +9,7 @@ import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/error
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
-  "findUserWorkspace" | "findMembershipByUserId"
+  "resolveIdByUid" | "findWorkspaceById" | "findMembership" | "findMembershipByUserId"
 >;
 type BillingRiskSummary = {
   recentRefundCount: number;
@@ -79,13 +79,27 @@ export class BillingService {
     private polarClient: PolarBillingClient | null = null,
   ) {}
 
-  async getMyBilling(userId: number): Promise<BillingOverview> {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+  private async getWorkspace(workspaceUid: string, userId: number) {
+    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
+    if (!internalId) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const membership = await this.workspaceStorage.findMembership(internalId, userId);
+    if (!membership) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const membership = await this.workspaceStorage.findMembershipByUserId(userId);
+    return { workspace, membership };
+  }
+
+  async getMyBilling(workspaceUid: string, userId: number): Promise<BillingOverview> {
+    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
@@ -109,12 +123,12 @@ export class BillingService {
   }
 
   async prepareCheckout(
+    workspaceUid: string,
     userId: number,
     idempotencyKey: string,
     locale: "ko" | "en",
   ) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    const membership = await this.workspaceStorage.findMembershipByUserId(userId);
+    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
 
     if (!workspace || !membership) {
       throw new NotFoundError("NOT_FOUND");
@@ -236,9 +250,8 @@ export class BillingService {
     }
   }
 
-  async getPortalUrl(userId: number): Promise<string> {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    const membership = await this.workspaceStorage.findMembershipByUserId(userId);
+  async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {
+    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
     const billingState = workspace
       ? await this.billingStorage.findWorkspaceBillingState(workspace.id)
       : null;
