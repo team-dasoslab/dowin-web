@@ -1,6 +1,7 @@
 "use client";
 
-import { useGetBillingMe } from "@/api/generated/billing/billing";
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
@@ -17,7 +18,9 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 type EntitlementSource =
   | "POLAR"
@@ -28,10 +31,14 @@ type EntitlementSource =
 
 export function PricingPageClient() {
   const t = useTranslations("Pricing");
+  const params = useParams();
   const isNativeApp = useNativeApp();
-  const { data: billingResponse, error, isLoading } = useGetBillingMe({
+  const { data: workspaceResponse } = useGetWorkspacesMe();
+  const workspaceId = (params.workspaceId as string | undefined) ?? (workspaceResponse?.status === 200 ? (workspaceResponse?.data?.id ?? "") : "");
+  const { data: billingResponse, error, isLoading } = useGetWorkspacesWorkspaceIdBillingMe(workspaceId, {
     query: {
       retry: false,
+      enabled: !!workspaceId,
     },
   });
   const { isCheckoutPending, startCheckout } = useProfileBillingActions();
@@ -168,7 +175,7 @@ export function PricingPageClient() {
                     asChild
                     className="h-11 w-full border border-primary/15 bg-primary/10 text-sm font-black text-primary"
                   >
-                    <Link href="/profile/billing">
+                    <Link href={getWorkspacePath(workspaceId, "/profile/billing")}>
                       {isPolarEntitlement
                         ? t("manageButton")
                         : t("viewGrantButton")}
@@ -238,7 +245,7 @@ export function PricingPageClient() {
             {t("privacyLink")}
           </Link>
           <Link
-            href="/profile/contact"
+            href={getWorkspacePath(workspaceId, "/profile/contact")}
             className="transition-colors"
           >
             {t("contactLink")}
@@ -361,6 +368,7 @@ function PlanCard({
 
 function PricingUnavailableInAppState() {
   const t = useTranslations("Pricing");
+  const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
@@ -373,7 +381,7 @@ function PricingUnavailableInAppState() {
               asChild
               className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
             >
-              <Link href="/profile">{t("appUnavailableAction")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
             </Button>
           }
           icon={

@@ -284,6 +284,7 @@ export const devicePushTokensRelations = relations(
 
 export const workspaces = sqliteTable("workspaces", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  uid: text("uid").unique(),
   name: text("name").notNull(),
   planCode: text("plan_code", { enum: ["FREE", "STANDARD"] })
     .notNull()

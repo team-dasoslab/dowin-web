@@ -9,7 +9,7 @@ import { useToast } from "@/context/ToastContext";
 import { getApiErrorCode, getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useCallback, useMemo, useTransition } from "react";
 
-export const useDashboardScoreboard = (workspaceId: number) => {
+export const useDashboardScoreboard = (workspaceId: string) => {
   const { showToast } = useToast();
   const [isPending, startTransition] = useTransition();
   const {
@@ -150,6 +150,7 @@ export const useDashboardScoreboard = (workspaceId: number) => {
     showToast,
     weeklyById,
     weeklyLogsQueryKey,
+    workspaceId,
   });
 
   return {

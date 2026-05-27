@@ -58,9 +58,9 @@ export function Sidebar() {
     "/dashboard",
     "/dashboard/my",
     "/report",
-    "/setup",
-    "/scoreboards",
-    "/profile",
+    workspaceId ? `/${workspaceId}/setup` : "/setup",
+    workspaceId ? `/${workspaceId}/scoreboards` : "/scoreboards",
+    workspaceId ? `/${workspaceId}/profile` : "/profile",
   ];
 
   const isMainTab = mainTabPaths.includes(pathname);

@@ -3,7 +3,9 @@ import { DailyLogService } from "@/domain/daily-log/services/daily-log.service";
 
 describe("DailyLogService", () => {
   const oldCreatedAt = new Date("2026-02-20T00:00:00.000Z");
-  const findUserWorkspace = vi.fn();
+  const resolveIdByUid = vi.fn();
+  const findWorkspaceById = vi.fn();
+  const findMembership = vi.fn();
   const countMembers = vi.fn();
   const findPlanLimit = vi.fn();
   const findOwnedScoreboard = vi.fn();
@@ -14,7 +16,7 @@ describe("DailyLogService", () => {
   const findLeadMeasuresByScoreboard = vi.fn();
 
   const service = new DailyLogService(
-    { findUserWorkspace, countMembers, findPlanLimit },
+    { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findPlanLimit },
     { findOwnedScoreboard },
     { findOwnedLeadMeasure, findLeadMeasuresByScoreboard },
     { upsertLog, deleteLog, findLogsForLeadMeasures },
@@ -33,7 +35,7 @@ describe("DailyLogService", () => {
   });
 
   it("이번 주 이전 날짜는 기록할 수 없다", async () => {
-    await expect(service.upsertLog(10, 100, "2026-04-05", true)).rejects.toThrow(
+    await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-05", true)).rejects.toThrow(
       "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
     );
     expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
@@ -41,7 +43,7 @@ describe("DailyLogService", () => {
   });
 
   it("이번 주 이전 날짜는 삭제할 수 없다", async () => {
-    await expect(service.deleteLog(10, 100, "2026-04-05")).rejects.toThrow(
+    await expect(service.deleteLog("ws_uid", 1, 100, "2026-04-05")).rejects.toThrow(
       "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
     );
     expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
@@ -49,7 +51,9 @@ describe("DailyLogService", () => {
   });
 
   it("이번 주 날짜는 기록할 수 있다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(2);
+    findWorkspaceById.mockResolvedValue({ id: 2 });
+    findMembership.mockResolvedValue(true);
     findOwnedLeadMeasure.mockResolvedValue({
       id: 10,
       status: "ACTIVE",
@@ -62,7 +66,7 @@ describe("DailyLogService", () => {
       value: true,
     });
 
-    await expect(service.upsertLog(10, 100, "2026-04-09", true)).resolves.toEqual({
+    await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-09", true)).resolves.toEqual({
       id: 1,
       leadMeasureId: 10,
       logDate: "2026-04-09",
@@ -72,7 +76,9 @@ describe("DailyLogService", () => {
   });
 
   it("FREE 플랜 멤버 한도 초과 상태에서는 기록할 수 없다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1, planCode: "FREE" });
+    resolveIdByUid.mockResolvedValue(2);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 2, planCode: "FREE" });
     countMembers.mockResolvedValue(11);
     findOwnedLeadMeasure.mockResolvedValue({
       id: 10,
@@ -81,13 +87,15 @@ describe("DailyLogService", () => {
     });
 
     await expect(
-      service.upsertLog(10, 100, "2026-04-09", true),
+      service.upsertLog("ws_uid", 10, 100, "2026-04-09", true),
     ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
     expect(upsertLog).not.toHaveBeenCalled();
   });
 
   it("ARCHIVED 선행지표에는 기록할 수 없다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedLeadMeasure.mockResolvedValue({
       id: 10,
       status: "ARCHIVED",
@@ -95,12 +103,14 @@ describe("DailyLogService", () => {
     });
 
     await expect(
-      service.upsertLog(10, 100, "2026-04-09", true),
+      service.upsertLog("ws_uid", 10, 100, "2026-04-09", true),
     ).rejects.toThrow("LEAD_MEASURE_ARCHIVED");
   });
 
   it("주간 기록 조회 시 월~일 로그 맵과 달성률을 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -118,7 +128,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-04-07", value: false },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result).toEqual({
       weekStart: "2026-04-06",
@@ -135,7 +145,9 @@ describe("DailyLogService", () => {
   });
 
   it("주간 기록 조회 시 개별 지표 달성률은 100%를 초과하지 않는다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -156,7 +168,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-04-10", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -169,7 +181,9 @@ describe("DailyLogService", () => {
   });
 
   it("주간 기록 조회 시 2주 연속 0회면 선행지표 변경 제안을 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -184,7 +198,7 @@ describe("DailyLogService", () => {
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -204,7 +218,9 @@ describe("DailyLogService", () => {
   });
 
   it("주간 기록 조회 시 2주 연속 50% 미만이면 횟수 조정 제안을 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -222,7 +238,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-04-08", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -237,7 +253,9 @@ describe("DailyLogService", () => {
   });
 
   it("주간 기록 조회 시 2주 연속 50% 이상이면 가이드를 반환하지 않는다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -257,7 +275,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-03-11", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-03-09");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -268,7 +286,9 @@ describe("DailyLogService", () => {
   });
 
   it("직전 주 시작 이후에 생성된 지표에는 가이드를 붙이지 않는다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -283,7 +303,7 @@ describe("DailyLogService", () => {
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-03-09");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -294,7 +314,9 @@ describe("DailyLogService", () => {
   });
 
   it("이번 주가 아닌 주간 조회에는 가이드를 반환하지 않는다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -308,8 +330,8 @@ describe("DailyLogService", () => {
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const lastWeekResult = await service.getWeeklyLogs(2, 100, "2026-03-30");
-    const nextWeekResult = await service.getWeeklyLogs(2, 100, "2026-04-13");
+    const lastWeekResult = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-03-30");
+    const nextWeekResult = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-13");
 
     expect(lastWeekResult.leadMeasures).toEqual([
       expect.objectContaining({
@@ -326,7 +348,9 @@ describe("DailyLogService", () => {
   });
 
   it("월간 기록 조회 시 WEEKLY와 MONTHLY 지표를 모두 반환한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -355,7 +379,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 11, logDate: "2026-03-04", value: false },
     ]);
 
-    const result = await service.getMonthlyLogs(2, 100, "2026-03-01");
+    const result = await service.getMonthlyLogs("ws_uid", 2, 100, "2026-03-01");
 
     expect(result.monthStart).toBe("2026-03-01");
     expect(result.monthEnd).toBe("2026-03-31");
@@ -389,12 +413,14 @@ describe("DailyLogService", () => {
   });
 
   it("monthStart가 월 1일이 아니어도 해당 월의 1일로 정규화한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getMonthlyLogs(2, 100, "2026-03-18");
+    const result = await service.getMonthlyLogs("ws_uid", 2, 100, "2026-03-18");
 
     expect(result.monthStart).toBe("2026-03-01");
     expect(result.monthEnd).toBe("2026-03-31");
@@ -402,7 +428,9 @@ describe("DailyLogService", () => {
   });
 
   it("주간 지표는 주차별 목표 상한(min)으로 월간 summary를 계산한다", async () => {
-    findUserWorkspace.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
@@ -423,7 +451,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-03-08", value: true },
     ]);
 
-    const result = await service.getMonthlyLogs(2, 100, "2026-03-01");
+    const result = await service.getMonthlyLogs("ws_uid", 2, 100, "2026-03-01");
 
     expect(result.summary).toEqual({
       achieved: 3,

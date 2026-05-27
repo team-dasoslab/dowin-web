@@ -4,6 +4,14 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockGetMyWorkspace = vi.fn();
+const mockCookiesGet = vi.fn();
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(() => ({
+    get: mockCookiesGet,
+  })),
+  headers: vi.fn(() => new Headers()),
+}));
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -49,7 +57,7 @@ describe("GET /api/workspaces/me", () => {
   it("워크스페이스 멤버 한도 상태를 포함해 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 7 });
     mockGetMyWorkspace.mockResolvedValue({
-      id: 3,
+      id: "ws_ops",
       name: "운영팀",
       planCode: "FREE",
       memberCount: 11,
@@ -65,12 +73,12 @@ describe("GET /api/workspaces/me", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual(
       expect.objectContaining({
-        id: 3,
+        id: "ws_ops",
         memberCount: 11,
         freeMemberLimit: 10,
         isOverFreeMemberLimit: true,
       }),
     );
-    expect(mockGetMyWorkspace).toHaveBeenCalledWith(7);
+    expect(mockGetMyWorkspace).toHaveBeenCalledWith(7, undefined);
   });
 });

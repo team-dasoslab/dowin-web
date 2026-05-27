@@ -45,7 +45,7 @@ export function WeeklyTable({
   const tc = useTranslations("Common");
   const memberUserId = toNumberId(member.userId);
   const params = useParams();
-  const workspaceId = Number(params.workspaceId);
+  const workspaceId = params.workspaceId as string;
   const { showToast } = useToast();
   const {
     memos,

@@ -7,6 +7,8 @@ import { useGetWorkspaces, useGetWorkspacesMe, usePutWorkspacesCurrent } from "@
 import { Logo } from "@/components/ui/Logo";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useLocale } from "next-intl";
 
 interface WorkspaceSwitcherProps {
   isCollapsed: boolean;
@@ -17,13 +19,21 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const params = useParams();
+  const locale = useLocale();
+  const currentWorkspaceId = params.workspaceId as string | undefined;
+
   const { data: meResponse, isLoading: isMeLoading } = useGetWorkspacesMe();
   const { data: workspacesResponse } = useGetWorkspaces();
   const { mutate: switchWorkspace, isPending } = usePutWorkspacesCurrent({
     mutation: {
-      onSuccess: () => {
-        // Hard reload to ensure all states are reset for the new workspace context
-        window.location.reload();
+      onSuccess: (_, variables) => {
+        const newWorkspaceId = variables.data.workspaceId;
+        if (currentWorkspaceId) {
+          window.location.href = window.location.href.replace(`/${currentWorkspaceId}`, `/${newWorkspaceId}`);
+        } else {
+          window.location.href = `/${locale}/${newWorkspaceId}/dashboard/my`;
+        }
       },
     },
   });
@@ -66,7 +76,7 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
           isCollapsed ? "justify-center gap-0 px-0" : "justify-between gap-3 lg:px-4",
         )}
       >
-        <div className="flex items-center gap-3 overflow-hidden">
+        <div className={cn("flex items-center overflow-hidden", isCollapsed ? "gap-0" : "gap-3")}>
           <Logo size="20px" className="text-primary shrink-0" />
           <span
             className={cn(

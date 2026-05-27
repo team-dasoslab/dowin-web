@@ -16,7 +16,9 @@ import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 export default function ProfileExportPage() {
   const isNativeApp = useNativeApp();
@@ -157,7 +159,7 @@ export default function ProfileExportPage() {
               </Button>
             </div>
             <div className="grid gap-1.5 sm:grid-cols-2">
-              {exportMeasureOptions.map((measure) => {
+              {exportMeasureOptions.map((measure: any) => {
                 const checked = selectedExportMeasureIds.includes(measure.id);
 
                 return (
@@ -214,6 +216,7 @@ export default function ProfileExportPage() {
 
 function ExportUnavailableInAppState() {
   const t = useTranslations("ProfileExport");
+  const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
     <div className="min-h-screen bg-background">
@@ -227,7 +230,7 @@ function ExportUnavailableInAppState() {
               asChild
               className="w-fit rounded-content border border-border bg-white px-5 py-3 text-sm font-semibold text-text-primary"
             >
-              <Link href="/profile">{t("appUnavailableAction")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
             </Button>
           }
         />
@@ -280,12 +283,13 @@ function NoWorkspaceState() {
 }
 
 function NoScoreboardState() {
+  const workspaceId = useParams().workspaceId as string | undefined;
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
-          title="아직 가중목이 없어요"
+          title="아직 핵심 목표가 없어요"
           description={
             <>
               먼저 점수판을 만들고 선행지표를 기록하면
@@ -298,7 +302,7 @@ function NoScoreboardState() {
               asChild
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
-              <Link href="/setup?mode=create">새 점수판 만들기</Link>
+              <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>새 점수판 만들기</Link>
             </Button>
           }
         />

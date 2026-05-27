@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 interface PeriodControlsProps {
   monthLabel?: string;
@@ -34,6 +35,7 @@ export function PeriodControls({
   isPeriodLoading,
 }: PeriodControlsProps) {
   const t = useTranslations("Dashboard");
+  const workspaceId = useParams().workspaceId as string;
   const currentWeekStart = getWeekDates(today)[0] ?? today;
   const isResetVisible =
     selectedView === "month"
@@ -70,7 +72,7 @@ export function PeriodControls({
             asChild
             className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all shrink-0"
           >
-            <Link href="/setup?mode=update">
+            <Link href={`/${workspaceId}/setup?mode=update`}>
               <DowinIcon name="action-add" size="14px" />
               <span className="inline">{t("addMeasure")}</span>
             </Link>
@@ -150,7 +152,7 @@ export function PeriodControls({
             asChild
             className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all lg:h-8 lg:px-3 lg:text-[11px]"
           >
-            <Link href="/setup?mode=update">
+            <Link href={`/${workspaceId}/setup?mode=update`}>
               <DowinIcon name="action-add" size="14px" />
               <span className="sm:inline">{t("addMeasure")}</span>
             </Link>

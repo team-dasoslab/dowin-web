@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 type ScoreboardSummary = {
   endDate?: string | null;
@@ -72,6 +73,7 @@ export function ActiveScoreboardSection({
 function EmptyActiveScoreboardCard() {
   const t = useTranslations("Scoreboard");
   const td = useTranslations("Dashboard");
+  const workspaceId = useParams().workspaceId as string;
   return (
     <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center space-y-4">
       <div className="w-12 h-12 bg-primary/10 rounded-content mx-auto flex items-center justify-center">
@@ -88,7 +90,7 @@ function EmptyActiveScoreboardCard() {
           asChild
           className="btn-dowin-primary px-4 py-2 text-xs font-bold"
         >
-          <Link href="/setup?mode=create">
+          <Link href={`/${workspaceId}/setup?mode=create`}>
             {td("createScoreboard")}
           </Link>
         </Button>

@@ -2,6 +2,7 @@
 
 import { SubPageLayout } from "@/app/[locale]/(protected)/_components/SubPageLayout";
 import { usePathname } from "@/i18n/routing";
+import { useParams } from "next/navigation";
 import React from "react";
 
 export function ProtectedContentLayout({
@@ -10,11 +11,15 @@ export function ProtectedContentLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const params = useParams();
+  const workspaceId = params.workspaceId as string | undefined;
+  const profilePath = workspaceId ? `/${workspaceId}/profile` : "/profile";
+  const pricingPath = workspaceId ? `/${workspaceId}/pricing` : "/pricing";
   const isProfilePath =
-    pathname === "/profile" || pathname.startsWith("/profile/");
+    pathname === profilePath || pathname.startsWith(`${profilePath}/`);
   const usesSubPageLayout =
-    pathname === "/updates" || pathname === "/pricing" || isProfilePath;
-  const showBackButton = pathname !== "/profile";
+    pathname === "/updates" || pathname === pricingPath || isProfilePath;
+  const showBackButton = pathname !== profilePath;
 
   if (!usesSubPageLayout) {
     return <>{children}</>;
