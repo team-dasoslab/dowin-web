@@ -23,12 +23,12 @@ export const GET = withErrorHandler(
       return await apiError("UNAUTHORIZED");
     }
 
-    const parsedParams = workspaceParamsSchema.safeParse({ id });
-    if (!parsedParams.success) {
-      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+    const validatedParams = workspaceParamsSchema.safeParse({ id });
+    if (!validatedParams.success) {
+      return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    const resolvedId = await storage.resolveIdByUid(parsedParams.data.id);
+    const resolvedId = await storage.resolveIdByUid(validatedParams.data.id);
     if (!resolvedId) {
       return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }

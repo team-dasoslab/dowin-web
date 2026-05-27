@@ -35,13 +35,13 @@ export const DELETE = withErrorHandler(
     }
 
     const params = await context.params;
-    const parsedParams = workspaceParamsSchema.safeParse(params);
+    const validatedParams = workspaceParamsSchema.safeParse(params);
 
-    if (!parsedParams.success) {
-      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+    if (!validatedParams.success) {
+      return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    const resolvedId = await storage.resolveIdByUid(parsedParams.data.id);
+    const resolvedId = await storage.resolveIdByUid(validatedParams.data.id);
     if (!resolvedId) {
       return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }

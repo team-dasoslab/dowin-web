@@ -1,0 +1,50 @@
+import { getDb } from "@/db";
+import { ScoreboardService } from "@/domain/scoreboard/services/scoreboard.service";
+import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
+import { scoreboardIdParamSchema } from "@/domain/scoreboard/validation";
+import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { getSessionWithRefresh } from "@/lib/server/auth";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
+import { withErrorHandler } from "@/lib/server/with-error-handler";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+
+export const POST = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string }> }) => {
+  const { workspaceId } = await params;
+const { env } = getCloudflareContext();
+    const db = getDb(env.DB);
+    const session = await getSessionWithRefresh(db);
+
+    if (!session) {
+      return await apiError("UNAUTHORIZED");
+    }
+
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: session.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
+    }
+
+    const validatedParams = scoreboardIdParamSchema.safeParse(await params);
+    if (!validatedParams.success) {
+      return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
+    }
+
+    const service = new ScoreboardService(
+      new ScoreboardStorage(db),
+      new WorkspaceStorage(db),
+    );
+    const scoreboard = await service.archiveScoreboard(workspaceId, validatedParams.data.id,
+      session.userId,
+    );
+
+    return apiSuccess({
+      id: scoreboard.id,
+      status: scoreboard.status,
+    });
+  },
+);

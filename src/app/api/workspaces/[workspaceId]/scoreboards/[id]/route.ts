@@ -1,0 +1,58 @@
+import { getDb } from "@/db";
+import { ScoreboardService } from "@/domain/scoreboard/services/scoreboard.service";
+import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
+import {
+  scoreboardIdParamSchema,
+  scoreboardUpdateSchema,
+} from "@/domain/scoreboard/validation";
+import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { getSessionWithRefresh } from "@/lib/server/auth";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
+import { withErrorHandler } from "@/lib/server/with-error-handler";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+
+export const PUT = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string }> }) => {
+  const { workspaceId } = await params;
+const { env } = getCloudflareContext();
+    const db = getDb(env.DB);
+    const session = await getSessionWithRefresh(db);
+
+    if (!session) {
+      return await apiError("UNAUTHORIZED");
+    }
+
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: session.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
+    }
+
+    const validatedParams = scoreboardIdParamSchema.safeParse(await params);
+    if (!validatedParams.success) {
+      return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
+    }
+
+    const body = await request.json();
+    const parsed = scoreboardUpdateSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    }
+
+    const service = new ScoreboardService(
+      new ScoreboardStorage(db),
+      new WorkspaceStorage(db),
+    );
+    const scoreboard = await service.updateScoreboard(workspaceId, validatedParams.data.id,
+      session.userId,
+      parsed.data,
+    );
+
+    return apiSuccess(scoreboard);
+  },
+);

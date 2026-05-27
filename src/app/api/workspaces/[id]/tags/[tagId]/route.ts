@@ -38,12 +38,12 @@ export const PUT = withErrorHandler(
       return restrictedWriteResponse;
     }
 
-    const parsedParams = workspaceTagParamsSchema.safeParse(await params);
-    if (!parsedParams.success) {
-      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+    const validatedParams = workspaceTagParamsSchema.safeParse(await params);
+    if (!validatedParams.success) {
+      return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    const resolvedId = await service.resolveWorkspaceIdByUid(parsedParams.data.id);
+    const resolvedId = await service.resolveWorkspaceIdByUid(validatedParams.data.id);
     if (!resolvedId) {
       return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }
@@ -55,7 +55,7 @@ export const PUT = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
     }
 
-    const tag = await service.updateTag(resolvedId, parsedParams.data.tagId, {
+    const tag = await service.updateTag(resolvedId, validatedParams.data.tagId, {
       name: parsedBody.data.name.trim(),
       normalizedName: normalizeWorkspaceTagName(parsedBody.data.name),
     });
@@ -88,18 +88,18 @@ export const DELETE = withErrorHandler(
       return restrictedWriteResponse;
     }
 
-    const parsedParams = workspaceTagParamsSchema.safeParse(await params);
-    if (!parsedParams.success) {
-      return await apiError("VALIDATION_ERROR", parsedParams.error.flatten().fieldErrors);
+    const validatedParams = workspaceTagParamsSchema.safeParse(await params);
+    if (!validatedParams.success) {
+      return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    const resolvedId = await service.resolveWorkspaceIdByUid(parsedParams.data.id);
+    const resolvedId = await service.resolveWorkspaceIdByUid(validatedParams.data.id);
     if (!resolvedId) {
       return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
     }
 
     await requireWorkspaceMember(db, resolvedId, session.userId);
-    await service.deleteTag(resolvedId, parsedParams.data.tagId);
+    await service.deleteTag(resolvedId, validatedParams.data.tagId);
 
     return new NextResponse(null, { status: 204 });
   },
