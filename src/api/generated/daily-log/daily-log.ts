@@ -28,8 +28,8 @@ import type {
   DailyLog,
   DailyLogUpsertRequest,
   ErrorResponse,
-  GetScoreboardsScoreboardIdLogsMonthlyParams,
-  GetScoreboardsScoreboardIdLogsWeeklyParams,
+  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams,
+  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams,
   MonthlyLogsResponse,
   UnauthorizedErrorResponse,
   WeeklyLogsResponse
@@ -45,54 +45,56 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 일일 기록 생성 또는 수정
  */
-export type putLeadMeasuresLeadMeasureIdLogsDateResponse200 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse200 = {
   data: DailyLog
   status: 200
 }
 
-export type putLeadMeasuresLeadMeasureIdLogsDateResponse401 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type putLeadMeasuresLeadMeasureIdLogsDateResponse403 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type putLeadMeasuresLeadMeasureIdLogsDateResponse404 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type putLeadMeasuresLeadMeasureIdLogsDateResponse422 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type putLeadMeasuresLeadMeasureIdLogsDateResponseSuccess = (putLeadMeasuresLeadMeasureIdLogsDateResponse200) & {
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseSuccess = (putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse200) & {
   headers: Headers;
 };
-export type putLeadMeasuresLeadMeasureIdLogsDateResponseError = (putLeadMeasuresLeadMeasureIdLogsDateResponse401 | putLeadMeasuresLeadMeasureIdLogsDateResponse403 | putLeadMeasuresLeadMeasureIdLogsDateResponse404 | putLeadMeasuresLeadMeasureIdLogsDateResponse422) & {
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseError = (putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse401 | putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse403 | putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse404 | putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse422) & {
   headers: Headers;
 };
 
-export type putLeadMeasuresLeadMeasureIdLogsDateResponse = (putLeadMeasuresLeadMeasureIdLogsDateResponseSuccess | putLeadMeasuresLeadMeasureIdLogsDateResponseError)
+export type putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse = (putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseSuccess | putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseError)
 
-export const getPutLeadMeasuresLeadMeasureIdLogsDateUrl = (leadMeasureId: number,
+export const getPutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl = (workspaceId: string,
+    leadMeasureId: number,
     date: string,) => {
 
 
   
 
-  return `/api/lead-measures/${leadMeasureId}/logs/${date}`
+  return `/api/workspaces/${workspaceId}/lead-measures/${leadMeasureId}/logs/${date}`
 }
 
-export const putLeadMeasuresLeadMeasureIdLogsDate = async (leadMeasureId: number,
+export const putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate = async (workspaceId: string,
+    leadMeasureId: number,
     date: string,
-    dailyLogUpsertRequest: DailyLogUpsertRequest, options?: RequestInit): Promise<putLeadMeasuresLeadMeasureIdLogsDateResponse> => {
+    dailyLogUpsertRequest: DailyLogUpsertRequest, options?: RequestInit): Promise<putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse> => {
   
-  return customInstance<putLeadMeasuresLeadMeasureIdLogsDateResponse>(getPutLeadMeasuresLeadMeasureIdLogsDateUrl(leadMeasureId,date),
+  return customInstance<putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse>(getPutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl(workspaceId,leadMeasureId,date),
   {      
     ...options,
     method: 'PUT',
@@ -105,11 +107,11 @@ export const putLeadMeasuresLeadMeasureIdLogsDate = async (leadMeasureId: number
 
 
 
-export const getPutLeadMeasuresLeadMeasureIdLogsDateMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putLeadMeasuresLeadMeasureIdLogsDate>>, TError,{leadMeasureId: number;date: string;data: DailyLogUpsertRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof putLeadMeasuresLeadMeasureIdLogsDate>>, TError,{leadMeasureId: number;date: string;data: DailyLogUpsertRequest}, TContext> => {
+export const getPutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, TError,{workspaceId: string;leadMeasureId: number;date: string;data: DailyLogUpsertRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, TError,{workspaceId: string;leadMeasureId: number;date: string;data: DailyLogUpsertRequest}, TContext> => {
 
-const mutationKey = ['putLeadMeasuresLeadMeasureIdLogsDate'];
+const mutationKey = ['putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -119,10 +121,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putLeadMeasuresLeadMeasureIdLogsDate>>, {leadMeasureId: number;date: string;data: DailyLogUpsertRequest}> = (props) => {
-          const {leadMeasureId,date,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, {workspaceId: string;leadMeasureId: number;date: string;data: DailyLogUpsertRequest}> = (props) => {
+          const {workspaceId,leadMeasureId,date,data} = props ?? {};
 
-          return  putLeadMeasuresLeadMeasureIdLogsDate(leadMeasureId,date,data,requestOptions)
+          return  putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(workspaceId,leadMeasureId,date,data,requestOptions)
         }
 
 
@@ -132,63 +134,65 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PutLeadMeasuresLeadMeasureIdLogsDateMutationResult = NonNullable<Awaited<ReturnType<typeof putLeadMeasuresLeadMeasureIdLogsDate>>>
-    export type PutLeadMeasuresLeadMeasureIdLogsDateMutationBody = DailyLogUpsertRequest
-    export type PutLeadMeasuresLeadMeasureIdLogsDateMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationResult = NonNullable<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>>
+    export type PutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationBody = DailyLogUpsertRequest
+    export type PutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 일일 기록 생성 또는 수정
  */
-export const usePutLeadMeasuresLeadMeasureIdLogsDate = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putLeadMeasuresLeadMeasureIdLogsDate>>, TError,{leadMeasureId: number;date: string;data: DailyLogUpsertRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, TError,{workspaceId: string;leadMeasureId: number;date: string;data: DailyLogUpsertRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof putLeadMeasuresLeadMeasureIdLogsDate>>,
+        Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>,
         TError,
-        {leadMeasureId: number;date: string;data: DailyLogUpsertRequest},
+        {workspaceId: string;leadMeasureId: number;date: string;data: DailyLogUpsertRequest},
         TContext
       > => {
-      return useMutation(getPutLeadMeasuresLeadMeasureIdLogsDateMutationOptions(options), queryClient);
+      return useMutation(getPutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationOptions(options), queryClient);
     }
     /**
  * @summary 일일 기록 삭제
  */
-export type deleteLeadMeasuresLeadMeasureIdLogsDateResponse204 = {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse204 = {
   data: void
   status: 204
 }
 
-export type deleteLeadMeasuresLeadMeasureIdLogsDateResponse401 = {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type deleteLeadMeasuresLeadMeasureIdLogsDateResponse404 = {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type deleteLeadMeasuresLeadMeasureIdLogsDateResponseSuccess = (deleteLeadMeasuresLeadMeasureIdLogsDateResponse204) & {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseSuccess = (deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse204) & {
   headers: Headers;
 };
-export type deleteLeadMeasuresLeadMeasureIdLogsDateResponseError = (deleteLeadMeasuresLeadMeasureIdLogsDateResponse401 | deleteLeadMeasuresLeadMeasureIdLogsDateResponse404) & {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseError = (deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse401 | deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse404) & {
   headers: Headers;
 };
 
-export type deleteLeadMeasuresLeadMeasureIdLogsDateResponse = (deleteLeadMeasuresLeadMeasureIdLogsDateResponseSuccess | deleteLeadMeasuresLeadMeasureIdLogsDateResponseError)
+export type deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse = (deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseSuccess | deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponseError)
 
-export const getDeleteLeadMeasuresLeadMeasureIdLogsDateUrl = (leadMeasureId: number,
+export const getDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl = (workspaceId: string,
+    leadMeasureId: number,
     date: string,) => {
 
 
   
 
-  return `/api/lead-measures/${leadMeasureId}/logs/${date}`
+  return `/api/workspaces/${workspaceId}/lead-measures/${leadMeasureId}/logs/${date}`
 }
 
-export const deleteLeadMeasuresLeadMeasureIdLogsDate = async (leadMeasureId: number,
-    date: string, options?: RequestInit): Promise<deleteLeadMeasuresLeadMeasureIdLogsDateResponse> => {
+export const deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate = async (workspaceId: string,
+    leadMeasureId: number,
+    date: string, options?: RequestInit): Promise<deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse> => {
   
-  return customInstance<deleteLeadMeasuresLeadMeasureIdLogsDateResponse>(getDeleteLeadMeasuresLeadMeasureIdLogsDateUrl(leadMeasureId,date),
+  return customInstance<deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse>(getDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl(workspaceId,leadMeasureId,date),
   {      
     ...options,
     method: 'DELETE'
@@ -200,11 +204,11 @@ export const deleteLeadMeasuresLeadMeasureIdLogsDate = async (leadMeasureId: num
 
 
 
-export const getDeleteLeadMeasuresLeadMeasureIdLogsDateMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLeadMeasuresLeadMeasureIdLogsDate>>, TError,{leadMeasureId: number;date: string}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteLeadMeasuresLeadMeasureIdLogsDate>>, TError,{leadMeasureId: number;date: string}, TContext> => {
+export const getDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, TError,{workspaceId: string;leadMeasureId: number;date: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, TError,{workspaceId: string;leadMeasureId: number;date: string}, TContext> => {
 
-const mutationKey = ['deleteLeadMeasuresLeadMeasureIdLogsDate'];
+const mutationKey = ['deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -214,10 +218,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteLeadMeasuresLeadMeasureIdLogsDate>>, {leadMeasureId: number;date: string}> = (props) => {
-          const {leadMeasureId,date} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, {workspaceId: string;leadMeasureId: number;date: string}> = (props) => {
+          const {workspaceId,leadMeasureId,date} = props ?? {};
 
-          return  deleteLeadMeasuresLeadMeasureIdLogsDate(leadMeasureId,date,requestOptions)
+          return  deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(workspaceId,leadMeasureId,date,requestOptions)
         }
 
 
@@ -227,52 +231,53 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DeleteLeadMeasuresLeadMeasureIdLogsDateMutationResult = NonNullable<Awaited<ReturnType<typeof deleteLeadMeasuresLeadMeasureIdLogsDate>>>
+    export type DeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>>
     
-    export type DeleteLeadMeasuresLeadMeasureIdLogsDateMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type DeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 일일 기록 삭제
  */
-export const useDeleteLeadMeasuresLeadMeasureIdLogsDate = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLeadMeasuresLeadMeasureIdLogsDate>>, TError,{leadMeasureId: number;date: string}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, TError,{workspaceId: string;leadMeasureId: number;date: string}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteLeadMeasuresLeadMeasureIdLogsDate>>,
+        Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>,
         TError,
-        {leadMeasureId: number;date: string},
+        {workspaceId: string;leadMeasureId: number;date: string},
         TContext
       > => {
-      return useMutation(getDeleteLeadMeasuresLeadMeasureIdLogsDateMutationOptions(options), queryClient);
+      return useMutation(getDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationOptions(options), queryClient);
     }
     /**
  * @summary 주간 기록 조회
  */
-export type getScoreboardsScoreboardIdLogsWeeklyResponse200 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200 = {
   data: WeeklyLogsResponse
   status: 200
 }
 
-export type getScoreboardsScoreboardIdLogsWeeklyResponse401 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getScoreboardsScoreboardIdLogsWeeklyResponse404 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getScoreboardsScoreboardIdLogsWeeklyResponseSuccess = (getScoreboardsScoreboardIdLogsWeeklyResponse200) & {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponseSuccess = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200) & {
   headers: Headers;
 };
-export type getScoreboardsScoreboardIdLogsWeeklyResponseError = (getScoreboardsScoreboardIdLogsWeeklyResponse401 | getScoreboardsScoreboardIdLogsWeeklyResponse404) & {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponseError = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse401 | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse404) & {
   headers: Headers;
 };
 
-export type getScoreboardsScoreboardIdLogsWeeklyResponse = (getScoreboardsScoreboardIdLogsWeeklyResponseSuccess | getScoreboardsScoreboardIdLogsWeeklyResponseError)
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponseSuccess | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponseError)
 
-export const getGetScoreboardsScoreboardIdLogsWeeklyUrl = (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsWeeklyParams,) => {
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyUrl = (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -284,13 +289,14 @@ export const getGetScoreboardsScoreboardIdLogsWeeklyUrl = (scoreboardId: number,
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/scoreboards/${scoreboardId}/logs/weekly?${stringifiedParams}` : `/api/scoreboards/${scoreboardId}/logs/weekly`
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/logs/weekly?${stringifiedParams}` : `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/logs/weekly`
 }
 
-export const getScoreboardsScoreboardIdLogsWeekly = async (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsWeeklyParams, options?: RequestInit): Promise<getScoreboardsScoreboardIdLogsWeeklyResponse> => {
+export const getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly = async (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse> => {
   
-  return customInstance<getScoreboardsScoreboardIdLogsWeeklyResponse>(getGetScoreboardsScoreboardIdLogsWeeklyUrl(scoreboardId,params),
+  return customInstance<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse>(getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyUrl(workspaceId,scoreboardId,params),
   {      
     ...options,
     method: 'GET'
@@ -303,75 +309,81 @@ export const getScoreboardsScoreboardIdLogsWeekly = async (scoreboardId: number,
 
 
 
-export const getGetScoreboardsScoreboardIdLogsWeeklyQueryKey = (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsWeeklyParams,) => {
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey = (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams,) => {
     return [
-    `/api/scoreboards/${scoreboardId}/logs/weekly`, ...(params ? [params] : [])
+    `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/logs/weekly`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getGetScoreboardsScoreboardIdLogsWeeklyQueryOptions = <TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetScoreboardsScoreboardIdLogsWeeklyQueryKey(scoreboardId,params);
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey(workspaceId,scoreboardId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>> = ({ signal }) => getScoreboardsScoreboardIdLogsWeekly(scoreboardId,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly(workspaceId,scoreboardId,params, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId && scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetScoreboardsScoreboardIdLogsWeeklyQueryResult = NonNullable<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>>
-export type GetScoreboardsScoreboardIdLogsWeeklyQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>>
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params: undefined |  GetScoreboardsScoreboardIdLogsWeeklyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params: undefined |  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 주간 기록 조회
  */
 
-export function useGetScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetScoreboardsScoreboardIdLogsWeeklyQueryOptions(scoreboardId,params,options)
+  const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryOptions(workspaceId,scoreboardId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -384,32 +396,33 @@ export function useGetScoreboardsScoreboardIdLogsWeekly<TData = Awaited<ReturnTy
 /**
  * @summary 월간 기록 조회
  */
-export type getScoreboardsScoreboardIdLogsMonthlyResponse200 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse200 = {
   data: MonthlyLogsResponse
   status: 200
 }
 
-export type getScoreboardsScoreboardIdLogsMonthlyResponse401 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getScoreboardsScoreboardIdLogsMonthlyResponse404 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getScoreboardsScoreboardIdLogsMonthlyResponseSuccess = (getScoreboardsScoreboardIdLogsMonthlyResponse200) & {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponseSuccess = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse200) & {
   headers: Headers;
 };
-export type getScoreboardsScoreboardIdLogsMonthlyResponseError = (getScoreboardsScoreboardIdLogsMonthlyResponse401 | getScoreboardsScoreboardIdLogsMonthlyResponse404) & {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponseError = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse401 | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse404) & {
   headers: Headers;
 };
 
-export type getScoreboardsScoreboardIdLogsMonthlyResponse = (getScoreboardsScoreboardIdLogsMonthlyResponseSuccess | getScoreboardsScoreboardIdLogsMonthlyResponseError)
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponseSuccess | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponseError)
 
-export const getGetScoreboardsScoreboardIdLogsMonthlyUrl = (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsMonthlyParams,) => {
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyUrl = (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -421,13 +434,14 @@ export const getGetScoreboardsScoreboardIdLogsMonthlyUrl = (scoreboardId: number
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/scoreboards/${scoreboardId}/logs/monthly?${stringifiedParams}` : `/api/scoreboards/${scoreboardId}/logs/monthly`
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/logs/monthly?${stringifiedParams}` : `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/logs/monthly`
 }
 
-export const getScoreboardsScoreboardIdLogsMonthly = async (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsMonthlyParams, options?: RequestInit): Promise<getScoreboardsScoreboardIdLogsMonthlyResponse> => {
+export const getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly = async (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse> => {
   
-  return customInstance<getScoreboardsScoreboardIdLogsMonthlyResponse>(getGetScoreboardsScoreboardIdLogsMonthlyUrl(scoreboardId,params),
+  return customInstance<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse>(getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyUrl(workspaceId,scoreboardId,params),
   {      
     ...options,
     method: 'GET'
@@ -440,75 +454,81 @@ export const getScoreboardsScoreboardIdLogsMonthly = async (scoreboardId: number
 
 
 
-export const getGetScoreboardsScoreboardIdLogsMonthlyQueryKey = (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsMonthlyParams,) => {
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey = (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams,) => {
     return [
-    `/api/scoreboards/${scoreboardId}/logs/monthly`, ...(params ? [params] : [])
+    `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/logs/monthly`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getGetScoreboardsScoreboardIdLogsMonthlyQueryOptions = <TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetScoreboardsScoreboardIdLogsMonthlyQueryKey(scoreboardId,params);
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey(workspaceId,scoreboardId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>> = ({ signal }) => getScoreboardsScoreboardIdLogsMonthly(scoreboardId,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly(workspaceId,scoreboardId,params, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId && scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetScoreboardsScoreboardIdLogsMonthlyQueryResult = NonNullable<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>>
-export type GetScoreboardsScoreboardIdLogsMonthlyQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>>
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params: undefined |  GetScoreboardsScoreboardIdLogsMonthlyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params: undefined |  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 월간 기록 조회
  */
 
-export function useGetScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetScoreboardsScoreboardIdLogsMonthlyQueryOptions(scoreboardId,params,options)
+  const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryOptions(workspaceId,scoreboardId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

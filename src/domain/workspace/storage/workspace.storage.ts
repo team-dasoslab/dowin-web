@@ -1,4 +1,10 @@
 import { getDb } from "@/db";
+import { customAlphabet } from "nanoid";
+
+const generateUid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  12
+);
 import {
   billingPlanLimits,
   users,
@@ -58,6 +64,14 @@ export class WorkspaceStorage {
     );
   }
 
+  async resolveIdByUid(uid: string): Promise<number | null> {
+    const workspace = await this.db.query.workspaces.findFirst({
+      where: eq(workspaces.uid, uid),
+      columns: { id: true },
+    });
+    return workspace?.id ?? null;
+  }
+
   async findUserWorkspace(userId: number): Promise<Workspace | null> {
     const firstMembership = await this.db.query.workspaceMembers.findFirst({
       where: eq(workspaceMembers.userId, userId),
@@ -69,9 +83,10 @@ export class WorkspaceStorage {
   }
 
   async createWorkspace(name: string): Promise<Workspace> {
+    const uid = generateUid();
     const [newWorkspace] = await this.db
       .insert(workspaces)
-      .values({ name })
+      .values({ name, uid })
       .returning();
     return newWorkspace;
   }

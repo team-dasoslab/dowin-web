@@ -14,7 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 type UseTeamMemosParams = {
-  workspaceId: number;
+  workspaceId: string;
   targetUserId: number | null;
   enabled: boolean;
   currentUser: {
@@ -26,7 +26,7 @@ type UseTeamMemosParams = {
 
 type TeamMemosQueryData = {
   data: {
-    workspaceId: number;
+    workspaceId: string;
     targetUserId: number;
     memos: DashboardTeamMemo[];
   };
@@ -42,7 +42,7 @@ const ensureMemoQueryData = (
     previous ?? {
       status: 200,
       data: {
-        workspaceId: 0,
+        workspaceId: "",
         targetUserId,
         memos: [],
       },
@@ -95,7 +95,7 @@ export const useTeamMemos = ({
     const optimisticMemoId = -Date.now();
     const optimisticMemo: DashboardTeamMemo = {
       id: optimisticMemoId,
-      workspaceId: 0,
+      workspaceId: "",
       targetUserId,
       author: {
         userId: currentUser.id,

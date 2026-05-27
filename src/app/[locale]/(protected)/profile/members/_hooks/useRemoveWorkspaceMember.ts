@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseRemoveWorkspaceMemberParams = {
-  workspaceId: number;
+  workspaceId: string;
 };
 
 export const useRemoveWorkspaceMember = ({

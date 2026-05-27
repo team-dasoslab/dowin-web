@@ -45,7 +45,7 @@ export default function DashboardPage() {
     setSelectedDate,
     weekDates,
     weekLabel,
-  } = useTeamDashboard(Number(useParams().workspaceId));
+  } = useTeamDashboard(useParams().workspaceId as string);
   const { data: profileResponse } = useGetUsersMe();
   const [activeMemoState, setActiveMemoState] = useState<ActiveMemoState>(null);
   const myUserId =
@@ -352,6 +352,7 @@ function DashboardNoWorkspaceState() {
 
 function DashboardNoScoreboardState() {
   const t = useTranslations("Dashboard");
+  const workspaceId = useParams().workspaceId as string;
   return (
     <div className="min-h-screen bg-zinc-50/50">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
@@ -364,7 +365,7 @@ function DashboardNoScoreboardState() {
               asChild
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
             >
-              <Link href="/setup?mode=create">{t("createScoreboard")}</Link>
+              <Link href={`/${workspaceId}/setup?mode=create`}>{t("createScoreboard")}</Link>
             </Button>
           }
         />

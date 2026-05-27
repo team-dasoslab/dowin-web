@@ -15,7 +15,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseProfileExportActionParams = {
-  workspaceId?: number;
+  workspaceId?: string;
   exportFrom: string;
   exportTo: string;
   selectedExportMeasureIds: number[];

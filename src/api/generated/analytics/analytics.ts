@@ -66,7 +66,7 @@ export type getWorkspacesWorkspaceIdAnalyticsExportDataResponseError = (getWorks
 
 export type getWorkspacesWorkspaceIdAnalyticsExportDataResponse = (getWorkspacesWorkspaceIdAnalyticsExportDataResponseSuccess | getWorkspacesWorkspaceIdAnalyticsExportDataResponseError)
 
-export const getGetWorkspacesWorkspaceIdAnalyticsExportDataUrl = (workspaceId: number,
+export const getGetWorkspacesWorkspaceIdAnalyticsExportDataUrl = (workspaceId: string,
     params: GetWorkspacesWorkspaceIdAnalyticsExportDataParams,) => {
   const normalizedParams = new URLSearchParams();
 
@@ -82,7 +82,7 @@ export const getGetWorkspacesWorkspaceIdAnalyticsExportDataUrl = (workspaceId: n
   return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/analytics/export-data?${stringifiedParams}` : `/api/workspaces/${workspaceId}/analytics/export-data`
 }
 
-export const getWorkspacesWorkspaceIdAnalyticsExportData = async (workspaceId: number,
+export const getWorkspacesWorkspaceIdAnalyticsExportData = async (workspaceId: string,
     params: GetWorkspacesWorkspaceIdAnalyticsExportDataParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdAnalyticsExportDataResponse> => {
   
   return customInstance<getWorkspacesWorkspaceIdAnalyticsExportDataResponse>(getGetWorkspacesWorkspaceIdAnalyticsExportDataUrl(workspaceId,params),
@@ -98,7 +98,7 @@ export const getWorkspacesWorkspaceIdAnalyticsExportData = async (workspaceId: n
 
 
 
-export const getGetWorkspacesWorkspaceIdAnalyticsExportDataQueryKey = (workspaceId: number,
+export const getGetWorkspacesWorkspaceIdAnalyticsExportDataQueryKey = (workspaceId: string,
     params?: GetWorkspacesWorkspaceIdAnalyticsExportDataParams,) => {
     return [
     `/api/workspaces/${workspaceId}/analytics/export-data`, ...(params ? [params] : [])
@@ -106,7 +106,7 @@ export const getGetWorkspacesWorkspaceIdAnalyticsExportDataQueryKey = (workspace
     }
 
     
-export const getGetWorkspacesWorkspaceIdAnalyticsExportDataQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: number,
+export const getGetWorkspacesWorkspaceIdAnalyticsExportDataQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
     params: GetWorkspacesWorkspaceIdAnalyticsExportDataParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -130,7 +130,7 @@ export type GetWorkspacesWorkspaceIdAnalyticsExportDataQueryError = Unauthorized
 
 
 export function useGetWorkspacesWorkspaceIdAnalyticsExportData<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number,
+ workspaceId: string,
     params: GetWorkspacesWorkspaceIdAnalyticsExportDataParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>,
@@ -141,7 +141,7 @@ export function useGetWorkspacesWorkspaceIdAnalyticsExportData<TData = Awaited<R
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesWorkspaceIdAnalyticsExportData<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number,
+ workspaceId: string,
     params: GetWorkspacesWorkspaceIdAnalyticsExportDataParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>,
@@ -152,7 +152,7 @@ export function useGetWorkspacesWorkspaceIdAnalyticsExportData<TData = Awaited<R
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetWorkspacesWorkspaceIdAnalyticsExportData<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number,
+ workspaceId: string,
     params: GetWorkspacesWorkspaceIdAnalyticsExportDataParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
@@ -161,7 +161,7 @@ export function useGetWorkspacesWorkspaceIdAnalyticsExportData<TData = Awaited<R
  */
 
 export function useGetWorkspacesWorkspaceIdAnalyticsExportData<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- workspaceId: number,
+ workspaceId: string,
     params: GetWorkspacesWorkspaceIdAnalyticsExportDataParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdAnalyticsExportData>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {

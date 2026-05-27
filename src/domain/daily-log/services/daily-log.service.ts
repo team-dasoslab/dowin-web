@@ -50,6 +50,7 @@ export class DailyLogService {
   ) {}
 
   async upsertLog(
+    workspaceUid: string,
     leadMeasureId: number,
     userId: number,
     date: string,
@@ -57,6 +58,7 @@ export class DailyLogService {
   ): Promise<DailyLogRecord> {
     assertPastWeekLogEditable(date);
     const { measure, workspace } = await this.getOwnedLeadMeasureWithWorkspace(
+      workspaceUid,
       leadMeasureId,
       userId,
     );
@@ -69,9 +71,10 @@ export class DailyLogService {
     return await this.dailyLogStorage.upsertLog(leadMeasureId, date, value);
   }
 
-  async deleteLog(leadMeasureId: number, userId: number, date: string): Promise<void> {
+  async deleteLog(workspaceUid: string, leadMeasureId: number, userId: number, date: string): Promise<void> {
     assertPastWeekLogEditable(date);
     const { workspace } = await this.getOwnedLeadMeasureWithWorkspace(
+      workspaceUid,
       leadMeasureId,
       userId,
     );
@@ -80,6 +83,7 @@ export class DailyLogService {
   }
 
   async getWeeklyLogs(
+    workspaceUid: string,
     scoreboardId: number,
     userId: number,
   weekStart?: string,
@@ -101,7 +105,7 @@ export class DailyLogService {
       } | null;
     }>;
   }> {
-    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(scoreboardId, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(workspaceUid, scoreboardId, userId);
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -171,6 +175,7 @@ export class DailyLogService {
   }
 
   async getMonthlyLogs(
+    workspaceUid: string,
     scoreboardId: number,
     userId: number,
     monthStart?: string,
@@ -195,7 +200,7 @@ export class DailyLogService {
       achievementRate: number;
     }>;
   }> {
-    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(scoreboardId, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(workspaceUid, scoreboardId, userId);
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -293,8 +298,8 @@ export class DailyLogService {
     };
   }
 
-  private async getOwnedScoreboardWithWorkspace(scoreboardId: number, userId: number) {
-    const workspace = await this.getWorkspace(userId);
+  private async getOwnedScoreboardWithWorkspace(workspaceUid: string, scoreboardId: number, userId: number) {
+    const workspace = await this.getWorkspace(workspaceUid, userId);
 
     const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       scoreboardId,
@@ -305,10 +310,11 @@ export class DailyLogService {
   }
 
   private async getOwnedLeadMeasureWithWorkspace(
+    workspaceUid: string,
     leadMeasureId: number,
     userId: number,
   ) {
-    const workspace = await this.getWorkspace(userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
 
     const measure = await this.leadMeasureStorage.findOwnedLeadMeasure(
       leadMeasureId,
@@ -322,8 +328,18 @@ export class DailyLogService {
     return { measure, workspace };
   }
 
-  private async getWorkspace(userId: number) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+  private async getWorkspace(workspaceUid: string, userId: number) {
+    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
+    if (!internalId) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const membership = await this.workspaceStorage.findMembership(internalId, userId);
+    if (!membership) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }

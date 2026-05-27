@@ -9,7 +9,7 @@ import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/error
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
-  "findUserWorkspace" | "findMembershipByUserId"
+  "resolveIdByUid" | "findWorkspaceById" | "findMembership" | "findMembershipByUserId"
 >;
 type BillingRiskSummary = {
   recentRefundCount: number;
@@ -21,7 +21,7 @@ const BILLING_RISK_REVIEW_THRESHOLD = 2;
 const BILLING_RISK_LOOKBACK_DAYS = 30;
 
 export type BillingOverview = {
-  workspaceId: number;
+  workspaceId: string;
   workspaceName: string;
   planCode: "FREE" | "STANDARD";
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
@@ -64,6 +64,14 @@ function getBillingRiskLookbackStart(now: Date): Date {
   return lookback;
 }
 
+function getWorkspacePublicId(workspace: { id: number; uid: string | null }) {
+  if (!workspace.uid) {
+    throw new Error(`WORKSPACE_UID_MISSING:${workspace.id}`);
+  }
+
+  return workspace.uid;
+}
+
 export class BillingService {
   constructor(
     private workspaceStorage: WorkspacePort,
@@ -71,20 +79,34 @@ export class BillingService {
     private polarClient: PolarBillingClient | null = null,
   ) {}
 
-  async getMyBilling(userId: number): Promise<BillingOverview> {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+  private async getWorkspace(workspaceUid: string, userId: number) {
+    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
+    if (!internalId) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const membership = await this.workspaceStorage.findMembership(internalId, userId);
+    if (!membership) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const membership = await this.workspaceStorage.findMembershipByUserId(userId);
+    return { workspace, membership };
+  }
+
+  async getMyBilling(workspaceUid: string, userId: number): Promise<BillingOverview> {
+    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
     const riskSummary = await this.getBillingRiskSummary(workspace.id);
 
     return {
-      workspaceId: workspace.id,
+      workspaceId: getWorkspacePublicId(workspace),
       workspaceName: workspace.name,
       planCode: billingState?.planCode ?? workspace.planCode,
       billingStatus: billingState?.billingStatus ?? "NONE",
@@ -101,12 +123,12 @@ export class BillingService {
   }
 
   async prepareCheckout(
+    workspaceUid: string,
     userId: number,
     idempotencyKey: string,
     locale: "ko" | "en",
   ) {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    const membership = await this.workspaceStorage.findMembershipByUserId(userId);
+    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
 
     if (!workspace || !membership) {
       throw new NotFoundError("NOT_FOUND");
@@ -228,9 +250,8 @@ export class BillingService {
     }
   }
 
-  async getPortalUrl(userId: number): Promise<string> {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
-    const membership = await this.workspaceStorage.findMembershipByUserId(userId);
+  async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {
+    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
     const billingState = workspace
       ? await this.billingStorage.findWorkspaceBillingState(workspace.id)
       : null;

@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 type UseInviteActionsParams = {
-  workspaceId: number;
+  workspaceId: string;
 };
 
 import { useTranslations } from "next-intl";

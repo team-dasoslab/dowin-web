@@ -183,6 +183,13 @@
       "when": 1779340339960,
       "tag": "0025_previous_chamber",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "6",
+      "when": 1779704545442,
+      "tag": "0026_adorable_manta",
+      "breakpoints": true
     }
   ]
 }

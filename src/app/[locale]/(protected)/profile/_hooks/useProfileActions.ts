@@ -12,7 +12,6 @@ import {
   useDeleteWorkspacesIdLeave,
   usePutWorkspacesId,
 } from "@/api/generated/workspace/workspace";
-import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "@/i18n/routing";
@@ -25,7 +24,7 @@ import { useState } from "react";
 type UseProfileActionsParams = {
   nickname: string;
   workspace: {
-    id?: number | null;
+    id?: string | null;
     name?: string | null;
   } | null;
 };
@@ -63,7 +62,7 @@ export const useProfileActions = ({
         queryKey: getGetWorkspacesMeQueryKey(),
       }),
       queryClient.invalidateQueries({
-        queryKey: getGetScoreboardsActiveQueryKey(),
+        queryKey: ['workspaces'],
       }),
       queryClient.invalidateQueries({
         predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
@@ -112,7 +111,7 @@ export const useProfileActions = ({
     try {
       setPendingAction("workspace-name");
       const response = await updateWorkspaceMutation.mutateAsync({
-        id: workspace.id ?? 0,
+        id: workspace.id ?? "",
         data: { name: next },
       });
 
@@ -186,8 +185,8 @@ export const useProfileActions = ({
   };
 
   const leaveWorkspace = async () => {
-    const workspaceId = workspace?.id ?? 0;
-    if (workspaceId <= 0) {
+    const workspaceId = workspace?.id ?? "";
+    if (!workspaceId) {
       showToast("error", t("noWorkspaceToLeave"));
       return;
     }
@@ -218,10 +217,10 @@ export const useProfileActions = ({
   };
 
   const deleteWorkspace = async () => {
-    const workspaceId = workspace?.id ?? 0;
+    const workspaceId = workspace?.id ?? "";
     const workspaceName = workspace?.name?.trim() ?? "";
 
-    if (workspaceId <= 0) {
+    if (!workspaceId) {
       showToast("error", t("noWorkspaceToDelete"));
       return;
     }

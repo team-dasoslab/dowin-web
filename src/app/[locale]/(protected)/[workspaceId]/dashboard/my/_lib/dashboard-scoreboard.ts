@@ -1,12 +1,12 @@
 import {
-  getGetScoreboardsScoreboardIdLogsWeeklyQueryKey,
-  getScoreboardsScoreboardIdLogsWeeklyResponse200,
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
+  getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200,
 } from "@/api/generated/daily-log/daily-log";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 
 export type WeeklyLogsQueryData =
-  | getScoreboardsScoreboardIdLogsWeeklyResponse200
+  | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200
   | undefined;
 
 export type DailyLogValue = boolean | null;
@@ -17,7 +17,7 @@ export type ToggleLogContext = {
   currentLogKey: string;
   previousWeeklyLogs: WeeklyLogsQueryData;
   weeklyLogsQueryKey: ReturnType<
-    typeof getGetScoreboardsScoreboardIdLogsWeeklyQueryKey
+    typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey
   > | null;
 };
 
@@ -59,10 +59,10 @@ export const computeWeeklyRate = (
   }>,
 ): number => {
   const weeklyTargetMeasures = activeLeadMeasures.filter(
-    (leadMeasure) => leadMeasure.period !== "MONTHLY",
+    (leadMeasure: any) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure) => [leadMeasure.id ?? null, leadMeasure]),
+    weeklyLeadMeasures.map((leadMeasure: any) => [leadMeasure.id ?? null, leadMeasure]),
   );
 
   const achieved = weeklyTargetMeasures.reduce((accumulator, leadMeasure) => {
@@ -94,7 +94,7 @@ export const updateWeeklyLogsCache = (
     ...previous,
     data: {
       ...previous.data,
-      leadMeasures: previous.data.leadMeasures?.map((leadMeasure) => {
+      leadMeasures: previous.data.leadMeasures?.map((leadMeasure: any) => {
         if (toNumberId(leadMeasure.id) !== leadMeasureId) {
           return leadMeasure;
         }

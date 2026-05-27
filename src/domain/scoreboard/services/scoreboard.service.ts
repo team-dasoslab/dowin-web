@@ -18,7 +18,9 @@ type WorkspaceSummary = {
 };
 
 export interface WorkspaceLookupPort {
-  findUserWorkspace(userId: number): Promise<WorkspaceSummary | null>;
+  resolveIdByUid(uid: string): Promise<number | null>;
+  findWorkspaceById(workspaceId: number): Promise<WorkspaceSummary | null>;
+  findMembership(workspaceId: number, userId: number): Promise<unknown | null>;
   countMembers(workspaceId: number): Promise<number>;
   findPlanLimit(
     planCode: "FREE" | "STANDARD",
@@ -54,8 +56,8 @@ export class ScoreboardService {
     private workspaceStorage: WorkspaceLookupPort,
   ) {}
 
-  async getActiveScoreboard(userId: number): Promise<ScoreboardWithLeadMeasures> {
-    const workspace = await this.getWorkspace(userId);
+  async getActiveScoreboard(workspaceUid: string, userId: number): Promise<ScoreboardWithLeadMeasures> {
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     const scoreboard = await this.scoreboardStorage.findActiveScoreboard(
       userId,
       workspace.id,
@@ -69,10 +71,11 @@ export class ScoreboardService {
   }
 
   async createScoreboard(
+    workspaceUid: string,
     userId: number,
     input: Omit<CreateScoreboardInput, "userId" | "workspaceId">,
   ): Promise<ScoreboardRecord> {
-    const workspace = await this.getWorkspace(userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
     const existing = await this.scoreboardStorage.findActiveScoreboard(
       userId,
@@ -92,12 +95,13 @@ export class ScoreboardService {
   }
 
   async updateScoreboard(
+    workspaceUid: string,
     id: number,
     userId: number,
     input: UpdateScoreboardInput,
   ): Promise<ScoreboardRecord> {
-    const scoreboard = await this.getOwnedScoreboard(id, userId);
-    const workspace = await this.getWorkspace(userId);
+    const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
@@ -107,9 +111,9 @@ export class ScoreboardService {
     return await this.scoreboardStorage.updateScoreboard(id, input);
   }
 
-  async archiveScoreboard(id: number, userId: number): Promise<ScoreboardRecord> {
-    const scoreboard = await this.getOwnedScoreboard(id, userId);
-    const workspace = await this.getWorkspace(userId);
+  async archiveScoreboard(workspaceUid: string, id: number, userId: number): Promise<ScoreboardRecord> {
+    const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
@@ -122,8 +126,8 @@ export class ScoreboardService {
     );
   }
 
-  async getHistory(userId: number): Promise<ScoreboardRecord[]> {
-    const workspace = await this.getWorkspace(userId);
+  async getHistory(workspaceUid: string, userId: number): Promise<ScoreboardRecord[]> {
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     return await this.scoreboardStorage.findArchivedScoreboards(
       userId,
       workspace.id,
@@ -131,11 +135,12 @@ export class ScoreboardService {
   }
 
   async reactivateScoreboard(
+    workspaceUid: string,
     id: number,
     userId: number,
   ): Promise<ScoreboardRecord> {
-    const scoreboard = await this.getOwnedScoreboard(id, userId);
-    const workspace = await this.getWorkspace(userId);
+    const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ACTIVE") {
@@ -154,9 +159,18 @@ export class ScoreboardService {
     return await this.scoreboardStorage.reactivateScoreboard(id);
   }
 
-  private async getWorkspace(userId: number): Promise<WorkspaceSummary> {
-    const workspace = await this.workspaceStorage.findUserWorkspace(userId);
+  private async getWorkspace(workspaceUid: string, userId: number): Promise<WorkspaceSummary> {
+    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
+    if (!internalId) {
+      throw new NotFoundError("NOT_FOUND");
+    }
 
+    const membership = await this.workspaceStorage.findMembership(internalId, userId);
+    if (!membership) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -165,10 +179,11 @@ export class ScoreboardService {
   }
 
   private async getOwnedScoreboard(
+    workspaceUid: string,
     id: number,
     userId: number,
   ): Promise<ScoreboardWithLeadMeasures> {
-    const workspace = await this.getWorkspace(userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
     const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       id,
       userId,

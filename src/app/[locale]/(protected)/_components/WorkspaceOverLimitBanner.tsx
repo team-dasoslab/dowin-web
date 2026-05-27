@@ -5,7 +5,9 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 type WorkspaceOverLimitBannerProps = {
   freeMemberLimit?: number | null;
@@ -20,6 +22,7 @@ export function WorkspaceOverLimitBanner({
 }: WorkspaceOverLimitBannerProps) {
   const t = useTranslations("WorkspaceOverLimit");
   const isNativeApp = useNativeApp();
+  const workspaceId = useParams().workspaceId as string | undefined;
   const showBillingSurface = publicRuntimeConfig.isDevelopment && !isNativeApp;
   const count = memberCount ?? 0;
   const limit = freeMemberLimit ?? 10;
@@ -50,7 +53,7 @@ export function WorkspaceOverLimitBanner({
                 asChild
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-[11px] font-bold text-red-700"
               >
-                <Link href="/profile/members">
+                <Link href={getWorkspacePath(workspaceId, "/profile/members")}>
                   <DowinIcon name="domain-people" size="14px" />
                   {t("manageMembers")}
                 </Link>

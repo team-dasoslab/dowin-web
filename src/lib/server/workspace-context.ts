@@ -2,14 +2,28 @@ import { NotFoundError } from "@/lib/server/errors";
 
 type WorkspaceStoragePort = {
   getAccessContextData(workspaceId: number, userId: number): Promise<{
-    workspace: any;
-    member: any;
-    billingState: any;
+    workspace: {
+      id: number;
+      uid: string | null;
+      name: string;
+      planCode: "FREE" | "STANDARD";
+    };
+    member: {
+      id: number;
+      userId: number;
+      role: "ADMIN" | "MEMBER";
+    };
+    billingState: {
+      planCode: "FREE" | "STANDARD";
+      billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+      entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+    } | null;
   } | null>;
 };
 
 export type WorkspaceAccessContext = {
   workspaceId: number;
+  workspacePublicId: string;
   workspaceName: string;
   userId: number;
   role: "ADMIN" | "MEMBER";
@@ -34,6 +48,9 @@ export async function requireWorkspaceAccess(
   }
 
   const { workspace, member, billingState } = result;
+  if (!workspace.uid) {
+    throw new Error(`WORKSPACE_UID_MISSING:${workspace.id}`);
+  }
 
   const planCode = billingState?.planCode ?? workspace.planCode;
   const billingStatus = billingState?.billingStatus ?? "NONE";
@@ -45,6 +62,7 @@ export async function requireWorkspaceAccess(
 
   return {
     workspaceId: workspace.id,
+    workspacePublicId: workspace.uid,
     workspaceName: workspace.name,
     userId: member.userId,
     role: member.role,

@@ -10,12 +10,13 @@ import {
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "@/i18n/routing";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type UseTransferWorkspaceAdminParams = {
-  workspaceId: number;
+  workspaceId: string;
 };
 
 export const useTransferWorkspaceAdmin = ({
@@ -67,7 +68,7 @@ export const useTransferWorkspaceAdmin = ({
 
       await invalidateMemberQueries();
       showToast("success", t("adminTransferred"));
-      router.replace("/profile");
+      router.replace(getWorkspacePath(workspaceId, "/profile"));
     } catch (error) {
       showToast("error", getApiErrorMessage(error, t("adminTransferFailed")));
     } finally {

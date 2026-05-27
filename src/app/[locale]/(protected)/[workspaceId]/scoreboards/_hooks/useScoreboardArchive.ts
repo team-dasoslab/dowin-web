@@ -1,12 +1,10 @@
 "use client";
 
 import {
-  getGetScoreboardsActiveQueryKey,
-  getGetScoreboardsQueryKey,
-  useGetScoreboards,
-  useGetScoreboardsActive,
-  usePostScoreboardsIdArchive,
-  usePostScoreboardsIdReactivate,
+  useGetWorkspacesWorkspaceIdScoreboards,
+  useGetWorkspacesWorkspaceIdScoreboardsActive,
+  usePostWorkspacesWorkspaceIdScoreboardsIdArchive,
+  usePostWorkspacesWorkspaceIdScoreboardsIdReactivate,
 } from "@/api/generated/scoreboard/scoreboard";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { useToast } from "@/context/ToastContext";
@@ -31,25 +29,31 @@ export const useScoreboardArchive = () => {
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount, error) =>
+      retry: (failureCount: number, error: any) =>
         getApiErrorStatus(error) !== 404 && failureCount < 3,
     },
   });
+
+  const workspaceId = workspaceResponse?.status === 200 ? (workspaceResponse?.data?.id ?? "") : "";
+
   const {
     data: activeScoreboardResponse,
     isLoading: isActiveScoreboardLoading,
     error: activeScoreboardError,
-  } = useGetScoreboardsActive({
+  } = useGetWorkspacesWorkspaceIdScoreboardsActive(workspaceId, {
     query: {
-      retry: (failureCount, error) =>
+      retry: (failureCount: number, error: any) =>
         getApiErrorStatus(error) !== 404 && failureCount < 1,
+      enabled: !!workspaceId,
     },
   });
   const { data: archivedScoreboardsResponse, isLoading: isArchivedLoading } =
-    useGetScoreboards();
+    useGetWorkspacesWorkspaceIdScoreboards(workspaceId, {
+      query: { enabled: !!workspaceId }
+    });
 
-  const archiveMutation = usePostScoreboardsIdArchive();
-  const reactivateMutation = usePostScoreboardsIdReactivate();
+  const archiveMutation = usePostWorkspacesWorkspaceIdScoreboardsIdArchive();
+  const reactivateMutation = usePostWorkspacesWorkspaceIdScoreboardsIdReactivate();
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const hasNoActiveScoreboard = getApiErrorStatus(activeScoreboardError) === 404;
 
@@ -71,10 +75,10 @@ export const useScoreboardArchive = () => {
   const invalidateQueries = async () => {
     await Promise.all([
       queryClient.invalidateQueries({
-        queryKey: getGetScoreboardsActiveQueryKey(),
+        queryKey: ['workspaces'],
       }),
       queryClient.invalidateQueries({
-        queryKey: getGetScoreboardsQueryKey(),
+        queryKey: ['workspaces'],
       }),
     ]);
   };
@@ -83,7 +87,7 @@ export const useScoreboardArchive = () => {
     setPendingActionId(id);
 
     try {
-      await archiveMutation.mutateAsync({ id });
+      await archiveMutation.mutateAsync({ workspaceId, id });
       await invalidateQueries();
       showToast("success", t("archiveSuccess"));
       return true;
@@ -99,7 +103,7 @@ export const useScoreboardArchive = () => {
     setPendingActionId(id);
 
     try {
-      await reactivateMutation.mutateAsync({ id });
+      await reactivateMutation.mutateAsync({ workspaceId, id });
       await invalidateQueries();
       showToast("success", t("reactivateSuccess"));
       return true;

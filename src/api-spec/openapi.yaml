@@ -883,7 +883,7 @@ paths:
               type: object
               required: [workspaceId]
               properties:
-                workspaceId: { type: integer, example: 1 }
+                workspaceId: { type: string }
       responses:
         "200":
           description: 참가 성공
@@ -955,7 +955,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "200":
           description: 조회 성공
@@ -981,7 +981,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "200":
           description: 조회 성공
@@ -1005,7 +1005,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1044,7 +1044,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: tagId
           in: path
           required: true
@@ -1090,7 +1090,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: tagId
           in: path
           required: true
@@ -1120,7 +1120,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "200":
           description: 조회 성공
@@ -1144,7 +1144,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1179,7 +1179,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: inviteId
           in: path
           required: true
@@ -1223,7 +1223,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1259,7 +1259,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "204":
           description: 삭제 성공
@@ -1285,7 +1285,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       responses:
         "204":
           description: 탈퇴 성공
@@ -1316,7 +1316,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -1362,7 +1362,7 @@ paths:
         - name: id
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: memberId
           in: path
           required: true
@@ -1383,11 +1383,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards/active:
+  /workspaces/{workspaceId}/scoreboards/active:
     get:
       summary: 현재 활성 점수판 조회
       tags: [Scoreboard]
       security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
       responses:
         "200":
           description: 조회 성공
@@ -1402,11 +1409,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards:
+  /workspaces/{workspaceId}/scoreboards:
     get:
       summary: 보관된 점수판 목록 조회
       tags: [Scoreboard]
       security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
       responses:
         "200":
           description: 조회 성공
@@ -1426,6 +1440,13 @@ paths:
         content:
           application/json:
             schema: { $ref: "#/components/schemas/ScoreboardCreateRequest" }
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
       responses:
         "201":
           description: 생성 성공
@@ -1445,12 +1466,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards/{id}:
+  /workspaces/{workspaceId}/scoreboards/{id}:
     put:
       summary: 점수판 수정
       tags: [Scoreboard]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: id
           in: path
           required: true
@@ -1484,12 +1511,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards/{id}/archive:
+  /workspaces/{workspaceId}/scoreboards/{id}/archive:
     post:
       summary: 점수판 보관
       tags: [Scoreboard]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: id
           in: path
           required: true
@@ -1518,12 +1551,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards/{id}/reactivate:
+  /workspaces/{workspaceId}/scoreboards/{id}/reactivate:
     post:
       summary: 보관된 점수판 재활성화
       tags: [Scoreboard]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: id
           in: path
           required: true
@@ -1552,12 +1591,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards/{scoreboardId}/lead-measures:
+  /workspaces/{workspaceId}/scoreboards/{scoreboardId}/lead-measures:
     get:
       summary: 점수판 선행지표 목록 조회
       tags: [LeadMeasure]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: scoreboardId
           in: path
           required: true
@@ -1586,6 +1631,12 @@ paths:
       tags: [LeadMeasure]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: scoreboardId
           in: path
           required: true
@@ -1619,12 +1670,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /lead-measures/{id}:
+  /workspaces/{workspaceId}/lead-measures/{id}:
     put:
       summary: 선행지표 수정
       tags: [LeadMeasure]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: id
           in: path
           required: true
@@ -1662,6 +1719,12 @@ paths:
       tags: [LeadMeasure]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: id
           in: path
           required: true
@@ -1690,12 +1753,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /lead-measures/{id}/archive:
+  /workspaces/{workspaceId}/lead-measures/{id}/archive:
     post:
       summary: 선행지표 보관
       tags: [LeadMeasure]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: id
           in: path
           required: true
@@ -1719,12 +1788,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /lead-measures/{id}/reactivate:
+  /workspaces/{workspaceId}/lead-measures/{id}/reactivate:
     post:
       summary: 선행지표 재활성화
       tags: [LeadMeasure]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: id
           in: path
           required: true
@@ -1748,12 +1823,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /lead-measures/{leadMeasureId}/logs/{date}:
+  /workspaces/{workspaceId}/lead-measures/{leadMeasureId}/logs/{date}:
     put:
       summary: 일일 기록 생성 또는 수정
       tags: [DailyLog]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: leadMeasureId
           in: path
           required: true
@@ -1795,6 +1876,12 @@ paths:
       tags: [DailyLog]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: leadMeasureId
           in: path
           required: true
@@ -1814,12 +1901,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards/{scoreboardId}/logs/weekly:
+  /workspaces/{workspaceId}/scoreboards/{scoreboardId}/logs/weekly:
     get:
       summary: 주간 기록 조회
       tags: [DailyLog]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: scoreboardId
           in: path
           required: true
@@ -1842,12 +1935,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /scoreboards/{scoreboardId}/logs/monthly:
+  /workspaces/{workspaceId}/scoreboards/{scoreboardId}/logs/monthly:
     get:
       summary: 월간 기록 조회
       tags: [DailyLog]
       security: [{ sessionCookie: [] }]
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - name: scoreboardId
           in: path
           required: true
@@ -1879,7 +1978,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: from
           in: query
           required: true
@@ -1924,11 +2023,18 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
-  /billing/me:
+  /workspaces/{workspaceId}/billing/me:
     get:
       summary: 현재 워크스페이스 billing 상태 조회
       tags: [Billing]
       security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
       responses:
         "200":
           description: 조회 성공
@@ -1943,7 +2049,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /billing/checkout:
+  /workspaces/{workspaceId}/billing/checkout:
     post:
       summary: STANDARD checkout 시작
       tags: [Billing]
@@ -1961,6 +2067,12 @@ paths:
                   enum: [ko, en]
                   description: checkout 복귀 후 다시 진입할 앱 locale
       parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
         - in: header
           name: Idempotency-Key
           required: true
@@ -1991,11 +2103,18 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /billing/portal:
+  /workspaces/{workspaceId}/billing/portal:
     get:
       summary: customer portal 진입
       tags: [Billing]
       security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
       responses:
         "307":
           description: billing portal로 리다이렉트
@@ -2026,7 +2145,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: weekStart
           in: query
           required: false
@@ -2058,7 +2177,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: weekStart
           in: query
           required: false
@@ -2099,7 +2218,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: targetUserId
           in: query
           required: true
@@ -2131,7 +2250,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
       requestBody:
         required: true
         content:
@@ -2166,7 +2285,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: memoId
           in: path
           required: true
@@ -2210,7 +2329,7 @@ paths:
         - name: workspaceId
           in: path
           required: true
-          schema: { type: integer }
+          schema: { type: string }
         - name: memoId
           in: path
           required: true
@@ -2665,7 +2784,7 @@ components:
     Workspace:
       type: object
       properties:
-        id: { type: integer }
+        id: { type: string }
         name: { type: string }
         planCode:
           type: string
@@ -2684,7 +2803,7 @@ components:
       type: object
       required: [id, name, planCode, role, isCurrent, createdAt]
       properties:
-        id: { type: integer }
+        id: { type: string }
         name: { type: string }
         planCode:
           type: string
@@ -2701,8 +2820,7 @@ components:
       required: [workspaceId]
       properties:
         workspaceId:
-          type: integer
-          minimum: 1
+          type: string
 
     BillingOverview:
       type: object
@@ -2720,7 +2838,7 @@ components:
           canManageBilling,
         ]
       properties:
-        workspaceId: { type: integer }
+        workspaceId: { type: string }
         workspaceName: { type: string }
         planCode:
           type: string
@@ -3183,7 +3301,7 @@ components:
         [id, workspaceId, targetUserId, author, content, isResolved, createdAt]
       properties:
         id: { type: integer }
-        workspaceId: { type: integer }
+        workspaceId: { type: string }
         targetUserId: { type: integer }
         author:
           $ref: "#/components/schemas/DashboardTeamMemoAuthor"
@@ -3204,7 +3322,7 @@ components:
       type: object
       required: [workspaceId, targetUserId, memos]
       properties:
-        workspaceId: { type: integer }
+        workspaceId: { type: string }
         targetUserId: { type: integer }
         memos:
           type: array

@@ -3,8 +3,8 @@ import { z } from "zod";
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
 export const scoreboardCreateSchema = z.object({
-  goalName: z.string().trim().min(1, "가중목은 필수입니다."),
-  lagMeasure: z.string().trim().min(1, "후행지표는 필수입니다."),
+  goalName: z.string().trim().min(1, "핵심 목표는 필수입니다."),
+  lagMeasure: z.string().trim().min(1, "성공 기준은 필수입니다."),
   startDate: z.string().regex(datePattern, "시작일 형식이 올바르지 않습니다."),
   endDate: z
     .string()
@@ -15,8 +15,8 @@ export const scoreboardCreateSchema = z.object({
 
 export const scoreboardUpdateSchema = z
   .object({
-    goalName: z.string().trim().min(1, "가중목은 필수입니다.").optional(),
-    lagMeasure: z.string().trim().min(1, "후행지표는 필수입니다.").optional(),
+    goalName: z.string().trim().min(1, "핵심 목표는 필수입니다.").optional(),
+    lagMeasure: z.string().trim().min(1, "성공 기준은 필수입니다.").optional(),
     startDate: z
       .string()
       .regex(datePattern, "시작일 형식이 올바르지 않습니다.")

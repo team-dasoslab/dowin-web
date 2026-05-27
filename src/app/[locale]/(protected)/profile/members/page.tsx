@@ -19,15 +19,18 @@ import { Card } from "@/components/ui/Card";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { useMemo } from "react";
+import { useParams } from "next/navigation";
 
 import { useTranslations } from "next-intl";
 
 export default function ProfileMembersPage() {
   const t = useTranslations("ProfileMembers");
   const isNativeApp = useNativeApp();
+  const workspaceParamId = useParams().workspaceId as string | undefined;
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
   const {
@@ -44,13 +47,13 @@ export default function ProfileMembersPage() {
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
-  const workspaceId = workspace?.id ?? 0;
+  const workspaceId = workspace?.id ?? "";
   const isWorkspaceAdmin = user?.role === "ADMIN";
 
   const { data: membersResponse, isLoading: isMembersLoading } =
     useGetWorkspacesIdMembers(workspaceId, {
       query: {
-        enabled: workspaceId > 0 && isWorkspaceAdmin,
+        enabled: Boolean(workspaceId) && isWorkspaceAdmin,
         retry: false,
       },
     });
@@ -136,7 +139,7 @@ export default function ProfileMembersPage() {
             asChild
             className="btn-dowin-primary rounded-content px-3 py-2 text-xs font-bold"
           >
-            <Link href="/profile/invites">
+            <Link href={getWorkspacePath(workspaceParamId, "/profile/invites")}>
               {t("invitesCardButton")}
             </Link>
           </Button>
@@ -233,6 +236,7 @@ function NoWorkspaceState() {
 
 function NoAccessState() {
   const t = useTranslations("ProfileMembers");
+  const workspaceId = useParams().workspaceId as string | undefined;
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
@@ -250,7 +254,7 @@ function NoAccessState() {
             asChild
             className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
           >
-            <Link href="/profile">{t("backToSettings")}</Link>
+            <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
           </Button>
         </Card>
       </div>

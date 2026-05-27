@@ -3,7 +3,9 @@
 import { usePutAuthPassword } from "@/api/generated/auth/auth";
 import { useToast } from "@/context/ToastContext";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useRouter } from "@/i18n/routing";
+import { useParams } from "next/navigation";
 import { useState } from "react";
 
 type UsePasswordChangeActionParams = {
@@ -18,6 +20,7 @@ export const usePasswordChangeAction = ({
   validate,
 }: UsePasswordChangeActionParams) => {
   const router = useRouter();
+  const workspaceId = useParams().workspaceId as string | undefined;
   const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const changePasswordMutation = usePutAuthPassword();
@@ -46,7 +49,7 @@ export const usePasswordChangeAction = ({
         "success",
         response.data.message || "비밀번호가 성공적으로 변경되었습니다.",
       );
-      router.replace("/profile");
+      router.replace(getWorkspacePath(workspaceId, "/profile"));
     } catch (error) {
       showToast(
         "error",

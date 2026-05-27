@@ -3,8 +3,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
-const mockGetActiveWorkspaceIdFromCookies = vi.fn();
-const mockSetActiveWorkspaceCookie = vi.fn();
 const mockListMyWorkspaces = vi.fn();
 const mockCreateWorkspace = vi.fn();
 const mockGuardRestrictedTestAccountWrite = vi.fn();
@@ -19,11 +17,6 @@ vi.mock("@/db", () => ({
 
 vi.mock("@/lib/server/auth", () => ({
   getSessionWithRefresh: mockGetSessionWithRefresh,
-}));
-
-vi.mock("@/lib/server/active-workspace", () => ({
-  getActiveWorkspaceIdFromCookies: mockGetActiveWorkspaceIdFromCookies,
-  setActiveWorkspaceCookie: mockSetActiveWorkspaceCookie,
 }));
 
 vi.mock("@/lib/server/restricted-test-account", () => ({
@@ -51,12 +44,11 @@ describe("/api/workspaces", () => {
     mockGuardRestrictedTestAccountWrite.mockResolvedValue(null);
   });
 
-  it("GET은 현재 active workspace 기준으로 목록을 반환한다", async () => {
+  it("GET은 내 워크스페이스 목록을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 9 });
-    mockGetActiveWorkspaceIdFromCookies.mockResolvedValue(7);
     mockListMyWorkspaces.mockResolvedValue([
       {
-        id: 7,
+        id: "ws_ops",
         name: "운영팀",
         planCode: "STANDARD",
         role: "ADMIN",
@@ -70,19 +62,19 @@ describe("/api/workspaces", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(mockListMyWorkspaces).toHaveBeenCalledWith(9, 7);
+    expect(mockListMyWorkspaces).toHaveBeenCalledWith(9);
     expect(body).toEqual([
       expect.objectContaining({
-        id: 7,
+        id: "ws_ops",
         isCurrent: true,
       }),
     ]);
   });
 
-  it("POST는 워크스페이스 생성 후 active workspace를 전환한다", async () => {
+  it("POST는 워크스페이스 생성 결과를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 9 });
     mockCreateWorkspace.mockResolvedValue({
-      id: 11,
+      id: "ws_new",
       name: "새 워크스페이스",
       planCode: "FREE",
       createdAt: new Date("2026-05-21T00:00:00.000Z"),
@@ -99,10 +91,9 @@ describe("/api/workspaces", () => {
 
     expect(response.status).toBe(201);
     expect(mockCreateWorkspace).toHaveBeenCalledWith(9, "새 워크스페이스");
-    expect(mockSetActiveWorkspaceCookie).toHaveBeenCalledWith(11);
     expect(body).toEqual(
       expect.objectContaining({
-        id: 11,
+        id: "ws_new",
         name: "새 워크스페이스",
       }),
     );
