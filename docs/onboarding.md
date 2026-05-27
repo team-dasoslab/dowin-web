@@ -127,12 +127,12 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 
 ### 2.3. 현재 우선순위 (2026-04-30 기준)
 
-- 단기 우선순위는 `강한 Free 제한 추가`보다 `STANDARD 유료 가치 강화`다.
+- 단기 우선순위는 무료 플랜 제한 조정보다 `가입 즉시 Basic seat 결제` 구조와 Basic에서 체감할 운영 가치를 맞추는 것이다.
 - 그 범용화에는 제품 전반의 내부 초기 용어를 독립적인 제품 언어로 재정리하고, 외부 방법론 의존 설명을 끊어내는 작업이 포함된다.
 - 공개 회원가입과 워크스페이스 셀프서브 진입은 현재 동작 중이며, 다음 우선순위는 운영 마감 기능과 무료 가치 측정 체계를 보강하는 것이다.
-- 현재 기준에서는 모든 워크스페이스를 `FREE`로 운영하되, 제한을 더 세게 늘리기보다 `STANDARD`의 핵심 결제 이유를 선명하게 만드는 쪽을 우선한다.
+- 목표 모델은 모든 워크스페이스가 Basic 플랜으로 시작하고, Basic이 seat 기반 유료 기본 플랜이 되는 구조다. 가입은 결제와 분리된 무료 완료 상태가 아니라, Basic checkout 성공 후에만 완료된다.
 - 그 핵심은 `리더 액션 어시스턴트` 계열 기능이며, 구체적으로는 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인` 흐름이다.
-- Free 플랜 구조와 최소 제한은 유지하되, 다음 유료화 작업의 중심은 `자동 운영 체크인 + 체크인 결과 리포트`로 둔다.
+- 무료 플랜 구조를 유지하는 방향은 폐기한다. 다음 유료화 작업의 중심은 Basic seat 결제 진입과 `자동 운영 체크인 + 체크인 결과 리포트` 같은 paid product value를 연결하는 것이다.
 - 팀 회의/회고 흐름은 별도 미팅 모드보다 팀 대시보드 메모 레일로 운영한다.
 - 무료 가치 측정 지표, 온보딩 카피 일관성, 계정 탈퇴 같은 잔여 운영 기능을 다음 제품 축으로 본다.
 - 용어 범용화는 내부 모델을 지우는 작업이 아니라, 사용자 노출 카피와 설명 레이어를 재설계하는 작업으로 본다.
@@ -140,6 +140,8 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 랜딩은 단순 용어 치환만으로 끝내지 않고, `누가 봐도 어떤 제품인지 이해되는 카피`로 별도 다듬는 것을 다음 우선 작업으로 둔다.
 - 초대코드 만료 시간 정책과 다중 워크스페이스는 당장 우선순위에 올리지 않는다.
 - 결제/청구 구현은 별도 축이지만, `무엇을 사게 만들 것인가`에 대한 제품 가치는 `STANDARD` 기능 묶음 강화와 함께 먼저 선명해져야 한다.
+- 현재 구현 enum에는 아직 과거 `FREE | STANDARD` 명칭이 남아 있지만, 목표 모델에서는 `FREE` 무료 플랜 전제를 제거하고 `BASIC` paid seat entitlement를 기본값으로 만든다.
+- seat 기반 결제 전환은 가입 플로우부터 바뀐다. 현재 선행 작업은 `CapacityPolicy` 경계 확보이며, 다음 큰 배치는 pending signup checkout, Basic seat entitlement, 결제 성공 후 user/workspace provisioning 설계다. 상세 순서는 `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`를 기준으로 본다.
 - 운영 기본기 측면에서 외부 `Tally` 의존 문의 흐름은 내부 문의 저장 + Discord 운영 알림 + 사용자 문의 결과 조회 구조로 전환 완료됐다.
 - 다음 운영 후속은 운영자 처리 도구와 정책 문구 정렬이다.
 
@@ -576,6 +578,7 @@ PR을 머지하기 전에는 자동 검증과 별개로 짧은 보안 점검을 
 - 프로필/설정 문제: `src/app/(protected)/profile/*`, `src/app/api/users/me/route.ts`, `src/domain/profile/*`
 - 업데이트 허브 문제: `src/app/(protected)/updates/page.tsx`, `src/content/product-updates.ts`, `src/lib/product-updates.ts`
 - 수익화/요금제 전략 검토: `docs/planning/2026.03.18-monetization-strategy.md`, `docs/planning/2026.03.09-service-overview.md`
+- seat 기반 결제/권한 구조 변경: `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`, `src/domain/workspace/plan-limits.ts`, `src/lib/server/workspace-context.ts`, `src/domain/billing/*`
 - 성능 최적화 작업: `docs/dev/performance/2026.03.17-optimization-points.md`, `docs/dev/performance/2026.03.17-baseline.md`, `docs/dev/performance/2026.03.17-measurement-report.md`
 
 ## 11. 현재 가장 현실적인 다음 작업
