@@ -1265,40 +1265,40 @@ export type PostWorkspacesIdTransferAdmin200 = {
   message: string;
 };
 
-export type PostScoreboardsIdArchive200Status = typeof PostScoreboardsIdArchive200Status[keyof typeof PostScoreboardsIdArchive200Status];
+export type PostWorkspacesWorkspaceIdScoreboardsIdArchive200Status = typeof PostWorkspacesWorkspaceIdScoreboardsIdArchive200Status[keyof typeof PostWorkspacesWorkspaceIdScoreboardsIdArchive200Status];
 
 
-export const PostScoreboardsIdArchive200Status = {
+export const PostWorkspacesWorkspaceIdScoreboardsIdArchive200Status = {
   ARCHIVED: 'ARCHIVED',
 } as const;
 
-export type PostScoreboardsIdArchive200 = {
+export type PostWorkspacesWorkspaceIdScoreboardsIdArchive200 = {
   id: number;
-  status: PostScoreboardsIdArchive200Status;
+  status: PostWorkspacesWorkspaceIdScoreboardsIdArchive200Status;
 };
 
-export type GetScoreboardsScoreboardIdLeadMeasuresParams = {
-status?: GetScoreboardsScoreboardIdLeadMeasuresStatus;
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams = {
+status?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresStatus;
 };
 
-export type GetScoreboardsScoreboardIdLeadMeasuresStatus = typeof GetScoreboardsScoreboardIdLeadMeasuresStatus[keyof typeof GetScoreboardsScoreboardIdLeadMeasuresStatus];
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresStatus = typeof GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresStatus[keyof typeof GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresStatus];
 
 
-export const GetScoreboardsScoreboardIdLeadMeasuresStatus = {
+export const GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresStatus = {
   active: 'active',
   all: 'all',
 } as const;
 
-export type DeleteLeadMeasuresId200 = {
+export type DeleteWorkspacesWorkspaceIdLeadMeasuresId200 = {
   warning: string;
   deleted: boolean;
 };
 
-export type GetScoreboardsScoreboardIdLogsWeeklyParams = {
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams = {
 weekStart?: string;
 };
 
-export type GetScoreboardsScoreboardIdLogsMonthlyParams = {
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams = {
 monthStart?: string;
 };
 
@@ -1332,17 +1332,17 @@ export const GetWorkspacesWorkspaceIdAnalyticsExportDataView = {
 /**
  * checkout 복귀 후 다시 진입할 앱 locale
  */
-export type PostBillingCheckoutBodyLocale = typeof PostBillingCheckoutBodyLocale[keyof typeof PostBillingCheckoutBodyLocale];
+export type PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale = typeof PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale[keyof typeof PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale];
 
 
-export const PostBillingCheckoutBodyLocale = {
+export const PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale = {
   ko: 'ko',
   en: 'en',
 } as const;
 
-export type PostBillingCheckoutBody = {
+export type PostWorkspacesWorkspaceIdBillingCheckoutBody = {
   /** checkout 복귀 후 다시 진입할 앱 locale */
-  locale: PostBillingCheckoutBodyLocale;
+  locale: PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale;
 };
 
 export type GetWorkspacesWorkspaceIdDashboardTeamParams = {

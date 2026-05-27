@@ -25,9 +25,9 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  DeleteLeadMeasuresId200,
+  DeleteWorkspacesWorkspaceIdLeadMeasuresId200,
   ErrorResponse,
-  GetScoreboardsScoreboardIdLeadMeasuresParams,
+  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams,
   LeadMeasure,
   LeadMeasureCreateRequest,
   LeadMeasureListItem,
@@ -45,32 +45,33 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 점수판 선행지표 목록 조회
  */
-export type getScoreboardsScoreboardIdLeadMeasuresResponse200 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse200 = {
   data: LeadMeasureListItem[]
   status: 200
 }
 
-export type getScoreboardsScoreboardIdLeadMeasuresResponse401 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getScoreboardsScoreboardIdLeadMeasuresResponse404 = {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getScoreboardsScoreboardIdLeadMeasuresResponseSuccess = (getScoreboardsScoreboardIdLeadMeasuresResponse200) & {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseSuccess = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse200) & {
   headers: Headers;
 };
-export type getScoreboardsScoreboardIdLeadMeasuresResponseError = (getScoreboardsScoreboardIdLeadMeasuresResponse401 | getScoreboardsScoreboardIdLeadMeasuresResponse404) & {
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseError = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse401 | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse404) & {
   headers: Headers;
 };
 
-export type getScoreboardsScoreboardIdLeadMeasuresResponse = (getScoreboardsScoreboardIdLeadMeasuresResponseSuccess | getScoreboardsScoreboardIdLeadMeasuresResponseError)
+export type getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse = (getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseSuccess | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseError)
 
-export const getGetScoreboardsScoreboardIdLeadMeasuresUrl = (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLeadMeasuresParams,) => {
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresUrl = (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams,) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -82,13 +83,14 @@ export const getGetScoreboardsScoreboardIdLeadMeasuresUrl = (scoreboardId: numbe
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/scoreboards/${scoreboardId}/lead-measures?${stringifiedParams}` : `/api/scoreboards/${scoreboardId}/lead-measures`
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/lead-measures?${stringifiedParams}` : `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/lead-measures`
 }
 
-export const getScoreboardsScoreboardIdLeadMeasures = async (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLeadMeasuresParams, options?: RequestInit): Promise<getScoreboardsScoreboardIdLeadMeasuresResponse> => {
+export const getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures = async (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse> => {
   
-  return customInstance<getScoreboardsScoreboardIdLeadMeasuresResponse>(getGetScoreboardsScoreboardIdLeadMeasuresUrl(scoreboardId,params),
+  return customInstance<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse>(getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresUrl(workspaceId,scoreboardId,params),
   {      
     ...options,
     method: 'GET'
@@ -101,75 +103,81 @@ export const getScoreboardsScoreboardIdLeadMeasures = async (scoreboardId: numbe
 
 
 
-export const getGetScoreboardsScoreboardIdLeadMeasuresQueryKey = (scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLeadMeasuresParams,) => {
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey = (workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams,) => {
     return [
-    `/api/scoreboards/${scoreboardId}/lead-measures`, ...(params ? [params] : [])
+    `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/lead-measures`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getGetScoreboardsScoreboardIdLeadMeasuresQueryOptions = <TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetScoreboardsScoreboardIdLeadMeasuresQueryKey(scoreboardId,params);
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(workspaceId,scoreboardId,params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>> = ({ signal }) => getScoreboardsScoreboardIdLeadMeasures(scoreboardId,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures(workspaceId,scoreboardId,params, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, enabled: !!(scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId && scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetScoreboardsScoreboardIdLeadMeasuresQueryResult = NonNullable<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>>
-export type GetScoreboardsScoreboardIdLeadMeasuresQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>>
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params: undefined |  GetScoreboardsScoreboardIdLeadMeasuresParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params: undefined |  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 점수판 선행지표 목록 조회
  */
 
-export function useGetScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
- scoreboardId: number,
-    params?: GetScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsScoreboardIdLeadMeasures>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    scoreboardId: number,
+    params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetScoreboardsScoreboardIdLeadMeasuresQueryOptions(scoreboardId,params,options)
+  const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryOptions(workspaceId,scoreboardId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -182,52 +190,54 @@ export function useGetScoreboardsScoreboardIdLeadMeasures<TData = Awaited<Return
 /**
  * @summary 선행지표 생성
  */
-export type postScoreboardsScoreboardIdLeadMeasuresResponse201 = {
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse201 = {
   data: LeadMeasure
   status: 201
 }
 
-export type postScoreboardsScoreboardIdLeadMeasuresResponse401 = {
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postScoreboardsScoreboardIdLeadMeasuresResponse403 = {
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type postScoreboardsScoreboardIdLeadMeasuresResponse404 = {
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type postScoreboardsScoreboardIdLeadMeasuresResponse422 = {
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type postScoreboardsScoreboardIdLeadMeasuresResponseSuccess = (postScoreboardsScoreboardIdLeadMeasuresResponse201) & {
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseSuccess = (postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse201) & {
   headers: Headers;
 };
-export type postScoreboardsScoreboardIdLeadMeasuresResponseError = (postScoreboardsScoreboardIdLeadMeasuresResponse401 | postScoreboardsScoreboardIdLeadMeasuresResponse403 | postScoreboardsScoreboardIdLeadMeasuresResponse404 | postScoreboardsScoreboardIdLeadMeasuresResponse422) & {
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseError = (postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse401 | postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse403 | postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse404 | postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse422) & {
   headers: Headers;
 };
 
-export type postScoreboardsScoreboardIdLeadMeasuresResponse = (postScoreboardsScoreboardIdLeadMeasuresResponseSuccess | postScoreboardsScoreboardIdLeadMeasuresResponseError)
+export type postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse = (postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseSuccess | postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponseError)
 
-export const getPostScoreboardsScoreboardIdLeadMeasuresUrl = (scoreboardId: number,) => {
+export const getPostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresUrl = (workspaceId: string,
+    scoreboardId: number,) => {
 
 
   
 
-  return `/api/scoreboards/${scoreboardId}/lead-measures`
+  return `/api/workspaces/${workspaceId}/scoreboards/${scoreboardId}/lead-measures`
 }
 
-export const postScoreboardsScoreboardIdLeadMeasures = async (scoreboardId: number,
-    leadMeasureCreateRequest: LeadMeasureCreateRequest, options?: RequestInit): Promise<postScoreboardsScoreboardIdLeadMeasuresResponse> => {
+export const postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures = async (workspaceId: string,
+    scoreboardId: number,
+    leadMeasureCreateRequest: LeadMeasureCreateRequest, options?: RequestInit): Promise<postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse> => {
   
-  return customInstance<postScoreboardsScoreboardIdLeadMeasuresResponse>(getPostScoreboardsScoreboardIdLeadMeasuresUrl(scoreboardId),
+  return customInstance<postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresResponse>(getPostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresUrl(workspaceId,scoreboardId),
   {      
     ...options,
     method: 'POST',
@@ -240,11 +250,11 @@ export const postScoreboardsScoreboardIdLeadMeasures = async (scoreboardId: numb
 
 
 
-export const getPostScoreboardsScoreboardIdLeadMeasuresMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsScoreboardIdLeadMeasures>>, TError,{scoreboardId: number;data: LeadMeasureCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsScoreboardIdLeadMeasures>>, TError,{scoreboardId: number;data: LeadMeasureCreateRequest}, TContext> => {
+export const getPostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError,{workspaceId: string;scoreboardId: number;data: LeadMeasureCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError,{workspaceId: string;scoreboardId: number;data: LeadMeasureCreateRequest}, TContext> => {
 
-const mutationKey = ['postScoreboardsScoreboardIdLeadMeasures'];
+const mutationKey = ['postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -254,10 +264,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postScoreboardsScoreboardIdLeadMeasures>>, {scoreboardId: number;data: LeadMeasureCreateRequest}> = (props) => {
-          const {scoreboardId,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, {workspaceId: string;scoreboardId: number;data: LeadMeasureCreateRequest}> = (props) => {
+          const {workspaceId,scoreboardId,data} = props ?? {};
 
-          return  postScoreboardsScoreboardIdLeadMeasures(scoreboardId,data,requestOptions)
+          return  postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures(workspaceId,scoreboardId,data,requestOptions)
         }
 
 
@@ -267,72 +277,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostScoreboardsScoreboardIdLeadMeasuresMutationResult = NonNullable<Awaited<ReturnType<typeof postScoreboardsScoreboardIdLeadMeasures>>>
-    export type PostScoreboardsScoreboardIdLeadMeasuresMutationBody = LeadMeasureCreateRequest
-    export type PostScoreboardsScoreboardIdLeadMeasuresMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>>
+    export type PostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresMutationBody = LeadMeasureCreateRequest
+    export type PostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 선행지표 생성
  */
-export const usePostScoreboardsScoreboardIdLeadMeasures = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsScoreboardIdLeadMeasures>>, TError,{scoreboardId: number;data: LeadMeasureCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>, TError,{workspaceId: string;scoreboardId: number;data: LeadMeasureCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postScoreboardsScoreboardIdLeadMeasures>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures>>,
         TError,
-        {scoreboardId: number;data: LeadMeasureCreateRequest},
+        {workspaceId: string;scoreboardId: number;data: LeadMeasureCreateRequest},
         TContext
       > => {
-      return useMutation(getPostScoreboardsScoreboardIdLeadMeasuresMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresMutationOptions(options), queryClient);
     }
     /**
  * @summary 선행지표 수정
  */
-export type putLeadMeasuresIdResponse200 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponse200 = {
   data: LeadMeasure
   status: 200
 }
 
-export type putLeadMeasuresIdResponse401 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type putLeadMeasuresIdResponse403 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type putLeadMeasuresIdResponse404 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type putLeadMeasuresIdResponse422 = {
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type putLeadMeasuresIdResponseSuccess = (putLeadMeasuresIdResponse200) & {
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponseSuccess = (putWorkspacesWorkspaceIdLeadMeasuresIdResponse200) & {
   headers: Headers;
 };
-export type putLeadMeasuresIdResponseError = (putLeadMeasuresIdResponse401 | putLeadMeasuresIdResponse403 | putLeadMeasuresIdResponse404 | putLeadMeasuresIdResponse422) & {
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponseError = (putWorkspacesWorkspaceIdLeadMeasuresIdResponse401 | putWorkspacesWorkspaceIdLeadMeasuresIdResponse403 | putWorkspacesWorkspaceIdLeadMeasuresIdResponse404 | putWorkspacesWorkspaceIdLeadMeasuresIdResponse422) & {
   headers: Headers;
 };
 
-export type putLeadMeasuresIdResponse = (putLeadMeasuresIdResponseSuccess | putLeadMeasuresIdResponseError)
+export type putWorkspacesWorkspaceIdLeadMeasuresIdResponse = (putWorkspacesWorkspaceIdLeadMeasuresIdResponseSuccess | putWorkspacesWorkspaceIdLeadMeasuresIdResponseError)
 
-export const getPutLeadMeasuresIdUrl = (id: number,) => {
+export const getPutWorkspacesWorkspaceIdLeadMeasuresIdUrl = (workspaceId: string,
+    id: number,) => {
 
 
   
 
-  return `/api/lead-measures/${id}`
+  return `/api/workspaces/${workspaceId}/lead-measures/${id}`
 }
 
-export const putLeadMeasuresId = async (id: number,
-    leadMeasureUpdateRequest: LeadMeasureUpdateRequest, options?: RequestInit): Promise<putLeadMeasuresIdResponse> => {
+export const putWorkspacesWorkspaceIdLeadMeasuresId = async (workspaceId: string,
+    id: number,
+    leadMeasureUpdateRequest: LeadMeasureUpdateRequest, options?: RequestInit): Promise<putWorkspacesWorkspaceIdLeadMeasuresIdResponse> => {
   
-  return customInstance<putLeadMeasuresIdResponse>(getPutLeadMeasuresIdUrl(id),
+  return customInstance<putWorkspacesWorkspaceIdLeadMeasuresIdResponse>(getPutWorkspacesWorkspaceIdLeadMeasuresIdUrl(workspaceId,id),
   {      
     ...options,
     method: 'PUT',
@@ -345,11 +357,11 @@ export const putLeadMeasuresId = async (id: number,
 
 
 
-export const getPutLeadMeasuresIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putLeadMeasuresId>>, TError,{id: number;data: LeadMeasureUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof putLeadMeasuresId>>, TError,{id: number;data: LeadMeasureUpdateRequest}, TContext> => {
+export const getPutWorkspacesWorkspaceIdLeadMeasuresIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresId>>, TError,{workspaceId: string;id: number;data: LeadMeasureUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresId>>, TError,{workspaceId: string;id: number;data: LeadMeasureUpdateRequest}, TContext> => {
 
-const mutationKey = ['putLeadMeasuresId'];
+const mutationKey = ['putWorkspacesWorkspaceIdLeadMeasuresId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -359,10 +371,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putLeadMeasuresId>>, {id: number;data: LeadMeasureUpdateRequest}> = (props) => {
-          const {id,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresId>>, {workspaceId: string;id: number;data: LeadMeasureUpdateRequest}> = (props) => {
+          const {workspaceId,id,data} = props ?? {};
 
-          return  putLeadMeasuresId(id,data,requestOptions)
+          return  putWorkspacesWorkspaceIdLeadMeasuresId(workspaceId,id,data,requestOptions)
         }
 
 
@@ -372,66 +384,68 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PutLeadMeasuresIdMutationResult = NonNullable<Awaited<ReturnType<typeof putLeadMeasuresId>>>
-    export type PutLeadMeasuresIdMutationBody = LeadMeasureUpdateRequest
-    export type PutLeadMeasuresIdMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PutWorkspacesWorkspaceIdLeadMeasuresIdMutationResult = NonNullable<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresId>>>
+    export type PutWorkspacesWorkspaceIdLeadMeasuresIdMutationBody = LeadMeasureUpdateRequest
+    export type PutWorkspacesWorkspaceIdLeadMeasuresIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 선행지표 수정
  */
-export const usePutLeadMeasuresId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putLeadMeasuresId>>, TError,{id: number;data: LeadMeasureUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePutWorkspacesWorkspaceIdLeadMeasuresId = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresId>>, TError,{workspaceId: string;id: number;data: LeadMeasureUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof putLeadMeasuresId>>,
+        Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresId>>,
         TError,
-        {id: number;data: LeadMeasureUpdateRequest},
+        {workspaceId: string;id: number;data: LeadMeasureUpdateRequest},
         TContext
       > => {
-      return useMutation(getPutLeadMeasuresIdMutationOptions(options), queryClient);
+      return useMutation(getPutWorkspacesWorkspaceIdLeadMeasuresIdMutationOptions(options), queryClient);
     }
     /**
  * @summary 선행지표 삭제
  */
-export type deleteLeadMeasuresIdResponse200 = {
-  data: DeleteLeadMeasuresId200
+export type deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse200 = {
+  data: DeleteWorkspacesWorkspaceIdLeadMeasuresId200
   status: 200
 }
 
-export type deleteLeadMeasuresIdResponse401 = {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type deleteLeadMeasuresIdResponse403 = {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type deleteLeadMeasuresIdResponse404 = {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type deleteLeadMeasuresIdResponseSuccess = (deleteLeadMeasuresIdResponse200) & {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresIdResponseSuccess = (deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse200) & {
   headers: Headers;
 };
-export type deleteLeadMeasuresIdResponseError = (deleteLeadMeasuresIdResponse401 | deleteLeadMeasuresIdResponse403 | deleteLeadMeasuresIdResponse404) & {
+export type deleteWorkspacesWorkspaceIdLeadMeasuresIdResponseError = (deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse401 | deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse403 | deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse404) & {
   headers: Headers;
 };
 
-export type deleteLeadMeasuresIdResponse = (deleteLeadMeasuresIdResponseSuccess | deleteLeadMeasuresIdResponseError)
+export type deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse = (deleteWorkspacesWorkspaceIdLeadMeasuresIdResponseSuccess | deleteWorkspacesWorkspaceIdLeadMeasuresIdResponseError)
 
-export const getDeleteLeadMeasuresIdUrl = (id: number,) => {
+export const getDeleteWorkspacesWorkspaceIdLeadMeasuresIdUrl = (workspaceId: string,
+    id: number,) => {
 
 
   
 
-  return `/api/lead-measures/${id}`
+  return `/api/workspaces/${workspaceId}/lead-measures/${id}`
 }
 
-export const deleteLeadMeasuresId = async (id: number, options?: RequestInit): Promise<deleteLeadMeasuresIdResponse> => {
+export const deleteWorkspacesWorkspaceIdLeadMeasuresId = async (workspaceId: string,
+    id: number, options?: RequestInit): Promise<deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse> => {
   
-  return customInstance<deleteLeadMeasuresIdResponse>(getDeleteLeadMeasuresIdUrl(id),
+  return customInstance<deleteWorkspacesWorkspaceIdLeadMeasuresIdResponse>(getDeleteWorkspacesWorkspaceIdLeadMeasuresIdUrl(workspaceId,id),
   {      
     ...options,
     method: 'DELETE'
@@ -443,11 +457,11 @@ export const deleteLeadMeasuresId = async (id: number, options?: RequestInit): P
 
 
 
-export const getDeleteLeadMeasuresIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLeadMeasuresId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteLeadMeasuresId>>, TError,{id: number}, TContext> => {
+export const getDeleteWorkspacesWorkspaceIdLeadMeasuresIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresId>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresId>>, TError,{workspaceId: string;id: number}, TContext> => {
 
-const mutationKey = ['deleteLeadMeasuresId'];
+const mutationKey = ['deleteWorkspacesWorkspaceIdLeadMeasuresId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -457,10 +471,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteLeadMeasuresId>>, {id: number}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresId>>, {workspaceId: string;id: number}> = (props) => {
+          const {workspaceId,id} = props ?? {};
 
-          return  deleteLeadMeasuresId(id,requestOptions)
+          return  deleteWorkspacesWorkspaceIdLeadMeasuresId(workspaceId,id,requestOptions)
         }
 
 
@@ -470,66 +484,68 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type DeleteLeadMeasuresIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteLeadMeasuresId>>>
+    export type DeleteWorkspacesWorkspaceIdLeadMeasuresIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresId>>>
     
-    export type DeleteLeadMeasuresIdMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type DeleteWorkspacesWorkspaceIdLeadMeasuresIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 선행지표 삭제
  */
-export const useDeleteLeadMeasuresId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteLeadMeasuresId>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const useDeleteWorkspacesWorkspaceIdLeadMeasuresId = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresId>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deleteLeadMeasuresId>>,
+        Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresId>>,
         TError,
-        {id: number},
+        {workspaceId: string;id: number},
         TContext
       > => {
-      return useMutation(getDeleteLeadMeasuresIdMutationOptions(options), queryClient);
+      return useMutation(getDeleteWorkspacesWorkspaceIdLeadMeasuresIdMutationOptions(options), queryClient);
     }
     /**
  * @summary 선행지표 보관
  */
-export type postLeadMeasuresIdArchiveResponse200 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse200 = {
   data: LeadMeasure
   status: 200
 }
 
-export type postLeadMeasuresIdArchiveResponse400 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse400 = {
   data: ErrorResponse
   status: 400
 }
 
-export type postLeadMeasuresIdArchiveResponse401 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postLeadMeasuresIdArchiveResponse404 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type postLeadMeasuresIdArchiveResponseSuccess = (postLeadMeasuresIdArchiveResponse200) & {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponseSuccess = (postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse200) & {
   headers: Headers;
 };
-export type postLeadMeasuresIdArchiveResponseError = (postLeadMeasuresIdArchiveResponse400 | postLeadMeasuresIdArchiveResponse401 | postLeadMeasuresIdArchiveResponse404) & {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponseError = (postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse400 | postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse401 | postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse404) & {
   headers: Headers;
 };
 
-export type postLeadMeasuresIdArchiveResponse = (postLeadMeasuresIdArchiveResponseSuccess | postLeadMeasuresIdArchiveResponseError)
+export type postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse = (postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponseSuccess | postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponseError)
 
-export const getPostLeadMeasuresIdArchiveUrl = (id: number,) => {
+export const getPostWorkspacesWorkspaceIdLeadMeasuresIdArchiveUrl = (workspaceId: string,
+    id: number,) => {
 
 
   
 
-  return `/api/lead-measures/${id}/archive`
+  return `/api/workspaces/${workspaceId}/lead-measures/${id}/archive`
 }
 
-export const postLeadMeasuresIdArchive = async (id: number, options?: RequestInit): Promise<postLeadMeasuresIdArchiveResponse> => {
+export const postWorkspacesWorkspaceIdLeadMeasuresIdArchive = async (workspaceId: string,
+    id: number, options?: RequestInit): Promise<postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse> => {
   
-  return customInstance<postLeadMeasuresIdArchiveResponse>(getPostLeadMeasuresIdArchiveUrl(id),
+  return customInstance<postWorkspacesWorkspaceIdLeadMeasuresIdArchiveResponse>(getPostWorkspacesWorkspaceIdLeadMeasuresIdArchiveUrl(workspaceId,id),
   {      
     ...options,
     method: 'POST'
@@ -541,11 +557,11 @@ export const postLeadMeasuresIdArchive = async (id: number, options?: RequestIni
 
 
 
-export const getPostLeadMeasuresIdArchiveMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>, TError,{id: number}, TContext> => {
+export const getPostWorkspacesWorkspaceIdLeadMeasuresIdArchiveMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdArchive>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdArchive>>, TError,{workspaceId: string;id: number}, TContext> => {
 
-const mutationKey = ['postLeadMeasuresIdArchive'];
+const mutationKey = ['postWorkspacesWorkspaceIdLeadMeasuresIdArchive'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -555,10 +571,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>, {id: number}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdArchive>>, {workspaceId: string;id: number}> = (props) => {
+          const {workspaceId,id} = props ?? {};
 
-          return  postLeadMeasuresIdArchive(id,requestOptions)
+          return  postWorkspacesWorkspaceIdLeadMeasuresIdArchive(workspaceId,id,requestOptions)
         }
 
 
@@ -568,66 +584,68 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostLeadMeasuresIdArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>>
+    export type PostWorkspacesWorkspaceIdLeadMeasuresIdArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdArchive>>>
     
-    export type PostLeadMeasuresIdArchiveMutationError = ErrorResponse | UnauthorizedErrorResponse
+    export type PostWorkspacesWorkspaceIdLeadMeasuresIdArchiveMutationError = ErrorResponse | UnauthorizedErrorResponse
 
     /**
  * @summary 선행지표 보관
  */
-export const usePostLeadMeasuresIdArchive = <TError = ErrorResponse | UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdLeadMeasuresIdArchive = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdArchive>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postLeadMeasuresIdArchive>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdArchive>>,
         TError,
-        {id: number},
+        {workspaceId: string;id: number},
         TContext
       > => {
-      return useMutation(getPostLeadMeasuresIdArchiveMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdLeadMeasuresIdArchiveMutationOptions(options), queryClient);
     }
     /**
  * @summary 선행지표 재활성화
  */
-export type postLeadMeasuresIdReactivateResponse200 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse200 = {
   data: LeadMeasure
   status: 200
 }
 
-export type postLeadMeasuresIdReactivateResponse400 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse400 = {
   data: ErrorResponse
   status: 400
 }
 
-export type postLeadMeasuresIdReactivateResponse401 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postLeadMeasuresIdReactivateResponse404 = {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type postLeadMeasuresIdReactivateResponseSuccess = (postLeadMeasuresIdReactivateResponse200) & {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponseSuccess = (postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse200) & {
   headers: Headers;
 };
-export type postLeadMeasuresIdReactivateResponseError = (postLeadMeasuresIdReactivateResponse400 | postLeadMeasuresIdReactivateResponse401 | postLeadMeasuresIdReactivateResponse404) & {
+export type postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponseError = (postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse400 | postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse401 | postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse404) & {
   headers: Headers;
 };
 
-export type postLeadMeasuresIdReactivateResponse = (postLeadMeasuresIdReactivateResponseSuccess | postLeadMeasuresIdReactivateResponseError)
+export type postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse = (postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponseSuccess | postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponseError)
 
-export const getPostLeadMeasuresIdReactivateUrl = (id: number,) => {
+export const getPostWorkspacesWorkspaceIdLeadMeasuresIdReactivateUrl = (workspaceId: string,
+    id: number,) => {
 
 
   
 
-  return `/api/lead-measures/${id}/reactivate`
+  return `/api/workspaces/${workspaceId}/lead-measures/${id}/reactivate`
 }
 
-export const postLeadMeasuresIdReactivate = async (id: number, options?: RequestInit): Promise<postLeadMeasuresIdReactivateResponse> => {
+export const postWorkspacesWorkspaceIdLeadMeasuresIdReactivate = async (workspaceId: string,
+    id: number, options?: RequestInit): Promise<postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse> => {
   
-  return customInstance<postLeadMeasuresIdReactivateResponse>(getPostLeadMeasuresIdReactivateUrl(id),
+  return customInstance<postWorkspacesWorkspaceIdLeadMeasuresIdReactivateResponse>(getPostWorkspacesWorkspaceIdLeadMeasuresIdReactivateUrl(workspaceId,id),
   {      
     ...options,
     method: 'POST'
@@ -639,11 +657,11 @@ export const postLeadMeasuresIdReactivate = async (id: number, options?: Request
 
 
 
-export const getPostLeadMeasuresIdReactivateMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>, TError,{id: number}, TContext> => {
+export const getPostWorkspacesWorkspaceIdLeadMeasuresIdReactivateMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdReactivate>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdReactivate>>, TError,{workspaceId: string;id: number}, TContext> => {
 
-const mutationKey = ['postLeadMeasuresIdReactivate'];
+const mutationKey = ['postWorkspacesWorkspaceIdLeadMeasuresIdReactivate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -653,10 +671,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>, {id: number}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdReactivate>>, {workspaceId: string;id: number}> = (props) => {
+          const {workspaceId,id} = props ?? {};
 
-          return  postLeadMeasuresIdReactivate(id,requestOptions)
+          return  postWorkspacesWorkspaceIdLeadMeasuresIdReactivate(workspaceId,id,requestOptions)
         }
 
 
@@ -666,21 +684,21 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostLeadMeasuresIdReactivateMutationResult = NonNullable<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>>
+    export type PostWorkspacesWorkspaceIdLeadMeasuresIdReactivateMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdReactivate>>>
     
-    export type PostLeadMeasuresIdReactivateMutationError = ErrorResponse | UnauthorizedErrorResponse
+    export type PostWorkspacesWorkspaceIdLeadMeasuresIdReactivateMutationError = ErrorResponse | UnauthorizedErrorResponse
 
     /**
  * @summary 선행지표 재활성화
  */
-export const usePostLeadMeasuresIdReactivate = <TError = ErrorResponse | UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdLeadMeasuresIdReactivate = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdReactivate>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postLeadMeasuresIdReactivate>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdLeadMeasuresIdReactivate>>,
         TError,
-        {id: number},
+        {workspaceId: string;id: number},
         TContext
       > => {
-      return useMutation(getPostLeadMeasuresIdReactivateMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdLeadMeasuresIdReactivateMutationOptions(options), queryClient);
     }
     

@@ -26,7 +26,7 @@ import type {
 
 import type {
   ErrorResponse,
-  PostScoreboardsIdArchive200,
+  PostWorkspacesWorkspaceIdScoreboardsIdArchive200,
   Scoreboard,
   ScoreboardCreateRequest,
   ScoreboardSummary,
@@ -44,41 +44,41 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 /**
  * @summary 현재 활성 점수판 조회
  */
-export type getScoreboardsActiveResponse200 = {
+export type getWorkspacesWorkspaceIdScoreboardsActiveResponse200 = {
   data: Scoreboard
   status: 200
 }
 
-export type getScoreboardsActiveResponse401 = {
+export type getWorkspacesWorkspaceIdScoreboardsActiveResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getScoreboardsActiveResponse404 = {
+export type getWorkspacesWorkspaceIdScoreboardsActiveResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type getScoreboardsActiveResponseSuccess = (getScoreboardsActiveResponse200) & {
+export type getWorkspacesWorkspaceIdScoreboardsActiveResponseSuccess = (getWorkspacesWorkspaceIdScoreboardsActiveResponse200) & {
   headers: Headers;
 };
-export type getScoreboardsActiveResponseError = (getScoreboardsActiveResponse401 | getScoreboardsActiveResponse404) & {
+export type getWorkspacesWorkspaceIdScoreboardsActiveResponseError = (getWorkspacesWorkspaceIdScoreboardsActiveResponse401 | getWorkspacesWorkspaceIdScoreboardsActiveResponse404) & {
   headers: Headers;
 };
 
-export type getScoreboardsActiveResponse = (getScoreboardsActiveResponseSuccess | getScoreboardsActiveResponseError)
+export type getWorkspacesWorkspaceIdScoreboardsActiveResponse = (getWorkspacesWorkspaceIdScoreboardsActiveResponseSuccess | getWorkspacesWorkspaceIdScoreboardsActiveResponseError)
 
-export const getGetScoreboardsActiveUrl = () => {
+export const getGetWorkspacesWorkspaceIdScoreboardsActiveUrl = (workspaceId: string,) => {
 
 
   
 
-  return `/api/scoreboards/active`
+  return `/api/workspaces/${workspaceId}/scoreboards/active`
 }
 
-export const getScoreboardsActive = async ( options?: RequestInit): Promise<getScoreboardsActiveResponse> => {
+export const getWorkspacesWorkspaceIdScoreboardsActive = async (workspaceId: string, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsActiveResponse> => {
   
-  return customInstance<getScoreboardsActiveResponse>(getGetScoreboardsActiveUrl(),
+  return customInstance<getWorkspacesWorkspaceIdScoreboardsActiveResponse>(getGetWorkspacesWorkspaceIdScoreboardsActiveUrl(workspaceId),
   {      
     ...options,
     method: 'GET'
@@ -91,69 +91,69 @@ export const getScoreboardsActive = async ( options?: RequestInit): Promise<getS
 
 
 
-export const getGetScoreboardsActiveQueryKey = () => {
+export const getGetWorkspacesWorkspaceIdScoreboardsActiveQueryKey = (workspaceId: string,) => {
     return [
-    `/api/scoreboards/active`
+    `/api/workspaces/${workspaceId}/scoreboards/active`
     ] as const;
     }
 
     
-export const getGetScoreboardsActiveQueryOptions = <TData = Awaited<ReturnType<typeof getScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsActive>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdScoreboardsActiveQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetScoreboardsActiveQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsActiveQueryKey(workspaceId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScoreboardsActive>>> = ({ signal }) => getScoreboardsActive({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboardsActive(workspaceId, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsActive>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetScoreboardsActiveQueryResult = NonNullable<Awaited<ReturnType<typeof getScoreboardsActive>>>
-export type GetScoreboardsActiveQueryError = UnauthorizedErrorResponse | ErrorResponse
+export type GetWorkspacesWorkspaceIdScoreboardsActiveQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>>
+export type GetWorkspacesWorkspaceIdScoreboardsActiveQueryError = UnauthorizedErrorResponse | ErrorResponse
 
 
-export function useGetScoreboardsActive<TData = Awaited<ReturnType<typeof getScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsActive>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsActive<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsActive>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsActive>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsActive<TData = Awaited<ReturnType<typeof getScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsActive>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboardsActive<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboardsActive>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboardsActive>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboardsActive<TData = Awaited<ReturnType<typeof getScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsActive>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsActive<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 현재 활성 점수판 조회
  */
 
-export function useGetScoreboardsActive<TData = Awaited<ReturnType<typeof getScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboardsActive>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboardsActive<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsActive>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetScoreboardsActiveQueryOptions(options)
+  const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsActiveQueryOptions(workspaceId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -166,36 +166,36 @@ export function useGetScoreboardsActive<TData = Awaited<ReturnType<typeof getSco
 /**
  * @summary 보관된 점수판 목록 조회
  */
-export type getScoreboardsResponse200 = {
+export type getWorkspacesWorkspaceIdScoreboardsResponse200 = {
   data: ScoreboardSummary[]
   status: 200
 }
 
-export type getScoreboardsResponse401 = {
+export type getWorkspacesWorkspaceIdScoreboardsResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type getScoreboardsResponseSuccess = (getScoreboardsResponse200) & {
+export type getWorkspacesWorkspaceIdScoreboardsResponseSuccess = (getWorkspacesWorkspaceIdScoreboardsResponse200) & {
   headers: Headers;
 };
-export type getScoreboardsResponseError = (getScoreboardsResponse401) & {
+export type getWorkspacesWorkspaceIdScoreboardsResponseError = (getWorkspacesWorkspaceIdScoreboardsResponse401) & {
   headers: Headers;
 };
 
-export type getScoreboardsResponse = (getScoreboardsResponseSuccess | getScoreboardsResponseError)
+export type getWorkspacesWorkspaceIdScoreboardsResponse = (getWorkspacesWorkspaceIdScoreboardsResponseSuccess | getWorkspacesWorkspaceIdScoreboardsResponseError)
 
-export const getGetScoreboardsUrl = () => {
+export const getGetWorkspacesWorkspaceIdScoreboardsUrl = (workspaceId: string,) => {
 
 
   
 
-  return `/api/scoreboards`
+  return `/api/workspaces/${workspaceId}/scoreboards`
 }
 
-export const getScoreboards = async ( options?: RequestInit): Promise<getScoreboardsResponse> => {
+export const getWorkspacesWorkspaceIdScoreboards = async (workspaceId: string, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsResponse> => {
   
-  return customInstance<getScoreboardsResponse>(getGetScoreboardsUrl(),
+  return customInstance<getWorkspacesWorkspaceIdScoreboardsResponse>(getGetWorkspacesWorkspaceIdScoreboardsUrl(workspaceId),
   {      
     ...options,
     method: 'GET'
@@ -208,69 +208,69 @@ export const getScoreboards = async ( options?: RequestInit): Promise<getScorebo
 
 
 
-export const getGetScoreboardsQueryKey = () => {
+export const getGetWorkspacesWorkspaceIdScoreboardsQueryKey = (workspaceId: string,) => {
     return [
-    `/api/scoreboards`
+    `/api/workspaces/${workspaceId}/scoreboards`
     ] as const;
     }
 
     
-export const getGetScoreboardsQueryOptions = <TData = Awaited<ReturnType<typeof getScoreboards>>, TError = UnauthorizedErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboards>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export const getGetWorkspacesWorkspaceIdScoreboardsQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError = UnauthorizedErrorResponse>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetScoreboardsQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsQueryKey(workspaceId);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScoreboards>>> = ({ signal }) => getScoreboards({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboards(workspaceId, { signal, ...requestOptions });
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScoreboards>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetScoreboardsQueryResult = NonNullable<Awaited<ReturnType<typeof getScoreboards>>>
-export type GetScoreboardsQueryError = UnauthorizedErrorResponse
+export type GetWorkspacesWorkspaceIdScoreboardsQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>>
+export type GetWorkspacesWorkspaceIdScoreboardsQueryError = UnauthorizedErrorResponse
 
 
-export function useGetScoreboards<TData = Awaited<ReturnType<typeof getScoreboards>>, TError = UnauthorizedErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboards>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboards<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError = UnauthorizedErrorResponse>(
+ workspaceId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboards>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboards>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboards<TData = Awaited<ReturnType<typeof getScoreboards>>, TError = UnauthorizedErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboards>>, TError, TData>> & Pick<
+export function useGetWorkspacesWorkspaceIdScoreboards<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError = UnauthorizedErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getScoreboards>>,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>,
           TError,
-          Awaited<ReturnType<typeof getScoreboards>>
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetScoreboards<TData = Awaited<ReturnType<typeof getScoreboards>>, TError = UnauthorizedErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboards>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboards<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError = UnauthorizedErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary 보관된 점수판 목록 조회
  */
 
-export function useGetScoreboards<TData = Awaited<ReturnType<typeof getScoreboards>>, TError = UnauthorizedErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getScoreboards>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+export function useGetWorkspacesWorkspaceIdScoreboards<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError = UnauthorizedErrorResponse>(
+ workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboards>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetScoreboardsQueryOptions(options)
+  const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsQueryOptions(workspaceId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -283,46 +283,47 @@ export function useGetScoreboards<TData = Awaited<ReturnType<typeof getScoreboar
 /**
  * @summary 점수판 생성
  */
-export type postScoreboardsResponse201 = {
+export type postWorkspacesWorkspaceIdScoreboardsResponse201 = {
   data: ScoreboardSummary
   status: 201
 }
 
-export type postScoreboardsResponse401 = {
+export type postWorkspacesWorkspaceIdScoreboardsResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postScoreboardsResponse409 = {
+export type postWorkspacesWorkspaceIdScoreboardsResponse409 = {
   data: ErrorResponse
   status: 409
 }
 
-export type postScoreboardsResponse422 = {
+export type postWorkspacesWorkspaceIdScoreboardsResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type postScoreboardsResponseSuccess = (postScoreboardsResponse201) & {
+export type postWorkspacesWorkspaceIdScoreboardsResponseSuccess = (postWorkspacesWorkspaceIdScoreboardsResponse201) & {
   headers: Headers;
 };
-export type postScoreboardsResponseError = (postScoreboardsResponse401 | postScoreboardsResponse409 | postScoreboardsResponse422) & {
+export type postWorkspacesWorkspaceIdScoreboardsResponseError = (postWorkspacesWorkspaceIdScoreboardsResponse401 | postWorkspacesWorkspaceIdScoreboardsResponse409 | postWorkspacesWorkspaceIdScoreboardsResponse422) & {
   headers: Headers;
 };
 
-export type postScoreboardsResponse = (postScoreboardsResponseSuccess | postScoreboardsResponseError)
+export type postWorkspacesWorkspaceIdScoreboardsResponse = (postWorkspacesWorkspaceIdScoreboardsResponseSuccess | postWorkspacesWorkspaceIdScoreboardsResponseError)
 
-export const getPostScoreboardsUrl = () => {
+export const getPostWorkspacesWorkspaceIdScoreboardsUrl = (workspaceId: string,) => {
 
 
   
 
-  return `/api/scoreboards`
+  return `/api/workspaces/${workspaceId}/scoreboards`
 }
 
-export const postScoreboards = async (scoreboardCreateRequest: ScoreboardCreateRequest, options?: RequestInit): Promise<postScoreboardsResponse> => {
+export const postWorkspacesWorkspaceIdScoreboards = async (workspaceId: string,
+    scoreboardCreateRequest: ScoreboardCreateRequest, options?: RequestInit): Promise<postWorkspacesWorkspaceIdScoreboardsResponse> => {
   
-  return customInstance<postScoreboardsResponse>(getPostScoreboardsUrl(),
+  return customInstance<postWorkspacesWorkspaceIdScoreboardsResponse>(getPostWorkspacesWorkspaceIdScoreboardsUrl(workspaceId),
   {      
     ...options,
     method: 'POST',
@@ -335,11 +336,11 @@ export const postScoreboards = async (scoreboardCreateRequest: ScoreboardCreateR
 
 
 
-export const getPostScoreboardsMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboards>>, TError,{data: ScoreboardCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postScoreboards>>, TError,{data: ScoreboardCreateRequest}, TContext> => {
+export const getPostWorkspacesWorkspaceIdScoreboardsMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboards>>, TError,{workspaceId: string;data: ScoreboardCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboards>>, TError,{workspaceId: string;data: ScoreboardCreateRequest}, TContext> => {
 
-const mutationKey = ['postScoreboards'];
+const mutationKey = ['postWorkspacesWorkspaceIdScoreboards'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -349,10 +350,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postScoreboards>>, {data: ScoreboardCreateRequest}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboards>>, {workspaceId: string;data: ScoreboardCreateRequest}> = (props) => {
+          const {workspaceId,data} = props ?? {};
 
-          return  postScoreboards(data,requestOptions)
+          return  postWorkspacesWorkspaceIdScoreboards(workspaceId,data,requestOptions)
         }
 
 
@@ -362,72 +363,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostScoreboardsMutationResult = NonNullable<Awaited<ReturnType<typeof postScoreboards>>>
-    export type PostScoreboardsMutationBody = ScoreboardCreateRequest
-    export type PostScoreboardsMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PostWorkspacesWorkspaceIdScoreboardsMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboards>>>
+    export type PostWorkspacesWorkspaceIdScoreboardsMutationBody = ScoreboardCreateRequest
+    export type PostWorkspacesWorkspaceIdScoreboardsMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 점수판 생성
  */
-export const usePostScoreboards = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboards>>, TError,{data: ScoreboardCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdScoreboards = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboards>>, TError,{workspaceId: string;data: ScoreboardCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postScoreboards>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboards>>,
         TError,
-        {data: ScoreboardCreateRequest},
+        {workspaceId: string;data: ScoreboardCreateRequest},
         TContext
       > => {
-      return useMutation(getPostScoreboardsMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdScoreboardsMutationOptions(options), queryClient);
     }
     /**
  * @summary 점수판 수정
  */
-export type putScoreboardsIdResponse200 = {
+export type putWorkspacesWorkspaceIdScoreboardsIdResponse200 = {
   data: ScoreboardSummary
   status: 200
 }
 
-export type putScoreboardsIdResponse401 = {
+export type putWorkspacesWorkspaceIdScoreboardsIdResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type putScoreboardsIdResponse403 = {
+export type putWorkspacesWorkspaceIdScoreboardsIdResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type putScoreboardsIdResponse404 = {
+export type putWorkspacesWorkspaceIdScoreboardsIdResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type putScoreboardsIdResponse422 = {
+export type putWorkspacesWorkspaceIdScoreboardsIdResponse422 = {
   data: ErrorResponse
   status: 422
 }
 
-export type putScoreboardsIdResponseSuccess = (putScoreboardsIdResponse200) & {
+export type putWorkspacesWorkspaceIdScoreboardsIdResponseSuccess = (putWorkspacesWorkspaceIdScoreboardsIdResponse200) & {
   headers: Headers;
 };
-export type putScoreboardsIdResponseError = (putScoreboardsIdResponse401 | putScoreboardsIdResponse403 | putScoreboardsIdResponse404 | putScoreboardsIdResponse422) & {
+export type putWorkspacesWorkspaceIdScoreboardsIdResponseError = (putWorkspacesWorkspaceIdScoreboardsIdResponse401 | putWorkspacesWorkspaceIdScoreboardsIdResponse403 | putWorkspacesWorkspaceIdScoreboardsIdResponse404 | putWorkspacesWorkspaceIdScoreboardsIdResponse422) & {
   headers: Headers;
 };
 
-export type putScoreboardsIdResponse = (putScoreboardsIdResponseSuccess | putScoreboardsIdResponseError)
+export type putWorkspacesWorkspaceIdScoreboardsIdResponse = (putWorkspacesWorkspaceIdScoreboardsIdResponseSuccess | putWorkspacesWorkspaceIdScoreboardsIdResponseError)
 
-export const getPutScoreboardsIdUrl = (id: number,) => {
+export const getPutWorkspacesWorkspaceIdScoreboardsIdUrl = (workspaceId: string,
+    id: number,) => {
 
 
   
 
-  return `/api/scoreboards/${id}`
+  return `/api/workspaces/${workspaceId}/scoreboards/${id}`
 }
 
-export const putScoreboardsId = async (id: number,
-    scoreboardUpdateRequest: ScoreboardUpdateRequest, options?: RequestInit): Promise<putScoreboardsIdResponse> => {
+export const putWorkspacesWorkspaceIdScoreboardsId = async (workspaceId: string,
+    id: number,
+    scoreboardUpdateRequest: ScoreboardUpdateRequest, options?: RequestInit): Promise<putWorkspacesWorkspaceIdScoreboardsIdResponse> => {
   
-  return customInstance<putScoreboardsIdResponse>(getPutScoreboardsIdUrl(id),
+  return customInstance<putWorkspacesWorkspaceIdScoreboardsIdResponse>(getPutWorkspacesWorkspaceIdScoreboardsIdUrl(workspaceId,id),
   {      
     ...options,
     method: 'PUT',
@@ -440,11 +443,11 @@ export const putScoreboardsId = async (id: number,
 
 
 
-export const getPutScoreboardsIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putScoreboardsId>>, TError,{id: number;data: ScoreboardUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof putScoreboardsId>>, TError,{id: number;data: ScoreboardUpdateRequest}, TContext> => {
+export const getPutWorkspacesWorkspaceIdScoreboardsIdMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdScoreboardsId>>, TError,{workspaceId: string;id: number;data: ScoreboardUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdScoreboardsId>>, TError,{workspaceId: string;id: number;data: ScoreboardUpdateRequest}, TContext> => {
 
-const mutationKey = ['putScoreboardsId'];
+const mutationKey = ['putWorkspacesWorkspaceIdScoreboardsId'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -454,10 +457,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putScoreboardsId>>, {id: number;data: ScoreboardUpdateRequest}> = (props) => {
-          const {id,data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdScoreboardsId>>, {workspaceId: string;id: number;data: ScoreboardUpdateRequest}> = (props) => {
+          const {workspaceId,id,data} = props ?? {};
 
-          return  putScoreboardsId(id,data,requestOptions)
+          return  putWorkspacesWorkspaceIdScoreboardsId(workspaceId,id,data,requestOptions)
         }
 
 
@@ -467,66 +470,68 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PutScoreboardsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putScoreboardsId>>>
-    export type PutScoreboardsIdMutationBody = ScoreboardUpdateRequest
-    export type PutScoreboardsIdMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PutWorkspacesWorkspaceIdScoreboardsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdScoreboardsId>>>
+    export type PutWorkspacesWorkspaceIdScoreboardsIdMutationBody = ScoreboardUpdateRequest
+    export type PutWorkspacesWorkspaceIdScoreboardsIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 점수판 수정
  */
-export const usePutScoreboardsId = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putScoreboardsId>>, TError,{id: number;data: ScoreboardUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePutWorkspacesWorkspaceIdScoreboardsId = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdScoreboardsId>>, TError,{workspaceId: string;id: number;data: ScoreboardUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof putScoreboardsId>>,
+        Awaited<ReturnType<typeof putWorkspacesWorkspaceIdScoreboardsId>>,
         TError,
-        {id: number;data: ScoreboardUpdateRequest},
+        {workspaceId: string;id: number;data: ScoreboardUpdateRequest},
         TContext
       > => {
-      return useMutation(getPutScoreboardsIdMutationOptions(options), queryClient);
+      return useMutation(getPutWorkspacesWorkspaceIdScoreboardsIdMutationOptions(options), queryClient);
     }
     /**
  * @summary 점수판 보관
  */
-export type postScoreboardsIdArchiveResponse200 = {
-  data: PostScoreboardsIdArchive200
+export type postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse200 = {
+  data: PostWorkspacesWorkspaceIdScoreboardsIdArchive200
   status: 200
 }
 
-export type postScoreboardsIdArchiveResponse401 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postScoreboardsIdArchiveResponse403 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse403 = {
   data: ErrorResponse
   status: 403
 }
 
-export type postScoreboardsIdArchiveResponse404 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type postScoreboardsIdArchiveResponseSuccess = (postScoreboardsIdArchiveResponse200) & {
+export type postWorkspacesWorkspaceIdScoreboardsIdArchiveResponseSuccess = (postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse200) & {
   headers: Headers;
 };
-export type postScoreboardsIdArchiveResponseError = (postScoreboardsIdArchiveResponse401 | postScoreboardsIdArchiveResponse403 | postScoreboardsIdArchiveResponse404) & {
+export type postWorkspacesWorkspaceIdScoreboardsIdArchiveResponseError = (postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse401 | postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse403 | postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse404) & {
   headers: Headers;
 };
 
-export type postScoreboardsIdArchiveResponse = (postScoreboardsIdArchiveResponseSuccess | postScoreboardsIdArchiveResponseError)
+export type postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse = (postWorkspacesWorkspaceIdScoreboardsIdArchiveResponseSuccess | postWorkspacesWorkspaceIdScoreboardsIdArchiveResponseError)
 
-export const getPostScoreboardsIdArchiveUrl = (id: number,) => {
+export const getPostWorkspacesWorkspaceIdScoreboardsIdArchiveUrl = (workspaceId: string,
+    id: number,) => {
 
 
   
 
-  return `/api/scoreboards/${id}/archive`
+  return `/api/workspaces/${workspaceId}/scoreboards/${id}/archive`
 }
 
-export const postScoreboardsIdArchive = async (id: number, options?: RequestInit): Promise<postScoreboardsIdArchiveResponse> => {
+export const postWorkspacesWorkspaceIdScoreboardsIdArchive = async (workspaceId: string,
+    id: number, options?: RequestInit): Promise<postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse> => {
   
-  return customInstance<postScoreboardsIdArchiveResponse>(getPostScoreboardsIdArchiveUrl(id),
+  return customInstance<postWorkspacesWorkspaceIdScoreboardsIdArchiveResponse>(getPostWorkspacesWorkspaceIdScoreboardsIdArchiveUrl(workspaceId,id),
   {      
     ...options,
     method: 'POST'
@@ -538,11 +543,11 @@ export const postScoreboardsIdArchive = async (id: number, options?: RequestInit
 
 
 
-export const getPostScoreboardsIdArchiveMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdArchive>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdArchive>>, TError,{id: number}, TContext> => {
+export const getPostWorkspacesWorkspaceIdScoreboardsIdArchiveMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdArchive>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdArchive>>, TError,{workspaceId: string;id: number}, TContext> => {
 
-const mutationKey = ['postScoreboardsIdArchive'];
+const mutationKey = ['postWorkspacesWorkspaceIdScoreboardsIdArchive'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -552,10 +557,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postScoreboardsIdArchive>>, {id: number}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdArchive>>, {workspaceId: string;id: number}> = (props) => {
+          const {workspaceId,id} = props ?? {};
 
-          return  postScoreboardsIdArchive(id,requestOptions)
+          return  postWorkspacesWorkspaceIdScoreboardsIdArchive(workspaceId,id,requestOptions)
         }
 
 
@@ -565,71 +570,73 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostScoreboardsIdArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof postScoreboardsIdArchive>>>
+    export type PostWorkspacesWorkspaceIdScoreboardsIdArchiveMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdArchive>>>
     
-    export type PostScoreboardsIdArchiveMutationError = UnauthorizedErrorResponse | ErrorResponse
+    export type PostWorkspacesWorkspaceIdScoreboardsIdArchiveMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
  * @summary 점수판 보관
  */
-export const usePostScoreboardsIdArchive = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdArchive>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdScoreboardsIdArchive = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdArchive>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postScoreboardsIdArchive>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdArchive>>,
         TError,
-        {id: number},
+        {workspaceId: string;id: number},
         TContext
       > => {
-      return useMutation(getPostScoreboardsIdArchiveMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdScoreboardsIdArchiveMutationOptions(options), queryClient);
     }
     /**
  * @summary 보관된 점수판 재활성화
  */
-export type postScoreboardsIdReactivateResponse200 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse200 = {
   data: ScoreboardSummary
   status: 200
 }
 
-export type postScoreboardsIdReactivateResponse400 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse400 = {
   data: ErrorResponse
   status: 400
 }
 
-export type postScoreboardsIdReactivateResponse401 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
 }
 
-export type postScoreboardsIdReactivateResponse404 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse404 = {
   data: ErrorResponse
   status: 404
 }
 
-export type postScoreboardsIdReactivateResponse409 = {
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse409 = {
   data: ErrorResponse
   status: 409
 }
 
-export type postScoreboardsIdReactivateResponseSuccess = (postScoreboardsIdReactivateResponse200) & {
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponseSuccess = (postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse200) & {
   headers: Headers;
 };
-export type postScoreboardsIdReactivateResponseError = (postScoreboardsIdReactivateResponse400 | postScoreboardsIdReactivateResponse401 | postScoreboardsIdReactivateResponse404 | postScoreboardsIdReactivateResponse409) & {
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponseError = (postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse400 | postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse401 | postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse404 | postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse409) & {
   headers: Headers;
 };
 
-export type postScoreboardsIdReactivateResponse = (postScoreboardsIdReactivateResponseSuccess | postScoreboardsIdReactivateResponseError)
+export type postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse = (postWorkspacesWorkspaceIdScoreboardsIdReactivateResponseSuccess | postWorkspacesWorkspaceIdScoreboardsIdReactivateResponseError)
 
-export const getPostScoreboardsIdReactivateUrl = (id: number,) => {
+export const getPostWorkspacesWorkspaceIdScoreboardsIdReactivateUrl = (workspaceId: string,
+    id: number,) => {
 
 
   
 
-  return `/api/scoreboards/${id}/reactivate`
+  return `/api/workspaces/${workspaceId}/scoreboards/${id}/reactivate`
 }
 
-export const postScoreboardsIdReactivate = async (id: number, options?: RequestInit): Promise<postScoreboardsIdReactivateResponse> => {
+export const postWorkspacesWorkspaceIdScoreboardsIdReactivate = async (workspaceId: string,
+    id: number, options?: RequestInit): Promise<postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse> => {
   
-  return customInstance<postScoreboardsIdReactivateResponse>(getPostScoreboardsIdReactivateUrl(id),
+  return customInstance<postWorkspacesWorkspaceIdScoreboardsIdReactivateResponse>(getPostWorkspacesWorkspaceIdScoreboardsIdReactivateUrl(workspaceId,id),
   {      
     ...options,
     method: 'POST'
@@ -641,11 +648,11 @@ export const postScoreboardsIdReactivate = async (id: number, options?: RequestI
 
 
 
-export const getPostScoreboardsIdReactivateMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, TError,{id: number}, TContext> => {
+export const getPostWorkspacesWorkspaceIdScoreboardsIdReactivateMutationOptions = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdReactivate>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdReactivate>>, TError,{workspaceId: string;id: number}, TContext> => {
 
-const mutationKey = ['postScoreboardsIdReactivate'];
+const mutationKey = ['postWorkspacesWorkspaceIdScoreboardsIdReactivate'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -655,10 +662,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, {id: number}> = (props) => {
-          const {id} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdReactivate>>, {workspaceId: string;id: number}> = (props) => {
+          const {workspaceId,id} = props ?? {};
 
-          return  postScoreboardsIdReactivate(id,requestOptions)
+          return  postWorkspacesWorkspaceIdScoreboardsIdReactivate(workspaceId,id,requestOptions)
         }
 
 
@@ -668,21 +675,21 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type PostScoreboardsIdReactivateMutationResult = NonNullable<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>>
+    export type PostWorkspacesWorkspaceIdScoreboardsIdReactivateMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdReactivate>>>
     
-    export type PostScoreboardsIdReactivateMutationError = ErrorResponse | UnauthorizedErrorResponse
+    export type PostWorkspacesWorkspaceIdScoreboardsIdReactivateMutationError = ErrorResponse | UnauthorizedErrorResponse
 
     /**
  * @summary 보관된 점수판 재활성화
  */
-export const usePostScoreboardsIdReactivate = <TError = ErrorResponse | UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postScoreboardsIdReactivate>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+export const usePostWorkspacesWorkspaceIdScoreboardsIdReactivate = <TError = ErrorResponse | UnauthorizedErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdReactivate>>, TError,{workspaceId: string;id: number}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postScoreboardsIdReactivate>>,
+        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdScoreboardsIdReactivate>>,
         TError,
-        {id: number},
+        {workspaceId: string;id: number},
         TContext
       > => {
-      return useMutation(getPostScoreboardsIdReactivateMutationOptions(options), queryClient);
+      return useMutation(getPostWorkspacesWorkspaceIdScoreboardsIdReactivateMutationOptions(options), queryClient);
     }
     
