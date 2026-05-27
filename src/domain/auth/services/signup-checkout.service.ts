@@ -121,6 +121,8 @@ export class SignupCheckoutService {
         idempotencyKey: input.idempotencyKey,
         locale: input.locale,
         seats: input.seatCount,
+        successPath: "/auth/signup/success",
+        signupIntentId: pending.uid,
         metadata: {
           flow: "signup",
           signupIntentId: pending.uid,

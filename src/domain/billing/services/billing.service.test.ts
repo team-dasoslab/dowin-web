@@ -150,6 +150,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession,
         createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -200,6 +201,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession,
         createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -244,6 +246,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession,
         createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -281,6 +284,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession: vi.fn(),
         createCustomerSession,
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -323,6 +327,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession: vi.fn(),
         createCustomerSession,
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -363,6 +368,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession: vi.fn(),
         createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -401,6 +407,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession: vi.fn(),
         createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -445,6 +452,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession: vi.fn(),
         createCustomerSession,
+        getCheckoutSession: vi.fn(),
       },
     );
 
@@ -487,6 +495,7 @@ describe("BillingService", () => {
         environment: "sandbox",
         createCheckoutSession: vi.fn(),
         createCustomerSession,
+        getCheckoutSession: vi.fn(),
       },
     );
 

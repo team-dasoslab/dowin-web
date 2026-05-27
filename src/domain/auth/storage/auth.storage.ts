@@ -1,12 +1,22 @@
 import { getDb } from "@/db";
+import { customAlphabet } from "nanoid";
 import {
   authLoginAttempts,
   authRecoveryCodes,
   pendingSignupCheckouts,
   sessions,
   users,
+  workspaceBillingState,
+  workspaceMembers,
+  workspaces,
+  workspaceSeatEntitlements,
 } from "@/db/schema";
 import { and, desc, eq, gt, inArray, isNull } from "drizzle-orm";
+
+const generateWorkspaceUid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  12,
+);
 
 export class AuthStorage {
   constructor(private db: ReturnType<typeof getDb>) {}
@@ -40,6 +50,14 @@ export class AuthStorage {
     return (
       (await this.db.query.pendingSignupCheckouts.findFirst({
         where: eq(pendingSignupCheckouts.requestId, requestId),
+      })) ?? null
+    );
+  }
+
+  async findPendingSignupCheckoutByUid(uid: string) {
+    return (
+      (await this.db.query.pendingSignupCheckouts.findFirst({
+        where: eq(pendingSignupCheckouts.uid, uid),
       })) ?? null
     );
   }
@@ -98,6 +116,82 @@ export class AuthStorage {
       .returning();
 
     return updated ?? null;
+  }
+
+  async provisionCompletedSignup(input: {
+    pendingId: number;
+    pendingUid: string;
+    customId: string;
+    nickname: string;
+    passwordHash: string;
+    locale: "ko" | "en";
+    workspaceName: string;
+    purchasedSeatCount: number;
+    customerKey: string | null;
+    subscriptionKey: string | null;
+    now: Date;
+  }) {
+    const user = await this.createUser({
+      customId: input.customId,
+      nickname: input.nickname,
+      passwordHash: input.passwordHash,
+      isFirstLogin: true,
+      locale: input.locale,
+    });
+
+    const [workspace] = await this.db
+      .insert(workspaces)
+      .values({
+        uid: generateWorkspaceUid(),
+        name: input.workspaceName,
+        planCode: "BASIC",
+        billingCustomerExternalRef: `signup:${input.pendingUid}`,
+        billingOwnerUserId: user.id,
+      })
+      .returning();
+
+    await this.db.insert(workspaceMembers).values({
+      workspaceId: workspace.id,
+      userId: user.id,
+      role: "ADMIN",
+    });
+
+    await this.db.insert(workspaceBillingState).values({
+      workspaceId: workspace.id,
+      provider: "POLAR",
+      billingStatus: "ACTIVE",
+      planCode: "BASIC",
+      entitlementSource: "POLAR",
+      customerKey: input.customerKey,
+      subscriptionKey: input.subscriptionKey,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      billingOwnerUserId: user.id,
+      lastEventId: null,
+      lastEventOccurredAt: input.now,
+      updatedAt: input.now,
+    });
+
+    await this.db.insert(workspaceSeatEntitlements).values({
+      workspaceId: workspace.id,
+      planCode: "BASIC",
+      purchasedSeatCount: input.purchasedSeatCount,
+      seatSource: "POLAR",
+      updatedAt: input.now,
+    });
+
+    await this.db
+      .update(pendingSignupCheckouts)
+      .set({
+        status: "COMPLETED",
+        completedUserId: user.id,
+        completedWorkspaceId: workspace.id,
+        completedAt: input.now,
+        updatedAt: input.now,
+      })
+      .where(eq(pendingSignupCheckouts.id, input.pendingId));
+
+    return { user, workspace };
   }
 
   async findUserById(id: number) {

@@ -39,6 +39,7 @@ describe("SignupCheckoutService", () => {
               checkoutId: "chk_basic",
             }),
             createCustomerSession: vi.fn(),
+            getCheckoutSession: vi.fn(),
             ...overrides?.polar,
           };
 

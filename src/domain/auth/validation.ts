@@ -50,6 +50,11 @@ export const signupCheckoutSchema = signupSchema.extend({
     .max(999, "좌석 수는 999 이하여야 합니다."),
 });
 
+export const signupCompleteSchema = z.object({
+  signupIntentId: z.string().trim().min(1),
+  checkoutId: z.string().trim().min(1),
+});
+
 export const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1, "현재 비밀번호를 입력해주세요."),
   newPassword: z
