@@ -298,13 +298,15 @@ describe("BillingService", () => {
     });
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
+          uid: "ws_abc",
           name: "Dowin",
           planCode: "STANDARD",
           billingCustomerExternalRef: "workspace:1",
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -335,13 +337,15 @@ describe("BillingService", () => {
   it("활성 Polar product 매핑이 없으면 checkout을 시작할 수 없다", async () => {
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
+          uid: "ws_abc",
           name: "Dowin",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -372,13 +376,15 @@ describe("BillingService", () => {
   it("최근 환불/취소 이력이 누적되면 checkout을 막는다", async () => {
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
+          uid: "ws_abc",
           name: "Dowin",
           planCode: "FREE",
           billingCustomerExternalRef: null,
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -411,13 +417,15 @@ describe("BillingService", () => {
     });
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
+          uid: "ws_abc",
           name: "Dowin",
           planCode: "STANDARD",
           billingCustomerExternalRef: "workspace:1",
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,
@@ -454,13 +462,15 @@ describe("BillingService", () => {
     });
     const service = new BillingService(
       {
-        findUserWorkspace: vi.fn().mockResolvedValue({
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
           id: 1,
+          uid: "ws_abc",
           name: "Dowin",
           planCode: "STANDARD",
           billingCustomerExternalRef: "workspace:1",
         }),
-        findMembershipByUserId: vi.fn().mockResolvedValue({
+        findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
       } as never,

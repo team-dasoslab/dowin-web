@@ -33,6 +33,23 @@ export const signupSchema = z.object({
     ),
 });
 
+export const signupCheckoutHeaderSchema = z.object({
+  idempotencyKey: z.string().trim().min(1).max(255),
+});
+
+export const signupCheckoutSchema = signupSchema.extend({
+  workspaceName: z
+    .string()
+    .trim()
+    .min(1, "워크스페이스 이름을 입력해주세요.")
+    .max(100, "워크스페이스 이름은 100자 이하여야 합니다."),
+  seatCount: z.coerce
+    .number()
+    .int("좌석 수는 정수여야 합니다.")
+    .min(1, "좌석 수는 1 이상이어야 합니다.")
+    .max(999, "좌석 수는 999 이하여야 합니다."),
+});
+
 export const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1, "현재 비밀번호를 입력해주세요."),
   newPassword: z

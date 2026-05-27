@@ -56,7 +56,7 @@ paths:
 
   /auth/signup:
     post:
-      summary: 회원가입
+      summary: 회원가입 완료 (legacy)
       tags: [Auth]
       requestBody:
         required: true
@@ -102,6 +102,39 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "422":
           description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /auth/signup/checkout:
+    post:
+      summary: Basic seat 가입 checkout 시작
+      tags: [Auth, Billing]
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+          description: 같은 가입 결제 요청의 중복 checkout 생성을 방지하는 멱등 키
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SignupCheckoutRequest" }
+      responses:
+        "201":
+          description: 가입 checkout 준비 완료
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SignupCheckoutResponse" }
+        "409":
+          description: 이미 사용 중인 아이디, 진행 중인 가입 checkout, 또는 billing 연동 미준비
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 또는 헤더 유효성 오류
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -2359,6 +2392,48 @@ components:
         nickname: { type: string }
         isFirstLogin: { type: boolean }
         locale: { type: string, enum: [ko, en] }
+
+    SignupCheckoutRequest:
+      type: object
+      required: [customId, nickname, password, workspaceName, seatCount]
+      properties:
+        customId:
+          type: string
+          minLength: 3
+          maxLength: 20
+          example: john123
+        nickname:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: 존
+        password:
+          type: string
+          format: password
+          example: "newSecurePass1!"
+        workspaceName:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: 우리 팀
+        seatCount:
+          type: integer
+          minimum: 1
+          maximum: 999
+          description: Basic checkout에서 결제할 최초 seat 수
+          example: 5
+
+    SignupCheckoutResponse:
+      type: object
+      required: [signupIntentId, checkoutUrl]
+      properties:
+        signupIntentId:
+          type: string
+          description: 결제 성공 후 가입 완료 검증에 사용할 pending signup intent ID
+        checkoutUrl:
+          type: string
+          format: uri
+          description: Polar Basic seat checkout URL
 
     RecoveryAccount:
       type: object

@@ -876,6 +876,7 @@
     "INVITE_CODE_INACTIVE": "비활성화된 초대 코드입니다.",
     "INVITE_CODE_USAGE_LIMIT_REACHED": "초대 코드가 만료되었습니다. 관리자에게 새 코드를 요청하세요.",
     "CUSTOM_ID_ALREADY_EXISTS": "이미 사용 중인 아이디입니다.",
+    "SIGNUP_CHECKOUT_ALREADY_PENDING": "이미 진행 중인 가입 결제가 있습니다. 기존 결제 화면에서 계속 진행해주세요.",
     "ALREADY_IN_WORKSPACE": "이미 워크스페이스에 소속되어 있습니다.",
     "WORKSPACE_MEMBER_LIMIT_REACHED": "현재 워크스페이스에 참여할 수 없어요. 관리자에게 문의하세요.",
     "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "현재 FREE 플랜의 멤버 한도를 초과해 워크스페이스가 읽기 전용 상태입니다. 멤버 수를 10명 이하로 줄이거나 STANDARD 플랜으로 변경해주세요.",

@@ -36,7 +36,8 @@ export type PolarBillingClient = {
     idempotencyKey: string;
     locale: "ko" | "en";
     metadata: Record<string, string>;
-  }): Promise<{ checkoutUrl: string }>;
+    seats?: number;
+  }): Promise<{ checkoutUrl: string; checkoutId: string | null }>;
   createCustomerSession(
     input:
       | {
@@ -139,6 +140,7 @@ export function createPolarBillingClient(
       idempotencyKey,
       locale,
       metadata,
+      seats,
     }) {
       const response = await fetch(`${apiBaseUrl}/checkouts`, {
         method: "POST",
@@ -150,6 +152,7 @@ export function createPolarBillingClient(
         body: JSON.stringify({
           products: [productId],
           external_customer_id: externalCustomerId,
+          ...(seats !== undefined ? { seats } : {}),
           success_url: buildCheckoutCallbackUrl({
             appBaseUrl,
             path: "/billing/polar/success",
@@ -166,7 +169,7 @@ export function createPolarBillingClient(
       });
 
       const data = await parsePolarResponse<CheckoutSessionResponse>(response);
-      return { checkoutUrl: data.url };
+      return { checkoutUrl: data.url, checkoutId: data.id ?? null };
     },
 
     async createCustomerSession(input) {

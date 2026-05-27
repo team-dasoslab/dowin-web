@@ -213,6 +213,7 @@ export class BillingService {
         requestedByUserId: userId,
         requestId: idempotencyKey,
         targetPlanCode: "STANDARD",
+        providerCheckoutId: checkout.checkoutId,
         eventType: "CHECKOUT_SESSION_CREATED",
         occurredAt: new Date(),
         payloadJson: JSON.stringify(checkout),

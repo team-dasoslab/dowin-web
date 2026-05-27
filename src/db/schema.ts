@@ -93,6 +93,53 @@ export const authLoginAttemptsRelations = relations(
   () => ({}),
 );
 
+export const pendingSignupCheckouts = sqliteTable(
+  "pending_signup_checkouts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    uid: text("uid").notNull().unique(),
+    requestId: text("request_id").notNull(),
+    customId: text("custom_id").notNull(),
+    nickname: text("nickname").notNull(),
+    passwordHash: text("password_hash").notNull(),
+    locale: text("locale", { enum: ["ko", "en"] }).notNull(),
+    workspaceName: text("workspace_name").notNull(),
+    requestedSeatCount: integer("requested_seat_count").notNull(),
+    targetPlanCode: text("target_plan_code", { enum: ["BASIC"] }).notNull(),
+    provider: text("provider", { enum: ["POLAR"] }).notNull(),
+    providerProductId: text("provider_product_id").notNull(),
+    providerCheckoutId: text("provider_checkout_id"),
+    checkoutUrl: text("checkout_url"),
+    status: text("status", {
+      enum: [
+        "PENDING",
+        "CHECKOUT_CREATED",
+        "COMPLETED",
+        "EXPIRED",
+        "FAILED",
+      ],
+    })
+      .notNull()
+      .default("PENDING"),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("pending_signup_checkouts_uid_unique").on(table.uid),
+    uniqueIndex("pending_signup_checkouts_request_unique").on(table.requestId),
+    index("pending_signup_checkouts_custom_status_idx").on(
+      table.customId,
+      table.status,
+    ),
+    index("pending_signup_checkouts_expires_at_idx").on(table.expiresAt),
+  ],
+);
+
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(), // nanoid
   userId: integer("user_id")
@@ -320,7 +367,7 @@ export const billingProviderProducts = sqliteTable(
     environment: text("environment", {
       enum: ["sandbox", "production"],
     }).notNull(),
-    planCode: text("plan_code", { enum: ["STANDARD"] }).notNull(),
+    planCode: text("plan_code", { enum: ["BASIC", "STANDARD"] }).notNull(),
     providerProductId: text("provider_product_id").notNull(),
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     createdAt: integer("created_at", { mode: "timestamp" })

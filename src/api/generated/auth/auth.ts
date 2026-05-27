@@ -27,6 +27,8 @@ import type {
   PutAuthPasswordBody,
   PutAuthPasswordByRecoveryCode200,
   PutAuthPasswordByRecoveryCodeBody,
+  SignupCheckoutRequest,
+  SignupCheckoutResponse,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
 
@@ -137,7 +139,7 @@ export const usePostAuthLogin = <TError = ErrorResponse,
       return useMutation(getPostAuthLoginMutationOptions(options), queryClient);
     }
     /**
- * @summary 회원가입
+ * @summary 회원가입 완료 (legacy)
  */
 export type postAuthSignupResponse201 = {
   data: PostAuthSignup201
@@ -218,7 +220,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PostAuthSignupMutationError = ErrorResponse
 
     /**
- * @summary 회원가입
+ * @summary 회원가입 완료 (legacy)
  */
 export const usePostAuthSignup = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignup>>, TError,{data: PostAuthSignupBody}, TContext>, request?: SecondParameter<typeof customInstance>}
@@ -229,6 +231,100 @@ export const usePostAuthSignup = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPostAuthSignupMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Basic seat 가입 checkout 시작
+ */
+export type postAuthSignupCheckoutResponse201 = {
+  data: SignupCheckoutResponse
+  status: 201
+}
+
+export type postAuthSignupCheckoutResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postAuthSignupCheckoutResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postAuthSignupCheckoutResponseSuccess = (postAuthSignupCheckoutResponse201) & {
+  headers: Headers;
+};
+export type postAuthSignupCheckoutResponseError = (postAuthSignupCheckoutResponse409 | postAuthSignupCheckoutResponse422) & {
+  headers: Headers;
+};
+
+export type postAuthSignupCheckoutResponse = (postAuthSignupCheckoutResponseSuccess | postAuthSignupCheckoutResponseError)
+
+export const getPostAuthSignupCheckoutUrl = () => {
+
+
+  
+
+  return `/api/auth/signup/checkout`
+}
+
+export const postAuthSignupCheckout = async (signupCheckoutRequest: SignupCheckoutRequest, options?: RequestInit): Promise<postAuthSignupCheckoutResponse> => {
+  
+  return customInstance<postAuthSignupCheckoutResponse>(getPostAuthSignupCheckoutUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      signupCheckoutRequest,)
+  }
+);}
+  
+
+
+
+export const getPostAuthSignupCheckoutMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignupCheckout>>, TError,{data: SignupCheckoutRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAuthSignupCheckout>>, TError,{data: SignupCheckoutRequest}, TContext> => {
+
+const mutationKey = ['postAuthSignupCheckout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthSignupCheckout>>, {data: SignupCheckoutRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postAuthSignupCheckout(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAuthSignupCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthSignupCheckout>>>
+    export type PostAuthSignupCheckoutMutationBody = SignupCheckoutRequest
+    export type PostAuthSignupCheckoutMutationError = ErrorResponse
+
+    /**
+ * @summary Basic seat 가입 checkout 시작
+ */
+export const usePostAuthSignupCheckout = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignupCheckout>>, TError,{data: SignupCheckoutRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAuthSignupCheckout>>,
+        TError,
+        {data: SignupCheckoutRequest},
+        TContext
+      > => {
+      return useMutation(getPostAuthSignupCheckoutMutationOptions(options), queryClient);
     }
     /**
  * @summary 로그아웃

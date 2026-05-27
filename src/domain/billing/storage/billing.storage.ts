@@ -58,7 +58,7 @@ export class BillingStorage {
   async findActiveProviderProduct(input: {
     provider: "POLAR";
     environment: "sandbox" | "production";
-    planCode: "STANDARD";
+    planCode: "BASIC" | "STANDARD";
   }) {
     return (
       (await this.db.query.billingProviderProducts.findFirst({

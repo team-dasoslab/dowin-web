@@ -2,10 +2,11 @@ import { getDb } from "@/db";
 import {
   authLoginAttempts,
   authRecoveryCodes,
+  pendingSignupCheckouts,
   sessions,
   users,
 } from "@/db/schema";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull } from "drizzle-orm";
 
 export class AuthStorage {
   constructor(private db: ReturnType<typeof getDb>) {}
@@ -14,6 +15,89 @@ export class AuthStorage {
     return await this.db.query.users.findFirst({
       where: eq(users.customId, customId),
     });
+  }
+
+  async findActivePendingSignupCheckoutByCustomId(
+    customId: string,
+    now: Date,
+  ) {
+    return (
+      (await this.db.query.pendingSignupCheckouts.findFirst({
+        where: and(
+          eq(pendingSignupCheckouts.customId, customId),
+          inArray(pendingSignupCheckouts.status, [
+            "PENDING",
+            "CHECKOUT_CREATED",
+          ]),
+          gt(pendingSignupCheckouts.expiresAt, now),
+        ),
+        orderBy: [desc(pendingSignupCheckouts.createdAt)],
+      })) ?? null
+    );
+  }
+
+  async findPendingSignupCheckoutByRequestId(requestId: string) {
+    return (
+      (await this.db.query.pendingSignupCheckouts.findFirst({
+        where: eq(pendingSignupCheckouts.requestId, requestId),
+      })) ?? null
+    );
+  }
+
+  async createPendingSignupCheckout(input: {
+    uid: string;
+    requestId: string;
+    customId: string;
+    nickname: string;
+    passwordHash: string;
+    locale: "ko" | "en";
+    workspaceName: string;
+    requestedSeatCount: number;
+    targetPlanCode: "BASIC";
+    provider: "POLAR";
+    providerProductId: string;
+    expiresAt: Date;
+  }) {
+    const [created] = await this.db
+      .insert(pendingSignupCheckouts)
+      .values(input)
+      .returning();
+
+    return created;
+  }
+
+  async markPendingSignupCheckoutCreated(
+    id: number,
+    input: {
+      providerCheckoutId: string | null;
+      checkoutUrl: string;
+    },
+  ) {
+    const [updated] = await this.db
+      .update(pendingSignupCheckouts)
+      .set({
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: input.providerCheckoutId,
+        checkoutUrl: input.checkoutUrl,
+        updatedAt: new Date(),
+      })
+      .where(eq(pendingSignupCheckouts.id, id))
+      .returning();
+
+    return updated ?? null;
+  }
+
+  async markPendingSignupCheckoutFailed(id: number) {
+    const [updated] = await this.db
+      .update(pendingSignupCheckouts)
+      .set({
+        status: "FAILED",
+        updatedAt: new Date(),
+      })
+      .where(eq(pendingSignupCheckouts.id, id))
+      .returning();
+
+    return updated ?? null;
   }
 
   async findUserById(id: number) {

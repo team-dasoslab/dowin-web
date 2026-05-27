@@ -873,6 +873,7 @@
     "INVITE_CODE_INACTIVE": "This invite code is inactive.",
     "INVITE_CODE_USAGE_LIMIT_REACHED": "Invite code limit reached. Request a new one from the admin.",
     "CUSTOM_ID_ALREADY_EXISTS": "This ID is already in use.",
+    "SIGNUP_CHECKOUT_ALREADY_PENDING": "A signup checkout is already in progress. Continue from the existing checkout page.",
     "ALREADY_IN_WORKSPACE": "You are already in a workspace.",
     "WORKSPACE_MEMBER_LIMIT_REACHED": "Cannot join the workspace. Contact the admin.",
     "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "This FREE workspace is over the 10-member limit and is now read-only. Remove members until the workspace has 10 or fewer members, or upgrade to STANDARD.",
