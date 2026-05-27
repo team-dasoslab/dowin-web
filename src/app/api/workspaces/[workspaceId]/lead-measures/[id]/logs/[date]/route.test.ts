@@ -67,7 +67,7 @@ describe("PUT /api/lead-measures/:id/logs/:date", () => {
         body: JSON.stringify({ value: true }),
         method: "PUT",
       }),
-      { params: Promise.resolve({ id: "10", date: "2026-04-21" }) },
+      { params: Promise.resolve({ workspaceId: "1", id: "10", date: "2026-04-21" }) },
     );
     const body = (await response.json()) as {
       error: { code: string };

@@ -2,7 +2,6 @@
 
 
 import { getGetUsersMeQueryKey } from "@/api/generated/profile/profile";
-import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import {
   getGetWorkspacesMeQueryKey,
   usePostWorkspaces,
@@ -39,7 +38,7 @@ export const useCreateWorkspaceMutation = ({
             queryKey: getGetWorkspacesMeQueryKey(),
           }),
           queryClient.invalidateQueries({
-            queryKey: getGetScoreboardsActiveQueryKey(),
+            queryKey: ['workspaces'],
           }),
           queryClient.invalidateQueries({
             predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),

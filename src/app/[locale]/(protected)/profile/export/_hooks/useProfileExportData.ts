@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { useGetScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
+import { useGetWorkspacesWorkspaceIdScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { getApiErrorStatus, toNumberId } from "@/lib/client/frontend-api";
 import { useMemo } from "react";
@@ -14,24 +14,25 @@ export const useProfileExportData = () => {
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount, error) =>
+      retry: (failureCount: number, error: any) =>
         getApiErrorStatus(error) !== 404 && failureCount < 3,
     },
   });
+  const workspaceId = workspaceResponse?.status === 200 ? (workspaceResponse.data as any)?.id : "";
   const {
     data: activeScoreboardResponse,
     isLoading: isScoreboardLoading,
     error: scoreboardError,
-  } = useGetScoreboardsActive({
+  } = useGetWorkspacesWorkspaceIdScoreboardsActive(workspaceId, {
     query: {
-      retry: (failureCount, error) =>
+      retry: (failureCount: number, error: any) =>
         getApiErrorStatus(error) !== 404 && failureCount < 1,
     },
   });
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const workspace =
-    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+    workspaceResponse?.status === 200 ? workspaceResponse.data as any : null;
   const activeScoreboard =
     activeScoreboardResponse?.status === 200
       ? activeScoreboardResponse.data
@@ -40,8 +41,8 @@ export const useProfileExportData = () => {
   const exportMeasureOptions = useMemo(
     () =>
       (activeScoreboard?.leadMeasures ?? [])
-        .filter((measure) => measure.status === "ACTIVE")
-        .map((measure) => ({
+        .filter((measure: any) => measure.status === "ACTIVE")
+        .map((measure: any) => ({
           id: toNumberId(measure.id),
           name: measure.name,
         }))

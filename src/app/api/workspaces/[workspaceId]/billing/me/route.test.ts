@@ -44,7 +44,7 @@ describe("GET /api/billing/me", () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any);
 
     expect(response.status).toBe(401);
   });
@@ -68,7 +68,7 @@ describe("GET /api/billing/me", () => {
     });
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any);
     const body = (await response.json()) as { workspaceId: number };
 
     expect(response.status).toBe(200);

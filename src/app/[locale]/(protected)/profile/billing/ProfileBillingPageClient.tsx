@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetBillingMe } from "@/api/generated/billing/billing";
+import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
@@ -42,7 +42,7 @@ export function ProfileBillingPageClient() {
     isLoading,
     isFetching,
     refetch,
-  } = useGetBillingMe({
+  } = useGetWorkspacesWorkspaceIdBillingMe(workspaceId ?? "", {
     query: {
       retry: false,
     },

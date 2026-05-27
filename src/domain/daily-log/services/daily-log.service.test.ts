@@ -128,7 +128,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-04-07", value: false },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result).toEqual({
       weekStart: "2026-04-06",
@@ -168,7 +168,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-04-10", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -198,7 +198,7 @@ describe("DailyLogService", () => {
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -238,7 +238,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-04-08", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-04-06");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -275,7 +275,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-03-11", value: true },
     ]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-03-09");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -303,7 +303,7 @@ describe("DailyLogService", () => {
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getWeeklyLogs(2, 100, "2026-03-09");
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-03-09");
 
     expect(result.leadMeasures).toEqual([
       expect.objectContaining({
@@ -330,8 +330,8 @@ describe("DailyLogService", () => {
     ]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const lastWeekResult = await service.getWeeklyLogs(2, 100, "2026-03-30");
-    const nextWeekResult = await service.getWeeklyLogs(2, 100, "2026-04-13");
+    const lastWeekResult = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-03-30");
+    const nextWeekResult = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-13");
 
     expect(lastWeekResult.leadMeasures).toEqual([
       expect.objectContaining({
@@ -379,7 +379,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 11, logDate: "2026-03-04", value: false },
     ]);
 
-    const result = await service.getMonthlyLogs(2, 100, "2026-03-01");
+    const result = await service.getMonthlyLogs("ws_uid", 2, 100, "2026-03-01");
 
     expect(result.monthStart).toBe("2026-03-01");
     expect(result.monthEnd).toBe("2026-03-31");
@@ -420,7 +420,7 @@ describe("DailyLogService", () => {
     findLeadMeasuresByScoreboard.mockResolvedValue([]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getMonthlyLogs(2, 100, "2026-03-18");
+    const result = await service.getMonthlyLogs("ws_uid", 2, 100, "2026-03-18");
 
     expect(result.monthStart).toBe("2026-03-01");
     expect(result.monthEnd).toBe("2026-03-31");
@@ -451,7 +451,7 @@ describe("DailyLogService", () => {
       { leadMeasureId: 10, logDate: "2026-03-08", value: true },
     ]);
 
-    const result = await service.getMonthlyLogs(2, 100, "2026-03-01");
+    const result = await service.getMonthlyLogs("ws_uid", 2, 100, "2026-03-01");
 
     expect(result.summary).toEqual({
       achieved: 3,

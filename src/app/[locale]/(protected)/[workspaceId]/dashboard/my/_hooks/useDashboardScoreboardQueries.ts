@@ -1,18 +1,18 @@
 "use client";
 
 import {
-  getGetScoreboardsScoreboardIdLogsMonthlyQueryKey,
-  getGetScoreboardsScoreboardIdLogsWeeklyQueryKey,
-  getScoreboardsScoreboardIdLogsWeekly,
-  useGetScoreboardsScoreboardIdLogsMonthly,
-  useGetScoreboardsScoreboardIdLogsWeekly,
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey,
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
+  getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly,
+  useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly,
+  useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly,
 } from "@/api/generated/daily-log/daily-log";
 import { getGetWorkspacesWorkspaceIdDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
-import { useGetScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
+import { useGetWorkspacesWorkspaceIdScoreboardsActive } from "@/api/generated/scoreboard/scoreboard";
 import {
   GetWorkspacesWorkspaceIdDashboardTeamParams,
-  GetScoreboardsScoreboardIdLogsMonthlyParams,
-  GetScoreboardsScoreboardIdLogsWeeklyParams,
+  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams,
+  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams,
 } from "@/api/generated/dowin.schemas";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import {
@@ -46,7 +46,7 @@ export const useDashboardScoreboardQueries = ({
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount, error) =>
+      retry: (failureCount: number, error: any) =>
         getApiErrorStatus(error) !== 404 && failureCount < 3,
     },
   });
@@ -55,9 +55,9 @@ export const useDashboardScoreboardQueries = ({
     data: activeScoreboardResponse,
     isLoading: isScoreboardLoading,
     error: scoreboardError,
-  } = useGetScoreboardsActive({
+  } = useGetWorkspacesWorkspaceIdScoreboardsActive(workspaceId, {
     query: {
-      retry: (failureCount, error) =>
+      retry: (failureCount: number, error: any) =>
         getApiErrorStatus(error) !== 404 && failureCount < 1,
     },
   });
@@ -67,10 +67,10 @@ export const useDashboardScoreboardQueries = ({
       ? activeScoreboardResponse.data
       : null;
   const scoreboardId = toNumberId(activeScoreboard?.id);
-  const weeklyLogsParams: GetScoreboardsScoreboardIdLogsWeeklyParams = {
+  const weeklyLogsParams: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams = {
     weekStart: selectedWeekStart,
   };
-  const monthlyLogsParams: GetScoreboardsScoreboardIdLogsMonthlyParams = {
+  const monthlyLogsParams: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams = {
     monthStart: selectedMonthStart,
   };
   const trendWeekStarts = [-21, -14, -7, 0].map((offset) =>
@@ -79,14 +79,16 @@ export const useDashboardScoreboardQueries = ({
 
   const weeklyLogsQueryKey =
     scoreboardId !== null
-      ? getGetScoreboardsScoreboardIdLogsWeeklyQueryKey(
+      ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey(
+          workspaceId,
           scoreboardId,
           weeklyLogsParams,
         )
       : null;
   const monthlyLogsQueryKey =
     scoreboardId !== null
-      ? getGetScoreboardsScoreboardIdLogsMonthlyQueryKey(
+      ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey(
+          workspaceId,
           scoreboardId,
           monthlyLogsParams,
         )
@@ -103,13 +105,12 @@ export const useDashboardScoreboardQueries = ({
     isLoading: isWeeklyLogsLoading,
     isFetching: isWeeklyLogsFetching,
     error: weeklyLogsError,
-  } = useGetScoreboardsScoreboardIdLogsWeekly(
-    scoreboardId ?? 0,
+  } = useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly(workspaceId, scoreboardId ?? 0,
     weeklyLogsParams,
     {
       query: {
         enabled: scoreboardId !== null && selectedView === "week",
-        retry: (failureCount, error) =>
+        retry: (failureCount: number, error: any) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
     },
@@ -119,13 +120,12 @@ export const useDashboardScoreboardQueries = ({
     isLoading: isMonthlyLogsLoading,
     isFetching: isMonthlyLogsFetching,
     error: monthlyLogsError,
-  } = useGetScoreboardsScoreboardIdLogsMonthly(
-    scoreboardId ?? 0,
+  } = useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly(workspaceId, scoreboardId ?? 0,
     monthlyLogsParams,
     {
       query: {
         enabled: scoreboardId !== null && selectedView === "month",
-        retry: (failureCount, error) =>
+        retry: (failureCount: number, error: any) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
     },
@@ -134,12 +134,12 @@ export const useDashboardScoreboardQueries = ({
     queries: trendWeekStarts.map((weekStart) => ({
       enabled: scoreboardId !== null,
       queryFn: () =>
-        getScoreboardsScoreboardIdLogsWeekly(scoreboardId ?? 0, {
+        getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly(workspaceId, scoreboardId ?? 0, {
           weekStart,
         }),
       queryKey:
         scoreboardId !== null
-          ? getGetScoreboardsScoreboardIdLogsWeeklyQueryKey(scoreboardId, {
+          ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey(workspaceId, scoreboardId, {
               weekStart,
             })
           : ["dashboard", "weekly-trend", weekStart],
@@ -166,20 +166,20 @@ export const useDashboardScoreboardQueries = ({
       ? monthlyLogsResponse.data.monthLabel
       : undefined;
   const activeLeadMeasures = (activeScoreboard?.leadMeasures ?? []).filter(
-    (leadMeasure) => leadMeasure.status === "ACTIVE",
+    (leadMeasure: any) => leadMeasure.status === "ACTIVE",
   );
   const weeklyTargetMeasures = activeLeadMeasures.filter(
-    (leadMeasure) => leadMeasure.period !== "MONTHLY",
+    (leadMeasure: any) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure) => [
+    weeklyLeadMeasures.map((leadMeasure: any) => [
       toNumberId(leadMeasure.id),
       leadMeasure,
     ]),
   );
 
   const weeklyAchieved = weeklyTargetMeasures.reduce(
-    (accumulator, leadMeasure) => {
+    (accumulator: any, leadMeasure: any) => {
       const weekly = weeklyById.get(toNumberId(leadMeasure.id));
       const targetValue = leadMeasure.targetValue ?? 0;
       return accumulator + Math.min(weekly?.achieved ?? 0, targetValue);
@@ -187,7 +187,7 @@ export const useDashboardScoreboardQueries = ({
     0,
   );
   const weeklyTotalTarget = weeklyTargetMeasures.reduce(
-    (accumulator, leadMeasure) => accumulator + (leadMeasure.targetValue ?? 0),
+    (accumulator: any, leadMeasure: any) => accumulator + (leadMeasure.targetValue ?? 0),
     0,
   );
   const weeklyOverallRate =
@@ -221,7 +221,7 @@ export const useDashboardScoreboardQueries = ({
     },
   );
   const weeklyGuideById = new Map(
-    weeklyLeadMeasures.map((leadMeasure) => [
+    weeklyLeadMeasures.map((leadMeasure: any) => [
       toNumberId(leadMeasure.id),
       leadMeasure.guide ?? null,
     ]),

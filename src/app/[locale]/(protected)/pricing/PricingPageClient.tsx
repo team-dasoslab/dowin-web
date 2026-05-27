@@ -1,6 +1,7 @@
 "use client";
 
-import { useGetBillingMe } from "@/api/generated/billing/billing";
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
@@ -30,11 +31,14 @@ type EntitlementSource =
 
 export function PricingPageClient() {
   const t = useTranslations("Pricing");
-  const workspaceId = useParams().workspaceId as string | undefined;
+  const params = useParams();
   const isNativeApp = useNativeApp();
-  const { data: billingResponse, error, isLoading } = useGetBillingMe({
+  const { data: workspaceResponse } = useGetWorkspacesMe();
+  const workspaceId = (params.workspaceId as string | undefined) ?? (workspaceResponse?.status === 200 ? (workspaceResponse?.data?.id ?? "") : "");
+  const { data: billingResponse, error, isLoading } = useGetWorkspacesWorkspaceIdBillingMe(workspaceId, {
     query: {
       retry: false,
+      enabled: !!workspaceId,
     },
   });
   const { isCheckoutPending, startCheckout } = useProfileBillingActions();

@@ -12,7 +12,6 @@ import {
   useDeleteWorkspacesIdLeave,
   usePutWorkspacesId,
 } from "@/api/generated/workspace/workspace";
-import { getGetScoreboardsActiveQueryKey } from "@/api/generated/scoreboard/scoreboard";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "@/i18n/routing";
@@ -63,7 +62,7 @@ export const useProfileActions = ({
         queryKey: getGetWorkspacesMeQueryKey(),
       }),
       queryClient.invalidateQueries({
-        queryKey: getGetScoreboardsActiveQueryKey(),
+        queryKey: ['workspaces'],
       }),
       queryClient.invalidateQueries({
         predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),

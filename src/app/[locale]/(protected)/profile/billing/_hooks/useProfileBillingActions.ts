@@ -1,6 +1,7 @@
 "use client";
 
-import { postBillingCheckout } from "@/api/generated/billing/billing";
+import { postWorkspacesWorkspaceIdBillingCheckout } from "@/api/generated/billing/billing";
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { useToast } from "@/context/ToastContext";
 import type { Locale } from "@/i18n/detect-locale";
 import {
@@ -11,15 +12,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 import { generateId } from "@/lib/utils";
 
-export function useProfileBillingActions() {
+export const useProfileBillingActions = () => {
   const t = useTranslations("ProfileBilling");
   const locale = useLocale() as Locale;
   const { showToast } = useToast();
   const queryClient = useQueryClient();
+  const { data: workspaceResponse } = useGetWorkspacesMe();
+  const workspaceId = workspaceResponse?.status === 200 ? (workspaceResponse?.data?.id ?? "") : "";
 
   const checkoutMutation = useMutation({
     mutationFn: async () => {
-      const response = await postBillingCheckout(
+      const response = await postWorkspacesWorkspaceIdBillingCheckout(
+        workspaceId,
         { locale },
         {
           headers: {
@@ -67,4 +71,4 @@ export function useProfileBillingActions() {
     handleReturnedFromCheckout,
     isCheckoutPending: checkoutMutation.isPending,
   };
-}
+};

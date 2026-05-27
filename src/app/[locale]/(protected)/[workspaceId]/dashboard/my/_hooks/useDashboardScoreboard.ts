@@ -150,6 +150,7 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     showToast,
     weeklyById,
     weeklyLogsQueryKey,
+    workspaceId,
   });
 
   return {

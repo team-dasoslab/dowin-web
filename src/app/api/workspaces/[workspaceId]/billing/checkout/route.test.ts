@@ -46,7 +46,7 @@ describe("POST /api/billing/checkout", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/billing/checkout", { method: "POST" }),
+      new Request("http://localhost/api/billing/checkout", { method: "POST" }), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any
     );
 
     expect(response.status).toBe(401);
@@ -60,7 +60,7 @@ describe("POST /api/billing/checkout", () => {
       new Request("http://localhost/api/billing/checkout", {
         method: "POST",
         body: JSON.stringify({ locale: "ko" }),
-      }),
+      }), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any
     );
 
     expect(response.status).toBe(422);
@@ -78,7 +78,7 @@ describe("POST /api/billing/checkout", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({}),
-      }),
+      }), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any
     );
 
     expect(response.status).toBe(422);
@@ -97,7 +97,7 @@ describe("POST /api/billing/checkout", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ locale: "ko" }),
-      }),
+      }), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any
     );
     const body = (await response.json()) as { error: { code: string } };
 
@@ -120,7 +120,7 @@ describe("POST /api/billing/checkout", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ locale: "ko" }),
-      }),
+      }), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any
     );
     const body = (await response.json()) as { error: { code: string } };
 
@@ -143,7 +143,7 @@ describe("POST /api/billing/checkout", () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ locale: "en" }),
-      }),
+      }), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any
     );
     const body = (await response.json()) as { checkoutUrl: string };
 

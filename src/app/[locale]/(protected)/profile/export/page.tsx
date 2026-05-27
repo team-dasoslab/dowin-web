@@ -159,7 +159,7 @@ export default function ProfileExportPage() {
               </Button>
             </div>
             <div className="grid gap-1.5 sm:grid-cols-2">
-              {exportMeasureOptions.map((measure) => {
+              {exportMeasureOptions.map((measure: any) => {
                 const checked = selectedExportMeasureIds.includes(measure.id);
 
                 return (
