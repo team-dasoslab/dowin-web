@@ -4,6 +4,14 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockGetMyWorkspace = vi.fn();
+const mockCookiesGet = vi.fn();
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(() => ({
+    get: mockCookiesGet,
+  })),
+  headers: vi.fn(() => new Headers()),
+}));
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -71,6 +79,6 @@ describe("GET /api/workspaces/me", () => {
         isOverFreeMemberLimit: true,
       }),
     );
-    expect(mockGetMyWorkspace).toHaveBeenCalledWith(7);
+    expect(mockGetMyWorkspace).toHaveBeenCalledWith(7, undefined);
   });
 });

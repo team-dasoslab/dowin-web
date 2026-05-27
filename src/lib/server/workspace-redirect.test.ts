@@ -4,6 +4,14 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockFindUserWorkspace = vi.fn();
 const mockRedirect = vi.fn();
+const mockCookiesGet = vi.fn();
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(() => ({
+    get: mockCookiesGet,
+  })),
+  headers: vi.fn(() => new Headers()),
+}));
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -17,6 +25,8 @@ vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
   WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
     return {
       findUserWorkspace: mockFindUserWorkspace,
+      resolveIdByUid: vi.fn(),
+      findMembership: vi.fn(),
     };
   }),
 }));
@@ -30,6 +40,7 @@ describe("workspace redirect", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockResolvedValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockCookiesGet.mockReturnValue(undefined);
   });
 
   it("기본 워크스페이스 public uid를 반환한다", async () => {

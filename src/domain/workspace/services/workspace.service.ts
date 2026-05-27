@@ -160,8 +160,23 @@ export class WorkspaceService {
     }));
   }
 
-  async getMyWorkspace(userId: number): Promise<WorkspaceWithPlanLimits> {
-    const workspace = await this.storage.findUserWorkspace(userId);
+  async getMyWorkspace(userId: number, currentWorkspaceUid?: string): Promise<WorkspaceWithPlanLimits> {
+    let workspace = null;
+
+    if (currentWorkspaceUid) {
+      const internalId = await this.storage.resolveIdByUid(currentWorkspaceUid);
+      if (internalId) {
+        const membership = await this.storage.findMembership(internalId, userId);
+        if (membership) {
+          workspace = await this.storage.findWorkspaceById(internalId);
+        }
+      }
+    }
+
+    if (!workspace) {
+      workspace = await this.storage.findUserWorkspace(userId);
+    }
+
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }

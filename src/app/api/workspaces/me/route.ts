@@ -5,6 +5,7 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { cookies } from "next/headers";
 
 export const GET = withErrorHandler(async () => {
   const { env } = getCloudflareContext();
@@ -17,6 +18,9 @@ export const GET = withErrorHandler(async () => {
     return await apiError("UNAUTHORIZED");
   }
 
-  const workspace = await service.getMyWorkspace(session.userId);
+  const cookieStore = await cookies();
+  const currentWorkspaceUid = cookieStore.get("dowin_workspace_id")?.value;
+
+  const workspace = await service.getMyWorkspace(session.userId, currentWorkspaceUid);
   return apiSuccess(workspace);
 });
