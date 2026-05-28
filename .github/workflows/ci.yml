@@ -35,6 +35,9 @@ jobs:
       - name: Run lint
         run: yarn lint
 
+      - name: Run tsc
+        run: yarn tsc
+
       - name: Run tests
         run: yarn test --run
 

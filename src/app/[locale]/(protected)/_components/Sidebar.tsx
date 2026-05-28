@@ -31,7 +31,7 @@ export function Sidebar() {
   }) : [];
 
   const mobileLinks = filteredLinks.filter(
-    (link) => link.translationKey !== "weeklyReport",
+    (link) => !["weeklyReport", "workspaceSettings"].includes(link.translationKey),
   );
 
   const getIsActive = (href: string) => {
@@ -52,18 +52,20 @@ export function Sidebar() {
     );
   };
 
-  // Main tab paths where the bottom navigation should be visible
   const mainTabPaths = [
-    "/",
     "/dashboard",
     "/dashboard/my",
     "/report",
-    workspaceId ? `/${workspaceId}/setup` : "/setup",
-    workspaceId ? `/${workspaceId}/scoreboards` : "/scoreboards",
-    workspaceId ? `/${workspaceId}/profile` : "/profile",
+    "/setup",
+    "/scoreboards",
+    "/workspace/settings",
+    "/profile",
   ];
 
-  const isMainTab = mainTabPaths.includes(pathname);
+  const isMainTab =
+    pathname === "/" ||
+    pathname === `/${workspaceId}` ||
+    mainTabPaths.some((p) => pathname.includes(p));
 
   return (
     <>

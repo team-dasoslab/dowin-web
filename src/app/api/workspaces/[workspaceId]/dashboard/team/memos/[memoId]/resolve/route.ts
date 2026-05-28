@@ -8,13 +8,8 @@ import { getSessionWithRefresh } from "@/lib/server/auth";
 import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { NextResponse } from "next/server";
-import { z } from "zod";
 
-const memoParamsSchema = z.object({
-  workspaceId: z.string().min(1),
-  memoId: z.string().min(1),
-});
+
 
 export const PATCH = withErrorHandler(
   async (
@@ -31,7 +26,6 @@ export const PATCH = withErrorHandler(
 
     const { workspaceId, memoId } = await contextParams.params;
     const memoIdValue = Number(memoId);
-    const validatedParams = memoParamsSchema.safeParse({ workspaceId, memoId });
     const parsed = dashboardTeamMemoResolveSchema.safeParse(await request.json());
     const workspaceStorage = new WorkspaceStorage(db);
     const activeWorkspaceId = await workspaceStorage.resolveIdByUid(workspaceId);

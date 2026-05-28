@@ -11,6 +11,7 @@ import { ProductUpdateCard } from "@/app/[locale]/(protected)/[workspaceId]/dash
 import { ScoreboardOverviewSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ScoreboardOverviewSection";
 import { WeeklyBoardSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/WeeklyBoardSection";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
+import { useLoginPushPrompt } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useLoginPushPrompt";
 import { useMyDashboardPageState } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useMyDashboardPageState";
 import { type CelebrationLevel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-celebration";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
@@ -95,6 +96,8 @@ export default function MyDashboardPage() {
   });
   const monthWeeks = getMonthCalendarWeeks(selectedDate);
   const lastTrackedViewRef = useRef<string | null>(null);
+
+  useLoginPushPrompt();
 
   const [activeSection, setActiveSection] = useState("overview");
 

@@ -2,6 +2,7 @@
 
 import {
   deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
   putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
   useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
@@ -31,6 +32,9 @@ type UseDashboardLogMutationParams = {
   weeklyLogsQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey
   > | null;
+  monthlyLogsQueryKey: ReturnType<
+    typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey
+  > | null;
   workspaceId: string;
 };
 
@@ -40,6 +44,7 @@ export const useDashboardLogMutation = ({
   showToast,
   weeklyById,
   weeklyLogsQueryKey,
+  monthlyLogsQueryKey,
   workspaceId,
 }: UseDashboardLogMutationParams) => {
   const t = useTranslations("Dashboard.My");
@@ -65,13 +70,17 @@ export const useDashboardLogMutation = ({
   };
 
   const invalidateToggleQueries = async (context?: ToggleLogContext) => {
-    if (!context?.weeklyLogsQueryKey) {
-      return;
+    if (context?.weeklyLogsQueryKey) {
+      await queryClient.invalidateQueries({
+        queryKey: context.weeklyLogsQueryKey,
+      });
     }
 
-    await queryClient.invalidateQueries({
-      queryKey: context.weeklyLogsQueryKey,
-    });
+    if (context?.monthlyLogsQueryKey) {
+      await queryClient.invalidateQueries({
+        queryKey: context.monthlyLogsQueryKey,
+      });
+    }
   };
 
   const createToggleLogContext = (
@@ -98,6 +107,7 @@ export const useDashboardLogMutation = ({
       currentLogKey,
       previousWeeklyLogs,
       weeklyLogsQueryKey,
+      monthlyLogsQueryKey,
     };
   };
 
@@ -125,7 +135,7 @@ export const useDashboardLogMutation = ({
     ToggleLogContext
   >({
     mutation: {
-      mutationFn: async ({ leadMeasureId, date, data }: any) => {
+      mutationFn: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: boolean } }) => {
         const response = await putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(
           workspaceId,
           leadMeasureId,
@@ -139,17 +149,17 @@ export const useDashboardLogMutation = ({
 
         return response;
       },
-      onMutate: async ({ leadMeasureId, date, data }: any) => {
+      onMutate: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: boolean } }) => {
         await queryClient.cancelQueries({
           queryKey: weeklyLogsQueryKey ?? undefined,
         });
 
         return createToggleLogContext(leadMeasureId, date, data.value);
       },
-      onError: (error: any, _variables: any, context: any) => {
+      onError: (error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
         handleToggleLogError(error, context);
       },
-      onSettled: async (_data: any, _error: any, _variables: any, context: any) => {
+      onSettled: async (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
         await handleToggleLogSettled(context);
       },
     },
@@ -160,7 +170,7 @@ export const useDashboardLogMutation = ({
     ToggleLogContext
   >({
     mutation: {
-      mutationFn: async ({ leadMeasureId, date }: any) => {
+      mutationFn: async ({ leadMeasureId, date }: { leadMeasureId: number; date: string }) => {
         const response = await deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(
           workspaceId,
           leadMeasureId,
@@ -173,17 +183,17 @@ export const useDashboardLogMutation = ({
 
         return response;
       },
-      onMutate: async ({ leadMeasureId, date }: any) => {
+      onMutate: async ({ leadMeasureId, date }: { leadMeasureId: number; date: string }) => {
         await queryClient.cancelQueries({
           queryKey: weeklyLogsQueryKey ?? undefined,
         });
 
         return createToggleLogContext(leadMeasureId, date, null);
       },
-      onError: (error: any, _variables: any, context: any) => {
+      onError: (error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
         handleToggleLogError(error, context);
       },
-      onSettled: async (_data: any, _error: any, _variables: any, context: any) => {
+      onSettled: async (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
         await handleToggleLogSettled(context);
       },
     },

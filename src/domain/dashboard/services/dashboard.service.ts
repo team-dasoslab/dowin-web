@@ -1,4 +1,4 @@
-import { NotFoundError, ForbiddenError } from "@/lib/server/errors";
+import { ForbiddenError } from "@/lib/server/errors";
 
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<
@@ -54,7 +54,7 @@ export class DashboardService {
     private workspaceStorage: WorkspaceLookupPort,
     private scoreboardStorage: ScoreboardLookupPort,
     private dailyLogStorage: DailyLogLookupPort,
-  ) {}
+  ) { }
 
   async getTeamDashboard(context: WorkspaceAccessContext, weekStart?: string) {
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
@@ -148,162 +148,162 @@ function buildTeamDashboard({
   scoreboards: TeamScoreboard[];
   logs: DailyLogLookup[];
 }) {
-    const weekDates = getWeekDates(normalizedWeekStart);
-    const weekEnd = weekDates[6];
-    const normalizedMonthStart = normalizeMonthStart(normalizedWeekStart);
-    const monthDates = getMonthDates(normalizedMonthStart);
-    const monthEnd = monthDates[monthDates.length - 1];
-    const sortedMembers = [...members].sort((a, b) => {
-      const aPriority = a.userId === userId ? 0 : 1;
-      const bPriority = b.userId === userId ? 0 : 1;
-      return aPriority - bPriority;
-    });
-    const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
+  const weekDates = getWeekDates(normalizedWeekStart);
+  const weekEnd = weekDates[6];
+  const normalizedMonthStart = normalizeMonthStart(normalizedWeekStart);
+  const monthDates = getMonthDates(normalizedMonthStart);
+  const monthEnd = monthDates[monthDates.length - 1];
+  const sortedMembers = [...members].sort((a, b) => {
+    const aPriority = a.userId === userId ? 0 : 1;
+    const bPriority = b.userId === userId ? 0 : 1;
+    return aPriority - bPriority;
+  });
+  const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
 
-    const scoreboardsByUserId = new Map(
-      scoreboards.map((scoreboard) => [scoreboard.userId, scoreboard]),
-    );
+  const scoreboardsByUserId = new Map(
+    scoreboards.map((scoreboard) => [scoreboard.userId, scoreboard]),
+  );
 
-    return {
-      workspaceId: workspace.id,
-      workspaceName: workspace.name,
-      weekStart: normalizedWeekStart,
-      weekEnd,
-      members: sortedMembers.map((member) => {
-        const scoreboard = scoreboardsByUserId.get(member.userId);
+  return {
+    workspaceId: workspace.id,
+    workspaceName: workspace.name,
+    weekStart: normalizedWeekStart,
+    weekEnd,
+    members: sortedMembers.map((member) => {
+      const scoreboard = scoreboardsByUserId.get(member.userId);
 
-        if (!scoreboard) {
-          return {
-            userId: member.userId,
-            nickname: member.user?.nickname ?? "이름 없음",
-            avatarKey: member.user?.avatarKey ?? null,
-            role: member.role,
-            hasScoreboard: false,
-            scoreboardId: null,
-            goalName: null,
-            lagMeasure: null,
-            achieved: 0,
-            total: 0,
-            achievementRate: 0,
-            weeklyAchievementRate: 0,
-            monthlyAchievementRate: 0,
-            isWinning: false,
-            leadMeasures: [],
-          };
-        }
-
-        const leadMeasures = scoreboard.leadMeasures
-          .filter((leadMeasure) => leadMeasure.status === "ACTIVE")
-          .map((leadMeasure) => {
-            const logMap = Object.fromEntries(
-              weekDates.map((date) => [date, null as boolean | null]),
-            );
-            const measureLogs = logsByLeadMeasure.get(leadMeasure.id) ?? [];
-            const weeklyLogs = measureLogs.filter(
-              (log) => log.logDate >= normalizedWeekStart && log.logDate <= weekEnd,
-            );
-
-            for (const log of weeklyLogs) {
-              logMap[log.logDate] = log.value;
-            }
-
-            const achieved = weeklyLogs.filter((log) => log.value).length;
-            const achievementRate = getAchievementRate(
-              achieved,
-              leadMeasure.targetValue,
-            );
-
-            return {
-              id: leadMeasure.id,
-              name: leadMeasure.name,
-              targetValue: leadMeasure.targetValue,
-              period: leadMeasure.period,
-              tags: leadMeasure.tags,
-              achieved,
-              achievementRate,
-              logs: logMap,
-            };
-          });
-
-        const weeklyLeadMeasures = leadMeasures.filter(
-          (leadMeasure) => leadMeasure.period !== "MONTHLY",
-        );
-        const achieved = weeklyLeadMeasures.reduce(
-          (sum, leadMeasure) =>
-            sum + Math.min(leadMeasure.achieved, leadMeasure.targetValue),
-          0,
-        );
-        const total = weeklyLeadMeasures.reduce(
-          (sum, leadMeasure) => sum + leadMeasure.targetValue,
-          0,
-        );
-        const achievementRate = total > 0 ? Math.round((achieved / total) * 100) : 0;
-        const monthlyMeasures = leadMeasures.filter(
-          (leadMeasure) => leadMeasure.period === "WEEKLY" || leadMeasure.period === "MONTHLY",
-        );
-        const weekStartsInMonth = getWeekStartsInMonth(monthDates);
-        const monthlyAchieved = monthlyMeasures.reduce((sum, leadMeasure) => {
-          const truthyLogs = (logsByLeadMeasure.get(leadMeasure.id) ?? []).filter(
-            (log) =>
-              log.value &&
-              log.logDate >= normalizedMonthStart &&
-              log.logDate <= monthEnd,
-          );
-
-          if (leadMeasure.period === "MONTHLY") {
-            return sum + Math.min(truthyLogs.length, leadMeasure.targetValue);
-          }
-
-          const weeklyAchieved = weekStartsInMonth.reduce((weekSum, monthWeekStart) => {
-            const weekTrueCount = truthyLogs.filter(
-              (log) => getWeekStart(log.logDate) === monthWeekStart,
-            ).length;
-
-            return weekSum + Math.min(weekTrueCount, leadMeasure.targetValue);
-          }, 0);
-
-          return sum + weeklyAchieved;
-        }, 0);
-        const monthlyTotal = monthlyMeasures.reduce((sum, leadMeasure) => {
-          if (leadMeasure.period === "MONTHLY") {
-            return sum + leadMeasure.targetValue;
-          }
-
-          return sum + leadMeasure.targetValue * weekStartsInMonth.length;
-        }, 0);
-        const monthlyAchievementRate =
-          monthlyTotal > 0
-            ? Math.round((monthlyAchieved / monthlyTotal) * 100)
-            : 0;
-
+      if (!scoreboard) {
         return {
           userId: member.userId,
           nickname: member.user?.nickname ?? "이름 없음",
           avatarKey: member.user?.avatarKey ?? null,
           role: member.role,
-          hasScoreboard: true,
-          scoreboardId: scoreboard.id,
-          goalName: scoreboard.goalName,
-          lagMeasure: scoreboard.lagMeasure,
-          achieved,
-          total,
-          achievementRate,
-          weeklyAchievementRate: achievementRate,
-          monthlyAchievementRate,
-          isWinning: achievementRate >= 80,
-          leadMeasures: leadMeasures.map((leadMeasure) => ({
+          hasScoreboard: false,
+          scoreboardId: null,
+          goalName: null,
+          lagMeasure: null,
+          achieved: 0,
+          total: 0,
+          achievementRate: 0,
+          weeklyAchievementRate: 0,
+          monthlyAchievementRate: 0,
+          isWinning: false,
+          leadMeasures: [],
+        };
+      }
+
+      const leadMeasures = scoreboard.leadMeasures
+        .filter((leadMeasure) => leadMeasure.status === "ACTIVE")
+        .map((leadMeasure) => {
+          const logMap = Object.fromEntries(
+            weekDates.map((date) => [date, null as boolean | null]),
+          );
+          const measureLogs = logsByLeadMeasure.get(leadMeasure.id) ?? [];
+          const weeklyLogs = measureLogs.filter(
+            (log) => log.logDate >= normalizedWeekStart && log.logDate <= weekEnd,
+          );
+
+          for (const log of weeklyLogs) {
+            logMap[log.logDate] = log.value;
+          }
+
+          const achieved = weeklyLogs.filter((log) => log.value).length;
+          const achievementRate = getAchievementRate(
+            achieved,
+            leadMeasure.targetValue,
+          );
+
+          return {
             id: leadMeasure.id,
             name: leadMeasure.name,
-            period: leadMeasure.period,
             targetValue: leadMeasure.targetValue,
+            period: leadMeasure.period,
             tags: leadMeasure.tags,
-            achieved: leadMeasure.achieved,
-            achievementRate: leadMeasure.achievementRate,
-            logs: leadMeasure.logs,
-          })),
-        };
-      }),
-    };
+            achieved,
+            achievementRate,
+            logs: logMap,
+          };
+        });
+
+      const weeklyLeadMeasures = leadMeasures.filter(
+        (leadMeasure) => leadMeasure.period !== "MONTHLY",
+      );
+      const achieved = weeklyLeadMeasures.reduce(
+        (sum, leadMeasure) =>
+          sum + Math.min(leadMeasure.achieved, leadMeasure.targetValue),
+        0,
+      );
+      const total = weeklyLeadMeasures.reduce(
+        (sum, leadMeasure) => sum + leadMeasure.targetValue,
+        0,
+      );
+      const achievementRate = total > 0 ? Math.round((achieved / total) * 100) : 0;
+      const monthlyMeasures = leadMeasures.filter(
+        (leadMeasure) => leadMeasure.period === "WEEKLY" || leadMeasure.period === "MONTHLY",
+      );
+      const weekStartsInMonth = getWeekStartsInMonth(monthDates);
+      const monthlyAchieved = monthlyMeasures.reduce((sum, leadMeasure) => {
+        const truthyLogs = (logsByLeadMeasure.get(leadMeasure.id) ?? []).filter(
+          (log) => log.value
+        );
+
+        if (leadMeasure.period === "MONTHLY") {
+          const monthlyLogsCount = truthyLogs.filter(
+            (log) => log.logDate >= normalizedMonthStart && log.logDate <= monthEnd
+          ).length;
+          return sum + Math.min(monthlyLogsCount, leadMeasure.targetValue);
+        }
+
+        const weeklyAchieved = weekStartsInMonth.reduce((weekSum, monthWeekStart) => {
+          const weekTrueCount = truthyLogs.filter(
+            (log) => getWeekStart(log.logDate) === monthWeekStart,
+          ).length;
+
+          return weekSum + Math.min(weekTrueCount, leadMeasure.targetValue);
+        }, 0);
+
+        return sum + weeklyAchieved;
+      }, 0);
+      const monthlyTotal = monthlyMeasures.reduce((sum, leadMeasure) => {
+        if (leadMeasure.period === "MONTHLY") {
+          return sum + leadMeasure.targetValue;
+        }
+
+        return sum + leadMeasure.targetValue * weekStartsInMonth.length;
+      }, 0);
+      const monthlyAchievementRate =
+        monthlyTotal > 0
+          ? Math.round((monthlyAchieved / monthlyTotal) * 100)
+          : 0;
+
+      return {
+        userId: member.userId,
+        nickname: member.user?.nickname ?? "이름 없음",
+        avatarKey: member.user?.avatarKey ?? null,
+        role: member.role,
+        hasScoreboard: true,
+        scoreboardId: scoreboard.id,
+        goalName: scoreboard.goalName,
+        lagMeasure: scoreboard.lagMeasure,
+        achieved,
+        total,
+        achievementRate,
+        weeklyAchievementRate: achievementRate,
+        monthlyAchievementRate,
+        isWinning: achievementRate >= 80,
+        leadMeasures: leadMeasures.map((leadMeasure) => ({
+          id: leadMeasure.id,
+          name: leadMeasure.name,
+          period: leadMeasure.period,
+          targetValue: leadMeasure.targetValue,
+          tags: leadMeasure.tags,
+          achieved: leadMeasure.achieved,
+          achievementRate: leadMeasure.achievementRate,
+          logs: leadMeasure.logs,
+        })),
+      };
+    }),
+  };
 }
 
 function buildWeeklyTrend({
@@ -396,10 +396,15 @@ function getDashboardLogRange(weekStart: string) {
   const monthStart = normalizeMonthStart(weekStart);
   const monthDates = getMonthDates(monthStart);
   const monthEnd = monthDates[monthDates.length - 1];
+  const weekStartsInMonth = getWeekStartsInMonth(monthDates);
+  const monthFirstWeekStart = weekStartsInMonth[0] ?? monthStart;
+
+  const startRange = weekStart < monthFirstWeekStart ? weekStart : monthFirstWeekStart;
+  const endRange = weekEnd > monthEnd ? weekEnd : monthEnd;
 
   return {
-    start: weekStart < monthStart ? weekStart : monthStart,
-    end: weekEnd > monthEnd ? weekEnd : monthEnd,
+    start: startRange,
+    end: endRange,
   };
 }
 
@@ -436,7 +441,7 @@ function assertHistoryLimit(context: WorkspaceAccessContext, requestedDate: stri
 
   const now = new Date();
   const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  
+
   const limitDate = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth() - 5, 1));
   const limitDateString = `${limitDate.getUTCFullYear()}-${String(limitDate.getUTCMonth() + 1).padStart(2, '0')}-01`;
 

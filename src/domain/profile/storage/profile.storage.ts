@@ -1,6 +1,6 @@
 import { users, workspaceMembers, workspaces } from "@/db/schema";
 import { getDb } from "@/db";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export type ProfileRecord = {
   id: number;

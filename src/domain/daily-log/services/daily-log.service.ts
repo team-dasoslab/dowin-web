@@ -26,8 +26,8 @@ type LeadMeasureStoragePort = {
     workspaceId: number,
   ): Promise<
     | (LeadMeasureRecord & {
-        scoreboard: { id: number; status: "ACTIVE" | "ARCHIVED" };
-      })
+      scoreboard: { id: number; status: "ACTIVE" | "ARCHIVED" };
+    })
     | undefined
   >;
   findLeadMeasuresByScoreboard(
@@ -47,7 +47,7 @@ export class DailyLogService {
     private scoreboardStorage: ScoreboardStoragePort,
     private leadMeasureStorage: LeadMeasureStoragePort,
     private dailyLogStorage: DailyLogStoragePort,
-  ) {}
+  ) { }
 
   async upsertLog(
     workspaceUid: string,
@@ -86,19 +86,19 @@ export class DailyLogService {
     workspaceUid: string,
     scoreboardId: number,
     userId: number,
-  weekStart?: string,
+    weekStart?: string,
   ): Promise<{
     weekStart: string;
     weekEnd: string;
-      leadMeasures: Array<{
-        id: number;
-        name: string;
-        period: "WEEKLY" | "MONTHLY";
-        targetValue: number;
-        tags: LeadMeasureTagRecord[];
-        logs: Record<string, boolean | null>;
-        achieved: number;
-        achievementRate: number;
+    leadMeasures: Array<{
+      id: number;
+      name: string;
+      period: "WEEKLY" | "MONTHLY";
+      targetValue: number;
+      tags: LeadMeasureTagRecord[];
+      logs: Record<string, boolean | null>;
+      achieved: number;
+      achievementRate: number;
       guide: {
         kind: "adjust" | "change";
         description: string;
@@ -161,13 +161,13 @@ export class DailyLogService {
           achievementRate: getAchievementRate(achieved, measure.targetValue),
           guide: shouldIncludeGuide
             ? getWeeklyGuide({
-                createdAt: measure.createdAt,
-                currentAchieved: achieved,
-                period: measure.period,
-                previousAchieved: previousWeekLogs.filter((log) => log.value).length,
-                previousWeekStart,
-                targetValue: measure.targetValue,
-              })
+              createdAt: measure.createdAt,
+              currentAchieved: achieved,
+              period: measure.period,
+              previousAchieved: previousWeekLogs.filter((log) => log.value).length,
+              previousWeekStart,
+              targetValue: measure.targetValue,
+            })
             : null,
         };
       }),
@@ -192,7 +192,7 @@ export class DailyLogService {
     leadMeasures: Array<{
       id: number;
       name: string;
-      period: "WEEKLY" | "MONTHLY";
+      period: "DAILY" | "WEEKLY" | "MONTHLY";
       targetValue: number;
       tags: LeadMeasureTagRecord[];
       logs: Record<string, boolean | null>;
@@ -210,6 +210,11 @@ export class DailyLogService {
 
     const monthDates = getMonthDates(normalizedMonthStart);
     const monthEnd = monthDates[monthDates.length - 1];
+    const weekStarts = getWeekStartsInMonth(monthDates);
+
+    const fetchStart = weekStarts[0] ?? normalizedMonthStart;
+    const fetchEnd = addDays(weekStarts[weekStarts.length - 1] ?? normalizedMonthStart, 6);
+
     const measures = (
       await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
         scoreboardId,
@@ -218,15 +223,14 @@ export class DailyLogService {
     ).filter(
       (
         measure,
-      ): measure is LeadMeasureRecordWithTags & { period: "WEEKLY" | "MONTHLY" } =>
-        measure.period === "WEEKLY" || measure.period === "MONTHLY",
+      ): measure is LeadMeasureRecordWithTags & { period: "DAILY" | "WEEKLY" | "MONTHLY" } =>
+        measure.period === "DAILY" || measure.period === "WEEKLY" || measure.period === "MONTHLY",
     );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
-      normalizedMonthStart,
-      monthEnd,
+      fetchStart,
+      fetchEnd,
     );
-    const weekStarts = getWeekStartsInMonth(monthDates);
     const leadMeasures = measures.map((measure) => {
       const measureLogs = logs.filter((log) => log.leadMeasureId === measure.id);
       const logMap = Object.fromEntries(
@@ -234,10 +238,12 @@ export class DailyLogService {
       );
 
       for (const log of measureLogs) {
-        logMap[log.logDate] = log.value;
+        if (log.logDate >= normalizedMonthStart && log.logDate <= monthEnd) {
+          logMap[log.logDate] = log.value;
+        }
       }
 
-      const achieved = measureLogs.filter((log) => log.value).length;
+      const achieved = measureLogs.filter((log) => log.logDate >= normalizedMonthStart && log.logDate <= monthEnd && log.value).length;
 
       return {
         id: measure.id,
@@ -256,7 +262,10 @@ export class DailyLogService {
       );
 
       if (measure.period === "MONTHLY") {
-        return accumulator + Math.min(measureLogs.length, measure.targetValue);
+        const monthlyLogsCount = measureLogs.filter(
+          (log) => log.logDate >= normalizedMonthStart && log.logDate <= monthEnd
+        ).length;
+        return accumulator + Math.min(monthlyLogsCount, measure.targetValue);
       }
 
       const weeklyAchieved = weekStarts.reduce((weekAccumulator, weekStart) => {
@@ -500,7 +509,7 @@ function assertHistoryLimit(planCode: string, requestedDate: string) {
 
   const now = new Date();
   const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  
+
   const limitDate = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth() - 5, 1));
   const limitDateString = `${limitDate.getUTCFullYear()}-${String(limitDate.getUTCMonth() + 1).padStart(2, '0')}-01`;
 
