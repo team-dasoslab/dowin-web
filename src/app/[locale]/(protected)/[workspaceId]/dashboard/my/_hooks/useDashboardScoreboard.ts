@@ -29,7 +29,7 @@ export const useDashboardScoreboard = (workspaceId: string) => {
   const {
     activeLeadMeasures,
     activeScoreboard,
-    dashboardTeamQueryKey,
+    activeScoreboard,
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
@@ -41,7 +41,7 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     monthLabel,
     monthlyLeadMeasures,
     monthlyLogsError,
-    monthlyLogsQueryKey,
+    monthlyLogsError,
     monthlyOverallRate,
     monthlySummary,
     scoreboardError,

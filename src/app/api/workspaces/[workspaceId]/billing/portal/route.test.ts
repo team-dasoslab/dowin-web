@@ -45,7 +45,7 @@ describe("GET /api/billing/portal", () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any);
+    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as unknown as { params: Promise<Record<string, string>> });
 
     expect(response.status).toBe(401);
   });
@@ -55,7 +55,7 @@ describe("GET /api/billing/portal", () => {
     mockGetPortalUrl.mockResolvedValue("https://example.com/portal");
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any);
+    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as unknown as { params: Promise<Record<string, string>> });
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe("https://example.com/portal");
@@ -66,7 +66,7 @@ describe("GET /api/billing/portal", () => {
     mockGetPortalUrl.mockRejectedValue(new ConflictError("BILLING_NOT_READY"));
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as any);
+    const response = await GET(new Request("http://localhost"), { params: Promise.resolve({ workspaceId: "ws_uid", id: "1" }) } as unknown as { params: Promise<Record<string, string>> });
     const body = (await response.json()) as { error: { code: string } };
 
     expect(response.status).toBe(409);

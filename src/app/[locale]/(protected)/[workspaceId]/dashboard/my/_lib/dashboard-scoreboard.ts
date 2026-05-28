@@ -59,10 +59,10 @@ export const computeWeeklyRate = (
   }>,
 ): number => {
   const weeklyTargetMeasures = activeLeadMeasures.filter(
-    (leadMeasure: any) => leadMeasure.period !== "MONTHLY",
+    (leadMeasure: { period?: string }) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure: any) => [leadMeasure.id ?? null, leadMeasure]),
+    weeklyLeadMeasures.map((leadMeasure: { id?: number }) => [leadMeasure.id ?? null, leadMeasure]),
   );
 
   const achieved = weeklyTargetMeasures.reduce((accumulator, leadMeasure) => {
@@ -94,7 +94,7 @@ export const updateWeeklyLogsCache = (
     ...previous,
     data: {
       ...previous.data,
-      leadMeasures: previous.data.leadMeasures?.map((leadMeasure: any) => {
+      leadMeasures: previous.data.leadMeasures?.map((leadMeasure: { id?: number | string; logs?: Record<string, DailyLogValue>; targetValue?: number | null }) => {
         if (toNumberId(leadMeasure.id) !== leadMeasureId) {
           return leadMeasure;
         }
@@ -108,7 +108,7 @@ export const updateWeeklyLogsCache = (
         const achievementRate =
           targetValue > 0
             ? Math.round((Math.min(achieved, targetValue) / targetValue) * 1000) /
-              10
+            10
             : 0;
 
         return {

@@ -1,4 +1,4 @@
-import { NotFoundError, ForbiddenError } from "@/lib/server/errors";
+import { ForbiddenError } from "@/lib/server/errors";
 
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<

@@ -29,7 +29,7 @@ export const useScoreboardArchive = () => {
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount: number, error: any) =>
+      retry: (failureCount: number, error: unknown) =>
         getApiErrorStatus(error) !== 404 && failureCount < 3,
     },
   });
@@ -42,7 +42,7 @@ export const useScoreboardArchive = () => {
     error: activeScoreboardError,
   } = useGetWorkspacesWorkspaceIdScoreboardsActive(workspaceId, {
     query: {
-      retry: (failureCount: number, error: any) =>
+      retry: (failureCount: number, error: unknown) =>
         getApiErrorStatus(error) !== 404 && failureCount < 1,
       enabled: !!workspaceId,
     },

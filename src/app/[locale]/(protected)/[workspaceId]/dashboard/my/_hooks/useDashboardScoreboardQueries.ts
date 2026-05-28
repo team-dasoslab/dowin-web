@@ -46,7 +46,7 @@ export const useDashboardScoreboardQueries = ({
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount: number, error: any) =>
+      retry: (failureCount: number, error: unknown) =>
         getApiErrorStatus(error) !== 404 && failureCount < 3,
     },
   });
@@ -57,7 +57,7 @@ export const useDashboardScoreboardQueries = ({
     error: scoreboardError,
   } = useGetWorkspacesWorkspaceIdScoreboardsActive(workspaceId, {
     query: {
-      retry: (failureCount: number, error: any) =>
+      retry: (failureCount: number, error: unknown) =>
         getApiErrorStatus(error) !== 404 && failureCount < 1,
     },
   });
@@ -80,18 +80,18 @@ export const useDashboardScoreboardQueries = ({
   const weeklyLogsQueryKey =
     scoreboardId !== null
       ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey(
-          workspaceId,
-          scoreboardId,
-          weeklyLogsParams,
-        )
+        workspaceId,
+        scoreboardId,
+        weeklyLogsParams,
+      )
       : null;
   const monthlyLogsQueryKey =
     scoreboardId !== null
       ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey(
-          workspaceId,
-          scoreboardId,
-          monthlyLogsParams,
-        )
+        workspaceId,
+        scoreboardId,
+        monthlyLogsParams,
+      )
       : null;
   const dashboardTeamQueryKey = getGetWorkspacesWorkspaceIdDashboardTeamQueryKey(
     workspaceId,
@@ -110,7 +110,7 @@ export const useDashboardScoreboardQueries = ({
     {
       query: {
         enabled: scoreboardId !== null && selectedView === "week",
-        retry: (failureCount: number, error: any) =>
+        retry: (failureCount: number, error: unknown) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
     },
@@ -125,7 +125,7 @@ export const useDashboardScoreboardQueries = ({
     {
       query: {
         enabled: scoreboardId !== null && selectedView === "month",
-        retry: (failureCount: number, error: any) =>
+        retry: (failureCount: number, error: unknown) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
     },
@@ -140,8 +140,8 @@ export const useDashboardScoreboardQueries = ({
       queryKey:
         scoreboardId !== null
           ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey(workspaceId, scoreboardId, {
-              weekStart,
-            })
+            weekStart,
+          })
           : ["dashboard", "weekly-trend", weekStart],
       staleTime: 60_000,
       retry: 0,
@@ -166,20 +166,20 @@ export const useDashboardScoreboardQueries = ({
       ? monthlyLogsResponse.data.monthLabel
       : undefined;
   const activeLeadMeasures = (activeScoreboard?.leadMeasures ?? []).filter(
-    (leadMeasure: any) => leadMeasure.status === "ACTIVE",
+    (leadMeasure: { status?: string }) => leadMeasure.status === "ACTIVE",
   );
   const weeklyTargetMeasures = activeLeadMeasures.filter(
-    (leadMeasure: any) => leadMeasure.period !== "MONTHLY",
+    (leadMeasure: { period?: string }) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure: any) => [
+    weeklyLeadMeasures.map((leadMeasure: { id?: number | string }) => [
       toNumberId(leadMeasure.id),
       leadMeasure,
     ]),
   );
 
   const weeklyAchieved = weeklyTargetMeasures.reduce(
-    (accumulator: any, leadMeasure: any) => {
+    (accumulator: number, leadMeasure: { id?: number | string; targetValue?: number | null }) => {
       const weekly = weeklyById.get(toNumberId(leadMeasure.id));
       const targetValue = leadMeasure.targetValue ?? 0;
       return accumulator + Math.min(weekly?.achieved ?? 0, targetValue);
@@ -187,7 +187,7 @@ export const useDashboardScoreboardQueries = ({
     0,
   );
   const weeklyTotalTarget = weeklyTargetMeasures.reduce(
-    (accumulator: any, leadMeasure: any) => accumulator + (leadMeasure.targetValue ?? 0),
+    (accumulator: number, leadMeasure: { targetValue?: number | null }) => accumulator + (leadMeasure.targetValue ?? 0),
     0,
   );
   const weeklyOverallRate =
@@ -221,7 +221,7 @@ export const useDashboardScoreboardQueries = ({
     },
   );
   const weeklyGuideById = new Map(
-    weeklyLeadMeasures.map((leadMeasure: any) => [
+    weeklyLeadMeasures.map((leadMeasure: { id?: number | string; guide?: string | null }) => [
       toNumberId(leadMeasure.id),
       leadMeasure.guide ?? null,
     ]),
