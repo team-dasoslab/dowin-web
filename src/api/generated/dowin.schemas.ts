@@ -20,61 +20,6 @@ export interface User {
   locale?: UserLocale;
 }
 
-export interface SignupCheckoutRequest {
-  /**
-   * @minLength 3
-   * @maxLength 20
-   */
-  customId: string;
-  /**
-   * @minLength 1
-   * @maxLength 50
-   */
-  nickname: string;
-  password: string;
-  /**
-   * @minLength 1
-   * @maxLength 100
-   */
-  workspaceName: string;
-  /**
-   * Basic checkout에서 결제할 최초 seat 수
-   * @minimum 1
-   * @maximum 999
-   */
-  seatCount: number;
-}
-
-export interface SignupCheckoutResponse {
-  /** 결제 성공 후 가입 완료 검증에 사용할 pending signup intent ID */
-  signupIntentId: string;
-  /** Polar Basic seat checkout URL */
-  checkoutUrl: string;
-}
-
-export interface SignupCompleteRequest {
-  /**
-   * /auth/signup/checkout 응답으로 받은 pending signup intent ID
-   * @minLength 1
-   */
-  signupIntentId: string;
-  /**
-   * Polar checkout 성공 callback에서 전달된 checkout ID
-   * @minLength 1
-   */
-  checkoutId: string;
-}
-
-export interface SignupCompleteResponse {
-  user: User;
-  /**
-   * 가입 직후 1회 노출되는 복원 코드 목록
-   * @minItems 8
-   * @maxItems 8
-   */
-  recoveryCodes: string[];
-}
-
 export interface RecoveryAccount {
   customId: string;
   nickname: string;
@@ -704,10 +649,10 @@ export interface WorkspaceCheckoutCompleteRequest {
    */
   workspaceCheckoutId: string;
   /**
-   * Polar checkout 성공 callback에서 전달된 checkout ID
+   * Polar checkout 성공 callback에서 전달된 checkout ID. 없으면 저장된 provider checkout ID로 검증한다.
    * @minLength 1
    */
-  checkoutId: string;
+  checkoutId?: string;
 }
 
 export interface WorkspaceCheckoutCompleteResponse {

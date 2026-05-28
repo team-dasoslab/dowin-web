@@ -51,9 +51,7 @@ export type PolarBillingClient = {
     seats?: number;
     successPath?:
       | "/billing/polar/success"
-      | "/auth/signup/success"
       | "/workspace/checkout/success";
-    signupIntentId?: string;
     workspaceCheckoutId?: string;
   }): Promise<{ checkoutUrl: string; checkoutId: string | null }>;
   createCustomerSession(
@@ -108,18 +106,15 @@ function buildCheckoutCallbackUrl({
   path,
   locale,
   billing,
-  signupIntentId,
   workspaceCheckoutId,
 }: {
   appBaseUrl: string;
   path:
     | "/billing/polar/success"
     | "/billing/polar/return"
-    | "/auth/signup/success"
     | "/workspace/checkout/success";
   locale: "ko" | "en";
   billing?: "success";
-  signupIntentId?: string;
   workspaceCheckoutId?: string;
 }) {
   const url = new URL(`${appBaseUrl}${path}`);
@@ -129,15 +124,15 @@ function buildCheckoutCallbackUrl({
     url.searchParams.set("billing", billing);
   }
 
-  if (signupIntentId) {
-    url.searchParams.set("signup_intent_id", signupIntentId);
-  }
-
   if (workspaceCheckoutId) {
     url.searchParams.set("workspace_checkout_id", workspaceCheckoutId);
   }
 
-  return url.toString();
+  if (path !== "/billing/polar/return") {
+    url.searchParams.set("checkout_id", "{CHECKOUT_ID}");
+  }
+
+  return url.toString().replace("%7BCHECKOUT_ID%7D", "{CHECKOUT_ID}");
 }
 
 async function parsePolarResponse<T>(response: Response): Promise<T> {
@@ -184,7 +179,6 @@ export function createPolarBillingClient(
       metadata,
       seats,
       successPath = "/billing/polar/success",
-      signupIntentId,
       workspaceCheckoutId,
     }) {
       const response = await fetch(`${apiBaseUrl}/checkouts`, {
@@ -204,7 +198,6 @@ export function createPolarBillingClient(
             locale,
             billing:
               successPath === "/billing/polar/success" ? "success" : undefined,
-            signupIntentId,
             workspaceCheckoutId,
           }),
           return_url: buildCheckoutCallbackUrl({

@@ -102,77 +102,6 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /auth/signup/checkout:
-    post:
-      summary: Basic seat 가입 checkout 시작
-      tags: [Auth, Billing]
-      parameters:
-        - in: header
-          name: Idempotency-Key
-          required: true
-          schema:
-            type: string
-          description: 같은 가입 결제 요청의 중복 checkout 생성을 방지하는 멱등 키
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/SignupCheckoutRequest" }
-      responses:
-        "201":
-          description: 가입 checkout 준비 완료
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/SignupCheckoutResponse" }
-        "409":
-          description: 이미 사용 중인 아이디, 진행 중인 가입 checkout, 또는 billing 연동 미준비
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-        "422":
-          description: 입력값 또는 헤더 유효성 오류
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-
-  /auth/signup/complete:
-    post:
-      summary: Basic seat 결제 검증 후 회원가입 완료
-      tags: [Auth, Billing]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: "#/components/schemas/SignupCompleteRequest" }
-      responses:
-        "201":
-          description: 결제 검증 및 회원가입 완료
-          headers:
-            Set-Cookie:
-              schema:
-                {
-                  type: string,
-                  example: "dowin_sid=abc; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=2592000",
-                }
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/SignupCompleteResponse" }
-        "404":
-          description: 가입 intent를 찾을 수 없음
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-        "409":
-          description: 결제가 아직 완료되지 않았거나 이미 가입 완료된 intent
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-        "422":
-          description: 입력값 유효성 오류
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-
   /auth/logout:
     post:
       summary: 로그아웃
@@ -2555,75 +2484,6 @@ components:
         isFirstLogin: { type: boolean }
         locale: { type: string, enum: [ko, en] }
 
-    SignupCheckoutRequest:
-      type: object
-      required: [customId, nickname, password, workspaceName, seatCount]
-      properties:
-        customId:
-          type: string
-          minLength: 3
-          maxLength: 20
-          example: john123
-        nickname:
-          type: string
-          minLength: 1
-          maxLength: 50
-          example: 존
-        password:
-          type: string
-          format: password
-          example: "newSecurePass1!"
-        workspaceName:
-          type: string
-          minLength: 1
-          maxLength: 100
-          example: 우리 팀
-        seatCount:
-          type: integer
-          minimum: 1
-          maximum: 999
-          description: Basic checkout에서 결제할 최초 seat 수
-          example: 5
-
-    SignupCheckoutResponse:
-      type: object
-      required: [signupIntentId, checkoutUrl]
-      properties:
-        signupIntentId:
-          type: string
-          description: 결제 성공 후 가입 완료 검증에 사용할 pending signup intent ID
-        checkoutUrl:
-          type: string
-          format: uri
-          description: Polar Basic seat checkout URL
-
-    SignupCompleteRequest:
-      type: object
-      required: [signupIntentId, checkoutId]
-      properties:
-        signupIntentId:
-          type: string
-          minLength: 1
-          description: /auth/signup/checkout 응답으로 받은 pending signup intent ID
-        checkoutId:
-          type: string
-          minLength: 1
-          description: Polar checkout 성공 callback에서 전달된 checkout ID
-
-    SignupCompleteResponse:
-      type: object
-      required: [user, recoveryCodes]
-      properties:
-        user: { $ref: "#/components/schemas/User" }
-        recoveryCodes:
-          type: array
-          description: 가입 직후 1회 노출되는 복원 코드 목록
-          minItems: 8
-          maxItems: 8
-          items:
-            type: string
-            example: 6JYSB959TK
-
     RecoveryAccount:
       type: object
       required: [customId, nickname]
@@ -3168,7 +3028,7 @@ components:
 
     WorkspaceCheckoutCompleteRequest:
       type: object
-      required: [workspaceCheckoutId, checkoutId]
+      required: [workspaceCheckoutId]
       properties:
         workspaceCheckoutId:
           type: string
@@ -3177,7 +3037,7 @@ components:
         checkoutId:
           type: string
           minLength: 1
-          description: Polar checkout 성공 callback에서 전달된 checkout ID
+          description: Polar checkout 성공 callback에서 전달된 checkout ID. 없으면 저장된 provider checkout ID로 검증한다.
 
     WorkspaceCheckoutCompleteResponse:
       type: object

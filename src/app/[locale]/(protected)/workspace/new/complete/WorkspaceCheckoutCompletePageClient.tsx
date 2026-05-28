@@ -30,14 +30,14 @@ export default function WorkspaceCheckoutCompletePageClient({
     }
     hasCompletedRef.current = true;
 
-    if (!checkoutId || !workspaceCheckoutId) {
+    if (!workspaceCheckoutId) {
       setError(t("checkoutMissing"));
       return;
     }
 
     void postWorkspacesCheckoutComplete({
-      checkoutId,
       workspaceCheckoutId,
+      ...(checkoutId ? { checkoutId } : {}),
     })
       .then((response) => {
         const workspaceId =

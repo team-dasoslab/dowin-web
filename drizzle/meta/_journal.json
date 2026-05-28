@@ -211,6 +211,13 @@
       "when": 1779927779752,
       "tag": "0029_fine_the_santerians",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "6",
+      "when": 1779929152613,
+      "tag": "0030_vengeful_tarantula",
+      "breakpoints": true
     }
   ]
 }

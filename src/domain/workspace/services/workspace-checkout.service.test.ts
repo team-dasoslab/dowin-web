@@ -134,4 +134,39 @@ describe("WorkspaceCheckoutService", () => {
       }),
     );
   });
+
+  it("callback에 checkoutId가 없어도 pending row의 provider checkout id로 검증한다", async () => {
+    const polarClient = createPolarClient();
+    const storage = createStorage({
+      findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
+        id: 10,
+        uid: "pending_ws_1",
+        userId: 9,
+        workspaceName: "운영팀",
+        requestedSeatCount: 5,
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: "checkout_1",
+        expiresAt: new Date("2026-05-28T01:00:00.000Z"),
+      }),
+      provisionCompletedWorkspaceCheckout: vi.fn().mockResolvedValue({
+        id: 3,
+        uid: "ws_public",
+      }),
+    });
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      polarClient,
+    );
+
+    await service.completeWorkspaceCheckout({
+      userId: 9,
+      workspaceCheckoutId: "pending_ws_1",
+      now: new Date("2026-05-28T00:10:00.000Z"),
+    });
+
+    expect(polarClient.getCheckoutSession).toHaveBeenCalledWith({
+      checkoutId: "checkout_1",
+    });
+  });
 });

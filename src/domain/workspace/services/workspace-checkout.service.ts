@@ -166,7 +166,7 @@ export class WorkspaceCheckoutService {
   async completeWorkspaceCheckout(input: {
     userId: number;
     workspaceCheckoutId: string;
-    checkoutId: string;
+    checkoutId?: string;
     now?: Date;
   }) {
     const now = input.now ?? new Date();
@@ -197,10 +197,12 @@ export class WorkspaceCheckoutService {
       throw new ConflictError("WORKSPACE_CHECKOUT_NOT_READY");
     }
 
+    const checkoutId = input.checkoutId ?? pending.providerCheckoutId ?? "";
+
     if (
       pending.status !== "CHECKOUT_CREATED" ||
       !pending.providerCheckoutId ||
-      pending.providerCheckoutId !== input.checkoutId
+      pending.providerCheckoutId !== checkoutId
     ) {
       throw new ConflictError("WORKSPACE_CHECKOUT_NOT_READY");
     }
@@ -209,7 +211,7 @@ export class WorkspaceCheckoutService {
       throw new ConflictError("BILLING_NOT_READY");
     }
 
-    const checkout = await this.getVerifiedCheckout(input.checkoutId);
+    const checkout = await this.getVerifiedCheckout(checkoutId);
 
     if (
       checkout.status !== "succeeded" ||

@@ -29,7 +29,7 @@ export const workspaceCheckoutSchema = z.object({
 
 export const workspaceCheckoutCompleteSchema = z.object({
   workspaceCheckoutId: z.string().trim().min(1),
-  checkoutId: z.string().trim().min(1),
+  checkoutId: z.string().trim().min(1).optional(),
 });
 
 export const workspaceUpdateSchema = z.object({
