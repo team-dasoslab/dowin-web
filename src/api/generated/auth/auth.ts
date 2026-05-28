@@ -21,7 +21,6 @@ import type {
   PostAuthLoginBody,
   PostAuthRecoveryCodesVerify200,
   PostAuthRecoveryCodesVerifyBody,
-  PostAuthSignup201,
   PostAuthSignupBody,
   PutAuthPassword200,
   PutAuthPasswordBody,
@@ -141,31 +140,19 @@ export const usePostAuthLogin = <TError = ErrorResponse,
       return useMutation(getPostAuthLoginMutationOptions(options), queryClient);
     }
     /**
- * @summary 회원가입 완료 (legacy)
+ * @summary 회원가입 완료 (legacy, 결제 기반 가입으로 대체)
  */
-export type postAuthSignupResponse201 = {
-  data: PostAuthSignup201
-  status: 201
-}
-
 export type postAuthSignupResponse409 = {
   data: ErrorResponse
   status: 409
 }
 
-export type postAuthSignupResponse422 = {
-  data: ErrorResponse
-  status: 422
-}
-
-export type postAuthSignupResponseSuccess = (postAuthSignupResponse201) & {
-  headers: Headers;
-};
-export type postAuthSignupResponseError = (postAuthSignupResponse409 | postAuthSignupResponse422) & {
+;
+export type postAuthSignupResponseError = (postAuthSignupResponse409) & {
   headers: Headers;
 };
 
-export type postAuthSignupResponse = (postAuthSignupResponseSuccess | postAuthSignupResponseError)
+export type postAuthSignupResponse = (postAuthSignupResponseError)
 
 export const getPostAuthSignupUrl = () => {
 
@@ -222,7 +209,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PostAuthSignupMutationError = ErrorResponse
 
     /**
- * @summary 회원가입 완료 (legacy)
+ * @summary 회원가입 완료 (legacy, 결제 기반 가입으로 대체)
  */
 export const usePostAuthSignup = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthSignup>>, TError,{data: PostAuthSignupBody}, TContext>, request?: SecondParameter<typeof customInstance>}

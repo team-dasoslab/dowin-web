@@ -1284,16 +1284,6 @@ export type PostAuthSignupBody = {
   password: string;
 };
 
-export type PostAuthSignup201 = {
-  user: User;
-  /**
-   * 가입 직후 1회 노출되는 복원 코드 목록
-   * @minItems 8
-   * @maxItems 8
-   */
-  recoveryCodes: string[];
-};
-
 export type PutAuthPasswordBody = {
   currentPassword: string;
   newPassword: string;
