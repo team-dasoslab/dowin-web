@@ -79,9 +79,6 @@ export function PricingPageClient() {
               <h2 className="text-xl font-black tracking-tight text-zinc-900">
                 {t("heroTitle")}
               </h2>
-              <p className="text-sm font-medium leading-relaxed text-zinc-500">
-                {t("heroDesc")}
-              </p>
             </div>
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-zinc-50 text-primary">
               <DowinIcon name="domain-wallet" size="24px" />
@@ -139,20 +136,6 @@ export function PricingPageClient() {
             <GuideCard title={t("cancelStep3Title")} desc={t("cancelStep3Desc")} />
           </div>
         </section>
-
-        <Card className="border-zinc-200 bg-zinc-100/50 p-5">
-          <h3 className="flex items-center gap-2 text-[14px] font-black text-zinc-900">
-            <DowinIcon
-              name="status-info"
-              size="16px"
-              className="text-zinc-400"
-            />
-            {t("cancelPolicyTitle")}
-          </h3>
-          <p className="mt-2 text-[12px] font-medium leading-relaxed text-zinc-500">
-            {t("cancelPolicyDesc")}
-          </p>
-        </Card>
 
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
           <Link href="/billing-policy" className="transition-colors">

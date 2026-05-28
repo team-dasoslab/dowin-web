@@ -736,9 +736,8 @@
   },
   "Pricing": {
     "header": "Plan Details",
-    "description": "Review your Basic subscription status and cancellation path.",
-    "heroTitle": "Basic is managed per workspace and seat",
-    "heroDesc": "New workspaces are created after Basic checkout is completed. This screen now focuses on the current subscription state and cancellation path.",
+    "description": "Review the current subscription status and cancellation path.",
+    "heroTitle": "Basic subscription status",
     "planLabel": "Plan",
     "basicPlanName": "Basic Plan",
     "statusLabel": "Billing status",
@@ -820,8 +819,6 @@
     "cancelStep2Desc": "Find the current Basic subscription in the portal and choose the cancellation option.",
     "cancelStep3Title": "3. Confirm the end date",
     "cancelStep3Desc": "Seat access remains available until the paid period ends. You can return to this screen to confirm the scheduled end date.",
-    "cancelPolicyTitle": "Cancellation and refund rules",
-    "cancelPolicyDesc": "General cancellation stops future billing from the next billing date. Refunds for an already-paid period are reviewed first where required by law or where duplicate payment, an obvious mistaken charge, or a technical failure right after payment is confirmed.",
     "status": {
       "NONE": "Not subscribed",
       "ACTIVE": "Active",

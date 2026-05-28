@@ -739,9 +739,8 @@
   },
   "Pricing": {
     "header": "플랜 안내",
-    "description": "Basic 구독 상태와 해지 방법을 확인할 수 있습니다.",
-    "heroTitle": "Basic 구독은 워크스페이스와 좌석 단위로 관리됩니다",
-    "heroDesc": "신규 워크스페이스는 가입 후 Basic 결제를 완료해야 생성됩니다. 이 화면에서는 현재 구독 상태와 해지 경로만 안내합니다.",
+    "description": "현재 구독 상태와 해지 방법을 확인합니다.",
+    "heroTitle": "Basic 구독 상태",
     "planLabel": "플랜",
     "basicPlanName": "Basic 플랜",
     "statusLabel": "결제 상태",
@@ -823,8 +822,6 @@
     "cancelStep2Desc": "포털에서 현재 Basic 구독을 확인하고 구독 취소 또는 해지 옵션을 선택합니다.",
     "cancelStep3Title": "3. 종료일 확인",
     "cancelStep3Desc": "해지 후에도 이미 결제된 기간이 끝날 때까지 좌석 권한은 유지됩니다. 종료일은 이 화면에서 다시 확인할 수 있습니다.",
-    "cancelPolicyTitle": "해지와 환불 기준",
-    "cancelPolicyDesc": "일반 해지는 다음 결제일부터 과금이 중단됩니다. 이미 결제된 기간의 환불은 법령상 권리, 중복 결제, 명백한 오결제, 결제 직후 기술적 오류 등 예외 사유를 우선 검토합니다.",
     "status": {
       "NONE": "미구독",
       "ACTIVE": "이용 중",
