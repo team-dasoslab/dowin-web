@@ -148,6 +148,60 @@ export const pendingSignupCheckouts = sqliteTable(
   ],
 );
 
+export const pendingWorkspaceCheckouts = sqliteTable(
+  "pending_workspace_checkouts",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    uid: text("uid").notNull().unique(),
+    requestId: text("request_id").notNull(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    locale: text("locale", { enum: ["ko", "en"] }).notNull(),
+    workspaceName: text("workspace_name").notNull(),
+    requestedSeatCount: integer("requested_seat_count").notNull(),
+    targetPlanCode: text("target_plan_code", { enum: ["BASIC"] }).notNull(),
+    provider: text("provider", { enum: ["POLAR"] }).notNull(),
+    providerProductId: text("provider_product_id").notNull(),
+    providerCheckoutId: text("provider_checkout_id"),
+    checkoutUrl: text("checkout_url"),
+    status: text("status", {
+      enum: [
+        "PENDING",
+        "CHECKOUT_CREATED",
+        "COMPLETED",
+        "EXPIRED",
+        "FAILED",
+      ],
+    })
+      .notNull()
+      .default("PENDING"),
+    completedWorkspaceId: integer("completed_workspace_id").references(
+      () => workspaces.id,
+      { onDelete: "set null" },
+    ),
+    completedAt: integer("completed_at", { mode: "timestamp" }),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("pending_workspace_checkouts_uid_unique").on(table.uid),
+    uniqueIndex("pending_workspace_checkouts_request_unique").on(
+      table.requestId,
+    ),
+    index("pending_workspace_checkouts_user_status_idx").on(
+      table.userId,
+      table.status,
+    ),
+    index("pending_workspace_checkouts_expires_at_idx").on(table.expiresAt),
+  ],
+);
+
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(), // nanoid
   userId: integer("user_id")

@@ -676,6 +676,44 @@ export interface WorkspaceListItem {
   createdAt: string;
 }
 
+export interface WorkspaceCheckoutRequest {
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  workspaceName: string;
+  /**
+   * Basic checkout에서 결제할 최초 seat 수
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount: number;
+}
+
+export interface WorkspaceCheckoutResponse {
+  /** 결제 성공 후 워크스페이스 생성 검증에 사용할 pending workspace checkout ID */
+  workspaceCheckoutId: string;
+  /** Polar Basic seat checkout URL */
+  checkoutUrl: string;
+}
+
+export interface WorkspaceCheckoutCompleteRequest {
+  /**
+   * /workspaces/checkout 응답으로 받은 pending workspace checkout ID
+   * @minLength 1
+   */
+  workspaceCheckoutId: string;
+  /**
+   * Polar checkout 성공 callback에서 전달된 checkout ID
+   * @minLength 1
+   */
+  checkoutId: string;
+}
+
+export interface WorkspaceCheckoutCompleteResponse {
+  workspaceId: string;
+}
+
 export interface WorkspaceCurrentUpdateRequest {
   workspaceId: string;
 }
@@ -1282,6 +1320,12 @@ export type PostAuthSignupBody = {
   customId: string;
   nickname: string;
   password: string;
+};
+
+export type PostAuthSignup201 = {
+  user: User;
+  /** 가입 직후 1회 노출되는 복원 코드 목록 */
+  recoveryCodes: string[];
 };
 
 export type PutAuthPasswordBody = {

@@ -73,7 +73,7 @@ export const getGetAdminBillingWorkspacesUrl = (params?: GetAdminBillingWorkspac
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
+    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
@@ -85,16 +85,16 @@ export const getGetAdminBillingWorkspacesUrl = (params?: GetAdminBillingWorkspac
 }
 
 export const getAdminBillingWorkspaces = async (params?: GetAdminBillingWorkspacesParams, options?: RequestInit): Promise<getAdminBillingWorkspacesResponse> => {
-
+  
   return customInstance<getAdminBillingWorkspacesResponse>(getGetAdminBillingWorkspacesUrl(params),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -105,7 +105,7 @@ export const getGetAdminBillingWorkspacesQueryKey = (params?: GetAdminBillingWor
     ] as const;
     }
 
-
+    
 export const getGetAdminBillingWorkspacesQueryOptions = <TData = Awaited<ReturnType<typeof getAdminBillingWorkspaces>>, TError = UnauthorizedErrorResponse | ErrorResponse>(params?: GetAdminBillingWorkspacesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -113,13 +113,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminBillingWorkspacesQueryKey(params);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminBillingWorkspaces>>> = ({ signal }) => getAdminBillingWorkspaces(params, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspaces>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -158,7 +158,7 @@ export function useGetAdminBillingWorkspaces<TData = Awaited<ReturnType<typeof g
 
 export function useGetAdminBillingWorkspaces<TData = Awaited<ReturnType<typeof getAdminBillingWorkspaces>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  params?: GetAdminBillingWorkspacesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminBillingWorkspacesQueryOptions(params,options)
@@ -201,22 +201,22 @@ export type getAdminBillingProviderProductsResponse = (getAdminBillingProviderPr
 export const getGetAdminBillingProviderProductsUrl = () => {
 
 
-
+  
 
   return `/api/admin/billing/provider-products`
 }
 
 export const getAdminBillingProviderProducts = async ( options?: RequestInit): Promise<getAdminBillingProviderProductsResponse> => {
-
+  
   return customInstance<getAdminBillingProviderProductsResponse>(getGetAdminBillingProviderProductsUrl(),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -227,7 +227,7 @@ export const getGetAdminBillingProviderProductsQueryKey = () => {
     ] as const;
     }
 
-
+    
 export const getGetAdminBillingProviderProductsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminBillingProviderProducts>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingProviderProducts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -235,13 +235,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminBillingProviderProductsQueryKey();
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminBillingProviderProducts>>> = ({ signal }) => getAdminBillingProviderProducts({ signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingProviderProducts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -280,7 +280,7 @@ export function useGetAdminBillingProviderProducts<TData = Awaited<ReturnType<ty
 
 export function useGetAdminBillingProviderProducts<TData = Awaited<ReturnType<typeof getAdminBillingProviderProducts>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingProviderProducts>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminBillingProviderProductsQueryOptions(options)
@@ -328,15 +328,15 @@ export type postAdminBillingProviderProductsResponse = (postAdminBillingProvider
 export const getPostAdminBillingProviderProductsUrl = () => {
 
 
-
+  
 
   return `/api/admin/billing/provider-products`
 }
 
 export const postAdminBillingProviderProducts = async (adminBillingProviderProductUpsertRequest: AdminBillingProviderProductUpsertRequest, options?: RequestInit): Promise<postAdminBillingProviderProductsResponse> => {
-
+  
   return customInstance<postAdminBillingProviderProductsResponse>(getPostAdminBillingProviderProductsUrl(),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -344,7 +344,7 @@ export const postAdminBillingProviderProducts = async (adminBillingProviderProdu
       adminBillingProviderProductUpsertRequest,)
   }
 );}
-
+  
 
 
 
@@ -359,7 +359,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminBillingProviderProducts>>, {data: AdminBillingProviderProductUpsertRequest}> = (props) => {
@@ -370,7 +370,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -427,22 +427,22 @@ export type getAdminBillingWorkspacesWorkspaceIdResponse = (getAdminBillingWorks
 export const getGetAdminBillingWorkspacesWorkspaceIdUrl = (workspaceId: number,) => {
 
 
-
+  
 
   return `/api/admin/billing/workspaces/${workspaceId}`
 }
 
 export const getAdminBillingWorkspacesWorkspaceId = async (workspaceId: number, options?: RequestInit): Promise<getAdminBillingWorkspacesWorkspaceIdResponse> => {
-
+  
   return customInstance<getAdminBillingWorkspacesWorkspaceIdResponse>(getGetAdminBillingWorkspacesWorkspaceIdUrl(workspaceId),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -453,7 +453,7 @@ export const getGetAdminBillingWorkspacesWorkspaceIdQueryKey = (workspaceId: num
     ] as const;
     }
 
-
+    
 export const getGetAdminBillingWorkspacesWorkspaceIdQueryOptions = <TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -461,13 +461,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetAdminBillingWorkspacesWorkspaceIdQueryKey(workspaceId);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>> = ({ signal }) => getAdminBillingWorkspacesWorkspaceId(workspaceId, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -506,7 +506,7 @@ export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnTy
 
 export function useGetAdminBillingWorkspacesWorkspaceId<TData = Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  workspaceId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminBillingWorkspacesWorkspaceId>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetAdminBillingWorkspacesWorkspaceIdQueryOptions(workspaceId,options)
@@ -559,16 +559,16 @@ export type postAdminBillingWorkspacesWorkspaceIdManualOverrideResponse = (postA
 export const getPostAdminBillingWorkspacesWorkspaceIdManualOverrideUrl = (workspaceId: number,) => {
 
 
-
+  
 
   return `/api/admin/billing/workspaces/${workspaceId}/manual-override`
 }
 
 export const postAdminBillingWorkspacesWorkspaceIdManualOverride = async (workspaceId: number,
     adminBillingManualOverrideRequest: AdminBillingManualOverrideRequest, options?: RequestInit): Promise<postAdminBillingWorkspacesWorkspaceIdManualOverrideResponse> => {
-
+  
   return customInstance<postAdminBillingWorkspacesWorkspaceIdManualOverrideResponse>(getPostAdminBillingWorkspacesWorkspaceIdManualOverrideUrl(workspaceId),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -576,7 +576,7 @@ export const postAdminBillingWorkspacesWorkspaceIdManualOverride = async (worksp
       adminBillingManualOverrideRequest,)
   }
 );}
-
+  
 
 
 
@@ -591,7 +591,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdManualOverride>>, {workspaceId: number;data: AdminBillingManualOverrideRequest}> = (props) => {
@@ -602,7 +602,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -624,3 +624,4 @@ export const usePostAdminBillingWorkspacesWorkspaceIdManualOverride = <TError = 
       > => {
       return useMutation(getPostAdminBillingWorkspacesWorkspaceIdManualOverrideMutationOptions(options), queryClient);
     }
+    
