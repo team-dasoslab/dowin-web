@@ -401,13 +401,13 @@
     "submittingButton": "Changing..."
   },
   "WorkspaceOverLimit": {
-    "title": "FREE member limit exceeded",
-    "adminDesc": "{count} members are currently in this workspace, while FREE allows {limit}. Existing data is kept, but tracking and operations are limited until you remove members or upgrade to STANDARD.",
-    "adminDescApp": "{count} members are currently in this workspace, while the base limit is {limit}. Existing data is kept, but some tracking and operations remain limited until the member count is reduced.",
-    "memberDesc": "This workspace is over the FREE limit of {limit} members and is currently read-only. Contact a workspace admin to resume tracking and operations.",
-    "memberDescApp": "This workspace is over the base limit of {limit} members, so some features are currently limited. Contact a workspace admin for the required adjustments.",
+    "title": "Seat limit exceeded",
+    "adminDesc": "{count} members are currently in this workspace, while {limit} seats are available. Existing data is kept, but some tracking and operations remain limited until members are reduced or seat status is updated.",
+    "adminDescApp": "{count} members are currently in this workspace, while {limit} seats are available. Existing data is kept, but some tracking and operations remain limited until the member count is reduced.",
+    "memberDesc": "This workspace is over its {limit}-seat limit, so some features are currently limited. Contact a workspace admin to resume tracking and operations.",
+    "memberDescApp": "This workspace is over its {limit}-seat limit, so some features are currently limited. Contact a workspace admin for the required adjustments.",
     "manageMembers": "Manage members",
-    "billing": "Plans & Billing"
+    "billing": "Billing"
   },
   "ProfileDeleteAccount": {
     "header": "Delete Account",
@@ -461,8 +461,8 @@
     "presetUnit": "{count} times",
     "inviteListTitle": "Invite Code List",
     "inviteListDesc": "Copy codes and manage active/inactive status.",
-    "overLimitInviteDisabled": "New invite codes are disabled while this FREE workspace is over the member limit. Remove members until the workspace has 10 or fewer members, or upgrade to STANDARD.",
-    "overLimitInviteDisabledApp": "New invite codes are unavailable while this workspace is over the base member limit. Reduce the member count first.",
+    "overLimitInviteDisabled": "New invite codes are disabled while this workspace is over its seat limit. Reduce members or review seat status in billing management.",
+    "overLimitInviteDisabledApp": "New invite codes are unavailable while this workspace is over its seat limit. Reduce the member count first.",
     "activeInviteOverLimit": "This code cannot be used to join while the workspace is over the member limit.",
     "noInvites": "No invite codes created yet.",
     "noCode": "No Code",
@@ -546,6 +546,7 @@
     "manageMembersDesc": "View and manage workspace member access.",
     "manageInvites": "Manage Invite Codes",
     "manageInvitesDesc": "Create and manage invite codes for your workspace.",
+    "basicPlanName": "Basic",
     "pricingTitle": "Plan Details",
     "pricingDesc": "Review your Basic subscription status and cancellation path.",
     "billingTitle": "Plans & Billing",
@@ -623,7 +624,7 @@
       "emptyMeasures": "Please select at least one lead measure.",
       "fetchFailed": "Failed to load export data.",
       "downloadStarted": "CSV download started.",
-      "standardRequired": "CSV download is only available on STANDARD plan."
+      "standardRequired": "CSV download is not available right now."
     },
     "Notification": {
       "timeChanged": "Daily reminder time has been changed.",
@@ -904,8 +905,8 @@
     "WORKSPACE_CHECKOUT_NOT_READY": "Workspace checkout is not completed yet.",
     "WORKSPACE_CHECKOUT_OWNER_MISMATCH": "Log in with the account that started this checkout, then try again.",
     "WORKSPACE_MEMBER_LIMIT_REACHED": "Cannot join the workspace. Contact the admin.",
-    "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "This FREE workspace is over the 10-member limit and is now read-only. Remove members until the workspace has 10 or fewer members, or upgrade to STANDARD.",
-    "STANDARD_PLAN_REQUIRED": "This feature requires a STANDARD plan.",
+    "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "This workspace is over its seat limit, so some features are currently limited. Reduce members or review seat status in billing management.",
+    "STANDARD_PLAN_REQUIRED": "This feature is not available right now.",
     "WORKSPACE_TAG_ALREADY_EXISTS": "A tag with the same name already exists.",
     "ADMIN_TRANSFER_REQUIRED": "Admins can only delete their account after transferring ownership or deleting the workspace.",
     "CANNOT_REMOVE_LAST_ADMIN": "Cannot remove the last admin.",
@@ -917,7 +918,7 @@
     "LEAD_MEASURE_ARCHIVED": "Cannot add logs to archived lead measures.",
     "FUTURE_DATE_NOT_ALLOWED": "Cannot record data for future dates.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
-    "FREE_PLAN_HISTORY_LIMIT_REACHED": "Free plan users can view up to 6 months of history. Upgrade to STANDARD to view older data.",
+    "FREE_PLAN_HISTORY_LIMIT_REACHED": "Records for this period are not available right now.",
     "BILLING_NOT_READY": "Billing integration is not ready yet.",
     "BILLING_REVIEW_REQUIRED": "This workspace has repeated refund or cancellation history, so a new checkout cannot be started right now. Please contact support."
   },
@@ -996,7 +997,7 @@
     "join": {
       "title": "Join with Invite Code",
       "description": "Enter the invitation code received from your team admin.",
-      "planInfo": "FREE plan workspaces can have up to 10 members.",
+      "planInfo": "Members can join up to the number of purchased workspace seats.",
       "label": "Invite Code",
       "placeholder": "e.g. TEAM-AB12-CD34",
       "button": "Join",
@@ -1076,12 +1077,23 @@
       "item4Desc": "Without writing separate reports, daily records naturally build into a visible execution flow for the team."
     },
     "Pricing": {
-      "header": "Start with a small team,\nand expand only when needed.",
-      "description": "Try the core execution flow first on the Free plan, then expand when the team needs deeper operating features.",
-      "cadence": "/ mo",
+      "header": "Choose a workspace and seats,\nthen start right away.",
+      "description": "Basic is the default team subscription. Choose the seats you need during workspace setup, complete checkout, and start operating.",
+      "eyebrow": "Base subscription",
+      "price": "Basic",
+      "cadence": "seat-based",
+      "planDescription": "Billing is managed per workspace, and members can join up to the number of purchased seats.",
+      "cta": "Get started",
       "ctaFree": "Get Started",
       "ctaStandard": "Get Notified",
       "standardOnly": "STANDARD Only",
+      "features": [
+        "Workspace and member seat-based operations",
+        "Personal records and team scoreboard together",
+        "Primary goals, action items, and weekly check-ins",
+        "Team invites and member management by seat count",
+        "Basic subscription status and billing management"
+      ],
       "plans": {
         "FREE": {
           "eyebrow": "Available Now",

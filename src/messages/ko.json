@@ -403,13 +403,13 @@
     "submittingButton": "변경 중..."
   },
   "WorkspaceOverLimit": {
-    "title": "FREE 멤버 한도를 초과했어요",
-    "adminDesc": "현재 {count}명이 참여 중이며 FREE 한도는 {limit}명입니다. 기존 데이터는 보존되지만 기록과 운영 기능은 멤버 수를 줄이거나 STANDARD로 변경할 때까지 제한됩니다.",
-    "adminDescApp": "현재 {count}명이 참여 중이며 기본 한도는 {limit}명입니다. 기존 데이터는 보존되지만, 멤버 수를 줄일 때까지 일부 기록과 운영 기능이 제한됩니다.",
-    "memberDesc": "현재 워크스페이스가 FREE 한도 {limit}명을 초과해 읽기 전용 상태입니다. 기록과 운영 기능을 다시 사용하려면 관리자에게 문의해주세요.",
-    "memberDescApp": "현재 워크스페이스가 기본 한도 {limit}명을 초과해 일부 기능이 제한된 상태입니다. 자세한 운영 조정은 관리자에게 문의해주세요.",
+    "title": "좌석 한도를 초과했어요",
+    "adminDesc": "현재 {count}명이 참여 중이며 구매 좌석은 {limit}개입니다. 기존 데이터는 보존되지만 멤버 수를 줄이거나 좌석 상태를 정리할 때까지 일부 기록과 운영 기능이 제한됩니다.",
+    "adminDescApp": "현재 {count}명이 참여 중이며 구매 좌석은 {limit}개입니다. 기존 데이터는 보존되지만, 멤버 수를 줄일 때까지 일부 기록과 운영 기능이 제한됩니다.",
+    "memberDesc": "현재 워크스페이스가 좌석 한도 {limit}개를 초과해 일부 기능이 제한된 상태입니다. 기록과 운영 기능을 다시 사용하려면 관리자에게 문의해주세요.",
+    "memberDescApp": "현재 워크스페이스가 좌석 한도 {limit}개를 초과해 일부 기능이 제한된 상태입니다. 자세한 운영 조정은 관리자에게 문의해주세요.",
     "manageMembers": "멤버 관리",
-    "billing": "플랜 및 결제"
+    "billing": "결제 관리"
   },
   "ProfileDeleteAccount": {
     "header": "서비스 탈퇴",
@@ -464,8 +464,8 @@
     "presetUnit": "{count}회",
     "inviteListTitle": "초대코드 목록",
     "inviteListDesc": "코드 복사와 활성/비활성 상태를 관리할 수 있습니다.",
-    "overLimitInviteDisabled": "FREE 멤버 한도 초과 상태에서는 새 초대코드를 만들 수 없습니다. 멤버 수를 10명 이하로 줄이거나 STANDARD로 변경해주세요.",
-    "overLimitInviteDisabledApp": "현재 참여 인원이 기본 한도를 초과해 새 초대코드를 만들 수 없습니다. 먼저 멤버 수를 조정해주세요.",
+    "overLimitInviteDisabled": "좌석 한도 초과 상태에서는 새 초대코드를 만들 수 없습니다. 멤버 수를 줄이거나 결제 관리에서 좌석 상태를 확인해주세요.",
+    "overLimitInviteDisabledApp": "현재 참여 인원이 좌석 한도를 초과해 새 초대코드를 만들 수 없습니다. 먼저 멤버 수를 조정해주세요.",
     "activeInviteOverLimit": "현재 한도 초과로 이 코드는 참가에 사용할 수 없습니다.",
     "noInvites": "아직 생성된 초대코드가 없습니다.",
     "noCode": "코드 없음",
@@ -549,6 +549,7 @@
     "manageMembersDesc": "워크스페이스 멤버 조회와 퇴출을 관리합니다.",
     "manageInvites": "초대코드 관리",
     "manageInvitesDesc": "초대코드 생성과 활성/비활성 상태를 관리합니다.",
+    "basicPlanName": "Basic",
     "pricingTitle": "플랜 안내",
     "pricingDesc": "Basic 구독 상태와 해지 방법을 확인합니다.",
     "billingTitle": "플랜 및 결제",
@@ -626,7 +627,7 @@
       "emptyMeasures": "최소 1개 이상의 액션 아이템을 선택해주세요.",
       "fetchFailed": "내보내기 데이터를 불러오지 못했습니다.",
       "downloadStarted": "CSV 다운로드를 시작했습니다.",
-      "standardRequired": "CSV 다운로드는 STANDARD 플랜에서 사용할 수 있어요."
+      "standardRequired": "CSV 다운로드는 현재 사용할 수 없습니다."
     },
     "Notification": {
       "timeChanged": "일일 리마인드 시간이 변경되었습니다.",
@@ -907,8 +908,8 @@
     "WORKSPACE_CHECKOUT_NOT_READY": "워크스페이스 결제가 아직 완료되지 않았습니다.",
     "WORKSPACE_CHECKOUT_OWNER_MISMATCH": "결제를 시작한 계정으로 로그인한 뒤 다시 시도해주세요.",
     "WORKSPACE_MEMBER_LIMIT_REACHED": "현재 워크스페이스에 참여할 수 없어요. 관리자에게 문의하세요.",
-    "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "현재 FREE 플랜의 멤버 한도를 초과해 워크스페이스가 읽기 전용 상태입니다. 멤버 수를 10명 이하로 줄이거나 STANDARD 플랜으로 변경해주세요.",
-    "STANDARD_PLAN_REQUIRED": "이 기능은 STANDARD 플랜에서 사용할 수 있습니다.",
+    "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "현재 워크스페이스의 좌석 한도를 초과해 일부 기능이 제한된 상태입니다. 멤버 수를 줄이거나 결제 관리에서 좌석 상태를 확인해주세요.",
+    "STANDARD_PLAN_REQUIRED": "현재 이 기능을 사용할 수 없습니다.",
     "WORKSPACE_TAG_ALREADY_EXISTS": "같은 이름의 태그가 이미 존재합니다.",
     "ADMIN_TRANSFER_REQUIRED": "관리자는 권한 이전 또는 워크스페이스 삭제 후에만 탈퇴할 수 있습니다.",
     "CANNOT_REMOVE_LAST_ADMIN": "마지막 관리자는 퇴출할 수 없습니다.",
@@ -920,7 +921,7 @@
     "LEAD_MEASURE_ARCHIVED": "보관된 액션 아이템에는 기록을 추가할 수 없습니다.",
     "FUTURE_DATE_NOT_ALLOWED": "미래 날짜에는 기록할 수 없습니다.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
-    "FREE_PLAN_HISTORY_LIMIT_REACHED": "Free 플랜에서는 최근 6개월 기록까지 확인할 수 있어요. 더 이전의 기록을 보시려면 STANDARD 플랜으로 변경해주세요.",
+    "FREE_PLAN_HISTORY_LIMIT_REACHED": "현재 이 기간의 기록은 확인할 수 없습니다.",
     "BILLING_NOT_READY": "결제 연동 준비가 아직 끝나지 않았습니다.",
     "BILLING_REVIEW_REQUIRED": "반복 환불 또는 취소 이력이 있어 결제를 바로 다시 시작할 수 없습니다. 고객지원으로 문의해주세요."
   },
@@ -999,7 +1000,7 @@
     "join": {
       "title": "초대코드로 참가하기",
       "description": "팀 관리자에게 전달받은 초대코드를 입력하세요.",
-      "planInfo": "FREE 플랜 워크스페이스는 최대 10명까지 참여할 수 있습니다.",
+      "planInfo": "워크스페이스는 구매한 좌석 수만큼 멤버가 참여할 수 있습니다.",
       "label": "초대코드",
       "placeholder": "예: TEAM-AB12-CD34",
       "button": "참가하기",
@@ -1078,12 +1079,23 @@
       "item4Desc": "딱딱한 보고서를 따로 만들지 않아도, 매일 남긴 기록이 팀의 실행 흐름으로 이어집니다."
     },
     "Pricing": {
-      "header": "작은 팀이 바로 써보고,\n필요할 때 넓히면 됩니다.",
-      "description": "무료 플랜으로 핵심 실행 흐름을 먼저 굴려보고, 팀 운영에 더 필요한 기능이 생기면 그때 확장하면 됩니다.",
-      "cadence": "/ 월",
+      "header": "워크스페이스와 좌석 수만 정하면\n바로 시작할 수 있습니다.",
+      "description": "Basic은 팀이 함께 쓰는 기본 구독입니다. 워크스페이스 생성 시 필요한 좌석 수를 정하고 결제를 완료하면 바로 운영을 시작합니다.",
+      "eyebrow": "기본 구독",
+      "price": "Basic",
+      "cadence": "좌석 기반",
+      "planDescription": "워크스페이스 단위로 결제하고, 구매한 좌석 수만큼 멤버가 함께 사용할 수 있습니다.",
+      "cta": "시작하기",
       "ctaFree": "시작하기",
       "ctaStandard": "출시 알림 받기",
       "standardOnly": "STANDARD 전용",
+      "features": [
+        "워크스페이스와 멤버 좌석 기반 운영",
+        "개인 기록과 팀 점수판 함께 확인",
+        "핵심 목표, 액션 아이템, 주간 점검 흐름 제공",
+        "좌석 수에 맞춘 팀 초대와 멤버 관리",
+        "Basic 구독 상태와 결제 관리 제공"
+      ],
       "plans": {
         "FREE": {
           "eyebrow": "지금 바로 사용 가능",
