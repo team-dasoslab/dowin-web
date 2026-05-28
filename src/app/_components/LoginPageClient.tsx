@@ -1,23 +1,18 @@
 "use client";
 
-import {
-  postAuthSignupCheckout,
-  usePostAuthLogin,
-} from "@/api/generated/auth/auth";
+import { usePostAuthLogin, usePostAuthSignup } from "@/api/generated/auth/auth";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { Logo } from "@/components/ui/Logo";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";
-import {
-  getApiErrorCode,
-  getApiErrorMessage,
-  getApiErrorStatus,
-} from "@/lib/client/frontend-api";
+import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
+import { hashId } from "@/lib/client/id-hash";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -30,16 +25,16 @@ export default function LoginPageClient() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [id, setId] = useState("");
   const [nickname, setNickname] = useState("");
-  const [workspaceName, setWorkspaceName] = useState("");
-  const [seatCount, setSeatCount] = useState("1");
   const [pw, setPw] = useState("");
   const [error, setError] = useState("");
-  const [isSignupCheckoutPending, setIsSignupCheckoutPending] = useState(false);
+  const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
   const loginMutation = usePostAuthLogin();
+  const signupMutation = usePostAuthSignup();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
-  const isPending = loginMutation.isPending || isSignupCheckoutPending;
+  const isPending = loginMutation.isPending || signupMutation.isPending;
 
   const signupFormSchema = useMemo(
     () =>
@@ -51,16 +46,6 @@ export default function LoginPageClient() {
           .string()
           .min(1, t("errors.nicknameRequired"))
           .max(50, t("errors.nicknameTooLong")),
-        workspaceName: z
-          .string()
-          .trim()
-          .min(1, t("errors.workspaceNameRequired"))
-          .max(100, t("errors.workspaceNameTooLong")),
-        seatCount: z.coerce
-          .number()
-          .int(t("errors.invalidSeatCount"))
-          .min(1, t("errors.invalidSeatCount"))
-          .max(999, t("errors.invalidSeatCount")),
         password: z
           .string()
           .regex(
@@ -100,6 +85,41 @@ export default function LoginPageClient() {
     setMode(nextMode);
   };
 
+  const handleCopyRecoveryCodes = async () => {
+    if (!recoveryCodes || recoveryCodes.length === 0) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(recoveryCodes.join(", "));
+      setIsCopied(true);
+    } catch {
+      setError(t("recovery.failedToCopy"));
+    }
+  };
+
+  const handleDownloadRecoveryCodes = () => {
+    if (!recoveryCodes || recoveryCodes.length === 0) {
+      return;
+    }
+
+    const content = [
+      t("recovery.txtHeader"),
+      "",
+      t("recovery.txtDescription"),
+      "",
+      recoveryCodes.join(", "),
+      "",
+    ].join("\n");
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "dowin-recovery-codes.txt";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -108,8 +128,6 @@ export default function LoginPageClient() {
       const parsed = signupFormSchema.safeParse({
         customId: id,
         nickname,
-        workspaceName,
-        seatCount,
         password: pw,
       });
 
@@ -120,46 +138,37 @@ export default function LoginPageClient() {
       }
 
       try {
-        setIsSignupCheckoutPending(true);
-        const response = await postAuthSignupCheckout(
-          {
+        const response = await signupMutation.mutateAsync({
+          data: {
             customId: parsed.data.customId,
             nickname: parsed.data.nickname,
             password: parsed.data.password,
-            workspaceName: parsed.data.workspaceName,
-            seatCount: parsed.data.seatCount,
           },
-          {
-            headers: {
-              "Idempotency-Key": createSignupIdempotencyKey(),
-            },
-          },
-        );
+        });
 
         if (
           response.status !== 201 ||
-          !response.data.checkoutUrl ||
-          !response.data.signupIntentId
+          !response.data.user ||
+          !Array.isArray(response.data.recoveryCodes) ||
+          response.data.recoveryCodes.length === 0
         ) {
           setError(t("errors.signupFailed"));
           return;
         }
 
-        trackEvent("sign_up_checkout_started", {
-          signup_method: "basic_seat_checkout",
+        setRecoveryCodes(response.data.recoveryCodes);
+        setIsCopied(false);
+        trackEvent("sign_up_completed", {
+          signup_method: "self_signup",
+          user_id_hash: hashId(response.data.user.id),
         });
-        window.location.assign(response.data.checkoutUrl);
       } catch (signupError) {
-        const code = getApiErrorCode(signupError);
-        if (code === "CUSTOM_ID_ALREADY_EXISTS") {
+        const status = getApiErrorStatus(signupError);
+        if (status === 409) {
           setError(t("errors.idAlreadyExists"));
-        } else if (code === "BILLING_NOT_READY") {
-          setError(t("errors.billingNotReady"));
         } else {
           setError(getApiErrorMessage(signupError, t("errors.signupFailed")));
         }
-      } finally {
-        setIsSignupCheckoutPending(false);
       }
 
       return;
@@ -190,6 +199,94 @@ export default function LoginPageClient() {
       }
     }
   };
+
+  if (recoveryCodes) {
+    return (
+      <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
+
+        <Card className="w-full max-w-[480px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+          <div className="space-y-4 text-center mb-8">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
+              {t("recovery.title")}
+            </h1>
+            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
+              {t("recovery.description")}
+            </p>
+          </div>
+
+          <div className="mt-8 rounded-content border border-border bg-sub-background p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              {recoveryCodes.map((code) => (
+                <div
+                  key={code}
+                  className="rounded-button border border-border bg-sub-background px-3 py-3 text-center text-[13px] sm:text-sm font-black tracking-wider sm:tracking-widest text-text-primary truncate"
+                >
+                  {code}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <div className="mt-6 p-4 bg-danger/5 border border-danger/10 rounded-content">
+              <p className="text-danger text-[12px] font-bold text-center leading-tight">
+                {error}
+              </p>
+            </div>
+          )}
+
+          <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <Button
+              type="button"
+              onClick={handleCopyRecoveryCodes}
+              className="w-full rounded-button py-4 text-[13px] font-bold border border-border bg-white text-text-primary transition-all"
+            >
+              {isCopied ? (
+                <span className="inline-flex items-center gap-2">
+                  <DowinIcon
+                    name="status-checkmark"
+                    size="16px"
+                    className="text-success"
+                  />
+                  {t("recovery.copied")}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2">
+                  <DowinIcon
+                    name="action-copy"
+                    size="16px"
+                    className="opacity-50"
+                  />
+                  {t("recovery.copy")}
+                </span>
+              )}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleDownloadRecoveryCodes}
+              className="w-full rounded-button py-4 text-[13px] font-bold border border-border bg-white text-text-primary transition-all"
+            >
+              {t("recovery.saveTxt")}
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                router.push("/workspace/new");
+              }}
+              className="w-full rounded-button py-4 text-[13px] font-black bg-text-primary text-white transition-all"
+            >
+              {t("continue")}
+            </Button>
+          </div>
+        </Card>
+
+        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
+          © 2026 Dasoslab. All rights reserved.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
@@ -225,43 +322,6 @@ export default function LoginPageClient() {
                   className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
                   required
                 />
-              </div>
-            )}
-
-            {mode === "signup" && (
-              <div className="space-y-2 animate-fade-in-up">
-                <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                  {t("workspaceName")}
-                </label>
-                <Input
-                  type="text"
-                  value={workspaceName}
-                  onChange={(e) => setWorkspaceName(e.target.value)}
-                  placeholder={t("workspaceNamePlaceholder")}
-                  className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
-                  required
-                />
-              </div>
-            )}
-
-            {mode === "signup" && (
-              <div className="space-y-2 animate-fade-in-up">
-                <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                  {t("seatCount")}
-                </label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={999}
-                  value={seatCount}
-                  onChange={(e) => setSeatCount(e.target.value)}
-                  placeholder={t("seatCountPlaceholder")}
-                  className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
-                  required
-                />
-                <p className="px-1 text-[12px] font-bold leading-relaxed text-text-muted">
-                  {t("signupPaymentNotice")}
-                </p>
               </div>
             )}
 
@@ -321,7 +381,7 @@ export default function LoginPageClient() {
                   {mode === "login" ? (
                     <span>{t("login")}</span>
                   ) : (
-                    <span>{t("startCheckout")}</span>
+                    <span>{t("signup")}</span>
                   )}
                 </>
               )}
@@ -363,12 +423,4 @@ export default function LoginPageClient() {
       </p>
     </div>
   );
-}
-
-function createSignupIdempotencyKey() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-
-  return `signup_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 }
