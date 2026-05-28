@@ -4,6 +4,7 @@ import {
   billingCheckoutEvents,
   billingProviderProducts,
   workspaceBillingState,
+  workspaceSeatEntitlements,
   workspaces,
 } from "@/db/schema";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
@@ -382,6 +383,30 @@ export class BillingStorage {
           billingOwnerUserId: input.billingOwnerUserId,
           lastEventId: input.lastEventId,
           lastEventOccurredAt: input.lastEventOccurredAt,
+          updatedAt: new Date(),
+        },
+      });
+  }
+
+  async upsertWorkspaceSeatEntitlement(input: {
+    workspaceId: number;
+    purchasedSeatCount: number;
+    seatSource: "POLAR";
+  }) {
+    await this.db
+      .insert(workspaceSeatEntitlements)
+      .values({
+        workspaceId: input.workspaceId,
+        planCode: "BASIC",
+        purchasedSeatCount: input.purchasedSeatCount,
+        seatSource: input.seatSource,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: workspaceSeatEntitlements.workspaceId,
+        set: {
+          purchasedSeatCount: input.purchasedSeatCount,
+          seatSource: input.seatSource,
           updatedAt: new Date(),
         },
       });

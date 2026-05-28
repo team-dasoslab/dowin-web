@@ -9,6 +9,7 @@ type BillingPort = Pick<
   | "findWorkspaceByCustomerExternalRef"
   | "appendBillingEvent"
   | "upsertWorkspaceBillingState"
+  | "upsertWorkspaceSeatEntitlement"
   | "updateWorkspaceBillingProjection"
 >;
 
@@ -30,6 +31,7 @@ type BillingProjection = {
   currentPeriodEnd: Date | null;
   cancelAtPeriodEnd: boolean;
   billingOwnerUserId: number | null;
+  purchasedSeatCount: number | null;
 };
 
 function getRiskReviewFailureReason(input: {
@@ -86,6 +88,13 @@ function asNumber(value: unknown): number | null {
   return null;
 }
 
+function asPositiveInteger(value: unknown): number | null {
+  const number = asNumber(value);
+  return number !== null && Number.isInteger(number) && number > 0
+    ? number
+    : null;
+}
+
 function parseWorkspaceIdFromExternalRef(value: string | null): number | null {
   if (!value?.startsWith("workspace:")) {
     return null;
@@ -131,6 +140,21 @@ function pickPaidPlanCode(
   return metadata?.targetPlanCode === "BASIC" ? "BASIC" : "STANDARD";
 }
 
+function pickPurchasedSeatCount(
+  payload: WebhookEnvelope,
+  subscription?: Record<string, unknown> | null,
+): number | null {
+  const metadata =
+    asRecord(payload.data.metadata) ?? asRecord(subscription?.metadata);
+
+  return (
+    asPositiveInteger(payload.data.seats) ??
+    asPositiveInteger(subscription?.seats) ??
+    asPositiveInteger(metadata?.requestedSeatCount) ??
+    null
+  );
+}
+
 function resolveProjection(
   payload: WebhookEnvelope,
   now: Date,
@@ -158,6 +182,7 @@ function resolveProjection(
         currentPeriodEnd: null,
         cancelAtPeriodEnd: false,
         billingOwnerUserId,
+        purchasedSeatCount: null,
       };
     }
 
@@ -165,6 +190,10 @@ function resolveProjection(
     const cancelAtPeriodEnd =
       asBoolean(activeSubscription.cancel_at_period_end) ?? false;
     const paidPlanCode = pickPaidPlanCode(payload, activeSubscription);
+    const purchasedSeatCount =
+      paidPlanCode === "BASIC"
+        ? pickPurchasedSeatCount(payload, activeSubscription)
+        : null;
 
     return {
       billingStatus:
@@ -184,6 +213,7 @@ function resolveProjection(
       currentPeriodEnd,
       cancelAtPeriodEnd,
       billingOwnerUserId,
+      purchasedSeatCount,
     };
   }
 
@@ -192,6 +222,8 @@ function resolveProjection(
   const subscriptionKey =
     asString(payload.data.subscription_id) ?? asString(payload.data.id) ?? null;
   const paidPlanCode = pickPaidPlanCode(payload);
+  const purchasedSeatCount =
+    paidPlanCode === "BASIC" ? pickPurchasedSeatCount(payload) : null;
 
   switch (payload.type) {
     case "subscription.active":
@@ -205,6 +237,7 @@ function resolveProjection(
         currentPeriodEnd,
         cancelAtPeriodEnd,
         billingOwnerUserId,
+        purchasedSeatCount,
       };
     case "subscription.canceled":
       return {
@@ -219,6 +252,7 @@ function resolveProjection(
         currentPeriodEnd,
         cancelAtPeriodEnd: true,
         billingOwnerUserId,
+        purchasedSeatCount,
       };
     case "subscription.uncanceled":
       return {
@@ -231,6 +265,7 @@ function resolveProjection(
         currentPeriodEnd,
         cancelAtPeriodEnd: false,
         billingOwnerUserId,
+        purchasedSeatCount,
       };
     case "subscription.ended":
       return {
@@ -243,6 +278,7 @@ function resolveProjection(
         currentPeriodEnd,
         cancelAtPeriodEnd,
         billingOwnerUserId,
+        purchasedSeatCount: paidPlanCode === "BASIC" ? 0 : null,
       };
     case "subscription.updated": {
       const rawStatus = asString(payload.data.status);
@@ -259,6 +295,7 @@ function resolveProjection(
           currentPeriodEnd,
           cancelAtPeriodEnd,
           billingOwnerUserId,
+          purchasedSeatCount: paidPlanCode === "BASIC" ? 0 : null,
         };
       }
 
@@ -273,13 +310,14 @@ function resolveProjection(
           currentPeriodEnd: endedAt,
           cancelAtPeriodEnd,
           billingOwnerUserId,
+          purchasedSeatCount: paidPlanCode === "BASIC" ? 0 : null,
         };
       }
 
       if (rawStatus === "past_due") {
         return {
           billingStatus: "ACTIVE",
-          planCode: "STANDARD",
+          planCode: paidPlanCode,
           entitlementSource: "POLAR",
           customerKey,
           customerExternalRef,
@@ -287,12 +325,13 @@ function resolveProjection(
           currentPeriodEnd,
           cancelAtPeriodEnd,
           billingOwnerUserId,
+          purchasedSeatCount,
         };
       }
 
       return {
         billingStatus: cancelAtPeriodEnd ? "CANCELED" : "ACTIVE",
-        planCode: "STANDARD",
+        planCode: paidPlanCode,
         entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
@@ -300,6 +339,7 @@ function resolveProjection(
         currentPeriodEnd,
         cancelAtPeriodEnd,
         billingOwnerUserId,
+        purchasedSeatCount,
       };
     }
     case "subscription.revoked":
@@ -313,6 +353,7 @@ function resolveProjection(
         currentPeriodEnd,
         cancelAtPeriodEnd,
         billingOwnerUserId,
+        purchasedSeatCount: paidPlanCode === "BASIC" ? 0 : null,
       };
     case "order.refunded": {
       const refundedAmount = asNumber(payload.data.refunded_amount) ?? 0;
@@ -329,6 +370,7 @@ function resolveProjection(
           currentPeriodEnd,
           cancelAtPeriodEnd,
           billingOwnerUserId,
+          purchasedSeatCount: paidPlanCode === "BASIC" ? 0 : null,
         };
       }
 
@@ -442,6 +484,20 @@ export class PolarWebhookService {
       lastEventId: event.id,
       lastEventOccurredAt: occurredAt,
     });
+
+    const nextPurchasedSeatCount =
+      projection.purchasedSeatCount ??
+      (projection.planCode === "FREE" && workspace.planCode === "BASIC"
+        ? 0
+        : null);
+
+    if (nextPurchasedSeatCount !== null) {
+      await this.billingStorage.upsertWorkspaceSeatEntitlement({
+        workspaceId: workspace.id,
+        purchasedSeatCount: nextPurchasedSeatCount,
+        seatSource: "POLAR",
+      });
+    }
 
     await this.billingStorage.updateWorkspaceBillingProjection({
       workspaceId: workspace.id,
