@@ -27,7 +27,6 @@ type UseDashboardScoreboardQueriesParams = {
   workspaceId: string;
   currentWeekDates: string[];
   selectedMonthStart: string;
-  selectedView: "week" | "month";
   selectedWeekStart: string;
   weekDates: string[];
 };
@@ -36,7 +35,6 @@ export const useDashboardScoreboardQueries = ({
   workspaceId,
   currentWeekDates,
   selectedMonthStart,
-  selectedView,
   selectedWeekStart,
   weekDates,
 }: UseDashboardScoreboardQueriesParams) => {
@@ -109,7 +107,7 @@ export const useDashboardScoreboardQueries = ({
     weeklyLogsParams,
     {
       query: {
-        enabled: scoreboardId !== null && selectedView === "week",
+        enabled: scoreboardId !== null,
         retry: (failureCount: number, error: unknown) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
@@ -124,7 +122,7 @@ export const useDashboardScoreboardQueries = ({
     monthlyLogsParams,
     {
       query: {
-        enabled: scoreboardId !== null && selectedView === "month",
+        enabled: scoreboardId !== null,
         retry: (failureCount: number, error: unknown) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },

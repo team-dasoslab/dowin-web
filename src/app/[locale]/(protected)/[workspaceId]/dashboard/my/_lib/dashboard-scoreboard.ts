@@ -1,4 +1,5 @@
 import {
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
   getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200,
 } from "@/api/generated/daily-log/daily-log";
@@ -18,6 +19,9 @@ export type ToggleLogContext = {
   previousWeeklyLogs: WeeklyLogsQueryData;
   weeklyLogsQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey
+  > | null;
+  monthlyLogsQueryKey: ReturnType<
+    typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey
   > | null;
 };
 

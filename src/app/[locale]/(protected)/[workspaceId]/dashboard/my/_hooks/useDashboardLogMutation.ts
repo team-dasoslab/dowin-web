@@ -2,6 +2,7 @@
 
 import {
   deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey,
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
   putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
   useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
@@ -31,6 +32,9 @@ type UseDashboardLogMutationParams = {
   weeklyLogsQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey
   > | null;
+  monthlyLogsQueryKey: ReturnType<
+    typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey
+  > | null;
   workspaceId: string;
 };
 
@@ -40,6 +44,7 @@ export const useDashboardLogMutation = ({
   showToast,
   weeklyById,
   weeklyLogsQueryKey,
+  monthlyLogsQueryKey,
   workspaceId,
 }: UseDashboardLogMutationParams) => {
   const t = useTranslations("Dashboard.My");
@@ -65,13 +70,17 @@ export const useDashboardLogMutation = ({
   };
 
   const invalidateToggleQueries = async (context?: ToggleLogContext) => {
-    if (!context?.weeklyLogsQueryKey) {
-      return;
+    if (context?.weeklyLogsQueryKey) {
+      await queryClient.invalidateQueries({
+        queryKey: context.weeklyLogsQueryKey,
+      });
     }
 
-    await queryClient.invalidateQueries({
-      queryKey: context.weeklyLogsQueryKey,
-    });
+    if (context?.monthlyLogsQueryKey) {
+      await queryClient.invalidateQueries({
+        queryKey: context.monthlyLogsQueryKey,
+      });
+    }
   };
 
   const createToggleLogContext = (
@@ -98,6 +107,7 @@ export const useDashboardLogMutation = ({
       currentLogKey,
       previousWeeklyLogs,
       weeklyLogsQueryKey,
+      monthlyLogsQueryKey,
     };
   };
 

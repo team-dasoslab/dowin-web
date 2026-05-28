@@ -40,6 +40,7 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     monthLabel,
     monthlyLeadMeasures,
     monthlyLogsError,
+    monthlyLogsQueryKey,
     monthlyOverallRate,
     monthlySummary,
     scoreboardError,
@@ -57,7 +58,6 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     workspaceId,
     currentWeekDates,
     selectedMonthStart,
-    selectedView: selectedView as DashboardView,
     selectedWeekStart,
     weekDates,
   });
@@ -148,6 +148,7 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     showToast,
     weeklyById,
     weeklyLogsQueryKey,
+    monthlyLogsQueryKey,
     workspaceId,
   });
 
