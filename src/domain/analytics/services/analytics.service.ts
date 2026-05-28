@@ -2,6 +2,7 @@ import { ForbiddenError, NotFoundError } from "@/lib/server/errors";
 
 const MS_PER_DAY = 86_400_000;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 type WorkspacePort = {
   // Empty for now, but kept for future use or can be removed if not needed.
 };

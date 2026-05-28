@@ -158,6 +158,7 @@ export default function LoginPageClient() {
 
         setRecoveryCodes(response.data.recoveryCodes);
         setIsCopied(false);
+        window.sessionStorage.setItem("dowin.intent.push-prompt", "true");
         trackEvent("sign_up_completed", {
           signup_method: "self_signup",
           user_id_hash: hashId(response.data.user.id),
@@ -187,6 +188,7 @@ export default function LoginPageClient() {
         return;
       }
 
+      window.sessionStorage.setItem("dowin.intent.push-prompt", "true");
       const nextPath = searchParams.get("next");
       router.push(nextPath || "/");
     } catch (loginError) {
@@ -202,7 +204,6 @@ export default function LoginPageClient() {
   if (recoveryCodes) {
     return (
       <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
-        {/* Background Grid */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
         <Card className="w-full max-w-[480px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
@@ -272,8 +273,7 @@ export default function LoginPageClient() {
             <Button
               type="button"
               onClick={() => {
-                const nextPath = searchParams.get("next");
-                router.push(nextPath || "/");
+                router.push("/workspace/new");
               }}
               className="w-full rounded-button py-4 text-[13px] font-black bg-text-primary text-white transition-all"
             >
@@ -291,7 +291,6 @@ export default function LoginPageClient() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
-      {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
       <Card className="w-full max-w-[480px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
@@ -311,20 +310,6 @@ export default function LoginPageClient() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                {t("id")}
-              </label>
-              <Input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                placeholder={t("idPlaceholder")}
-                className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
-                required
-              />
-            </div>
-
             {mode === "signup" && (
               <div className="space-y-2 animate-fade-in-up">
                 <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
@@ -340,6 +325,20 @@ export default function LoginPageClient() {
                 />
               </div>
             )}
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
+                {t("id")}
+              </label>
+              <Input
+                type="text"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                placeholder={t("idPlaceholder")}
+                className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
+                required
+              />
+            </div>
 
             <div className="space-y-2">
               <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
@@ -370,10 +369,9 @@ export default function LoginPageClient() {
               disabled={isPending}
               className={`
                 w-full py-4 flex items-center justify-center gap-3 rounded-button text-[15px] font-black transition-all
-                ${
-                  isPending
-                    ? "bg-sub-background text-text-muted cursor-not-allowed border border-border"
-                    : "bg-text-primary text-white"
+                ${isPending
+                  ? "bg-sub-background text-text-muted cursor-not-allowed border border-border"
+                  : "bg-text-primary text-white"
                 }
               `}
             >

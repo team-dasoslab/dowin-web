@@ -35,11 +35,12 @@ interface MenuItem {
   id: string;
   icon: React.ReactNode;
   title: string;
-  description: string;
+  description?: string;
   danger?: boolean;
   href?: string;
   onClick?: () => void;
   rightElement?: React.ReactNode;
+  wrapOnMobile?: boolean;
 }
 
 export default function ProfilePage() {
@@ -181,25 +182,44 @@ export default function ProfilePage() {
           id: "push-notification",
           icon: <DowinIcon name="status-bell" className="w-4 h-4" />,
           title: t("pushReminder"),
-          description: t("pushReminderDesc"),
           rightElement: (
             <NotificationSettingControl
               isSubscribed={isPushSubscribed}
-              dailyReminderTime={dailySettings?.dailyReminderTime ?? "21:00"}
               disabled={isDailyLoading || isUpdatingDaily}
-              timeOptions={TIME_OPTIONS}
               onSubscriptionChange={(next) => {
                 setIsPushSubscribed(next);
                 if (next) {
                   void refreshSettings();
                 }
               }}
-              onDailyReminderTimeChange={(time) => {
-                void updateDailySettings(time);
-              }}
             />
           ),
         },
+        ...(isPushSubscribed
+          ? [
+              {
+                id: "push-notification-time",
+                icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
+                title: t("reminderTime"),
+                rightElement: (
+                  <select
+                    value={dailySettings?.dailyReminderTime ?? "21:00"}
+                    disabled={isDailyLoading || isUpdatingDaily}
+                    onChange={(event) => {
+                      void updateDailySettings(event.target.value);
+                    }}
+                    className="h-9 cursor-pointer rounded-button border border-border bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:border-primary focus:bg-white disabled:cursor-not-allowed disabled:bg-sub-background disabled:text-text-muted"
+                  >
+                    {TIME_OPTIONS.map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                  </select>
+                ),
+              },
+            ]
+          : []),
       ],
     },
     {
@@ -448,7 +468,6 @@ function MenuItemRow({
           >
             {item.title}
           </p>
-          <p className="text-[12px] text-text-secondary mt-0.5">{item.description}</p>
         </div>
       </div>
       <div className="flex-shrink-0">

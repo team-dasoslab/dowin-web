@@ -14,25 +14,25 @@ export const useProfileExportData = () => {
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount: number, error: any) =>
+      retry: (failureCount: number, error: unknown) =>
         getApiErrorStatus(error) !== 404 && failureCount < 3,
     },
   });
-  const workspaceId = workspaceResponse?.status === 200 ? (workspaceResponse.data as any)?.id : "";
+  const workspaceId = workspaceResponse?.status === 200 ? String((workspaceResponse.data as { id?: string | number })?.id ?? "") : "";
   const {
     data: activeScoreboardResponse,
     isLoading: isScoreboardLoading,
     error: scoreboardError,
   } = useGetWorkspacesWorkspaceIdScoreboardsActive(workspaceId, {
     query: {
-      retry: (failureCount: number, error: any) =>
+      retry: (failureCount: number, error: unknown) =>
         getApiErrorStatus(error) !== 404 && failureCount < 1,
     },
   });
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const workspace =
-    workspaceResponse?.status === 200 ? workspaceResponse.data as any : null;
+    workspaceResponse?.status === 200 ? workspaceResponse.data as { id?: string | number; name?: string; planCode?: string } : null;
   const activeScoreboard =
     activeScoreboardResponse?.status === 200
       ? activeScoreboardResponse.data
@@ -41,8 +41,8 @@ export const useProfileExportData = () => {
   const exportMeasureOptions = useMemo(
     () =>
       (activeScoreboard?.leadMeasures ?? [])
-        .filter((measure: any) => measure.status === "ACTIVE")
-        .map((measure: any) => ({
+        .filter((measure: { status?: string }) => measure.status === "ACTIVE")
+        .map((measure: { id?: number | string; name?: string }) => ({
           id: toNumberId(measure.id),
           name: measure.name,
         }))

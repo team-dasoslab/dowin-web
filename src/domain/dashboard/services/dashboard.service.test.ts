@@ -12,7 +12,7 @@ describe("DashboardService", () => {
     { findLogsForLeadMeasures },
   );
 
-  const context: any = { workspaceId: 3, workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } };
+  const context: Parameters<typeof service.getTeamDashboard>[0] = { workspaceId: 3, workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getTeamDashboard>[0];
 
   beforeEach(() => {
     vi.clearAllMocks();
