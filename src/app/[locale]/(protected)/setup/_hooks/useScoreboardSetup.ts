@@ -157,7 +157,7 @@ export const useScoreboardSetup = () => {
       setGoalName(activeScoreboard.goalName ?? "");
       setLagMeasure(activeScoreboard.lagMeasure ?? "");
       setMeasures(
-        nextLeadMeasures.map((leadMeasure: { id?: string | number; status?: string; name?: string; period?: string; targetValue?: number | null; tags?: Array<{ id: number; name: string }> }) => ({
+        nextLeadMeasures.map((leadMeasure) => ({
           id: String(leadMeasure.id ?? generateId()),
           existingId: toNumberId(leadMeasure.id),
           initialStatus: leadMeasure.status ?? "ACTIVE",
@@ -403,7 +403,7 @@ export const useScoreboardSetup = () => {
 
           return {
             ...measure,
-            tags: measure.tags.map((tag: { id: number; name?: string }) =>
+            tags: measure.tags.map((tag) =>
               tag.id === optimisticTag.id ? createdTag : tag,
             ),
           };
@@ -463,7 +463,7 @@ export const useScoreboardSetup = () => {
     }
 
     const previousName =
-      availableTags.find((tag: { id: number; name: string }) => tag.id === tagId)?.name ?? nextName;
+      availableTags.find((tag) => tag.id === tagId)?.name ?? nextName;
     const previousTagsResponse = workspaceTagsQueryKey
       ? queryClient.getQueryData<GetWorkspacesIdTagsQueryResult>(
           workspaceTagsQueryKey,
@@ -473,7 +473,7 @@ export const useScoreboardSetup = () => {
     setMeasures((previous) =>
       previous.map((measure) => ({
         ...measure,
-        tags: measure.tags.map((tag: { id: number; name?: string }) =>
+        tags: measure.tags.map((tag) =>
           tag.id === tagId ? { ...tag, name: nextName } : tag,
         ),
       })),
@@ -488,7 +488,7 @@ export const useScoreboardSetup = () => {
 
           return {
             ...previous,
-            data: previous.data.map((tag: { id: number; name: string }) =>
+            data: previous.data.map((tag) =>
               tag.id === tagId ? { ...tag, name: nextName } : tag,
             ),
           };
@@ -514,7 +514,7 @@ export const useScoreboardSetup = () => {
       setMeasures((previous) =>
         previous.map((measure) => ({
           ...measure,
-          tags: measure.tags.map((tag: { id: number; name?: string }) =>
+          tags: measure.tags.map((tag) =>
             tag.id === tagId ? { ...tag, name: previousName } : tag,
           ),
         })),
@@ -542,7 +542,7 @@ export const useScoreboardSetup = () => {
     setMeasures((previous) =>
       previous.map((measure) => ({
         ...measure,
-        tags: measure.tags.filter((tag: { id: number }) => tag.id !== tagId),
+        tags: measure.tags.filter((tag) => tag.id !== tagId),
       })),
     );
     if (workspaceTagsQueryKey) {
@@ -555,7 +555,7 @@ export const useScoreboardSetup = () => {
 
           return {
             ...previous,
-            data: previous.data.filter((tag: { id: number }) => tag.id !== tagId),
+            data: previous.data.filter((tag) => tag.id !== tagId),
           };
         },
       );

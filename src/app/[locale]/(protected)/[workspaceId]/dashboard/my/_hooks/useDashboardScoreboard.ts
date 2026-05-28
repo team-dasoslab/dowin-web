@@ -29,7 +29,6 @@ export const useDashboardScoreboard = (workspaceId: string) => {
   const {
     activeLeadMeasures,
     activeScoreboard,
-    activeScoreboard,
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
@@ -40,7 +39,6 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     isWeeklyTrendLoading,
     monthLabel,
     monthlyLeadMeasures,
-    monthlyLogsError,
     monthlyLogsError,
     monthlyOverallRate,
     monthlySummary,

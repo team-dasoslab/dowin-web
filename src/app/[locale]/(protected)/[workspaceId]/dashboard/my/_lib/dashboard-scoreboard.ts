@@ -62,7 +62,7 @@ export const computeWeeklyRate = (
     (leadMeasure: { period?: string }) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure: { id?: number }) => [leadMeasure.id ?? null, leadMeasure]),
+    weeklyLeadMeasures.map((leadMeasure) => [leadMeasure.id ?? null, leadMeasure]),
   );
 
   const achieved = weeklyTargetMeasures.reduce((accumulator, leadMeasure) => {
@@ -94,7 +94,7 @@ export const updateWeeklyLogsCache = (
     ...previous,
     data: {
       ...previous.data,
-      leadMeasures: previous.data.leadMeasures?.map((leadMeasure: { id?: number | string; logs?: Record<string, DailyLogValue>; targetValue?: number | null }) => {
+      leadMeasures: previous.data.leadMeasures?.map((leadMeasure) => {
         if (toNumberId(leadMeasure.id) !== leadMeasureId) {
           return leadMeasure;
         }

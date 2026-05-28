@@ -166,20 +166,20 @@ export const useDashboardScoreboardQueries = ({
       ? monthlyLogsResponse.data.monthLabel
       : undefined;
   const activeLeadMeasures = (activeScoreboard?.leadMeasures ?? []).filter(
-    (leadMeasure: { status?: string }) => leadMeasure.status === "ACTIVE",
+    (leadMeasure) => leadMeasure.status === "ACTIVE",
   );
   const weeklyTargetMeasures = activeLeadMeasures.filter(
-    (leadMeasure: { period?: string }) => leadMeasure.period !== "MONTHLY",
+    (leadMeasure) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure: { id?: number | string }) => [
+    weeklyLeadMeasures.map((leadMeasure) => [
       toNumberId(leadMeasure.id),
       leadMeasure,
     ]),
   );
 
   const weeklyAchieved = weeklyTargetMeasures.reduce(
-    (accumulator: number, leadMeasure: { id?: number | string; targetValue?: number | null }) => {
+    (accumulator, leadMeasure) => {
       const weekly = weeklyById.get(toNumberId(leadMeasure.id));
       const targetValue = leadMeasure.targetValue ?? 0;
       return accumulator + Math.min(weekly?.achieved ?? 0, targetValue);
@@ -187,7 +187,7 @@ export const useDashboardScoreboardQueries = ({
     0,
   );
   const weeklyTotalTarget = weeklyTargetMeasures.reduce(
-    (accumulator: number, leadMeasure: { targetValue?: number | null }) => accumulator + (leadMeasure.targetValue ?? 0),
+    (accumulator, leadMeasure) => accumulator + (leadMeasure.targetValue ?? 0),
     0,
   );
   const weeklyOverallRate =
@@ -221,7 +221,7 @@ export const useDashboardScoreboardQueries = ({
     },
   );
   const weeklyGuideById = new Map(
-    weeklyLeadMeasures.map((leadMeasure: { id?: number | string; guide?: string | null }) => [
+    weeklyLeadMeasures.map((leadMeasure) => [
       toNumberId(leadMeasure.id),
       leadMeasure.guide ?? null,
     ]),

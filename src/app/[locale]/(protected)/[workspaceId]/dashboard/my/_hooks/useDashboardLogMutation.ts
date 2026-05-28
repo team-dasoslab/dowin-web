@@ -125,7 +125,7 @@ export const useDashboardLogMutation = ({
     ToggleLogContext
   >({
     mutation: {
-      mutationFn: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: DailyLogValue } }) => {
+      mutationFn: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: boolean } }) => {
         const response = await putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(
           workspaceId,
           leadMeasureId,
@@ -139,7 +139,7 @@ export const useDashboardLogMutation = ({
 
         return response;
       },
-      onMutate: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: DailyLogValue } }) => {
+      onMutate: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: boolean } }) => {
         await queryClient.cancelQueries({
           queryKey: weeklyLogsQueryKey ?? undefined,
         });
