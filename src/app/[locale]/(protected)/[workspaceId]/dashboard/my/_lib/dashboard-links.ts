@@ -39,8 +39,8 @@ export const getDashboardLinks = (workspaceId: string): {
   },
   {
     href: `/${workspaceId}/setup?mode=update`,
-    iconName: "nav-settings",
-    iconNameActive: "nav-settings-active",
+    iconName: "action-edit",
+    iconNameActive: "action-edit-active",
     label: "점수판 관리",
     translationKey: "manageScoreboard",
   },
