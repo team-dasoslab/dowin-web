@@ -29,7 +29,6 @@ export const useDashboardScoreboard = (workspaceId: string) => {
   const {
     activeLeadMeasures,
     activeScoreboard,
-    dashboardTeamQueryKey,
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
@@ -59,7 +58,6 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     workspaceId,
     currentWeekDates,
     selectedMonthStart,
-    selectedView: selectedView as DashboardView,
     selectedWeekStart,
     weekDates,
   });
@@ -150,6 +148,7 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     showToast,
     weeklyById,
     weeklyLogsQueryKey,
+    monthlyLogsQueryKey,
     workspaceId,
   });
 

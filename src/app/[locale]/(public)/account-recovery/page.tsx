@@ -1,8 +1,7 @@
 import AccountRecoveryPageClient from "@/app/_components/AccountRecoveryPageClient";
 import { getDb } from "@/db";
-import { redirect } from "@/i18n/routing";
-import { redirectToDefaultWorkspace } from "@/lib/server/workspace-redirect";
 import { getSession } from "@/lib/server/auth";
+import { redirectToDefaultWorkspace } from "@/lib/server/workspace-redirect";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export default async function AccountRecoveryPage({
