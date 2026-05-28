@@ -877,6 +877,7 @@
     "WORKSPACE_PAYMENT_REQUIRED": "New workspaces can be created only after Basic seat payment.",
     "WORKSPACE_CHECKOUT_ALREADY_PENDING": "A workspace checkout is already in progress. Continue from the existing checkout page.",
     "WORKSPACE_CHECKOUT_NOT_READY": "Workspace checkout is not completed yet.",
+    "WORKSPACE_CHECKOUT_OWNER_MISMATCH": "Log in with the account that started this checkout, then try again.",
     "WORKSPACE_MEMBER_LIMIT_REACHED": "Cannot join the workspace. Contact the admin.",
     "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "This FREE workspace is over the 10-member limit and is now read-only. Remove members until the workspace has 10 or fewer members, or upgrade to STANDARD.",
     "STANDARD_PLAN_REQUIRED": "This feature requires a STANDARD plan.",

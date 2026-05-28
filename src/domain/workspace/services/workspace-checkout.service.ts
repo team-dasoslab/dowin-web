@@ -5,7 +5,7 @@ import {
 } from "@/domain/billing/polar";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { ConflictError, NotFoundError } from "@/lib/server/errors";
+import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 
 const WORKSPACE_CHECKOUT_EXPIRES_MS = 30 * 60 * 1000;
 
@@ -180,7 +180,7 @@ export class WorkspaceCheckoutService {
     }
 
     if (pending.userId !== input.userId) {
-      throw new NotFoundError("NOT_FOUND");
+      throw new ForbiddenError("WORKSPACE_CHECKOUT_OWNER_MISMATCH");
     }
 
     if (pending.status === "COMPLETED" && pending.completedWorkspaceId) {

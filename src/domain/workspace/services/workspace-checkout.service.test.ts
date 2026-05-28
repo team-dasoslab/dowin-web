@@ -169,4 +169,36 @@ describe("WorkspaceCheckoutService", () => {
       checkoutId: "checkout_1",
     });
   });
+
+  it("결제를 시작한 사용자와 현재 세션 사용자가 다르면 명시적으로 거절한다", async () => {
+    const storage = createStorage({
+      findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
+        id: 10,
+        uid: "pending_ws_1",
+        userId: 9,
+        workspaceName: "운영팀",
+        requestedSeatCount: 5,
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: "checkout_1",
+        expiresAt: new Date("2026-05-28T01:00:00.000Z"),
+      }),
+    });
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      createPolarClient(),
+    );
+
+    await expect(
+      service.completeWorkspaceCheckout({
+        userId: 10,
+        workspaceCheckoutId: "pending_ws_1",
+        checkoutId: "checkout_1",
+        now: new Date("2026-05-28T00:10:00.000Z"),
+      }),
+    ).rejects.toMatchObject({
+      code: "WORKSPACE_CHECKOUT_OWNER_MISMATCH",
+      statusCode: 403,
+    });
+  });
 });
