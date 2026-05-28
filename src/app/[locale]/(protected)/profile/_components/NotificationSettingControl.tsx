@@ -18,8 +18,7 @@ import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 
-const DEVICE_NOTIFICATION_PREFERENCE_KEY =
-  "dowin.notifications.current-device.enabled";
+import { DEVICE_NOTIFICATION_PREFERENCE_KEY } from "@/lib/client/notification-constants";
 
 const getInitialNotificationPreference = () => {
   if (typeof window !== "undefined") {
