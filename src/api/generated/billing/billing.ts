@@ -6,29 +6,23 @@
  * OpenAPI spec version: 0.1.0
  */
 import {
-  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
-  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
-  UseMutationOptions,
-  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  BillingCheckoutResponse,
   BillingOverview,
   ErrorResponse,
-  PostWorkspacesWorkspaceIdBillingCheckoutBody,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
 
@@ -162,111 +156,6 @@ export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<
 
 
 /**
- * @summary STANDARD checkout 시작
- */
-export type postWorkspacesWorkspaceIdBillingCheckoutResponse200 = {
-  data: BillingCheckoutResponse
-  status: 200
-}
-
-export type postWorkspacesWorkspaceIdBillingCheckoutResponse401 = {
-  data: UnauthorizedErrorResponse
-  status: 401
-}
-
-export type postWorkspacesWorkspaceIdBillingCheckoutResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-
-export type postWorkspacesWorkspaceIdBillingCheckoutResponse409 = {
-  data: ErrorResponse
-  status: 409
-}
-
-export type postWorkspacesWorkspaceIdBillingCheckoutResponse422 = {
-  data: ErrorResponse
-  status: 422
-}
-
-export type postWorkspacesWorkspaceIdBillingCheckoutResponseSuccess = (postWorkspacesWorkspaceIdBillingCheckoutResponse200) & {
-  headers: Headers;
-};
-export type postWorkspacesWorkspaceIdBillingCheckoutResponseError = (postWorkspacesWorkspaceIdBillingCheckoutResponse401 | postWorkspacesWorkspaceIdBillingCheckoutResponse403 | postWorkspacesWorkspaceIdBillingCheckoutResponse409 | postWorkspacesWorkspaceIdBillingCheckoutResponse422) & {
-  headers: Headers;
-};
-
-export type postWorkspacesWorkspaceIdBillingCheckoutResponse = (postWorkspacesWorkspaceIdBillingCheckoutResponseSuccess | postWorkspacesWorkspaceIdBillingCheckoutResponseError)
-
-export const getPostWorkspacesWorkspaceIdBillingCheckoutUrl = (workspaceId: string,) => {
-
-
-  
-
-  return `/api/workspaces/${workspaceId}/billing/checkout`
-}
-
-export const postWorkspacesWorkspaceIdBillingCheckout = async (workspaceId: string,
-    postWorkspacesWorkspaceIdBillingCheckoutBody: PostWorkspacesWorkspaceIdBillingCheckoutBody, options?: RequestInit): Promise<postWorkspacesWorkspaceIdBillingCheckoutResponse> => {
-  
-  return customInstance<postWorkspacesWorkspaceIdBillingCheckoutResponse>(getPostWorkspacesWorkspaceIdBillingCheckoutUrl(workspaceId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      postWorkspacesWorkspaceIdBillingCheckoutBody,)
-  }
-);}
-  
-
-
-
-export const getPostWorkspacesWorkspaceIdBillingCheckoutMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, TError,{workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, TError,{workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}, TContext> => {
-
-const mutationKey = ['postWorkspacesWorkspaceIdBillingCheckout'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, {workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}> = (props) => {
-          const {workspaceId,data} = props ?? {};
-
-          return  postWorkspacesWorkspaceIdBillingCheckout(workspaceId,data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PostWorkspacesWorkspaceIdBillingCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>>
-    export type PostWorkspacesWorkspaceIdBillingCheckoutMutationBody = PostWorkspacesWorkspaceIdBillingCheckoutBody
-    export type PostWorkspacesWorkspaceIdBillingCheckoutMutationError = UnauthorizedErrorResponse | ErrorResponse
-
-    /**
- * @summary STANDARD checkout 시작
- */
-export const usePostWorkspacesWorkspaceIdBillingCheckout = <TError = UnauthorizedErrorResponse | ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, TError,{workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody}, TContext>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>,
-        TError,
-        {workspaceId: string;data: PostWorkspacesWorkspaceIdBillingCheckoutBody},
-        TContext
-      > => {
-      return useMutation(getPostWorkspacesWorkspaceIdBillingCheckoutMutationOptions(options), queryClient);
-    }
-    /**
  * @summary customer portal 진입
  */
 export type getWorkspacesWorkspaceIdBillingPortalResponse307 = {

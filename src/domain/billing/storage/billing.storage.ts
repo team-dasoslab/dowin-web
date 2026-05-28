@@ -1,7 +1,6 @@
 import { getDb } from "@/db";
 import {
   billingEvents,
-  billingCheckoutEvents,
   billingProviderProducts,
   workspaceBillingState,
   workspaceSeatEntitlements,
@@ -115,19 +114,6 @@ export class BillingStorage {
       .returning();
 
     return product;
-  }
-
-  async findCheckoutSessionCreatedEvent(workspaceId: number, requestId: string) {
-    return (
-      (await this.db.query.billingCheckoutEvents.findFirst({
-        where: and(
-          eq(billingCheckoutEvents.workspaceId, workspaceId),
-          eq(billingCheckoutEvents.requestId, requestId),
-          eq(billingCheckoutEvents.eventType, "CHECKOUT_SESSION_CREATED"),
-        ),
-        orderBy: [desc(billingCheckoutEvents.recordedAt)],
-      })) ?? null
-    );
   }
 
   async getRecentBillingRiskSummary(workspaceId: number, since: Date) {
@@ -301,38 +287,6 @@ export class BillingStorage {
       .returning();
 
     return event;
-  }
-
-  async appendCheckoutEvent(input: {
-    workspaceId: number;
-    requestedByUserId: number;
-    requestId: string;
-    targetPlanCode: "STANDARD";
-    providerCheckoutId?: string | null;
-    eventType:
-      | "CHECKOUT_REQUESTED"
-      | "CHECKOUT_SESSION_CREATED"
-      | "CHECKOUT_FAILED";
-    occurredAt: Date;
-    payloadJson: string;
-  }) {
-    const result = await this.db
-      .insert(billingCheckoutEvents)
-      .values({
-        workspaceId: input.workspaceId,
-        requestedByUserId: input.requestedByUserId,
-        requestId: input.requestId,
-        targetPlanCode: input.targetPlanCode,
-        provider: "POLAR",
-        providerCheckoutId: input.providerCheckoutId ?? null,
-        eventType: input.eventType,
-        occurredAt: input.occurredAt,
-        payloadJson: input.payloadJson,
-      })
-      .onConflictDoNothing()
-      .returning();
-
-    return result[0] ?? null;
   }
 
   async upsertWorkspaceBillingState(input: {

@@ -3,14 +3,6 @@ import { entitlementSourceValues } from "@/domain/billing/types";
 
 export const entitlementSourceSchema = z.enum(entitlementSourceValues);
 
-export const billingCheckoutHeaderSchema = z.object({
-  idempotencyKey: z.string().trim().min(1).max(255),
-});
-
-export const billingCheckoutBodySchema = z.object({
-  locale: z.enum(["ko", "en"]),
-});
-
 export const adminBillingWorkspaceListQuerySchema = z.object({
   workspaceId: z.coerce.number().int().positive().optional(),
   workspaceName: z

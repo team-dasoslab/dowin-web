@@ -2173,60 +2173,6 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
-  /workspaces/{workspaceId}/billing/checkout:
-    post:
-      summary: STANDARD checkout 시작
-      tags: [Billing]
-      security: [{ sessionCookie: [] }]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [locale]
-              properties:
-                locale:
-                  type: string
-                  enum: [ko, en]
-                  description: checkout 복귀 후 다시 진입할 앱 locale
-      parameters:
-        - in: path
-          name: workspaceId
-          required: true
-          schema:
-            type: string
-          description: 워크스페이스 public ID
-        - in: header
-          name: Idempotency-Key
-          required: true
-          schema:
-            type: string
-          description: 같은 업그레이드 요청의 중복 checkout 생성을 방지하는 멱등 키
-      responses:
-        "200":
-          description: checkout 준비 완료
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/BillingCheckoutResponse" }
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          description: 관리자만 결제 시작 가능
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-        "409":
-          description: billing 연동 미준비 또는 현재 상태에서 checkout 불가
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-        "422":
-          description: 헤더 유효성 오류
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/ErrorResponse" }
-
   /workspaces/{workspaceId}/billing/portal:
     get:
       summary: customer portal 진입
@@ -3102,14 +3048,6 @@ components:
         requiresManualReview:
           type: boolean
         canManageBilling: { type: boolean }
-
-    BillingCheckoutResponse:
-      type: object
-      required: [checkoutUrl]
-      properties:
-        checkoutUrl:
-          type: string
-          format: uri
 
     UserNotificationSettings:
       type: object

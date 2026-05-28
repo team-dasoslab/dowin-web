@@ -728,10 +728,6 @@ export interface BillingOverview {
   canManageBilling: boolean;
 }
 
-export interface BillingCheckoutResponse {
-  checkoutUrl: string;
-}
-
 export interface UserNotificationSettings {
   dailyReminderEnabled: boolean;
   dailyReminderTime: string;
@@ -1441,22 +1437,6 @@ export const GetWorkspacesWorkspaceIdAnalyticsExportDataView = {
   week: 'week',
   month: 'month',
 } as const;
-
-/**
- * checkout 복귀 후 다시 진입할 앱 locale
- */
-export type PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale = typeof PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale[keyof typeof PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale];
-
-
-export const PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale = {
-  ko: 'ko',
-  en: 'en',
-} as const;
-
-export type PostWorkspacesWorkspaceIdBillingCheckoutBody = {
-  /** checkout 복귀 후 다시 진입할 앱 locale */
-  locale: PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale;
-};
 
 export type GetWorkspacesWorkspaceIdDashboardTeamParams = {
 weekStart?: string;
