@@ -31,7 +31,7 @@ export function Sidebar() {
   }) : [];
 
   const mobileLinks = filteredLinks.filter(
-    (link) => link.translationKey !== "weeklyReport",
+    (link) => !["weeklyReport", "workspaceSettings"].includes(link.translationKey),
   );
 
   const getIsActive = (href: string) => {
