@@ -32,20 +32,14 @@ const getInitialNotificationPreference = () => {
 
 type NotificationSettingControlProps = {
   isSubscribed: boolean;
-  dailyReminderTime: string;
   disabled?: boolean;
   onSubscriptionChange: (isSubscribed: boolean) => void;
-  onDailyReminderTimeChange: (time: string) => void;
-  timeOptions: string[];
 };
 
 export function NotificationSettingControl({
   isSubscribed,
-  dailyReminderTime,
   disabled = false,
   onSubscriptionChange,
-  onDailyReminderTimeChange,
-  timeOptions,
 }: NotificationSettingControlProps) {
   const t = useTranslations("Profile.NotificationControl");
   const isNativeApp = useNativeApp();
@@ -222,18 +216,6 @@ export function NotificationSettingControl({
       className="flex flex-wrap items-center justify-end gap-2"
       data-coachmark="profile-personal-reminder"
     >
-      <select
-        value={dailyReminderTime}
-        disabled={disabled || !isRegistered}
-        onChange={(event) => onDailyReminderTimeChange(event.target.value)}
-        className="h-9 cursor-pointer rounded-button border border-border bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:border-primary focus:bg-white disabled:cursor-not-allowed disabled:bg-sub-background disabled:text-text-muted"
-      >
-        {timeOptions.map((time) => (
-          <option key={time} value={time}>
-            {time}
-          </option>
-        ))}
-      </select>
       <button
         type="button"
         disabled={isToggleDisabled}
