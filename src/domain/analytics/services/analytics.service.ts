@@ -71,7 +71,7 @@ export class AnalyticsService {
     leadMeasureBreakdown: ExportMeasureBreakdown[];
     dailyRows: ExportRow[];
   }> {
-    if (!context.entitlement.canAccessStandardFeatures) {
+    if (!context.entitlement.canAccessBasicSubscription) {
       throw new ForbiddenError("STANDARD_PLAN_REQUIRED");
     }
 

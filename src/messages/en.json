@@ -623,7 +623,7 @@
       "emptyMeasures": "Please select at least one lead measure.",
       "fetchFailed": "Failed to load export data.",
       "downloadStarted": "CSV download started.",
-      "standardRequired": "CSV download is not available right now."
+      "standardRequired": "CSV download requires an active Basic subscription."
     },
     "Notification": {
       "timeChanged": "Daily reminder time has been changed.",
@@ -905,7 +905,7 @@
     "WORKSPACE_CHECKOUT_OWNER_MISMATCH": "Log in with the account that started this checkout, then try again.",
     "WORKSPACE_MEMBER_LIMIT_REACHED": "Cannot join the workspace. Contact the admin.",
     "FREE_PLAN_MEMBER_LIMIT_EXCEEDED": "This workspace is over its seat limit, so some features are currently limited. Reduce members or review seat status in billing management.",
-    "STANDARD_PLAN_REQUIRED": "This feature is not available right now.",
+    "STANDARD_PLAN_REQUIRED": "This feature requires an active Basic subscription.",
     "WORKSPACE_TAG_ALREADY_EXISTS": "A tag with the same name already exists.",
     "ADMIN_TRANSFER_REQUIRED": "Admins can only delete their account after transferring ownership or deleting the workspace.",
     "CANNOT_REMOVE_LAST_ADMIN": "Cannot remove the last admin.",

@@ -32,7 +32,7 @@ describe("TeamMemoService", () => {
     role: "MEMBER" as const,
     membershipId: 100,
     entitlement: {
-      canAccessStandardFeatures: false,
+      canAccessBasicSubscription: false,
       entitlementSource: null,
       billingStatus: "NONE" as const,
       planCode: "FREE" as const,
