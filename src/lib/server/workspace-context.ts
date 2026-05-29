@@ -56,8 +56,10 @@ export async function requireWorkspaceAccess(
   const billingStatus = billingState?.billingStatus ?? "NONE";
   const entitlementSource = billingState?.entitlementSource ?? null;
 
-  // DB planCode는 아직 FREE/STANDARD 호환값을 쓰지만, 제품 권한은 Basic 구독 활성 여부로 해석한다.
-  const canAccessBasicSubscription = planCode === "STANDARD";
+  // FREE/STANDARD는 과거 호환 코드값일 뿐이며, 제품 권한은 Basic entitlement 활성 여부로 해석한다.
+  const canAccessBasicSubscription =
+    (planCode === "BASIC" || planCode === "STANDARD") &&
+    (billingStatus === "ACTIVE" || billingStatus === "CANCELED");
 
   return {
     workspaceId: workspace.id,

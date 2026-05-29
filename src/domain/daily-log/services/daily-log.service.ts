@@ -4,7 +4,7 @@ import {
 } from "@/lib/server/errors";
 import { WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
 import { DailyLogRecord, DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
-import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
+import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import {
   LeadMeasureRecord,
   LeadMeasureRecordWithTags,
@@ -62,7 +62,7 @@ export class DailyLogService {
       leadMeasureId,
       userId,
     );
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -78,7 +78,7 @@ export class DailyLogService {
       leadMeasureId,
       userId,
     );
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     await this.dailyLogStorage.deleteLog(leadMeasureId, date);
   }
 

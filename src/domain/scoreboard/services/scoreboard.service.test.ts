@@ -17,6 +17,7 @@ describe("ScoreboardService", () => {
   const findWorkspaceById = vi.fn();
   const findMembership = vi.fn();
   const countMembers = vi.fn();
+  const findBillingState = vi.fn();
   const findPlanLimit = vi.fn();
 
   const mockScoreboardStorage: ScoreboardStoragePort = {
@@ -34,6 +35,7 @@ describe("ScoreboardService", () => {
     findWorkspaceById,
     findMembership,
     countMembers,
+    findBillingState,
     findPlanLimit,
   };
 
@@ -45,6 +47,11 @@ describe("ScoreboardService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     countMembers.mockResolvedValue(1);
+    findBillingState.mockResolvedValue({
+      planCode: "BASIC",
+      billingStatus: "ACTIVE",
+      entitlementSource: "POLAR",
+    });
     findPlanLimit.mockResolvedValue({ memberLimit: 10 });
   });
 
@@ -102,6 +109,23 @@ describe("ScoreboardService", () => {
       });
     });
 
+    it("Basic entitlement가 없으면 새 점수판을 생성할 수 없다", async () => {
+      resolveIdByUid.mockResolvedValue(3);
+      findMembership.mockResolvedValue(true);
+      findWorkspaceById.mockResolvedValue({ id: 3, planCode: "FREE" });
+      findBillingState.mockResolvedValue(null);
+
+      await expect(
+        service.createScoreboard("ws_uid", 1, {
+          goalName: "체중을 감량한다",
+          lagMeasure: "80kg에서 75kg까지 달성",
+          startDate: "2026-03-15",
+          endDate: null,
+        }),
+      ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+      expect(createScoreboard).not.toHaveBeenCalled();
+    });
+
     it("이미 활성 점수판이 있으면 409 에러를 던진다", async () => {
       resolveIdByUid.mockResolvedValue(3);
       findMembership.mockResolvedValue(true);
@@ -131,7 +155,7 @@ describe("ScoreboardService", () => {
           startDate: "2026-03-15",
           endDate: null,
         }),
-      ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+      ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
       expect(createScoreboard).not.toHaveBeenCalled();
     });
   });

@@ -345,6 +345,14 @@ export class WorkspaceStorage {
     );
   }
 
+  async findBillingState(workspaceId: number) {
+    return (
+      (await this.db.query.workspaceBillingState.findFirst({
+        where: eq(workspaceBillingState.workspaceId, workspaceId),
+      })) ?? null
+    );
+  }
+
   async findSeatEntitlement(workspaceId: number) {
     return (
       (await this.db.query.workspaceSeatEntitlements.findFirst({

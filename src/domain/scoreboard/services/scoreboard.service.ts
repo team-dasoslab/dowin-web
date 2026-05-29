@@ -4,7 +4,7 @@ import {
   NotFoundError,
   PlatformError,
 } from "@/lib/server/errors";
-import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
+import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import {
   CreateScoreboardInput,
   ScoreboardRecord,
@@ -22,6 +22,11 @@ export interface WorkspaceLookupPort {
   findWorkspaceById(workspaceId: number): Promise<WorkspaceSummary | null>;
   findMembership(workspaceId: number, userId: number): Promise<unknown | null>;
   countMembers(workspaceId: number): Promise<number>;
+  findBillingState(workspaceId: number): Promise<{
+    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+  } | null>;
   findPlanLimit(
     planCode: "BASIC" | "FREE" | "STANDARD",
   ): Promise<{ memberLimit: number } | null>;
@@ -76,7 +81,7 @@ export class ScoreboardService {
     input: Omit<CreateScoreboardInput, "userId" | "workspaceId">,
   ): Promise<ScoreboardRecord> {
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     const existing = await this.scoreboardStorage.findActiveScoreboard(
       userId,
       workspace.id,
@@ -102,7 +107,7 @@ export class ScoreboardService {
   ): Promise<ScoreboardRecord> {
     const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
       throw new PlatformScoreboardArchivedError();
@@ -114,7 +119,7 @@ export class ScoreboardService {
   async archiveScoreboard(workspaceUid: string, id: number, userId: number): Promise<ScoreboardRecord> {
     const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
       throw new PlatformScoreboardArchivedError();
@@ -141,7 +146,7 @@ export class ScoreboardService {
   ): Promise<ScoreboardRecord> {
     const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ACTIVE") {
       throw new BadRequestError("SCOREBOARD_ALREADY_ACTIVE");

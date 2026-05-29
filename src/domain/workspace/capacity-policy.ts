@@ -5,11 +5,18 @@ type WorkspacePlanSummary = {
   planCode?: "BASIC" | "FREE" | "STANDARD" | string | null;
 };
 
+type WorkspaceBillingState = {
+  planCode: "BASIC" | "FREE" | "STANDARD";
+  billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+};
+
 type MemberCapacityPort = {
   countMembers(workspaceId: number): Promise<number>;
   findSeatEntitlement?(
     workspaceId: number,
   ): Promise<{ purchasedSeatCount: number } | null>;
+  findBillingState(workspaceId: number): Promise<WorkspaceBillingState | null>;
   findPlanLimit(
     planCode: "BASIC" | "FREE" | "STANDARD",
   ): Promise<{ memberLimit: number } | null>;
@@ -35,6 +42,20 @@ export async function getPlanMemberLimitFromStorage(
 
   const planLimit = await storage.findPlanLimit(planCode);
   return planLimit?.memberLimit ?? null;
+}
+
+export function hasActiveBasicEntitlement(
+  billingState: WorkspaceBillingState | null,
+) {
+  if (!billingState) return false;
+  if (billingState.planCode !== "BASIC" && billingState.planCode !== "STANDARD") {
+    return false;
+  }
+
+  return (
+    billingState.billingStatus === "ACTIVE" ||
+    billingState.billingStatus === "CANCELED"
+  );
 }
 
 export class CapacityPolicy {
@@ -76,6 +97,7 @@ export class CapacityPolicy {
   }
 
   async assertCanAddMember(workspace: WorkspacePlanSummary): Promise<void> {
+    await this.assertBasicEntitlementActive(workspace);
     const capacity = await this.getWorkspaceMemberCapacity(workspace);
 
     if (!capacity.hasAvailableMemberSlot) {
@@ -86,10 +108,20 @@ export class CapacityPolicy {
   async assertWorkspaceUsageAllowed(
     workspace: WorkspacePlanSummary,
   ): Promise<void> {
+    await this.assertBasicEntitlementActive(workspace);
     const capacity = await this.getWorkspaceMemberCapacity(workspace);
 
     if (capacity.isOverLimit) {
-      throw new ForbiddenError("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+      throw new ForbiddenError("WORKSPACE_SEAT_LIMIT_EXCEEDED");
+    }
+  }
+
+  private async assertBasicEntitlementActive(
+    workspace: WorkspacePlanSummary,
+  ): Promise<void> {
+    const billingState = await this.storage.findBillingState(workspace.id);
+    if (!hasActiveBasicEntitlement(billingState)) {
+      throw new ForbiddenError("BASIC_SUBSCRIPTION_REQUIRED");
     }
   }
 }

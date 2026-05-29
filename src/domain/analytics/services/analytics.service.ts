@@ -72,7 +72,7 @@ export class AnalyticsService {
     dailyRows: ExportRow[];
   }> {
     if (!context.entitlement.canAccessBasicSubscription) {
-      throw new ForbiddenError("STANDARD_PLAN_REQUIRED");
+      throw new ForbiddenError("BASIC_SUBSCRIPTION_REQUIRED");
     }
 
     const scoreboard = await this.scoreboardStorage.findActiveScoreboard(

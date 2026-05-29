@@ -28,7 +28,7 @@ describe("AnalyticsService", () => {
   it("Basic 구독이 활성 상태가 아니면 export 데이터를 조회할 수 없다", async () => {
     await expect(
       service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: false, entitlementSource: null, billingStatus: "NONE", planCode: "FREE" } } as unknown as Parameters<typeof service.getExportData>[0], { from: "2026-03-01", to: "2026-03-31" }),
-    ).rejects.toThrow("STANDARD_PLAN_REQUIRED");
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
   });
 
   it("기간/지표 기준 export 데이터를 집계해 반환한다", async () => {

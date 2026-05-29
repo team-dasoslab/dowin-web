@@ -6,6 +6,7 @@ describe("LeadMeasureService", () => {
   const findWorkspaceById = vi.fn();
   const findMembership = vi.fn();
   const countMembers = vi.fn();
+  const findBillingState = vi.fn();
   const findPlanLimit = vi.fn();
   const findOwnedScoreboard = vi.fn();
   const findLeadMeasuresByScoreboard = vi.fn();
@@ -20,7 +21,7 @@ describe("LeadMeasureService", () => {
   const countTrueLogsByLeadMeasures = vi.fn();
 
   const service = new LeadMeasureService(
-    { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findPlanLimit },
+    { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findBillingState, findPlanLimit },
     { findOwnedScoreboard },
     {
       findLeadMeasuresByScoreboard,
@@ -38,7 +39,13 @@ describe("LeadMeasureService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     countMembers.mockResolvedValue(1);
+    findBillingState.mockResolvedValue({
+      planCode: "BASIC",
+      billingStatus: "ACTIVE",
+      entitlementSource: "POLAR",
+    });
     findPlanLimit.mockResolvedValue({ memberLimit: 10 });
+    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "BASIC" });
   });
 
   it("점수판의 활성 선행지표 목록을 주간 달성 수와 함께 반환한다", async () => {
@@ -134,7 +141,29 @@ describe("LeadMeasureService", () => {
         targetValue: 3,
         period: "WEEKLY",
       }),
-    ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+    ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
+    expect(createLeadMeasure).not.toHaveBeenCalled();
+  });
+
+  it("Basic entitlement가 없으면 선행지표를 생성할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
+    findBillingState.mockResolvedValue(null);
+    findOwnedScoreboard.mockResolvedValue({
+      id: 2,
+      workspaceId: 1,
+      status: "ACTIVE",
+      startDate: "2026-03-01",
+    });
+
+    await expect(
+      service.createLeadMeasure("ws_uid", 2, 100, {
+        name: "주 3회 운동",
+        targetValue: 3,
+        period: "WEEKLY",
+      }),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
     expect(createLeadMeasure).not.toHaveBeenCalled();
   });
 

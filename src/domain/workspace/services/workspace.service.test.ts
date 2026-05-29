@@ -15,6 +15,7 @@ describe("WorkspaceService", () => {
     findMembers: vi.fn(),
     countMembers: vi.fn(),
     findPlanLimit: vi.fn(),
+    findBillingState: vi.fn(),
     findSeatEntitlement: vi.fn(),
     removeMemberById: vi.fn(),
     updateMemberRole: vi.fn(),
@@ -40,6 +41,11 @@ describe("WorkspaceService", () => {
     vi.clearAllMocks();
     mockStorage.countMembers.mockResolvedValue(1);
     mockStorage.findPlanLimit.mockResolvedValue({ memberLimit: 10 });
+    mockStorage.findBillingState.mockResolvedValue({
+      planCode: "BASIC",
+      billingStatus: "ACTIVE",
+      entitlementSource: "POLAR",
+    });
     mockStorage.findSeatEntitlement.mockResolvedValue(null);
   });
 
@@ -232,6 +238,20 @@ describe("WorkspaceService", () => {
       expect(mockStorage.addMember).not.toHaveBeenCalled();
     });
 
+    it("Basic entitlement가 없으면 워크스페이스 참가를 막는다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.findBillingState.mockResolvedValue(null);
+
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
+        "BASIC_SUBSCRIPTION_REQUIRED",
+      );
+      expect(mockStorage.addMember).not.toHaveBeenCalled();
+    });
+
     it("좌석 권한이 있으면 플랜이 아니라 purchasedSeatCount 기준으로 참가를 막는다", async () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
@@ -376,7 +396,7 @@ describe("WorkspaceService", () => {
       mockStorage.countMembers.mockResolvedValue(11);
 
       await expect(service.createInvite(1, 1, 3)).rejects.toThrow(
-        "FREE_PLAN_MEMBER_LIMIT_EXCEEDED",
+        "WORKSPACE_SEAT_LIMIT_EXCEEDED",
       );
       expect(mockStorage.createInvite).not.toHaveBeenCalled();
     });
@@ -393,7 +413,7 @@ describe("WorkspaceService", () => {
       mockStorage.countMembers.mockResolvedValue(4);
 
       await expect(service.createInvite(1, 1, 3)).rejects.toThrow(
-        "FREE_PLAN_MEMBER_LIMIT_EXCEEDED",
+        "WORKSPACE_SEAT_LIMIT_EXCEEDED",
       );
       expect(mockStorage.createInvite).not.toHaveBeenCalled();
     });
@@ -558,7 +578,7 @@ describe("WorkspaceService", () => {
           name: "운동",
           normalizedName: "운동",
         }),
-      ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+      ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
       expect(mockStorage.createTag).not.toHaveBeenCalled();
     });
 

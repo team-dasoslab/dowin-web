@@ -58,7 +58,7 @@ export class TeamMemoService {
     context: WorkspaceAccessContext,
     input: { targetUserId: number; content: string },
   ) {
-    // FREE 플랜 제한 등은 생략하거나 나중에 추가. 일단 메모 기능 자체의 제한은 없음
+    this.assertBasicEntitlementActive(context);
     await this.requireWorkspaceMember(context.workspaceId, input.targetUserId);
 
     const memo = await this.teamMemoStorage.create({
@@ -76,6 +76,7 @@ export class TeamMemoService {
     memoId: number,
     isResolved: boolean,
   ) {
+    this.assertBasicEntitlementActive(context);
     const memo = await this.teamMemoStorage.findById(memoId);
 
     if (!memo || memo.workspaceId !== context.workspaceId) {
@@ -100,6 +101,7 @@ export class TeamMemoService {
   }
 
   async deleteTeamMemo(context: WorkspaceAccessContext, memoId: number) {
+    this.assertBasicEntitlementActive(context);
     const memo = await this.teamMemoStorage.findById(memoId);
 
     if (!memo || memo.workspaceId !== context.workspaceId) {
@@ -128,6 +130,12 @@ export class TeamMemoService {
     }
 
     return membership;
+  }
+
+  private assertBasicEntitlementActive(context: WorkspaceAccessContext) {
+    if (!context.entitlement.canAccessBasicSubscription) {
+      throw new ForbiddenError("BASIC_SUBSCRIPTION_REQUIRED");
+    }
   }
 }
 

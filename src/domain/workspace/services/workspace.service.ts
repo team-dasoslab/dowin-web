@@ -1,6 +1,6 @@
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import {
-  assertFreePlanWithinMemberLimit,
+  assertWorkspaceOperationAllowed,
   assertWorkspaceHasMemberCapacity,
   getPlanMemberLimit,
   getWorkspaceMemberCapacity,
@@ -119,6 +119,7 @@ export interface WorkspaceStoragePort {
   findMembers: WorkspaceStorage["findMembers"];
   countMembers: WorkspaceStorage["countMembers"];
   findPlanLimit: WorkspaceStorage["findPlanLimit"];
+  findBillingState: WorkspaceStorage["findBillingState"];
   findSeatEntitlement: WorkspaceStorage["findSeatEntitlement"];
   removeMemberById: WorkspaceStorage["removeMemberById"];
   updateMemberRole: WorkspaceStorage["updateMemberRole"];
@@ -262,7 +263,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     return await this.storage.createInvite({
       workspaceId,
@@ -286,7 +287,7 @@ export class WorkspaceService {
       if (!workspace) {
         throw new NotFoundError("NOT_FOUND");
       }
-      await assertFreePlanWithinMemberLimit(workspace, this.storage);
+      await assertWorkspaceOperationAllowed(workspace, this.storage);
     }
 
     const updated = await this.storage.updateInviteStatus(
@@ -315,7 +316,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     try {
       return await this.storage.createTag({
@@ -345,7 +346,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     try {
       const updated = await this.storage.updateTag(workspaceId, tagId, input);
@@ -370,7 +371,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     await this.storage.deleteTag(workspaceId, tagId);
   }

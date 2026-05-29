@@ -6,9 +6,23 @@ function createPolicy(input: {
   memberCount: number;
   memberLimit: number | null;
   purchasedSeatCount?: number | null;
+  billingState?: {
+    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+  } | null;
 }) {
   const storage = {
     countMembers: vi.fn().mockResolvedValue(input.memberCount),
+    findBillingState: vi.fn().mockResolvedValue(
+      input.billingState === undefined
+        ? {
+            planCode: "BASIC",
+            billingStatus: "ACTIVE",
+            entitlementSource: "POLAR",
+          }
+        : input.billingState,
+    ),
     findPlanLimit: vi.fn().mockResolvedValue(
       input.memberLimit === null ? null : { memberLimit: input.memberLimit },
     ),
@@ -47,6 +61,18 @@ describe("CapacityPolicy", () => {
     ).rejects.toBeInstanceOf(ConflictError);
   });
 
+  it("Basic entitlement가 없으면 멤버 추가를 차단한다", async () => {
+    const { policy } = createPolicy({
+      memberCount: 1,
+      memberLimit: 10,
+      billingState: null,
+    });
+
+    await expect(
+      policy.assertCanAddMember({ id: 1, planCode: "FREE" }),
+    ).rejects.toMatchObject({ code: "BASIC_SUBSCRIPTION_REQUIRED" });
+  });
+
   it("BASIC workspace는 구매 seat 수를 멤버 한도로 사용한다", async () => {
     const { policy, storage } = createPolicy({
       memberCount: 5,
@@ -67,6 +93,18 @@ describe("CapacityPolicy", () => {
     await expect(
       policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "FREE" }),
     ).rejects.toBeInstanceOf(ForbiddenError);
+  });
+
+  it("Basic entitlement가 없으면 feature 사용을 차단한다", async () => {
+    const { policy } = createPolicy({
+      memberCount: 1,
+      memberLimit: 10,
+      billingState: null,
+    });
+
+    await expect(
+      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "FREE" }),
+    ).rejects.toMatchObject({ code: "BASIC_SUBSCRIPTION_REQUIRED" });
   });
 
   it("BASIC workspace도 구매 seat 초과 상태면 feature 사용을 차단한다", async () => {

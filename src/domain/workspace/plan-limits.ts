@@ -13,6 +13,13 @@ type MemberCountPort = {
   findSeatEntitlement?(
     workspaceId: number,
   ): Promise<{ purchasedSeatCount: number } | null>;
+  findBillingState(
+    workspaceId: number,
+  ): Promise<{
+    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+  } | null>;
   findPlanLimit(
     planCode: "BASIC" | "FREE" | "STANDARD",
   ): Promise<{ memberLimit: number } | null>;
@@ -32,7 +39,7 @@ export async function getWorkspaceMemberCapacity(
   return await new CapacityPolicy(storage).getWorkspaceMemberCapacity(workspace);
 }
 
-export async function assertFreePlanWithinMemberLimit(
+export async function assertWorkspaceOperationAllowed(
   workspace: WorkspacePlanSummary,
   storage: MemberCountPort,
 ) {
