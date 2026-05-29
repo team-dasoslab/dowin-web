@@ -84,7 +84,6 @@
     "monthlyAchievementRate": "Monthly Achievement",
     "monthlyAchievementRateWithMonth": "Monthly Achievement ({month})",
     "recentTrend": "Last 4 Weeks Trend",
-    "historyLimitMessage": "Data older than 6 months is restricted.",
     "viewAllUpdates": "View all updates",
     "monthlyBoardTitle": "Monthly Board",
     "monthlyBoardDesc": "View all records for the selected month by week.",
@@ -918,7 +917,6 @@
     "LEAD_MEASURE_ARCHIVED": "Cannot add logs to archived lead measures.",
     "FUTURE_DATE_NOT_ALLOWED": "Cannot record data for future dates.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
-    "FREE_PLAN_HISTORY_LIMIT_REACHED": "Records for this period are not available right now.",
     "BILLING_NOT_READY": "Billing integration is not ready yet.",
     "BILLING_REVIEW_REQUIRED": "This workspace has repeated refund or cancellation history, so a new checkout cannot be started right now. Please contact support."
   },
