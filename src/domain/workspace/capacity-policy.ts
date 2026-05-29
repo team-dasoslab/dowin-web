@@ -43,10 +43,10 @@ export class CapacityPolicy {
   private async getWorkspaceMemberLimit(
     workspace: WorkspacePlanSummary,
   ): Promise<number | null> {
-    if (workspace.planCode === "BASIC") {
-      const seatEntitlement =
-        await this.storage.findSeatEntitlement?.(workspace.id);
-      return seatEntitlement?.purchasedSeatCount ?? 0;
+    const seatEntitlement =
+      await this.storage.findSeatEntitlement?.(workspace.id);
+    if (seatEntitlement) {
+      return seatEntitlement.purchasedSeatCount;
     }
 
     return await this.getPlanMemberLimit(workspace.planCode);
@@ -86,10 +86,6 @@ export class CapacityPolicy {
   async assertWorkspaceUsageAllowed(
     workspace: WorkspacePlanSummary,
   ): Promise<void> {
-    if (workspace.planCode !== "FREE") {
-      return;
-    }
-
     const capacity = await this.getWorkspaceMemberCapacity(workspace);
 
     if (capacity.isOverLimit) {

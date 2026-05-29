@@ -3,6 +3,7 @@ import {
   assertFreePlanWithinMemberLimit,
   assertWorkspaceHasMemberCapacity,
   getPlanMemberLimit,
+  getWorkspaceMemberCapacity,
 } from "@/domain/workspace/plan-limits";
 import {
   ConflictError,
@@ -118,6 +119,7 @@ export interface WorkspaceStoragePort {
   findMembers: WorkspaceStorage["findMembers"];
   countMembers: WorkspaceStorage["countMembers"];
   findPlanLimit: WorkspaceStorage["findPlanLimit"];
+  findSeatEntitlement: WorkspaceStorage["findSeatEntitlement"];
   removeMemberById: WorkspaceStorage["removeMemberById"];
   updateMemberRole: WorkspaceStorage["updateMemberRole"];
   transferAdmin: WorkspaceStorage["transferAdmin"];
@@ -181,17 +183,22 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    const memberCount = await this.storage.countMembers(workspace.id);
-    const freeMemberLimit = await getPlanMemberLimit("FREE", this.storage);
+    const memberCapacity = await getWorkspaceMemberCapacity(
+      workspace,
+      this.storage,
+    );
+    const fallbackFreeMemberLimit = await getPlanMemberLimit(
+      "FREE",
+      this.storage,
+    );
+    const memberLimit =
+      memberCapacity.memberLimit ?? fallbackFreeMemberLimit ?? 10;
 
     return {
       ...toPublicWorkspace(workspace),
-      freeMemberLimit: freeMemberLimit ?? 10,
-      isOverFreeMemberLimit:
-        workspace.planCode === "FREE" &&
-        freeMemberLimit !== null &&
-        memberCount > freeMemberLimit,
-      memberCount,
+      freeMemberLimit: memberLimit,
+      isOverFreeMemberLimit: memberCapacity.memberCount > memberLimit,
+      memberCount: memberCapacity.memberCount,
     };
   }
 

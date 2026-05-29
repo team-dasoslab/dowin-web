@@ -15,6 +15,7 @@ describe("WorkspaceService", () => {
     findMembers: vi.fn(),
     countMembers: vi.fn(),
     findPlanLimit: vi.fn(),
+    findSeatEntitlement: vi.fn(),
     removeMemberById: vi.fn(),
     updateMemberRole: vi.fn(),
     transferAdmin: vi.fn(),
@@ -39,6 +40,7 @@ describe("WorkspaceService", () => {
     vi.clearAllMocks();
     mockStorage.countMembers.mockResolvedValue(1);
     mockStorage.findPlanLimit.mockResolvedValue({ memberLimit: 10 });
+    mockStorage.findSeatEntitlement.mockResolvedValue(null);
   });
 
   describe("getMyWorkspace", () => {
@@ -72,6 +74,26 @@ describe("WorkspaceService", () => {
         freeMemberLimit: 10,
         isOverFreeMemberLimit: true,
         memberCount: 11,
+      });
+    });
+
+    it("좌석 권한이 있으면 purchasedSeatCount 기준으로 초과 상태를 반환한다", async () => {
+      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: "STANDARD" };
+      mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
+      mockStorage.findSeatEntitlement.mockResolvedValue({
+        purchasedSeatCount: 5,
+      });
+      mockStorage.countMembers.mockResolvedValue(6);
+
+      const result = await service.getMyWorkspace(123);
+
+      expect(result).toEqual({
+        id: "ws_1",
+        name: "Workspace",
+        planCode: "STANDARD",
+        freeMemberLimit: 5,
+        isOverFreeMemberLimit: true,
+        memberCount: 6,
       });
     });
 
@@ -196,13 +218,30 @@ describe("WorkspaceService", () => {
       );
     });
 
-    it("FREE 플랜 멤버 수 제한에 도달하면 409 에러를 던진다", async () => {
+    it("멤버 수 제한에 도달하면 409 에러를 던진다", async () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
         planCode: "FREE",
       });
       mockStorage.countMembers.mockResolvedValue(10);
+
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
+        "WORKSPACE_MEMBER_LIMIT_REACHED",
+      );
+      expect(mockStorage.addMember).not.toHaveBeenCalled();
+    });
+
+    it("좌석 권한이 있으면 플랜이 아니라 purchasedSeatCount 기준으로 참가를 막는다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "STANDARD",
+      });
+      mockStorage.findSeatEntitlement.mockResolvedValue({
+        purchasedSeatCount: 3,
+      });
+      mockStorage.countMembers.mockResolvedValue(3);
 
       await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
         "WORKSPACE_MEMBER_LIMIT_REACHED",
@@ -328,13 +367,30 @@ describe("WorkspaceService", () => {
       );
     });
 
-    it("FREE 플랜 멤버 한도 초과 상태에서는 초대코드를 생성할 수 없다", async () => {
+    it("멤버 한도 초과 상태에서는 초대코드를 생성할 수 없다", async () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
         planCode: "FREE",
       });
       mockStorage.countMembers.mockResolvedValue(11);
+
+      await expect(service.createInvite(1, 1, 3)).rejects.toThrow(
+        "FREE_PLAN_MEMBER_LIMIT_EXCEEDED",
+      );
+      expect(mockStorage.createInvite).not.toHaveBeenCalled();
+    });
+
+    it("좌석 권한이 있으면 STANDARD 워크스페이스도 초과 상태에서 초대코드를 생성할 수 없다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "STANDARD",
+      });
+      mockStorage.findSeatEntitlement.mockResolvedValue({
+        purchasedSeatCount: 3,
+      });
+      mockStorage.countMembers.mockResolvedValue(4);
 
       await expect(service.createInvite(1, 1, 3)).rejects.toThrow(
         "FREE_PLAN_MEMBER_LIMIT_EXCEEDED",

@@ -10,6 +10,9 @@ type WorkspacePlanSummary = {
 
 type MemberCountPort = {
   countMembers(workspaceId: number): Promise<number>;
+  findSeatEntitlement?(
+    workspaceId: number,
+  ): Promise<{ purchasedSeatCount: number } | null>;
   findPlanLimit(
     planCode: "BASIC" | "FREE" | "STANDARD",
   ): Promise<{ memberLimit: number } | null>;
@@ -20,6 +23,13 @@ export async function getPlanMemberLimit(
   storage: Pick<MemberCountPort, "findPlanLimit">,
 ): Promise<number | null> {
   return await getPlanMemberLimitFromStorage(planCode, storage);
+}
+
+export async function getWorkspaceMemberCapacity(
+  workspace: WorkspacePlanSummary,
+  storage: MemberCountPort,
+) {
+  return await new CapacityPolicy(storage).getWorkspaceMemberCapacity(workspace);
 }
 
 export async function assertFreePlanWithinMemberLimit(
