@@ -61,7 +61,7 @@ describe("CapacityPolicy", () => {
     expect(storage.findPlanLimit).not.toHaveBeenCalled();
   });
 
-  it("FREE workspace가 limit을 초과하면 feature 사용을 차단한다", async () => {
+  it("limit을 초과하면 feature 사용을 차단한다", async () => {
     const { policy } = createPolicy({ memberCount: 11, memberLimit: 10 });
 
     await expect(
@@ -69,12 +69,25 @@ describe("CapacityPolicy", () => {
     ).rejects.toBeInstanceOf(ForbiddenError);
   });
 
-  it("STANDARD workspace는 기존 동작처럼 usage block 대상에서 제외한다", async () => {
+  it("BASIC workspace도 구매 seat 초과 상태면 feature 사용을 차단한다", async () => {
+    const { policy, storage } = createPolicy({
+      memberCount: 6,
+      memberLimit: null,
+      purchasedSeatCount: 5,
+    });
+
+    await expect(
+      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "BASIC" }),
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    expect(storage.findSeatEntitlement).toHaveBeenCalledWith(1);
+  });
+
+  it("STANDARD workspace도 plan limit을 초과하면 feature 사용을 차단한다", async () => {
     const { policy, storage } = createPolicy({ memberCount: 31, memberLimit: 30 });
 
     await expect(
       policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "STANDARD" }),
-    ).resolves.toBeUndefined();
-    expect(storage.countMembers).not.toHaveBeenCalled();
+    ).rejects.toBeInstanceOf(ForbiddenError);
+    expect(storage.countMembers).toHaveBeenCalledWith(1);
   });
 });
