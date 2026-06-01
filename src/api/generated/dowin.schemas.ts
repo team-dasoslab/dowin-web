@@ -95,6 +95,7 @@ export type AdminBillingWorkspaceSummaryPlanCode = typeof AdminBillingWorkspaceS
 
 
 export const AdminBillingWorkspaceSummaryPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -162,6 +163,86 @@ export interface AdminBillingWorkspaceSummary {
   /** @minimum 0 */
   recentRevokedCount: number;
   requiresManualReview: boolean;
+  /**
+   * 워크스페이스의 현재 Basic seat entitlement 수
+   * @minimum 0
+   * @nullable
+   */
+  purchasedSeatCount: number | null;
+}
+
+export type AdminBillingProviderProductProvider = typeof AdminBillingProviderProductProvider[keyof typeof AdminBillingProviderProductProvider];
+
+
+export const AdminBillingProviderProductProvider = {
+  POLAR: 'POLAR',
+} as const;
+
+export type AdminBillingProviderProductEnvironment = typeof AdminBillingProviderProductEnvironment[keyof typeof AdminBillingProviderProductEnvironment];
+
+
+export const AdminBillingProviderProductEnvironment = {
+  sandbox: 'sandbox',
+  production: 'production',
+} as const;
+
+export type AdminBillingProviderProductPlanCode = typeof AdminBillingProviderProductPlanCode[keyof typeof AdminBillingProviderProductPlanCode];
+
+
+export const AdminBillingProviderProductPlanCode = {
+  BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
+} as const;
+
+export interface AdminBillingProviderProduct {
+  id: number;
+  provider: AdminBillingProviderProductProvider;
+  environment: AdminBillingProviderProductEnvironment;
+  planCode: AdminBillingProviderProductPlanCode;
+  providerProductId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type AdminBillingProviderProductUpsertRequestProvider = typeof AdminBillingProviderProductUpsertRequestProvider[keyof typeof AdminBillingProviderProductUpsertRequestProvider];
+
+
+export const AdminBillingProviderProductUpsertRequestProvider = {
+  POLAR: 'POLAR',
+} as const;
+
+export type AdminBillingProviderProductUpsertRequestEnvironment = typeof AdminBillingProviderProductUpsertRequestEnvironment[keyof typeof AdminBillingProviderProductUpsertRequestEnvironment];
+
+
+export const AdminBillingProviderProductUpsertRequestEnvironment = {
+  sandbox: 'sandbox',
+  production: 'production',
+} as const;
+
+export type AdminBillingProviderProductUpsertRequestPlanCode = typeof AdminBillingProviderProductUpsertRequestPlanCode[keyof typeof AdminBillingProviderProductUpsertRequestPlanCode];
+
+
+export const AdminBillingProviderProductUpsertRequestPlanCode = {
+  BASIC: 'BASIC',
+  STANDARD: 'STANDARD',
+} as const;
+
+export interface AdminBillingProviderProductUpsertRequest {
+  provider: AdminBillingProviderProductUpsertRequestProvider;
+  environment: AdminBillingProviderProductUpsertRequestEnvironment;
+  planCode: AdminBillingProviderProductUpsertRequestPlanCode;
+  /**
+   * @minLength 1
+   * @maxLength 255
+   */
+  providerProductId: string;
+  isActive?: boolean;
+  /**
+   * @minLength 1
+   * @maxLength 500
+   */
+  changeReason: string;
 }
 
 export type AdminBillingEventProvider = typeof AdminBillingEventProvider[keyof typeof AdminBillingEventProvider];
@@ -215,6 +296,7 @@ export type AdminBillingManualOverrideRequestPlanCode = typeof AdminBillingManua
 
 
 export const AdminBillingManualOverrideRequestPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -263,6 +345,13 @@ export interface AdminBillingManualOverrideRequest {
   cancelAtPeriodEnd?: boolean;
   /** @nullable */
   billingOwnerUserId?: number | null;
+  /**
+   * BASIC 수동 보정 시 지급할 seat 수. 생략하면 현재 멤버 수 이상으로 자동 설정한다.
+   * @minimum 0
+   * @maximum 999
+   * @nullable
+   */
+  purchasedSeatCount?: number | null;
   /**
    * @minLength 1
    * @maxLength 500
@@ -502,6 +591,7 @@ export type WorkspacePlanCode = typeof WorkspacePlanCode[keyof typeof WorkspaceP
 
 
 export const WorkspacePlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -522,6 +612,7 @@ export type WorkspaceListItemPlanCode = typeof WorkspaceListItemPlanCode[keyof t
 
 
 export const WorkspaceListItemPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -543,6 +634,63 @@ export interface WorkspaceListItem {
   createdAt: string;
 }
 
+export interface WorkspaceCheckoutRequest {
+  /**
+   * @minLength 1
+   * @maxLength 100
+   */
+  workspaceName: string;
+  /**
+   * Basic checkout에서 결제할 최초 seat 수
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount: number;
+}
+
+export interface WorkspaceCheckoutResponse {
+  /** 결제 성공 후 워크스페이스 생성 검증에 사용할 pending workspace checkout ID */
+  workspaceCheckoutId: string;
+  /** Polar Basic seat checkout URL */
+  checkoutUrl: string;
+}
+
+export interface WorkspaceBillingCheckoutRequest {
+  /**
+   * Basic checkout에서 결제할 seat 수. 생략하면 현재 워크스페이스 멤버 수를 기준으로 계산한다.
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount?: number;
+}
+
+export interface WorkspaceBillingCheckoutResponse {
+  /** Polar Basic seat checkout URL */
+  checkoutUrl: string;
+  /**
+   * Polar checkout ID
+   * @nullable
+   */
+  checkoutId?: string | null;
+}
+
+export interface WorkspaceCheckoutCompleteRequest {
+  /**
+   * /workspaces/checkout 응답으로 받은 pending workspace checkout ID
+   * @minLength 1
+   */
+  workspaceCheckoutId: string;
+  /**
+   * Polar checkout 성공 callback에서 전달된 checkout ID. 없으면 저장된 provider checkout ID로 검증한다.
+   * @minLength 1
+   */
+  checkoutId?: string;
+}
+
+export interface WorkspaceCheckoutCompleteResponse {
+  workspaceId: string;
+}
+
 export interface WorkspaceCurrentUpdateRequest {
   workspaceId: string;
 }
@@ -551,6 +699,7 @@ export type BillingOverviewPlanCode = typeof BillingOverviewPlanCode[keyof typeo
 
 
 export const BillingOverviewPlanCode = {
+  BASIC: 'BASIC',
   FREE: 'FREE',
   STANDARD: 'STANDARD',
 } as const;
@@ -608,11 +757,18 @@ export interface BillingOverview {
   /** @minimum 0 */
   recentRevokedCount: number;
   requiresManualReview: boolean;
+  /**
+   * 현재 워크스페이스가 결제한 Basic seat 수
+   * @minimum 0
+   * @nullable
+   */
+  purchasedSeatCount: number | null;
+  /**
+   * 현재 사용 중인 seat 수. 현재는 워크스페이스 멤버 수 기준이다.
+   * @minimum 0
+   */
+  usedSeatCount: number;
   canManageBilling: boolean;
-}
-
-export interface BillingCheckoutResponse {
-  checkoutUrl: string;
 }
 
 export interface UserNotificationSettings {
@@ -1152,11 +1308,7 @@ export type PostAuthSignupBody = {
 
 export type PostAuthSignup201 = {
   user: User;
-  /**
-   * 가입 직후 1회 노출되는 복원 코드 목록
-   * @minItems 8
-   * @maxItems 8
-   */
+  /** 가입 직후 1회 노출되는 복원 코드 목록 */
   recoveryCodes: string[];
 };
 
@@ -1328,22 +1480,6 @@ export const GetWorkspacesWorkspaceIdAnalyticsExportDataView = {
   week: 'week',
   month: 'month',
 } as const;
-
-/**
- * checkout 복귀 후 다시 진입할 앱 locale
- */
-export type PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale = typeof PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale[keyof typeof PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale];
-
-
-export const PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale = {
-  ko: 'ko',
-  en: 'en',
-} as const;
-
-export type PostWorkspacesWorkspaceIdBillingCheckoutBody = {
-  /** checkout 복귀 후 다시 진입할 앱 locale */
-  locale: PostWorkspacesWorkspaceIdBillingCheckoutBodyLocale;
-};
 
 export type GetWorkspacesWorkspaceIdDashboardTeamParams = {
 weekStart?: string;

@@ -1,13 +1,14 @@
 import { getDb } from "@/db";
 import {
   billingEvents,
-  billingCheckoutEvents,
   billingProviderProducts,
   workspaceBillingState,
+  workspaceSeatEntitlements,
+  workspaceMembers,
   workspaces,
 } from "@/db/schema";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
-import { and, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, like, or, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -58,7 +59,7 @@ export class BillingStorage {
   async findActiveProviderProduct(input: {
     provider: "POLAR";
     environment: "sandbox" | "production";
-    planCode: "STANDARD";
+    planCode: "BASIC" | "STANDARD";
   }) {
     return (
       (await this.db.query.billingProviderProducts.findFirst({
@@ -72,20 +73,73 @@ export class BillingStorage {
     );
   }
 
-  async findCheckoutSessionCreatedEvent(workspaceId: number, requestId: string) {
-    return (
-      (await this.db.query.billingCheckoutEvents.findFirst({
-        where: and(
-          eq(billingCheckoutEvents.workspaceId, workspaceId),
-          eq(billingCheckoutEvents.requestId, requestId),
-          eq(billingCheckoutEvents.eventType, "CHECKOUT_SESSION_CREATED"),
-        ),
-        orderBy: [desc(billingCheckoutEvents.recordedAt)],
-      })) ?? null
-    );
+  async listProviderProducts() {
+    return await this.db.query.billingProviderProducts.findMany({
+      orderBy: [
+        asc(billingProviderProducts.environment),
+        asc(billingProviderProducts.planCode),
+      ],
+    });
   }
 
-  async getRecentBillingRiskSummary(workspaceId: number, since: Date) {
+  async upsertProviderProduct(input: {
+    provider: "POLAR";
+    environment: "sandbox" | "production";
+    planCode: "BASIC" | "STANDARD";
+    providerProductId: string;
+    isActive: boolean;
+  }) {
+    const now = new Date();
+    const [product] = await this.db
+      .insert(billingProviderProducts)
+      .values({
+        provider: input.provider,
+        environment: input.environment,
+        planCode: input.planCode,
+        providerProductId: input.providerProductId,
+        isActive: input.isActive,
+        updatedAt: now,
+      })
+      .onConflictDoUpdate({
+        target: [
+          billingProviderProducts.provider,
+          billingProviderProducts.environment,
+          billingProviderProducts.planCode,
+        ],
+        set: {
+          providerProductId: input.providerProductId,
+          isActive: input.isActive,
+          updatedAt: now,
+        },
+      })
+      .returning();
+
+    return product;
+  }
+
+  async getRecentBillingRiskSummary(input: {
+    workspaceId: number;
+    customerKey?: string | null;
+    customerExternalRef?: string | null;
+    billingOwnerUserId?: number | null;
+    since: Date;
+  }) {
+    const scopeConditions = [
+      eq(billingEvents.workspaceId, input.workspaceId),
+      input.customerKey ? eq(billingEvents.customerKey, input.customerKey) : null,
+      input.customerExternalRef
+        ? eq(workspaces.billingCustomerExternalRef, input.customerExternalRef)
+        : null,
+      input.billingOwnerUserId
+        ? or(
+            eq(workspaces.billingOwnerUserId, input.billingOwnerUserId),
+            eq(workspaceBillingState.billingOwnerUserId, input.billingOwnerUserId),
+          )
+        : null,
+    ].filter((condition): condition is NonNullable<typeof condition> =>
+      Boolean(condition),
+    );
+
     const [result] = await this.db
       .select({
         recentRefundCount:
@@ -94,11 +148,16 @@ export class BillingStorage {
           sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
       })
       .from(billingEvents)
+      .leftJoin(workspaces, eq(billingEvents.workspaceId, workspaces.id))
+      .leftJoin(
+        workspaceBillingState,
+        eq(billingEvents.workspaceId, workspaceBillingState.workspaceId),
+      )
       .where(
         and(
-          eq(billingEvents.workspaceId, workspaceId),
+          or(...scopeConditions),
           eq(billingEvents.status, "ACCEPTED"),
-          gte(billingEvents.occurredAt, since),
+          gte(billingEvents.occurredAt, input.since),
         ),
       );
 
@@ -162,7 +221,7 @@ export class BillingStorage {
       .select({
         workspaceId: workspaces.id,
         workspaceName: workspaces.name,
-        planCode: sql<"FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        planCode: sql<"BASIC" | "FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
         billingStatus:
           sql<
             "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
@@ -177,11 +236,16 @@ export class BillingStorage {
         billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
         lastEventOccurredAt: workspaceBillingState.lastEventOccurredAt,
         updatedAt: workspaceBillingState.updatedAt,
+        purchasedSeatCount: workspaceSeatEntitlements.purchasedSeatCount,
       })
       .from(workspaces)
       .leftJoin(
         workspaceBillingState,
         eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .leftJoin(
+        workspaceSeatEntitlements,
+        eq(workspaces.id, workspaceSeatEntitlements.workspaceId),
       )
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(workspaces.id));
@@ -192,7 +256,7 @@ export class BillingStorage {
       .select({
         workspaceId: workspaces.id,
         workspaceName: workspaces.name,
-        planCode: sql<"FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        planCode: sql<"BASIC" | "FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
         billingStatus:
           sql<
             "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
@@ -207,11 +271,16 @@ export class BillingStorage {
         billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
         lastEventOccurredAt: workspaceBillingState.lastEventOccurredAt,
         updatedAt: workspaceBillingState.updatedAt,
+        purchasedSeatCount: workspaceSeatEntitlements.purchasedSeatCount,
       })
       .from(workspaces)
       .leftJoin(
         workspaceBillingState,
         eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .leftJoin(
+        workspaceSeatEntitlements,
+        eq(workspaces.id, workspaceSeatEntitlements.workspaceId),
       )
       .where(eq(workspaces.id, workspaceId));
 
@@ -258,42 +327,10 @@ export class BillingStorage {
     return event;
   }
 
-  async appendCheckoutEvent(input: {
-    workspaceId: number;
-    requestedByUserId: number;
-    requestId: string;
-    targetPlanCode: "STANDARD";
-    providerCheckoutId?: string | null;
-    eventType:
-      | "CHECKOUT_REQUESTED"
-      | "CHECKOUT_SESSION_CREATED"
-      | "CHECKOUT_FAILED";
-    occurredAt: Date;
-    payloadJson: string;
-  }) {
-    const result = await this.db
-      .insert(billingCheckoutEvents)
-      .values({
-        workspaceId: input.workspaceId,
-        requestedByUserId: input.requestedByUserId,
-        requestId: input.requestId,
-        targetPlanCode: input.targetPlanCode,
-        provider: "POLAR",
-        providerCheckoutId: input.providerCheckoutId ?? null,
-        eventType: input.eventType,
-        occurredAt: input.occurredAt,
-        payloadJson: input.payloadJson,
-      })
-      .onConflictDoNothing()
-      .returning();
-
-    return result[0] ?? null;
-  }
-
   async upsertWorkspaceBillingState(input: {
     workspaceId: number;
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    planCode: "FREE" | "STANDARD";
+    planCode: "BASIC" | "FREE" | "STANDARD";
     entitlementSource: NullableEntitlementSource;
     customerKey: string | null;
     subscriptionKey: string | null;
@@ -343,9 +380,42 @@ export class BillingStorage {
       });
   }
 
+  async upsertWorkspaceSeatEntitlement(input: {
+    workspaceId: number;
+    purchasedSeatCount: number;
+    seatSource: "POLAR" | "MANUAL_GRANT";
+  }) {
+    await this.db
+      .insert(workspaceSeatEntitlements)
+      .values({
+        workspaceId: input.workspaceId,
+        planCode: "BASIC",
+        purchasedSeatCount: input.purchasedSeatCount,
+        seatSource: input.seatSource,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: workspaceSeatEntitlements.workspaceId,
+        set: {
+          purchasedSeatCount: input.purchasedSeatCount,
+          seatSource: input.seatSource,
+          updatedAt: new Date(),
+        },
+      });
+  }
+
+  async countWorkspaceMembers(workspaceId: number) {
+    const [result] = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(workspaceMembers)
+      .where(eq(workspaceMembers.workspaceId, workspaceId));
+
+    return Number(result?.count ?? 0);
+  }
+
   async updateWorkspaceBillingProjection(input: {
     workspaceId: number;
-    planCode: "FREE" | "STANDARD";
+    planCode: "BASIC" | "FREE" | "STANDARD";
     billingCustomerExternalRef: string | null;
     billingOwnerUserId: number | null;
   }) {

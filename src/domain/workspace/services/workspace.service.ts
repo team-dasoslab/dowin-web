@@ -1,7 +1,9 @@
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import {
-  assertFreePlanWithinMemberLimit,
+  assertWorkspaceOperationAllowed,
+  assertWorkspaceHasMemberCapacity,
   getPlanMemberLimit,
+  getWorkspaceMemberCapacity,
 } from "@/domain/workspace/plan-limits";
 import {
   ConflictError,
@@ -24,7 +26,7 @@ type WorkspaceWithPlanLimits = PublicWorkspace & {
 type WorkspaceListItem = {
   id: string;
   name: string;
-  planCode: "FREE" | "STANDARD";
+  planCode: "BASIC" | "FREE" | "STANDARD";
   role: "ADMIN" | "MEMBER";
   isCurrent: boolean;
   createdAt: Date;
@@ -117,6 +119,8 @@ export interface WorkspaceStoragePort {
   findMembers: WorkspaceStorage["findMembers"];
   countMembers: WorkspaceStorage["countMembers"];
   findPlanLimit: WorkspaceStorage["findPlanLimit"];
+  findBillingState: WorkspaceStorage["findBillingState"];
+  findSeatEntitlement: WorkspaceStorage["findSeatEntitlement"];
   removeMemberById: WorkspaceStorage["removeMemberById"];
   updateMemberRole: WorkspaceStorage["updateMemberRole"];
   transferAdmin: WorkspaceStorage["transferAdmin"];
@@ -180,17 +184,22 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    const memberCount = await this.storage.countMembers(workspace.id);
-    const freeMemberLimit = await getPlanMemberLimit("FREE", this.storage);
+    const memberCapacity = await getWorkspaceMemberCapacity(
+      workspace,
+      this.storage,
+    );
+    const fallbackFreeMemberLimit = await getPlanMemberLimit(
+      "FREE",
+      this.storage,
+    );
+    const memberLimit =
+      memberCapacity.memberLimit ?? fallbackFreeMemberLimit ?? 10;
 
     return {
       ...toPublicWorkspace(workspace),
-      freeMemberLimit: freeMemberLimit ?? 10,
-      isOverFreeMemberLimit:
-        workspace.planCode === "FREE" &&
-        freeMemberLimit !== null &&
-        memberCount > freeMemberLimit,
-      memberCount,
+      freeMemberLimit: memberLimit,
+      isOverFreeMemberLimit: memberCapacity.memberCount > memberLimit,
+      memberCount: memberCapacity.memberCount,
     };
   }
 
@@ -254,7 +263,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     return await this.storage.createInvite({
       workspaceId,
@@ -278,7 +287,7 @@ export class WorkspaceService {
       if (!workspace) {
         throw new NotFoundError("NOT_FOUND");
       }
-      await assertFreePlanWithinMemberLimit(workspace, this.storage);
+      await assertWorkspaceOperationAllowed(workspace, this.storage);
     }
 
     const updated = await this.storage.updateInviteStatus(
@@ -295,6 +304,12 @@ export class WorkspaceService {
   }
 
   async listTags(workspaceId: number): Promise<WorkspaceTag[]> {
+    const workspace = await this.storage.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
+
     return await this.storage.listTags(workspaceId);
   }
 
@@ -307,7 +322,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     try {
       return await this.storage.createTag({
@@ -337,7 +352,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     try {
       const updated = await this.storage.updateTag(workspaceId, tagId, input);
@@ -362,7 +377,7 @@ export class WorkspaceService {
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
-    await assertFreePlanWithinMemberLimit(workspace, this.storage);
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     await this.storage.deleteTag(workspaceId, tagId);
   }
@@ -426,15 +441,7 @@ export class WorkspaceService {
   }
 
   private async ensureWorkspaceHasMemberCapacity(workspace: Workspace) {
-    const memberLimit = await getPlanMemberLimit(workspace.planCode, this.storage);
-    if (memberLimit === null) {
-      return;
-    }
-
-    const memberCount = await this.storage.countMembers(workspace.id);
-    if (memberCount >= memberLimit) {
-      throw new ConflictError("WORKSPACE_MEMBER_LIMIT_REACHED");
-    }
+    await assertWorkspaceHasMemberCapacity(workspace, this.storage);
   }
 
   async getMembers(

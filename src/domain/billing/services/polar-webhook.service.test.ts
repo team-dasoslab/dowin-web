@@ -72,6 +72,100 @@ describe("PolarWebhookService", () => {
     });
   });
 
+  it("subscription.active BASIC seats를 seat entitlement에 반영한다", async () => {
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
+    const service = new PolarWebhookService({
+      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 13,
+        planCode: "BASIC",
+        billingCustomerExternalRef: "workspace-checkout:pending_13",
+        billingOwnerUserId: 21,
+      }),
+      findWorkspaceByCustomerExternalRef: vi.fn(),
+      appendBillingEvent: vi.fn().mockResolvedValue({ id: 51 }),
+      upsertWorkspaceBillingState: vi.fn().mockResolvedValue(undefined),
+      upsertWorkspaceSeatEntitlement,
+      updateWorkspaceBillingProjection: vi.fn().mockResolvedValue(undefined),
+    } as never);
+
+    await service.handleWebhook({
+      providerEventId: "msg_basic_active",
+      payloadJson: JSON.stringify({
+        type: "subscription.active",
+        timestamp: "2026-05-28T00:00:00.000Z",
+        data: {
+          id: "sub_basic",
+          customer_id: "cus_basic",
+          current_period_end: "2026-06-28T00:00:00.000Z",
+          cancel_at_period_end: false,
+          seats: 5,
+          metadata: {
+            targetPlanCode: "BASIC",
+            workspaceId: "13",
+            requestedByUserId: "21",
+          },
+          customer: {
+            external_id: "workspace-checkout:pending_13",
+          },
+        },
+      }),
+      now: new Date("2026-05-28T00:00:00.000Z"),
+    });
+
+    expect(upsertWorkspaceSeatEntitlement).toHaveBeenCalledWith({
+      workspaceId: 13,
+      purchasedSeatCount: 5,
+      seatSource: "POLAR",
+    });
+  });
+
+  it("BASIC 구독이 회수되면 seat entitlement를 0으로 낮춘다", async () => {
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
+    const service = new PolarWebhookService({
+      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 14,
+        planCode: "BASIC",
+        billingCustomerExternalRef: "workspace-checkout:pending_14",
+        billingOwnerUserId: 22,
+      }),
+      findWorkspaceByCustomerExternalRef: vi.fn(),
+      appendBillingEvent: vi.fn().mockResolvedValue({ id: 52 }),
+      upsertWorkspaceBillingState: vi.fn().mockResolvedValue(undefined),
+      upsertWorkspaceSeatEntitlement,
+      updateWorkspaceBillingProjection: vi.fn().mockResolvedValue(undefined),
+    } as never);
+
+    await service.handleWebhook({
+      providerEventId: "msg_basic_revoked",
+      payloadJson: JSON.stringify({
+        type: "subscription.revoked",
+        timestamp: "2026-05-28T00:00:00.000Z",
+        data: {
+          id: "sub_basic",
+          customer_id: "cus_basic",
+          current_period_end: "2026-06-28T00:00:00.000Z",
+          cancel_at_period_end: false,
+          metadata: {
+            targetPlanCode: "BASIC",
+            workspaceId: "14",
+          },
+          customer: {
+            external_id: "workspace-checkout:pending_14",
+          },
+        },
+      }),
+      now: new Date("2026-05-28T00:00:00.000Z"),
+    });
+
+    expect(upsertWorkspaceSeatEntitlement).toHaveBeenCalledWith({
+      workspaceId: 14,
+      purchasedSeatCount: 0,
+      seatSource: "POLAR",
+    });
+  });
+
   it("중복 webhook-id는 무시한다", async () => {
     const service = new PolarWebhookService({
       findBillingEventByProviderEventId: vi.fn().mockResolvedValue({ id: 1 }),
@@ -444,6 +538,55 @@ describe("PolarWebhookService", () => {
         failureReason: "RISK_REVIEW_SIGNAL",
       }),
     );
+  });
+
+  it("부분 환불 order.refunded도 권한 회수 없이 위험 이벤트로 저장한다", async () => {
+    const appendBillingEvent = vi.fn().mockResolvedValue({ id: 45 });
+    const upsertWorkspaceBillingState = vi.fn();
+    const service = new PolarWebhookService({
+      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 12,
+        planCode: "BASIC",
+        billingCustomerExternalRef: "workspace:12",
+        billingOwnerUserId: 16,
+      }),
+      findWorkspaceByCustomerExternalRef: vi.fn(),
+      appendBillingEvent,
+      upsertWorkspaceBillingState,
+      updateWorkspaceBillingProjection: vi.fn(),
+    } as never);
+
+    await service.handleWebhook({
+      providerEventId: "msg_partial_refund",
+      payloadJson: JSON.stringify({
+        type: "order.refunded",
+        timestamp: "2026-04-21T00:00:00.000Z",
+        data: {
+          id: "ord_12",
+          customer_id: "cus_12",
+          subscription_id: "sub_12",
+          refunded_amount: 1000,
+          total_amount: 29000,
+          metadata: {
+            workspaceId: "12",
+          },
+          customer: {
+            external_id: "workspace:12",
+          },
+        },
+      }),
+      now: new Date("2026-04-21T00:00:00.000Z"),
+    });
+
+    expect(appendBillingEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "order.refunded",
+        status: "ACCEPTED",
+        failureReason: "PARTIAL_REFUND_RISK_SIGNAL",
+      }),
+    );
+    expect(upsertWorkspaceBillingState).not.toHaveBeenCalled();
   });
 
   it("signed payload가 JSON이 아니면 무시한다", async () => {

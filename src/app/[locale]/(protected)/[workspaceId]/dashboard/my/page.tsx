@@ -4,7 +4,6 @@ import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
-import { HistoryLimitOverlay } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/HistoryLimitOverlay";
 import { MonthlyBoardSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/MonthlyBoardSection";
 import { PeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/PeriodControls";
 import { ProductUpdateCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ProductUpdateCard";
@@ -63,11 +62,8 @@ export default function MyDashboardPage() {
     weeklyOverallRate,
     weeklyById,
     workspace,
-    historyLimitDate,
     isPreviousDisabled,
     isPeriodLoading,
-    isHistoryLimited,
-    isTrendLimited,
     // isPreviousTrendLoading,
   } = useDashboardScoreboard(workspaceId);
   const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe({
@@ -246,7 +242,6 @@ export default function MyDashboardPage() {
               <ScoreboardOverviewSection
                 activeScoreboard={activeScoreboard}
                 isWeeklyTrendLoading={isWeeklyTrendLoading}
-                isTrendLimited={isTrendLimited}
                 monthlyOverallRate={monthlyOverallRate}
                 weeklyOverallRate={weeklyOverallRate}
                 weeklyTrendPoints={weeklyTrendPoints}
@@ -272,41 +267,38 @@ export default function MyDashboardPage() {
                 setSelectedView={setSelectedView}
                 weekLabel={weekLabel}
                 today={today}
-                historyLimitDate={historyLimitDate}
                 isPreviousDisabled={isPreviousDisabled}
                 isPeriodLoading={isPeriodLoading}
               />
 
-              <HistoryLimitOverlay isLimited={isHistoryLimited}>
-                {isLoading ? (
-                  <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-50" />
-                ) : activeLeadMeasures.length === 0 ? (
-                  <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
-                    {t("noActiveMeasures")}
-                  </div>
-                ) : selectedView === "month" ? (
-                  <MonthlyBoardSection
-                    activeLeadMeasures={activeLeadMeasures}
-                    monthLabel={monthLabel}
-                    monthWeeks={monthWeeks}
-                    monthlyLeadMeasures={monthlyLeadMeasures}
-                    monthlyOverallRate={monthlyOverallRate}
-                    monthlySummary={monthlySummary}
-                    today={today}
-                  />
-                ) : (
-                  <WeeklyBoardSection
-                    activeLeadMeasures={activeLeadMeasures}
-                    onBeforeToggle={markCelebrationPending}
-                    pendingLogKeys={pendingLogKeys}
-                    today={today}
-                    toggleLog={toggleLog}
-                    weekDates={weekDates}
-                    weeklyGuideById={weeklyGuideById}
-                    weeklyById={weeklyById}
-                  />
-                )}
-              </HistoryLimitOverlay>
+              {isLoading ? (
+                <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-50" />
+              ) : activeLeadMeasures.length === 0 ? (
+                <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
+                  {t("noActiveMeasures")}
+                </div>
+              ) : selectedView === "month" ? (
+                <MonthlyBoardSection
+                  activeLeadMeasures={activeLeadMeasures}
+                  monthLabel={monthLabel}
+                  monthWeeks={monthWeeks}
+                  monthlyLeadMeasures={monthlyLeadMeasures}
+                  monthlyOverallRate={monthlyOverallRate}
+                  monthlySummary={monthlySummary}
+                  today={today}
+                />
+              ) : (
+                <WeeklyBoardSection
+                  activeLeadMeasures={activeLeadMeasures}
+                  onBeforeToggle={markCelebrationPending}
+                  pendingLogKeys={pendingLogKeys}
+                  today={today}
+                  toggleLog={toggleLog}
+                  weekDates={weekDates}
+                  weeklyGuideById={weeklyGuideById}
+                  weeklyById={weeklyById}
+                />
+              )}
             </section>
           </div>
         </div>

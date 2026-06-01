@@ -23,7 +23,8 @@ export class AuditLogStorage {
       | "USER"
       | "CONTACT_INQUIRY"
       | "ADMIN_USER"
-      | "ADMIN_ROLE_GRANT";
+      | "ADMIN_ROLE_GRANT"
+      | "BILLING_PROVIDER_PRODUCT";
     entityId?: number | null;
     actionType:
       | "CREATE"

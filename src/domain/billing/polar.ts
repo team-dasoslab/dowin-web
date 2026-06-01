@@ -28,6 +28,19 @@ type CustomerSessionResponse = {
   customerPortalUrl?: string;
 };
 
+type CheckoutSessionDetailResponse = {
+  id: string;
+  status?: string;
+  seats?: number | null;
+  metadata?: Record<string, unknown> | null;
+  external_customer_id?: string | null;
+  externalCustomerId?: string | null;
+  subscription_id?: string | null;
+  subscriptionId?: string | null;
+  customer_id?: string | null;
+  customerId?: string | null;
+};
+
 export type PolarBillingClient = {
   environment: "sandbox" | "production";
   createCheckoutSession(input: {
@@ -36,7 +49,14 @@ export type PolarBillingClient = {
     idempotencyKey: string;
     locale: "ko" | "en";
     metadata: Record<string, string>;
-  }): Promise<{ checkoutUrl: string }>;
+    seats?: number;
+    minSeats?: number;
+    maxSeats?: number;
+    successPath?:
+      | "/billing/polar/success"
+      | "/workspace/checkout/success";
+    workspaceCheckoutId?: string;
+  }): Promise<{ checkoutUrl: string; checkoutId: string | null }>;
   createCustomerSession(
     input:
       | {
@@ -46,6 +66,15 @@ export type PolarBillingClient = {
           externalCustomerId: string;
         },
   ): Promise<{ customerPortalUrl: string }>;
+  getCheckoutSession(input: { checkoutId: string }): Promise<{
+    checkoutId: string;
+    status: string | null;
+    metadata: Record<string, unknown>;
+    externalCustomerId: string | null;
+    subscriptionKey: string | null;
+    customerKey: string | null;
+    seats: number | null;
+  }>;
 };
 
 class PolarApiError extends Error {
@@ -81,11 +110,16 @@ function buildCheckoutCallbackUrl({
   path,
   locale,
   billing,
+  workspaceCheckoutId,
 }: {
   appBaseUrl: string;
-  path: "/billing/polar/success" | "/billing/polar/return";
+  path:
+    | "/billing/polar/success"
+    | "/billing/polar/return"
+    | "/workspace/checkout/success";
   locale: "ko" | "en";
   billing?: "success";
+  workspaceCheckoutId?: string;
 }) {
   const url = new URL(`${appBaseUrl}${path}`);
   url.searchParams.set("locale", locale);
@@ -94,7 +128,15 @@ function buildCheckoutCallbackUrl({
     url.searchParams.set("billing", billing);
   }
 
-  return url.toString();
+  if (workspaceCheckoutId) {
+    url.searchParams.set("workspace_checkout_id", workspaceCheckoutId);
+  }
+
+  if (path !== "/billing/polar/return") {
+    url.searchParams.set("checkout_id", "{CHECKOUT_ID}");
+  }
+
+  return url.toString().replace("%7BCHECKOUT_ID%7D", "{CHECKOUT_ID}");
 }
 
 async function parsePolarResponse<T>(response: Response): Promise<T> {
@@ -110,6 +152,19 @@ export function isPolarRecoverableError(error: unknown): boolean {
     error instanceof PolarApiError &&
     [400, 401, 403, 404, 409, 422].includes(error.status)
   );
+}
+
+export function getPolarApiErrorInfo(
+  error: unknown,
+): { status: number; body: string } | null {
+  if (!(error instanceof PolarApiError)) {
+    return null;
+  }
+
+  return {
+    status: error.status,
+    body: error.body,
+  };
 }
 
 export function createPolarBillingClient(
@@ -139,6 +194,11 @@ export function createPolarBillingClient(
       idempotencyKey,
       locale,
       metadata,
+      seats,
+      minSeats,
+      maxSeats,
+      successPath = "/billing/polar/success",
+      workspaceCheckoutId,
     }) {
       const response = await fetch(`${apiBaseUrl}/checkouts`, {
         method: "POST",
@@ -150,11 +210,16 @@ export function createPolarBillingClient(
         body: JSON.stringify({
           products: [productId],
           external_customer_id: externalCustomerId,
+          ...(seats !== undefined ? { seats } : {}),
+          ...(minSeats !== undefined ? { min_seats: minSeats } : {}),
+          ...(maxSeats !== undefined ? { max_seats: maxSeats } : {}),
           success_url: buildCheckoutCallbackUrl({
             appBaseUrl,
-            path: "/billing/polar/success",
+            path: successPath,
             locale,
-            billing: "success",
+            billing:
+              successPath === "/billing/polar/success" ? "success" : undefined,
+            workspaceCheckoutId,
           }),
           return_url: buildCheckoutCallbackUrl({
             appBaseUrl,
@@ -166,11 +231,11 @@ export function createPolarBillingClient(
       });
 
       const data = await parsePolarResponse<CheckoutSessionResponse>(response);
-      return { checkoutUrl: data.url };
+      return { checkoutUrl: data.url, checkoutId: data.id ?? null };
     },
 
     async createCustomerSession(input) {
-      const response = await fetch(`${apiBaseUrl}/customer-sessions/`, {
+      const response = await fetch(`${apiBaseUrl}/customer-sessions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
@@ -196,6 +261,34 @@ export function createPolarBillingClient(
       }
 
       return { customerPortalUrl };
+    },
+
+    async getCheckoutSession({ checkoutId }) {
+      const response = await fetch(`${apiBaseUrl}/checkouts/${checkoutId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCheckoutAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await parsePolarResponse<CheckoutSessionDetailResponse>(
+        response,
+      );
+
+      return {
+        checkoutId: data.id,
+        status: data.status ?? null,
+        metadata: data.metadata ?? {},
+        externalCustomerId:
+          data.externalCustomerId ?? data.external_customer_id ?? null,
+        subscriptionKey: data.subscriptionId ?? data.subscription_id ?? null,
+        customerKey: data.customerId ?? data.customer_id ?? null,
+        seats:
+          typeof data.seats === "number" && Number.isFinite(data.seats)
+            ? data.seats
+            : null,
+      };
     },
   };
 }

@@ -1,6 +1,6 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { ScoreboardStoragePort, WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
-import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
+import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import {
   CreateLeadMeasureInput,
   LeadMeasureRecordWithTags,
@@ -46,6 +46,8 @@ export class LeadMeasureService {
     status: "active" | "all",
   ): Promise<Array<LeadMeasureRecordWithTags & { weeklyAchievement: { achieved: number; total: number } }>> {
     await this.getOwnedScoreboard(workspaceUid, scoreboardId, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       status,
@@ -74,7 +76,7 @@ export class LeadMeasureService {
   ): Promise<LeadMeasureRecordWithTags> {
     const scoreboard = await this.getOwnedScoreboard(workspaceUid, scoreboardId, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
       throw new ForbiddenError("SCOREBOARD_ARCHIVED");
@@ -97,7 +99,7 @@ export class LeadMeasureService {
   ): Promise<LeadMeasureRecordWithTags> {
     const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -120,7 +122,7 @@ export class LeadMeasureService {
   async archiveLeadMeasure(workspaceUid: string, id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
     const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new BadRequestError("LEAD_MEASURE_ALREADY_ARCHIVED");
@@ -132,7 +134,7 @@ export class LeadMeasureService {
   async reactivateLeadMeasure(workspaceUid: string, id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
     const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ACTIVE") {
       throw new BadRequestError("LEAD_MEASURE_ALREADY_ACTIVE");
@@ -148,7 +150,7 @@ export class LeadMeasureService {
   ): Promise<{ warning: string; deleted: boolean }> {
     const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
     const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");

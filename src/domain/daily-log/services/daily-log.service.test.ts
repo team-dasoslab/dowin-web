@@ -7,6 +7,7 @@ describe("DailyLogService", () => {
   const findWorkspaceById = vi.fn();
   const findMembership = vi.fn();
   const countMembers = vi.fn();
+  const findBillingState = vi.fn();
   const findPlanLimit = vi.fn();
   const findOwnedScoreboard = vi.fn();
   const findOwnedLeadMeasure = vi.fn();
@@ -16,7 +17,7 @@ describe("DailyLogService", () => {
   const findLeadMeasuresByScoreboard = vi.fn();
 
   const service = new DailyLogService(
-    { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findPlanLimit },
+    { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findBillingState, findPlanLimit },
     { findOwnedScoreboard },
     { findOwnedLeadMeasure, findLeadMeasuresByScoreboard },
     { upsertLog, deleteLog, findLogsForLeadMeasures },
@@ -25,6 +26,11 @@ describe("DailyLogService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     countMembers.mockResolvedValue(1);
+    findBillingState.mockResolvedValue({
+      planCode: "BASIC",
+      billingStatus: "ACTIVE",
+      entitlementSource: "POLAR",
+    });
     findPlanLimit.mockResolvedValue({ memberLimit: 10 });
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-04-09T12:00:00+09:00"));
@@ -88,7 +94,24 @@ describe("DailyLogService", () => {
 
     await expect(
       service.upsertLog("ws_uid", 10, 100, "2026-04-09", true),
-    ).rejects.toThrow("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
+    ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
+    expect(upsertLog).not.toHaveBeenCalled();
+  });
+
+  it("Basic entitlement가 없으면 기록할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(2);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 2, planCode: "FREE" });
+    findBillingState.mockResolvedValue(null);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+
+    await expect(
+      service.upsertLog("ws_uid", 10, 100, "2026-04-09", true),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
     expect(upsertLog).not.toHaveBeenCalled();
   });
 
@@ -142,6 +165,19 @@ describe("DailyLogService", () => {
         }),
       ],
     });
+  });
+
+  it("Basic entitlement가 없으면 주간 기록을 조회할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
+    findBillingState.mockResolvedValue(null);
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+
+    await expect(
+      service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06"),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+    expect(findLeadMeasuresByScoreboard).not.toHaveBeenCalled();
   });
 
   it("주간 기록 조회 시 개별 지표 달성률은 100%를 초과하지 않는다", async () => {
@@ -407,8 +443,8 @@ describe("DailyLogService", () => {
     );
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [10, 11],
-      "2026-03-01",
-      "2026-03-31",
+      "2026-02-23",
+      "2026-04-05",
     );
   });
 
