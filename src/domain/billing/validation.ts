@@ -3,6 +3,19 @@ import { entitlementSourceValues } from "@/domain/billing/types";
 
 export const entitlementSourceSchema = z.enum(entitlementSourceValues);
 
+export const workspaceBillingCheckoutHeaderSchema = z.object({
+  idempotencyKey: z.string().trim().min(1).max(255),
+});
+
+export const workspaceBillingCheckoutSchema = z.object({
+  seatCount: z
+    .number()
+    .int("좌석 수는 정수여야 합니다.")
+    .min(1, "좌석 수는 1 이상이어야 합니다.")
+    .max(999, "좌석 수는 999 이하여야 합니다.")
+    .optional(),
+});
+
 export const adminBillingWorkspaceListQuerySchema = z.object({
   workspaceId: z.coerce.number().int().positive().optional(),
   workspaceName: z

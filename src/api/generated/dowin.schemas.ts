@@ -642,6 +642,25 @@ export interface WorkspaceCheckoutResponse {
   checkoutUrl: string;
 }
 
+export interface WorkspaceBillingCheckoutRequest {
+  /**
+   * Basic checkout에서 결제할 seat 수. 생략하면 현재 워크스페이스 멤버 수를 기준으로 계산한다.
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount?: number;
+}
+
+export interface WorkspaceBillingCheckoutResponse {
+  /** Polar Basic seat checkout URL */
+  checkoutUrl: string;
+  /**
+   * Polar checkout ID
+   * @nullable
+   */
+  checkoutId?: string | null;
+}
+
 export interface WorkspaceCheckoutCompleteRequest {
   /**
    * /workspaces/checkout 응답으로 받은 pending workspace checkout ID
