@@ -535,7 +535,9 @@ export const workspaceSeatEntitlements = sqliteTable(
       .references(() => workspaces.id, { onDelete: "cascade" }),
     planCode: text("plan_code", { enum: ["BASIC"] }).notNull(),
     purchasedSeatCount: integer("purchased_seat_count").notNull(),
-    seatSource: text("seat_source", { enum: ["POLAR"] }).notNull(),
+    seatSource: text("seat_source", {
+      enum: ["POLAR", "MANUAL_GRANT"],
+    }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),

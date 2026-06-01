@@ -163,6 +163,12 @@ export interface AdminBillingWorkspaceSummary {
   /** @minimum 0 */
   recentRevokedCount: number;
   requiresManualReview: boolean;
+  /**
+   * 워크스페이스의 현재 Basic seat entitlement 수
+   * @minimum 0
+   * @nullable
+   */
+  purchasedSeatCount: number | null;
 }
 
 export type AdminBillingProviderProductProvider = typeof AdminBillingProviderProductProvider[keyof typeof AdminBillingProviderProductProvider];
@@ -339,6 +345,13 @@ export interface AdminBillingManualOverrideRequest {
   cancelAtPeriodEnd?: boolean;
   /** @nullable */
   billingOwnerUserId?: number | null;
+  /**
+   * BASIC 수동 보정 시 지급할 seat 수. 생략하면 현재 멤버 수 이상으로 자동 설정한다.
+   * @minimum 0
+   * @maximum 999
+   * @nullable
+   */
+  purchasedSeatCount?: number | null;
   /**
    * @minLength 1
    * @maxLength 500

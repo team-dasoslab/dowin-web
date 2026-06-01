@@ -73,6 +73,13 @@ export const adminBillingManualOverrideSchema = z
     currentPeriodEnd: z.string().datetime().nullable().optional(),
     cancelAtPeriodEnd: z.boolean().optional(),
     billingOwnerUserId: z.coerce.number().int().positive().nullable().optional(),
+    purchasedSeatCount: z.coerce
+      .number()
+      .int("좌석 수는 정수여야 합니다.")
+      .min(0, "좌석 수는 0 이상이어야 합니다.")
+      .max(999, "좌석 수는 999 이하여야 합니다.")
+      .nullable()
+      .optional(),
     changeReason: z
       .string()
       .trim()
