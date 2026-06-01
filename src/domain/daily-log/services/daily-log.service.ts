@@ -4,7 +4,7 @@ import {
 } from "@/lib/server/errors";
 import { WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
 import { DailyLogRecord, DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
-import { assertFreePlanWithinMemberLimit } from "@/domain/workspace/plan-limits";
+import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import {
   LeadMeasureRecord,
   LeadMeasureRecordWithTags,
@@ -62,7 +62,7 @@ export class DailyLogService {
       leadMeasureId,
       userId,
     );
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -78,7 +78,7 @@ export class DailyLogService {
       leadMeasureId,
       userId,
     );
-    await assertFreePlanWithinMemberLimit(workspace, this.workspaceStorage);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     await this.dailyLogStorage.deleteLog(leadMeasureId, date);
   }
 
@@ -109,9 +109,9 @@ export class DailyLogService {
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
-    assertHistoryLimit(workspace.planCode ?? "FREE", normalizedWeekStart);
 
     const weekDates = getWeekDates(normalizedWeekStart);
     const weekEnd = weekDates[6];
@@ -204,9 +204,9 @@ export class DailyLogService {
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     const normalizedMonthStart = normalizeMonthStart(monthStart);
-    assertHistoryLimit(workspace.planCode ?? "FREE", normalizedMonthStart);
 
     const monthDates = getMonthDates(normalizedMonthStart);
     const monthEnd = monthDates[monthDates.length - 1];
@@ -501,24 +501,6 @@ function formatDateLocal(date: Date) {
 function assertPastWeekLogEditable(date: string) {
   if (date < getCurrentWeekStart()) {
     throw new ForbiddenError("PAST_WEEK_LOG_EDIT_NOT_ALLOWED");
-  }
-}
-
-function assertHistoryLimit(planCode: string, requestedDate: string) {
-  if (planCode !== "FREE") return;
-
-  const now = new Date();
-  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-
-  const limitDate = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth() - 5, 1));
-  const limitDateString = `${limitDate.getUTCFullYear()}-${String(limitDate.getUTCMonth() + 1).padStart(2, '0')}-01`;
-
-  // 주간 보기일 수 있으므로(주로 월요일 시작), 요청된 날짜로부터 6일 뒤(해당 주의 끝)가 제한일 이후인지 봅니다.
-  const checkBase = new Date(requestedDate);
-  const checkDateString = formatDateLocal(new Date(checkBase.getTime() + 6 * 24 * 60 * 60 * 1000));
-
-  if (checkDateString < limitDateString) {
-    throw new ForbiddenError("FREE_PLAN_HISTORY_LIMIT_REACHED");
   }
 }
 

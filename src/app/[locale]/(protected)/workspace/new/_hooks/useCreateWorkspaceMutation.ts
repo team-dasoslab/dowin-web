@@ -1,16 +1,8 @@
 "use client";
 
-
-import { getGetUsersMeQueryKey } from "@/api/generated/profile/profile";
-import {
-  getGetWorkspacesMeQueryKey,
-  usePostWorkspaces,
-} from "@/api/generated/workspace/workspace";
-import { useRouter } from "@/i18n/routing";
+import { postWorkspacesCheckout } from "@/api/generated/workspace/workspace";
 import { trackEvent } from "@/lib/client/gtag";
-import { hashId } from "@/lib/client/id-hash";
-import { useQueryClient } from "@tanstack/react-query";
-import { useLocale } from "next-intl";
+import { useState } from "react";
 
 type WorkspaceCreateError = {
   data?: {
@@ -25,53 +17,45 @@ type UseCreateWorkspaceMutationParams = {
 export const useCreateWorkspaceMutation = ({
   onError,
 }: UseCreateWorkspaceMutationParams) => {
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const locale = useLocale();
+  const [isPending, setIsPending] = useState(false);
 
-  const { mutate: createWorkspace, isPending } = usePostWorkspaces({
-    mutation: {
-      onSuccess: async (response) => {
-        await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: getGetUsersMeQueryKey(),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: getGetWorkspacesMeQueryKey(),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: ['workspaces'],
-          }),
-          queryClient.invalidateQueries({
-            predicate: (query) => typeof query.queryKey[0] === 'string' && query.queryKey[0].includes('/dashboard/team'),
-          }),
-        ]);
- 
-        const workspaceId =
-          response.status === 201 ? response.data.id : undefined;
-        trackEvent("workspace_created", {
-          workspace_id_hash: hashId(workspaceId),
-        });
- 
-        if (workspaceId) {
-          window.location.href = `/${locale}/${workspaceId}/dashboard/my`;
-        } else {
-          router.refresh();
-          router.push("/");
-        }
-      },
-      onError: (error: WorkspaceCreateError) => {
-        onError(
-          error.data?.message || "워크스페이스 생성 중 오류가 발생했습니다.",
-        );
-      },
-    },
-  });
+  const submitCreateWorkspace = async (name: string, seatCount: number) => {
+    setIsPending(true);
+    try {
+      const response = await postWorkspacesCheckout(
+        {
+          workspaceName: name,
+          seatCount,
+        },
+        {
+          headers: {
+            "Idempotency-Key": createWorkspaceCheckoutIdempotencyKey(),
+          },
+        },
+      );
 
-  const submitCreateWorkspace = (name: string) => {
-    createWorkspace({
-      data: { name },
-    });
+      if (
+        response.status !== 201 ||
+        !response.data.checkoutUrl ||
+        !response.data.workspaceCheckoutId
+      ) {
+        onError("워크스페이스 결제 준비 중 오류가 발생했습니다.");
+        return;
+      }
+
+      trackEvent("workspace_checkout_started", {
+        checkout_method: "basic_seat_checkout",
+      });
+      window.location.assign(response.data.checkoutUrl);
+    } catch (error) {
+      const workspaceError = error as WorkspaceCreateError;
+      onError(
+        workspaceError.data?.message ||
+          "워크스페이스 결제 준비 중 오류가 발생했습니다.",
+      );
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return {
@@ -79,3 +63,11 @@ export const useCreateWorkspaceMutation = ({
     submitCreateWorkspace,
   };
 };
+
+function createWorkspaceCheckoutIdempotencyKey() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `workspace_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}

@@ -22,7 +22,6 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Card } from "@/components/ui/Card";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
-import { useNativeApp } from "@/context/NativeAppContext";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -45,7 +44,6 @@ interface MenuItem {
 
 export default function ProfilePage() {
   const t = useTranslations("Profile");
-  const isNativeApp = useNativeApp();
   const router = useRouter();
   const workspaceId = useParams().workspaceId as string | undefined;
   const { showToast } = useToast();
@@ -66,7 +64,6 @@ export default function ProfilePage() {
     !hasNoWorkspace && workspaceResponse?.status === 200
       ? workspaceResponse.data
       : null;
-  const workspacePlanCode = workspace?.planCode ?? "FREE";
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const nickname = user?.nickname ?? t("defaultNickname");
   const customId = user?.customId ?? "";
@@ -161,18 +158,7 @@ export default function ProfilePage() {
     {
       id: "data",
       label: t("dataSection"),
-      items:
-        !isNativeApp && workspacePlanCode === "STANDARD"
-          ? [
-              {
-                id: "export",
-                icon: <DowinIcon name="action-download" className="w-4 h-4" />,
-                title: t("csvDownload"),
-                description: t("csvDownloadDesc"),
-                href: getWorkspacePath(workspaceId, "/profile/export"),
-              },
-            ]
-          : [],
+      items: [],
     },
     {
       id: "notifications",

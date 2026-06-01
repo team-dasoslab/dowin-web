@@ -14,8 +14,16 @@ import { Link } from "@/i18n/routing";
 export default function NewWorkspacePage() {
   const t = useTranslations("Workspace.new");
   const tCommon = useTranslations("Common");
-  const { error, getValidatedName, name, setError, handleNameChange } =
-    useCreateWorkspaceForm();
+  const {
+    error,
+    getValidatedName,
+    getValidatedSeatCount,
+    name,
+    seatCount,
+    setError,
+    handleNameChange,
+    handleSeatCountChange,
+  } = useCreateWorkspaceForm();
   const { isPending, submitCreateWorkspace } = useCreateWorkspaceMutation({
     onError: (message) => {
       setError(message);
@@ -30,7 +38,12 @@ export default function NewWorkspacePage() {
       return;
     }
 
-    submitCreateWorkspace(validatedName);
+    const validatedSeatCount = getValidatedSeatCount();
+    if (validatedSeatCount === null) {
+      return;
+    }
+
+    submitCreateWorkspace(validatedName, validatedSeatCount);
   };
 
   return (
@@ -78,6 +91,26 @@ export default function NewWorkspacePage() {
             />
           </div>
 
+          <div className="space-y-4">
+            <label className="text-[11px] block font-black text-zinc-400 uppercase tracking-widest ml-1">
+              {t("seatLabel")}
+            </label>
+            <Input
+              type="number"
+              min={1}
+              max={999}
+              value={seatCount}
+              disabled={isPending}
+              onChange={(e) => handleSeatCountChange(e.target.value)}
+              placeholder={t("seatPlaceholder")}
+              className="w-full px-5 py-4 bg-zinc-50/50 border border-zinc-200 rounded-content text-base focus:border-primary outline-none transition-all placeholder:text-zinc-300"
+              required
+            />
+            <p className="text-xs font-bold leading-relaxed text-zinc-400">
+              {t("seatDescription")}
+            </p>
+          </div>
+
           {error && (
             <div className="p-4 bg-red-50 border border-red-100 rounded-content">
               <p className="text-red-600 text-xs font-bold text-center">
@@ -88,11 +121,11 @@ export default function NewWorkspacePage() {
 
           <Button
             type="submit"
-            disabled={isPending || !name.trim()}
+            disabled={isPending || !name.trim() || !seatCount.trim()}
             className={`
               w-full py-4 flex items-center justify-center gap-2 rounded-button text-sm font-black transition-all
               ${
-                isPending || !name.trim()
+                isPending || !name.trim() || !seatCount.trim()
                   ? "bg-primary/50 text-white cursor-not-allowed"
                   : "btn-dowin-primary"
               }
@@ -101,7 +134,7 @@ export default function NewWorkspacePage() {
             {isPending ? (
               <InlineSpinner size="sm" />
             ) : (
-              <span>{t("button")}</span>
+              <span>{t("checkoutButton")}</span>
             )}
           </Button>
         </form>

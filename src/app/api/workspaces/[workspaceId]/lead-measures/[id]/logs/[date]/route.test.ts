@@ -55,10 +55,10 @@ describe("PUT /api/lead-measures/:id/logs/:date", () => {
     mockGuardRestrictedTestAccountWrite.mockResolvedValue(null);
   });
 
-  it("FREE 멤버 한도 초과 상태에서는 403을 반환한다", async () => {
+  it("좌석 한도 초과 상태에서는 403을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockUpsertLog.mockRejectedValue(
-      new ForbiddenError("FREE_PLAN_MEMBER_LIMIT_EXCEEDED"),
+      new ForbiddenError("WORKSPACE_SEAT_LIMIT_EXCEEDED"),
     );
 
     const { PUT } = await import("./route");
@@ -74,7 +74,7 @@ describe("PUT /api/lead-measures/:id/logs/:date", () => {
     };
 
     expect(response.status).toBe(403);
-    expect(body.error.code).toBe("FREE_PLAN_MEMBER_LIMIT_EXCEEDED");
-    expect(mockUpsertLog).toHaveBeenCalledWith(10, 1, "2026-04-21", true);
+    expect(body.error.code).toBe("WORKSPACE_SEAT_LIMIT_EXCEEDED");
+    expect(mockUpsertLog).toHaveBeenCalledWith("1", 10, 1, "2026-04-21", true);
   });
 });

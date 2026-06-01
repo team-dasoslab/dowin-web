@@ -468,7 +468,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
     subtitle:
       "본 문서는 Dowin 유료 기능 이용 시 적용되는 결제, 해지, 환불 기준을 설명합니다.\n개별 결제 화면에 별도 조건이 표시되는 경우 그 조건이 함께 적용될 수 있습니다.",
     effectiveDateLabel: "시행일",
-    effectiveDate: "2026.04.28",
+    effectiveDate: "2026.06.01",
     footnote:
       "본 정책은 이용약관과 함께 적용됩니다. 법령, 결제 사업자 정책, 실제 운영 방식이 변경되면 본 문서를 함께 갱신합니다.",
     sections: [
@@ -491,6 +491,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "3. 결제 및 플랜 반영",
         body: [
           "결제는 외부 결제 사업자를 통해 처리될 수 있으며, 결제 완료 후 실제 플랜 상태 반영에는 webhook 처리 시간이 일부 소요될 수 있습니다.",
+          "Basic 구독은 결제 완료와 함께 워크스페이스 대시보드, 기록 조회, 운영 기능 접근권이 제공되는 것을 전제로 합니다.",
           "결제 완료 직후 서비스 화면에 즉시 상태가 바뀌지 않더라도, 잠시 후 새로고침하거나 다시 접속하면 최신 상태가 반영될 수 있습니다.",
         ],
       },
@@ -498,16 +499,18 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "4. 정기결제 해지",
         body: [
           "정기결제 해지 또는 결제수단 변경은 서비스 내 플랜 및 결제 화면 또는 결제 사업자 고객 포털에서 진행할 수 있습니다.",
-          "일반적인 해지는 즉시 환불이 아니라 다음 결제일부터 과금이 중단되는 방식으로 처리되며, 이미 결제된 현재 이용 기간 동안은 플랜 권한이 유지될 수 있습니다.",
+          "일반적인 해지는 즉시 환불이 아니라 현재 결제 기간 종료 후 다음 결제일부터 과금이 중단되는 방식으로 처리됩니다.",
+          "이용자는 이미 결제된 월 이용 기간이 끝나는 시점에 구독이 종료되도록 미리 해지 예약할 수 있으며, 해지 예약 후에도 현재 이용 기간이 끝날 때까지 플랜 권한이 유지될 수 있습니다.",
         ],
       },
       {
         heading: "5. 환불 원칙",
         body: [
           "회사는 관련 법령상 이용자에게 인정되는 청약철회, 취소, 환불 권리를 우선 적용합니다.",
-          "정기결제 해지는 원칙적으로 다음 결제일부터 과금이 중단되는 절차이며, 일반적인 해지 자체가 이미 결제된 기간에 대한 환불을 의미하지는 않습니다.",
-          "유료 기능이 결제 직후 즉시 제공되는 구조, 이미 상당 부분 사용이 개시된 상태, 또는 관련 법령상 청약철회 제한 사유가 인정되는 경우에는 법령이 허용하는 범위에서 환불 가능 범위가 달라질 수 있습니다.",
-          "회사는 원칙적으로 단순 변심, 사용 도중의 중도 해지, 기대와의 주관적 차이만을 이유로 이미 결제된 이용 기간 전체에 대한 환불을 보장하지 않습니다. 다만 이는 법령상 보장되는 권리를 제한하기 위한 것이 아닙니다.",
+          "Basic 구독은 결제 직후 워크스페이스 대시보드, 기록 조회, 운영 기능 접근권이 제공되는 구조이므로, 이미 결제된 이용 기간에 대해서는 원칙적으로 환불하지 않습니다.",
+          "정기결제 해지는 원칙적으로 현재 결제 기간 종료 후 다음 결제일부터 과금이 중단되는 절차이며, 일반적인 해지 자체가 이미 결제된 기간에 대한 환불을 의미하지는 않습니다.",
+          "유료 기능이 결제 직후 즉시 제공되는 구조, 이미 사용이 개시된 상태, 또는 관련 법령상 청약철회 제한 사유가 인정되는 경우에는 법령이 허용하는 범위에서 환불 가능 범위가 달라질 수 있습니다.",
+          "회사는 원칙적으로 단순 변심, 사용 도중의 중도 해지, 기대와의 주관적 차이만을 이유로 이미 결제된 이용 기간에 대한 환불을 보장하지 않습니다. 다만 이는 법령상 보장되는 권리를 제한하기 위한 것이 아닙니다.",
           "다만 중복 결제, 명백한 오결제, 결제 직후 기술적 오류로 유료 권한이 정상 제공되지 않은 경우, 법령상 환불이 필요한 경우 등 객관적으로 확인 가능한 예외 사유가 있는 때에는 환불 또는 취소를 검토할 수 있습니다.",
           "환불 또는 취소 검토 시 회사는 결제 시점, 실제 권한 제공 여부, 사용 개시 여부, 결제 사업자 처리 결과, 관련 법령상 권리 발생 여부 등을 함께 확인할 수 있습니다.",
         ],
@@ -524,7 +527,8 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
       {
         heading: "7. 결제 제한 및 수동 검토",
         body: [
-          "도용이 의심되는 결제, 중복 결제 악용, 비정상적인 결제 시도, 객관적으로 확인 가능한 반복 악용 패턴이 있는 경우 신규 결제가 제한되거나 수동 검토가 요구될 수 있습니다.",
+          "부당한 환불 반복, 악의적 결제, 사기 또는 도용이 의심되는 결제, 중복 결제 악용, 비정상적인 결제 시도, 객관적으로 확인 가능한 반복 남용 패턴이 있는 경우 신규 결제가 제한되거나 수동 검토가 요구될 수 있습니다.",
+          "법적으로 허용되는 범위에서 회사는 위와 같은 남용 패턴이 확인된 계정 또는 워크스페이스의 이용을 제한하거나 향후 거래를 거부할 수 있습니다.",
           "정상적인 법정 환불권 행사 자체만을 이유로 신규 결제를 제한하지는 않으며, 제한 또는 수동 검토는 결제 안전성과 악용 방지 관점에서 필요한 범위에서만 적용합니다.",
           "이 경우 회사는 필요 시 추가 확인, 고객지원 안내, 또는 해제 가능 여부에 관한 절차를 안내할 수 있습니다.",
         ],
@@ -536,7 +540,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
     subtitle:
       "This document describes the billing, cancellation, and refund rules that apply when users purchase paid features in Dowin.\nWhere separate conditions are shown in the billing flow, those conditions may also apply.",
     effectiveDateLabel: "Effective date",
-    effectiveDate: "2026.04.28",
+    effectiveDate: "2026.06.01",
     footnote:
       "This policy applies together with the Terms of Service. We may update it when legal requirements, payment-provider rules, or operating practices change.",
     sections: [
@@ -559,6 +563,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "3. Billing and plan activation",
         body: [
           "Payments may be processed through an external payment provider, and plan activation in the service may take additional time to reflect because it can depend on webhook processing.",
+          "A Basic subscription is designed to provide access to the workspace dashboard, record lookup, and operations features as soon as payment is completed.",
           "If the billing state does not change immediately after payment, the latest status may appear after a short delay, refresh, or re-entry into the service.",
         ],
       },
@@ -566,16 +571,18 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "4. Recurring billing cancellation",
         body: [
           "Users may cancel recurring billing or change billing methods through the in-product billing screen or the payment provider's customer portal where available.",
-          "As a general rule, cancellation stops future billing from the next billing date rather than creating an immediate refund, and access to the paid plan may remain available during the already-paid period.",
+          "As a general rule, cancellation stops future billing after the current paid period rather than creating an immediate refund.",
+          "Users may schedule the subscription to end when the already-paid monthly period ends, and access to the paid plan may remain available until that period ends.",
         ],
       },
       {
         heading: "5. Refund principles",
         body: [
           "Any cancellation, withdrawal, or refund rights granted to the user under applicable law take priority.",
-          "Cancellation of recurring billing generally means future billing stops from the next billing date and does not, by itself, create a refund for an already-paid period.",
-          "If the paid feature is made available immediately after payment, has already been substantially used, or falls under a lawful limitation on withdrawal or refund rights, the actual refund scope may differ to the extent permitted by law.",
-          "As a general rule, the company does not guarantee a refund of the full already-paid period solely because of a change of mind, mid-period cancellation, or subjective dissatisfaction with the service. This sentence does not limit refund rights that are granted by law.",
+          "Because Basic provides access to the workspace dashboard, record lookup, and operations features immediately after payment, already-paid periods are generally non-refundable.",
+          "Cancellation of recurring billing generally means future billing stops after the current paid period and does not, by itself, create a refund for an already-paid period.",
+          "If the paid feature is made available immediately after payment, use has already started, or the case falls under a lawful limitation on withdrawal or refund rights, the actual refund scope may differ to the extent permitted by law.",
+          "As a general rule, the company does not guarantee a refund for an already-paid period solely because of a change of mind, mid-period cancellation, or subjective dissatisfaction with the service. This sentence does not limit refund rights that are granted by law.",
           "However, the company may review a refund or cancellation request where there has been duplicate payment, an obvious mistaken charge, a technical failure that prevented paid access from being properly provided right after payment, a refund right required by applicable law, or another objectively verifiable exceptional circumstance.",
           "When reviewing a refund or cancellation request, the company may consider the timing of the payment, whether paid access was actually provided, whether use had already started, the payment provider's processing result, and whether a refund right arises under applicable law.",
         ],
@@ -592,7 +599,8 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
       {
         heading: "7. Billing restrictions and manual review",
         body: [
-          "Checkout may be restricted or subject to manual review where there is suspected stolen-payment use, duplicate-payment abuse, abnormal payment attempts, or another objectively verifiable pattern of repeated abuse.",
+          "Checkout may be restricted or subject to manual review where there is repeated abusive refund activity, malicious payment behavior, suspected fraud or stolen-payment use, duplicate-payment abuse, abnormal payment attempts, or another objectively verifiable pattern of repeated abuse.",
+          "To the extent permitted by law, the company may restrict access for an abusive account or workspace or refuse future transactions where such abuse is confirmed.",
           "The company does not restrict new checkout solely because a user exercised a lawful refund right, and any restriction or manual review is applied only to the extent reasonably necessary for payment safety and abuse prevention.",
           "In such cases, the company may request additional verification, provide further support guidance, or explain whether the restriction can be lifted.",
         ],

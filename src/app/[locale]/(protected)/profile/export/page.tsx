@@ -31,7 +31,7 @@ export default function ProfileExportPage() {
     user,
     workspace,
   } = useProfileExportData();
-  const isStandardPlan = workspace?.planCode === "STANDARD";
+  const isExportAvailable = workspace?.planCode === "STANDARD";
   const {
     exportFrom,
     exportTo,
@@ -91,25 +91,24 @@ export default function ProfileExportPage() {
               <span className="truncate">{workspace?.name}</span>
               <span
                 className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-bold ${
-                  isStandardPlan
+                  isExportAvailable
                     ? "bg-primary/10 text-primary"
                     : "bg-sub-background text-text-secondary"
                 }`}
               >
-                {workspace?.planCode ?? "FREE"}
+                Basic
               </span>
             </div>
           </div>
         </Card>
 
-        {!isStandardPlan ? (
+        {!isExportAvailable ? (
           <Card className="border border-border rounded-content p-4 space-y-2 bg-sub-background">
             <p className="text-sm font-bold text-text-primary">
-              CSV 다운로드는 STANDARD 플랜 기능입니다.
+              CSV 다운로드는 현재 제공되지 않습니다.
             </p>
             <p className="text-[11px] leading-relaxed text-text-muted">
-              현재 워크스페이스는 FREE 플랜이라 내보내기 기능이 잠겨 있습니다.
-              이번 단계에서는 앱 안에서 기록과 조회는 계속 사용할 수 있어요.
+              현재는 앱 안에서 기록과 조회를 계속 사용할 수 있습니다.
             </p>
           </Card>
         ) : null}
@@ -159,7 +158,7 @@ export default function ProfileExportPage() {
               </Button>
             </div>
             <div className="grid gap-1.5 sm:grid-cols-2">
-              {exportMeasureOptions.map((measure: { id: number; name: string }) => {
+              {exportMeasureOptions.map((measure) => {
                 const checked = selectedExportMeasureIds.includes(measure.id);
 
                 return (
@@ -197,15 +196,15 @@ export default function ProfileExportPage() {
             <Button
               type="button"
               onClick={() => void exportCsv()}
-              disabled={isExporting || !isStandardPlan}
+              disabled={isExporting || !isExportAvailable}
               className="h-9 w-full rounded-content bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
               <DowinIcon name="action-download" size="14px" />
-              {isStandardPlan
+              {isExportAvailable
                 ? isExporting
                   ? "CSV 생성 중..."
                   : "CSV 다운로드"
-                : "STANDARD 플랜 전용"}
+                : "현재 사용 불가"}
             </Button>
           </div>
         </Card>

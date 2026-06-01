@@ -5,10 +5,15 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
 
-const PLAN_KEYS = ["FREE", "STANDARD"] as const;
-
 export function LandingPricingSection() {
   const t = useTranslations("Landing.Pricing");
+  const features = [
+    t("features.0"),
+    t("features.1"),
+    t("features.2"),
+    t("features.3"),
+    t("features.4"),
+  ];
 
   return (
     <section className="bg-white py-16 md:py-24">
@@ -22,120 +27,50 @@ export function LandingPricingSection() {
           </p>
         </div>
 
-        <div className="mx-auto grid gap-6 lg:grid-cols-[1.05fr_0.95fr] max-w-[960px]">
-          {PLAN_KEYS.map((planKey) => {
-            const isFree = planKey === "FREE";
-            const planT = (key: string) => t(`plans.${planKey}.${key}`);
-            
-            // Get features array from translations
-            // next-intl doesn't support arrays directly easily, but we can use raw or map
-            // Actually, we defined them as arrays in JSON. 
-            // useTranslations does not support arrays, but we can use .raw() or just iterate if we know the count.
-            // Since we have 5 features for each, I'll use a fixed loop or better, use the raw data.
-            
-            // To be safe and clean, I'll use a count or mapping.
-            const features = [
-              planT("features.0"),
-              planT("features.1"),
-              planT("features.2"),
-              planT("features.3"),
-              planT("features.4"),
-            ];
+        <div className="mx-auto max-w-[560px]">
+          <div className="flex flex-col rounded-[24px] border border-zinc-200 bg-white p-8 lg:p-10">
+            <div className="mb-8">
+              <p className="mb-2 text-[12px] font-bold uppercase tracking-wider text-primary">
+                {t("eyebrow")}
+              </p>
+              <h3 className="text-[28px] font-black tracking-tight text-zinc-900">
+                Basic
+              </h3>
+            </div>
 
-            return (
-              <div
-                key={planKey}
-                className={`flex flex-col rounded-[24px] border p-8 lg:p-10 ${
-                  isFree
-                    ? "border-zinc-200 bg-white"
-                    : "border-zinc-100 bg-zinc-50/50"
-                }`}
-              >
-                <div className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div>
-                    <p
-                      className={`mb-2 text-[12px] font-bold uppercase tracking-wider ${
-                        isFree ? "text-primary" : "text-zinc-400"
-                      }`}
-                    >
-                      {planT("eyebrow")}
-                    </p>
-                    <h3
-                      className={`text-[28px] font-black tracking-tight ${
-                        isFree ? "text-zinc-900" : "text-zinc-400"
-                      }`}
-                    >
-                      {planKey}
-                    </h3>
+            <div className="mb-6 flex items-end gap-2">
+              <span className="text-[36px] font-black leading-none tracking-tighter text-zinc-900">
+                {t("price")}
+              </span>
+              <span className="pb-1.5 text-sm font-bold text-zinc-500">
+                {t("cadence")}
+              </span>
+            </div>
+
+            <p className="mb-8 break-keep text-[15px] font-medium leading-[1.65] text-zinc-600">
+              {t("planDescription")}
+            </p>
+
+            <div className="mb-10 space-y-3">
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-start gap-4">
+                  <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                    <DowinIcon name="status-checkmark" size="12px" />
                   </div>
+                  <p className="break-keep text-[15px] font-medium leading-[1.5] text-zinc-700">
+                    {feature}
+                  </p>
                 </div>
+              ))}
+            </div>
 
-                <div className="mb-6 flex items-end gap-2">
-                  <span
-                    className={`text-[36px] font-black leading-none tracking-tighter ${
-                      isFree ? "text-zinc-900" : "text-zinc-300"
-                    }`}
-                  >
-                    {planT("price")}
-                  </span>
-                  {isFree && (
-                    <span className="pb-1.5 text-sm font-bold text-zinc-500">
-                      {t("cadence")}
-                    </span>
-                  )}
-                </div>
-
-                <p
-                  className={`mb-8 text-[15px] leading-[1.65] font-medium break-keep ${
-                    isFree ? "text-zinc-600" : "text-zinc-400"
-                  }`}
-                >
-                  {planT("description")}
-                </p>
-
-                <div className="mb-10 space-y-3">
-                  {features.map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-4">
-                      <div
-                        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                          isFree
-                            ? "bg-primary/20 text-primary"
-                            : "bg-zinc-200 text-zinc-400"
-                        }`}
-                      >
-                        <DowinIcon name="status-checkmark" size="12px" />
-                      </div>
-                      <p
-                        className={`text-[15px] leading-[1.5] font-medium break-keep ${
-                          isFree ? "text-zinc-700" : "text-zinc-400"
-                        }`}
-                      >
-                        {feature}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-auto pt-4">
-                  {isFree ? (
-                    <Button
-                      asChild
-                      className="inline-flex h-12 w-full items-center justify-center rounded-[14px] bg-zinc-900 px-6 text-[15px] font-bold text-white transition-none"
-                    >
-                      <Link href="/login">{t("ctaFree")}</Link>
-                    </Button>
-                  ) : (
-                    <Button
-                      disabled
-                      className="inline-flex h-12 w-full items-center justify-center rounded-[14px] bg-zinc-100 px-6 text-[15px] font-bold text-zinc-400 transition-none"
-                    >
-                      {t("ctaStandard")}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+            <Button
+              asChild
+              className="inline-flex h-12 w-full items-center justify-center rounded-[14px] bg-zinc-900 px-6 text-[15px] font-bold text-white transition-none"
+            >
+              <Link href="/login">{t("cta")}</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </section>

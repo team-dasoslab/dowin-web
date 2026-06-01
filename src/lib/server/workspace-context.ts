@@ -6,7 +6,7 @@ type WorkspaceStoragePort = {
       id: number;
       uid: string | null;
       name: string;
-      planCode: "FREE" | "STANDARD";
+      planCode: "BASIC" | "FREE" | "STANDARD";
     };
     member: {
       id: number;
@@ -14,7 +14,7 @@ type WorkspaceStoragePort = {
       role: "ADMIN" | "MEMBER";
     };
     billingState: {
-      planCode: "FREE" | "STANDARD";
+      planCode: "BASIC" | "FREE" | "STANDARD";
       billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
       entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
     } | null;
@@ -29,10 +29,10 @@ export type WorkspaceAccessContext = {
   role: "ADMIN" | "MEMBER";
   membershipId: number;
   entitlement: {
-    canAccessStandardFeatures: boolean;
+    canAccessBasicSubscription: boolean;
     entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    planCode: "FREE" | "STANDARD";
+    planCode: "BASIC" | "FREE" | "STANDARD";
   };
 };
 
@@ -56,9 +56,10 @@ export async function requireWorkspaceAccess(
   const billingStatus = billingState?.billingStatus ?? "NONE";
   const entitlementSource = billingState?.entitlementSource ?? null;
 
-  // FREE는 STANDARD 기능에 접근 불가.
-  // 추후 entitlementStatus 추가 시 이곳에 로직 추가.
-  const canAccessStandardFeatures = planCode === "STANDARD";
+  // FREE/STANDARD는 과거 호환 코드값일 뿐이며, 제품 권한은 Basic entitlement 활성 여부로 해석한다.
+  const canAccessBasicSubscription =
+    (planCode === "BASIC" || planCode === "STANDARD") &&
+    (billingStatus === "ACTIVE" || billingStatus === "CANCELED");
 
   return {
     workspaceId: workspace.id,
@@ -68,7 +69,7 @@ export async function requireWorkspaceAccess(
     role: member.role,
     membershipId: member.id,
     entitlement: {
-      canAccessStandardFeatures,
+      canAccessBasicSubscription,
       entitlementSource,
       billingStatus,
       planCode,

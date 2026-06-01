@@ -3,7 +3,6 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 type TeamPeriodControlsProps = {
-  historyLimitDate?: string;
   isPeriodLoading?: boolean;
   isPreviousDisabled?: boolean;
   isResetVisible?: boolean;
@@ -15,7 +14,6 @@ type TeamPeriodControlsProps = {
 };
 
 export function TeamPeriodControls({
-  historyLimitDate,
   isPeriodLoading,
   isPreviousDisabled,
   isResetVisible = false,
@@ -40,7 +38,6 @@ export function TeamPeriodControls({
             <input
               type="date"
               value={selectedDate}
-              min={historyLimitDate}
               disabled={isPeriodLoading}
               onChange={(event) => setSelectedDate(event.target.value)}
               className="absolute inset-0 w-full cursor-pointer opacity-0"

@@ -7,14 +7,16 @@ const generateUid = customAlphabet(
 );
 import {
   billingPlanLimits,
+  pendingWorkspaceCheckouts,
   users,
   workspaceInvites,
   workspaceMembers,
+  workspaceSeatEntitlements,
   workspaceTags,
   workspaces,
   workspaceBillingState,
 } from "@/db/schema";
-import { and, eq, gt, inArray, lt, sql } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, lt, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 type Workspace = typeof workspaces.$inferSelect;
@@ -89,6 +91,156 @@ export class WorkspaceStorage {
       .values({ name, uid })
       .returning();
     return newWorkspace;
+  }
+
+  async findActivePendingWorkspaceCheckoutByUserId(userId: number, now: Date) {
+    return (
+      (await this.db.query.pendingWorkspaceCheckouts.findFirst({
+        where: and(
+          eq(pendingWorkspaceCheckouts.userId, userId),
+          inArray(pendingWorkspaceCheckouts.status, [
+            "PENDING",
+            "CHECKOUT_CREATED",
+          ]),
+          gt(pendingWorkspaceCheckouts.expiresAt, now),
+        ),
+        orderBy: [desc(pendingWorkspaceCheckouts.createdAt)],
+      })) ?? null
+    );
+  }
+
+  async findPendingWorkspaceCheckoutByRequestId(requestId: string) {
+    return (
+      (await this.db.query.pendingWorkspaceCheckouts.findFirst({
+        where: eq(pendingWorkspaceCheckouts.requestId, requestId),
+      })) ?? null
+    );
+  }
+
+  async findPendingWorkspaceCheckoutByUid(uid: string) {
+    return (
+      (await this.db.query.pendingWorkspaceCheckouts.findFirst({
+        where: eq(pendingWorkspaceCheckouts.uid, uid),
+      })) ?? null
+    );
+  }
+
+  async createPendingWorkspaceCheckout(input: {
+    uid: string;
+    requestId: string;
+    userId: number;
+    locale: "ko" | "en";
+    workspaceName: string;
+    requestedSeatCount: number;
+    targetPlanCode: "BASIC";
+    provider: "POLAR";
+    providerProductId: string;
+    expiresAt: Date;
+  }) {
+    const [created] = await this.db
+      .insert(pendingWorkspaceCheckouts)
+      .values(input)
+      .returning();
+
+    return created;
+  }
+
+  async markPendingWorkspaceCheckoutCreated(
+    id: number,
+    input: {
+      providerCheckoutId: string | null;
+      checkoutUrl: string;
+    },
+  ) {
+    const [updated] = await this.db
+      .update(pendingWorkspaceCheckouts)
+      .set({
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: input.providerCheckoutId,
+        checkoutUrl: input.checkoutUrl,
+        updatedAt: new Date(),
+      })
+      .where(eq(pendingWorkspaceCheckouts.id, id))
+      .returning();
+
+    return updated ?? null;
+  }
+
+  async markPendingWorkspaceCheckoutFailed(id: number) {
+    const [updated] = await this.db
+      .update(pendingWorkspaceCheckouts)
+      .set({
+        status: "FAILED",
+        updatedAt: new Date(),
+      })
+      .where(eq(pendingWorkspaceCheckouts.id, id))
+      .returning();
+
+    return updated ?? null;
+  }
+
+  async provisionCompletedWorkspaceCheckout(input: {
+    pendingId: number;
+    pendingUid: string;
+    userId: number;
+    workspaceName: string;
+    purchasedSeatCount: number;
+    customerKey: string | null;
+    subscriptionKey: string | null;
+    now: Date;
+  }) {
+    const [workspace] = await this.db
+      .insert(workspaces)
+      .values({
+        uid: generateUid(),
+        name: input.workspaceName,
+        planCode: "BASIC",
+        billingCustomerExternalRef: `workspace-checkout:${input.pendingUid}`,
+        billingOwnerUserId: input.userId,
+      })
+      .returning();
+
+    await this.db.insert(workspaceMembers).values({
+      workspaceId: workspace.id,
+      userId: input.userId,
+      role: "ADMIN",
+    });
+
+    await this.db.insert(workspaceBillingState).values({
+      workspaceId: workspace.id,
+      provider: "POLAR",
+      billingStatus: "ACTIVE",
+      planCode: "BASIC",
+      entitlementSource: "POLAR",
+      customerKey: input.customerKey,
+      subscriptionKey: input.subscriptionKey,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      billingOwnerUserId: input.userId,
+      lastEventId: null,
+      lastEventOccurredAt: input.now,
+      updatedAt: input.now,
+    });
+
+    await this.db.insert(workspaceSeatEntitlements).values({
+      workspaceId: workspace.id,
+      planCode: "BASIC",
+      purchasedSeatCount: input.purchasedSeatCount,
+      seatSource: "POLAR",
+      updatedAt: input.now,
+    });
+
+    await this.db
+      .update(pendingWorkspaceCheckouts)
+      .set({
+        status: "COMPLETED",
+        completedWorkspaceId: workspace.id,
+        completedAt: input.now,
+        updatedAt: input.now,
+      })
+      .where(eq(pendingWorkspaceCheckouts.id, input.pendingId));
+
+    return workspace;
   }
 
   async updateWorkspaceName(
@@ -185,10 +337,26 @@ export class WorkspaceStorage {
     return Number(result?.count ?? 0);
   }
 
-  async findPlanLimit(planCode: "FREE" | "STANDARD") {
+  async findPlanLimit(planCode: "BASIC" | "FREE" | "STANDARD") {
     return (
       (await this.db.query.billingPlanLimits.findFirst({
         where: eq(billingPlanLimits.planCode, planCode),
+      })) ?? null
+    );
+  }
+
+  async findBillingState(workspaceId: number) {
+    return (
+      (await this.db.query.workspaceBillingState.findFirst({
+        where: eq(workspaceBillingState.workspaceId, workspaceId),
+      })) ?? null
+    );
+  }
+
+  async findSeatEntitlement(workspaceId: number) {
+    return (
+      (await this.db.query.workspaceSeatEntitlements.findFirst({
+        where: eq(workspaceSeatEntitlements.workspaceId, workspaceId),
       })) ?? null
     );
   }

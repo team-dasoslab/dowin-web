@@ -158,7 +158,6 @@ export default function LoginPageClient() {
 
         setRecoveryCodes(response.data.recoveryCodes);
         setIsCopied(false);
-        window.sessionStorage.setItem("dowin.intent.push-prompt", "true");
         trackEvent("sign_up_completed", {
           signup_method: "self_signup",
           user_id_hash: hashId(response.data.user.id),

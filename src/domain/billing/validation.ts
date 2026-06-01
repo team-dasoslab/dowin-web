@@ -3,12 +3,17 @@ import { entitlementSourceValues } from "@/domain/billing/types";
 
 export const entitlementSourceSchema = z.enum(entitlementSourceValues);
 
-export const billingCheckoutHeaderSchema = z.object({
+export const workspaceBillingCheckoutHeaderSchema = z.object({
   idempotencyKey: z.string().trim().min(1).max(255),
 });
 
-export const billingCheckoutBodySchema = z.object({
-  locale: z.enum(["ko", "en"]),
+export const workspaceBillingCheckoutSchema = z.object({
+  seatCount: z
+    .number()
+    .int("좌석 수는 정수여야 합니다.")
+    .min(1, "좌석 수는 1 이상이어야 합니다.")
+    .max(999, "좌석 수는 999 이하여야 합니다.")
+    .optional(),
 });
 
 export const adminBillingWorkspaceListQuerySchema = z.object({
@@ -25,9 +30,26 @@ export const adminBillingWorkspaceParamsSchema = z.object({
   workspaceId: z.coerce.number().int().positive(),
 });
 
+export const adminBillingProviderProductUpsertSchema = z.object({
+  provider: z.enum(["POLAR"]),
+  environment: z.enum(["sandbox", "production"]),
+  planCode: z.enum(["BASIC", "STANDARD"]),
+  providerProductId: z
+    .string()
+    .trim()
+    .min(1, "Provider product ID를 입력해주세요.")
+    .max(255, "Provider product ID는 255자 이하여야 합니다."),
+  isActive: z.boolean().optional(),
+  changeReason: z
+    .string()
+    .trim()
+    .min(1, "변경 사유를 입력해주세요.")
+    .max(500, "변경 사유는 500자 이하여야 합니다."),
+});
+
 export const adminBillingManualOverrideSchema = z
   .object({
-    planCode: z.enum(["FREE", "STANDARD"]),
+    planCode: z.enum(["BASIC", "FREE", "STANDARD"]),
     billingStatus: z.enum([
       "NONE",
       "ACTIVE",
@@ -51,6 +73,13 @@ export const adminBillingManualOverrideSchema = z
     currentPeriodEnd: z.string().datetime().nullable().optional(),
     cancelAtPeriodEnd: z.boolean().optional(),
     billingOwnerUserId: z.coerce.number().int().positive().nullable().optional(),
+    purchasedSeatCount: z.coerce
+      .number()
+      .int("좌석 수는 정수여야 합니다.")
+      .min(0, "좌석 수는 0 이상이어야 합니다.")
+      .max(999, "좌석 수는 999 이하여야 합니다.")
+      .nullable()
+      .optional(),
     changeReason: z
       .string()
       .trim()
@@ -61,14 +90,14 @@ export const adminBillingManualOverrideSchema = z
     const validCombo =
       (value.planCode === "FREE" &&
         ["NONE", "EXPIRED", "REVOKED"].includes(value.billingStatus)) ||
-      (value.planCode === "STANDARD" &&
+      (["BASIC", "STANDARD"].includes(value.planCode) &&
         ["ACTIVE", "CANCELED"].includes(value.billingStatus));
 
     if (!validCombo) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "플랜과 billing 상태 조합이 올바르지 않습니다. FREE는 NONE/EXPIRED/REVOKED만, STANDARD는 ACTIVE/CANCELED만 허용됩니다.",
+          "플랜과 billing 상태 조합이 올바르지 않습니다. FREE는 NONE/EXPIRED/REVOKED만, BASIC/STANDARD는 ACTIVE/CANCELED만 허용됩니다.",
         path: ["billingStatus"],
       });
     }

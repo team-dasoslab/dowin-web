@@ -71,14 +71,8 @@ describe("/api/workspaces", () => {
     ]);
   });
 
-  it("POST는 워크스페이스 생성 결과를 반환한다", async () => {
+  it("POST는 직접 워크스페이스 생성을 막고 결제 checkout을 요구한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 9 });
-    mockCreateWorkspace.mockResolvedValue({
-      id: "ws_new",
-      name: "새 워크스페이스",
-      planCode: "FREE",
-      createdAt: new Date("2026-05-21T00:00:00.000Z"),
-    });
 
     const { POST } = await import("./route");
     const response = await POST(
@@ -87,15 +81,14 @@ describe("/api/workspaces", () => {
         body: JSON.stringify({ name: "새 워크스페이스" }),
       }),
     );
-    const body = await response.json();
+    const body = (await response.json()) as {
+      error: {
+        code: string;
+      };
+    };
 
-    expect(response.status).toBe(201);
-    expect(mockCreateWorkspace).toHaveBeenCalledWith(9, "새 워크스페이스");
-    expect(body).toEqual(
-      expect.objectContaining({
-        id: "ws_new",
-        name: "새 워크스페이스",
-      }),
-    );
+    expect(response.status).toBe(409);
+    expect(mockCreateWorkspace).not.toHaveBeenCalled();
+    expect(body.error.code).toBe("WORKSPACE_PAYMENT_REQUIRED");
   });
 });

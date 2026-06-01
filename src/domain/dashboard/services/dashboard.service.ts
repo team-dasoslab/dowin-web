@@ -1,4 +1,5 @@
-import { ForbiddenError } from "@/lib/server/errors";
+import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<
@@ -8,6 +9,18 @@ type WorkspaceLookupPort = {
       user?: { nickname?: string | null; avatarKey?: string | null } | null;
     }>
   >;
+  countMembers(workspaceId: number): Promise<number>;
+  findSeatEntitlement?(
+    workspaceId: number,
+  ): Promise<{ purchasedSeatCount: number } | null>;
+  findBillingState(workspaceId: number): Promise<{
+    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+  } | null>;
+  findPlanLimit(
+    planCode: "BASIC" | "FREE" | "STANDARD",
+  ): Promise<{ memberLimit: number } | null>;
 };
 
 type TeamScoreboard = {
@@ -47,8 +60,6 @@ type DailyLogLookup = Awaited<
   ReturnType<DailyLogLookupPort["findLogsForLeadMeasures"]>
 >[number];
 
-import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
-
 export class DashboardService {
   constructor(
     private workspaceStorage: WorkspaceLookupPort,
@@ -57,8 +68,11 @@ export class DashboardService {
   ) { }
 
   async getTeamDashboard(context: WorkspaceAccessContext, weekStart?: string) {
+    await assertWorkspaceOperationAllowed(
+      { id: context.workspaceId, planCode: context.entitlement.planCode },
+      this.workspaceStorage,
+    );
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
-    assertHistoryLimit(context, normalizedWeekStart);
 
     const members = await this.workspaceStorage.findMembers(context.workspaceId);
     const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
@@ -83,6 +97,10 @@ export class DashboardService {
   }
 
   async getTeamWeeklyReport(context: WorkspaceAccessContext, weekStart?: string, weeks = 5) {
+    await assertWorkspaceOperationAllowed(
+      { id: context.workspaceId, planCode: context.entitlement.planCode },
+      this.workspaceStorage,
+    );
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     const boundedWeeks = Math.min(Math.max(weeks, 1), 12);
     const trendWeekStarts = getPreviousWeekStarts(
@@ -90,8 +108,6 @@ export class DashboardService {
       boundedWeeks,
     );
     const earliestWeekStart = trendWeekStarts[0] ?? normalizedWeekStart;
-
-    assertHistoryLimit(context, earliestWeekStart);
 
     const members = await this.workspaceStorage.findMembers(context.workspaceId);
     const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
@@ -434,25 +450,6 @@ function getCurrentWeekStart() {
   const monday = new Date(kstToday);
   monday.setUTCDate(diff);
   return monday.toISOString().slice(0, 10);
-}
-
-function assertHistoryLimit(context: WorkspaceAccessContext, requestedDate: string) {
-  if (context.entitlement.canAccessStandardFeatures) return;
-
-  const now = new Date();
-  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-
-  const limitDate = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth() - 5, 1));
-  const limitDateString = `${limitDate.getUTCFullYear()}-${String(limitDate.getUTCMonth() + 1).padStart(2, '0')}-01`;
-
-  // 주간 보기일 수 있으므로(주로 월요일 시작), 요청된 날짜로부터 6일 뒤(해당 주의 끝)가 제한일 이후인지 봅니다.
-  const checkDate = new Date(parseDate(requestedDate));
-  checkDate.setUTCDate(checkDate.getUTCDate() + 6);
-  const checkDateString = formatDate(checkDate);
-
-  if (checkDateString < limitDateString) {
-    throw new ForbiddenError("FREE_PLAN_HISTORY_LIMIT_REACHED");
-  }
 }
 
 function getWeekDates(weekStart: string) {

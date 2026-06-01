@@ -1,5 +1,6 @@
 import {
   type PolarBillingClient,
+  getPolarApiErrorInfo,
   isPolarRecoverableError,
 } from "@/domain/billing/polar";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
@@ -9,7 +10,12 @@ import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/error
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
-  "resolveIdByUid" | "findWorkspaceById" | "findMembership" | "findMembershipByUserId"
+  | "resolveIdByUid"
+  | "findWorkspaceById"
+  | "findMembership"
+  | "findMembershipByUserId"
+  | "countMembers"
+  | "findSeatEntitlement"
 >;
 type BillingRiskSummary = {
   recentRefundCount: number;
@@ -19,11 +25,12 @@ type BillingRiskSummary = {
 
 const BILLING_RISK_REVIEW_THRESHOLD = 2;
 const BILLING_RISK_LOOKBACK_DAYS = 30;
+const BASIC_CHECKOUT_MAX_SEATS = 999;
 
 export type BillingOverview = {
   workspaceId: string;
   workspaceName: string;
-  planCode: "FREE" | "STANDARD";
+  planCode: "BASIC" | "FREE" | "STANDARD";
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
   entitlementSource: NullableEntitlementSource;
   provider: "POLAR" | null;
@@ -33,6 +40,8 @@ export type BillingOverview = {
   recentRefundCount: number;
   recentRevokedCount: number;
   requiresManualReview: boolean;
+  purchasedSeatCount: number | null;
+  usedSeatCount: number;
   canManageBilling: boolean;
 };
 
@@ -41,22 +50,14 @@ type BillingPort = Pick<
   | "findWorkspaceBillingState"
   | "findActiveProviderProduct"
   | "getRecentBillingRiskSummary"
-  | "findCheckoutSessionCreatedEvent"
-  | "appendCheckoutEvent"
 >;
 
-function readCheckoutUrl(payloadJson: string | null | undefined): string | null {
-  if (!payloadJson) {
-    return null;
-  }
-
-  try {
-    const payload = JSON.parse(payloadJson) as { checkoutUrl?: unknown };
-    return typeof payload.checkoutUrl === "string" ? payload.checkoutUrl : null;
-  } catch {
-    return null;
-  }
-}
+type BillingRiskScope = {
+  workspaceId: number;
+  customerKey?: string | null;
+  customerExternalRef?: string | null;
+  billingOwnerUserId?: number | null;
+};
 
 function getBillingRiskLookbackStart(now: Date): Date {
   const lookback = new Date(now);
@@ -70,6 +71,14 @@ function getWorkspacePublicId(workspace: { id: number; uid: string | null }) {
   }
 
   return workspace.uid;
+}
+
+function truncateForLog(value: string, maxLength = 1000): string {
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  return `${value.slice(0, maxLength)}...`;
 }
 
 export class BillingService {
@@ -98,12 +107,28 @@ export class BillingService {
     return { workspace, membership };
   }
 
-  async getMyBilling(workspaceUid: string, userId: number): Promise<BillingOverview> {
-    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
+  async getMyBilling(
+    workspaceUid: string,
+    userId: number,
+  ): Promise<BillingOverview> {
+    const { workspace, membership } = await this.getWorkspace(
+      workspaceUid,
+      userId,
+    );
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
-    const riskSummary = await this.getBillingRiskSummary(workspace.id);
+    const [riskSummary, seatEntitlement, usedSeatCount] = await Promise.all([
+      this.getBillingRiskSummary({
+        workspaceId: workspace.id,
+        customerKey: billingState?.customerKey ?? null,
+        customerExternalRef: workspace.billingCustomerExternalRef ?? null,
+        billingOwnerUserId:
+          billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+      }),
+      this.workspaceStorage.findSeatEntitlement(workspace.id),
+      this.workspaceStorage.countMembers(workspace.id),
+    ]);
 
     return {
       workspaceId: getWorkspacePublicId(workspace),
@@ -118,140 +143,17 @@ export class BillingService {
       recentRefundCount: riskSummary.recentRefundCount,
       recentRevokedCount: riskSummary.recentRevokedCount,
       requiresManualReview: riskSummary.requiresManualReview,
+      purchasedSeatCount: seatEntitlement?.purchasedSeatCount ?? null,
+      usedSeatCount,
       canManageBilling: membership?.role === "ADMIN",
     };
   }
 
-  async prepareCheckout(
-    workspaceUid: string,
-    userId: number,
-    idempotencyKey: string,
-    locale: "ko" | "en",
-  ) {
-    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
-
-    if (!workspace || !membership) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    if (membership.role !== "ADMIN") {
-      throw new ForbiddenError("FORBIDDEN");
-    }
-
-    if (!this.polarClient) {
-      throw new ConflictError("BILLING_NOT_READY");
-    }
-
-    const billingState = await this.billingStorage.findWorkspaceBillingState(
-      workspace.id,
-    );
-    const riskSummary = await this.getBillingRiskSummary(workspace.id);
-
-    if (
-      billingState &&
-      (billingState.billingStatus === "ACTIVE" ||
-        billingState.billingStatus === "CANCELED")
-    ) {
-      throw new ConflictError("BILLING_NOT_READY");
-    }
-
-    if (riskSummary.requiresManualReview) {
-      throw new ConflictError("BILLING_REVIEW_REQUIRED");
-    }
-
-    const product = await this.billingStorage.findActiveProviderProduct({
-      provider: "POLAR",
-      environment: this.polarClient.environment,
-      planCode: "STANDARD",
-    });
-
-    if (!product) {
-      throw new ConflictError("BILLING_NOT_READY");
-    }
-
-    const existingCheckoutEvent =
-      await this.billingStorage.findCheckoutSessionCreatedEvent(
-        workspace.id,
-        idempotencyKey,
-      );
-    const existingCheckoutUrl = readCheckoutUrl(
-      existingCheckoutEvent?.payloadJson,
-    );
-
-    if (existingCheckoutUrl) {
-      return { checkoutUrl: existingCheckoutUrl };
-    }
-
-    const occurredAt = new Date();
-
-    await this.billingStorage.appendCheckoutEvent({
-      workspaceId: workspace.id,
-      requestedByUserId: userId,
-      requestId: idempotencyKey,
-      targetPlanCode: "STANDARD",
-      eventType: "CHECKOUT_REQUESTED",
-      occurredAt,
-      payloadJson: JSON.stringify({ locale }),
-    });
-
-    try {
-      const checkout = await this.polarClient.createCheckoutSession({
-        productId: product.providerProductId,
-        externalCustomerId:
-          workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
-        idempotencyKey,
-        locale,
-        metadata: {
-          workspaceId: String(workspace.id),
-          requestedByUserId: String(userId),
-          targetPlanCode: "STANDARD",
-        },
-      });
-
-      await this.billingStorage.appendCheckoutEvent({
-        workspaceId: workspace.id,
-        requestedByUserId: userId,
-        requestId: idempotencyKey,
-        targetPlanCode: "STANDARD",
-        eventType: "CHECKOUT_SESSION_CREATED",
-        occurredAt: new Date(),
-        payloadJson: JSON.stringify(checkout),
-      });
-
-      const storedCheckoutEvent =
-        await this.billingStorage.findCheckoutSessionCreatedEvent(
-          workspace.id,
-          idempotencyKey,
-        );
-      const storedCheckoutUrl = readCheckoutUrl(storedCheckoutEvent?.payloadJson);
-
-      return {
-        checkoutUrl: storedCheckoutUrl ?? checkout.checkoutUrl,
-      };
-    } catch (error) {
-      await this.billingStorage.appendCheckoutEvent({
-        workspaceId: workspace.id,
-        requestedByUserId: userId,
-        requestId: idempotencyKey,
-        targetPlanCode: "STANDARD",
-        eventType: "CHECKOUT_FAILED",
-        occurredAt: new Date(),
-        payloadJson: JSON.stringify({
-          locale,
-          message: error instanceof Error ? error.message : "unknown_error",
-        }),
-      });
-
-      if (isPolarRecoverableError(error)) {
-        throw new ConflictError("BILLING_NOT_READY");
-      }
-
-      throw error;
-    }
-  }
-
   async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {
-    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
+    const { workspace, membership } = await this.getWorkspace(
+      workspaceUid,
+      userId,
+    );
     const billingState = workspace
       ? await this.billingStorage.findWorkspaceBillingState(workspace.id)
       : null;
@@ -265,6 +167,105 @@ export class BillingService {
     }
 
     if (!this.polarClient) {
+      console.error("[billing.portal] Polar client is not configured", {
+        workspaceUid,
+        workspaceId: workspace.id,
+        userId,
+        hasBillingCustomerExternalRef: Boolean(
+          workspace.billingCustomerExternalRef,
+        ),
+        billingStatus: billingState?.billingStatus ?? "NONE",
+        entitlementSource: billingState?.entitlementSource ?? null,
+      });
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    if (billingState && billingState.entitlementSource !== "POLAR") {
+      console.warn("[billing.portal] non-Polar entitlement cannot open portal", {
+        workspaceUid,
+        workspaceId: workspace.id,
+        userId,
+        billingStatus: billingState.billingStatus,
+        entitlementSource: billingState.entitlementSource,
+      });
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    const customerSessionInput = billingState?.customerKey
+      ? { customerId: billingState.customerKey }
+      : {
+          externalCustomerId:
+            workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
+        };
+
+    try {
+      const { customerPortalUrl } =
+        await this.polarClient.createCustomerSession(customerSessionInput);
+      return customerPortalUrl;
+    } catch (error) {
+      if (isPolarRecoverableError(error)) {
+        const polarError = getPolarApiErrorInfo(error);
+        console.error("[billing.portal] Polar customer session request failed", {
+          workspaceUid,
+          workspaceId: workspace.id,
+          userId,
+          billingStatus: billingState?.billingStatus ?? "NONE",
+          entitlementSource: billingState?.entitlementSource ?? null,
+          hasCustomerKey: Boolean(billingState?.customerKey),
+          hasBillingCustomerExternalRef: Boolean(
+            workspace.billingCustomerExternalRef,
+          ),
+          customerSessionInputType:
+            "customerId" in customerSessionInput
+              ? "customer_id"
+              : "external_customer_id",
+          polarStatus: polarError?.status ?? null,
+          polarBody: polarError ? truncateForLog(polarError.body) : null,
+        });
+        throw new ConflictError("BILLING_NOT_READY");
+      }
+
+      throw error;
+    }
+  }
+
+  async startBasicCheckout(input: {
+    workspaceUid: string;
+    userId: number;
+    seatCount?: number;
+    locale: "ko" | "en";
+    idempotencyKey: string;
+  }): Promise<{ checkoutUrl: string; checkoutId: string | null }> {
+    const { workspace, membership } = await this.getWorkspace(
+      input.workspaceUid,
+      input.userId,
+    );
+
+    if (membership.role !== "ADMIN") {
+      throw new ForbiddenError("FORBIDDEN");
+    }
+
+    const billingState = await this.billingStorage.findWorkspaceBillingState(
+      workspace.id,
+    );
+    const billingStatus = billingState?.billingStatus ?? "NONE";
+
+    const riskSummary = await this.getBillingRiskSummary({
+      workspaceId: workspace.id,
+      customerKey: billingState?.customerKey ?? null,
+      customerExternalRef: workspace.billingCustomerExternalRef ?? null,
+      billingOwnerUserId:
+        billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+    });
+    if (riskSummary.requiresManualReview) {
+      throw new ConflictError("BILLING_REVIEW_REQUIRED");
+    }
+
+    if (billingStatus === "REVOKED") {
+      throw new ConflictError("BILLING_REVIEW_REQUIRED");
+    }
+
+    if (billingStatus !== "NONE" && billingStatus !== "EXPIRED") {
       throw new ConflictError("BILLING_NOT_READY");
     }
 
@@ -272,16 +273,44 @@ export class BillingService {
       throw new ConflictError("BILLING_NOT_READY");
     }
 
+    if (!this.polarClient) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    const product = await this.billingStorage.findActiveProviderProduct({
+      provider: "POLAR",
+      environment: this.polarClient.environment,
+      planCode: "BASIC",
+    });
+
+    if (!product) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    const memberCount = await this.workspaceStorage.countMembers(workspace.id);
+    const minSeatCount = Math.max(memberCount, 1);
+    const seatCount = Math.max(input.seatCount ?? minSeatCount, minSeatCount);
+
     try {
-      const customerSessionInput = billingState?.customerKey
-        ? { customerId: billingState.customerKey }
-        : {
-            externalCustomerId:
-              workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
-          };
-      const { customerPortalUrl } =
-        await this.polarClient.createCustomerSession(customerSessionInput);
-      return customerPortalUrl;
+      return await this.polarClient.createCheckoutSession({
+        productId: product.providerProductId,
+        externalCustomerId:
+          workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
+        idempotencyKey: input.idempotencyKey,
+        locale: input.locale,
+        seats: seatCount,
+        minSeats: minSeatCount,
+        maxSeats: BASIC_CHECKOUT_MAX_SEATS,
+        successPath: "/billing/polar/success",
+        metadata: {
+          flow: "workspace_resubscribe",
+          workspaceId: String(workspace.id),
+          workspaceUid: getWorkspacePublicId(workspace),
+          requestedByUserId: String(input.userId),
+          targetPlanCode: "BASIC",
+          requestedSeatCount: String(seatCount),
+        },
+      });
     } catch (error) {
       if (isPolarRecoverableError(error)) {
         throw new ConflictError("BILLING_NOT_READY");
@@ -292,13 +321,13 @@ export class BillingService {
   }
 
   private async getBillingRiskSummary(
-    workspaceId: number,
+    scope: BillingRiskScope,
   ): Promise<BillingRiskSummary> {
     const { recentRefundCount, recentRevokedCount } =
-      await this.billingStorage.getRecentBillingRiskSummary(
-        workspaceId,
-        getBillingRiskLookbackStart(new Date()),
-      );
+      await this.billingStorage.getRecentBillingRiskSummary({
+        ...scope,
+        since: getBillingRiskLookbackStart(new Date()),
+      });
     const totalRiskEvents = recentRefundCount + recentRevokedCount;
 
     return {

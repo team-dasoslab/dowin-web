@@ -63,7 +63,7 @@ export function WorkspaceOverLimitBanner({
                   asChild
                   className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-red-600 px-3 text-[11px] font-bold text-white"
                 >
-                  <Link href="/pricing">
+                  <Link href={getWorkspacePath(workspaceId, "/profile/billing")}>
                     <DowinIcon name="domain-payment" size="14px" />
                     {t("billing")}
                   </Link>

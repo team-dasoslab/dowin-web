@@ -3,23 +3,53 @@ import { DashboardService } from "@/domain/dashboard/services/dashboard.service"
 
 describe("DashboardService", () => {
   const findMembers = vi.fn();
+  const countMembers = vi.fn();
+  const findBillingState = vi.fn();
+  const findPlanLimit = vi.fn();
   const findActiveScoreboardsByWorkspace = vi.fn();
   const findLogsForLeadMeasures = vi.fn();
 
   const service = new DashboardService(
-    { findMembers },
+    { findMembers, countMembers, findBillingState, findPlanLimit },
     { findActiveScoreboardsByWorkspace },
     { findLogsForLeadMeasures },
   );
 
-  const context: Parameters<typeof service.getTeamDashboard>[0] = { workspaceId: 3, workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessStandardFeatures: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getTeamDashboard>[0];
+  const context: Parameters<typeof service.getTeamDashboard>[0] = { workspaceId: 3, workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getTeamDashboard>[0];
 
   beforeEach(() => {
     vi.clearAllMocks();
+    countMembers.mockResolvedValue(2);
+    findBillingState.mockResolvedValue({
+      planCode: "BASIC",
+      billingStatus: "ACTIVE",
+      entitlementSource: "POLAR",
+    });
+    findPlanLimit.mockResolvedValue({ memberLimit: 10 });
   });
 
   it("워크스페이스가 없으면 404 에러를 던진다", async () => {
     // 워크스페이스 없는 경우는 API 계층에서 처리하므로 생략
+  });
+
+  it("Basic entitlement가 없으면 팀 대시보드를 조회할 수 없다", async () => {
+    findBillingState.mockResolvedValue(null);
+
+    await expect(
+      service.getTeamDashboard(
+        {
+          ...context,
+          entitlement: {
+            ...context.entitlement,
+            canAccessBasicSubscription: false,
+            billingStatus: "NONE",
+            planCode: "FREE",
+          },
+        },
+        "2026-03-09",
+      ),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+    expect(findMembers).not.toHaveBeenCalled();
   });
 
   it("팀 대시보드 조회 시 멤버별 점수판 요약과 주간 로그를 반환한다", async () => {
@@ -159,7 +189,7 @@ describe("DashboardService", () => {
     expect(findActiveScoreboardsByWorkspace).toHaveBeenCalledWith(3);
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [31, 32],
-      "2026-03-01",
+      "2026-02-23",
       "2026-03-31",
     );
   });
@@ -260,7 +290,7 @@ describe("DashboardService", () => {
     expect(findActiveScoreboardsByWorkspace).toHaveBeenCalledOnce();
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [31],
-      "2026-04-01",
+      "2026-03-30",
       "2026-04-30",
     );
   });

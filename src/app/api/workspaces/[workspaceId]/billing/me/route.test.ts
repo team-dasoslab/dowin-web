@@ -73,6 +73,6 @@ describe("GET /api/billing/me", () => {
 
     expect(response.status).toBe(200);
     expect(body.workspaceId).toBe(1);
-    expect(mockGetMyBilling).toHaveBeenCalledWith(1);
+    expect(mockGetMyBilling).toHaveBeenCalledWith("ws_uid", 1);
   });
 });

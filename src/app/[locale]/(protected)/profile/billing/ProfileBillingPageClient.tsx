@@ -14,7 +14,8 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
-import { Link, useRouter } from "@/i18n/routing";
+import { useToast } from "@/context/ToastContext";
+import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useLocale, useTranslations } from "next-intl";
@@ -22,7 +23,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-type PlanCode = "FREE" | "STANDARD";
+type PlanCode = "BASIC" | "FREE" | "STANDARD";
 type EntitlementSource =
   | "POLAR"
   | "MANUAL_GRANT"
@@ -33,8 +34,8 @@ type EntitlementSource =
 export function ProfileBillingPageClient() {
   const t = useTranslations("ProfileBilling");
   const isNativeApp = useNativeApp();
+  const { showToast } = useToast();
   const locale = useLocale();
-  const router = useRouter();
   const workspaceId = useParams().workspaceId as string | undefined;
   const {
     data: billingResponse,
@@ -47,12 +48,21 @@ export function ProfileBillingPageClient() {
       retry: false,
     },
   });
-  const { handleReturnedFromCheckout, openPortal } = useProfileBillingActions();
+  const { handleReturnedFromCheckout, openPortal, isPortalPending } =
+    useProfileBillingActions(workspaceId);
   const [isReturningFromCheckout, setIsReturningFromCheckout] = useState(false);
 
   useEffect(() => {
     const currentUrl = new URL(window.location.href);
     const billing = currentUrl.searchParams.get("billing");
+
+    if (billing === "portal_error") {
+      showToast("error", t("portalFailed"));
+      currentUrl.searchParams.delete("billing");
+      currentUrl.searchParams.delete("code");
+      window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+      return;
+    }
 
     if (billing !== "success") {
       return;
@@ -62,24 +72,10 @@ export function ProfileBillingPageClient() {
     currentUrl.searchParams.delete("billing");
     window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
     void handleReturnedFromCheckout();
-  }, [handleReturnedFromCheckout]);
+  }, [handleReturnedFromCheckout, showToast, t]);
 
   const hasNoWorkspace = getApiErrorStatus(error) === 404;
   const billing = billingResponse?.status === 200 ? billingResponse.data : null;
-
-  useEffect(() => {
-    if (
-      isNativeApp ||
-      !billing ||
-      billing.planCode === "STANDARD" ||
-      billing.billingStatus === "ACTIVE" ||
-      billing.billingStatus === "CANCELED"
-    ) {
-      return;
-    }
-
-    router.replace(getWorkspacePath(workspaceId, "/pricing"));
-  }, [billing, isNativeApp, router, workspaceId]);
 
   if (isLoading) {
     return <ProfileBillingSkeleton />;
@@ -97,23 +93,13 @@ export function ProfileBillingPageClient() {
     return <BillingErrorState onRefresh={() => void refetch()} />;
   }
 
-  if (
-    billing.planCode !== "STANDARD" &&
-    billing.billingStatus !== "ACTIVE" &&
-    billing.billingStatus !== "CANCELED"
-  ) {
-    return null;
-  }
-
   const isAdmin = billing.canManageBilling;
   const requiresManualReview = billing.requiresManualReview;
   const isPolarEntitlement = billing.entitlementSource === "POLAR";
   const canOpenPortal =
     isAdmin &&
     isPolarEntitlement &&
-    (billing.planCode === "STANDARD" ||
-      billing.billingStatus === "ACTIVE" ||
-      billing.billingStatus === "CANCELED");
+    (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED");
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
@@ -131,9 +117,7 @@ export function ProfileBillingPageClient() {
                   {billing.workspaceName}
                 </h2>
                 <p className="text-xs font-bold text-zinc-400">
-                  {billing.planCode === "STANDARD"
-                    ? t("standardPlanName")
-                    : t("freePlanName")}
+                  {t("basicPlanName")}
                 </p>
                 {billing.entitlementSource ? (
                   <p className="mt-1 text-[11px] font-bold text-zinc-500">
@@ -149,9 +133,10 @@ export function ProfileBillingPageClient() {
                 <Button
                   type="button"
                   onClick={() => void openPortal()}
+                  disabled={isPortalPending}
                   className="h-10 rounded-button border border-zinc-200 bg-white px-5 text-sm font-black text-zinc-600 transition-colors"
                 >
-                  {t("portalButton")}
+                  {isPortalPending ? t("portalLoading") : t("portalButton")}
                 </Button>
               ) : null}
             </div>
@@ -168,7 +153,7 @@ export function ProfileBillingPageClient() {
             </div>
           ) : null}
 
-          {billing.planCode === "STANDARD" && !isPolarEntitlement ? (
+          {billing.entitlementSource && !isPolarEntitlement ? (
             <div className="flex items-start gap-2.5 rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
               <DowinIcon
                 name="status-info"
@@ -195,15 +180,9 @@ export function ProfileBillingPageClient() {
                 </span>
               </div>
               <span
-                className={`text-sm font-black ${
-                  billing.planCode === "STANDARD"
-                    ? "text-primary"
-                    : "text-zinc-900"
-                }`}
+                className="text-sm font-black text-primary"
               >
-                {billing.planCode === "STANDARD"
-                  ? t("standardPlanName")
-                  : t("freePlanName")}
+                {t("basicPlanName")}
               </span>
             </div>
             <div className="flex items-center justify-between p-5">
@@ -408,9 +387,9 @@ function getStatusDescription({
       return t("statusDescRevoked");
     case "NONE":
     default:
-      return planCode === "STANDARD"
-        ? t("statusDescStandardFallback")
-        : t("statusDescFree");
+      return planCode === "BASIC"
+        ? t("statusDescBasicFallback")
+        : t("statusDescNoSubscription");
   }
 }
 

@@ -66,7 +66,6 @@ export default function WorkspaceSettingsPage() {
   const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaces = allWorkspacesResponse?.status === 200 ? allWorkspacesResponse.data : [];
   
-  const workspacePlanCode = workspace?.planCode ?? "FREE";
   const showBillingSurface = publicRuntimeConfig.isDevelopment && !isNativeApp;
   const hasWorkspace = workspace !== null;
   const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
@@ -125,13 +124,11 @@ export default function WorkspaceSettingsPage() {
               ...(showBillingSurface
                 ? [
                     {
-                      id: workspacePlanCode === "STANDARD" ? "billing" : "pricing",
+                      id: "billing",
                       icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
-                      title: workspacePlanCode === "STANDARD" ? t("billingTitle") : t("pricingTitle"),
-                      description: workspacePlanCode === "STANDARD" ? t("billingDesc") : t("pricingDesc"),
-                      href: workspacePlanCode === "STANDARD"
-                        ? getWorkspacePath(workspaceId, "/profile/billing")
-                        : getWorkspacePath(workspaceId, "/pricing"),
+                      title: t("billingTitle"),
+                      description: t("billingDesc"),
+                      href: getWorkspacePath(workspaceId, "/profile/billing"),
                     },
                   ]
                 : []),
@@ -265,13 +262,8 @@ export default function WorkspaceSettingsPage() {
                 </p>
               </div>
               {!isNativeApp ? (
-                <span className={`inline-flex items-center h-6 rounded-button px-2.5 text-[10px] font-black tracking-wider border ${
-                    workspacePlanCode === "STANDARD"
-                      ? "border-primary/20 bg-primary/5 text-primary"
-                      : "border-zinc-200 bg-zinc-50 text-zinc-500"
-                  }`}
-                >
-                  {workspacePlanCode}
+                <span className="inline-flex h-6 items-center rounded-button border border-primary/20 bg-primary/5 px-2.5 text-[10px] font-black tracking-wider text-primary">
+                  {t("basicPlanName")}
                 </span>
               ) : null}
             </div>

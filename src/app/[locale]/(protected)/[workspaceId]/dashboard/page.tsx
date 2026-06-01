@@ -33,8 +33,6 @@ export default function DashboardPage() {
   const {
     dashboard,
     hasNoWorkspace,
-    historyLimitDate,
-    isHistoryLimited,
     isLoading,
     isPeriodLoading,
     isPreviousDisabled,
@@ -242,7 +240,6 @@ export default function DashboardPage() {
                 description={t("teamWeeklyScoreboardDesc")}
               />
               <TeamPeriodControls
-                historyLimitDate={historyLimitDate}
                 isPeriodLoading={isPeriodLoading}
                 isPreviousDisabled={isPreviousDisabled}
                 isResetVisible={isResetVisible}
@@ -253,12 +250,6 @@ export default function DashboardPage() {
                 weekLabel={weekLabel}
               />
 
-              {isHistoryLimited ? (
-                <div className="rounded-content border border-border bg-white p-8 text-center text-sm text-text-muted">
-                  {t("historyLimitMessage")}
-                </div>
-              ) : null}
-
               {isLoading ? (
                 <div className="space-y-6">
                   {[1, 2].map((i) => (
@@ -268,7 +259,7 @@ export default function DashboardPage() {
                     />
                   ))}
                 </div>
-              ) : !isHistoryLimited ? (
+              ) : (
                 membersWithScoreboard.map((member) => (
                   <WeeklyTable
                     key={member.userId}
@@ -310,7 +301,7 @@ export default function DashboardPage() {
                     currentUserRole={currentUserRole}
                   />
                 ))
-              ) : null}
+              )}
             </section>
           </div>
         </div>

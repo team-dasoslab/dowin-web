@@ -15,7 +15,6 @@ interface PeriodControlsProps {
   movePeriod: (direction: -1 | 1) => void;
   weekLabel: string;
   today: string;
-  historyLimitDate?: string;
   isPreviousDisabled?: boolean;
   isPeriodLoading?: boolean;
 }
@@ -30,7 +29,6 @@ export function PeriodControls({
   setSelectedView,
   weekLabel,
   today,
-  historyLimitDate,
   isPreviousDisabled,
   isPeriodLoading,
 }: PeriodControlsProps) {
@@ -89,7 +87,6 @@ export function PeriodControls({
             <input
               type="date"
               value={selectedDate}
-              min={historyLimitDate}
               disabled={isPeriodLoading}
               onChange={(event) => setSelectedDate(event.target.value)}
               className="absolute inset-0 w-full cursor-pointer opacity-0"
@@ -172,7 +169,6 @@ export function PeriodControls({
               <input
                 type="date"
                 value={selectedDate}
-                min={historyLimitDate}
                 disabled={isPeriodLoading}
                 onChange={(event) => setSelectedDate(event.target.value)}
                 className="absolute inset-0 w-full cursor-pointer opacity-0"

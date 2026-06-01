@@ -24,7 +24,6 @@ type WeeklyTrendPoint = {
 interface ScoreboardOverviewSectionProps {
   activeScoreboard: ReturnType<typeof useDashboardScoreboard>["activeScoreboard"];
   isWeeklyTrendLoading: boolean;
-  isTrendLimited: boolean;
   monthlyOverallRate: number;
   weeklyOverallRate: number;
   weeklyTrendPoints: WeeklyTrendPoint[];
@@ -33,7 +32,6 @@ interface ScoreboardOverviewSectionProps {
 export function ScoreboardOverviewSection({
   activeScoreboard,
   isWeeklyTrendLoading,
-  isTrendLimited,
   monthlyOverallRate,
   weeklyOverallRate,
   weeklyTrendPoints,
@@ -118,7 +116,6 @@ export function ScoreboardOverviewSection({
         {/* ── Recent Trend (Expanded) ── */}
         <DashboardWeeklyTrendSection
           isLoading={isWeeklyTrendLoading}
-          isHistoryLimited={isTrendLimited}
           weeklyTrendPoints={weeklyTrendPoints}
           className="lg:col-span-4"
         />
@@ -173,12 +170,10 @@ function getRateColorHex(v: number) {
 
 function DashboardWeeklyTrendSection({
   isLoading,
-  isHistoryLimited,
   weeklyTrendPoints,
   className,
 }: {
   isLoading: boolean;
-  isHistoryLimited: boolean;
   weeklyTrendPoints: WeeklyTrendPoint[];
   className?: string;
 }) {
@@ -194,12 +189,6 @@ function DashboardWeeklyTrendSection({
 
       {isLoading ? (
         <div className="flex-1 animate-pulse rounded-lg bg-zinc-50" />
-      ) : isHistoryLimited ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 py-1">
-          <p className="text-[10px] text-text-muted text-center leading-tight">
-            {t("historyLimitMessage")}
-          </p>
-        </div>
       ) : (
         <div className="h-[140px] lg:h-auto lg:flex-1 w-full min-h-[140px]">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />
