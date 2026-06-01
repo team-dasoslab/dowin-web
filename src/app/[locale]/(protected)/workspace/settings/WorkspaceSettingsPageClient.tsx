@@ -12,7 +12,6 @@ import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/use
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { useToast } from "@/context/ToastContext";
 import { useNativeApp } from "@/context/NativeAppContext";
-import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -66,7 +65,7 @@ export default function WorkspaceSettingsPage() {
   const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaces = allWorkspacesResponse?.status === 200 ? allWorkspacesResponse.data : [];
   
-  const showBillingSurface = publicRuntimeConfig.isDevelopment && !isNativeApp;
+  const showBillingSurface = !isNativeApp;
   const hasWorkspace = workspace !== null;
   const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
 
