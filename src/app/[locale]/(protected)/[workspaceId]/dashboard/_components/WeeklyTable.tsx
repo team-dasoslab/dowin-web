@@ -12,7 +12,7 @@ import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
-const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
+const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
 type WeeklyTableProps = {
   member: TeamDashboardMember;
@@ -196,7 +196,7 @@ export function WeeklyTable({
                             date === today ? "text-primary" : "text-text-muted"
                           }`}
                         >
-                          {DAY_LABELS[index]}
+                          {t(DAY_KEYS[index])}
                         </p>
                         <span
                           className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
@@ -225,8 +225,8 @@ export function WeeklyTable({
                 <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[38%]" />
-                    {DAY_LABELS.map((day) => (
-                      <col key={day} className="w-[8%]" />
+                    {DAY_KEYS.map((dayKey) => (
+                      <col key={dayKey} className="w-[8%]" />
                     ))}
                     <col className="w-[14%]" />
                   </colgroup>
@@ -235,9 +235,9 @@ export function WeeklyTable({
                       <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
                         {t("leadMeasureHead")}
                       </th>
-                      {DAY_LABELS.map((day, index) => (
+                      {DAY_KEYS.map((dayKey, index) => (
                         <th
-                          key={day}
+                          key={dayKey}
                           className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
                             weekDates[index] === today
                               ? "text-primary"
@@ -246,7 +246,7 @@ export function WeeklyTable({
                                 : "text-text-muted"
                           }`}
                         >
-                          {day}
+                          {t(dayKey)}
                         </th>
                       ))}
                       <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
@@ -260,8 +260,8 @@ export function WeeklyTable({
               <table className="w-full table-fixed text-xs">
                 <colgroup>
                   <col className="w-[38%]" />
-                  {DAY_LABELS.map((day) => (
-                    <col key={day} className="w-[8%]" />
+                  {DAY_KEYS.map((dayKey) => (
+                    <col key={dayKey} className="w-[8%]" />
                   ))}
                   <col className="w-[14%]" />
                 </colgroup>
