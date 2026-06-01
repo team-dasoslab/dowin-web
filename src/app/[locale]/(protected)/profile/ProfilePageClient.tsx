@@ -170,7 +170,6 @@ export default function ProfilePage() {
           title: t("pushReminder"),
           rightElement: (
             <NotificationSettingControl
-              isSubscribed={isPushSubscribed}
               disabled={isDailyLoading || isUpdatingDaily}
               onSubscriptionChange={(next) => {
                 setIsPushSubscribed(next);

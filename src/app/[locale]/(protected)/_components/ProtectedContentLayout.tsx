@@ -21,9 +21,6 @@ export function ProtectedContentLayout({
   const workspaceId = params.workspaceId as string | undefined;
   const profilePath = workspaceId ? `/${workspaceId}/profile` : "/profile";
   const pricingPath = workspaceId ? `/${workspaceId}/pricing` : "/pricing";
-  const subscriptionRequiredPath = workspaceId
-    ? `/${workspaceId}/subscription-required`
-    : "/subscription-required";
   const needsOperationalAccess = isWorkspaceOperationalPath(
     pathname,
     workspaceId,
