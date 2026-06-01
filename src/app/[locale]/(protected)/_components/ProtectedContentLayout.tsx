@@ -51,7 +51,6 @@ export function ProtectedContentLayout({
   const usesSubPageLayout =
     pathname === "/updates" ||
     pathname === pricingPath ||
-    pathname === subscriptionRequiredPath ||
     isProfilePath ||
     isWorkspacePath;
   const showBackButton = pathname !== profilePath && pathname !== workspaceSettingsPath;
