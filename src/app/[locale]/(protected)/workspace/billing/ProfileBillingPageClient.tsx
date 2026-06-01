@@ -22,8 +22,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-
 type EntitlementSource =
   | "POLAR"
   | "MANUAL_GRANT"
@@ -170,12 +168,11 @@ export function ProfileBillingPageClient() {
                   {t("planLabel")}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-primary">
-                  {t("basicPlanName")}
-                </span>
-                <BillingStatusBadge status={billing.billingStatus} t={t} />
-              </div>
+              <span
+                className="text-sm font-black text-primary"
+              >
+                {t("basicPlanName")}
+              </span>
             </div>
             {billing.purchasedSeatCount !== null && (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
               <div className="flex items-center justify-between p-5">
@@ -345,39 +342,6 @@ function formatDateLabel(
   }).format(date);
 }
 
-
-function BillingStatusBadge({
-  status,
-  t,
-}: {
-  status: BillingStatus;
-  t: ReturnType<typeof useTranslations<"ProfileBilling">>;
-}) {
-  const labelMap: Record<BillingStatus, string> = {
-    ACTIVE: t("statusActive"),
-    CANCELED: t("statusCanceled"),
-    EXPIRED: t("statusExpired"),
-    NONE: t("statusNone"),
-    REVOKED: t("statusRevoked"),
-  };
-  const colorMap: Record<BillingStatus, string> = {
-    ACTIVE: "bg-success/10 text-success border-success/20",
-    CANCELED: "bg-warning/10 text-warning border-warning/20",
-    EXPIRED: "bg-red-50 text-red-500 border-red-200",
-    NONE: "bg-zinc-100 text-zinc-400 border-zinc-200",
-    REVOKED: "bg-red-50 text-red-500 border-red-200",
-  };
-
-  if (status === "ACTIVE") return null;
-
-  return (
-    <span
-      className={`rounded-full border px-2 py-0.5 text-[11px] font-bold ${colorMap[status]}`}
-    >
-      {labelMap[status]}
-    </span>
-  );
-}
 
 function getEntitlementSourceLabel(
   source: EntitlementSource,
