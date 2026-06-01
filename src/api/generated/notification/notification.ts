@@ -28,8 +28,10 @@ import type {
   DeleteNotificationsDevices200,
   DevicePushTokenDisableRequest,
   DevicePushTokenRegisterRequest,
+  DevicePushTokenStatusRequest,
   ErrorResponse,
   PostNotificationsDevices200,
+  PostNotificationsDevicesStatus200,
   UnauthorizedErrorResponse,
   UserNotificationSettings,
   UserNotificationSettingsUpdateRequest
@@ -440,5 +442,99 @@ export const useDeleteNotificationsDevices = <TError = UnauthorizedErrorResponse
         TContext
       > => {
       return useMutation(getDeleteNotificationsDevicesMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 현재 기기 알림 토큰 활성 상태 조회
+ */
+export type postNotificationsDevicesStatusResponse200 = {
+  data: PostNotificationsDevicesStatus200
+  status: 200
+}
+
+export type postNotificationsDevicesStatusResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postNotificationsDevicesStatusResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postNotificationsDevicesStatusResponseSuccess = (postNotificationsDevicesStatusResponse200) & {
+  headers: Headers;
+};
+export type postNotificationsDevicesStatusResponseError = (postNotificationsDevicesStatusResponse401 | postNotificationsDevicesStatusResponse422) & {
+  headers: Headers;
+};
+
+export type postNotificationsDevicesStatusResponse = (postNotificationsDevicesStatusResponseSuccess | postNotificationsDevicesStatusResponseError)
+
+export const getPostNotificationsDevicesStatusUrl = () => {
+
+
+  
+
+  return `/api/notifications/devices/status`
+}
+
+export const postNotificationsDevicesStatus = async (devicePushTokenStatusRequest: DevicePushTokenStatusRequest, options?: RequestInit): Promise<postNotificationsDevicesStatusResponse> => {
+  
+  return customInstance<postNotificationsDevicesStatusResponse>(getPostNotificationsDevicesStatusUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      devicePushTokenStatusRequest,)
+  }
+);}
+  
+
+
+
+export const getPostNotificationsDevicesStatusMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postNotificationsDevicesStatus>>, TError,{data: DevicePushTokenStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postNotificationsDevicesStatus>>, TError,{data: DevicePushTokenStatusRequest}, TContext> => {
+
+const mutationKey = ['postNotificationsDevicesStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postNotificationsDevicesStatus>>, {data: DevicePushTokenStatusRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postNotificationsDevicesStatus(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostNotificationsDevicesStatusMutationResult = NonNullable<Awaited<ReturnType<typeof postNotificationsDevicesStatus>>>
+    export type PostNotificationsDevicesStatusMutationBody = DevicePushTokenStatusRequest
+    export type PostNotificationsDevicesStatusMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 현재 기기 알림 토큰 활성 상태 조회
+ */
+export const usePostNotificationsDevicesStatus = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postNotificationsDevicesStatus>>, TError,{data: DevicePushTokenStatusRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postNotificationsDevicesStatus>>,
+        TError,
+        {data: DevicePushTokenStatusRequest},
+        TContext
+      > => {
+      return useMutation(getPostNotificationsDevicesStatusMutationOptions(options), queryClient);
     }
     
