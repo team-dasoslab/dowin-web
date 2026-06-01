@@ -23,6 +23,7 @@ declare namespace Cloudflare {
 		POLAR_ACCESS_TOKEN: string;
 		APP_BASE_URL: string;
 		CONTACT_DISCORD_WEBHOOK_URL: string;
+		LOGS_DISCORD_WEBHOOK_URL: string;
 		WORKER_SELF_REFERENCE: Service<typeof import("./worker").default>;
 	}
 }
@@ -31,7 +32,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "NEXTJS_ENV" | "FCM_PROJECT_ID" | "FCM_CLIENT_EMAIL" | "FCM_PRIVATE_KEY" | "CRON_SECRET" | "NEXT_PUBLIC_GA_ID" | "POLAR_ENV" | "POLAR_CHECKOUT_TOKEN" | "POLAR_PRODUCT_ID" | "POLAR_WEBHOOK_SECRET" | "POLAR_ACCESS_TOKEN" | "APP_BASE_URL" | "CONTACT_DISCORD_WEBHOOK_URL">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "NEXTJS_ENV" | "FCM_PROJECT_ID" | "FCM_CLIENT_EMAIL" | "FCM_PRIVATE_KEY" | "CRON_SECRET" | "NEXT_PUBLIC_GA_ID" | "POLAR_ENV" | "POLAR_CHECKOUT_TOKEN" | "POLAR_PRODUCT_ID" | "POLAR_WEBHOOK_SECRET" | "POLAR_ACCESS_TOKEN" | "APP_BASE_URL" | "CONTACT_DISCORD_WEBHOOK_URL" | "LOGS_DISCORD_WEBHOOK_URL">> {}
 }
 
 // Begin runtime types
