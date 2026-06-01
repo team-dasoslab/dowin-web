@@ -69,22 +69,22 @@ export type getWorkspacesWorkspaceIdBillingMeResponse = (getWorkspacesWorkspaceI
 export const getGetWorkspacesWorkspaceIdBillingMeUrl = (workspaceId: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${workspaceId}/billing/me`
 }
 
 export const getWorkspacesWorkspaceIdBillingMe = async (workspaceId: string, options?: RequestInit): Promise<getWorkspacesWorkspaceIdBillingMeResponse> => {
-
+  
   return customInstance<getWorkspacesWorkspaceIdBillingMeResponse>(getGetWorkspacesWorkspaceIdBillingMeUrl(workspaceId),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -95,7 +95,7 @@ export const getGetWorkspacesWorkspaceIdBillingMeQueryKey = (workspaceId: string
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesWorkspaceIdBillingMeQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -103,13 +103,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdBillingMeQueryKey(workspaceId);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>> = ({ signal }) => getWorkspacesWorkspaceIdBillingMe(workspaceId, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -148,7 +148,7 @@ export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<
 
 export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdBillingMeQueryOptions(workspaceId,options)
@@ -194,22 +194,22 @@ export type getWorkspacesWorkspaceIdBillingPortalResponse = (getWorkspacesWorksp
 export const getGetWorkspacesWorkspaceIdBillingPortalUrl = (workspaceId: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${workspaceId}/billing/portal`
 }
 
 export const getWorkspacesWorkspaceIdBillingPortal = async (workspaceId: string, options?: RequestInit): Promise<getWorkspacesWorkspaceIdBillingPortalResponse> => {
-
+  
   return customInstance<getWorkspacesWorkspaceIdBillingPortalResponse>(getGetWorkspacesWorkspaceIdBillingPortalUrl(workspaceId),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -220,7 +220,7 @@ export const getGetWorkspacesWorkspaceIdBillingPortalQueryKey = (workspaceId: st
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesWorkspaceIdBillingPortalQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -228,13 +228,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdBillingPortalQueryKey(workspaceId);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>> = ({ signal }) => getWorkspacesWorkspaceIdBillingPortal(workspaceId, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -273,7 +273,7 @@ export function useGetWorkspacesWorkspaceIdBillingPortal<TData = Awaited<ReturnT
 
 export function useGetWorkspacesWorkspaceIdBillingPortal<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError = void | UnauthorizedErrorResponse | ErrorResponse>(
  workspaceId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdBillingPortal>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdBillingPortalQueryOptions(workspaceId,options)
@@ -331,16 +331,16 @@ export type postWorkspacesWorkspaceIdBillingCheckoutResponse = (postWorkspacesWo
 export const getPostWorkspacesWorkspaceIdBillingCheckoutUrl = (workspaceId: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${workspaceId}/billing/checkout`
 }
 
 export const postWorkspacesWorkspaceIdBillingCheckout = async (workspaceId: string,
     workspaceBillingCheckoutRequest?: WorkspaceBillingCheckoutRequest, options?: RequestInit): Promise<postWorkspacesWorkspaceIdBillingCheckoutResponse> => {
-
+  
   return customInstance<postWorkspacesWorkspaceIdBillingCheckoutResponse>(getPostWorkspacesWorkspaceIdBillingCheckoutUrl(workspaceId),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -348,7 +348,7 @@ export const postWorkspacesWorkspaceIdBillingCheckout = async (workspaceId: stri
       workspaceBillingCheckoutRequest,)
   }
 );}
-
+  
 
 
 
@@ -363,7 +363,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdBillingCheckout>>, {workspaceId: string;data: WorkspaceBillingCheckoutRequest}> = (props) => {
@@ -374,7 +374,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -396,3 +396,4 @@ export const usePostWorkspacesWorkspaceIdBillingCheckout = <TError = Unauthorize
       > => {
       return useMutation(getPostWorkspacesWorkspaceIdBillingCheckoutMutationOptions(options), queryClient);
     }
+    

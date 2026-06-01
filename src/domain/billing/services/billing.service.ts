@@ -14,6 +14,7 @@ type WorkspacePort = Pick<
   | "findMembership"
   | "findMembershipByUserId"
   | "countMembers"
+  | "findSeatEntitlement"
 >;
 type BillingRiskSummary = {
   recentRefundCount: number;
@@ -37,6 +38,8 @@ export type BillingOverview = {
   recentRefundCount: number;
   recentRevokedCount: number;
   requiresManualReview: boolean;
+  purchasedSeatCount: number | null;
+  usedSeatCount: number;
   canManageBilling: boolean;
 };
 
@@ -92,7 +95,11 @@ export class BillingService {
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
-    const riskSummary = await this.getBillingRiskSummary(workspace.id);
+    const [riskSummary, seatEntitlement, usedSeatCount] = await Promise.all([
+      this.getBillingRiskSummary(workspace.id),
+      this.workspaceStorage.findSeatEntitlement(workspace.id),
+      this.workspaceStorage.countMembers(workspace.id),
+    ]);
 
     return {
       workspaceId: getWorkspacePublicId(workspace),
@@ -107,6 +114,8 @@ export class BillingService {
       recentRefundCount: riskSummary.recentRefundCount,
       recentRevokedCount: riskSummary.recentRevokedCount,
       requiresManualReview: riskSummary.requiresManualReview,
+      purchasedSeatCount: seatEntitlement?.purchasedSeatCount ?? null,
+      usedSeatCount,
       canManageBilling: membership?.role === "ADMIN",
     };
   }

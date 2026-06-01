@@ -16,6 +16,8 @@ describe("BillingService", () => {
         findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
         }),
+        countMembers: vi.fn().mockResolvedValue(1),
+        findSeatEntitlement: vi.fn().mockResolvedValue(null),
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue(null),
@@ -39,7 +41,50 @@ describe("BillingService", () => {
       recentRefundCount: 0,
       recentRevokedCount: 0,
       requiresManualReview: false,
+      purchasedSeatCount: null,
+      usedSeatCount: 1,
       canManageBilling: true,
+    });
+  });
+
+  it("seat entitlement가 있으면 결제 seat 수와 사용 seat 수를 반환한다", async () => {
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+        }),
+        findMembership: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+        countMembers: vi.fn().mockResolvedValue(3),
+        findSeatEntitlement: vi.fn().mockResolvedValue({
+          purchasedSeatCount: 5,
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          provider: "POLAR",
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          billingOwnerUserId: 7,
+        }),
+        getRecentBillingRiskSummary: vi.fn().mockResolvedValue({
+          recentRefundCount: 0,
+          recentRevokedCount: 0,
+        }),
+      } as never,
+    );
+
+    await expect(service.getMyBilling("ws_abc", 7)).resolves.toMatchObject({
+      purchasedSeatCount: 5,
+      usedSeatCount: 3,
     });
   });
 

@@ -744,6 +744,17 @@ export interface BillingOverview {
   /** @minimum 0 */
   recentRevokedCount: number;
   requiresManualReview: boolean;
+  /**
+   * 현재 워크스페이스가 결제한 Basic seat 수
+   * @minimum 0
+   * @nullable
+   */
+  purchasedSeatCount: number | null;
+  /**
+   * 현재 사용 중인 seat 수. 현재는 워크스페이스 멤버 수 기준이다.
+   * @minimum 0
+   */
+  usedSeatCount: number;
   canManageBilling: boolean;
 }
 
