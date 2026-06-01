@@ -88,6 +88,55 @@ describe("BillingService", () => {
     });
   });
 
+  it("billing risk 조회는 workspace, customer, owner 범위를 함께 전달한다", async () => {
+    const getRecentBillingRiskSummary = vi.fn().mockResolvedValue({
+      recentRefundCount: 1,
+      recentRevokedCount: 0,
+    });
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+          billingCustomerExternalRef: "workspace:1",
+          billingOwnerUserId: 7,
+        }),
+        findMembership: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+        countMembers: vi.fn().mockResolvedValue(2),
+        findSeatEntitlement: vi.fn().mockResolvedValue(null),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          provider: "POLAR",
+          customerKey: "cus_123",
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          billingOwnerUserId: 9,
+        }),
+        getRecentBillingRiskSummary,
+      } as never,
+    );
+
+    await service.getMyBilling("ws_abc", 7);
+
+    expect(getRecentBillingRiskSummary).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: 1,
+        customerKey: "cus_123",
+        customerExternalRef: "workspace:1",
+        billingOwnerUserId: 9,
+      }),
+    );
+  });
+
   it("manual grant 상태에서는 portal을 열 수 없다", async () => {
     const createCustomerSession = vi.fn();
     const service = new BillingService(
@@ -278,6 +327,67 @@ describe("BillingService", () => {
         }),
       }),
     );
+  });
+
+  it("같은 customer나 billing owner의 최근 위험 이력이 있으면 Basic checkout을 막는다", async () => {
+    const createCheckoutSession = vi.fn();
+    const getRecentBillingRiskSummary = vi.fn().mockResolvedValue({
+      recentRefundCount: 2,
+      recentRevokedCount: 0,
+    });
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "FREE",
+          billingCustomerExternalRef: "workspace:1",
+          billingOwnerUserId: 7,
+        }),
+        findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
+        countMembers: vi.fn().mockResolvedValue(1),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          billingStatus: "NONE",
+          entitlementSource: "POLAR",
+          customerKey: "cus_123",
+          billingOwnerUserId: 7,
+        }),
+        findActiveProviderProduct: vi.fn(),
+        getRecentBillingRiskSummary,
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession,
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+      },
+    );
+
+    await expect(
+      service.startBasicCheckout({
+        workspaceUid: "ws_abc",
+        userId: 7,
+        locale: "ko",
+        idempotencyKey: "idem_risk",
+      }),
+    ).rejects.toEqual(
+      expect.objectContaining<Partial<ConflictError>>({
+        code: "BILLING_REVIEW_REQUIRED",
+      }),
+    );
+    expect(getRecentBillingRiskSummary).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: 1,
+        customerKey: "cus_123",
+        customerExternalRef: "workspace:1",
+        billingOwnerUserId: 7,
+      }),
+    );
+    expect(createCheckoutSession).not.toHaveBeenCalled();
   });
 
   it("EXPIRED 상태에서는 기존 customer external ref로 Basic checkout을 시작한다", async () => {

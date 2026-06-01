@@ -38,7 +38,12 @@ function getRiskReviewFailureReason(input: {
   eventType: string;
   currentPeriodEnd: Date | null;
   occurredAt: Date;
+  projection: BillingProjection | null;
 }): string | null {
+  if (input.eventType === "order.refunded" && !input.projection) {
+    return "PARTIAL_REFUND_RISK_SIGNAL";
+  }
+
   if (input.eventType !== "subscription.revoked") {
     return null;
   }
@@ -48,6 +53,17 @@ function getRiskReviewFailureReason(input: {
   }
 
   return null;
+}
+
+function getBillingEventStatus(
+  eventType: string,
+  projection: BillingProjection | null,
+) {
+  if (projection || eventType === "order.refunded") {
+    return "ACCEPTED";
+  }
+
+  return "IGNORED";
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -458,11 +474,12 @@ export class PolarWebhookService {
       subscriptionKey,
       occurredAt,
       payloadJson: input.payloadJson,
-      status: projection ? "ACCEPTED" : "IGNORED",
+      status: getBillingEventStatus(payload.type, projection),
       failureReason: getRiskReviewFailureReason({
         eventType: payload.type,
         currentPeriodEnd: projection?.currentPeriodEnd ?? null,
         occurredAt,
+        projection,
       }),
     });
 

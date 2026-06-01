@@ -51,6 +51,13 @@ type BillingPort = Pick<
   | "getRecentBillingRiskSummary"
 >;
 
+type BillingRiskScope = {
+  workspaceId: number;
+  customerKey?: string | null;
+  customerExternalRef?: string | null;
+  billingOwnerUserId?: number | null;
+};
+
 function getBillingRiskLookbackStart(now: Date): Date {
   const lookback = new Date(now);
   lookback.setDate(lookback.getDate() - BILLING_RISK_LOOKBACK_DAYS);
@@ -97,7 +104,13 @@ export class BillingService {
       workspace.id,
     );
     const [riskSummary, seatEntitlement, usedSeatCount] = await Promise.all([
-      this.getBillingRiskSummary(workspace.id),
+      this.getBillingRiskSummary({
+        workspaceId: workspace.id,
+        customerKey: billingState?.customerKey ?? null,
+        customerExternalRef: workspace.billingCustomerExternalRef ?? null,
+        billingOwnerUserId:
+          billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+      }),
       this.workspaceStorage.findSeatEntitlement(workspace.id),
       this.workspaceStorage.countMembers(workspace.id),
     ]);
@@ -178,15 +191,21 @@ export class BillingService {
       throw new ForbiddenError("FORBIDDEN");
     }
 
-    const riskSummary = await this.getBillingRiskSummary(workspace.id);
-    if (riskSummary.requiresManualReview) {
-      throw new ConflictError("BILLING_REVIEW_REQUIRED");
-    }
-
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
     const billingStatus = billingState?.billingStatus ?? "NONE";
+
+    const riskSummary = await this.getBillingRiskSummary({
+      workspaceId: workspace.id,
+      customerKey: billingState?.customerKey ?? null,
+      customerExternalRef: workspace.billingCustomerExternalRef ?? null,
+      billingOwnerUserId:
+        billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+    });
+    if (riskSummary.requiresManualReview) {
+      throw new ConflictError("BILLING_REVIEW_REQUIRED");
+    }
 
     if (billingStatus === "REVOKED") {
       throw new ConflictError("BILLING_REVIEW_REQUIRED");
@@ -248,13 +267,13 @@ export class BillingService {
   }
 
   private async getBillingRiskSummary(
-    workspaceId: number,
+    scope: BillingRiskScope,
   ): Promise<BillingRiskSummary> {
     const { recentRefundCount, recentRevokedCount } =
-      await this.billingStorage.getRecentBillingRiskSummary(
-        workspaceId,
-        getBillingRiskLookbackStart(new Date()),
-      );
+      await this.billingStorage.getRecentBillingRiskSummary({
+        ...scope,
+        since: getBillingRiskLookbackStart(new Date()),
+      });
     const totalRiskEvents = recentRefundCount + recentRevokedCount;
 
     return {

@@ -540,6 +540,55 @@ describe("PolarWebhookService", () => {
     );
   });
 
+  it("부분 환불 order.refunded도 권한 회수 없이 위험 이벤트로 저장한다", async () => {
+    const appendBillingEvent = vi.fn().mockResolvedValue({ id: 45 });
+    const upsertWorkspaceBillingState = vi.fn();
+    const service = new PolarWebhookService({
+      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 12,
+        planCode: "BASIC",
+        billingCustomerExternalRef: "workspace:12",
+        billingOwnerUserId: 16,
+      }),
+      findWorkspaceByCustomerExternalRef: vi.fn(),
+      appendBillingEvent,
+      upsertWorkspaceBillingState,
+      updateWorkspaceBillingProjection: vi.fn(),
+    } as never);
+
+    await service.handleWebhook({
+      providerEventId: "msg_partial_refund",
+      payloadJson: JSON.stringify({
+        type: "order.refunded",
+        timestamp: "2026-04-21T00:00:00.000Z",
+        data: {
+          id: "ord_12",
+          customer_id: "cus_12",
+          subscription_id: "sub_12",
+          refunded_amount: 1000,
+          total_amount: 29000,
+          metadata: {
+            workspaceId: "12",
+          },
+          customer: {
+            external_id: "workspace:12",
+          },
+        },
+      }),
+      now: new Date("2026-04-21T00:00:00.000Z"),
+    });
+
+    expect(appendBillingEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "order.refunded",
+        status: "ACCEPTED",
+        failureReason: "PARTIAL_REFUND_RISK_SIGNAL",
+      }),
+    );
+    expect(upsertWorkspaceBillingState).not.toHaveBeenCalled();
+  });
+
   it("signed payload가 JSON이 아니면 무시한다", async () => {
     const service = new PolarWebhookService({
       findBillingEventByProviderEventId: vi.fn(),

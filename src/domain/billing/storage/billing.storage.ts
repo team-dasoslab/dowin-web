@@ -8,7 +8,7 @@ import {
   workspaces,
 } from "@/db/schema";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
-import { and, asc, desc, eq, gte, inArray, like, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, like, or, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -117,7 +117,29 @@ export class BillingStorage {
     return product;
   }
 
-  async getRecentBillingRiskSummary(workspaceId: number, since: Date) {
+  async getRecentBillingRiskSummary(input: {
+    workspaceId: number;
+    customerKey?: string | null;
+    customerExternalRef?: string | null;
+    billingOwnerUserId?: number | null;
+    since: Date;
+  }) {
+    const scopeConditions = [
+      eq(billingEvents.workspaceId, input.workspaceId),
+      input.customerKey ? eq(billingEvents.customerKey, input.customerKey) : null,
+      input.customerExternalRef
+        ? eq(workspaces.billingCustomerExternalRef, input.customerExternalRef)
+        : null,
+      input.billingOwnerUserId
+        ? or(
+            eq(workspaces.billingOwnerUserId, input.billingOwnerUserId),
+            eq(workspaceBillingState.billingOwnerUserId, input.billingOwnerUserId),
+          )
+        : null,
+    ].filter((condition): condition is NonNullable<typeof condition> =>
+      Boolean(condition),
+    );
+
     const [result] = await this.db
       .select({
         recentRefundCount:
@@ -126,11 +148,16 @@ export class BillingStorage {
           sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
       })
       .from(billingEvents)
+      .leftJoin(workspaces, eq(billingEvents.workspaceId, workspaces.id))
+      .leftJoin(
+        workspaceBillingState,
+        eq(billingEvents.workspaceId, workspaceBillingState.workspaceId),
+      )
       .where(
         and(
-          eq(billingEvents.workspaceId, workspaceId),
+          or(...scopeConditions),
           eq(billingEvents.status, "ACCEPTED"),
-          gte(billingEvents.occurredAt, since),
+          gte(billingEvents.occurredAt, input.since),
         ),
       );
 
