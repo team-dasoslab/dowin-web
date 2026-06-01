@@ -6,7 +6,6 @@ import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/b
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Link } from "@/i18n/routing";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { CreditCard, Settings, Users } from "lucide-react";
@@ -46,16 +45,6 @@ export default function SubscriptionRequiredPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50/50 px-4 py-12">
       <div className="w-full max-w-[480px] space-y-4 animate-dowin-in">
-
-        {/* Icon + workspace label */}
-        <div className="flex flex-col items-center gap-3 pb-2 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <DowinIcon name="domain-wallet" size="28px" />
-          </div>
-          <p className="text-xs font-bold tracking-wider text-zinc-400 uppercase">
-            {billing?.workspaceName ?? t("workspaceFallback")}
-          </p>
-        </div>
 
         {/* Main card */}
         <Card className="divide-y divide-zinc-100 border-zinc-200 bg-white">
