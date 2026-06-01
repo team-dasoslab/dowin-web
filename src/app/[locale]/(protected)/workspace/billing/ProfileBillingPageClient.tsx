@@ -176,6 +176,21 @@ export function ProfileBillingPageClient() {
                 {t("basicPlanName")}
               </span>
             </div>
+            {billing.purchasedSeatCount !== null && (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
+              <div className="flex items-center justify-between p-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                    <DowinIcon name="domain-people" size="16px" />
+                  </div>
+                  <span className="text-sm font-bold text-zinc-500">
+                    {t("purchasedSeatLabel")}
+                  </span>
+                </div>
+                <span className="text-sm font-black text-zinc-900">
+                  {billing.purchasedSeatCount} {t("seatUnit")}
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">

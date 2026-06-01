@@ -649,6 +649,8 @@
     "planLabel": "Plan",
     "statusLabel": "Billing status",
     "periodEndLabel": "Subscription end",
+    "purchasedSeatLabel": "Member limit",
+    "seatUnit": "members",
     "entitlementSourceLabel": "Entitlement source",
     "managePermissionLabel": "Manage permission",
     "riskSignalLabel": "Billing risk signal",
