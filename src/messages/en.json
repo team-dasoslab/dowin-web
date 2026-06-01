@@ -883,22 +883,20 @@
     }
   },
   "SubscriptionRequired": {
-    "title": "Basic subscription required",
-    "description": "This workspace's operating screens require an active Basic subscription.",
     "workspaceFallback": "Workspace",
-    "adminTitle": "Review the billing status",
-    "adminDescription": "Dashboard, setup, scoreboards, and reports are available only when this workspace has active billing access. Review the billing status before continuing.",
-    "memberTitle": "Workspace admin action required",
-    "memberDescription": "This workspace's Basic subscription is not active, so operating screens are unavailable. Ask a workspace admin to review the billing status.",
+    "adminTitle": "Your Basic subscription has expired",
+    "adminDescription": "A Basic subscription is required to access the dashboard and team operations. Restarting takes less than a minute.",
+    "memberTitle": "Workspace subscription needs attention",
+    "memberDescription": "This workspace's Basic subscription is not active, so operations are unavailable. Please contact a workspace admin.",
     "billingAction": "View billing status",
-    "checkoutAction": "Restart Basic subscription",
-    "checkoutLoading": "Preparing checkout...",
+    "checkoutAction": "Restart subscription",
+    "checkoutLoading": "Connecting to checkout...",
     "checkoutFailed": "Failed to start checkout. Please try again later.",
-    "checkoutUnavailable": "A new checkout is not available in the current state. Review billing status or contact support.",
-    "portalAction": "Open billing management",
+    "checkoutUnavailable": "A new subscription cannot be started right now. Review billing status or contact support.",
+    "portalAction": "Polar billing management",
     "contactAction": "Contact us",
-    "allowedTitle": "Account and billing management remain available",
-    "allowedDescription": "Profile, billing status, contact, members, and invite management remain accessible so the workspace can resolve billing issues."
+    "allowedTitle": "Account & billing management remain available",
+    "allowedDescription": "Profile, billing settings, member/invite management, and contact remain accessible so you can resolve subscription issues."
   },
   "ApiError": {
     "UNAUTHORIZED": "Login required.",
