@@ -202,18 +202,6 @@ export function ProfileBillingPageClient() {
                 )}
               </span>
             </div>
-            <div className="bg-zinc-50/50 p-5">
-              <p className="text-xs font-medium leading-relaxed text-zinc-500">
-                {getStatusDescription({
-                  status: billing.billingStatus,
-                  planCode: billing.planCode,
-                  entitlementSource: billing.entitlementSource,
-                  currentPeriodEnd: billing.currentPeriodEnd,
-                  locale,
-                  t,
-                })}
-              </p>
-            </div>
           </Card>
         </section>
 
@@ -350,48 +338,6 @@ function formatDateLabel(
   }).format(date);
 }
 
-function getStatusDescription({
-  status,
-  planCode,
-  entitlementSource,
-  currentPeriodEnd,
-  locale,
-  t,
-}: {
-  status: BillingStatus;
-  planCode: PlanCode;
-  entitlementSource: EntitlementSource;
-  currentPeriodEnd: string | null | undefined;
-  locale: string;
-  t: ReturnType<typeof useTranslations<"ProfileBilling">>;
-}) {
-  const formattedDate = formatDateLabel(
-    currentPeriodEnd,
-    t("notAvailable"),
-    locale,
-  );
-
-  switch (status) {
-    case "ACTIVE":
-      if (entitlementSource && entitlementSource !== "POLAR") {
-        return t("statusDescNonPolarActive", {
-          source: getEntitlementSourceLabel(entitlementSource, t),
-        });
-      }
-      return t("statusDescActive", { date: formattedDate });
-    case "CANCELED":
-      return t("statusDescCanceled", { date: formattedDate });
-    case "EXPIRED":
-      return t("statusDescExpired");
-    case "REVOKED":
-      return t("statusDescRevoked");
-    case "NONE":
-    default:
-      return planCode === "BASIC"
-        ? t("statusDescBasicFallback")
-        : t("statusDescNoSubscription");
-  }
-}
 
 function getEntitlementSourceLabel(
   source: EntitlementSource,
