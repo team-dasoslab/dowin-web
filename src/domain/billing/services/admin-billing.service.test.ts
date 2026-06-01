@@ -24,7 +24,9 @@ describe("AdminBillingService", () => {
         getRecentBillingRiskSummaries: vi.fn(),
         appendBillingEvent: vi.fn(),
         upsertWorkspaceBillingState: vi.fn(),
+        upsertWorkspaceSeatEntitlement: vi.fn(),
         updateWorkspaceBillingProjection: vi.fn(),
+        countWorkspaceMembers: vi.fn(),
       } as never,
       { create: createAuditLog },
     );
@@ -98,7 +100,9 @@ describe("AdminBillingService", () => {
           ),
         appendBillingEvent: vi.fn(),
         upsertWorkspaceBillingState: vi.fn(),
+        upsertWorkspaceSeatEntitlement: vi.fn(),
         updateWorkspaceBillingProjection: vi.fn(),
+        countWorkspaceMembers: vi.fn(),
       } as never,
       { create: vi.fn() },
     );
@@ -155,6 +159,7 @@ describe("AdminBillingService", () => {
       });
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 77 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
     const createAuditLog = vi.fn().mockResolvedValue(undefined);
     const service = new AdminBillingService(
@@ -181,7 +186,9 @@ describe("AdminBillingService", () => {
         getRecentBillingRiskSummaries: vi.fn().mockResolvedValue(new Map()),
         appendBillingEvent,
         upsertWorkspaceBillingState,
+        upsertWorkspaceSeatEntitlement,
         updateWorkspaceBillingProjection,
+        countWorkspaceMembers: vi.fn().mockResolvedValue(2),
       } as never,
       { create: createAuditLog },
     );
@@ -235,5 +242,148 @@ describe("AdminBillingService", () => {
       }),
     );
     vi.useRealTimers();
+  });
+
+  it("BASIC 수동 보정 시 seat entitlement를 함께 저장한다", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-01T12:00:00.000Z"));
+
+    const findWorkspaceBillingAdminDetail = vi
+      .fn()
+      .mockResolvedValueOnce({
+        workspaceId: 3,
+        workspaceName: "Dowin",
+        planCode: "FREE",
+        billingStatus: "NONE",
+        entitlementSource: null,
+        provider: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        billingOwnerUserId: null,
+        customerKey: null,
+        subscriptionKey: null,
+        billingCustomerExternalRef: "workspace:3",
+        lastEventOccurredAt: null,
+        updatedAt: null,
+        purchasedSeatCount: null,
+      })
+      .mockResolvedValueOnce({
+        workspaceId: 3,
+        workspaceName: "Dowin",
+        planCode: "BASIC",
+        billingStatus: "ACTIVE",
+        entitlementSource: "MANUAL_GRANT",
+        provider: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        billingOwnerUserId: null,
+        customerKey: null,
+        subscriptionKey: null,
+        billingCustomerExternalRef: "workspace:3",
+        lastEventOccurredAt: new Date("2026-05-01T12:00:00.000Z"),
+        updatedAt: new Date("2026-05-01T12:00:00.000Z"),
+        purchasedSeatCount: 5,
+      });
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
+    const service = new AdminBillingService(
+      {
+        listProviderProducts: vi.fn(),
+        upsertProviderProduct: vi.fn(),
+        searchAdminBillingWorkspaces: vi.fn(),
+        findWorkspaceBillingAdminDetail,
+        listBillingEventsForWorkspace: vi.fn().mockResolvedValue([]),
+        getRecentBillingRiskSummaries: vi.fn().mockResolvedValue(new Map()),
+        appendBillingEvent: vi.fn().mockResolvedValue({ id: 77 }),
+        upsertWorkspaceBillingState: vi.fn(),
+        upsertWorkspaceSeatEntitlement,
+        updateWorkspaceBillingProjection: vi.fn(),
+        countWorkspaceMembers: vi.fn().mockResolvedValue(2),
+      } as never,
+      { create: vi.fn() },
+    );
+
+    await service.applyManualOverride(1, 3, {
+      planCode: "BASIC",
+      billingStatus: "ACTIVE",
+      entitlementSource: "MANUAL_GRANT",
+      purchasedSeatCount: 5,
+      changeReason: "수동 Basic 지급",
+    });
+
+    expect(upsertWorkspaceSeatEntitlement).toHaveBeenCalledWith({
+      workspaceId: 3,
+      purchasedSeatCount: 5,
+      seatSource: "MANUAL_GRANT",
+    });
+    vi.useRealTimers();
+  });
+
+  it("BASIC 수동 보정 seat가 현재 멤버 수보다 작으면 현재 멤버 수로 보정한다", async () => {
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
+    const service = new AdminBillingService(
+      {
+        listProviderProducts: vi.fn(),
+        upsertProviderProduct: vi.fn(),
+        searchAdminBillingWorkspaces: vi.fn(),
+        findWorkspaceBillingAdminDetail: vi
+          .fn()
+          .mockResolvedValueOnce({
+            workspaceId: 3,
+            workspaceName: "Dowin",
+            planCode: "FREE",
+            billingStatus: "NONE",
+            entitlementSource: null,
+            provider: null,
+            currentPeriodEnd: null,
+            cancelAtPeriodEnd: false,
+            billingOwnerUserId: null,
+            customerKey: null,
+            subscriptionKey: null,
+            billingCustomerExternalRef: "workspace:3",
+            lastEventOccurredAt: null,
+            updatedAt: null,
+            purchasedSeatCount: null,
+          })
+          .mockResolvedValueOnce({
+            workspaceId: 3,
+            workspaceName: "Dowin",
+            planCode: "BASIC",
+            billingStatus: "ACTIVE",
+            entitlementSource: "MANUAL_GRANT",
+            provider: null,
+            currentPeriodEnd: null,
+            cancelAtPeriodEnd: false,
+            billingOwnerUserId: null,
+            customerKey: null,
+            subscriptionKey: null,
+            billingCustomerExternalRef: "workspace:3",
+            lastEventOccurredAt: null,
+            updatedAt: null,
+            purchasedSeatCount: 4,
+          }),
+        listBillingEventsForWorkspace: vi.fn().mockResolvedValue([]),
+        getRecentBillingRiskSummaries: vi.fn().mockResolvedValue(new Map()),
+        appendBillingEvent: vi.fn().mockResolvedValue({ id: 77 }),
+        upsertWorkspaceBillingState: vi.fn(),
+        upsertWorkspaceSeatEntitlement,
+        updateWorkspaceBillingProjection: vi.fn(),
+        countWorkspaceMembers: vi.fn().mockResolvedValue(4),
+      } as never,
+      { create: vi.fn() },
+    );
+
+    await service.applyManualOverride(1, 3, {
+      planCode: "BASIC",
+      billingStatus: "ACTIVE",
+      entitlementSource: "MANUAL_GRANT",
+      purchasedSeatCount: 1,
+      changeReason: "수동 Basic 지급",
+    });
+
+    expect(upsertWorkspaceSeatEntitlement).toHaveBeenCalledWith(
+      expect.objectContaining({
+        purchasedSeatCount: 4,
+      }),
+    );
   });
 });

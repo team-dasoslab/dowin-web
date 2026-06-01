@@ -65,6 +65,7 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/manual-override", () 
           customerKey: "cus_123",
           subscriptionKey: "sub_123",
           currentPeriodEnd: "2026-05-31T00:00:00.000Z",
+          purchasedSeatCount: 5,
           changeReason: "웹훅 누락 수동 보정",
         }),
       }),
@@ -83,6 +84,7 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/manual-override", () 
       customerKey: "cus_123",
       subscriptionKey: "sub_123",
       currentPeriodEnd: "2026-05-31T00:00:00.000Z",
+      purchasedSeatCount: 5,
       changeReason: "웹훅 누락 수동 보정",
     });
   });

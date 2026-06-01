@@ -24,7 +24,9 @@ type BillingPort = Pick<
   | "getRecentBillingRiskSummaries"
   | "appendBillingEvent"
   | "upsertWorkspaceBillingState"
+  | "upsertWorkspaceSeatEntitlement"
   | "updateWorkspaceBillingProjection"
+  | "countWorkspaceMembers"
 >;
 type AuditLogPort = Pick<AuditLogStorage, "create">;
 
@@ -46,6 +48,7 @@ type AdminBillingWorkspaceBase = {
   billingCustomerExternalRef: string | null;
   lastEventOccurredAt: string | null;
   updatedAt: string | null;
+  purchasedSeatCount: number | null;
   recentRefundCount: number;
   recentRevokedCount: number;
   requiresManualReview: boolean;
@@ -190,6 +193,7 @@ export class AdminBillingService {
       currentPeriodEnd?: string | null;
       cancelAtPeriodEnd?: boolean;
       billingOwnerUserId?: number | null;
+      purchasedSeatCount?: number | null;
       changeReason: string;
     },
   ): Promise<AdminBillingWorkspaceDetail> {
@@ -214,6 +218,17 @@ export class AdminBillingService {
       input.billingOwnerUserId !== undefined
         ? input.billingOwnerUserId
         : existing.billingOwnerUserId ?? null;
+    const shouldApplySeatEntitlement =
+      input.planCode === "BASIC" &&
+      (input.billingStatus === "ACTIVE" || input.billingStatus === "CANCELED");
+    const memberCount = shouldApplySeatEntitlement
+      ? await this.billingStorage.countWorkspaceMembers(workspaceId)
+      : 0;
+    const nextPurchasedSeatCount = shouldApplySeatEntitlement
+      ? Math.max(input.purchasedSeatCount ?? memberCount, memberCount, 1)
+      : input.purchasedSeatCount === null
+        ? 0
+        : null;
     const event = await this.billingStorage.appendBillingEvent({
       workspaceId,
       providerEventId: null,
@@ -234,6 +249,7 @@ export class AdminBillingService {
           currentPeriodEnd: currentPeriodEnd?.toISOString() ?? null,
           cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
           billingOwnerUserId: nextBillingOwnerUserId,
+          purchasedSeatCount: nextPurchasedSeatCount,
         },
       }),
       status: "ACCEPTED",
@@ -262,6 +278,14 @@ export class AdminBillingService {
       billingOwnerUserId: nextBillingOwnerUserId,
     });
 
+    if (nextPurchasedSeatCount !== null) {
+      await this.billingStorage.upsertWorkspaceSeatEntitlement({
+        workspaceId,
+        purchasedSeatCount: nextPurchasedSeatCount,
+        seatSource: "MANUAL_GRANT",
+      });
+    }
+
     await this.auditLogStorage.create({
       actorType: "ADMIN",
       actorAdminUserId: adminUserId,
@@ -282,6 +306,7 @@ export class AdminBillingService {
           currentPeriodEnd: currentPeriodEnd?.toISOString() ?? null,
           cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
           billingOwnerUserId: nextBillingOwnerUserId,
+          purchasedSeatCount: nextPurchasedSeatCount,
         },
       }),
     });
@@ -338,6 +363,7 @@ function toAdminBillingWorkspaceSummary(
     billingCustomerExternalRef: workspace.billingCustomerExternalRef ?? null,
     lastEventOccurredAt: workspace.lastEventOccurredAt?.toISOString() ?? null,
     updatedAt: workspace.updatedAt?.toISOString() ?? null,
+    purchasedSeatCount: workspace.purchasedSeatCount ?? null,
     recentRefundCount: riskSummary.recentRefundCount,
     recentRevokedCount: riskSummary.recentRevokedCount,
     requiresManualReview: totalRiskEvents >= BILLING_RISK_REVIEW_THRESHOLD,
@@ -397,5 +423,6 @@ function snapshotBillingState(
     billingCustomerExternalRef: workspace.billingCustomerExternalRef ?? null,
     lastEventOccurredAt: workspace.lastEventOccurredAt?.toISOString() ?? null,
     updatedAt: workspace.updatedAt?.toISOString() ?? null,
+    purchasedSeatCount: workspace.purchasedSeatCount ?? null,
   };
 }

@@ -4,6 +4,7 @@ import {
   billingProviderProducts,
   workspaceBillingState,
   workspaceSeatEntitlements,
+  workspaceMembers,
   workspaces,
 } from "@/db/schema";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
@@ -208,11 +209,16 @@ export class BillingStorage {
         billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
         lastEventOccurredAt: workspaceBillingState.lastEventOccurredAt,
         updatedAt: workspaceBillingState.updatedAt,
+        purchasedSeatCount: workspaceSeatEntitlements.purchasedSeatCount,
       })
       .from(workspaces)
       .leftJoin(
         workspaceBillingState,
         eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .leftJoin(
+        workspaceSeatEntitlements,
+        eq(workspaces.id, workspaceSeatEntitlements.workspaceId),
       )
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(workspaces.id));
@@ -238,11 +244,16 @@ export class BillingStorage {
         billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
         lastEventOccurredAt: workspaceBillingState.lastEventOccurredAt,
         updatedAt: workspaceBillingState.updatedAt,
+        purchasedSeatCount: workspaceSeatEntitlements.purchasedSeatCount,
       })
       .from(workspaces)
       .leftJoin(
         workspaceBillingState,
         eq(workspaces.id, workspaceBillingState.workspaceId),
+      )
+      .leftJoin(
+        workspaceSeatEntitlements,
+        eq(workspaces.id, workspaceSeatEntitlements.workspaceId),
       )
       .where(eq(workspaces.id, workspaceId));
 
@@ -345,7 +356,7 @@ export class BillingStorage {
   async upsertWorkspaceSeatEntitlement(input: {
     workspaceId: number;
     purchasedSeatCount: number;
-    seatSource: "POLAR";
+    seatSource: "POLAR" | "MANUAL_GRANT";
   }) {
     await this.db
       .insert(workspaceSeatEntitlements)
@@ -364,6 +375,15 @@ export class BillingStorage {
           updatedAt: new Date(),
         },
       });
+  }
+
+  async countWorkspaceMembers(workspaceId: number) {
+    const [result] = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(workspaceMembers)
+      .where(eq(workspaceMembers.workspaceId, workspaceId));
+
+    return Number(result?.count ?? 0);
   }
 
   async updateWorkspaceBillingProjection(input: {
