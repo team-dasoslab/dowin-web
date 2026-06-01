@@ -48,11 +48,14 @@ export function ProtectedContentLayout({
     pathname === workspaceSettingsPath ||
     pathname.startsWith(workspaceId ? `/${workspaceId}/workspace/` : "/workspace/");
   
+  const isWorkspaceNewPath =
+    pathname === "/workspace/new" ||
+    pathname.startsWith("/workspace/new/");
   const usesSubPageLayout =
     pathname === "/updates" ||
     pathname === pricingPath ||
     isProfilePath ||
-    isWorkspacePath;
+    (isWorkspacePath && !isWorkspaceNewPath);
   const showBackButton = pathname !== profilePath && pathname !== workspaceSettingsPath;
 
   useEffect(() => {
