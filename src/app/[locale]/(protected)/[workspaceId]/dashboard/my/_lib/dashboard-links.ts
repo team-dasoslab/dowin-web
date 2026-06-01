@@ -1,4 +1,5 @@
 import { IconName } from "@/components/ui/DowinIcon";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 
 export const getDashboardLinks = (workspaceId: string): {
   href: string;
@@ -22,14 +23,18 @@ export const getDashboardLinks = (workspaceId: string): {
     label: "나의 대시보드",
     translationKey: "myDashboard",
   },
-  {
-    href: `/${workspaceId}/report`,
-    iconName: "nav-report",
-    iconNameActive: "nav-report-active",
-    label: "주간 리포트",
-    translationKey: "weeklyReport",
-    adminOnly: true,
-  },
+  ...(publicRuntimeConfig.isDevelopment
+    ? [
+        {
+          href: `/${workspaceId}/report`,
+          iconName: "nav-report" as IconName,
+          iconNameActive: "nav-report-active" as IconName,
+          label: "주간 리포트",
+          translationKey: "weeklyReport",
+          adminOnly: true,
+        },
+      ]
+    : []),
   {
     href: `/${workspaceId}/scoreboards`,
     iconName: "nav-archive",
