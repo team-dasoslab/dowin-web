@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Link, usePathname } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useSidebar } from "@/context/SidebarContext";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { useTranslations } from "next-intl";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 
@@ -25,20 +26,29 @@ export function Sidebar() {
   const workspaceName = profile?.workspaceName;
   const role = profile?.role;
 
+  const isNativeApp = useNativeApp();
+
   const filteredLinks = workspaceId ? getDashboardLinks(workspaceId).filter((link) => {
     if (link.adminOnly && role !== "ADMIN") return false;
+    if (link.translationKey === "billing" && isNativeApp) return false;
     return true;
   }) : [];
 
   const mobileLinks = filteredLinks.filter(
-    (link) => !["weeklyReport", "workspaceSettings"].includes(link.translationKey),
+    (link) => !["weeklyReport", "workspaceSettings", "billing"].includes(link.translationKey),
   );
 
   const getIsActive = (href: string) => {
     const hrefPathname = href.split("?")[0];
 
+    // 워크스페이스 하위 메뉴(billing, members, invites) 진입 시에도 '워크스페이스 설정' 메뉴가 active 되도록 예외 처리
+    const isWorkspaceMenu =
+      hrefPathname.endsWith("/workspace/settings") &&
+      pathname.includes("/workspace/");
+
     return (
       pathname === hrefPathname ||
+      isWorkspaceMenu ||
       (hrefPathname !== "/" &&
         pathname.startsWith(hrefPathname + "/") &&
         !filteredLinks.some((link) => {

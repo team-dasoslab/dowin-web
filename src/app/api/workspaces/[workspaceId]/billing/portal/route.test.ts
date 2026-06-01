@@ -78,7 +78,7 @@ describe("GET /api/billing/portal", () => {
     const response = await GET(
       new Request("http://localhost/api/workspaces/ws_uid/billing/portal", {
         headers: {
-          referer: "http://localhost/ko/ws_uid/profile/billing",
+          referer: "http://localhost/ko/ws_uid/workspace/billing",
         },
       }),
       { params: Promise.resolve({ workspaceId: "ws_uid" }) },
@@ -86,7 +86,7 @@ describe("GET /api/billing/portal", () => {
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(
-      "http://localhost/ko/ws_uid/profile/billing?billing=portal_error&code=BILLING_NOT_READY",
+      "http://localhost/ko/ws_uid/workspace/billing?billing=portal_error&code=BILLING_NOT_READY",
     );
   });
 
@@ -102,7 +102,7 @@ describe("GET /api/billing/portal", () => {
 
     expect(response.status).toBe(307);
     expect(response.headers.get("location")).toBe(
-      "http://localhost/ws_uid/profile/billing?billing=portal_error&code=BILLING_NOT_READY",
+      "http://localhost/ws_uid/workspace/billing?billing=portal_error&code=BILLING_NOT_READY",
     );
   });
 });

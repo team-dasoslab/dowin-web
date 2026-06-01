@@ -304,21 +304,17 @@ export default function ReportPage() {
                       noScoreboardNames={summary.noScoreboardNames}
                     />
                   ) : (
-                    <Card className="overflow-hidden rounded-content border border-border bg-white">
-                      <InlineEmptyState
-                        title={t("empty.noActiveScoreboardsTitle")}
-                        description={t("empty.noActiveScoreboardsDesc")}
-                      />
-                    </Card>
+                    <InlineEmptyState
+                      title={t("empty.noActiveScoreboardsTitle")}
+                      description={t("empty.noActiveScoreboardsDesc")}
+                    />
                   )}
                 </div>
               ) : (
-                <Card className="overflow-hidden rounded-content border border-border bg-white">
-                  <InlineEmptyState
-                    title={t("empty.noMembersTitle")}
-                    description={t("empty.noMembersDesc")}
-                  />
-                </Card>
+                <InlineEmptyState
+                  title={t("empty.noMembersTitle")}
+                  description={t("empty.noMembersDesc")}
+                />
               )}
             </section>
 
@@ -343,14 +339,10 @@ export default function ReportPage() {
               {summary.focusMembers.length > 0 ? (
                 <FocusMemberList members={summary.focusMembers} />
               ) : (
-                <div className="rounded-content border border-border bg-sub-background px-5 py-8 text-center">
-                  <p className="text-sm font-semibold text-text-primary">
-                    {t("focus.emptyTitle")}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-text-muted">
-                    {t("focus.emptyDesc")}
-                  </p>
-                </div>
+                <InlineEmptyState
+                  title={t("focus.emptyTitle")}
+                  description={t("focus.emptyDesc")}
+                />
               )}
             </section>
           </div>
@@ -853,10 +845,10 @@ function InlineEmptyState({
   description: string;
 }) {
   return (
-    <div className="rounded-content border border-border bg-sub-background px-5 py-8 text-center">
+    <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center">
       <p className="text-sm font-semibold text-text-primary">{title}</p>
       <p className="mt-1 text-xs leading-5 text-text-muted">{description}</p>
-    </div>
+    </Card>
   );
 }
 

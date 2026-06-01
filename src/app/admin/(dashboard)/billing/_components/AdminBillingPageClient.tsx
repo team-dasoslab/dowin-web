@@ -57,6 +57,7 @@ export default function AdminBillingPageClient() {
   const [editEntitlementSource, setEditEntitlementSource] = useState<EditableEntitlementSource>("");
   const [editPeriodEnd, setEditPeriodEnd] = useState<string>("");
   const [editCancelAtEnd, setEditCancelAtEnd] = useState<boolean>(false);
+  const [editSeatCount, setEditSeatCount] = useState<string>("");
   const [editCustomerKey, setEditCustomerKey] = useState<string>("");
   const [editSubscriptionKey, setEditSubscriptionKey] = useState<string>("");
   const [changeReason, setChangeReason] = useState<string>("워크스페이스 결제 정보 보정");
@@ -107,6 +108,7 @@ export default function AdminBillingPageClient() {
       );
       setEditPeriodEnd(d.currentPeriodEnd ? d.currentPeriodEnd.split("T")[0] : "");
       setEditCancelAtEnd(d.cancelAtPeriodEnd || false);
+      setEditSeatCount(d.purchasedSeatCount !== null && d.purchasedSeatCount !== undefined ? String(d.purchasedSeatCount) : "");
       setEditCustomerKey(d.customerKey || "");
       setEditSubscriptionKey(d.subscriptionKey || "");
     }
@@ -124,6 +126,7 @@ export default function AdminBillingPageClient() {
     );
     setEditPeriodEnd(workspace.currentPeriodEnd ? workspace.currentPeriodEnd.split("T")[0] : "");
     setEditCancelAtEnd(workspace.cancelAtPeriodEnd || false);
+    setEditSeatCount(workspace.purchasedSeatCount !== null && workspace.purchasedSeatCount !== undefined ? String(workspace.purchasedSeatCount) : "");
     setEditCustomerKey(workspace.customerKey || "");
     setEditSubscriptionKey(workspace.subscriptionKey || "");
     setChangeReason("워크스페이스 결제 정보 보정");
@@ -158,6 +161,7 @@ export default function AdminBillingPageClient() {
 
     if (editPlanCode === "FREE") {
       setEditCancelAtEnd(false);
+      setEditSeatCount("");
     }
   }, [editPlanCode, editBillingStatus, editEntitlementSource]);
 
@@ -215,6 +219,7 @@ export default function AdminBillingPageClient() {
           entitlementSource: editEntitlementSource || null,
           currentPeriodEnd: editPeriodEnd ? new Date(editPeriodEnd).toISOString() : null,
           cancelAtPeriodEnd: editCancelAtEnd,
+          purchasedSeatCount: editSeatCount.trim() !== "" ? Number(editSeatCount) : null,
           customerKey: editCustomerKey || null,
           subscriptionKey: editSubscriptionKey || null,
           changeReason,
@@ -602,6 +607,16 @@ export default function AdminBillingPageClient() {
                     : "없음 (None)"}
                 </span>
               </div>
+              <div>
+                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                  멤버 한도 (Seats)
+                </span>
+                <span className="text-sm font-bold text-zinc-900">
+                  {detail?.purchasedSeatCount !== null && detail?.purchasedSeatCount !== undefined
+                    ? `${detail.purchasedSeatCount}명`
+                    : "자동 (Auto)"}
+                </span>
+              </div>
             </div>
 
             <div className="border-t border-border pt-4 mt-2 space-y-4 animate-fade-in">
@@ -676,16 +691,36 @@ export default function AdminBillingPageClient() {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-600 ml-1">
-                  이용 종료일 (Period End)
-                </label>
-                <Input
-                  type="date"
-                  value={editPeriodEnd}
-                  onChange={(e) => setEditPeriodEnd(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-600 ml-1">
+                    이용 종료일 (Period End)
+                  </label>
+                  <Input
+                    type="date"
+                    value={editPeriodEnd}
+                    onChange={(e) => setEditPeriodEnd(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-zinc-600 ml-1">
+                    멤버 한도 (Seats)
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={editSeatCount}
+                    onChange={(e) => setEditSeatCount(e.target.value)}
+                    disabled={editPlanCode === "FREE"}
+                    placeholder="지정 안 함 (자동 설정)"
+                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary disabled:bg-zinc-100 disabled:cursor-not-allowed"
+                  />
+                  <p className="px-1 text-[11px] font-medium leading-relaxed text-zinc-500 mt-1">
+                    빈 값이면 기존 값 유지 또는 현재 멤버 수 기준으로 자동 설정
+                  </p>
+                </div>
               </div>
 
               <div className="flex items-center gap-2 py-1">

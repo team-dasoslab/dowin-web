@@ -1,4 +1,4 @@
-import { ProfileBillingPageClient } from "@/app/[locale]/(protected)/profile/billing/ProfileBillingPageClient";
+import { ProfileBillingPageClient } from "@/app/[locale]/(protected)/workspace/billing/ProfileBillingPageClient";
 import { serverRuntimeConfig } from "@/config/server-runtime-config";
 import { redirect } from "next/navigation";
 
