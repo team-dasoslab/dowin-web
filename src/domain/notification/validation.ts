@@ -32,3 +32,7 @@ export const devicePushTokenRegisterSchema = z.object({
 export const devicePushTokenDisableSchema = z.object({
   token: z.string().min(1, "유효한 디바이스 토큰이 필요합니다."),
 });
+
+export const devicePushTokenStatusSchema = z.object({
+  token: z.string().min(1, "유효한 디바이스 토큰이 필요합니다."),
+});

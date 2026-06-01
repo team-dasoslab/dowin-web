@@ -812,6 +812,11 @@ export interface DevicePushTokenDisableRequest {
   token: string;
 }
 
+export interface DevicePushTokenStatusRequest {
+  /** @minLength 1 */
+  token: string;
+}
+
 export type WorkspaceMemberRole = typeof WorkspaceMemberRole[keyof typeof WorkspaceMemberRole];
 
 
@@ -1391,6 +1396,10 @@ export type PostNotificationsDevices200 = {
 
 export type DeleteNotificationsDevices200 = {
   success: boolean;
+};
+
+export type PostNotificationsDevicesStatus200 = {
+  notificationEnabled: boolean;
 };
 
 export type PostWorkspacesBody = {

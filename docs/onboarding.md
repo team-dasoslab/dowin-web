@@ -450,10 +450,11 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 
 ### 6.8. Notification / Push
 
-- `/api/notifications/devices`, `/api/push/send-daily` 라우트 존재
+- `/api/notifications/devices`, `/api/notifications/devices/status`, `/api/push/send-daily` 라우트 존재
 - 프로필 화면에서 앱 전용 푸시 알림 토글 제공
+- 프로필 알림 토글은 localStorage가 아니라 현재 기기 FCM 토큰의 서버 활성 상태를 기준으로 표시한다
 - 일일 기록 리마인드가 구현되어 있다
-- OpenAPI 계약에는 아직 포함되지 않은 보조 API다
+- 알림 API는 OpenAPI 계약 및 Orval 생성 클라이언트에 포함되어 있다
 
 관련 문서:
 

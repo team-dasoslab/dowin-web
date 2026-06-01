@@ -81,6 +81,20 @@ export class NotificationStorage {
       );
   }
 
+  async findDevicePushTokenForUser(
+    userId: number,
+    token: string,
+  ): Promise<DevicePushTokenRecord | null> {
+    return (
+      (await this.db.query.devicePushTokens.findFirst({
+        where: and(
+          eq(devicePushTokens.userId, userId),
+          eq(devicePushTokens.token, token),
+        ),
+      })) ?? null
+    );
+  }
+
   async disableDevicePushTokens(tokens: string[]): Promise<void> {
     if (tokens.length === 0) {
       return;

@@ -7,7 +7,6 @@ import {
   isNativeApp,
   requestNotificationPermission,
 } from "@/lib/bridge";
-import { DEVICE_NOTIFICATION_PREFERENCE_KEY } from "@/lib/client/notification-constants";
 import { useEffect, useState } from "react";
 
 export function useLoginPushPrompt() {
@@ -34,18 +33,13 @@ export function useLoginPushPrompt() {
 
     const promptAndRegister = async () => {
       try {
-        const currentPermission = getBridgeNotificationPermission();
-        
-        // If already granted, we don't need to prompt. The user might have just logged in
-        // on a device where they previously granted permission to the app.
-        // We could theoretically register here, but NotificationSettingControl handles 
-        // automatic sync on load if DEVICE_NOTIFICATION_PREFERENCE_KEY is 1.
-        if (currentPermission === "granted") {
-          return;
+        let currentPermission = getBridgeNotificationPermission();
+
+        if (currentPermission !== "granted") {
+          currentPermission = await requestNotificationPermission();
         }
 
-        const nextPermission = await requestNotificationPermission();
-        if (nextPermission !== "granted") {
+        if (currentPermission !== "granted") {
           return;
         }
 
@@ -65,8 +59,6 @@ export function useLoginPushPrompt() {
             notificationEnabled: true,
           },
         });
-
-        window.localStorage.setItem(DEVICE_NOTIFICATION_PREFERENCE_KEY, "1");
       } catch (error) {
         console.error("Failed to register push device after login prompt:", error);
       }
