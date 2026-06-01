@@ -26,7 +26,7 @@ interface MenuItem {
   id: string;
   icon: React.ReactNode;
   title: string;
-  description: string;
+  description?: string;
   danger?: boolean;
   href?: string;
   onClick?: () => void;
@@ -127,8 +127,7 @@ export default function WorkspaceSettingsPage() {
                       id: "billing",
                       icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
                       title: t("billingTitle"),
-                      description: t("billingDesc"),
-                      href: getWorkspacePath(workspaceId, "/profile/billing"),
+                      href: getWorkspacePath(workspaceId, "/workspace/billing"),
                     },
                   ]
                 : []),
@@ -136,28 +135,24 @@ export default function WorkspaceSettingsPage() {
                 id: "workspace-name",
                 icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
                 title: t("changeWorkspaceName"),
-                description: t("changeWorkspaceNameDesc"),
                 onClick: () => void changeWorkspaceName(),
               },
               {
                 id: "members",
                 icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
                 title: t("manageMembers"),
-                description: t("manageMembersDesc"),
-                href: getWorkspacePath(workspaceId, "/profile/members"),
+                href: getWorkspacePath(workspaceId, "/workspace/members"),
               },
               {
                 id: "invites",
                 icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
                 title: t("manageInvites"),
-                description: t("manageInvitesDesc"),
-                href: getWorkspacePath(workspaceId, "/profile/invites"),
+                href: getWorkspacePath(workspaceId, "/workspace/invites"),
               },
               {
                 id: "workspace-delete",
                 icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
                 title: t("workspaceDelete"),
-                description: t("workspaceDeleteDescFull"),
                 danger: true,
                 onClick: () => void deleteWorkspace(),
               },
@@ -167,7 +162,6 @@ export default function WorkspaceSettingsPage() {
                 id: "workspace-leave",
                 icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
                 title: t("workspaceLeave"),
-                description: t("workspaceLeaveDescFull"),
                 danger: true,
                 onClick: () => void leaveWorkspace(),
               },
@@ -365,7 +359,7 @@ function MenuItemRow({ item, isLast, isActionPending }: { item: MenuItem; isLast
           <p className={`text-[14px] font-bold ${item.danger ? "text-danger" : "text-text-primary"}`}>
             {item.title}
           </p>
-          <p className="text-[12px] text-text-secondary mt-0.5">{item.description}</p>
+          {item.description && <p className="text-[12px] text-text-secondary mt-0.5">{item.description}</p>}
         </div>
       </div>
       <div className="flex-shrink-0">

@@ -16,7 +16,7 @@ function buildPortalFailureRedirectUrl(
   code: string,
 ) {
   const requestUrl = new URL(request.url);
-  const fallbackUrl = new URL(`/${workspaceId}/profile/billing`, requestUrl);
+  const fallbackUrl = new URL(`/${workspaceId}/workspace/billing`, requestUrl);
   const referer = request.headers.get("referer");
 
   let redirectUrl = fallbackUrl;

@@ -7,7 +7,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/billing/_hooks/useProfileBillingActions";
+import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -18,12 +18,11 @@ import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
+import { Activity } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-type PlanCode = "BASIC" | "FREE" | "STANDARD";
 type EntitlementSource =
   | "POLAR"
   | "MANUAL_GRANT"
@@ -116,15 +115,6 @@ export function ProfileBillingPageClient() {
                 <h2 className="text-lg font-black tracking-tight text-zinc-900">
                   {billing.workspaceName}
                 </h2>
-                <p className="text-xs font-bold text-zinc-400">
-                  {t("basicPlanName")}
-                </p>
-                {billing.entitlementSource ? (
-                  <p className="mt-1 text-[11px] font-bold text-zinc-500">
-                    {t("entitlementSourceLabel")}:{" "}
-                    {getEntitlementSourceLabel(billing.entitlementSource, t)}
-                  </p>
-                ) : null}
               </div>
             </div>
 
@@ -188,6 +178,42 @@ export function ProfileBillingPageClient() {
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                  <Activity size={16} />
+                </div>
+                <span className="text-sm font-bold text-zinc-500">
+                  {t("statusLabel")}
+                </span>
+              </div>
+              <span
+                className={`text-sm font-black ${
+                  billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED"
+                    ? "text-success"
+                    : "text-zinc-400"
+                }`}
+              >
+                {billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED"
+                  ? t("statusActiveLabel")
+                  : t("statusInactiveLabel")}
+              </span>
+            </div>
+            {billing.purchasedSeatCount !== null && (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
+              <div className="flex items-center justify-between p-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                    <DowinIcon name="domain-people" size="16px" />
+                  </div>
+                  <span className="text-sm font-bold text-zinc-500">
+                    {t("purchasedSeatLabel")}
+                  </span>
+                </div>
+                <span className="text-sm font-black text-zinc-900">
+                  {billing.purchasedSeatCount} {t("seatUnit")}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-between p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
                   <DowinIcon name="domain-calendar" size="16px" />
                 </div>
                 <span className="text-sm font-bold text-zinc-500">
@@ -201,18 +227,6 @@ export function ProfileBillingPageClient() {
                   locale,
                 )}
               </span>
-            </div>
-            <div className="bg-zinc-50/50 p-5">
-              <p className="text-xs font-medium leading-relaxed text-zinc-500">
-                {getStatusDescription({
-                  status: billing.billingStatus,
-                  planCode: billing.planCode,
-                  entitlementSource: billing.entitlementSource,
-                  currentPeriodEnd: billing.currentPeriodEnd,
-                  locale,
-                  t,
-                })}
-              </p>
             </div>
           </Card>
         </section>
@@ -350,48 +364,6 @@ function formatDateLabel(
   }).format(date);
 }
 
-function getStatusDescription({
-  status,
-  planCode,
-  entitlementSource,
-  currentPeriodEnd,
-  locale,
-  t,
-}: {
-  status: BillingStatus;
-  planCode: PlanCode;
-  entitlementSource: EntitlementSource;
-  currentPeriodEnd: string | null | undefined;
-  locale: string;
-  t: ReturnType<typeof useTranslations<"ProfileBilling">>;
-}) {
-  const formattedDate = formatDateLabel(
-    currentPeriodEnd,
-    t("notAvailable"),
-    locale,
-  );
-
-  switch (status) {
-    case "ACTIVE":
-      if (entitlementSource && entitlementSource !== "POLAR") {
-        return t("statusDescNonPolarActive", {
-          source: getEntitlementSourceLabel(entitlementSource, t),
-        });
-      }
-      return t("statusDescActive", { date: formattedDate });
-    case "CANCELED":
-      return t("statusDescCanceled", { date: formattedDate });
-    case "EXPIRED":
-      return t("statusDescExpired");
-    case "REVOKED":
-      return t("statusDescRevoked");
-    case "NONE":
-    default:
-      return planCode === "BASIC"
-        ? t("statusDescBasicFallback")
-        : t("statusDescNoSubscription");
-  }
-}
 
 function getEntitlementSourceLabel(
   source: EntitlementSource,
