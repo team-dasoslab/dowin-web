@@ -126,30 +126,41 @@ export class DailyLogService {
       previousWeekStart,
       weekEnd,
     );
+    const logsByLeadMeasure = groupLogsByLeadMeasure(logs);
 
     return {
       weekStart: normalizedWeekStart,
       weekEnd,
       leadMeasures: measures.map((measure) => {
-        const measureLogs = logs.filter((log) => log.leadMeasureId === measure.id);
+        const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
         const logMap = Object.fromEntries(
           weekDates.map((date) => [date, null as boolean | null]),
         );
+        let achieved = 0;
+        let previousAchieved = 0;
 
         for (const log of measureLogs) {
           if (log.logDate in logMap) {
             logMap[log.logDate] = log.value;
           }
+
+          if (!log.value) {
+            continue;
+          }
+
+          if (log.logDate >= normalizedWeekStart && log.logDate <= weekEnd) {
+            achieved += 1;
+            continue;
+          }
+
+          if (
+            log.logDate >= previousWeekStart &&
+            log.logDate < normalizedWeekStart
+          ) {
+            previousAchieved += 1;
+          }
         }
 
-        const currentWeekLogs = measureLogs.filter(
-          (log) => log.logDate >= normalizedWeekStart && log.logDate <= weekEnd,
-        );
-        const previousWeekLogs = measureLogs.filter(
-          (log) =>
-            log.logDate >= previousWeekStart && log.logDate < normalizedWeekStart,
-        );
-        const achieved = currentWeekLogs.filter((log) => log.value).length;
         return {
           id: measure.id,
           name: measure.name,
@@ -164,7 +175,7 @@ export class DailyLogService {
               createdAt: measure.createdAt,
               currentAchieved: achieved,
               period: measure.period,
-              previousAchieved: previousWeekLogs.filter((log) => log.value).length,
+              previousAchieved,
               previousWeekStart,
               targetValue: measure.targetValue,
             })
@@ -231,19 +242,63 @@ export class DailyLogService {
       fetchStart,
       fetchEnd,
     );
+    const logsByLeadMeasure = groupLogsByLeadMeasure(logs);
+    const weekStartSet = new Set(weekStarts);
+    let totalAchieved = 0;
+
     const leadMeasures = measures.map((measure) => {
-      const measureLogs = logs.filter((log) => log.leadMeasureId === measure.id);
+      const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
       const logMap = Object.fromEntries(
         monthDates.map((date) => [date, null as boolean | null]),
       );
+      let achieved = 0;
+      let monthlySummaryAchieved = 0;
+      const weeklySummaryAchievedByWeek = new Map<string, number>();
 
       for (const log of measureLogs) {
-        if (log.logDate >= normalizedMonthStart && log.logDate <= monthEnd) {
+        const isInMonth =
+          log.logDate >= normalizedMonthStart && log.logDate <= monthEnd;
+
+        if (isInMonth) {
           logMap[log.logDate] = log.value;
+          if (log.value) {
+            achieved += 1;
+          }
+        }
+
+        if (!log.value) {
+          continue;
+        }
+
+        if (measure.period === "MONTHLY") {
+          if (isInMonth) {
+            monthlySummaryAchieved += 1;
+          }
+          continue;
+        }
+
+        const logWeekStart = getWeekStart(log.logDate);
+        if (weekStartSet.has(logWeekStart)) {
+          weeklySummaryAchievedByWeek.set(
+            logWeekStart,
+            (weeklySummaryAchievedByWeek.get(logWeekStart) ?? 0) + 1,
+          );
         }
       }
 
-      const achieved = measureLogs.filter((log) => log.logDate >= normalizedMonthStart && log.logDate <= monthEnd && log.value).length;
+      if (measure.period === "MONTHLY") {
+        totalAchieved += Math.min(monthlySummaryAchieved, measure.targetValue);
+      } else {
+        totalAchieved += weekStarts.reduce(
+          (weekAccumulator, weekStart) =>
+            weekAccumulator +
+            Math.min(
+              weeklySummaryAchievedByWeek.get(weekStart) ?? 0,
+              measure.targetValue,
+            ),
+          0,
+        );
+      }
 
       return {
         id: measure.id,
@@ -256,28 +311,6 @@ export class DailyLogService {
         achievementRate: getAchievementRate(achieved, measure.targetValue),
       };
     });
-    const totalAchieved = measures.reduce((accumulator, measure) => {
-      const measureLogs = logs.filter(
-        (log) => log.leadMeasureId === measure.id && log.value,
-      );
-
-      if (measure.period === "MONTHLY") {
-        const monthlyLogsCount = measureLogs.filter(
-          (log) => log.logDate >= normalizedMonthStart && log.logDate <= monthEnd
-        ).length;
-        return accumulator + Math.min(monthlyLogsCount, measure.targetValue);
-      }
-
-      const weeklyAchieved = weekStarts.reduce((weekAccumulator, weekStart) => {
-        const weekTrueCount = measureLogs.filter(
-          (log) => getWeekStart(log.logDate) === weekStart,
-        ).length;
-
-        return weekAccumulator + Math.min(weekTrueCount, measure.targetValue);
-      }, 0);
-
-      return accumulator + weeklyAchieved;
-    }, 0);
     const totalTarget = measures.reduce((accumulator, measure) => {
       if (measure.period === "MONTHLY") {
         return accumulator + measure.targetValue;
@@ -363,6 +396,21 @@ function getAchievementRate(achieved: number, targetValue: number) {
   }
 
   return Number(((Math.min(achieved, targetValue) / targetValue) * 100).toFixed(1));
+}
+
+function groupLogsByLeadMeasure(logs: DailyLogRecord[]) {
+  const byLeadMeasure = new Map<number, DailyLogRecord[]>();
+
+  for (const log of logs) {
+    const measureLogs = byLeadMeasure.get(log.leadMeasureId);
+    if (measureLogs) {
+      measureLogs.push(log);
+    } else {
+      byLeadMeasure.set(log.leadMeasureId, [log]);
+    }
+  }
+
+  return byLeadMeasure;
 }
 
 function getWeeklyGuide({
