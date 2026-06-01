@@ -37,8 +37,14 @@ export function Sidebar() {
   const getIsActive = (href: string) => {
     const hrefPathname = href.split("?")[0];
 
+    // 워크스페이스 하위 메뉴(billing, members, invites) 진입 시에도 '워크스페이스 설정' 메뉴가 active 되도록 예외 처리
+    const isWorkspaceMenu =
+      hrefPathname.endsWith("/workspace/settings") &&
+      pathname.includes("/workspace/");
+
     return (
       pathname === hrefPathname ||
+      isWorkspaceMenu ||
       (hrefPathname !== "/" &&
         pathname.startsWith(hrefPathname + "/") &&
         !filteredLinks.some((link) => {
