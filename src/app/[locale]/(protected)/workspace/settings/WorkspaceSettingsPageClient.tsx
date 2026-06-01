@@ -26,7 +26,7 @@ interface MenuItem {
   id: string;
   icon: React.ReactNode;
   title: string;
-  description: string;
+  description?: string;
   danger?: boolean;
   href?: string;
   onClick?: () => void;
@@ -66,7 +66,6 @@ export default function WorkspaceSettingsPage() {
   const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaces = allWorkspacesResponse?.status === 200 ? allWorkspacesResponse.data : [];
   
-  const workspacePlanCode = workspace?.planCode ?? "FREE";
   const showBillingSurface = publicRuntimeConfig.isDevelopment && !isNativeApp;
   const hasWorkspace = workspace !== null;
   const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
@@ -125,13 +124,10 @@ export default function WorkspaceSettingsPage() {
               ...(showBillingSurface
                 ? [
                     {
-                      id: workspacePlanCode === "STANDARD" ? "billing" : "pricing",
+                      id: "billing",
                       icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
-                      title: workspacePlanCode === "STANDARD" ? t("billingTitle") : t("pricingTitle"),
-                      description: workspacePlanCode === "STANDARD" ? t("billingDesc") : t("pricingDesc"),
-                      href: workspacePlanCode === "STANDARD"
-                        ? getWorkspacePath(workspaceId, "/profile/billing")
-                        : getWorkspacePath(workspaceId, "/pricing"),
+                      title: t("billingTitle"),
+                      href: getWorkspacePath(workspaceId, "/workspace/billing"),
                     },
                   ]
                 : []),
@@ -139,28 +135,24 @@ export default function WorkspaceSettingsPage() {
                 id: "workspace-name",
                 icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
                 title: t("changeWorkspaceName"),
-                description: t("changeWorkspaceNameDesc"),
                 onClick: () => void changeWorkspaceName(),
               },
               {
                 id: "members",
                 icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
                 title: t("manageMembers"),
-                description: t("manageMembersDesc"),
-                href: getWorkspacePath(workspaceId, "/profile/members"),
+                href: getWorkspacePath(workspaceId, "/workspace/members"),
               },
               {
                 id: "invites",
                 icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
                 title: t("manageInvites"),
-                description: t("manageInvitesDesc"),
-                href: getWorkspacePath(workspaceId, "/profile/invites"),
+                href: getWorkspacePath(workspaceId, "/workspace/invites"),
               },
               {
                 id: "workspace-delete",
                 icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
                 title: t("workspaceDelete"),
-                description: t("workspaceDeleteDescFull"),
                 danger: true,
                 onClick: () => void deleteWorkspace(),
               },
@@ -170,7 +162,6 @@ export default function WorkspaceSettingsPage() {
                 id: "workspace-leave",
                 icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
                 title: t("workspaceLeave"),
-                description: t("workspaceLeaveDescFull"),
                 danger: true,
                 onClick: () => void leaveWorkspace(),
               },
@@ -265,13 +256,8 @@ export default function WorkspaceSettingsPage() {
                 </p>
               </div>
               {!isNativeApp ? (
-                <span className={`inline-flex items-center h-6 rounded-button px-2.5 text-[10px] font-black tracking-wider border ${
-                    workspacePlanCode === "STANDARD"
-                      ? "border-primary/20 bg-primary/5 text-primary"
-                      : "border-zinc-200 bg-zinc-50 text-zinc-500"
-                  }`}
-                >
-                  {workspacePlanCode}
+                <span className="inline-flex h-6 items-center rounded-button border border-primary/20 bg-primary/5 px-2.5 text-[10px] font-black tracking-wider text-primary">
+                  {t("basicPlanName")}
                 </span>
               ) : null}
             </div>
@@ -373,7 +359,7 @@ function MenuItemRow({ item, isLast, isActionPending }: { item: MenuItem; isLast
           <p className={`text-[14px] font-bold ${item.danger ? "text-danger" : "text-text-primary"}`}>
             {item.title}
           </p>
-          <p className="text-[12px] text-text-secondary mt-0.5">{item.description}</p>
+          {item.description && <p className="text-[12px] text-text-secondary mt-0.5">{item.description}</p>}
         </div>
       </div>
       <div className="flex-shrink-0">

@@ -12,17 +12,21 @@ type BillingState =
   | "CANCELED"
   | "EXPIRED"
   | "REVOKED";
-type PlanCode = "FREE" | "STANDARD";
+type PlanCode = "BASIC" | "FREE" | "STANDARD";
 
 type BillingPort = Pick<
   BillingStorage,
+  | "listProviderProducts"
+  | "upsertProviderProduct"
   | "searchAdminBillingWorkspaces"
   | "findWorkspaceBillingAdminDetail"
   | "listBillingEventsForWorkspace"
   | "getRecentBillingRiskSummaries"
   | "appendBillingEvent"
   | "upsertWorkspaceBillingState"
+  | "upsertWorkspaceSeatEntitlement"
   | "updateWorkspaceBillingProjection"
+  | "countWorkspaceMembers"
 >;
 type AuditLogPort = Pick<AuditLogStorage, "create">;
 
@@ -44,6 +48,7 @@ type AdminBillingWorkspaceBase = {
   billingCustomerExternalRef: string | null;
   lastEventOccurredAt: string | null;
   updatedAt: string | null;
+  purchasedSeatCount: number | null;
   recentRefundCount: number;
   recentRevokedCount: number;
   requiresManualReview: boolean;
@@ -67,6 +72,17 @@ export type AdminBillingWorkspaceDetail = AdminBillingWorkspaceBase & {
   }>;
 };
 
+export type AdminBillingProviderProduct = {
+  id: number;
+  provider: "POLAR";
+  environment: "sandbox" | "production";
+  planCode: "BASIC" | "STANDARD";
+  providerProductId: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type BillingWorkspaceSearchResult = Awaited<
   ReturnType<BillingStorage["searchAdminBillingWorkspaces"]>
 >[number];
@@ -79,6 +95,50 @@ export class AdminBillingService {
     private billingStorage: BillingPort,
     private auditLogStorage: AuditLogPort,
   ) {}
+
+  async listProviderProducts(): Promise<AdminBillingProviderProduct[]> {
+    const products = await this.billingStorage.listProviderProducts();
+    return products.map(toAdminBillingProviderProduct);
+  }
+
+  async upsertProviderProduct(
+    adminUserId: number,
+    input: {
+      provider: "POLAR";
+      environment: "sandbox" | "production";
+      planCode: "BASIC" | "STANDARD";
+      providerProductId: string;
+      isActive?: boolean;
+      changeReason: string;
+    },
+  ): Promise<AdminBillingProviderProduct> {
+    const product = await this.billingStorage.upsertProviderProduct({
+      provider: input.provider,
+      environment: input.environment,
+      planCode: input.planCode,
+      providerProductId: input.providerProductId,
+      isActive: input.isActive ?? true,
+    });
+
+    await this.auditLogStorage.create({
+      actorType: "ADMIN",
+      actorAdminUserId: adminUserId,
+      entityType: "BILLING_PROVIDER_PRODUCT",
+      entityId: product.id,
+      actionType: "UPDATE",
+      metadata: JSON.stringify({
+        domain: "BILLING",
+        reason: input.changeReason,
+        provider: input.provider,
+        environment: input.environment,
+        planCode: input.planCode,
+        providerProductId: input.providerProductId,
+        isActive: input.isActive ?? true,
+      }),
+    });
+
+    return toAdminBillingProviderProduct(product);
+  }
 
   async listWorkspaces(filters?: {
     workspaceId?: number;
@@ -133,6 +193,7 @@ export class AdminBillingService {
       currentPeriodEnd?: string | null;
       cancelAtPeriodEnd?: boolean;
       billingOwnerUserId?: number | null;
+      purchasedSeatCount?: number | null;
       changeReason: string;
     },
   ): Promise<AdminBillingWorkspaceDetail> {
@@ -150,13 +211,24 @@ export class AdminBillingService {
     const nextEntitlementSource =
       input.entitlementSource !== undefined
         ? input.entitlementSource
-        : input.planCode === "STANDARD"
+        : input.planCode === "BASIC" || input.planCode === "STANDARD"
           ? ("MANUAL_GRANT" as EntitlementSource)
           : existing.entitlementSource ?? null;
     const nextBillingOwnerUserId =
       input.billingOwnerUserId !== undefined
         ? input.billingOwnerUserId
         : existing.billingOwnerUserId ?? null;
+    const shouldApplySeatEntitlement =
+      input.planCode === "BASIC" &&
+      (input.billingStatus === "ACTIVE" || input.billingStatus === "CANCELED");
+    const memberCount = shouldApplySeatEntitlement
+      ? await this.billingStorage.countWorkspaceMembers(workspaceId)
+      : 0;
+    const nextPurchasedSeatCount = shouldApplySeatEntitlement
+      ? Math.max(input.purchasedSeatCount ?? memberCount, memberCount, 1)
+      : input.purchasedSeatCount === null
+        ? 0
+        : null;
     const event = await this.billingStorage.appendBillingEvent({
       workspaceId,
       providerEventId: null,
@@ -177,6 +249,7 @@ export class AdminBillingService {
           currentPeriodEnd: currentPeriodEnd?.toISOString() ?? null,
           cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
           billingOwnerUserId: nextBillingOwnerUserId,
+          purchasedSeatCount: nextPurchasedSeatCount,
         },
       }),
       status: "ACCEPTED",
@@ -205,6 +278,14 @@ export class AdminBillingService {
       billingOwnerUserId: nextBillingOwnerUserId,
     });
 
+    if (nextPurchasedSeatCount !== null) {
+      await this.billingStorage.upsertWorkspaceSeatEntitlement({
+        workspaceId,
+        purchasedSeatCount: nextPurchasedSeatCount,
+        seatSource: "MANUAL_GRANT",
+      });
+    }
+
     await this.auditLogStorage.create({
       actorType: "ADMIN",
       actorAdminUserId: adminUserId,
@@ -225,6 +306,7 @@ export class AdminBillingService {
           currentPeriodEnd: currentPeriodEnd?.toISOString() ?? null,
           cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
           billingOwnerUserId: nextBillingOwnerUserId,
+          purchasedSeatCount: nextPurchasedSeatCount,
         },
       }),
     });
@@ -281,9 +363,32 @@ function toAdminBillingWorkspaceSummary(
     billingCustomerExternalRef: workspace.billingCustomerExternalRef ?? null,
     lastEventOccurredAt: workspace.lastEventOccurredAt?.toISOString() ?? null,
     updatedAt: workspace.updatedAt?.toISOString() ?? null,
+    purchasedSeatCount: workspace.purchasedSeatCount ?? null,
     recentRefundCount: riskSummary.recentRefundCount,
     recentRevokedCount: riskSummary.recentRevokedCount,
     requiresManualReview: totalRiskEvents >= BILLING_RISK_REVIEW_THRESHOLD,
+  };
+}
+
+function toAdminBillingProviderProduct(product: {
+  id: number;
+  provider: "POLAR";
+  environment: "sandbox" | "production";
+  planCode: "BASIC" | "STANDARD";
+  providerProductId: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}): AdminBillingProviderProduct {
+  return {
+    id: product.id,
+    provider: product.provider,
+    environment: product.environment,
+    planCode: product.planCode,
+    providerProductId: product.providerProductId,
+    isActive: product.isActive,
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
   };
 }
 
@@ -318,5 +423,6 @@ function snapshotBillingState(
     billingCustomerExternalRef: workspace.billingCustomerExternalRef ?? null,
     lastEventOccurredAt: workspace.lastEventOccurredAt?.toISOString() ?? null,
     updatedAt: workspace.updatedAt?.toISOString() ?? null,
+    purchasedSeatCount: workspace.purchasedSeatCount ?? null,
   };
 }

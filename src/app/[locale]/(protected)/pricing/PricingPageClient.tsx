@@ -1,15 +1,14 @@
 "use client";
 
-import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/billing/_hooks/useProfileBillingActions";
-import { Badge } from "@/components/ui/Badge";
+import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -19,32 +18,33 @@ import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-
-type EntitlementSource =
-  | "POLAR"
-  | "MANUAL_GRANT"
-  | "PARTNER"
-  | "INTERNAL_TEST"
-  | null;
 
 export function PricingPageClient() {
   const t = useTranslations("Pricing");
   const params = useParams();
+  const locale = useLocale();
   const isNativeApp = useNativeApp();
   const { data: workspaceResponse } = useGetWorkspacesMe();
-  const workspaceId = (params.workspaceId as string | undefined) ?? (workspaceResponse?.status === 200 ? (workspaceResponse?.data?.id ?? "") : "");
-  const { data: billingResponse, error, isLoading } = useGetWorkspacesWorkspaceIdBillingMe(workspaceId, {
-    query: {
-      retry: false,
-      enabled: !!workspaceId,
-    },
-  });
-  const { isCheckoutPending, startCheckout } = useProfileBillingActions();
+  const workspaceId =
+    (params.workspaceId as string | undefined) ??
+    (workspaceResponse?.status === 200 ? (workspaceResponse.data.id ?? "") : "");
+  const { data: billingResponse, error, isLoading } =
+    useGetWorkspacesWorkspaceIdBillingMe(workspaceId, {
+      query: {
+        retry: false,
+        enabled: Boolean(workspaceId),
+      },
+    });
+  const { openPortal, isPortalPending } = useProfileBillingActions(workspaceId);
 
   const hasNoWorkspace = getApiErrorStatus(error) === 404;
   const billing = billingResponse?.status === 200 ? billingResponse.data : null;
+  const canManageViaPolar =
+    Boolean(billing?.canManageBilling) &&
+    billing?.entitlementSource === "POLAR" &&
+    (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED");
 
   if (isLoading) {
     return <PricingSkeleton />;
@@ -62,20 +62,6 @@ export function PricingPageClient() {
     return <PricingErrorState />;
   }
 
-  const isAdmin = billing.canManageBilling;
-  const isPolarEntitlement = billing.entitlementSource === "POLAR";
-  const isStandard =
-    billing.planCode === "STANDARD" ||
-    billing.billingStatus === "ACTIVE" ||
-    billing.billingStatus === "CANCELED";
-  const canCheckout =
-    isAdmin &&
-    !isStandard &&
-    !billing.requiresManualReview &&
-    (billing.billingStatus === "NONE" ||
-      billing.billingStatus === "EXPIRED" ||
-      billing.billingStatus === "REVOKED");
-
   return (
     <div className="min-h-screen bg-zinc-50/50">
       <ProtectedPageContainer className="space-y-8 lg:space-y-12">
@@ -84,7 +70,7 @@ export function PricingPageClient() {
           description={t("description")}
         />
 
-        <Card className="space-y-4 border-zinc-200 bg-white p-5 md:p-6">
+        <Card className="space-y-5 border-zinc-200 bg-white p-5 md:p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <p className="text-xs font-bold text-zinc-400">
@@ -93,155 +79,72 @@ export function PricingPageClient() {
               <h2 className="text-xl font-black tracking-tight text-zinc-900">
                 {t("heroTitle")}
               </h2>
-              <p className="text-sm font-medium leading-relaxed text-zinc-500">
-                {t("heroDesc")}
-              </p>
             </div>
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-zinc-50 text-primary">
               <DowinIcon name="domain-wallet" size="24px" />
             </div>
           </div>
 
-          {!isAdmin ? (
+          <div className="grid gap-3 rounded-content border border-zinc-100 bg-zinc-50/60 p-4 sm:grid-cols-3">
+            <InfoItem label={t("planLabel")} value={t("basicPlanName")} />
+            <InfoItem
+              label={t("statusLabel")}
+              value={t(`status.${billing.billingStatus}`)}
+            />
+            <InfoItem
+              label={t("periodEndLabel")}
+              value={formatDateLabel(
+                billing.currentPeriodEnd,
+                t("notAvailable"),
+                locale,
+              )}
+            />
+          </div>
+
+          {!billing.canManageBilling ? (
             <div className="rounded-content border border-zinc-200 bg-zinc-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-zinc-500">
               {t("memberNotice")}
             </div>
           ) : null}
 
-          {billing.requiresManualReview ? (
-            <div className="rounded-content border border-red-200 bg-red-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-red-700/80">
-              {t("reviewRequiredNotice")}
+          {billing.entitlementSource && billing.entitlementSource !== "POLAR" ? (
+            <div className="rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+              {t("nonPolarEntitlementNotice")}
             </div>
           ) : null}
 
-          {isStandard && !isPolarEntitlement ? (
-            <div className="rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
-              {t("nonPolarEntitlementNotice", {
-                source: getPricingEntitlementSourceLabel(
-                  billing.entitlementSource,
-                  t,
-                ),
-              })}
-            </div>
+          {canManageViaPolar ? (
+            <Button
+              type="button"
+              onClick={() => void openPortal()}
+              disabled={isPortalPending}
+              className="btn-dowin-primary h-11 w-full text-sm font-black sm:w-auto sm:px-6"
+            >
+              {isPortalPending ? t("portalLoading") : t("portalButton")}
+            </Button>
           ) : null}
         </Card>
 
         <section className="space-y-4">
-          <SectionHeader title={t("plansTitle")} description={t("plansDesc")} />
-
-          <div className="grid gap-4 xl:grid-cols-2">
-            <PlanCard
-              badge={t("freeBadge")}
-              title={t("freeTitle")}
-              subtitle={t("freeSubtitle")}
-              price={t("freePrice")}
-              priceSuffix={t("freePriceSuffix")}
-              features={[
-                t("freeFeature1"),
-                t("freeFeature2"),
-                t("freeFeature3"),
-                t("freeFeature4"),
-              ]}
-              footer={isStandard ? t("freeCurrentBlocked") : t("freeCurrentLabel")}
-              tone="default"
-              cta={
-                <Button
-                  type="button"
-                  disabled
-                  className="h-11 w-full border border-zinc-200 bg-zinc-100 text-sm font-black text-zinc-500"
-                >
-                  {isStandard ? t("freeCurrentBlocked") : t("freeCurrentLabel")}
-                </Button>
-              }
-            />
-
-            <PlanCard
-              badge={t("standardBadge")}
-              title={t("standardTitle")}
-              subtitle={t("standardSubtitle")}
-              price={t("standardPrice")}
-              priceSuffix={t("standardPriceSuffix")}
-              features={[
-                t("standardFeature1"),
-                t("standardFeature2"),
-                t("standardFeature3"),
-                t("standardFeature4"),
-              ]}
-              footer={t("standardFooter")}
-              tone="primary"
-              cta={
-                isStandard ? (
-                  <Button
-                    asChild
-                    className="h-11 w-full border border-primary/15 bg-primary/10 text-sm font-black text-primary"
-                  >
-                    <Link href={getWorkspacePath(workspaceId, "/profile/billing")}>
-                      {isPolarEntitlement
-                        ? t("manageButton")
-                        : t("viewGrantButton")}
-                    </Link>
-                  </Button>
-                ) : canCheckout ? (
-                  <Button
-                    type="button"
-                    onClick={startCheckout}
-                    disabled={isCheckoutPending}
-                    className={`h-11 w-full text-sm font-black ${
-                      isCheckoutPending
-                        ? "cursor-not-allowed bg-zinc-300 text-white"
-                        : "btn-dowin-primary"
-                    }`}
-                  >
-                    {isCheckoutPending
-                      ? t("checkoutLoading")
-                      : t("checkoutButton")}
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    disabled
-                    className="h-11 w-full border border-zinc-200 bg-zinc-100 text-sm font-black text-zinc-500"
-                  >
-                    {isAdmin
-                      ? t("reviewRequiredCta")
-                      : t("memberUpgradeBlocked")}
-                  </Button>
-                )
-              }
-            />
+          <SectionHeader
+            title={t("cancelGuideTitle")}
+            description={t("cancelGuideDesc")}
+          />
+          <div className="grid gap-4 md:grid-cols-3">
+            <GuideCard title={t("cancelStep1Title")} desc={t("cancelStep1Desc")} />
+            <GuideCard title={t("cancelStep2Title")} desc={t("cancelStep2Desc")} />
+            <GuideCard title={t("cancelStep3Title")} desc={t("cancelStep3Desc")} />
           </div>
         </section>
 
-        <section>
-          <Card className="border-zinc-200 bg-zinc-100/50 p-5">
-            <h3 className="flex items-center gap-2 text-[14px] font-black text-zinc-900">
-              <DowinIcon
-                name="status-info"
-                size="16px"
-                className="text-zinc-400"
-              />
-              {t("downgradePolicyTitle")}
-            </h3>
-            <p className="mt-2 text-[12px] font-medium leading-relaxed text-zinc-500">
-              {t("downgradePolicyDesc")}
-            </p>
-          </Card>
-        </section>
-
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
-          <Link
-            href="/billing-policy"
-            className="transition-colors"
-          >
+          <Link href="/billing-policy" className="transition-colors">
             {t("billingPolicyLink")}
           </Link>
           <Link href="/terms" className="transition-colors">
             {t("termsLink")}
           </Link>
-          <Link
-            href="/privacy"
-            className="transition-colors"
-          >
+          <Link href="/privacy" className="transition-colors">
             {t("privacyLink")}
           </Link>
           <Link
@@ -256,112 +159,24 @@ export function PricingPageClient() {
   );
 }
 
-function getPricingEntitlementSourceLabel(
-  source: EntitlementSource,
-  t: ReturnType<typeof useTranslations<"Pricing">>,
-) {
-  switch (source) {
-    case "POLAR":
-      return t("entitlementSourcePolar");
-    case "MANUAL_GRANT":
-      return t("entitlementSourceManualGrant");
-    case "PARTNER":
-      return t("entitlementSourcePartner");
-    case "INTERNAL_TEST":
-      return t("entitlementSourceInternalTest");
-    default:
-      return t("freeTitle");
-  }
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-[11px] font-black uppercase tracking-[0.12em] text-zinc-400">
+        {label}
+      </p>
+      <p className="text-sm font-black text-zinc-900">{value}</p>
+    </div>
+  );
 }
 
-function PlanCard({
-  badge,
-  title,
-  subtitle,
-  price,
-  priceSuffix,
-  features,
-  footer,
-  cta,
-  tone,
-}: {
-  badge: string;
-  title: string;
-  subtitle: string;
-  price: string;
-  priceSuffix: string;
-  features: string[];
-  footer: string;
-  cta: React.ReactNode;
-  tone: "default" | "primary";
-}) {
+function GuideCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <Card
-      className={`rounded-content border p-5 md:p-6 ${
-        tone === "primary"
-          ? "border-primary/20 bg-primary/5"
-          : "border-zinc-200 bg-white"
-      }`}
-    >
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Badge
-            className={`inline-flex rounded-button border px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.12em] ${
-              tone === "primary"
-                ? "border-primary/20 bg-white text-primary"
-                : "border-zinc-200 bg-zinc-50 text-zinc-500"
-            }`}
-          >
-            {badge}
-          </Badge>
-          <div className="space-y-1">
-            <h3 className="text-lg font-black tracking-tight text-zinc-900">
-              {title}
-            </h3>
-            <p className="text-sm font-medium leading-relaxed text-zinc-500">
-              {subtitle}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-end gap-2">
-          <span
-            className={`text-3xl font-black tracking-tight ${
-              tone === "primary" ? "text-primary" : "text-zinc-900"
-            }`}
-          >
-            {price}
-          </span>
-          <span className="pb-1 text-sm font-bold text-zinc-400">
-            {priceSuffix}
-          </span>
-        </div>
-
-        <div className="space-y-2">
-          {features.map((feature) => (
-            <div key={feature} className="flex items-start gap-2.5">
-              <div
-                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                  tone === "primary"
-                    ? "bg-primary/10 text-primary"
-                    : "bg-zinc-100 text-zinc-500"
-                }`}
-              >
-                <DowinIcon name="action-checkmark" size="12px" />
-              </div>
-              <p className="text-[13px] font-bold leading-6 text-zinc-800">
-                {feature}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-[12px] font-medium leading-relaxed text-zinc-500">
-          {footer}
-        </p>
-
-        {cta}
-      </div>
+    <Card className="space-y-2 border-zinc-200 bg-white p-5">
+      <h3 className="text-[14px] font-black text-zinc-900">{title}</h3>
+      <p className="text-[12px] font-medium leading-relaxed text-zinc-500">
+        {desc}
+      </p>
     </Card>
   );
 }
@@ -381,7 +196,9 @@ function PricingUnavailableInAppState() {
               asChild
               className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
             >
-              <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile")}>
+                {t("appUnavailableAction")}
+              </Link>
             </Button>
           }
           icon={
@@ -449,13 +266,34 @@ function PricingSkeleton() {
     <div className="min-h-screen bg-zinc-50/50">
       <ProtectedPageContainer isLoading>
         <div className="h-10 w-48 rounded-content bg-zinc-100" />
-        <div className="h-32 rounded-content bg-zinc-100" />
-        <div className="grid gap-4 xl:grid-cols-2">
-          <div className="h-[420px] rounded-content bg-zinc-100" />
-          <div className="h-[420px] rounded-content bg-zinc-100" />
+        <div className="h-56 rounded-content bg-zinc-100" />
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="h-32 rounded-content bg-zinc-100" />
+          <div className="h-32 rounded-content bg-zinc-100" />
+          <div className="h-32 rounded-content bg-zinc-100" />
         </div>
-        <div className="h-64 rounded-content bg-zinc-100" />
       </ProtectedPageContainer>
     </div>
   );
+}
+
+function formatDateLabel(
+  value: string | null | undefined,
+  fallback: string,
+  locale = "ko",
+) {
+  if (!value) {
+    return fallback;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return fallback;
+  }
+
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ko-KR", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(date);
 }

@@ -18,7 +18,7 @@ export type ProductUpdate = {
   ctaLabel: "바로 써보기";
   ctaHref: string;
   isMajor: boolean;
-  plan?: "FREE" | "STANDARD";
+  plan?: "BASIC" | "FREE" | "STANDARD";
 };
 
 /**

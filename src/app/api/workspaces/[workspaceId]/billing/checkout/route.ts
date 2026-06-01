@@ -4,48 +4,73 @@ import { createPolarBillingClient } from "@/domain/billing/polar";
 import { BillingService } from "@/domain/billing/services/billing.service";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import {
-  billingCheckoutBodySchema,
-  billingCheckoutHeaderSchema,
+  workspaceBillingCheckoutHeaderSchema,
+  workspaceBillingCheckoutSchema,
 } from "@/domain/billing/validation";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
+import { getLocale } from "@/lib/server/locale";
+import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 
-export const POST = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
-  const session = await getSessionWithRefresh(db);
+export const POST = withErrorHandler(
+  async (
+    request: Request,
+    { params }: { params: Promise<{ workspaceId: string }> },
+  ) => {
+    const { workspaceId } = await params;
+    const { env } = getCloudflareContext();
+    const db = getDb(env.DB);
+    const session = await getSessionWithRefresh(db);
 
-  if (!session) {
-    return await apiError("UNAUTHORIZED");
-  }
+    if (!session) {
+      return await apiError("UNAUTHORIZED");
+    }
 
-  const headers = billingCheckoutHeaderSchema.safeParse({
-    idempotencyKey: request.headers.get("Idempotency-Key"),
-  });
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: session.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
+    }
 
-  if (!headers.success) {
-    return await apiError("VALIDATION_ERROR", headers.error.flatten().fieldErrors);
-  }
+    const headers = workspaceBillingCheckoutHeaderSchema.safeParse({
+      idempotencyKey: request.headers.get("Idempotency-Key"),
+    });
 
-  const body = billingCheckoutBodySchema.safeParse(await request.json());
+    if (!headers.success) {
+      return await apiError(
+        "VALIDATION_ERROR",
+        headers.error.flatten().fieldErrors,
+      );
+    }
 
-  if (!body.success) {
-    return await apiError("VALIDATION_ERROR", body.error.flatten().fieldErrors);
-  }
+    const json = await request.json().catch(() => ({}));
+    const body = workspaceBillingCheckoutSchema.safeParse(json);
 
-  const service = new BillingService(
-    new WorkspaceStorage(db),
-    new BillingStorage(db),
-    createPolarBillingClient(env),
-  );
+    if (!body.success) {
+      return await apiError("VALIDATION_ERROR", body.error.flatten().fieldErrors);
+    }
 
-  const result = await service.prepareCheckout(workspaceId, session.userId,
-    headers.data.idempotencyKey,
-    body.data.locale,
-  );
+    const locale = await getLocale();
+    const service = new BillingService(
+      new WorkspaceStorage(db),
+      new BillingStorage(db),
+      createPolarBillingClient(env),
+    );
 
-  return apiSuccess(result);
-});
+    const result = await service.startBasicCheckout({
+      workspaceUid: workspaceId,
+      userId: session.userId,
+      seatCount: body.data.seatCount,
+      locale,
+      idempotencyKey: headers.data.idempotencyKey,
+    });
+
+    return apiSuccess(result, 201);
+  },
+);

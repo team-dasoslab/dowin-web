@@ -32,10 +32,10 @@ describe("TeamMemoService", () => {
     role: "MEMBER" as const,
     membershipId: 100,
     entitlement: {
-      canAccessStandardFeatures: false,
-      entitlementSource: null,
-      billingStatus: "NONE" as const,
-      planCode: "FREE" as const,
+      canAccessBasicSubscription: true,
+      entitlementSource: "POLAR" as const,
+      billingStatus: "ACTIVE" as const,
+      planCode: "BASIC" as const,
     },
   } satisfies WorkspaceAccessContext;
 
@@ -83,6 +83,23 @@ describe("TeamMemoService", () => {
     });
   });
 
+  it("Basic entitlement가 없으면 메모 목록을 조회할 수 없다", async () => {
+    const inactiveContext = {
+      ...mockContext,
+      entitlement: {
+        canAccessBasicSubscription: false,
+        entitlementSource: null,
+        billingStatus: "NONE" as const,
+        planCode: "FREE" as const,
+      },
+    } satisfies WorkspaceAccessContext;
+
+    await expect(
+      service.listTeamMemos(inactiveContext, 12),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+    expect(listByWorkspaceAndTarget).not.toHaveBeenCalled();
+  });
+
   it("메모를 생성한다", async () => {
     create.mockResolvedValue({
       id: 2,
@@ -117,6 +134,26 @@ describe("TeamMemoService", () => {
         content: "다음 액션 정리",
       }),
     );
+  });
+
+  it("Basic entitlement가 없으면 메모를 생성할 수 없다", async () => {
+    const inactiveContext = {
+      ...mockContext,
+      entitlement: {
+        canAccessBasicSubscription: false,
+        entitlementSource: null,
+        billingStatus: "NONE" as const,
+        planCode: "FREE" as const,
+      },
+    } satisfies WorkspaceAccessContext;
+
+    await expect(
+      service.createTeamMemo(inactiveContext, {
+        targetUserId: 12,
+        content: "다음 액션 정리",
+      }),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+    expect(create).not.toHaveBeenCalled();
   });
 
   it("작성자 또는 ADMIN은 메모 완료 상태를 변경할 수 있다", async () => {

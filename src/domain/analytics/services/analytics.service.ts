@@ -71,8 +71,8 @@ export class AnalyticsService {
     leadMeasureBreakdown: ExportMeasureBreakdown[];
     dailyRows: ExportRow[];
   }> {
-    if (!context.entitlement.canAccessStandardFeatures) {
-      throw new ForbiddenError("STANDARD_PLAN_REQUIRED");
+    if (!context.entitlement.canAccessBasicSubscription) {
+      throw new ForbiddenError("BASIC_SUBSCRIPTION_REQUIRED");
     }
 
     const scoreboard = await this.scoreboardStorage.findActiveScoreboard(

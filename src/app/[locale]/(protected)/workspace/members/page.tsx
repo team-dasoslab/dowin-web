@@ -11,12 +11,11 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
-import { MemberListItem } from "@/app/[locale]/(protected)/profile/members/_components/MemberListItem";
-import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/profile/members/_hooks/useRemoveWorkspaceMember";
-import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/profile/members/_hooks/useTransferWorkspaceAdmin";
+import { MemberListItem } from "@/app/[locale]/(protected)/workspace/members/_components/MemberListItem";
+import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/workspace/members/_hooks/useRemoveWorkspaceMember";
+import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/workspace/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -29,7 +28,6 @@ import { useTranslations } from "next-intl";
 
 export default function ProfileMembersPage() {
   const t = useTranslations("ProfileMembers");
-  const isNativeApp = useNativeApp();
   const workspaceParamId = useParams().workspaceId as string | undefined;
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
@@ -99,6 +97,10 @@ export default function ProfileMembersPage() {
     return <NoAccessState />;
   }
 
+  const memberLimit = workspace.freeMemberLimit ?? 10;
+  const isAtOrOverMemberLimit =
+    workspace.isOverFreeMemberLimit || members.length >= memberLimit;
+
   return (
     <div className="min-h-screen bg-slate-50/50">
       <ProtectedPageContainer>
@@ -139,7 +141,7 @@ export default function ProfileMembersPage() {
             asChild
             className="btn-dowin-primary rounded-content px-3 py-2 text-xs font-bold"
           >
-            <Link href={getWorkspacePath(workspaceParamId, "/profile/invites")}>
+            <Link href={getWorkspacePath(workspaceParamId, "/workspace/invites")}>
               {t("invitesCardButton")}
             </Link>
           </Button>
@@ -150,13 +152,11 @@ export default function ProfileMembersPage() {
             <h2 className="text-sm font-bold text-text-primary">
               {t("currentMembersTitle")}
               <span
-                className={`ml-2 text-xs font-semibold ${workspace.planCode !== "STANDARD" && members.length >= 10 ? "text-danger" : "text-text-secondary"}`}
+                className={`ml-2 text-xs font-semibold ${
+                  isAtOrOverMemberLimit ? "text-danger" : "text-text-secondary"
+                }`}
               >
-                {isNativeApp
-                  ? `${members.length} / 10`
-                  : workspace.planCode === "STANDARD"
-                    ? members.length
-                    : `${members.length} / 10`}
+                {`${members.length} / ${memberLimit}`}
               </span>
             </h2>
             <p className="text-[11px] text-text-muted">

@@ -9,11 +9,8 @@ import {
   getWeekDates,
   isValidDateString,
 } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
-import {
-  getApiErrorCode,
-  getApiErrorStatus,
-} from "@/lib/client/frontend-api";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { getApiErrorStatus } from "@/lib/client/frontend-api";
+import { useEffect, useState } from "react";
 
 const getWeekDatesFromStart = (weekStart?: string) => {
   if (!weekStart) {
@@ -36,7 +33,6 @@ export const useTeamDashboard = (workspaceId: string) => {
   const selectedWeekStart = getWeekDates(selectedDate)[0] ?? today;
   const currentWeekStart = getWeekDates(today)[0] ?? today;
   const {
-    data: workspaceResponse,
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
@@ -44,24 +40,6 @@ export const useTeamDashboard = (workspaceId: string) => {
         getApiErrorStatus(error) !== 404 && failureCount < 2,
     },
   });
-  const workspace =
-    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
-  const isFreePlan = workspace?.planCode === "FREE" || !workspace?.planCode;
-  const historyLimitDate = useMemo(() => {
-    const [year, month] = today.split("-").map(Number);
-    const limitDate = new Date(Date.UTC(year, month - 6, 1));
-    return limitDate.toISOString().slice(0, 10);
-  }, [today]);
-  const isAllowedWeek = useCallback(
-    (weekStart: string) => {
-      if (!isFreePlan) {
-        return true;
-      }
-
-      return addDays(weekStart, 6) >= historyLimitDate;
-    },
-    [historyLimitDate, isFreePlan],
-  );
   const { data, isLoading, isFetching, error } = useGetWorkspacesWorkspaceIdDashboardTeam(
     workspaceId,
     selectedWeekStart ? { weekStart: selectedWeekStart } : undefined,
@@ -92,10 +70,6 @@ export const useTeamDashboard = (workspaceId: string) => {
   const movePeriod = (direction: -1 | 1) => {
     const nextWeekStart = addDays(selectedWeekStart, direction * 7);
 
-    if (direction === -1 && !isAllowedWeek(nextWeekStart)) {
-      return;
-    }
-
     setSelectedDateState(nextWeekStart);
   };
   const setSelectedDate = (value: string) => {
@@ -104,29 +78,20 @@ export const useTeamDashboard = (workspaceId: string) => {
     }
 
     const nextWeekStart = getWeekDates(value)[0] ?? value;
-    if (!isAllowedWeek(nextWeekStart)) {
-      return;
-    }
-
     setSelectedDateState(nextWeekStart);
   };
   const resetToToday = () => {
     setSelectedDateState(today);
   };
-  const isHistoryLimited =
-    getApiErrorStatus(error) === 403 &&
-    getApiErrorCode(error) === "FREE_PLAN_HISTORY_LIMIT_REACHED";
   const hasNoWorkspace =
     getApiErrorStatus(error) === 404 || getApiErrorStatus(workspaceError) === 404;
 
   return {
     dashboard,
     hasNoWorkspace,
-    historyLimitDate: isFreePlan ? historyLimitDate : undefined,
-    isHistoryLimited,
     isLoading,
     isPeriodLoading: isFetching,
-    isPreviousDisabled: !isAllowedWeek(addDays(selectedWeekStart, -7)),
+    isPreviousDisabled: false,
     isResetVisible: selectedWeekStart !== currentWeekStart,
     movePeriod,
     resetToToday,

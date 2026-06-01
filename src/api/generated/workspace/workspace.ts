@@ -34,6 +34,10 @@ import type {
   PutWorkspacesIdBody,
   UnauthorizedErrorResponse,
   Workspace,
+  WorkspaceCheckoutCompleteRequest,
+  WorkspaceCheckoutCompleteResponse,
+  WorkspaceCheckoutRequest,
+  WorkspaceCheckoutResponse,
   WorkspaceCurrentUpdateRequest,
   WorkspaceInvite,
   WorkspaceInviteCreateRequest,
@@ -172,13 +176,8 @@ export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces
 
 
 /**
- * @summary [ADMIN] 새 워크스페이스 생성
+ * @summary 새 워크스페이스 직접 생성 (Basic checkout 필요)
  */
-export type postWorkspacesResponse201 = {
-  data: Workspace
-  status: 201
-}
-
 export type postWorkspacesResponse401 = {
   data: UnauthorizedErrorResponse
   status: 401
@@ -189,14 +188,17 @@ export type postWorkspacesResponse403 = {
   status: 403
 }
 
-export type postWorkspacesResponseSuccess = (postWorkspacesResponse201) & {
-  headers: Headers;
-};
-export type postWorkspacesResponseError = (postWorkspacesResponse401 | postWorkspacesResponse403) & {
+export type postWorkspacesResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+;
+export type postWorkspacesResponseError = (postWorkspacesResponse401 | postWorkspacesResponse403 | postWorkspacesResponse409) & {
   headers: Headers;
 };
 
-export type postWorkspacesResponse = (postWorkspacesResponseSuccess | postWorkspacesResponseError)
+export type postWorkspacesResponse = (postWorkspacesResponseError)
 
 export const getPostWorkspacesUrl = () => {
 
@@ -253,7 +255,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PostWorkspacesMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary [ADMIN] 새 워크스페이스 생성
+ * @summary 새 워크스페이스 직접 생성 (Basic checkout 필요)
  */
 export const usePostWorkspaces = <TError = UnauthorizedErrorResponse | ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspaces>>, TError,{data: PostWorkspacesBody}, TContext>, request?: SecondParameter<typeof customInstance>}
@@ -264,6 +266,209 @@ export const usePostWorkspaces = <TError = UnauthorizedErrorResponse | ErrorResp
         TContext
       > => {
       return useMutation(getPostWorkspacesMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Basic seat 워크스페이스 checkout 시작
+ */
+export type postWorkspacesCheckoutResponse201 = {
+  data: WorkspaceCheckoutResponse
+  status: 201
+}
+
+export type postWorkspacesCheckoutResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postWorkspacesCheckoutResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postWorkspacesCheckoutResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postWorkspacesCheckoutResponseSuccess = (postWorkspacesCheckoutResponse201) & {
+  headers: Headers;
+};
+export type postWorkspacesCheckoutResponseError = (postWorkspacesCheckoutResponse401 | postWorkspacesCheckoutResponse409 | postWorkspacesCheckoutResponse422) & {
+  headers: Headers;
+};
+
+export type postWorkspacesCheckoutResponse = (postWorkspacesCheckoutResponseSuccess | postWorkspacesCheckoutResponseError)
+
+export const getPostWorkspacesCheckoutUrl = () => {
+
+
+  
+
+  return `/api/workspaces/checkout`
+}
+
+export const postWorkspacesCheckout = async (workspaceCheckoutRequest: WorkspaceCheckoutRequest, options?: RequestInit): Promise<postWorkspacesCheckoutResponse> => {
+  
+  return customInstance<postWorkspacesCheckoutResponse>(getPostWorkspacesCheckoutUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      workspaceCheckoutRequest,)
+  }
+);}
+  
+
+
+
+export const getPostWorkspacesCheckoutMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesCheckout>>, TError,{data: WorkspaceCheckoutRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesCheckout>>, TError,{data: WorkspaceCheckoutRequest}, TContext> => {
+
+const mutationKey = ['postWorkspacesCheckout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesCheckout>>, {data: WorkspaceCheckoutRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postWorkspacesCheckout(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostWorkspacesCheckoutMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesCheckout>>>
+    export type PostWorkspacesCheckoutMutationBody = WorkspaceCheckoutRequest
+    export type PostWorkspacesCheckoutMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary Basic seat 워크스페이스 checkout 시작
+ */
+export const usePostWorkspacesCheckout = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesCheckout>>, TError,{data: WorkspaceCheckoutRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postWorkspacesCheckout>>,
+        TError,
+        {data: WorkspaceCheckoutRequest},
+        TContext
+      > => {
+      return useMutation(getPostWorkspacesCheckoutMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Basic seat 결제 검증 후 워크스페이스 생성
+ */
+export type postWorkspacesCheckoutCompleteResponse201 = {
+  data: WorkspaceCheckoutCompleteResponse
+  status: 201
+}
+
+export type postWorkspacesCheckoutCompleteResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postWorkspacesCheckoutCompleteResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postWorkspacesCheckoutCompleteResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postWorkspacesCheckoutCompleteResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postWorkspacesCheckoutCompleteResponseSuccess = (postWorkspacesCheckoutCompleteResponse201) & {
+  headers: Headers;
+};
+export type postWorkspacesCheckoutCompleteResponseError = (postWorkspacesCheckoutCompleteResponse401 | postWorkspacesCheckoutCompleteResponse404 | postWorkspacesCheckoutCompleteResponse409 | postWorkspacesCheckoutCompleteResponse422) & {
+  headers: Headers;
+};
+
+export type postWorkspacesCheckoutCompleteResponse = (postWorkspacesCheckoutCompleteResponseSuccess | postWorkspacesCheckoutCompleteResponseError)
+
+export const getPostWorkspacesCheckoutCompleteUrl = () => {
+
+
+  
+
+  return `/api/workspaces/checkout/complete`
+}
+
+export const postWorkspacesCheckoutComplete = async (workspaceCheckoutCompleteRequest: WorkspaceCheckoutCompleteRequest, options?: RequestInit): Promise<postWorkspacesCheckoutCompleteResponse> => {
+  
+  return customInstance<postWorkspacesCheckoutCompleteResponse>(getPostWorkspacesCheckoutCompleteUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      workspaceCheckoutCompleteRequest,)
+  }
+);}
+  
+
+
+
+export const getPostWorkspacesCheckoutCompleteMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesCheckoutComplete>>, TError,{data: WorkspaceCheckoutCompleteRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesCheckoutComplete>>, TError,{data: WorkspaceCheckoutCompleteRequest}, TContext> => {
+
+const mutationKey = ['postWorkspacesCheckoutComplete'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesCheckoutComplete>>, {data: WorkspaceCheckoutCompleteRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postWorkspacesCheckoutComplete(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostWorkspacesCheckoutCompleteMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesCheckoutComplete>>>
+    export type PostWorkspacesCheckoutCompleteMutationBody = WorkspaceCheckoutCompleteRequest
+    export type PostWorkspacesCheckoutCompleteMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary Basic seat 결제 검증 후 워크스페이스 생성
+ */
+export const usePostWorkspacesCheckoutComplete = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesCheckoutComplete>>, TError,{data: WorkspaceCheckoutCompleteRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postWorkspacesCheckoutComplete>>,
+        TError,
+        {data: WorkspaceCheckoutCompleteRequest},
+        TContext
+      > => {
+      return useMutation(getPostWorkspacesCheckoutCompleteMutationOptions(options), queryClient);
     }
     /**
  * @summary 현재 active 워크스페이스 정보 조회

@@ -87,7 +87,12 @@ describe("POST /api/auth/signup", () => {
     );
 
     expect(response.status).toBe(201);
-    expect(mockSignup).toHaveBeenCalledWith("john123", "존", "newSecurePass1!", "ko");
+    expect(mockSignup).toHaveBeenCalledWith(
+      "john123",
+      "존",
+      "newSecurePass1!",
+      "ko",
+    );
     expect(mockCookieSet).toHaveBeenCalledTimes(1);
     await expect(response.json()).resolves.toEqual({
       user: {

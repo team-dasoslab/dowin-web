@@ -26,5 +26,5 @@ export function getPolarBillingCallbackPath({
   }
 
   const query = searchParams.toString();
-  return `/${resolvedLocale}/profile/billing${query ? `?${query}` : ""}`;
+  return `/${resolvedLocale}/workspace/billing${query ? `?${query}` : ""}`;
 }
