@@ -70,17 +70,25 @@ export const useDashboardLogMutation = ({
   };
 
   const invalidateToggleQueries = async (context?: ToggleLogContext) => {
+    const invalidations = [];
+
     if (context?.weeklyLogsQueryKey) {
-      await queryClient.invalidateQueries({
-        queryKey: context.weeklyLogsQueryKey,
-      });
+      invalidations.push(
+        queryClient.invalidateQueries({
+          queryKey: context.weeklyLogsQueryKey,
+        }),
+      );
     }
 
     if (context?.monthlyLogsQueryKey) {
-      await queryClient.invalidateQueries({
-        queryKey: context.monthlyLogsQueryKey,
-      });
+      invalidations.push(
+        queryClient.invalidateQueries({
+          queryKey: context.monthlyLogsQueryKey,
+        }),
+      );
     }
+
+    await Promise.all(invalidations);
   };
 
   const createToggleLogContext = (
@@ -122,12 +130,12 @@ export const useDashboardLogMutation = ({
     showToast("error", getApiErrorMessage(error, t("logSaveFailed")));
   };
 
-  const handleToggleLogSettled = async (context?: ToggleLogContext) => {
-    await invalidateToggleQueries(context);
-
+  const handleToggleLogSettled = (context?: ToggleLogContext) => {
     if (context) {
       removePendingLogKey(context.currentLogKey);
     }
+
+    void invalidateToggleQueries(context);
   };
 
   const updateLogMutation = usePutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate<
@@ -159,8 +167,8 @@ export const useDashboardLogMutation = ({
       onError: (error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
         handleToggleLogError(error, context);
       },
-      onSettled: async (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
-        await handleToggleLogSettled(context);
+      onSettled: (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
+        handleToggleLogSettled(context);
       },
     },
   });
@@ -193,8 +201,8 @@ export const useDashboardLogMutation = ({
       onError: (error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
         handleToggleLogError(error, context);
       },
-      onSettled: async (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
-        await handleToggleLogSettled(context);
+      onSettled: (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
+        handleToggleLogSettled(context);
       },
     },
   });
