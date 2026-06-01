@@ -883,6 +883,20 @@
       }
     }
   },
+  "SubscriptionRequired": {
+    "title": "Basic 구독이 필요합니다",
+    "description": "이 워크스페이스의 운영 화면은 Basic 구독이 활성화되어야 사용할 수 있습니다.",
+    "workspaceFallback": "워크스페이스",
+    "adminTitle": "결제 상태를 확인해주세요",
+    "adminDescription": "대시보드, 설정, 점수판, 리포트는 결제 상태가 활성화된 워크스페이스에서만 열립니다. 결제 상태를 확인한 뒤 다시 이용해주세요.",
+    "memberTitle": "워크스페이스 관리자 확인이 필요합니다",
+    "memberDescription": "현재 워크스페이스의 Basic 구독이 활성화되어 있지 않아 운영 화면을 열 수 없습니다. 관리자에게 결제 상태 확인을 요청해주세요.",
+    "billingAction": "결제 상태 보기",
+    "portalAction": "결제 관리 열기",
+    "contactAction": "문의하기",
+    "allowedTitle": "계정과 결제 관리는 계속 사용할 수 있어요",
+    "allowedDescription": "프로필, 결제 상태, 문의, 멤버/초대 관리 화면은 결제 문제를 해결할 수 있도록 계속 접근할 수 있습니다."
+  },
   "ApiError": {
     "UNAUTHORIZED": "로그인이 필요합니다.",
     "FORBIDDEN": "해당 리소스에 접근할 권한이 없습니다.",
