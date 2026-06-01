@@ -128,6 +128,8 @@ export class WorkspaceCheckoutService {
         idempotencyKey: input.idempotencyKey,
         locale: input.locale,
         seats: input.seatCount,
+        minSeats: input.seatCount,
+        maxSeats: input.seatCount,
         successPath: "/workspace/checkout/success",
         workspaceCheckoutId: pending.uid,
         metadata: {
@@ -236,7 +238,7 @@ export class WorkspaceCheckoutService {
         pendingUid: pending.uid,
         userId: pending.userId,
         workspaceName: pending.workspaceName,
-        purchasedSeatCount: pending.requestedSeatCount,
+        purchasedSeatCount: checkout.seats ?? pending.requestedSeatCount,
         customerKey: checkout.customerKey,
         subscriptionKey: checkout.subscriptionKey,
         now,

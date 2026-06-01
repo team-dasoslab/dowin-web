@@ -52,6 +52,7 @@ const createPolarClient = (
     externalCustomerId: "workspace-checkout:pending_ws_1",
     customerKey: "cus_1",
     subscriptionKey: "sub_1",
+    seats: null,
   }),
   ...overrides,
 });
@@ -85,6 +86,8 @@ describe("WorkspaceCheckoutService", () => {
         productId: "prod_basic",
         externalCustomerId: "workspace-checkout:pending_ws_1",
         seats: 5,
+        minSeats: 5,
+        maxSeats: 5,
         successPath: "/workspace/checkout/success",
         workspaceCheckoutId: "pending_ws_1",
       }),
@@ -131,6 +134,56 @@ describe("WorkspaceCheckoutService", () => {
         purchasedSeatCount: 5,
         customerKey: "cus_1",
         subscriptionKey: "sub_1",
+      }),
+    );
+  });
+
+  it("checkout detail에 실제 seat 수가 있으면 요청 seat 대신 실제 결제 seat로 provision한다", async () => {
+    const storage = createStorage({
+      findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
+        id: 10,
+        uid: "pending_ws_1",
+        userId: 9,
+        workspaceName: "운영팀",
+        requestedSeatCount: 5,
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: "checkout_1",
+        expiresAt: new Date("2026-05-28T01:00:00.000Z"),
+      }),
+      provisionCompletedWorkspaceCheckout: vi.fn().mockResolvedValue({
+        id: 3,
+        uid: "ws_public",
+      }),
+    });
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      createPolarClient({
+        getCheckoutSession: vi.fn().mockResolvedValue({
+          checkoutId: "checkout_1",
+          status: "succeeded",
+          metadata: {
+            flow: "workspace_setup",
+            workspaceCheckoutId: "pending_ws_1",
+          },
+          externalCustomerId: "workspace-checkout:pending_ws_1",
+          customerKey: "cus_1",
+          subscriptionKey: "sub_1",
+          seats: 7,
+        }),
+      }),
+    );
+
+    await service.completeWorkspaceCheckout({
+      userId: 9,
+      workspaceCheckoutId: "pending_ws_1",
+      checkoutId: "checkout_1",
+      now: new Date("2026-05-28T00:10:00.000Z"),
+    });
+
+    expect(storage.provisionCompletedWorkspaceCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        purchasedSeatCount: 7,
       }),
     );
   });

@@ -265,6 +265,8 @@ describe("BillingService", () => {
         idempotencyKey: "idem_1",
         locale: "ko",
         seats: 3,
+        minSeats: 3,
+        maxSeats: 999,
         successPath: "/billing/polar/success",
         metadata: expect.objectContaining({
           flow: "workspace_resubscribe",
@@ -329,6 +331,62 @@ describe("BillingService", () => {
       expect.objectContaining({
         externalCustomerId: "workspace-checkout:pending_1",
         seats: 2,
+        minSeats: 1,
+        maxSeats: 999,
+      }),
+    );
+  });
+
+  it("요청 seat가 현재 멤버 수보다 작으면 현재 멤버 수를 checkout seat 최소값으로 사용한다", async () => {
+    const createCheckoutSession = vi.fn().mockResolvedValue({
+      checkoutUrl: "https://polar.sh/checkout",
+      checkoutId: null,
+    });
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "FREE",
+          billingCustomerExternalRef: null,
+        }),
+        findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
+        countMembers: vi.fn().mockResolvedValue(4),
+        findSeatEntitlement: vi.fn(),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue(null),
+        findActiveProviderProduct: vi.fn().mockResolvedValue({
+          providerProductId: "prod_basic",
+        }),
+        getRecentBillingRiskSummary: vi.fn().mockResolvedValue({
+          recentRefundCount: 0,
+          recentRevokedCount: 0,
+        }),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession,
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+      },
+    );
+
+    await service.startBasicCheckout({
+      workspaceUid: "ws_abc",
+      userId: 7,
+      seatCount: 1,
+      locale: "ko",
+      idempotencyKey: "idem_2",
+    });
+
+    expect(createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        seats: 4,
+        minSeats: 4,
+        maxSeats: 999,
       }),
     );
   });

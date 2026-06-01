@@ -31,6 +31,7 @@ type CustomerSessionResponse = {
 type CheckoutSessionDetailResponse = {
   id: string;
   status?: string;
+  seats?: number | null;
   metadata?: Record<string, unknown> | null;
   external_customer_id?: string | null;
   externalCustomerId?: string | null;
@@ -49,6 +50,8 @@ export type PolarBillingClient = {
     locale: "ko" | "en";
     metadata: Record<string, string>;
     seats?: number;
+    minSeats?: number;
+    maxSeats?: number;
     successPath?:
       | "/billing/polar/success"
       | "/workspace/checkout/success";
@@ -70,6 +73,7 @@ export type PolarBillingClient = {
     externalCustomerId: string | null;
     subscriptionKey: string | null;
     customerKey: string | null;
+    seats: number | null;
   }>;
 };
 
@@ -178,6 +182,8 @@ export function createPolarBillingClient(
       locale,
       metadata,
       seats,
+      minSeats,
+      maxSeats,
       successPath = "/billing/polar/success",
       workspaceCheckoutId,
     }) {
@@ -192,6 +198,8 @@ export function createPolarBillingClient(
           products: [productId],
           external_customer_id: externalCustomerId,
           ...(seats !== undefined ? { seats } : {}),
+          ...(minSeats !== undefined ? { min_seats: minSeats } : {}),
+          ...(maxSeats !== undefined ? { max_seats: maxSeats } : {}),
           success_url: buildCheckoutCallbackUrl({
             appBaseUrl,
             path: successPath,
@@ -263,6 +271,10 @@ export function createPolarBillingClient(
           data.externalCustomerId ?? data.external_customer_id ?? null,
         subscriptionKey: data.subscriptionId ?? data.subscription_id ?? null,
         customerKey: data.customerId ?? data.customer_id ?? null,
+        seats:
+          typeof data.seats === "number" && Number.isFinite(data.seats)
+            ? data.seats
+            : null,
       };
     },
   };

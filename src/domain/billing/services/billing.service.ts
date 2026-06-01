@@ -24,6 +24,7 @@ type BillingRiskSummary = {
 
 const BILLING_RISK_REVIEW_THRESHOLD = 2;
 const BILLING_RISK_LOOKBACK_DAYS = 30;
+const BASIC_CHECKOUT_MAX_SEATS = 999;
 
 export type BillingOverview = {
   workspaceId: string;
@@ -214,10 +215,8 @@ export class BillingService {
     }
 
     const memberCount = await this.workspaceStorage.countMembers(workspace.id);
-    const seatCount = input.seatCount ?? Math.max(memberCount, 1);
-    if (seatCount < memberCount) {
-      throw new ForbiddenError("WORKSPACE_SEAT_LIMIT_EXCEEDED");
-    }
+    const minSeatCount = Math.max(memberCount, 1);
+    const seatCount = Math.max(input.seatCount ?? minSeatCount, minSeatCount);
 
     try {
       return await this.polarClient.createCheckoutSession({
@@ -227,6 +226,8 @@ export class BillingService {
         idempotencyKey: input.idempotencyKey,
         locale: input.locale,
         seats: seatCount,
+        minSeats: minSeatCount,
+        maxSeats: BASIC_CHECKOUT_MAX_SEATS,
         successPath: "/billing/polar/success",
         metadata: {
           flow: "workspace_resubscribe",
