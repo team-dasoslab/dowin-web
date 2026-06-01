@@ -57,14 +57,6 @@ export const getDashboardLinks = (workspaceId: string): {
     translationKey: "workspaceSettings",
   },
   {
-    href: `/${workspaceId}/workspace/billing`,
-    iconName: "domain-wallet" as IconName,
-    iconNameActive: "domain-wallet" as IconName,
-    label: "플랜 및 결제",
-    translationKey: "billing",
-    adminOnly: true,
-  },
-  {
     href: `/${workspaceId}/profile`,
     iconName: "nav-profile",
     iconNameActive: "nav-profile-active",
