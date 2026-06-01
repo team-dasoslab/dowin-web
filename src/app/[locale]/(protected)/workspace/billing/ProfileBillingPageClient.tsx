@@ -22,8 +22,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-type PlanCode = "BASIC" | "FREE" | "STANDARD";
 type EntitlementSource =
   | "POLAR"
   | "MANUAL_GRANT"
