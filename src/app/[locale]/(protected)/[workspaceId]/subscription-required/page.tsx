@@ -6,7 +6,7 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { useSubscriptionRequiredActions } from "@/app/[locale]/(protected)/[workspaceId]/subscription-required/_hooks/useSubscriptionRequiredActions";
-import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/billing/_hooks/useProfileBillingActions";
+import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
@@ -83,7 +83,7 @@ export default function SubscriptionRequiredPage() {
                 asChild
                 className="w-full justify-start gap-2 bg-primary px-4 py-3 text-sm font-bold text-white"
               >
-                <Link href={getWorkspacePath(workspaceId, "/profile/billing")}>
+                <Link href={getWorkspacePath(workspaceId, "/workspace/billing")}>
                   <CreditCard className="size-4" />
                   {t("billingAction")}
                 </Link>

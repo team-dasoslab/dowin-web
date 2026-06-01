@@ -48,7 +48,7 @@ describe("workspace operational access", () => {
     expect(isWorkspaceOperationalPath("/ws_1/profile/export", "ws_1")).toBe(
       true,
     );
-    expect(isWorkspaceOperationalPath("/ws_1/profile/billing", "ws_1")).toBe(
+    expect(isWorkspaceOperationalPath("/ws_1/workspace/billing", "ws_1")).toBe(
       false,
     );
     expect(isWorkspaceOperationalPath("/ws_1/subscription-required", "ws_1")).toBe(

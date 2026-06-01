@@ -9,7 +9,7 @@ describe("getPolarBillingCallbackPath", () => {
         acceptLanguage: "en-US,en;q=0.9",
         billing: "success",
       }),
-    ).toBe("/ko/profile/billing?billing=success");
+    ).toBe("/ko/workspace/billing?billing=success");
   });
 
   it("checkout id가 있으면 함께 전달한다", () => {
@@ -20,7 +20,7 @@ describe("getPolarBillingCallbackPath", () => {
         billing: "success",
         checkoutId: "chk_123",
       }),
-    ).toBe("/en/profile/billing?billing=success&checkout_id=chk_123");
+    ).toBe("/en/workspace/billing?billing=success&checkout_id=chk_123");
   });
 
   it("locale이 없으면 Accept-Language 기준으로 fallback한다", () => {
@@ -28,6 +28,6 @@ describe("getPolarBillingCallbackPath", () => {
       getPolarBillingCallbackPath({
         acceptLanguage: "en-US,en;q=0.9",
       }),
-    ).toBe("/en/profile/billing");
+    ).toBe("/en/workspace/billing");
   });
 });

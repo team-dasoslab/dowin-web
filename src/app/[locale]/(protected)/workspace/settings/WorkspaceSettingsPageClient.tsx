@@ -128,7 +128,7 @@ export default function WorkspaceSettingsPage() {
                       icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
                       title: t("billingTitle"),
                       description: t("billingDesc"),
-                      href: getWorkspacePath(workspaceId, "/profile/billing"),
+                      href: getWorkspacePath(workspaceId, "/workspace/billing"),
                     },
                   ]
                 : []),
@@ -144,14 +144,14 @@ export default function WorkspaceSettingsPage() {
                 icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
                 title: t("manageMembers"),
                 description: t("manageMembersDesc"),
-                href: getWorkspacePath(workspaceId, "/profile/members"),
+                href: getWorkspacePath(workspaceId, "/workspace/members"),
               },
               {
                 id: "invites",
                 icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
                 title: t("manageInvites"),
                 description: t("manageInvitesDesc"),
-                href: getWorkspacePath(workspaceId, "/profile/invites"),
+                href: getWorkspacePath(workspaceId, "/workspace/invites"),
               },
               {
                 id: "workspace-delete",
