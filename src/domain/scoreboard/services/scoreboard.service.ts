@@ -106,8 +106,11 @@ export class ScoreboardService {
     userId: number,
     input: UpdateScoreboardInput,
   ): Promise<ScoreboardRecord> {
-    const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
+      workspaceUid,
+      id,
+      userId,
+    );
     await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
@@ -118,8 +121,11 @@ export class ScoreboardService {
   }
 
   async archiveScoreboard(workspaceUid: string, id: number, userId: number): Promise<ScoreboardRecord> {
-    const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
+      workspaceUid,
+      id,
+      userId,
+    );
     await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ARCHIVED") {
@@ -146,8 +152,11 @@ export class ScoreboardService {
     id: number,
     userId: number,
   ): Promise<ScoreboardRecord> {
-    const scoreboard = await this.getOwnedScoreboard(workspaceUid, id, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
+      workspaceUid,
+      id,
+      userId,
+    );
     await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (scoreboard.status === "ACTIVE") {
@@ -185,11 +194,14 @@ export class ScoreboardService {
     return workspace;
   }
 
-  private async getOwnedScoreboard(
+  private async getOwnedScoreboardWithWorkspace(
     workspaceUid: string,
     id: number,
     userId: number,
-  ): Promise<ScoreboardWithLeadMeasures> {
+  ): Promise<{
+    scoreboard: ScoreboardWithLeadMeasures;
+    workspace: WorkspaceSummary;
+  }> {
     const workspace = await this.getWorkspace(workspaceUid, userId);
     const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       id,
@@ -201,7 +213,7 @@ export class ScoreboardService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return scoreboard;
+    return { scoreboard, workspace };
   }
 }
 

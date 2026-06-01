@@ -197,6 +197,9 @@ describe("ScoreboardService", () => {
       expect(updateScoreboard).toHaveBeenCalledWith(10, {
         goalName: "독서 습관을 만든다",
       });
+      expect(resolveIdByUid).toHaveBeenCalledTimes(1);
+      expect(findMembership).toHaveBeenCalledTimes(1);
+      expect(findWorkspaceById).toHaveBeenCalledTimes(1);
     });
 
     it("ARCHIVED 점수판 수정 시 403 에러를 던진다", async () => {
@@ -235,6 +238,9 @@ describe("ScoreboardService", () => {
         10,
         expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
       );
+      expect(resolveIdByUid).toHaveBeenCalledTimes(1);
+      expect(findMembership).toHaveBeenCalledTimes(1);
+      expect(findWorkspaceById).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -274,6 +280,9 @@ describe("ScoreboardService", () => {
       expect(result).toEqual({ id: 10, status: "ACTIVE" });
       expect(findActiveScoreboard).toHaveBeenCalledWith(1, 3);
       expect(reactivateScoreboard).toHaveBeenCalledWith(10);
+      expect(resolveIdByUid).toHaveBeenCalledTimes(1);
+      expect(findMembership).toHaveBeenCalledTimes(1);
+      expect(findWorkspaceById).toHaveBeenCalledTimes(1);
     });
 
     it("이미 ACTIVE 점수판이면 400 에러를 던진다", async () => {
