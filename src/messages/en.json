@@ -949,7 +949,9 @@
       "label": "Workspace Name",
       "placeholder": "e.g. Marketing Team, Company Name",
       "button": "Create Workspace",
-      "loading": "Creating workspace..."
+      "loading": "Creating workspace...",
+      "goToJoinText": "Have an invite code?",
+      "goToJoinButton": "Join Workspace"
     },
     "join": {
       "title": "Join with Invite Code",
@@ -961,7 +963,9 @@
       "createButton": "Create New",
       "loading": "Joining workspace...",
       "joinSuccess": "Joined workspace successfully.",
-      "joinFailed": "An error occurred while joining the workspace."
+      "joinFailed": "An error occurred while joining the workspace.",
+      "goToCreateText": "Want to create a new workspace?",
+      "goToCreateButton": "Create New"
     }
   },
   "Landing": {
