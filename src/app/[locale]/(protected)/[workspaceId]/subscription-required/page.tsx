@@ -6,13 +6,16 @@ import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/b
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Link } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
+import { hasWorkspaceOperationalAccess } from "@/lib/client/workspace-operational-access";
 import { CreditCard, Settings, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 
 export default function SubscriptionRequiredPage() {
+  const router = useRouter();
   const t = useTranslations("SubscriptionRequired");
   const workspaceId = useParams().workspaceId as string;
   const { data: billingResponse } = useGetWorkspacesWorkspaceIdBillingMe(
@@ -41,6 +44,12 @@ export default function SubscriptionRequiredPage() {
     (billingStatus === "ACTIVE" ||
       billingStatus === "CANCELED" ||
       billingStatus === "EXPIRED");
+
+  useEffect(() => {
+    if (billing && hasWorkspaceOperationalAccess(billing)) {
+      router.replace(`/${workspaceId}/dashboard/my`);
+    }
+  }, [billing, router, workspaceId]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50/50 px-4 py-12">
