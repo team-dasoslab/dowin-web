@@ -14,6 +14,7 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
+import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -33,6 +34,7 @@ type EntitlementSource =
 export function ProfileBillingPageClient() {
   const t = useTranslations("ProfileBilling");
   const isNativeApp = useNativeApp();
+  const { showToast } = useToast();
   const locale = useLocale();
   const workspaceId = useParams().workspaceId as string | undefined;
   const {
@@ -54,6 +56,14 @@ export function ProfileBillingPageClient() {
     const currentUrl = new URL(window.location.href);
     const billing = currentUrl.searchParams.get("billing");
 
+    if (billing === "portal_error") {
+      showToast("error", t("portalFailed"));
+      currentUrl.searchParams.delete("billing");
+      currentUrl.searchParams.delete("code");
+      window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+      return;
+    }
+
     if (billing !== "success") {
       return;
     }
@@ -62,7 +72,7 @@ export function ProfileBillingPageClient() {
     currentUrl.searchParams.delete("billing");
     window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
     void handleReturnedFromCheckout();
-  }, [handleReturnedFromCheckout]);
+  }, [handleReturnedFromCheckout, showToast, t]);
 
   const hasNoWorkspace = getApiErrorStatus(error) === 404;
   const billing = billingResponse?.status === 200 ? billingResponse.data : null;

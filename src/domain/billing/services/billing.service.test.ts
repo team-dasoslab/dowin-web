@@ -1,8 +1,17 @@
 import { ConflictError, ForbiddenError } from "@/lib/server/errors";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BillingService } from "./billing.service";
 
 describe("BillingService", () => {
+  beforeEach(() => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("billing state가 없으면 workspace planCode와 NONE 상태를 반환한다", async () => {
     const service = new BillingService(
       {

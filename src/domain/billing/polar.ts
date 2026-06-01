@@ -154,6 +154,19 @@ export function isPolarRecoverableError(error: unknown): boolean {
   );
 }
 
+export function getPolarApiErrorInfo(
+  error: unknown,
+): { status: number; body: string } | null {
+  if (!(error instanceof PolarApiError)) {
+    return null;
+  }
+
+  return {
+    status: error.status,
+    body: error.body,
+  };
+}
+
 export function createPolarBillingClient(
   env: Partial<{
     POLAR_ENV: string;
@@ -222,7 +235,7 @@ export function createPolarBillingClient(
     },
 
     async createCustomerSession(input) {
-      const response = await fetch(`${apiBaseUrl}/customer-sessions/`, {
+      const response = await fetch(`${apiBaseUrl}/customer-sessions`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,

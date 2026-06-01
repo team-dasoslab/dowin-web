@@ -1,5 +1,6 @@
 import {
   type PolarBillingClient,
+  getPolarApiErrorInfo,
   isPolarRecoverableError,
 } from "@/domain/billing/polar";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
@@ -72,6 +73,14 @@ function getWorkspacePublicId(workspace: { id: number; uid: string | null }) {
   return workspace.uid;
 }
 
+function truncateForLog(value: string, maxLength = 1000): string {
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  return `${value.slice(0, maxLength)}...`;
+}
+
 export class BillingService {
   constructor(
     private workspaceStorage: WorkspacePort,
@@ -98,8 +107,14 @@ export class BillingService {
     return { workspace, membership };
   }
 
-  async getMyBilling(workspaceUid: string, userId: number): Promise<BillingOverview> {
-    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
+  async getMyBilling(
+    workspaceUid: string,
+    userId: number,
+  ): Promise<BillingOverview> {
+    const { workspace, membership } = await this.getWorkspace(
+      workspaceUid,
+      userId,
+    );
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
@@ -135,7 +150,10 @@ export class BillingService {
   }
 
   async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {
-    const { workspace, membership } = await this.getWorkspace(workspaceUid, userId);
+    const { workspace, membership } = await this.getWorkspace(
+      workspaceUid,
+      userId,
+    );
     const billingState = workspace
       ? await this.billingStorage.findWorkspaceBillingState(workspace.id)
       : null;
@@ -149,25 +167,61 @@ export class BillingService {
     }
 
     if (!this.polarClient) {
+      console.error("[billing.portal] Polar client is not configured", {
+        workspaceUid,
+        workspaceId: workspace.id,
+        userId,
+        hasBillingCustomerExternalRef: Boolean(
+          workspace.billingCustomerExternalRef,
+        ),
+        billingStatus: billingState?.billingStatus ?? "NONE",
+        entitlementSource: billingState?.entitlementSource ?? null,
+      });
       throw new ConflictError("BILLING_NOT_READY");
     }
 
     if (billingState && billingState.entitlementSource !== "POLAR") {
+      console.warn("[billing.portal] non-Polar entitlement cannot open portal", {
+        workspaceUid,
+        workspaceId: workspace.id,
+        userId,
+        billingStatus: billingState.billingStatus,
+        entitlementSource: billingState.entitlementSource,
+      });
       throw new ConflictError("BILLING_NOT_READY");
     }
 
+    const customerSessionInput = billingState?.customerKey
+      ? { customerId: billingState.customerKey }
+      : {
+          externalCustomerId:
+            workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
+        };
+
     try {
-      const customerSessionInput = billingState?.customerKey
-        ? { customerId: billingState.customerKey }
-        : {
-            externalCustomerId:
-              workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
-          };
       const { customerPortalUrl } =
         await this.polarClient.createCustomerSession(customerSessionInput);
       return customerPortalUrl;
     } catch (error) {
       if (isPolarRecoverableError(error)) {
+        const polarError = getPolarApiErrorInfo(error);
+        console.error("[billing.portal] Polar customer session request failed", {
+          workspaceUid,
+          workspaceId: workspace.id,
+          userId,
+          billingStatus: billingState?.billingStatus ?? "NONE",
+          entitlementSource: billingState?.entitlementSource ?? null,
+          hasCustomerKey: Boolean(billingState?.customerKey),
+          hasBillingCustomerExternalRef: Boolean(
+            workspace.billingCustomerExternalRef,
+          ),
+          customerSessionInputType:
+            "customerId" in customerSessionInput
+              ? "customer_id"
+              : "external_customer_id",
+          polarStatus: polarError?.status ?? null,
+          polarBody: polarError ? truncateForLog(polarError.body) : null,
+        });
         throw new ConflictError("BILLING_NOT_READY");
       }
 
