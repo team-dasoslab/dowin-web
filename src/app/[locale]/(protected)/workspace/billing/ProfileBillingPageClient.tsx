@@ -18,6 +18,7 @@ import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
+import { Activity } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -172,6 +173,27 @@ export function ProfileBillingPageClient() {
                 className="text-sm font-black text-primary"
               >
                 {t("basicPlanName")}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                  <Activity size={16} />
+                </div>
+                <span className="text-sm font-bold text-zinc-500">
+                  {t("statusLabel")}
+                </span>
+              </div>
+              <span
+                className={`text-sm font-black ${
+                  billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED"
+                    ? "text-success"
+                    : "text-zinc-400"
+                }`}
+              >
+                {billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED"
+                  ? t("statusActiveLabel")
+                  : t("statusInactiveLabel")}
               </span>
             </div>
             {billing.purchasedSeatCount !== null && (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
