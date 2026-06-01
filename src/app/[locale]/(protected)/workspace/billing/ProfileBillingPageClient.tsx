@@ -116,15 +116,6 @@ export function ProfileBillingPageClient() {
                 <h2 className="text-lg font-black tracking-tight text-zinc-900">
                   {billing.workspaceName}
                 </h2>
-                <p className="text-xs font-bold text-zinc-400">
-                  {t("basicPlanName")}
-                </p>
-                {billing.entitlementSource ? (
-                  <p className="mt-1 text-[11px] font-bold text-zinc-500">
-                    {t("entitlementSourceLabel")}:{" "}
-                    {getEntitlementSourceLabel(billing.entitlementSource, t)}
-                  </p>
-                ) : null}
               </div>
             </div>
 
