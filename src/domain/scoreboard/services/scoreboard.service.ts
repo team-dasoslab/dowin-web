@@ -63,6 +63,7 @@ export class ScoreboardService {
 
   async getActiveScoreboard(workspaceUid: string, userId: number): Promise<ScoreboardWithLeadMeasures> {
     const workspace = await this.getWorkspace(workspaceUid, userId);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     const scoreboard = await this.scoreboardStorage.findActiveScoreboard(
       userId,
       workspace.id,
@@ -133,6 +134,7 @@ export class ScoreboardService {
 
   async getHistory(workspaceUid: string, userId: number): Promise<ScoreboardRecord[]> {
     const workspace = await this.getWorkspace(workspaceUid, userId);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     return await this.scoreboardStorage.findArchivedScoreboards(
       userId,
       workspace.id,

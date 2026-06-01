@@ -304,6 +304,12 @@ export class WorkspaceService {
   }
 
   async listTags(workspaceId: number): Promise<WorkspaceTag[]> {
+    const workspace = await this.storage.findWorkspaceById(workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+    await assertWorkspaceOperationAllowed(workspace, this.storage);
+
     return await this.storage.listTags(workspaceId);
   }
 

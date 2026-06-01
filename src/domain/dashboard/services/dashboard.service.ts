@@ -1,3 +1,6 @@
+import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<
     Array<{
@@ -6,6 +9,18 @@ type WorkspaceLookupPort = {
       user?: { nickname?: string | null; avatarKey?: string | null } | null;
     }>
   >;
+  countMembers(workspaceId: number): Promise<number>;
+  findSeatEntitlement?(
+    workspaceId: number,
+  ): Promise<{ purchasedSeatCount: number } | null>;
+  findBillingState(workspaceId: number): Promise<{
+    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+  } | null>;
+  findPlanLimit(
+    planCode: "BASIC" | "FREE" | "STANDARD",
+  ): Promise<{ memberLimit: number } | null>;
 };
 
 type TeamScoreboard = {
@@ -45,8 +60,6 @@ type DailyLogLookup = Awaited<
   ReturnType<DailyLogLookupPort["findLogsForLeadMeasures"]>
 >[number];
 
-import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
-
 export class DashboardService {
   constructor(
     private workspaceStorage: WorkspaceLookupPort,
@@ -55,6 +68,10 @@ export class DashboardService {
   ) { }
 
   async getTeamDashboard(context: WorkspaceAccessContext, weekStart?: string) {
+    await assertWorkspaceOperationAllowed(
+      { id: context.workspaceId, planCode: context.entitlement.planCode },
+      this.workspaceStorage,
+    );
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
 
     const members = await this.workspaceStorage.findMembers(context.workspaceId);
@@ -80,6 +97,10 @@ export class DashboardService {
   }
 
   async getTeamWeeklyReport(context: WorkspaceAccessContext, weekStart?: string, weeks = 5) {
+    await assertWorkspaceOperationAllowed(
+      { id: context.workspaceId, planCode: context.entitlement.planCode },
+      this.workspaceStorage,
+    );
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     const boundedWeeks = Math.min(Math.max(weeks, 1), 12);
     const trendWeekStarts = getPreviousWeekStarts(

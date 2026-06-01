@@ -105,10 +105,11 @@ export class DailyLogService {
       } | null;
     }>;
   }> {
-    const { scoreboard } = await this.getOwnedScoreboardWithWorkspace(workspaceUid, scoreboardId, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(workspaceUid, scoreboardId, userId);
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
 
@@ -199,10 +200,11 @@ export class DailyLogService {
       achievementRate: number;
     }>;
   }> {
-    const { scoreboard } = await this.getOwnedScoreboardWithWorkspace(workspaceUid, scoreboardId, userId);
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(workspaceUid, scoreboardId, userId);
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     const normalizedMonthStart = normalizeMonthStart(monthStart);
 

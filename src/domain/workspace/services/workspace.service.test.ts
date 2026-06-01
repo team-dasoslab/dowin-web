@@ -529,12 +529,31 @@ describe("WorkspaceService", () => {
         { id: 1, workspaceId: 1, name: "운동", normalizedName: "운동" },
         { id: 2, workspaceId: 1, name: "건강", normalizedName: "건강" },
       ];
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "BASIC",
+      });
       mockStorage.listTags.mockResolvedValue(tags);
 
       const result = await service.listTags(1);
 
       expect(result).toEqual(tags);
       expect(mockStorage.listTags).toHaveBeenCalledWith(1);
+    });
+
+    it("Basic entitlement가 없으면 태그 목록을 조회할 수 없다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "FREE",
+      });
+      mockStorage.findBillingState.mockResolvedValue(null);
+
+      await expect(service.listTags(1)).rejects.toThrow(
+        "BASIC_SUBSCRIPTION_REQUIRED",
+      );
+      expect(mockStorage.listTags).not.toHaveBeenCalled();
     });
 
     it("태그를 생성한다", async () => {

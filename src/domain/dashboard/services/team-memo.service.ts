@@ -40,6 +40,7 @@ export class TeamMemoService {
   ) {}
 
   async listTeamMemos(context: WorkspaceAccessContext, targetUserId: number) {
+    this.assertBasicEntitlementActive(context);
     await this.requireWorkspaceMember(context.workspaceId, targetUserId);
 
     const memos = await this.teamMemoStorage.listByWorkspaceAndTarget(

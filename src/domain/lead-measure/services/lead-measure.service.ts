@@ -46,6 +46,8 @@ export class LeadMeasureService {
     status: "active" | "all",
   ): Promise<Array<LeadMeasureRecordWithTags & { weeklyAchievement: { achieved: number; total: number } }>> {
     await this.getOwnedScoreboard(workspaceUid, scoreboardId, userId);
+    const workspace = await this.getWorkspace(workspaceUid, userId);
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       status,

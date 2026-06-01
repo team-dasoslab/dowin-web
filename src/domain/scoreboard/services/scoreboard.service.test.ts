@@ -74,6 +74,18 @@ describe("ScoreboardService", () => {
       );
     });
 
+    it("Basic entitlement가 없으면 활성 점수판을 조회할 수 없다", async () => {
+      resolveIdByUid.mockResolvedValue(3);
+      findMembership.mockResolvedValue(true);
+      findWorkspaceById.mockResolvedValue({ id: 3, planCode: "FREE" });
+      findBillingState.mockResolvedValue(null);
+
+      await expect(service.getActiveScoreboard("ws_uid", 1)).rejects.toThrow(
+        "BASIC_SUBSCRIPTION_REQUIRED",
+      );
+      expect(findActiveScoreboard).not.toHaveBeenCalled();
+    });
+
     it("활성 점수판이 없으면 404 에러를 던진다", async () => {
       resolveIdByUid.mockResolvedValue(3);
       findMembership.mockResolvedValue(true);

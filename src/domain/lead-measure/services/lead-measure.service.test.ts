@@ -67,6 +67,19 @@ describe("LeadMeasureService", () => {
     ]);
   });
 
+  it("Basic entitlement가 없으면 선행지표 목록을 조회할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
+    findBillingState.mockResolvedValue(null);
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+
+    await expect(
+      service.getLeadMeasures("ws_uid", 2, 100, "active"),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+    expect(findLeadMeasuresByScoreboard).not.toHaveBeenCalled();
+  });
+
   it("ARCHIVED 점수판에는 선행지표를 추가할 수 없다", async () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);

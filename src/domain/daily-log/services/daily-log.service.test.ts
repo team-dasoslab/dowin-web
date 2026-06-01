@@ -167,6 +167,19 @@ describe("DailyLogService", () => {
     });
   });
 
+  it("Basic entitlement가 없으면 주간 기록을 조회할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
+    findBillingState.mockResolvedValue(null);
+    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+
+    await expect(
+      service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06"),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+    expect(findLeadMeasuresByScoreboard).not.toHaveBeenCalled();
+  });
+
   it("주간 기록 조회 시 개별 지표 달성률은 100%를 초과하지 않는다", async () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);

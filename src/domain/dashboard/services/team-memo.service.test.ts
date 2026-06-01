@@ -83,6 +83,23 @@ describe("TeamMemoService", () => {
     });
   });
 
+  it("Basic entitlement가 없으면 메모 목록을 조회할 수 없다", async () => {
+    const inactiveContext = {
+      ...mockContext,
+      entitlement: {
+        canAccessBasicSubscription: false,
+        entitlementSource: null,
+        billingStatus: "NONE" as const,
+        planCode: "FREE" as const,
+      },
+    } satisfies WorkspaceAccessContext;
+
+    await expect(
+      service.listTeamMemos(inactiveContext, 12),
+    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
+    expect(listByWorkspaceAndTarget).not.toHaveBeenCalled();
+  });
+
   it("메모를 생성한다", async () => {
     create.mockResolvedValue({
       id: 2,
