@@ -130,8 +130,9 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 단기 우선순위는 무료 플랜 제한 조정보다 `가입 즉시 Basic seat 결제` 구조와 Basic에서 체감할 운영 가치를 맞추는 것이다.
 - 그 범용화에는 제품 전반의 내부 초기 용어를 독립적인 제품 언어로 재정리하고, 외부 방법론 의존 설명을 끊어내는 작업이 포함된다.
 - 공개 회원가입과 워크스페이스 셀프서브 진입은 현재 동작 중이며, 다음 우선순위는 운영 마감 기능과 무료 가치 측정 체계를 보강하는 것이다.
-- 목표 모델은 모든 워크스페이스가 Basic 플랜으로 시작하고, Basic이 seat 기반 유료 기본 플랜이 되는 구조다. 가입은 결제와 분리된 무료 완료 상태가 아니라, Basic checkout 성공 후에만 완료된다.
+- 목표 모델은 모든 워크스페이스가 Basic 플랜으로 시작하고, Basic이 seat 기반 유료 기본 플랜이 되는 구조다. 계정 가입과 복원코드 발급은 먼저 완료하지만, 워크스페이스 생성과 운영 접근은 Basic checkout 성공 검증 후에만 활성화된다.
 - 워크스페이스 접근은 `멤버십 접근권`과 `운영 접근권`을 분리한다. 결제 비활성 워크스페이스는 프로필, 결제, 문의, 멤버/초대 관리처럼 결제 문제 해결에 필요한 최소 표면만 허용하고, 대시보드/설정/점수판/리포트/export 같은 운영 화면은 `/{workspaceId}/subscription-required`로 유도한다.
+- 결제 비활성 워크스페이스의 복구 UX는 Polar portal과 새 Basic checkout을 분리한다. `ACTIVE`/`CANCELED`는 portal 중심, `NONE`/`EXPIRED`는 새 Basic checkout 중심, `REVOKED`는 문의/운영자 판단 중심으로 처리한다. `PAST_DUE`는 Polar상 복구 가능한 결제 실패 상태이므로 후속 enum 추가를 검토한다.
 - 그 핵심은 `리더 액션 어시스턴트` 계열 기능이며, 구체적으로는 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인` 흐름이다.
 - 무료 플랜 구조를 유지하는 방향은 폐기한다. 다음 유료화 작업의 중심은 Basic seat 결제 진입과 `자동 운영 체크인 + 체크인 결과 리포트` 같은 paid product value를 연결하는 것이다.
 - 팀 회의/회고 흐름은 별도 미팅 모드보다 팀 대시보드 메모 레일로 운영한다.
@@ -142,7 +143,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 초대코드 만료 시간 정책과 다중 워크스페이스는 당장 우선순위에 올리지 않는다.
 - 결제/청구 구현은 별도 축이지만, `무엇을 사게 만들 것인가`에 대한 제품 가치는 `STANDARD` 기능 묶음 강화와 함께 먼저 선명해져야 한다.
 - 현재 구현 enum에는 아직 과거 `FREE | STANDARD` 명칭이 남아 있지만, 목표 모델에서는 `FREE` 무료 플랜 전제를 제거하고 `BASIC` paid seat entitlement를 기본값으로 만든다.
-- seat 기반 결제 전환은 가입 플로우부터 바뀐다. 현재 선행 작업은 `CapacityPolicy` 경계 확보이며, 다음 큰 배치는 pending signup checkout, Basic seat entitlement, 결제 성공 후 user/workspace provisioning 설계다. 상세 순서는 `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`를 기준으로 본다.
+- seat 기반 결제 전환은 워크스페이스 생성과 결제 비활성 복구 흐름부터 바뀐다. 현재 선행 작업은 `CapacityPolicy` 경계 확보와 운영 접근 gate이며, 다음 큰 배치는 기존 워크스페이스의 Basic checkout 재시작 API/UI와 `PAST_DUE` 상태 분리 검토다. 상세 순서는 `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`를 기준으로 본다.
 - 운영 기본기 측면에서 외부 `Tally` 의존 문의 흐름은 내부 문의 저장 + Discord 운영 알림 + 사용자 문의 결과 조회 구조로 전환 완료됐다.
 - 다음 운영 후속은 운영자 처리 도구와 정책 문구 정렬이다.
 
