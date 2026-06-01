@@ -5,12 +5,13 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { useSubscriptionRequiredActions } from "@/app/[locale]/(protected)/[workspaceId]/subscription-required/_hooks/useSubscriptionRequiredActions";
 import { useProfileBillingActions } from "@/app/[locale]/(protected)/profile/billing/_hooks/useProfileBillingActions";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
-import { CreditCard, LifeBuoy, Settings, Users } from "lucide-react";
+import { CreditCard, LifeBuoy, RotateCw, Settings, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
@@ -29,12 +30,20 @@ export default function SubscriptionRequiredPage() {
   const billing =
     billingResponse?.status === 200 ? billingResponse.data : null;
   const { openPortal, isPortalPending } = useProfileBillingActions(workspaceId);
+  const { startBasicCheckout, isCheckoutPending } =
+    useSubscriptionRequiredActions(workspaceId);
   const canManageBilling = Boolean(billing?.canManageBilling);
+  const billingStatus = billing?.billingStatus ?? "NONE";
+  const canStartCheckout =
+    canManageBilling &&
+    !billing?.requiresManualReview &&
+    (billingStatus === "NONE" || billingStatus === "EXPIRED");
   const canOpenPortal =
     canManageBilling &&
     billing?.entitlementSource === "POLAR" &&
-    (billing.billingStatus === "ACTIVE" ||
-      billing.billingStatus === "CANCELED");
+    (billingStatus === "ACTIVE" ||
+      billingStatus === "CANCELED" ||
+      billingStatus === "EXPIRED");
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
@@ -58,15 +67,28 @@ export default function SubscriptionRequiredPage() {
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <Button
-              asChild
-              className="w-full justify-start gap-2 bg-primary px-4 py-3 text-sm font-bold text-white"
-            >
-              <Link href={getWorkspacePath(workspaceId, "/profile/billing")}>
-                <CreditCard className="size-4" />
-                {t("billingAction")}
-              </Link>
-            </Button>
+            {canStartCheckout ? (
+              <Button
+                className="w-full justify-start gap-2 bg-primary px-4 py-3 text-sm font-bold text-white"
+                disabled={isCheckoutPending}
+                onClick={() => {
+                  void startBasicCheckout();
+                }}
+              >
+                <RotateCw className="size-4" />
+                {isCheckoutPending ? t("checkoutLoading") : t("checkoutAction")}
+              </Button>
+            ) : (
+              <Button
+                asChild
+                className="w-full justify-start gap-2 bg-primary px-4 py-3 text-sm font-bold text-white"
+              >
+                <Link href={getWorkspacePath(workspaceId, "/profile/billing")}>
+                  <CreditCard className="size-4" />
+                  {t("billingAction")}
+                </Link>
+              </Button>
+            )}
             {canOpenPortal ? (
               <Button
                 className="w-full justify-start gap-2 border border-zinc-200 bg-white px-4 py-3 text-sm font-bold text-zinc-800"
