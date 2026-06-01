@@ -443,8 +443,8 @@ describe("DailyLogService", () => {
     );
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [10, 11],
-      "2026-03-01",
-      "2026-03-31",
+      "2026-02-23",
+      "2026-04-05",
     );
   });
 

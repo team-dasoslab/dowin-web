@@ -189,7 +189,7 @@ describe("DashboardService", () => {
     expect(findActiveScoreboardsByWorkspace).toHaveBeenCalledWith(3);
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [31, 32],
-      "2026-03-01",
+      "2026-02-23",
       "2026-03-31",
     );
   });
@@ -290,7 +290,7 @@ describe("DashboardService", () => {
     expect(findActiveScoreboardsByWorkspace).toHaveBeenCalledOnce();
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [31],
-      "2026-04-01",
+      "2026-03-30",
       "2026-04-30",
     );
   });
