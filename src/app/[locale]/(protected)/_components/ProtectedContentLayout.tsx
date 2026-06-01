@@ -41,12 +41,20 @@ export function ProtectedContentLayout({
     billingResponse?.status === 200 ? billingResponse.data : null;
   const isProfilePath =
     pathname === profilePath || pathname.startsWith(`${profilePath}/`);
+  const workspaceSettingsPath = workspaceId
+    ? `/${workspaceId}/workspace/settings`
+    : "/workspace/settings";
+  const isWorkspacePath =
+    pathname === workspaceSettingsPath ||
+    pathname.startsWith(workspaceId ? `/${workspaceId}/workspace/` : "/workspace/");
+  
   const usesSubPageLayout =
     pathname === "/updates" ||
     pathname === pricingPath ||
     pathname === subscriptionRequiredPath ||
-    isProfilePath;
-  const showBackButton = pathname !== profilePath;
+    isProfilePath ||
+    isWorkspacePath;
+  const showBackButton = pathname !== profilePath && pathname !== workspaceSettingsPath;
 
   useEffect(() => {
     if (!needsOperationalAccess || !workspaceId || !billing) {
