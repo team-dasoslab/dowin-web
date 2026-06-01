@@ -954,7 +954,9 @@
       "label": "워크스페이스 이름",
       "placeholder": "예: 마케팅 팀, 회사명",
       "button": "워크스페이스 생성하기",
-      "loading": "워크스페이스를 만드는 중입니다."
+      "loading": "워크스페이스를 만드는 중입니다.",
+      "goToJoinText": "초대코드가 있으신가요?",
+      "goToJoinButton": "참여하기"
     },
     "join": {
       "title": "초대코드로 참가하기",
@@ -966,7 +968,9 @@
       "createButton": "새로 만들기",
       "loading": "워크스페이스에 참가하는 중입니다.",
       "joinSuccess": "워크스페이스에 참가했습니다.",
-      "joinFailed": "워크스페이스 참가 중 오류가 발생했습니다."
+      "joinFailed": "워크스페이스 참가 중 오류가 발생했습니다.",
+      "goToCreateText": "워크스페이스를 새로 만들고 싶으신가요?",
+      "goToCreateButton": "생성하기"
     }
   },
   "Landing": {

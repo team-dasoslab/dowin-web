@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
+import { Link } from "@/i18n/routing";
 
 export default function NewWorkspacePage() {
   const t = useTranslations("Workspace.new");
@@ -104,6 +105,17 @@ export default function NewWorkspacePage() {
             )}
           </Button>
         </form>
+
+        {/* 하단 링크 */}
+        <div className="pt-2 flex items-center justify-center gap-2 text-sm">
+          <span className="text-zinc-500 font-medium">{t("goToJoinText")}</span>
+          <Link
+            href="/workspace/join"
+            className="font-bold text-primary hover:text-primary/80 transition-colors"
+          >
+            {t("goToJoinButton")}
+          </Link>
+        </div>
       </div>
     </div>
   );

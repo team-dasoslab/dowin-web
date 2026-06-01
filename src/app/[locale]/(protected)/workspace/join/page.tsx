@@ -90,21 +90,19 @@ export default function JoinWorkspacePage() {
                 t("button")
               )}
             </Button>
-
-            <Button
-              asChild
-              disabled={isPending}
-              className="w-full rounded-button border border-zinc-200 bg-white py-4 text-sm font-bold text-zinc-600 transition-colors"
-            >
-              <Link
-                href="/workspace/new"
-                className="flex items-center justify-center"
-              >
-                {t("createButton")}
-              </Link>
-            </Button>
           </div>
         </form>
+
+        {/* 하단 링크 */}
+        <div className="pt-2 flex items-center justify-center gap-2 text-sm">
+          <span className="text-zinc-500 font-medium">{t("goToCreateText")}</span>
+          <Link
+            href="/workspace/new"
+            className="font-bold text-primary hover:text-primary/80 transition-colors"
+          >
+            {t("goToCreateButton")}
+          </Link>
+        </div>
       </div>
     </div>
   );
