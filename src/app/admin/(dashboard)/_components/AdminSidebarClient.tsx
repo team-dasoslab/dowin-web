@@ -25,6 +25,10 @@ export default function AdminSidebarClient() {
       label: "어드민 홈",
     },
     {
+      href: "/admin/promotions",
+      label: "마케팅 프로모션",
+    },
+    {
       href: "/admin/inquiries",
       label: "문의 처리 센터",
     },
