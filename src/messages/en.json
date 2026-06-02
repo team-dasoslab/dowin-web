@@ -1001,7 +1001,7 @@
   "Workspace": {
     "new": {
       "title": "Create New Workspace",
-      "description": "Choose a workspace name and seat count, then start Basic checkout.",
+      "description": "Set a workspace name and choose how many seats you need for your team — then you'll be taken to Basic checkout.\n\nYou're billed monthly based on your seat count and charged automatically each cycle until you cancel. If you cancel, your workspace and seat access stay active until the end of the current billing period.",
       "label": "Workspace Name",
       "placeholder": "e.g. Marketing Team, Company Name",
       "seatLabel": "Seats",

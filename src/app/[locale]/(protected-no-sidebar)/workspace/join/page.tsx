@@ -39,13 +39,10 @@ export default function JoinWorkspacePage() {
           <div className="w-12 h-12 bg-primary/10 rounded-content flex items-center justify-center">
             <Logo size="24px" className="text-primary" />
           </div>
-          <div className="space-y-2">
+          <div>
             <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
               {t("title")}
             </h1>
-            <p className="text-sm text-zinc-500 font-medium leading-relaxed">
-              {t("description")}
-            </p>
           </div>
         </div>
 

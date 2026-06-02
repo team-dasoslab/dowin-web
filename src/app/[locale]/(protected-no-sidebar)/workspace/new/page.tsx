@@ -10,6 +10,7 @@ import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 
 export default function NewWorkspacePage() {
   const t = useTranslations("Workspace.new");
@@ -71,12 +72,14 @@ export default function NewWorkspacePage() {
             <Logo size="24px" className="text-primary" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
-              {t("title")}
-            </h1>
-            <p className="text-sm text-zinc-500 font-medium leading-relaxed whitespace-pre-line">
-              {t("description")}
-            </p>
+            <InfoTooltip
+              label={
+                <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
+                  {t("title")}
+                </h1>
+              }
+              content={t("description")}
+            />
           </div>
         </div>
 
