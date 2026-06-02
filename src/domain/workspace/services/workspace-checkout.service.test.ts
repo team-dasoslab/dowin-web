@@ -8,8 +8,7 @@ type BillingPort = ConstructorParameters<typeof WorkspaceCheckoutService>[1];
 const createStorage = (
   overrides: Partial<WorkspacePort> = {},
 ): WorkspacePort => ({
-  findUserWorkspace: vi.fn().mockResolvedValue(null),
-  findActivePendingWorkspaceCheckoutByUserId: vi.fn().mockResolvedValue(null),
+  findWorkspaceById: vi.fn().mockResolvedValue(null),
   findPendingWorkspaceCheckoutByRequestId: vi.fn().mockResolvedValue(null),
   findPendingWorkspaceCheckoutByUid: vi.fn(),
   createPendingWorkspaceCheckout: vi.fn().mockResolvedValue({
@@ -94,6 +93,58 @@ describe("WorkspaceCheckoutService", () => {
     );
   });
 
+  it("이미 다른 워크스페이스에 속한 사용자도 새 checkout을 생성할 수 있다", async () => {
+    const storage = createStorage();
+    const billingStorage = createBillingStorage();
+    const polarClient = createPolarClient();
+    const service = new WorkspaceCheckoutService(
+      storage,
+      billingStorage,
+      polarClient,
+    );
+
+    await expect(
+      service.prepareWorkspaceCheckout({
+        userId: 9,
+        workspaceName: "새 운영팀",
+        seatCount: 3,
+        locale: "ko",
+        idempotencyKey: "idem-2",
+        now: new Date("2026-05-28T00:00:00.000Z"),
+      }),
+    ).resolves.toEqual({
+      workspaceCheckoutId: "pending_ws_1",
+      checkoutUrl: "https://polar.test/checkout",
+    });
+  });
+
+  it("같은 사용자의 기존 pending checkout이 있어도 새 idempotency 요청은 새 seatCount로 checkout을 생성한다", async () => {
+    const storage = createStorage();
+    const polarClient = createPolarClient();
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      polarClient,
+    );
+
+    await service.prepareWorkspaceCheckout({
+      userId: 9,
+      workspaceName: "좌석 1명 팀",
+      seatCount: 1,
+      locale: "ko",
+      idempotencyKey: "new-seat-1",
+      now: new Date("2026-05-28T00:00:00.000Z"),
+    });
+
+    expect(polarClient.createCheckoutSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        seats: 1,
+        minSeats: 1,
+        maxSeats: 1,
+      }),
+    );
+  });
+
   it("결제 성공 검증 후 Basic 워크스페이스를 provision한다", async () => {
     const storage = createStorage({
       findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
@@ -136,6 +187,40 @@ describe("WorkspaceCheckoutService", () => {
         subscriptionKey: "sub_1",
       }),
     );
+  });
+
+  it("완료된 checkout 재진입 시 completed workspace id로 워크스페이스를 반환한다", async () => {
+    const storage = createStorage({
+      findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
+        id: 10,
+        uid: "pending_ws_1",
+        userId: 9,
+        workspaceName: "운영팀",
+        requestedSeatCount: 5,
+        status: "COMPLETED",
+        providerCheckoutId: "checkout_1",
+        completedWorkspaceId: 33,
+        expiresAt: new Date("2026-05-28T01:00:00.000Z"),
+      }),
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 33,
+        uid: "ws_completed",
+      }),
+    });
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      createPolarClient(),
+    );
+
+    await expect(
+      service.completeWorkspaceCheckout({
+        userId: 9,
+        workspaceCheckoutId: "pending_ws_1",
+        now: new Date("2026-05-28T00:10:00.000Z"),
+      }),
+    ).resolves.toEqual({ workspaceId: "ws_completed" });
+    expect(storage.findWorkspaceById).toHaveBeenCalledWith(33);
   });
 
   it("checkout detail에 실제 seat 수가 있으면 요청 seat 대신 실제 결제 seat로 provision한다", async () => {

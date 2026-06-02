@@ -16,7 +16,6 @@ type MarketingInviteStoragePort = Pick<
   | "createCode"
   | "updateCode"
   | "findRedemptionByCodeAndUser"
-  | "findMembershipByUserId"
   | "updateRedemptionFeedback"
   | "redeemCodeForWorkspace"
 >;
@@ -164,7 +163,7 @@ export class MarketingInviteService {
     await this.auditLogStorage.create({
       actorType: "ADMIN",
       actorAdminUserId: adminUserId,
-      workspaceId: updated.workspaceId,
+      workspaceId: updated.workspaceId ?? undefined,
       entityType: "MARKETING_INVITE_REDEMPTION",
       entityId: redemptionId,
       actionType: "UPDATE",
@@ -187,11 +186,6 @@ export class MarketingInviteService {
 
     if (!code) {
       throw new NotFoundError("INVALID_INVITE_CODE");
-    }
-
-    const existingMembership = await this.storage.findMembershipByUserId(userId);
-    if (existingMembership) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
     }
 
     if (code.status !== "ACTIVE") {
@@ -231,7 +225,7 @@ export class MarketingInviteService {
     await this.auditLogStorage.create({
       actorType: "USER",
       actorUserId: userId,
-      workspaceId: redeemed.redemption.workspaceId,
+      workspaceId: redeemed.redemption.workspaceId ?? undefined,
       entityType: "MARKETING_INVITE_REDEMPTION",
       entityId: redeemed.redemption.id,
       actionType: "CREATE",

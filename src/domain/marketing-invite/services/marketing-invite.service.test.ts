@@ -10,7 +10,6 @@ describe("MarketingInviteService", () => {
     createCode: vi.fn(),
     updateCode: vi.fn(),
     findRedemptionByCodeAndUser: vi.fn(),
-    findMembershipByUserId: vi.fn(),
     updateRedemptionFeedback: vi.fn(),
     redeemCodeForWorkspace: vi.fn(),
   };
@@ -39,7 +38,6 @@ describe("MarketingInviteService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockStorage.findMembershipByUserId.mockResolvedValue(null);
   });
 
   describe("createCode", () => {
@@ -117,7 +115,6 @@ describe("MarketingInviteService", () => {
       });
 
       expect(result).toEqual({ workspaceId: "ws_beta" });
-      expect(mockStorage.findMembershipByUserId).toHaveBeenCalledWith(123);
       expect(mockStorage.findCodeByCode).toHaveBeenCalledWith("BETA2026");
       expect(mockStorage.redeemCodeForWorkspace).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -136,20 +133,6 @@ describe("MarketingInviteService", () => {
           actionType: "CREATE",
         }),
       );
-    });
-
-    it("이미 워크스페이스에 속한 사용자는 사용할 수 없다", async () => {
-      mockStorage.findMembershipByUserId.mockResolvedValue({
-        id: 3,
-        workspaceId: 9,
-      });
-
-      mockStorage.findCodeByCode.mockResolvedValue(activeCode);
-
-      await expect(
-        service.redeemCode(123, { code: "BETA2026", workspaceName: "Team" }),
-      ).rejects.toThrow("ALREADY_IN_WORKSPACE");
-      expect(mockStorage.findCodeByCode).toHaveBeenCalledWith("BETA2026");
     });
 
     it("존재하지 않는 코드는 INVALID_INVITE_CODE로 막는다", async () => {
