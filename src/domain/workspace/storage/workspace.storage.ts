@@ -58,6 +58,23 @@ export class WorkspaceStorage {
     return result[0] ?? null;
   }
 
+  async findAccessibleWorkspaceByUid(uid: string, userId: number) {
+    const result = await this.db
+      .select({ workspace: workspaces })
+      .from(workspaces)
+      .innerJoin(
+        workspaceMembers,
+        and(
+          eq(workspaces.id, workspaceMembers.workspaceId),
+          eq(workspaceMembers.userId, userId),
+        ),
+      )
+      .where(eq(workspaces.uid, uid))
+      .limit(1);
+
+    return result[0]?.workspace ?? null;
+  }
+
   async findWorkspaceById(workspaceId: number): Promise<Workspace | null> {
     return (
       (await this.db.query.workspaces.findFirst({

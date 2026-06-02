@@ -9,17 +9,22 @@ describe("DailyLogService", () => {
   const countMembers = vi.fn();
   const findBillingState = vi.fn();
   const findPlanLimit = vi.fn();
-  const findOwnedScoreboard = vi.fn();
+  const findOwnedScoreboardSummary = vi.fn();
   const findOwnedLeadMeasure = vi.fn();
   const upsertLog = vi.fn();
   const deleteLog = vi.fn();
   const findLogsForLeadMeasures = vi.fn();
   const findLeadMeasuresByScoreboard = vi.fn();
+  const findActiveLeadMeasureSummariesByScoreboard = vi.fn();
 
   const service = new DailyLogService(
     { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findBillingState, findPlanLimit },
-    { findOwnedScoreboard },
-    { findOwnedLeadMeasure, findLeadMeasuresByScoreboard },
+    { findOwnedScoreboardSummary },
+    {
+      findOwnedLeadMeasure,
+      findLeadMeasuresByScoreboard,
+      findActiveLeadMeasureSummariesByScoreboard,
+    },
     { upsertLog, deleteLog, findLogsForLeadMeasures },
   );
 
@@ -134,7 +139,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -172,7 +177,7 @@ describe("DailyLogService", () => {
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
     findBillingState.mockResolvedValue(null);
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
 
     await expect(
       service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06"),
@@ -184,7 +189,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -220,7 +225,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -257,7 +262,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -292,7 +297,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -325,7 +330,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -353,7 +358,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -387,7 +392,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
@@ -448,11 +453,59 @@ describe("DailyLogService", () => {
     );
   });
 
+  it("월간 요약 조회 시 선행지표 요약과 로그만으로 summary를 계산한다", async () => {
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findActiveLeadMeasureSummariesByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        targetValue: 3,
+        period: "WEEKLY",
+      },
+      {
+        id: 11,
+        targetValue: 12,
+        period: "MONTHLY",
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-03-02", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 10, logDate: "2026-03-05", value: true },
+      { leadMeasureId: 11, logDate: "2026-03-01", value: true },
+      { leadMeasureId: 11, logDate: "2026-03-03", value: true },
+      { leadMeasureId: 11, logDate: "2026-03-04", value: false },
+    ]);
+
+    const result = await service.getMonthlySummary("ws_uid", 2, 100, "2026-03-01");
+
+    expect(result).toEqual({
+      monthStart: "2026-03-01",
+      monthEnd: "2026-03-31",
+      monthLabel: "2026.03",
+      summary: {
+        achieved: 5,
+        total: 30,
+        achievementRate: 16.7,
+        isWinning: false,
+      },
+    });
+    expect(findActiveLeadMeasureSummariesByScoreboard).toHaveBeenCalledWith(2);
+    expect(findLeadMeasuresByScoreboard).not.toHaveBeenCalled();
+    expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
+      [10, 11],
+      "2026-02-23",
+      "2026-04-05",
+    );
+  });
+
   it("monthStart가 월 1일이 아니어도 해당 월의 1일로 정규화한다", async () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([]);
     findLogsForLeadMeasures.mockResolvedValue([]);
 
@@ -467,7 +520,7 @@ describe("DailyLogService", () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
     findWorkspaceById.mockResolvedValue({ id: 1 });
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
     findLeadMeasuresByScoreboard.mockResolvedValue([
       {
         id: 10,
