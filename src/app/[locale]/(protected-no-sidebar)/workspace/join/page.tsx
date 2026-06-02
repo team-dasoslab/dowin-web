@@ -1,7 +1,7 @@
 "use client";
 
-import { useJoinWorkspaceForm } from "@/app/[locale]/(protected)/workspace/join/_hooks/useJoinWorkspaceForm";
-import { useJoinWorkspaceMutation } from "@/app/[locale]/(protected)/workspace/join/_hooks/useJoinWorkspaceMutation";
+import { useJoinWorkspaceForm } from "@/app/[locale]/(protected-no-sidebar)/workspace/join/_hooks/useJoinWorkspaceForm";
+import { useJoinWorkspaceMutation } from "@/app/[locale]/(protected-no-sidebar)/workspace/join/_hooks/useJoinWorkspaceMutation";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
