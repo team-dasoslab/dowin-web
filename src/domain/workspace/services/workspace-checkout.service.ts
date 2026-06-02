@@ -11,8 +11,7 @@ const WORKSPACE_CHECKOUT_EXPIRES_MS = 30 * 60 * 1000;
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
-  | "findUserWorkspace"
-  | "findActivePendingWorkspaceCheckoutByUserId"
+  | "findWorkspaceById"
   | "findPendingWorkspaceCheckoutByRequestId"
   | "findPendingWorkspaceCheckoutByUid"
   | "createPendingWorkspaceCheckout"
@@ -47,14 +46,6 @@ export class WorkspaceCheckoutService {
     now?: Date;
   }) {
     const now = input.now ?? new Date();
-    const existingWorkspace = await this.workspaceStorage.findUserWorkspace(
-      input.userId,
-    );
-
-    if (existingWorkspace) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
     const existingByRequest =
       await this.workspaceStorage.findPendingWorkspaceCheckoutByRequestId(
         input.idempotencyKey,
@@ -74,23 +65,6 @@ export class WorkspaceCheckoutService {
           checkoutUrl: existingByRequest.checkoutUrl,
         };
       }
-    }
-
-    const activePending =
-      await this.workspaceStorage.findActivePendingWorkspaceCheckoutByUserId(
-        input.userId,
-        now,
-      );
-
-    if (activePending?.checkoutUrl) {
-      return {
-        workspaceCheckoutId: activePending.uid,
-        checkoutUrl: activePending.checkoutUrl,
-      };
-    }
-
-    if (activePending) {
-      throw new ConflictError("WORKSPACE_CHECKOUT_ALREADY_PENDING");
     }
 
     if (!this.polarClient) {
@@ -186,8 +160,8 @@ export class WorkspaceCheckoutService {
     }
 
     if (pending.status === "COMPLETED" && pending.completedWorkspaceId) {
-      const workspace = await this.workspaceStorage.findUserWorkspace(
-        input.userId,
+      const workspace = await this.workspaceStorage.findWorkspaceById(
+        pending.completedWorkspaceId,
       );
       if (!workspace) {
         throw new ConflictError("WORKSPACE_CHECKOUT_NOT_READY");
@@ -222,14 +196,6 @@ export class WorkspaceCheckoutService {
       checkout.externalCustomerId !== `workspace-checkout:${pending.uid}`
     ) {
       throw new ConflictError("WORKSPACE_CHECKOUT_NOT_READY");
-    }
-
-    const existingWorkspace = await this.workspaceStorage.findUserWorkspace(
-      input.userId,
-    );
-
-    if (existingWorkspace) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
     }
 
     const workspace =

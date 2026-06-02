@@ -122,20 +122,6 @@ export class MarketingInviteStorage {
     );
   }
 
-  async findMembershipByUserId(
-    userId: number,
-  ): Promise<{ id: number; workspaceId: number } | null> {
-    return (
-      (await this.db.query.workspaceMembers.findFirst({
-        columns: {
-          id: true,
-          workspaceId: true,
-        },
-        where: eq(workspaceMembers.userId, userId),
-      })) ?? null
-    );
-  }
-
   async updateRedemptionFeedback(
     id: number,
     input: {
