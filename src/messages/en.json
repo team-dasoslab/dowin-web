@@ -915,7 +915,7 @@
     "SESSION_EXPIRED": "Session expired. Please log in again.",
     "WRONG_PASSWORD": "Current password is incorrect.",
     "LAST_ADMIN_ACCOUNT_DELETION_FORBIDDEN": "The only admin cannot delete their account. Transfer ownership or delete the workspace first.",
-    "INVALID_INVITE_CODE": "Invite code does not exist.",
+    "INVALID_INVITE_CODE": "Invalid promotion code.",
     "EXPIRED_INVITE_CODE": "Invite code has expired. Request a new one from the admin.",
     "INVITE_CODE_INACTIVE": "This invite code is inactive.",
     "INVITE_CODE_USAGE_LIMIT_REACHED": "Invite code limit reached. Request a new one from the admin.",

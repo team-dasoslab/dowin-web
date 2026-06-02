@@ -144,10 +144,12 @@ describe("MarketingInviteService", () => {
         workspaceId: 9,
       });
 
+      mockStorage.findCodeByCode.mockResolvedValue(activeCode);
+
       await expect(
         service.redeemCode(123, { code: "BETA2026", workspaceName: "Team" }),
       ).rejects.toThrow("ALREADY_IN_WORKSPACE");
-      expect(mockStorage.findCodeByCode).not.toHaveBeenCalled();
+      expect(mockStorage.findCodeByCode).toHaveBeenCalledWith("BETA2026");
     });
 
     it("존재하지 않는 코드는 INVALID_INVITE_CODE로 막는다", async () => {

@@ -182,16 +182,16 @@ export class MarketingInviteService {
     userId: number,
     input: { code: string; workspaceName: string },
   ): Promise<{ workspaceId: string }> {
-    const existingMembership = await this.storage.findMembershipByUserId(userId);
-    if (existingMembership) {
-      throw new ConflictError("ALREADY_IN_WORKSPACE");
-    }
-
     const normalizedCode = normalizeMarketingInviteCode(input.code);
     const code = await this.storage.findCodeByCode(normalizedCode);
 
     if (!code) {
       throw new NotFoundError("INVALID_INVITE_CODE");
+    }
+
+    const existingMembership = await this.storage.findMembershipByUserId(userId);
+    if (existingMembership) {
+      throw new ConflictError("ALREADY_IN_WORKSPACE");
     }
 
     if (code.status !== "ACTIVE") {
