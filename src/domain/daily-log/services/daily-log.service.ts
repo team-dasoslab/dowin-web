@@ -8,11 +8,24 @@ import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits"
 import {
   LeadMeasureRecord,
   LeadMeasureRecordWithTags,
+  LeadMeasureSummaryRecord,
   LeadMeasureTagRecord,
 } from "@/domain/lead-measure/storage/lead-measure.storage";
 
+type WorkspaceSummary = {
+  id: number;
+  planCode?: string | null;
+};
+
+type DailyLogWorkspacePort = WorkspaceLookupPort & {
+  findAccessibleWorkspaceByUid?(
+    uid: string,
+    userId: number,
+  ): Promise<WorkspaceSummary | null>;
+};
+
 type ScoreboardStoragePort = {
-  findOwnedScoreboard(
+  findOwnedScoreboardSummary(
     id: number,
     userId: number,
     workspaceId: number,
@@ -34,6 +47,9 @@ type LeadMeasureStoragePort = {
     scoreboardId: number,
     status: "active" | "all",
   ): Promise<LeadMeasureRecordWithTags[]>;
+  findActiveLeadMeasureSummariesByScoreboard(
+    scoreboardId: number,
+  ): Promise<LeadMeasureSummaryRecord[]>;
 };
 
 type DailyLogStoragePort = Pick<
@@ -43,7 +59,7 @@ type DailyLogStoragePort = Pick<
 
 export class DailyLogService {
   constructor(
-    private workspaceStorage: WorkspaceLookupPort,
+    private workspaceStorage: DailyLogWorkspacePort,
     private scoreboardStorage: ScoreboardStoragePort,
     private leadMeasureStorage: LeadMeasureStoragePort,
     private dailyLogStorage: DailyLogStoragePort,
@@ -340,10 +356,71 @@ export class DailyLogService {
     };
   }
 
+  async getMonthlySummary(
+    workspaceUid: string,
+    scoreboardId: number,
+    userId: number,
+    monthStart?: string,
+  ): Promise<{
+    monthStart: string;
+    monthEnd: string;
+    monthLabel: string;
+    summary: {
+      achieved: number;
+      total: number;
+      achievementRate: number;
+      isWinning: boolean;
+    };
+  }> {
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
+      workspaceUid,
+      scoreboardId,
+      userId,
+    );
+    if (!scoreboard) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+
+    const normalizedMonthStart = normalizeMonthStart(monthStart);
+    const monthDates = getMonthDates(normalizedMonthStart);
+    const monthEnd = monthDates[monthDates.length - 1];
+    const weekStarts = getWeekStartsInMonth(monthDates);
+    const fetchStart = weekStarts[0] ?? normalizedMonthStart;
+    const fetchEnd = addDays(
+      weekStarts[weekStarts.length - 1] ?? normalizedMonthStart,
+      6,
+    );
+
+    const measures = (
+      await this.leadMeasureStorage.findActiveLeadMeasureSummariesByScoreboard(
+        scoreboardId,
+      )
+    ).filter(isMonthlySummaryMeasure);
+    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
+      measures.map((measure) => measure.id),
+      fetchStart,
+      fetchEnd,
+    );
+
+    return {
+      monthStart: normalizedMonthStart,
+      monthEnd,
+      monthLabel: getMonthLabel(normalizedMonthStart),
+      summary: calculateMonthlySummary({
+        logs,
+        measures,
+        monthEnd,
+        monthStart: normalizedMonthStart,
+        weekStarts,
+      }),
+    };
+  }
+
   private async getOwnedScoreboardWithWorkspace(workspaceUid: string, scoreboardId: number, userId: number) {
     const workspace = await this.getWorkspace(workspaceUid, userId);
 
-    const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
+    const scoreboard = await this.scoreboardStorage.findOwnedScoreboardSummary(
       scoreboardId,
       userId,
       workspace.id,
@@ -371,6 +448,18 @@ export class DailyLogService {
   }
 
   private async getWorkspace(workspaceUid: string, userId: number) {
+    if (this.workspaceStorage.findAccessibleWorkspaceByUid) {
+      const workspace = await this.workspaceStorage.findAccessibleWorkspaceByUid(
+        workspaceUid,
+        userId,
+      );
+      if (!workspace) {
+        throw new NotFoundError("NOT_FOUND");
+      }
+
+      return workspace;
+    }
+
     const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
     if (!internalId) {
       throw new NotFoundError("NOT_FOUND");
@@ -398,6 +487,90 @@ function getAchievementRate(achieved: number, targetValue: number) {
   return Number(((Math.min(achieved, targetValue) / targetValue) * 100).toFixed(1));
 }
 
+function calculateMonthlySummary({
+  logs,
+  measures,
+  monthEnd,
+  monthStart,
+  weekStarts,
+}: {
+  logs: DailyLogRecord[];
+  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue">>;
+  monthEnd: string;
+  monthStart: string;
+  weekStarts: string[];
+}) {
+  const logsByLeadMeasure = groupLogsByLeadMeasure(logs);
+  const weekStartSet = new Set(weekStarts);
+  const achieved = measures.reduce((total, measure) => {
+    const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
+
+    if (measure.period === "MONTHLY") {
+      const monthlyCount = measureLogs.reduce((count, log) => {
+        if (log.logDate >= monthStart && log.logDate <= monthEnd && log.value) {
+          return count + 1;
+        }
+
+        return count;
+      }, 0);
+
+      return total + Math.min(monthlyCount, measure.targetValue);
+    }
+
+    const weeklyCounts = new Map<string, number>();
+    for (const log of measureLogs) {
+      if (!log.value) {
+        continue;
+      }
+
+      const weekStart = getWeekStart(log.logDate);
+      if (!weekStartSet.has(weekStart)) {
+        continue;
+      }
+
+      weeklyCounts.set(weekStart, (weeklyCounts.get(weekStart) ?? 0) + 1);
+    }
+
+    return (
+      total +
+      weekStarts.reduce(
+        (weekTotal, weekStart) =>
+          weekTotal +
+          Math.min(weeklyCounts.get(weekStart) ?? 0, measure.targetValue),
+        0,
+      )
+    );
+  }, 0);
+  const total = measures.reduce((accumulator, measure) => {
+    if (measure.period === "MONTHLY") {
+      return accumulator + measure.targetValue;
+    }
+
+    return accumulator + measure.targetValue * weekStarts.length;
+  }, 0);
+  const achievementRate =
+    total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
+
+  return {
+    achieved,
+    total,
+    achievementRate,
+    isWinning: achievementRate >= 80,
+  };
+}
+
+function isMonthlySummaryMeasure(
+  measure: LeadMeasureSummaryRecord,
+): measure is LeadMeasureSummaryRecord & {
+  period: "DAILY" | "WEEKLY" | "MONTHLY";
+} {
+  return (
+    measure.period === "DAILY" ||
+    measure.period === "WEEKLY" ||
+    measure.period === "MONTHLY"
+  );
+}
+
 function groupLogsByLeadMeasure(logs: DailyLogRecord[]) {
   const byLeadMeasure = new Map<number, DailyLogRecord[]>();
 
@@ -411,6 +584,10 @@ function groupLogsByLeadMeasure(logs: DailyLogRecord[]) {
   }
 
   return byLeadMeasure;
+}
+
+function getMonthLabel(monthStart: string) {
+  return `${monthStart.slice(0, 4)}.${monthStart.slice(5, 7)}`;
 }
 
 function getWeeklyGuide({
