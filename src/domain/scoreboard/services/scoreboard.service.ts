@@ -4,6 +4,7 @@ import {
   NotFoundError,
   PlatformError,
 } from "@/lib/server/errors";
+import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import {
   CreateScoreboardInput,
@@ -25,7 +26,7 @@ export interface WorkspaceLookupPort {
   findBillingState(workspaceId: number): Promise<{
     planCode: "BASIC" | "FREE" | "STANDARD";
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+    entitlementSource: NullableEntitlementSource;
   } | null>;
   findPlanLimit(
     planCode: "BASIC" | "FREE" | "STANDARD",

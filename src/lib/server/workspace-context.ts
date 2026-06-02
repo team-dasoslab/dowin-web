@@ -1,4 +1,5 @@
 import { NotFoundError } from "@/lib/server/errors";
+import { type NullableEntitlementSource } from "@/domain/billing/types";
 
 type WorkspaceStoragePort = {
   getAccessContextData(workspaceId: number, userId: number): Promise<{
@@ -16,7 +17,7 @@ type WorkspaceStoragePort = {
     billingState: {
       planCode: "BASIC" | "FREE" | "STANDARD";
       billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-      entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+      entitlementSource: NullableEntitlementSource;
     } | null;
   } | null>;
 };
@@ -30,7 +31,7 @@ export type WorkspaceAccessContext = {
   membershipId: number;
   entitlement: {
     canAccessBasicSubscription: boolean;
-    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+    entitlementSource: NullableEntitlementSource;
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
     planCode: "BASIC" | "FREE" | "STANDARD";
   };
