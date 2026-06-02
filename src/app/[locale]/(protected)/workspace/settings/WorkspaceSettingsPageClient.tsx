@@ -16,6 +16,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Card } from "@/components/ui/Card";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
@@ -237,28 +238,30 @@ export default function WorkspaceSettingsPage() {
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
             
-            {workspace?.isOverFreeMemberLimit && (
-              <WorkspaceOverLimitBanner
-                freeMemberLimit={workspace.freeMemberLimit}
-                isAdmin={isWorkspaceAdmin}
-                memberCount={workspace.memberCount}
-              />
-            )}
+            <div className="space-y-4">
+              {workspace?.isOverFreeMemberLimit && (
+                <WorkspaceOverLimitBanner
+                  freeMemberLimit={workspace.freeMemberLimit}
+                  isAdmin={isWorkspaceAdmin}
+                  memberCount={workspace.memberCount}
+                />
+              )}
 
-            <div className="mb-4 rounded-content border border-zinc-200 bg-white px-4 py-4 flex items-center justify-between gap-3 sm:px-8 sm:py-7">
-              <div className="flex flex-col min-w-0 text-left">
-                <p className="text-lg font-bold text-text-primary truncate tracking-tight">
-                  {workspace.name}
-                </p>
-                <p className="text-xs font-medium text-text-secondary mt-1">
-                  {isWorkspaceAdmin ? t("workspaceAdmin") : t("workspaceMember")}
-                </p>
-              </div>
-              {!isNativeApp ? (
-                <span className="inline-flex h-6 items-center rounded-button border border-primary/20 bg-primary/5 px-2.5 text-[10px] font-black tracking-wider text-primary">
-                  {t("basicPlanName")}
-                </span>
-              ) : null}
+              <Card className="rounded-content border border-zinc-200 bg-white px-4 py-4 flex items-center justify-between gap-4 sm:px-8 sm:py-8 sm:gap-6">
+                <div className="flex flex-col min-w-0 text-left">
+                  <h2 className="text-xl font-bold text-text-primary truncate tracking-tight">
+                    {workspace.name}
+                  </h2>
+                  <p className="text-sm font-medium text-text-secondary mt-1">
+                    {isWorkspaceAdmin ? t("workspaceAdmin") : t("workspaceMember")}
+                  </p>
+                </div>
+                {!isNativeApp ? (
+                  <span className="inline-flex h-6 items-center rounded-button border border-primary/20 bg-primary/5 px-2.5 text-[10px] font-black tracking-wider text-primary">
+                    {t("basicPlanName")}
+                  </span>
+                ) : null}
+              </Card>
             </div>
 
             {/* 설정 그룹들 */}
