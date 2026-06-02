@@ -1011,6 +1011,7 @@
       "promotionCodeLabel": "Promotion Code (Optional)",
       "promotionCodePlaceholder": "Enter code",
       "button": "Create Workspace",
+      "buttonPromo": "Create",
       "goToJoinText": "Have an invite code?",
       "goToJoinButton": "Join Workspace",
       "checkoutButton": "Pay and Create",

@@ -131,7 +131,7 @@ export default function NewWorkspacePage() {
               <button
                 type="button"
                 onClick={() => {
-                  const code = window.prompt("프로모션 코드를 입력해주세요.");
+                  const code = window.prompt(t("promotionCodePlaceholder"));
                   if (code !== null) {
                     handlePromotionCodeChange(code.trim().toUpperCase());
                   }
@@ -180,7 +180,7 @@ export default function NewWorkspacePage() {
             {isPending ? (
               <InlineSpinner size="sm" />
             ) : (
-              <span>{promotionCode ? t("button") : t("checkoutButton")}</span>
+              <span>{promotionCode ? t("buttonPromo") : t("checkoutButton")}</span>
             )}
           </Button>
         </form>

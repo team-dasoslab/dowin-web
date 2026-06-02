@@ -1014,6 +1014,7 @@
       "promotionCodeLabel": "프로모션 코드 (선택)",
       "promotionCodePlaceholder": "코드를 입력하세요",
       "button": "워크스페이스 생성하기",
+      "buttonPromo": "생성하기",
       "goToJoinText": "초대코드가 있으신가요?",
       "goToJoinButton": "참여하기",
       "checkoutButton": "결제하고 생성하기",
