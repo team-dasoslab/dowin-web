@@ -82,8 +82,10 @@ export class CapacityPolicy {
   async getWorkspaceMemberCapacity(
     workspace: WorkspacePlanSummary,
   ): Promise<WorkspaceMemberCapacity> {
-    const memberLimit = await this.getWorkspaceMemberLimit(workspace);
-    const memberCount = await this.storage.countMembers(workspace.id);
+    const [memberLimit, memberCount] = await Promise.all([
+      this.getWorkspaceMemberLimit(workspace),
+      this.storage.countMembers(workspace.id),
+    ]);
 
     return {
       workspaceId: workspace.id,

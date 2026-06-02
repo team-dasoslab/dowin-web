@@ -179,6 +179,24 @@ export class ScoreboardStorage {
     return row ? this.mapScoreboardWithLeadMeasures(row) : undefined;
   }
 
+  async findOwnedScoreboardSummary(
+    id: number,
+    userId: number,
+    workspaceId: number,
+  ): Promise<Pick<ScoreboardRecord, "id" | "status"> | undefined> {
+    return (await this.db.query.scoreboards.findFirst({
+      where: and(
+        eq(scoreboards.id, id),
+        eq(scoreboards.userId, userId),
+        eq(scoreboards.workspaceId, workspaceId),
+      ),
+      columns: {
+        id: true,
+        status: true,
+      },
+    })) as Pick<ScoreboardRecord, "id" | "status"> | undefined;
+  }
+
   async findActiveScoreboardsByWorkspace(
     workspaceId: number,
   ): Promise<ScoreboardWithLeadMeasures[]> {

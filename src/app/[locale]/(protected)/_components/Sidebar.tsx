@@ -96,7 +96,7 @@ export function Sidebar() {
             href="/workspace/new"
             className={cn(
               "mb-6 flex h-10 w-full items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all",
-              isCollapsed ? "justify-center gap-0 px-0" : "justify-center gap-3 lg:justify-start lg:px-4",
+              isCollapsed ? "justify-center gap-0 px-0" : "justify-center px-0 lg:justify-start lg:gap-3 lg:px-4",
             )}
           >
             <DowinIcon name="action-add-active" size="16px" />
@@ -126,7 +126,7 @@ export function Sidebar() {
                     isActive
                       ? "bg-zinc-100 text-zinc-950"
                       : "text-zinc-400",
-                    isCollapsed ? "justify-center gap-0 px-0" : "gap-3 px-4",
+                    isCollapsed ? "justify-center gap-0 px-0" : "justify-center px-0 lg:justify-start lg:gap-3 lg:px-4",
                   )}
                 >
                   <DowinIcon

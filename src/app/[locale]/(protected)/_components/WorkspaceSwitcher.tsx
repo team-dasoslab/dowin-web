@@ -73,7 +73,7 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
         disabled={isPending}
         className={cn(
           "flex h-10 w-full items-center rounded-content bg-primary/10 transition-all hover:bg-primary/15",
-          isCollapsed ? "justify-center gap-0 px-0" : "justify-between gap-3 lg:px-4",
+          isCollapsed ? "justify-center gap-0 px-0" : "justify-center px-0 lg:justify-between lg:gap-3 lg:px-4",
         )}
       >
         <div className={cn("flex items-center overflow-hidden", isCollapsed ? "gap-0" : "gap-3")}>
@@ -93,7 +93,7 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
       </button>
 
       {isOpen && !isCollapsed && (
-        <div className="absolute top-full left-0 mt-1 w-full rounded-content border border-zinc-200 bg-white py-1 shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-1 w-[200px] lg:w-full rounded-content border border-zinc-200 bg-white py-1 shadow-lg z-50">
           {workspaces.map((ws) => (
             <button
               key={ws.id}

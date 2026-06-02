@@ -2122,6 +2122,40 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
+  /workspaces/{workspaceId}/scoreboards/{scoreboardId}/logs/monthly/summary:
+    get:
+      summary: 월간 기록 요약 조회
+      tags: [DailyLog]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
+        - name: scoreboardId
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: monthStart
+          in: query
+          required: false
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MonthlyLogsSummaryResponse" }
+        "404":
+          description: 점수판을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
   /workspaces/{workspaceId}/analytics/export-data:
     get:
       summary: 내 대시보드 export 데이터 조회
@@ -3463,6 +3497,15 @@ components:
         leadMeasures:
           type: array
           items: { $ref: "#/components/schemas/MonthlyLogItem" }
+
+    MonthlyLogsSummaryResponse:
+      type: object
+      properties:
+        monthStart: { type: string, format: date }
+        monthEnd: { type: string, format: date }
+        monthLabel: { type: string, example: "2026.03" }
+        summary:
+          $ref: "#/components/schemas/PeriodSummary"
 
     PeriodSummary:
       type: object

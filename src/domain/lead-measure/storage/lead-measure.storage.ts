@@ -14,6 +14,10 @@ export type LeadMeasureForPushRecord = Pick<
   LeadMeasureRecord,
   "id" | "scoreboardId" | "name" | "targetValue" | "period"
 >;
+export type LeadMeasureSummaryRecord = Pick<
+  LeadMeasureRecord,
+  "id" | "targetValue" | "period"
+>;
 
 export type CreateLeadMeasureInput = {
   scoreboardId: number;
@@ -122,6 +126,22 @@ export class LeadMeasureStorage {
     >;
 
     return rows.map((row) => this.mapLeadMeasureRecord(row));
+  }
+
+  async findActiveLeadMeasureSummariesByScoreboard(
+    scoreboardId: number,
+  ): Promise<LeadMeasureSummaryRecord[]> {
+    return (await this.db.query.leadMeasures.findMany({
+      where: and(
+        eq(leadMeasures.scoreboardId, scoreboardId),
+        eq(leadMeasures.status, "ACTIVE"),
+      ),
+      columns: {
+        id: true,
+        targetValue: true,
+        period: true,
+      },
+    })) as LeadMeasureSummaryRecord[];
   }
 
   async createLeadMeasure(

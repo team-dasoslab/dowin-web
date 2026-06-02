@@ -585,25 +585,35 @@ export const useScoreboardSetup = () => {
   const invalidateScoreboardQueries = async (
     targetScoreboardId: number | null,
   ) => {
-    await queryClient.invalidateQueries({
-      queryKey: getGetWorkspacesWorkspaceIdScoreboardsActiveQueryKey(workspaceId),
-    });
-    await queryClient.invalidateQueries({
-      queryKey: getGetWorkspacesWorkspaceIdScoreboardsQueryKey(workspaceId),
-    });
+    const invalidations = [
+      queryClient.invalidateQueries({
+        queryKey: getGetWorkspacesWorkspaceIdScoreboardsActiveQueryKey(workspaceId),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: getGetWorkspacesWorkspaceIdScoreboardsQueryKey(workspaceId),
+      }),
+    ];
 
     if (targetScoreboardId !== null) {
-      await queryClient.invalidateQueries({
-        queryKey: getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(workspaceId, targetScoreboardId,
-          undefined,
-        ),
-      });
-      await queryClient.invalidateQueries({
-        queryKey: getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(workspaceId, targetScoreboardId,
-          { status: "all" },
-        ),
-      });
+      invalidations.push(
+        queryClient.invalidateQueries({
+          queryKey: getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(
+            workspaceId,
+            targetScoreboardId,
+            undefined,
+          ),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(
+            workspaceId,
+            targetScoreboardId,
+            { status: "all" },
+          ),
+        }),
+      );
     }
+
+    await Promise.all(invalidations);
   };
 
   const submit = async () => {
@@ -671,7 +681,7 @@ export const useScoreboardSetup = () => {
           }
         }
 
-        await invalidateScoreboardQueries(createdScoreboardId);
+        void invalidateScoreboardQueries(createdScoreboardId);
         trackEvent("scoreboard_created", {
           lead_measure_count: validMeasures.length,
           workspace_id_hash: workspaceId,
@@ -686,7 +696,6 @@ export const useScoreboardSetup = () => {
         });
 
         showToast("success", t("createSuccess"));
-        router.refresh();
         return true;
       }
 
@@ -770,9 +779,8 @@ export const useScoreboardSetup = () => {
           }
         }
 
-        await invalidateScoreboardQueries(scoreboardId);
+        void invalidateScoreboardQueries(scoreboardId);
         showToast("success", t("saveSuccess"));
-        router.refresh();
       }
 
       return true;

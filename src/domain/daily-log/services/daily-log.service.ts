@@ -8,11 +8,24 @@ import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits"
 import {
   LeadMeasureRecord,
   LeadMeasureRecordWithTags,
+  LeadMeasureSummaryRecord,
   LeadMeasureTagRecord,
 } from "@/domain/lead-measure/storage/lead-measure.storage";
 
+type WorkspaceSummary = {
+  id: number;
+  planCode?: string | null;
+};
+
+type DailyLogWorkspacePort = WorkspaceLookupPort & {
+  findAccessibleWorkspaceByUid?(
+    uid: string,
+    userId: number,
+  ): Promise<WorkspaceSummary | null>;
+};
+
 type ScoreboardStoragePort = {
-  findOwnedScoreboard(
+  findOwnedScoreboardSummary(
     id: number,
     userId: number,
     workspaceId: number,
@@ -34,6 +47,9 @@ type LeadMeasureStoragePort = {
     scoreboardId: number,
     status: "active" | "all",
   ): Promise<LeadMeasureRecordWithTags[]>;
+  findActiveLeadMeasureSummariesByScoreboard(
+    scoreboardId: number,
+  ): Promise<LeadMeasureSummaryRecord[]>;
 };
 
 type DailyLogStoragePort = Pick<
@@ -43,7 +59,7 @@ type DailyLogStoragePort = Pick<
 
 export class DailyLogService {
   constructor(
-    private workspaceStorage: WorkspaceLookupPort,
+    private workspaceStorage: DailyLogWorkspacePort,
     private scoreboardStorage: ScoreboardStoragePort,
     private leadMeasureStorage: LeadMeasureStoragePort,
     private dailyLogStorage: DailyLogStoragePort,
@@ -126,30 +142,41 @@ export class DailyLogService {
       previousWeekStart,
       weekEnd,
     );
+    const logsByLeadMeasure = groupLogsByLeadMeasure(logs);
 
     return {
       weekStart: normalizedWeekStart,
       weekEnd,
       leadMeasures: measures.map((measure) => {
-        const measureLogs = logs.filter((log) => log.leadMeasureId === measure.id);
+        const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
         const logMap = Object.fromEntries(
           weekDates.map((date) => [date, null as boolean | null]),
         );
+        let achieved = 0;
+        let previousAchieved = 0;
 
         for (const log of measureLogs) {
           if (log.logDate in logMap) {
             logMap[log.logDate] = log.value;
           }
+
+          if (!log.value) {
+            continue;
+          }
+
+          if (log.logDate >= normalizedWeekStart && log.logDate <= weekEnd) {
+            achieved += 1;
+            continue;
+          }
+
+          if (
+            log.logDate >= previousWeekStart &&
+            log.logDate < normalizedWeekStart
+          ) {
+            previousAchieved += 1;
+          }
         }
 
-        const currentWeekLogs = measureLogs.filter(
-          (log) => log.logDate >= normalizedWeekStart && log.logDate <= weekEnd,
-        );
-        const previousWeekLogs = measureLogs.filter(
-          (log) =>
-            log.logDate >= previousWeekStart && log.logDate < normalizedWeekStart,
-        );
-        const achieved = currentWeekLogs.filter((log) => log.value).length;
         return {
           id: measure.id,
           name: measure.name,
@@ -164,7 +191,7 @@ export class DailyLogService {
               createdAt: measure.createdAt,
               currentAchieved: achieved,
               period: measure.period,
-              previousAchieved: previousWeekLogs.filter((log) => log.value).length,
+              previousAchieved,
               previousWeekStart,
               targetValue: measure.targetValue,
             })
@@ -231,19 +258,63 @@ export class DailyLogService {
       fetchStart,
       fetchEnd,
     );
+    const logsByLeadMeasure = groupLogsByLeadMeasure(logs);
+    const weekStartSet = new Set(weekStarts);
+    let totalAchieved = 0;
+
     const leadMeasures = measures.map((measure) => {
-      const measureLogs = logs.filter((log) => log.leadMeasureId === measure.id);
+      const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
       const logMap = Object.fromEntries(
         monthDates.map((date) => [date, null as boolean | null]),
       );
+      let achieved = 0;
+      let monthlySummaryAchieved = 0;
+      const weeklySummaryAchievedByWeek = new Map<string, number>();
 
       for (const log of measureLogs) {
-        if (log.logDate >= normalizedMonthStart && log.logDate <= monthEnd) {
+        const isInMonth =
+          log.logDate >= normalizedMonthStart && log.logDate <= monthEnd;
+
+        if (isInMonth) {
           logMap[log.logDate] = log.value;
+          if (log.value) {
+            achieved += 1;
+          }
+        }
+
+        if (!log.value) {
+          continue;
+        }
+
+        if (measure.period === "MONTHLY") {
+          if (isInMonth) {
+            monthlySummaryAchieved += 1;
+          }
+          continue;
+        }
+
+        const logWeekStart = getWeekStart(log.logDate);
+        if (weekStartSet.has(logWeekStart)) {
+          weeklySummaryAchievedByWeek.set(
+            logWeekStart,
+            (weeklySummaryAchievedByWeek.get(logWeekStart) ?? 0) + 1,
+          );
         }
       }
 
-      const achieved = measureLogs.filter((log) => log.logDate >= normalizedMonthStart && log.logDate <= monthEnd && log.value).length;
+      if (measure.period === "MONTHLY") {
+        totalAchieved += Math.min(monthlySummaryAchieved, measure.targetValue);
+      } else {
+        totalAchieved += weekStarts.reduce(
+          (weekAccumulator, weekStart) =>
+            weekAccumulator +
+            Math.min(
+              weeklySummaryAchievedByWeek.get(weekStart) ?? 0,
+              measure.targetValue,
+            ),
+          0,
+        );
+      }
 
       return {
         id: measure.id,
@@ -256,28 +327,6 @@ export class DailyLogService {
         achievementRate: getAchievementRate(achieved, measure.targetValue),
       };
     });
-    const totalAchieved = measures.reduce((accumulator, measure) => {
-      const measureLogs = logs.filter(
-        (log) => log.leadMeasureId === measure.id && log.value,
-      );
-
-      if (measure.period === "MONTHLY") {
-        const monthlyLogsCount = measureLogs.filter(
-          (log) => log.logDate >= normalizedMonthStart && log.logDate <= monthEnd
-        ).length;
-        return accumulator + Math.min(monthlyLogsCount, measure.targetValue);
-      }
-
-      const weeklyAchieved = weekStarts.reduce((weekAccumulator, weekStart) => {
-        const weekTrueCount = measureLogs.filter(
-          (log) => getWeekStart(log.logDate) === weekStart,
-        ).length;
-
-        return weekAccumulator + Math.min(weekTrueCount, measure.targetValue);
-      }, 0);
-
-      return accumulator + weeklyAchieved;
-    }, 0);
     const totalTarget = measures.reduce((accumulator, measure) => {
       if (measure.period === "MONTHLY") {
         return accumulator + measure.targetValue;
@@ -307,10 +356,71 @@ export class DailyLogService {
     };
   }
 
+  async getMonthlySummary(
+    workspaceUid: string,
+    scoreboardId: number,
+    userId: number,
+    monthStart?: string,
+  ): Promise<{
+    monthStart: string;
+    monthEnd: string;
+    monthLabel: string;
+    summary: {
+      achieved: number;
+      total: number;
+      achievementRate: number;
+      isWinning: boolean;
+    };
+  }> {
+    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
+      workspaceUid,
+      scoreboardId,
+      userId,
+    );
+    if (!scoreboard) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+
+    const normalizedMonthStart = normalizeMonthStart(monthStart);
+    const monthDates = getMonthDates(normalizedMonthStart);
+    const monthEnd = monthDates[monthDates.length - 1];
+    const weekStarts = getWeekStartsInMonth(monthDates);
+    const fetchStart = weekStarts[0] ?? normalizedMonthStart;
+    const fetchEnd = addDays(
+      weekStarts[weekStarts.length - 1] ?? normalizedMonthStart,
+      6,
+    );
+
+    const measures = (
+      await this.leadMeasureStorage.findActiveLeadMeasureSummariesByScoreboard(
+        scoreboardId,
+      )
+    ).filter(isMonthlySummaryMeasure);
+    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
+      measures.map((measure) => measure.id),
+      fetchStart,
+      fetchEnd,
+    );
+
+    return {
+      monthStart: normalizedMonthStart,
+      monthEnd,
+      monthLabel: getMonthLabel(normalizedMonthStart),
+      summary: calculateMonthlySummary({
+        logs,
+        measures,
+        monthEnd,
+        monthStart: normalizedMonthStart,
+        weekStarts,
+      }),
+    };
+  }
+
   private async getOwnedScoreboardWithWorkspace(workspaceUid: string, scoreboardId: number, userId: number) {
     const workspace = await this.getWorkspace(workspaceUid, userId);
 
-    const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
+    const scoreboard = await this.scoreboardStorage.findOwnedScoreboardSummary(
       scoreboardId,
       userId,
       workspace.id,
@@ -338,6 +448,18 @@ export class DailyLogService {
   }
 
   private async getWorkspace(workspaceUid: string, userId: number) {
+    if (this.workspaceStorage.findAccessibleWorkspaceByUid) {
+      const workspace = await this.workspaceStorage.findAccessibleWorkspaceByUid(
+        workspaceUid,
+        userId,
+      );
+      if (!workspace) {
+        throw new NotFoundError("NOT_FOUND");
+      }
+
+      return workspace;
+    }
+
     const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
     if (!internalId) {
       throw new NotFoundError("NOT_FOUND");
@@ -363,6 +485,109 @@ function getAchievementRate(achieved: number, targetValue: number) {
   }
 
   return Number(((Math.min(achieved, targetValue) / targetValue) * 100).toFixed(1));
+}
+
+function calculateMonthlySummary({
+  logs,
+  measures,
+  monthEnd,
+  monthStart,
+  weekStarts,
+}: {
+  logs: DailyLogRecord[];
+  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue">>;
+  monthEnd: string;
+  monthStart: string;
+  weekStarts: string[];
+}) {
+  const logsByLeadMeasure = groupLogsByLeadMeasure(logs);
+  const weekStartSet = new Set(weekStarts);
+  const achieved = measures.reduce((total, measure) => {
+    const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
+
+    if (measure.period === "MONTHLY") {
+      const monthlyCount = measureLogs.reduce((count, log) => {
+        if (log.logDate >= monthStart && log.logDate <= monthEnd && log.value) {
+          return count + 1;
+        }
+
+        return count;
+      }, 0);
+
+      return total + Math.min(monthlyCount, measure.targetValue);
+    }
+
+    const weeklyCounts = new Map<string, number>();
+    for (const log of measureLogs) {
+      if (!log.value) {
+        continue;
+      }
+
+      const weekStart = getWeekStart(log.logDate);
+      if (!weekStartSet.has(weekStart)) {
+        continue;
+      }
+
+      weeklyCounts.set(weekStart, (weeklyCounts.get(weekStart) ?? 0) + 1);
+    }
+
+    return (
+      total +
+      weekStarts.reduce(
+        (weekTotal, weekStart) =>
+          weekTotal +
+          Math.min(weeklyCounts.get(weekStart) ?? 0, measure.targetValue),
+        0,
+      )
+    );
+  }, 0);
+  const total = measures.reduce((accumulator, measure) => {
+    if (measure.period === "MONTHLY") {
+      return accumulator + measure.targetValue;
+    }
+
+    return accumulator + measure.targetValue * weekStarts.length;
+  }, 0);
+  const achievementRate =
+    total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
+
+  return {
+    achieved,
+    total,
+    achievementRate,
+    isWinning: achievementRate >= 80,
+  };
+}
+
+function isMonthlySummaryMeasure(
+  measure: LeadMeasureSummaryRecord,
+): measure is LeadMeasureSummaryRecord & {
+  period: "DAILY" | "WEEKLY" | "MONTHLY";
+} {
+  return (
+    measure.period === "DAILY" ||
+    measure.period === "WEEKLY" ||
+    measure.period === "MONTHLY"
+  );
+}
+
+function groupLogsByLeadMeasure(logs: DailyLogRecord[]) {
+  const byLeadMeasure = new Map<number, DailyLogRecord[]>();
+
+  for (const log of logs) {
+    const measureLogs = byLeadMeasure.get(log.leadMeasureId);
+    if (measureLogs) {
+      measureLogs.push(log);
+    } else {
+      byLeadMeasure.set(log.leadMeasureId, [log]);
+    }
+  }
+
+  return byLeadMeasure;
+}
+
+function getMonthLabel(monthStart: string) {
+  return `${monthStart.slice(0, 4)}.${monthStart.slice(5, 7)}`;
 }
 
 function getWeeklyGuide({

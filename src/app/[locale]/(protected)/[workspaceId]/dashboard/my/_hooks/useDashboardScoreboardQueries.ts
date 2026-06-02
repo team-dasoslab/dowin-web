@@ -2,9 +2,11 @@
 
 import {
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey,
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey,
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
   getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly,
   useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly,
+  useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary,
   useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly,
 } from "@/api/generated/daily-log/daily-log";
 import { getGetWorkspacesWorkspaceIdDashboardTeamQueryKey } from "@/api/generated/dashboard/dashboard";
@@ -12,6 +14,7 @@ import { useGetWorkspacesWorkspaceIdScoreboardsActive } from "@/api/generated/sc
 import {
   GetWorkspacesWorkspaceIdDashboardTeamParams,
   GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams,
+  GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams,
   GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams,
 } from "@/api/generated/dowin.schemas";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
@@ -28,6 +31,7 @@ type UseDashboardScoreboardQueriesParams = {
   currentWeekDates: string[];
   selectedMonthStart: string;
   selectedWeekStart: string;
+  selectedView: "week" | "month";
   weekDates: string[];
 };
 
@@ -36,6 +40,7 @@ export const useDashboardScoreboardQueries = ({
   currentWeekDates,
   selectedMonthStart,
   selectedWeekStart,
+  selectedView,
   weekDates,
 }: UseDashboardScoreboardQueriesParams) => {
   const {
@@ -71,6 +76,9 @@ export const useDashboardScoreboardQueries = ({
   const monthlyLogsParams: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams = {
     monthStart: selectedMonthStart,
   };
+  const monthlySummaryParams: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams = {
+    monthStart: selectedMonthStart,
+  };
   const trendWeekStarts = [-21, -14, -7, 0].map((offset) =>
     addDays(selectedWeekStart, offset),
   );
@@ -89,6 +97,14 @@ export const useDashboardScoreboardQueries = ({
         workspaceId,
         scoreboardId,
         monthlyLogsParams,
+      )
+      : null;
+  const monthlySummaryQueryKey =
+    scoreboardId !== null
+      ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey(
+        workspaceId,
+        scoreboardId,
+        monthlySummaryParams,
       )
       : null;
   const dashboardTeamQueryKey = getGetWorkspacesWorkspaceIdDashboardTeamQueryKey(
@@ -122,7 +138,22 @@ export const useDashboardScoreboardQueries = ({
     monthlyLogsParams,
     {
       query: {
-        enabled: scoreboardId !== null,
+        enabled: scoreboardId !== null && selectedView === "month",
+        retry: (failureCount: number, error: unknown) =>
+          getApiErrorStatus(error) !== 403 && failureCount < 1,
+      },
+    },
+  );
+  const {
+    data: monthlySummaryResponse,
+    isLoading: isMonthlySummaryLoading,
+    isFetching: isMonthlySummaryFetching,
+    error: monthlySummaryError,
+  } = useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary(workspaceId, scoreboardId ?? 0,
+    monthlySummaryParams,
+    {
+      query: {
+        enabled: scoreboardId !== null && selectedView !== "month",
         retry: (failureCount: number, error: unknown) =>
           getApiErrorStatus(error) !== 403 && failureCount < 1,
       },
@@ -158,10 +189,14 @@ export const useDashboardScoreboardQueries = ({
   const monthlySummary =
     monthlyLogsResponse?.status === 200
       ? monthlyLogsResponse.data.summary
+      : monthlySummaryResponse?.status === 200
+        ? monthlySummaryResponse.data.summary
       : undefined;
   const monthLabel =
     monthlyLogsResponse?.status === 200
       ? monthlyLogsResponse.data.monthLabel
+      : monthlySummaryResponse?.status === 200
+        ? monthlySummaryResponse.data.monthLabel
       : undefined;
   const activeLeadMeasures = (activeScoreboard?.leadMeasures ?? []).filter(
     (leadMeasure) => leadMeasure.status === "ACTIVE",
@@ -232,15 +267,16 @@ export const useDashboardScoreboardQueries = ({
     hasNoScoreboard: isScoreboard404 || !activeScoreboard,
     hasNoWorkspace: isWorkspace404,
     isLoading: (isWorkspaceLoading || isScoreboardLoading) && !isWorkspace404,
-    isMonthlyLogsLoading,
+    isMonthlyLogsLoading: isMonthlyLogsLoading || isMonthlySummaryLoading,
     isWeeklyLogsLoading,
-    isMonthlyLogsFetching,
+    isMonthlyLogsFetching: isMonthlyLogsFetching || isMonthlySummaryFetching,
     isWeeklyLogsFetching,
     isWeeklyTrendLoading: weeklyTrendQueries.some((query) => query.isLoading),
     monthLabel,
     monthlyLeadMeasures,
-    monthlyLogsError,
+    monthlyLogsError: monthlyLogsError ?? monthlySummaryError,
     monthlyLogsQueryKey,
+    monthlySummaryQueryKey,
     monthlyOverallRate,
     monthlySummary,
     scoreboardError,
