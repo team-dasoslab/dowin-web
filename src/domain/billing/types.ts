@@ -3,6 +3,7 @@ export const entitlementSourceValues = [
   "MANUAL_GRANT",
   "PARTNER",
   "INTERNAL_TEST",
+  "BETA_PROMOTIONAL_GRANT",
 ] as const;
 
 export type EntitlementSource = (typeof entitlementSourceValues)[number];

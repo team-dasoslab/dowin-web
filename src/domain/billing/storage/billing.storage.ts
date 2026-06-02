@@ -383,7 +383,7 @@ export class BillingStorage {
   async upsertWorkspaceSeatEntitlement(input: {
     workspaceId: number;
     purchasedSeatCount: number;
-    seatSource: "POLAR" | "MANUAL_GRANT";
+    seatSource: "POLAR" | "MANUAL_GRANT" | "BETA_PROMOTIONAL_GRANT";
   }) {
     await this.db
       .insert(workspaceSeatEntitlements)

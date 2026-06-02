@@ -1,5 +1,6 @@
 import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { type NullableEntitlementSource } from "@/domain/billing/types";
 
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<
@@ -16,7 +17,7 @@ type WorkspaceLookupPort = {
   findBillingState(workspaceId: number): Promise<{
     planCode: "BASIC" | "FREE" | "STANDARD";
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+    entitlementSource: NullableEntitlementSource;
   } | null>;
   findPlanLimit(
     planCode: "BASIC" | "FREE" | "STANDARD",

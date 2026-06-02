@@ -14,3 +14,7 @@ export function generateId() {
     Math.random().toString(36).substring(2, 11)
   );
 }
+
+export function generatePromotionCode(prefix = "DOWIN") {
+  return `${prefix}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+}

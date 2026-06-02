@@ -548,6 +548,177 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /admin/marketing-invite-codes:
+    get:
+      summary: 운영자 영구 무료 혜택 초대코드 목록 조회
+      tags: [AdminMarketing]
+      security: [{ adminSessionCookie: [] }]
+      responses:
+        "200":
+          description: 영구 무료 혜택 초대코드 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MarketingInviteCodeSummary"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+    post:
+      summary: 운영자 영구 무료 혜택 초대코드 생성
+      tags: [AdminMarketing]
+      security: [{ adminSessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketingInviteCodeCreateRequest"
+      responses:
+        "201":
+          description: 영구 무료 혜택 초대코드 생성 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketingInviteCodeDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 이미 사용 중인 코드
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/marketing-invite-codes/{id}:
+    get:
+      summary: 운영자 영구 무료 혜택 초대코드 상세 조회
+      tags: [AdminMarketing]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: 영구 무료 혜택 초대코드 상세 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketingInviteCodeDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 초대코드를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+    patch:
+      summary: 운영자 영구 무료 혜택 초대코드 수정
+      tags: [AdminMarketing]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketingInviteCodeUpdateRequest"
+      responses:
+        "200":
+          description: 영구 무료 혜택 초대코드 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketingInviteCodeDetail"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 초대코드를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 사용 횟수보다 낮은 한도 설정
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /admin/marketing-invite-redemptions/{id}/feedback:
+    patch:
+      summary: 운영자 영구 무료 혜택 피드백 상태/메모 수정
+      tags: [AdminMarketing]
+      security: [{ adminSessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarketingInviteRedemptionFeedbackUpdateRequest"
+      responses:
+        "200":
+          description: 피드백 상태/메모 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketingInviteRedemption"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 운영 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 사용 이력을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /auth/password/by-recovery-code:
     put:
       summary: 복원코드로 비밀번호 재설정
@@ -965,6 +1136,40 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "409":
           description: 결제가 아직 완료되지 않았거나 이미 워크스페이스가 있음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/beta-promotion/redeem:
+    post:
+      summary: 영구 무료 혜택 초대코드로 Basic 워크스페이스 생성
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarketingInviteRedeemRequest" }
+      responses:
+        "201":
+          description: 영구 무료 혜택 워크스페이스 생성 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MarketingInviteRedeemResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: 유효하지 않은 초대코드
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 이미 워크스페이스에 속했거나, 비활성/사용 횟수 초과/중복 사용 초대코드
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -2635,7 +2840,7 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST]
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
           nullable: true
         provider:
           type: string
@@ -2799,7 +3004,7 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST]
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
           nullable: true
         customerKey:
           type: string
@@ -2828,6 +3033,176 @@ components:
           type: string
           minLength: 1
           maxLength: 500
+
+    MarketingInviteCodeStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE]
+
+    MarketingInviteFeedbackStatus:
+      type: string
+      enum: [NOT_REQUESTED, REQUESTED, RECEIVED, DROPPED]
+
+    MarketingInviteCodeSummary:
+      type: object
+      required:
+        [
+          id,
+          code,
+          campaignName,
+          maxUses,
+          usedCount,
+          grantedSeatCount,
+          status,
+          createdByAdminUserId,
+          createdAt,
+          updatedAt,
+        ]
+      properties:
+        id: { type: integer }
+        code: { type: string }
+        campaignName: { type: string }
+        description:
+          type: string
+          nullable: true
+        maxUses:
+          type: integer
+          minimum: 1
+        usedCount:
+          type: integer
+          minimum: 0
+        grantedSeatCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+        status:
+          $ref: "#/components/schemas/MarketingInviteCodeStatus"
+        createdByAdminUserId: { type: integer }
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    MarketingInviteRedemption:
+      type: object
+      required:
+        [
+          id,
+          marketingInviteCodeId,
+          redeemedByUserId,
+          workspaceId,
+          redeemedAt,
+          feedbackStatus,
+        ]
+      properties:
+        id: { type: integer }
+        marketingInviteCodeId: { type: integer }
+        redeemedByUserId: { type: integer }
+        workspaceId: { type: integer }
+        redeemedAt:
+          type: string
+          format: date-time
+        feedbackStatus:
+          $ref: "#/components/schemas/MarketingInviteFeedbackStatus"
+        acquisitionSource:
+          type: string
+          enum: [MARKETING_INVITE]
+        campaignName:
+          type: string
+        operatorNote:
+          type: string
+          nullable: true
+
+    MarketingInviteCodeDetail:
+      allOf:
+        - $ref: "#/components/schemas/MarketingInviteCodeSummary"
+        - type: object
+          required: [redemptions]
+          properties:
+            redemptions:
+              type: array
+              items:
+                $ref: "#/components/schemas/MarketingInviteRedemption"
+
+    MarketingInviteCodeCreateRequest:
+      type: object
+      required: [campaignName, maxUses, grantedSeatCount]
+      properties:
+        code:
+          type: string
+          minLength: 6
+          maxLength: 32
+          description: 생략하면 서버가 자동 생성한다.
+        campaignName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        maxUses:
+          type: integer
+          minimum: 1
+          maximum: 999
+        grantedSeatCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+
+    MarketingInviteCodeUpdateRequest:
+      type: object
+      properties:
+        campaignName:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+          maxLength: 500
+        maxUses:
+          type: integer
+          minimum: 1
+          maximum: 999
+        grantedSeatCount:
+          type: integer
+          minimum: 1
+          maximum: 10
+        status:
+          $ref: "#/components/schemas/MarketingInviteCodeStatus"
+
+    MarketingInviteRedemptionFeedbackUpdateRequest:
+      type: object
+      required: [feedbackStatus]
+      properties:
+        feedbackStatus:
+          $ref: "#/components/schemas/MarketingInviteFeedbackStatus"
+        operatorNote:
+          type: string
+          nullable: true
+          maxLength: 5000
+
+    MarketingInviteRedeemRequest:
+      type: object
+      required: [code, workspaceName]
+      properties:
+        code:
+          type: string
+          minLength: 6
+          maxLength: 32
+        workspaceName:
+          type: string
+          minLength: 1
+          maxLength: 100
+
+    MarketingInviteRedeemResponse:
+      type: object
+      required: [workspaceId]
+      properties:
+        workspaceId:
+          type: string
 
     UserProfile:
       type: object
@@ -3177,7 +3552,7 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST]
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
           nullable: true
         provider:
           type: string
