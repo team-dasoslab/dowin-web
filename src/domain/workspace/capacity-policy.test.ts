@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { CapacityPolicy } from "@/domain/workspace/capacity-policy";
+import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { ConflictError, ForbiddenError } from "@/lib/server/errors";
 
 function createPolicy(input: {
@@ -9,7 +10,7 @@ function createPolicy(input: {
   billingState?: {
     planCode: "BASIC" | "FREE" | "STANDARD";
     billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+    entitlementSource: NullableEntitlementSource;
   } | null;
 }) {
   const storage = {

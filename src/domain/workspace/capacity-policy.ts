@@ -1,4 +1,5 @@
 import { ForbiddenError, ConflictError } from "@/lib/server/errors";
+import { type NullableEntitlementSource } from "@/domain/billing/types";
 
 type WorkspacePlanSummary = {
   id: number;
@@ -8,7 +9,7 @@ type WorkspacePlanSummary = {
 type WorkspaceBillingState = {
   planCode: "BASIC" | "FREE" | "STANDARD";
   billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-  entitlementSource: "POLAR" | "MANUAL_GRANT" | "PARTNER" | "INTERNAL_TEST" | null;
+  entitlementSource: NullableEntitlementSource;
 };
 
 type MemberCapacityPort = {

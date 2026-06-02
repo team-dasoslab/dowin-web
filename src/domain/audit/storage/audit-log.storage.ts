@@ -22,6 +22,8 @@ export class AuditLogStorage {
       | "TEAM_MEMO"
       | "USER"
       | "CONTACT_INQUIRY"
+      | "MARKETING_INVITE_CODE"
+      | "MARKETING_INVITE_REDEMPTION"
       | "ADMIN_USER"
       | "ADMIN_ROLE_GRANT"
       | "BILLING_PROVIDER_PRODUCT";

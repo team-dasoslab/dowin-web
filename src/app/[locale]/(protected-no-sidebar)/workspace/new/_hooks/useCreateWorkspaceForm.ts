@@ -5,6 +5,7 @@ import { useState } from "react";
 export const useCreateWorkspaceForm = () => {
   const [name, setName] = useState("");
   const [seatCount, setSeatCount] = useState("1");
+  const [promotionCode, setPromotionCode] = useState("");
   const [error, setError] = useState("");
 
   const handleNameChange = (value: string) => {
@@ -17,6 +18,14 @@ export const useCreateWorkspaceForm = () => {
 
   const handleSeatCountChange = (value: string) => {
     setSeatCount(value);
+
+    if (error) {
+      setError("");
+    }
+  };
+
+  const handlePromotionCodeChange = (value: string) => {
+    setPromotionCode(value);
 
     if (error) {
       setError("");
@@ -45,14 +54,21 @@ export const useCreateWorkspaceForm = () => {
     return parsed;
   };
 
+  const getValidatedPromotionCode = () => {
+    return promotionCode.trim();
+  };
+
   return {
     error,
     getValidatedName,
     getValidatedSeatCount,
+    getValidatedPromotionCode,
     name,
     seatCount,
+    promotionCode,
     setError,
     handleNameChange,
     handleSeatCountChange,
+    handlePromotionCodeChange,
   };
 };
