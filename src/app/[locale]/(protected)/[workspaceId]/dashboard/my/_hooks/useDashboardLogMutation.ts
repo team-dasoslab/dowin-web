@@ -3,6 +3,7 @@
 import {
   deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey,
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey,
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
   putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
   useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
@@ -35,6 +36,9 @@ type UseDashboardLogMutationParams = {
   monthlyLogsQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey
   > | null;
+  monthlySummaryQueryKey: ReturnType<
+    typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey
+  > | null;
   workspaceId: string;
 };
 
@@ -45,6 +49,7 @@ export const useDashboardLogMutation = ({
   weeklyById,
   weeklyLogsQueryKey,
   monthlyLogsQueryKey,
+  monthlySummaryQueryKey,
   workspaceId,
 }: UseDashboardLogMutationParams) => {
   const t = useTranslations("Dashboard.My");
@@ -88,6 +93,14 @@ export const useDashboardLogMutation = ({
       );
     }
 
+    if (context?.monthlySummaryQueryKey) {
+      invalidations.push(
+        queryClient.invalidateQueries({
+          queryKey: context.monthlySummaryQueryKey,
+        }),
+      );
+    }
+
     await Promise.all(invalidations);
   };
 
@@ -116,6 +129,7 @@ export const useDashboardLogMutation = ({
       previousWeeklyLogs,
       weeklyLogsQueryKey,
       monthlyLogsQueryKey,
+      monthlySummaryQueryKey,
     };
   };
 
