@@ -743,9 +743,9 @@ export const marketingInviteRedemptions = sqliteTable(
     redeemedByUserId: integer("redeemed_by_user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    workspaceId: integer("workspace_id")
-      .notNull()
-      .references(() => workspaces.id, { onDelete: "cascade" }),
+    workspaceId: integer("workspace_id").references(() => workspaces.id, {
+      onDelete: "set null",
+    }),
     redeemedAt: integer("redeemed_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),

@@ -411,7 +411,8 @@ export interface MarketingInviteRedemption {
   id: number;
   marketingInviteCodeId: number;
   redeemedByUserId: number;
-  workspaceId: number;
+  /** @nullable */
+  workspaceId?: number | null;
   redeemedAt: string;
   feedbackStatus: MarketingInviteFeedbackStatus;
   acquisitionSource?: MarketingInviteRedemptionAcquisitionSource;
