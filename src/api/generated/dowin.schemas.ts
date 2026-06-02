@@ -1066,6 +1066,13 @@ export interface MonthlyLogsResponse {
   leadMeasures?: MonthlyLogItem[];
 }
 
+export interface MonthlyLogsSummaryResponse {
+  monthStart?: string;
+  monthEnd?: string;
+  monthLabel?: string;
+  summary?: PeriodSummary;
+}
+
 export interface AnalyticsExportPeriodMeta {
   from: string;
   to: string;
@@ -1460,6 +1467,10 @@ weekStart?: string;
 };
 
 export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams = {
+monthStart?: string;
+};
+
+export type GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams = {
 monthStart?: string;
 };
 
