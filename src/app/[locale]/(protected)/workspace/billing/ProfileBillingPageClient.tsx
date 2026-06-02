@@ -28,6 +28,7 @@ type EntitlementSource =
   | "MANUAL_GRANT"
   | "PARTNER"
   | "INTERNAL_TEST"
+  | "BETA_PROMOTIONAL_GRANT"
   | null;
 
 export function ProfileBillingPageClient() {
