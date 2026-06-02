@@ -122,11 +122,7 @@ export default function NewWorkspacePage() {
                 required
               />
             )}
-            {!promotionCode && (
-              <p className="text-xs font-bold leading-relaxed text-zinc-400">
-                {t("seatDescription")}
-              </p>
-            )}
+
           </div>
 
           <div className="space-y-2">

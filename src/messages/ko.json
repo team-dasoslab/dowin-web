@@ -1007,9 +1007,9 @@
       "description": "워크스페이스 이름과 팀 인원에 맞는 좌석 수를 정하면 Basic 결제로 연결됩니다.\n\n좌석 수 기준으로 월 단위 정기결제가 이뤄지며, 해지 전까지 매달 자동 청구됩니다. 해지를 예약해도 이미 결제된 기간이 끝날 때까지 워크스페이스와 좌석 권한은 유지됩니다.",
       "label": "워크스페이스 이름",
       "placeholder": "예: 마케팅 팀, 회사명",
-      "seatLabel": "좌석 수",
+      "seatLabel": "멤버 한도",
       "seatPlaceholder": "예: 5",
-      "seatDescription": "좌석 수는 워크스페이스에 참여할 수 있는 멤버 한도입니다.",
+
       "seatAutoApplied": "프로모션 혜택 최대 좌석 수로 자동 적용됩니다.",
       "promotionCodeLabel": "프로모션 코드 (선택)",
       "promotionCodePlaceholder": "코드를 입력하세요",
