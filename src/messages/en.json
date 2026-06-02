@@ -924,7 +924,7 @@
     "BETA_PROMOTION_CODE_ALREADY_USED": "You have already used this lifetime free benefit code.",
     "BETA_PROMOTION_CODE_ALREADY_EXISTS": "This lifetime free benefit code is already in use.",
     "CUSTOM_ID_ALREADY_EXISTS": "This ID is already in use.",
-    "ALREADY_IN_WORKSPACE": "You are already in a workspace.",
+    "ALREADY_IN_WORKSPACE": "You are already in a workspace. Creating or joining multiple workspaces is not supported.",
     "WORKSPACE_PAYMENT_REQUIRED": "New workspaces can be created only after Basic seat payment.",
     "WORKSPACE_CHECKOUT_ALREADY_PENDING": "A workspace checkout is already in progress. Continue from the existing checkout page.",
     "WORKSPACE_CHECKOUT_NOT_READY": "Workspace checkout is not completed yet.",

@@ -74,7 +74,6 @@ export const useCreateWorkspaceMutation = ({
       });
       window.location.assign(response.data.checkoutUrl);
     } catch (error) {
-      // This will correctly parse error.response.data.error.message
       onError(
         getApiErrorMessage(error, "워크스페이스 생성 중 오류가 발생했습니다.")
       );
