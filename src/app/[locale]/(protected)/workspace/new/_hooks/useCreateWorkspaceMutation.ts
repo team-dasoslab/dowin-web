@@ -3,6 +3,7 @@
 import { postWorkspacesCheckout, postWorkspacesBetaPromotionRedeem } from "@/api/generated/workspace/workspace";
 import { trackEvent } from "@/lib/client/gtag";
 import { useRouter } from "@/i18n/routing";
+import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useState } from "react";
 
 type WorkspaceCreateError = {
@@ -73,10 +74,9 @@ export const useCreateWorkspaceMutation = ({
       });
       window.location.assign(response.data.checkoutUrl);
     } catch (error) {
-      const workspaceError = error as WorkspaceCreateError;
+      // This will correctly parse error.response.data.error.message
       onError(
-        workspaceError.data?.message ||
-          "워크스페이스 생성 중 오류가 발생했습니다.",
+        getApiErrorMessage(error, "워크스페이스 생성 중 오류가 발생했습니다.")
       );
     } finally {
       setIsPending(false);
