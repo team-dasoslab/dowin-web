@@ -566,7 +566,7 @@ describe("BillingService", () => {
     expect(createCheckoutSession).not.toHaveBeenCalled();
   });
 
-  it("ACTIVE Basic Polar 구독의 seat 변경을 Polar에 요청한다", async () => {
+  it("ACTIVE Basic Polar 구독의 seat 증가를 즉시 반영 정책으로 요청한다", async () => {
     const updateSubscriptionSeats = vi.fn().mockResolvedValue({
       subscriptionId: "sub_123",
       seats: 6,
@@ -583,6 +583,9 @@ describe("BillingService", () => {
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(4),
+        findSeatEntitlement: vi.fn().mockResolvedValue({
+          purchasedSeatCount: 5,
+        }),
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
@@ -612,11 +615,121 @@ describe("BillingService", () => {
       seatCount: 6,
       appliedSeatCount: 6,
       pendingSeatCount: null,
+      effectiveTiming: "IMMEDIATE",
     });
     expect(updateSubscriptionSeats).toHaveBeenCalledWith({
       subscriptionId: "sub_123",
       seatCount: 6,
+      prorationBehavior: "prorate",
     });
+  });
+
+  it("ACTIVE Basic Polar 구독의 seat 감소를 다음 결제주기 적용 정책으로 요청한다", async () => {
+    const updateSubscriptionSeats = vi.fn().mockResolvedValue({
+      subscriptionId: "sub_123",
+      seats: 5,
+      pendingSeats: 4,
+    });
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+        }),
+        findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
+        countMembers: vi.fn().mockResolvedValue(3),
+        findSeatEntitlement: vi.fn().mockResolvedValue({
+          purchasedSeatCount: 5,
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          subscriptionKey: "sub_123",
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats,
+      },
+    );
+
+    await expect(
+      service.updateSubscriptionSeats({
+        workspaceUid: "ws_abc",
+        userId: 7,
+        seatCount: 4,
+      }),
+    ).resolves.toEqual({
+      seatCount: 4,
+      appliedSeatCount: 5,
+      pendingSeatCount: 4,
+      effectiveTiming: "NEXT_PERIOD",
+    });
+    expect(updateSubscriptionSeats).toHaveBeenCalledWith({
+      subscriptionId: "sub_123",
+      seatCount: 4,
+      prorationBehavior: "next_period",
+    });
+  });
+
+  it("요청 seat가 현재 구매 seat와 같으면 Polar 변경 요청을 보내지 않는다", async () => {
+    const updateSubscriptionSeats = vi.fn();
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+        }),
+        findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
+        countMembers: vi.fn().mockResolvedValue(3),
+        findSeatEntitlement: vi.fn().mockResolvedValue({
+          purchasedSeatCount: 5,
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          subscriptionKey: "sub_123",
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats,
+      },
+    );
+
+    await expect(
+      service.updateSubscriptionSeats({
+        workspaceUid: "ws_abc",
+        userId: 7,
+        seatCount: 5,
+      }),
+    ).resolves.toEqual({
+      seatCount: 5,
+      appliedSeatCount: 5,
+      pendingSeatCount: null,
+      effectiveTiming: "UNCHANGED",
+    });
+    expect(updateSubscriptionSeats).not.toHaveBeenCalled();
   });
 
   it("요청 seat가 현재 멤버 수보다 작으면 구독 seat 변경을 막는다", async () => {
@@ -632,6 +745,7 @@ describe("BillingService", () => {
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(4),
+        findSeatEntitlement: vi.fn(),
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({

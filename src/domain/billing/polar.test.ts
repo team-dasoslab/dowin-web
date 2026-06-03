@@ -67,6 +67,7 @@ describe("createPolarBillingClient", () => {
       client?.updateSubscriptionSeats({
         subscriptionId: "sub_123",
         seatCount: 5,
+        prorationBehavior: "prorate",
       }),
     ).resolves.toEqual({
       subscriptionId: "sub_123",
@@ -78,7 +79,10 @@ describe("createPolarBillingClient", () => {
       "https://sandbox-api.polar.sh/v1/subscriptions/sub_123",
       expect.objectContaining({
         method: "PATCH",
-        body: JSON.stringify({ seats: 5 }),
+        body: JSON.stringify({
+          seats: 5,
+          proration_behavior: "prorate",
+        }),
       }),
     );
   });

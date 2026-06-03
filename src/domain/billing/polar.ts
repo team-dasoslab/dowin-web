@@ -52,6 +52,8 @@ type SubscriptionUpdateResponse = {
   } | null;
 };
 
+type SubscriptionProrationBehavior = "invoice" | "prorate" | "next_period";
+
 export type PolarBillingClient = {
   environment: "sandbox" | "production";
   createCheckoutSession(input: {
@@ -89,6 +91,7 @@ export type PolarBillingClient = {
   updateSubscriptionSeats(input: {
     subscriptionId: string;
     seatCount: number;
+    prorationBehavior: SubscriptionProrationBehavior;
   }): Promise<{
     subscriptionId: string;
     seats: number | null;
@@ -310,14 +313,21 @@ export function createPolarBillingClient(
       };
     },
 
-    async updateSubscriptionSeats({ subscriptionId, seatCount }) {
+    async updateSubscriptionSeats({
+      subscriptionId,
+      seatCount,
+      prorationBehavior,
+    }) {
       const response = await fetch(`${apiBaseUrl}/subscriptions/${subscriptionId}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ seats: seatCount }),
+        body: JSON.stringify({
+          seats: seatCount,
+          proration_behavior: prorationBehavior,
+        }),
       });
 
       const data = await parsePolarResponse<SubscriptionUpdateResponse>(

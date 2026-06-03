@@ -84,6 +84,7 @@ describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
       seatCount: 5,
       appliedSeatCount: 5,
       pendingSeatCount: null,
+      effectiveTiming: "IMMEDIATE",
     });
 
     const { PATCH } = await import("./route");
@@ -98,6 +99,7 @@ describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
       seatCount: number;
       appliedSeatCount: number | null;
       pendingSeatCount: number | null;
+      effectiveTiming: string;
     };
 
     expect(response.status).toBe(200);
@@ -105,6 +107,7 @@ describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
       seatCount: 5,
       appliedSeatCount: 5,
       pendingSeatCount: null,
+      effectiveTiming: "IMMEDIATE",
     });
     expect(mockUpdateSubscriptionSeats).toHaveBeenCalledWith({
       workspaceUid: "ws_uid",

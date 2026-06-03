@@ -328,6 +328,7 @@ export class BillingService {
     seatCount: number;
     appliedSeatCount: number | null;
     pendingSeatCount: number | null;
+    effectiveTiming: "IMMEDIATE" | "NEXT_PERIOD" | "UNCHANGED";
   }> {
     const { workspace, membership } = await this.getWorkspace(
       input.workspaceUid,
@@ -361,16 +362,39 @@ export class BillingService {
       throw new ConflictError("BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT");
     }
 
+    const seatEntitlement = await this.workspaceStorage.findSeatEntitlement(
+      workspace.id,
+    );
+    const currentSeatCount = seatEntitlement?.purchasedSeatCount ?? null;
+
+    if (!currentSeatCount) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    if (input.seatCount === currentSeatCount) {
+      return {
+        seatCount: input.seatCount,
+        appliedSeatCount: currentSeatCount,
+        pendingSeatCount: null,
+        effectiveTiming: "UNCHANGED",
+      };
+    }
+
+    const isSeatIncrease = input.seatCount > currentSeatCount;
+    const prorationBehavior = isSeatIncrease ? "prorate" : "next_period";
+
     try {
       const result = await this.polarClient.updateSubscriptionSeats({
         subscriptionId: billingState.subscriptionKey,
         seatCount: input.seatCount,
+        prorationBehavior,
       });
 
       return {
         seatCount: input.seatCount,
         appliedSeatCount: result.seats,
         pendingSeatCount: result.pendingSeats,
+        effectiveTiming: isSeatIncrease ? "IMMEDIATE" : "NEXT_PERIOD",
       };
     } catch (error) {
       if (isPolarRecoverableError(error)) {
