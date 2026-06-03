@@ -828,6 +828,18 @@ export interface WorkspaceBillingSeatUpdateRequest {
   seatCount: number;
 }
 
+/**
+ * 요청 seat 수가 현재 구매 seat보다 크면 즉시 반영, 작으면 다음 결제주기 적용, 같으면 변경 없음
+ */
+export type WorkspaceBillingSeatUpdateResponseEffectiveTiming = typeof WorkspaceBillingSeatUpdateResponseEffectiveTiming[keyof typeof WorkspaceBillingSeatUpdateResponseEffectiveTiming];
+
+
+export const WorkspaceBillingSeatUpdateResponseEffectiveTiming = {
+  IMMEDIATE: 'IMMEDIATE',
+  NEXT_PERIOD: 'NEXT_PERIOD',
+  UNCHANGED: 'UNCHANGED',
+} as const;
+
 export interface WorkspaceBillingSeatUpdateResponse {
   /**
    * 요청한 seat 수
@@ -845,6 +857,8 @@ export interface WorkspaceBillingSeatUpdateResponse {
    * @nullable
    */
   pendingSeatCount?: number | null;
+  /** 요청 seat 수가 현재 구매 seat보다 크면 즉시 반영, 작으면 다음 결제주기 적용, 같으면 변경 없음 */
+  effectiveTiming: WorkspaceBillingSeatUpdateResponseEffectiveTiming;
 }
 
 export interface WorkspaceCheckoutCompleteRequest {
