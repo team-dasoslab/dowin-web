@@ -947,6 +947,7 @@
     "FUTURE_DATE_NOT_ALLOWED": "미래 날짜에는 기록할 수 없습니다.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
     "BILLING_NOT_READY": "결제 연동 준비가 아직 끝나지 않았습니다.",
+    "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "현재 멤버 수보다 낮은 좌석 수는 설정할 수 없습니다. 먼저 멤버를 정리한 뒤 다시 시도해주세요.",
     "BILLING_REVIEW_REQUIRED": "반복 환불 또는 취소 이력이 있어 결제를 바로 다시 시작할 수 없습니다. 고객지원으로 문의해주세요."
   },
   "Auth": {

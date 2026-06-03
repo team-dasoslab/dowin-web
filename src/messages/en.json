@@ -944,6 +944,7 @@
     "FUTURE_DATE_NOT_ALLOWED": "Cannot record data for future dates.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
     "BILLING_NOT_READY": "Billing integration is not ready yet.",
+    "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "Seat count cannot be lower than the current number of members. Remove members first, then try again.",
     "BILLING_REVIEW_REQUIRED": "This workspace has repeated refund or cancellation history, so a new checkout cannot be started right now. Please contact support."
   },
   "Auth": {

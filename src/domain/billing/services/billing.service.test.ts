@@ -174,6 +174,7 @@ describe("BillingService", () => {
         createCheckoutSession: vi.fn(),
         createCustomerSession,
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -215,6 +216,7 @@ describe("BillingService", () => {
         createCheckoutSession: vi.fn(),
         createCustomerSession,
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -256,6 +258,7 @@ describe("BillingService", () => {
         createCheckoutSession: vi.fn(),
         createCustomerSession,
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -302,6 +305,7 @@ describe("BillingService", () => {
         createCheckoutSession,
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -373,6 +377,7 @@ describe("BillingService", () => {
         createCheckoutSession,
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -435,6 +440,7 @@ describe("BillingService", () => {
         createCheckoutSession,
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -490,6 +496,7 @@ describe("BillingService", () => {
         createCheckoutSession,
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -540,6 +547,7 @@ describe("BillingService", () => {
         createCheckoutSession,
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
       },
     );
 
@@ -556,6 +564,105 @@ describe("BillingService", () => {
       }),
     );
     expect(createCheckoutSession).not.toHaveBeenCalled();
+  });
+
+  it("ACTIVE Basic Polar 구독의 seat 변경을 Polar에 요청한다", async () => {
+    const updateSubscriptionSeats = vi.fn().mockResolvedValue({
+      subscriptionId: "sub_123",
+      seats: 6,
+      pendingSeats: null,
+    });
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+        }),
+        findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
+        countMembers: vi.fn().mockResolvedValue(4),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          subscriptionKey: "sub_123",
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats,
+      },
+    );
+
+    await expect(
+      service.updateSubscriptionSeats({
+        workspaceUid: "ws_abc",
+        userId: 7,
+        seatCount: 6,
+      }),
+    ).resolves.toEqual({
+      seatCount: 6,
+      appliedSeatCount: 6,
+      pendingSeatCount: null,
+    });
+    expect(updateSubscriptionSeats).toHaveBeenCalledWith({
+      subscriptionId: "sub_123",
+      seatCount: 6,
+    });
+  });
+
+  it("요청 seat가 현재 멤버 수보다 작으면 구독 seat 변경을 막는다", async () => {
+    const updateSubscriptionSeats = vi.fn();
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+        }),
+        findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
+        countMembers: vi.fn().mockResolvedValue(4),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          subscriptionKey: "sub_123",
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats,
+      },
+    );
+
+    await expect(
+      service.updateSubscriptionSeats({
+        workspaceUid: "ws_abc",
+        userId: 7,
+        seatCount: 3,
+      }),
+    ).rejects.toEqual(
+      expect.objectContaining<Partial<ConflictError>>({
+        code: "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT",
+      }),
+    );
+    expect(updateSubscriptionSeats).not.toHaveBeenCalled();
   });
 
   it("관리자가 아니면 Basic checkout을 시작할 수 없다", async () => {

@@ -53,6 +53,7 @@ const createPolarClient = (
     subscriptionKey: "sub_1",
     seats: null,
   }),
+  updateSubscriptionSeats: vi.fn(),
   ...overrides,
 });
 

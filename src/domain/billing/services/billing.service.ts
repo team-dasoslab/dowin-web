@@ -320,6 +320,67 @@ export class BillingService {
     }
   }
 
+  async updateSubscriptionSeats(input: {
+    workspaceUid: string;
+    userId: number;
+    seatCount: number;
+  }): Promise<{
+    seatCount: number;
+    appliedSeatCount: number | null;
+    pendingSeatCount: number | null;
+  }> {
+    const { workspace, membership } = await this.getWorkspace(
+      input.workspaceUid,
+      input.userId,
+    );
+
+    if (membership.role !== "ADMIN") {
+      throw new ForbiddenError("FORBIDDEN");
+    }
+
+    const billingState = await this.billingStorage.findWorkspaceBillingState(
+      workspace.id,
+    );
+
+    if (
+      !billingState ||
+      billingState.planCode !== "BASIC" ||
+      billingState.billingStatus !== "ACTIVE" ||
+      billingState.entitlementSource !== "POLAR" ||
+      !billingState.subscriptionKey
+    ) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    if (!this.polarClient) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    const memberCount = await this.workspaceStorage.countMembers(workspace.id);
+    if (input.seatCount < memberCount) {
+      throw new ConflictError("BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT");
+    }
+
+    try {
+      const result = await this.polarClient.updateSubscriptionSeats({
+        subscriptionId: billingState.subscriptionKey,
+        seatCount: input.seatCount,
+      });
+
+      return {
+        seatCount: input.seatCount,
+        appliedSeatCount: result.seats,
+        pendingSeatCount: result.pendingSeats,
+      };
+    } catch (error) {
+      if (isPolarRecoverableError(error)) {
+        throw new ConflictError("BILLING_NOT_READY");
+      }
+
+      throw error;
+    }
+  }
+
   private async getBillingRiskSummary(
     scope: BillingRiskScope,
   ): Promise<BillingRiskSummary> {

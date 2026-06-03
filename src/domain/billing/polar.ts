@@ -41,6 +41,17 @@ type CheckoutSessionDetailResponse = {
   customerId?: string | null;
 };
 
+type SubscriptionUpdateResponse = {
+  id: string;
+  seats?: number | null;
+  pending_update?: {
+    seats?: number | null;
+  } | null;
+  pendingUpdate?: {
+    seats?: number | null;
+  } | null;
+};
+
 export type PolarBillingClient = {
   environment: "sandbox" | "production";
   createCheckoutSession(input: {
@@ -74,6 +85,14 @@ export type PolarBillingClient = {
     subscriptionKey: string | null;
     customerKey: string | null;
     seats: number | null;
+  }>;
+  updateSubscriptionSeats(input: {
+    subscriptionId: string;
+    seatCount: number;
+  }): Promise<{
+    subscriptionId: string;
+    seats: number | null;
+    pendingSeats: number | null;
   }>;
 };
 
@@ -287,6 +306,35 @@ export function createPolarBillingClient(
         seats:
           typeof data.seats === "number" && Number.isFinite(data.seats)
             ? data.seats
+            : null,
+      };
+    },
+
+    async updateSubscriptionSeats({ subscriptionId, seatCount }) {
+      const response = await fetch(`${apiBaseUrl}/subscriptions/${subscriptionId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ seats: seatCount }),
+      });
+
+      const data = await parsePolarResponse<SubscriptionUpdateResponse>(
+        response,
+      );
+      const pendingUpdate = data.pendingUpdate ?? data.pending_update ?? null;
+
+      return {
+        subscriptionId: data.id,
+        seats:
+          typeof data.seats === "number" && Number.isFinite(data.seats)
+            ? data.seats
+            : null,
+        pendingSeats:
+          typeof pendingUpdate?.seats === "number" &&
+          Number.isFinite(pendingUpdate.seats)
+            ? pendingUpdate.seats
             : null,
       };
     },
