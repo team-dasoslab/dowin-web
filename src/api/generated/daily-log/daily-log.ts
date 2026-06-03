@@ -86,7 +86,7 @@ export const getPutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl = (
     date: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${workspaceId}/lead-measures/${leadMeasureId}/logs/${date}`
 }
@@ -95,9 +95,9 @@ export const putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate = async (
     leadMeasureId: number,
     date: string,
     dailyLogUpsertRequest: DailyLogUpsertRequest, options?: RequestInit): Promise<putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse> => {
-
+  
   return customInstance<putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse>(getPutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl(workspaceId,leadMeasureId,date),
-  {
+  {      
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -105,7 +105,7 @@ export const putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate = async (
       dailyLogUpsertRequest,)
   }
 );}
-
+  
 
 
 
@@ -120,7 +120,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, {workspaceId: string;leadMeasureId: number;date: string;data: DailyLogUpsertRequest}> = (props) => {
@@ -131,7 +131,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -185,7 +185,7 @@ export const getDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl 
     date: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${workspaceId}/lead-measures/${leadMeasureId}/logs/${date}`
 }
@@ -193,16 +193,16 @@ export const getDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl 
 export const deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate = async (workspaceId: string,
     leadMeasureId: number,
     date: string, options?: RequestInit): Promise<deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse> => {
-
+  
   return customInstance<deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateResponse>(getDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateUrl(workspaceId,leadMeasureId,date),
-  {
+  {      
     ...options,
     method: 'DELETE'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -217,7 +217,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>, {workspaceId: string;leadMeasureId: number;date: string}> = (props) => {
@@ -228,13 +228,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate>>>
-
+    
     export type DeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDateMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
@@ -283,7 +283,7 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyUrl = (
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
+    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
@@ -297,16 +297,16 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyUrl = (
 export const getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly = async (workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse> => {
-
+  
   return customInstance<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse>(getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyUrl(workspaceId,scoreboardId,params),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -319,7 +319,7 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKe
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
@@ -329,13 +329,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey(workspaceId,scoreboardId,params);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly(workspaceId,scoreboardId,params, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(workspaceId && scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -382,7 +382,7 @@ export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly<TDa
  workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeekly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryOptions(workspaceId,scoreboardId,params,options)
@@ -428,7 +428,7 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyUrl = 
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
+    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
@@ -442,16 +442,16 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyUrl = 
 export const getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly = async (workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse> => {
-
+  
   return customInstance<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyResponse>(getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyUrl(workspaceId,scoreboardId,params),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -464,7 +464,7 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryK
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
@@ -474,13 +474,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey(workspaceId,scoreboardId,params);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly(workspaceId,scoreboardId,params, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(workspaceId && scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -527,7 +527,7 @@ export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly<TD
  workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthly>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryOptions(workspaceId,scoreboardId,params,options)
@@ -573,7 +573,7 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummar
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-
+    
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
@@ -587,16 +587,16 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummar
 export const getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary = async (workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryResponse> => {
-
+  
   return customInstance<getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryResponse>(getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryUrl(workspaceId,scoreboardId,params),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -609,7 +609,7 @@ export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummar
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
@@ -619,13 +619,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey(workspaceId,scoreboardId,params);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary>>> = ({ signal }) => getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary(workspaceId,scoreboardId,params, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(workspaceId && scoreboardId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -672,7 +672,7 @@ export function useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySum
  workspaceId: string,
     scoreboardId: number,
     params?: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummary>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryOptions(workspaceId,scoreboardId,params,options)
