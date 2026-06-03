@@ -8,6 +8,7 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
+import { useUpdateWorkspaceSeatsMutation } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useUpdateWorkspaceSeatsMutation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -51,6 +52,35 @@ export function ProfileBillingPageClient() {
   const { handleReturnedFromCheckout, openPortal, isPortalPending } =
     useProfileBillingActions(workspaceId);
   const [isReturningFromCheckout, setIsReturningFromCheckout] = useState(false);
+  const { updateSeats, isUpdatingSeats } = useUpdateWorkspaceSeatsMutation(workspaceId ?? "");
+
+  const handleSeatChangeClick = () => {
+    if (!billingResponse || billingResponse.status !== 200) return;
+    const currentBilling = billingResponse.data;
+    const currentUsedSeats = currentBilling.usedSeatCount ?? 1;
+    const initialSeats = currentBilling.purchasedSeatCount ?? currentUsedSeats;
+
+    const input = window.prompt(t("seatChangeDialogDesc"), initialSeats.toString());
+    if (input === null) return;
+
+    const count = parseInt(input.trim(), 10);
+    if (isNaN(count)) {
+      alert(t("seatChangeMinError"));
+      return;
+    }
+
+    if (count < currentUsedSeats) {
+      alert(t("seatChangeErrorLowerThanCurrent", { current: currentUsedSeats }));
+      return;
+    }
+
+    if (count > 999) {
+      alert(t("seatChangeMaxError"));
+      return;
+    }
+
+    updateSeats({ workspaceId: workspaceId ?? "", data: { seatCount: count } });
+  };
 
   useEffect(() => {
     const currentUrl = new URL(window.location.href);
@@ -206,20 +236,47 @@ export function ProfileBillingPageClient() {
                   : t("statusInactiveLabel")}
               </span>
             </div>
-            {billing.purchasedSeatCount !== null && (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
-              <div className="flex items-center justify-between p-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                    <DowinIcon name="domain-people" size="16px" />
+            {(billing.purchasedSeatCount !== null || billing.usedSeatCount !== null) && (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
+              <>
+                <div className="flex items-center justify-between p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                      <DowinIcon name="domain-people" size="16px" />
+                    </div>
+                    <span className="text-sm font-bold text-zinc-500">
+                      {t("usedSeatLabel")}
+                    </span>
                   </div>
-                  <span className="text-sm font-bold text-zinc-500">
-                    {t("purchasedSeatLabel")}
+                  <span className="text-sm font-black text-zinc-900">
+                    {billing.usedSeatCount ?? 0} {t("seatUnit")}
                   </span>
                 </div>
-                <span className="text-sm font-black text-zinc-900">
-                  {billing.purchasedSeatCount} {t("seatUnit")}
-                </span>
-              </div>
+                <div className="flex items-center justify-between p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                      <DowinIcon name="domain-people" size="16px" />
+                    </div>
+                    <span className="text-sm font-bold text-zinc-500">
+                      {t("purchasedSeatLabel")}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-black text-zinc-900">
+                      {billing.purchasedSeatCount} {t("seatUnit")}
+                    </span>
+                    {isAdmin && isPolarEntitlement && (
+                      <Button
+                        type="button"
+                        onClick={handleSeatChangeClick}
+                        disabled={isUpdatingSeats}
+                        className="h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
+                      >
+                        {isUpdatingSeats ? t("seatChangeDialogSubmitting") : t("seatChangeButton")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </>
             )}
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-3">

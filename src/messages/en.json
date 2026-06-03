@@ -733,7 +733,20 @@
     "statusDescNonPolarActive": "Basic access is currently active through {source}.",
     "statusDescCanceled": "Even if cancellation is scheduled, Basic access remains available until the end date. The scheduled end date is {date}.",
     "statusDescExpired": "The Basic access period has ended. Contact support if you need to keep using this workspace.",
-    "statusDescRevoked": "Basic access was removed immediately due to a refund or forced cancellation."
+    "statusDescRevoked": "Basic access was removed immediately due to a refund or forced cancellation.",
+    "usedSeatLabel": "Used members",
+    "seatChangeButton": "Change limit",
+    "seatChangeDialogTitle": "Change member limit",
+    "seatChangeDialogDesc": "Enter a new member limit. You cannot set it lower than your current member count.",
+    "seatChangeDialogInputLabel": "Member limit",
+    "seatChangeDialogCancel": "Cancel",
+    "seatChangeDialogSubmit": "Request change",
+    "seatChangeDialogSubmitting": "Requesting...",
+    "seatChangeErrorLowerThanCurrent": "Cannot be set lower than the current used members ({current}).",
+    "seatChangeSuccess": "Change request received. Final reflection will be applied after payment status update.",
+    "seatChangeMinError": "Must be at least 1.",
+    "seatChangeMaxError": "Can be at most 999.",
+    "seatChangeFailed": "An error occurred while processing the request."
   },
   "ProfileExport": {
     "appUnavailableTitle": "This screen is not available in the app",
@@ -1007,7 +1020,6 @@
       "placeholder": "e.g. Marketing Team, Company Name",
       "seatLabel": "Member limit",
       "seatPlaceholder": "e.g. 5",
-
       "seatAutoApplied": "Max seats from promotion automatically applied.",
       "promotionCodeLabel": "Promotion Code (Optional)",
       "promotionCodePlaceholder": "Enter code",
