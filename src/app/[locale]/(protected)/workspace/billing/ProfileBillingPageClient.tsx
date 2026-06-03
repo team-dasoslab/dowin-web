@@ -181,7 +181,7 @@ export function ProfileBillingPageClient() {
                 size="14px"
                 className="mt-0.5 shrink-0"
               />
-              Basic 영구 무료 혜택이 적용되어 있어요. 결제 없이 Basic 기능을 계속 사용할 수 있으며, 최대 {billing.purchasedSeatCount ?? 1}명까지 함께 사용할 수 있습니다.
+              Basic 프로모션 코드가 적용되어 있어요. 결제 없이 Basic 기능을 계속 사용할 수 있으며, 최대 {billing.purchasedSeatCount ?? 1}명까지 함께 사용할 수 있습니다.
             </div>
           ) : billing.entitlementSource && !isPolarEntitlement ? (
             <div className="flex items-start gap-2.5 rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">

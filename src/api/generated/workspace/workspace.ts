@@ -473,7 +473,7 @@ export const usePostWorkspacesCheckoutComplete = <TError = UnauthorizedErrorResp
       return useMutation(getPostWorkspacesCheckoutCompleteMutationOptions(options), queryClient);
     }
     /**
- * @summary 영구 무료 혜택 초대코드로 Basic 워크스페이스 생성
+ * @summary 프로모션 코드 초대코드로 Basic 워크스페이스 생성
  */
 export type postWorkspacesBetaPromotionRedeemResponse201 = {
   data: MarketingInviteRedeemResponse
@@ -564,7 +564,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PostWorkspacesBetaPromotionRedeemMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary 영구 무료 혜택 초대코드로 Basic 워크스페이스 생성
+ * @summary 프로모션 코드 초대코드로 Basic 워크스페이스 생성
  */
 export const usePostWorkspacesBetaPromotionRedeem = <TError = UnauthorizedErrorResponse | ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>, TError,{data: MarketingInviteRedeemRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
