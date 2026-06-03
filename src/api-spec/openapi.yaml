@@ -2526,6 +2526,52 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /workspaces/{workspaceId}/billing/seats:
+    patch:
+      summary: Basic 구독 seat 수 변경
+      tags: [Billing]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateRequest" }
+      responses:
+        "200":
+          description: seat 변경 요청 접수
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 관리자만 seat 수를 변경할 수 있음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 현재 상태에서는 seat 수를 변경할 수 없거나 현재 멤버 수보다 낮은 seat 요청
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /workspaces/{workspaceId}/dashboard/team:
     get:
       summary: 팀 대시보드 조회
@@ -3497,6 +3543,38 @@ components:
           type: string
           nullable: true
           description: Polar checkout ID
+
+    WorkspaceBillingSeatUpdateRequest:
+      type: object
+      required: [seatCount]
+      properties:
+        seatCount:
+          type: integer
+          minimum: 1
+          maximum: 999
+          description: 변경할 Basic 구독 seat 수. 현재 워크스페이스 멤버 수보다 낮을 수 없다.
+          example: 5
+
+    WorkspaceBillingSeatUpdateResponse:
+      type: object
+      required: [seatCount]
+      properties:
+        seatCount:
+          type: integer
+          minimum: 1
+          maximum: 999
+          description: 요청한 seat 수
+          example: 5
+        appliedSeatCount:
+          type: integer
+          nullable: true
+          description: Polar 응답 기준 즉시 반영된 seat 수. 최종 entitlement 반영은 webhook 기준이다.
+          example: 5
+        pendingSeatCount:
+          type: integer
+          nullable: true
+          description: Polar 응답 기준 다음 주기에 적용 대기 중인 seat 수
+          example: null
 
     WorkspaceCheckoutCompleteRequest:
       type: object

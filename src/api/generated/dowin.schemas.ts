@@ -819,6 +819,34 @@ export interface WorkspaceBillingCheckoutResponse {
   checkoutId?: string | null;
 }
 
+export interface WorkspaceBillingSeatUpdateRequest {
+  /**
+   * 변경할 Basic 구독 seat 수. 현재 워크스페이스 멤버 수보다 낮을 수 없다.
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount: number;
+}
+
+export interface WorkspaceBillingSeatUpdateResponse {
+  /**
+   * 요청한 seat 수
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount: number;
+  /**
+   * Polar 응답 기준 즉시 반영된 seat 수. 최종 entitlement 반영은 webhook 기준이다.
+   * @nullable
+   */
+  appliedSeatCount?: number | null;
+  /**
+   * Polar 응답 기준 다음 주기에 적용 대기 중인 seat 수
+   * @nullable
+   */
+  pendingSeatCount?: number | null;
+}
+
 export interface WorkspaceCheckoutCompleteRequest {
   /**
    * /workspaces/checkout 응답으로 받은 pending workspace checkout ID
