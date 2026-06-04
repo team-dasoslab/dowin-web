@@ -32,6 +32,20 @@ type EntitlementSource =
   | "BETA_PROMOTIONAL_GRANT"
   | null;
 
+function getPeriodEndLabelKey(status?: string | null) {
+  switch (status) {
+    case "ACTIVE":
+      return "nextRenewalLabel" as const;
+    case "CANCELED":
+      return "scheduledEndLabel" as const;
+    case "EXPIRED":
+    case "REVOKED":
+      return "periodEndedLabel" as const;
+    default:
+      return "currentPeriodEndLabel" as const;
+  }
+}
+
 export function ProfileBillingPageClient() {
   const t = useTranslations("ProfileBilling");
   const isNativeApp = useNativeApp();
@@ -52,7 +66,9 @@ export function ProfileBillingPageClient() {
   const { handleReturnedFromCheckout, openPortal, isPortalPending } =
     useProfileBillingActions(workspaceId);
   const [isReturningFromCheckout, setIsReturningFromCheckout] = useState(false);
-  const { updateSeats, isUpdatingSeats } = useUpdateWorkspaceSeatsMutation(workspaceId ?? "");
+  const { updateSeats, isUpdatingSeats } = useUpdateWorkspaceSeatsMutation(
+    workspaceId ?? "",
+  );
 
   const handleSeatChangeClick = () => {
     if (!billingResponse || billingResponse.status !== 200) return;
@@ -60,7 +76,10 @@ export function ProfileBillingPageClient() {
     const currentUsedSeats = currentBilling.usedSeatCount ?? 1;
     const initialSeats = currentBilling.purchasedSeatCount ?? currentUsedSeats;
 
-    const input = window.prompt(t("seatChangeDialogDesc"), initialSeats.toString());
+    const input = window.prompt(
+      t("seatChangeDialogDesc"),
+      initialSeats.toString(),
+    );
     if (input === null) return;
 
     const count = parseInt(input.trim(), 10);
@@ -70,7 +89,9 @@ export function ProfileBillingPageClient() {
     }
 
     if (count < currentUsedSeats) {
-      alert(t("seatChangeErrorLowerThanCurrent", { current: currentUsedSeats }));
+      alert(
+        t("seatChangeErrorLowerThanCurrent", { current: currentUsedSeats }),
+      );
       return;
     }
 
@@ -90,7 +111,11 @@ export function ProfileBillingPageClient() {
       showToast("error", t("portalFailed"));
       currentUrl.searchParams.delete("billing");
       currentUrl.searchParams.delete("code");
-      window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+      window.history.replaceState(
+        {},
+        "",
+        currentUrl.pathname + currentUrl.search,
+      );
       return;
     }
 
@@ -100,7 +125,11 @@ export function ProfileBillingPageClient() {
 
     setIsReturningFromCheckout(true);
     currentUrl.searchParams.delete("billing");
-    window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
+    window.history.replaceState(
+      {},
+      "",
+      currentUrl.pathname + currentUrl.search,
+    );
     void handleReturnedFromCheckout();
   }, [handleReturnedFromCheckout, showToast, t]);
 
@@ -129,7 +158,8 @@ export function ProfileBillingPageClient() {
   const canOpenPortal =
     isAdmin &&
     isPolarEntitlement &&
-    (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED");
+    (billing.billingStatus === "ACTIVE" ||
+      billing.billingStatus === "CANCELED");
 
   return (
     <div className="min-h-screen bg-zinc-50/50">
@@ -181,7 +211,9 @@ export function ProfileBillingPageClient() {
                 size="14px"
                 className="mt-0.5 shrink-0"
               />
-              Basic 프로모션 코드가 적용되어 있어요. 결제 없이 Basic 기능을 계속 사용할 수 있으며, 최대 {billing.purchasedSeatCount ?? 1}명까지 함께 사용할 수 있습니다.
+              Basic 프로모션 코드가 적용되어 있어요. 결제 없이 Basic 기능을 계속
+              사용할 수 있으며, 최대 {billing.purchasedSeatCount ?? 1}명까지
+              함께 사용할 수 있습니다.
             </div>
           ) : billing.entitlementSource && !isPolarEntitlement ? (
             <div className="flex items-start gap-2.5 rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
@@ -209,9 +241,7 @@ export function ProfileBillingPageClient() {
                   {t("planLabel")}
                 </span>
               </div>
-              <span
-                className="text-sm font-black text-primary"
-              >
+              <span className="text-sm font-black text-primary">
                 {t("basicPlanName")}
               </span>
             </div>
@@ -226,65 +256,72 @@ export function ProfileBillingPageClient() {
               </div>
               <span
                 className={`text-sm font-black ${
-                  billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED"
+                  billing.billingStatus === "ACTIVE" ||
+                  billing.billingStatus === "CANCELED"
                     ? "text-success"
                     : "text-zinc-400"
                 }`}
               >
-                {billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED"
+                {billing.billingStatus === "ACTIVE" ||
+                billing.billingStatus === "CANCELED"
                   ? t("statusActiveLabel")
                   : t("statusInactiveLabel")}
               </span>
             </div>
-            {(billing.purchasedSeatCount !== null || billing.usedSeatCount !== null) && (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
-              <>
-                <div className="flex items-center justify-between p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                      <DowinIcon name="domain-people" size="16px" />
+            {(billing.purchasedSeatCount !== null ||
+              billing.usedSeatCount !== null) &&
+              (billing.billingStatus === "ACTIVE" ||
+                billing.billingStatus === "CANCELED") && (
+                <>
+                  <div className="flex items-center justify-between p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                        <DowinIcon name="domain-people" size="16px" />
+                      </div>
+                      <span className="text-sm font-bold text-zinc-500">
+                        {t("usedSeatLabel")}
+                      </span>
                     </div>
-                    <span className="text-sm font-bold text-zinc-500">
-                      {t("usedSeatLabel")}
-                    </span>
-                  </div>
-                  <span className="text-sm font-black text-zinc-900">
-                    {billing.usedSeatCount ?? 0} {t("seatUnit")}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                      <DowinIcon name="domain-people" size="16px" />
-                    </div>
-                    <span className="text-sm font-bold text-zinc-500">
-                      {t("purchasedSeatLabel")}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
                     <span className="text-sm font-black text-zinc-900">
-                      {billing.purchasedSeatCount} {t("seatUnit")}
+                      {billing.usedSeatCount ?? 0} {t("seatUnit")}
                     </span>
-                    {isAdmin && isPolarEntitlement && (
-                      <Button
-                        type="button"
-                        onClick={handleSeatChangeClick}
-                        disabled={isUpdatingSeats}
-                        className="h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
-                      >
-                        {isUpdatingSeats ? t("seatChangeDialogSubmitting") : t("seatChangeButton")}
-                      </Button>
-                    )}
                   </div>
-                </div>
-              </>
-            )}
+                  <div className="flex items-center justify-between p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                        <DowinIcon name="domain-people" size="16px" />
+                      </div>
+                      <span className="text-sm font-bold text-zinc-500">
+                        {t("purchasedSeatLabel")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-black text-zinc-900">
+                        {billing.purchasedSeatCount} {t("seatUnit")}
+                      </span>
+                      {isAdmin && isPolarEntitlement && (
+                        <Button
+                          type="button"
+                          onClick={handleSeatChangeClick}
+                          disabled={isUpdatingSeats}
+                          className="h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
+                        >
+                          {isUpdatingSeats
+                            ? t("seatChangeDialogSubmitting")
+                            : t("seatChangeButton")}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
                   <DowinIcon name="domain-calendar" size="16px" />
                 </div>
                 <span className="text-sm font-bold text-zinc-500">
-                  {t("periodEndLabel")}
+                  {t(getPeriodEndLabelKey(billing.billingStatus))}
                 </span>
               </div>
               <span className="text-sm font-black text-zinc-900">
@@ -346,7 +383,11 @@ export function ProfileBillingPageClient() {
         <section>
           <Card className="border-zinc-200 bg-zinc-100/50 p-5">
             <h3 className="flex items-center gap-2 text-[14px] font-black text-zinc-900">
-              <DowinIcon name="status-info" size="16px" className="text-zinc-400" />
+              <DowinIcon
+                name="status-info"
+                size="16px"
+                className="text-zinc-400"
+              />
               {t("downgradePolicyTitle")}
             </h3>
             <p className="mt-2 text-[12px] font-medium leading-relaxed text-zinc-500">
@@ -356,19 +397,13 @@ export function ProfileBillingPageClient() {
         </section>
 
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
-          <Link
-            href="/billing-policy"
-            className="transition-colors"
-          >
+          <Link href="/billing-policy" className="transition-colors">
             {t("billingPolicyLink")}
           </Link>
           <Link href="/terms" className="transition-colors">
             {t("termsLink")}
           </Link>
-          <Link
-            href="/privacy"
-            className="transition-colors"
-          >
+          <Link href="/privacy" className="transition-colors">
             {t("privacyLink")}
           </Link>
           <Link
@@ -398,11 +433,17 @@ function BillingUnavailableInAppState() {
               asChild
               className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
             >
-              <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile")}>
+                {t("appUnavailableAction")}
+              </Link>
             </Button>
           }
           icon={
-            <DowinIcon name="domain-wallet" size="24px" className="text-primary" />
+            <DowinIcon
+              name="domain-wallet"
+              size="24px"
+              className="text-primary"
+            />
           }
         />
       </div>
@@ -430,7 +471,6 @@ function formatDateLabel(
     day: "numeric",
   }).format(date);
 }
-
 
 function getEntitlementSourceLabel(
   source: EntitlementSource,
