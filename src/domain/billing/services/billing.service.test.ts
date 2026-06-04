@@ -175,6 +175,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -217,6 +218,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -259,6 +261,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -306,6 +309,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -378,6 +382,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -441,6 +446,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -497,6 +503,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -548,6 +555,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -602,6 +610,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -660,6 +669,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -714,6 +724,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 
@@ -762,6 +773,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        findSubscriptionByCheckoutId: vi.fn(),
       },
     );
 

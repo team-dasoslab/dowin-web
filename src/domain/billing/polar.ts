@@ -54,6 +54,15 @@ type SubscriptionUpdateResponse = {
 
 type SubscriptionProrationBehavior = "invoice" | "prorate" | "next_period";
 
+type SubscriptionListResponse = {
+  items?: Array<{
+    id: string;
+    customer_id?: string | null;
+    customerId?: string | null;
+    seats?: number | null;
+  }>;
+};
+
 export type PolarBillingClient = {
   environment: "sandbox" | "production";
   createCheckoutSession(input: {
@@ -97,6 +106,11 @@ export type PolarBillingClient = {
     seats: number | null;
     pendingSeats: number | null;
   }>;
+  findSubscriptionByCheckoutId(input: { checkoutId: string }): Promise<{
+    subscriptionKey: string;
+    customerKey: string | null;
+    seats: number | null;
+  } | null>;
 };
 
 class PolarApiError extends Error {
@@ -345,6 +359,38 @@ export function createPolarBillingClient(
           typeof pendingUpdate?.seats === "number" &&
           Number.isFinite(pendingUpdate.seats)
             ? pendingUpdate.seats
+            : null,
+      };
+    },
+
+    async findSubscriptionByCheckoutId({ checkoutId }) {
+      const url = new URL(`${apiBaseUrl}/subscriptions`);
+      url.searchParams.set("checkout_id", checkoutId);
+      url.searchParams.set("limit", "1");
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await parsePolarResponse<SubscriptionListResponse>(response);
+      const subscription = data.items?.[0];
+
+      if (!subscription?.id) {
+        return null;
+      }
+
+      return {
+        subscriptionKey: subscription.id,
+        customerKey:
+          subscription.customerId ?? subscription.customer_id ?? null,
+        seats:
+          typeof subscription.seats === "number" &&
+          Number.isFinite(subscription.seats)
+            ? subscription.seats
             : null,
       };
     },

@@ -86,4 +86,48 @@ describe("createPolarBillingClient", () => {
       }),
     );
   });
+
+  it("checkout id로 subscription을 조회한다", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: [
+            {
+              id: "sub_123",
+              customer_id: "cus_123",
+              seats: 10,
+            },
+          ],
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createPolarBillingClient({
+      POLAR_ENV: "sandbox",
+      POLAR_ACCESS_TOKEN: "polar_oat_sandbox",
+      APP_BASE_URL: "http://localhost:3000",
+    });
+
+    await expect(
+      client?.findSubscriptionByCheckoutId({
+        checkoutId: "checkout_123",
+      }),
+    ).resolves.toEqual({
+      subscriptionKey: "sub_123",
+      customerKey: "cus_123",
+      seats: 10,
+    });
+
+    const calledUrl = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(`${calledUrl.origin}${calledUrl.pathname}`).toBe(
+      "https://sandbox-api.polar.sh/v1/subscriptions",
+    );
+    expect(calledUrl.searchParams.get("checkout_id")).toBe("checkout_123");
+    expect(calledUrl.searchParams.get("limit")).toBe("1");
+  });
 });
