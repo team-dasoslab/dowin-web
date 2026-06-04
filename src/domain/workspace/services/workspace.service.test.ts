@@ -778,7 +778,7 @@ describe("WorkspaceService", () => {
       expect(mockStorage.deleteWorkspace).not.toHaveBeenCalled();
     });
 
-    it("기간이 남은 취소 예약 Polar 구독이 있으면 삭제를 막는다", async () => {
+    it("취소된 Polar 구독은 이용 기간이 남아도 soft delete를 허용한다", async () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
@@ -791,10 +791,9 @@ describe("WorkspaceService", () => {
         currentPeriodEnd: new Date("2026-06-10T00:00:00.000Z"),
       });
 
-      await expect(
-        service.deleteWorkspace(1, new Date("2026-06-04T00:00:00.000Z")),
-      ).rejects.toThrow("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN");
-      expect(mockStorage.deleteWorkspace).not.toHaveBeenCalled();
+      await service.deleteWorkspace(1);
+
+      expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
     });
 
     it("기간이 끝난 취소 Polar 구독은 soft delete를 허용한다", async () => {
@@ -810,7 +809,7 @@ describe("WorkspaceService", () => {
         currentPeriodEnd: new Date("2026-06-01T00:00:00.000Z"),
       });
 
-      await service.deleteWorkspace(1, new Date("2026-06-04T00:00:00.000Z"));
+      await service.deleteWorkspace(1);
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
     });
