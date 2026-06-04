@@ -111,6 +111,20 @@ function asPositiveInteger(value: unknown): number | null {
     : null;
 }
 
+function pickMetadataWithAny(
+  keys: string[],
+  ...values: unknown[]
+): Record<string, unknown> | null {
+  for (const value of values) {
+    const metadata = asRecord(value);
+    if (metadata && keys.some((key) => metadata[key] !== undefined)) {
+      return metadata;
+    }
+  }
+
+  return values.map(asRecord).find((metadata) => metadata !== null) ?? null;
+}
+
 function parseWorkspaceIdFromExternalRef(value: string | null): number | null {
   if (!value?.startsWith("workspace:")) {
     return null;
@@ -138,8 +152,15 @@ function pickCustomerExternalRef(payload: WebhookEnvelope): string | null {
   );
 }
 
-function pickBillingOwnerUserId(payload: WebhookEnvelope): number | null {
-  const metadata = asRecord(payload.data.metadata);
+function pickBillingOwnerUserId(
+  payload: WebhookEnvelope,
+  subscription?: Record<string, unknown> | null,
+): number | null {
+  const metadata = pickMetadataWithAny(
+    ["adminUserId", "requestedByUserId"],
+    payload.data.metadata,
+    subscription?.metadata,
+  );
   return (
     asNumber(metadata?.adminUserId) ??
     asNumber(metadata?.requestedByUserId) ??
@@ -151,17 +172,23 @@ function pickPaidPlanCode(
   payload: WebhookEnvelope,
   subscription?: Record<string, unknown> | null,
 ): "BASIC" | "STANDARD" {
-  const metadata =
-    asRecord(payload.data.metadata) ?? asRecord(subscription?.metadata);
-  return metadata?.targetPlanCode === "BASIC" ? "BASIC" : "STANDARD";
+  const metadata = pickMetadataWithAny(
+    ["targetPlanCode"],
+    payload.data.metadata,
+    subscription?.metadata,
+  );
+  return metadata?.targetPlanCode === "STANDARD" ? "STANDARD" : "BASIC";
 }
 
 function pickPurchasedSeatCount(
   payload: WebhookEnvelope,
   subscription?: Record<string, unknown> | null,
 ): number | null {
-  const metadata =
-    asRecord(payload.data.metadata) ?? asRecord(subscription?.metadata);
+  const metadata = pickMetadataWithAny(
+    ["requestedSeatCount"],
+    payload.data.metadata,
+    subscription?.metadata,
+  );
 
   return (
     asPositiveInteger(payload.data.seats) ??
@@ -179,7 +206,6 @@ function resolveProjection(
   const customerKey =
     asString(payload.data.customer_id) ?? asString(customer?.id) ?? null;
   const customerExternalRef = pickCustomerExternalRef(payload);
-  const billingOwnerUserId = pickBillingOwnerUserId(payload);
 
   if (payload.type === "customer.state_changed") {
     const activeSubscriptions = Array.isArray(payload.data.active_subscriptions)
@@ -188,6 +214,7 @@ function resolveProjection(
     const activeSubscription = asRecord(activeSubscriptions[0]);
 
     if (!activeSubscription) {
+      const billingOwnerUserId = pickBillingOwnerUserId(payload);
       return {
         billingStatus: "EXPIRED",
         planCode: "FREE",
@@ -205,6 +232,10 @@ function resolveProjection(
     const currentPeriodEnd = asDate(activeSubscription.current_period_end);
     const cancelAtPeriodEnd =
       asBoolean(activeSubscription.cancel_at_period_end) ?? false;
+    const billingOwnerUserId = pickBillingOwnerUserId(
+      payload,
+      activeSubscription,
+    );
     const paidPlanCode = pickPaidPlanCode(payload, activeSubscription);
     const purchasedSeatCount =
       paidPlanCode === "BASIC"
@@ -237,6 +268,7 @@ function resolveProjection(
   const cancelAtPeriodEnd = asBoolean(payload.data.cancel_at_period_end) ?? false;
   const subscriptionKey =
     asString(payload.data.subscription_id) ?? asString(payload.data.id) ?? null;
+  const billingOwnerUserId = pickBillingOwnerUserId(payload);
   const paidPlanCode = pickPaidPlanCode(payload);
   const purchasedSeatCount =
     paidPlanCode === "BASIC" ? pickPurchasedSeatCount(payload) : null;

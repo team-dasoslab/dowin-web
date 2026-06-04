@@ -36,6 +36,7 @@ describe("PolarWebhookService", () => {
           metadata: {
             workspaceId: "3",
             adminUserId: "9",
+            targetPlanCode: "STANDARD",
           },
           customer: {
             external_id: "workspace:3",
@@ -242,6 +243,77 @@ describe("PolarWebhookService", () => {
     });
   });
 
+  it("customer.state_changed가 구독 metadata의 BASIC 플랜을 반영한다", async () => {
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
+    const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+    const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
+    const service = new PolarWebhookService({
+      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 13,
+        planCode: "BASIC",
+        billingCustomerExternalRef: "workspace-checkout:pending_13",
+        billingOwnerUserId: 21,
+      }),
+      findWorkspaceByCustomerExternalRef: vi.fn().mockResolvedValue({
+        id: 13,
+        planCode: "BASIC",
+        billingCustomerExternalRef: "workspace-checkout:pending_13",
+        billingOwnerUserId: 21,
+      }),
+      appendBillingEvent: vi.fn().mockResolvedValue({ id: 53 }),
+      upsertWorkspaceBillingState,
+      upsertWorkspaceSeatEntitlement,
+      updateWorkspaceBillingProjection,
+    } as never);
+
+    await service.handleWebhook({
+      providerEventId: "msg_state_basic",
+      payloadJson: JSON.stringify({
+        type: "customer.state_changed",
+        timestamp: "2026-05-28T00:00:00.000Z",
+        data: {
+          id: "cus_basic",
+          external_id: "workspace-checkout:pending_13",
+          metadata: {},
+          active_subscriptions: [
+            {
+              id: "sub_basic",
+              current_period_end: "2026-06-28T00:00:00.000Z",
+              cancel_at_period_end: true,
+              metadata: {
+                targetPlanCode: "BASIC",
+                requestedSeatCount: "10",
+                requestedByUserId: "21",
+              },
+            },
+          ],
+        },
+      }),
+      now: new Date("2026-05-28T00:00:00.000Z"),
+    });
+
+    expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: 13,
+        billingStatus: "CANCELED",
+        planCode: "BASIC",
+        billingOwnerUserId: 21,
+      }),
+    );
+    expect(updateWorkspaceBillingProjection).toHaveBeenCalledWith({
+      workspaceId: 13,
+      planCode: "BASIC",
+      billingCustomerExternalRef: "workspace-checkout:pending_13",
+      billingOwnerUserId: 21,
+    });
+    expect(upsertWorkspaceSeatEntitlement).toHaveBeenCalledWith({
+      workspaceId: 13,
+      purchasedSeatCount: 10,
+      seatSource: "POLAR",
+    });
+  });
+
   it("customer.state_changed의 기간말 해지가 이미 끝났으면 EXPIRED로 반영한다", async () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 22 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
@@ -325,6 +397,7 @@ describe("PolarWebhookService", () => {
           current_period_end: "2026-04-21T00:00:00.000Z",
           metadata: {
             workspaceId: "7",
+            targetPlanCode: "STANDARD",
           },
           customer: {
             external_id: "workspace:7",
@@ -380,6 +453,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: false,
           metadata: {
             workspaceId: "8",
+            targetPlanCode: "STANDARD",
           },
           customer: {
             external_id: "workspace:8",
@@ -431,6 +505,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: false,
           metadata: {
             workspaceId: "9",
+            targetPlanCode: "STANDARD",
           },
           customer: {
             external_id: "workspace:9",
@@ -478,6 +553,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: true,
           metadata: {
             workspaceId: "10",
+            targetPlanCode: "STANDARD",
           },
           customer: {
             external_id: "workspace:10",
@@ -523,6 +599,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: false,
           metadata: {
             workspaceId: "11",
+            targetPlanCode: "STANDARD",
           },
           customer: {
             external_id: "workspace:11",
