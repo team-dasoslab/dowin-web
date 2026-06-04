@@ -15,7 +15,7 @@ import { customAlphabet } from "nanoid";
 type Workspace = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["findUserWorkspace"]>>
 >;
-type PublicWorkspace = Omit<Workspace, "id" | "uid"> & {
+type PublicWorkspace = Omit<Workspace, "id" | "uid" | "deletedAt"> & {
   id: string;
 };
 type WorkspaceWithPlanLimits = PublicWorkspace & {
