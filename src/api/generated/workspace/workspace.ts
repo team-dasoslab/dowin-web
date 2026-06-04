@@ -2013,10 +2013,15 @@ export type deleteWorkspacesIdResponse404 = {
   status: 404
 }
 
+export type deleteWorkspacesIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
 export type deleteWorkspacesIdResponseSuccess = (deleteWorkspacesIdResponse204) & {
   headers: Headers;
 };
-export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | deleteWorkspacesIdResponse403 | deleteWorkspacesIdResponse404) & {
+export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | deleteWorkspacesIdResponse403 | deleteWorkspacesIdResponse404 | deleteWorkspacesIdResponse409) & {
   headers: Headers;
 };
 

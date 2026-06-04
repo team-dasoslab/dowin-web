@@ -1,4 +1,4 @@
-import { ForbiddenError } from "@/lib/server/errors";
+import { ConflictError, ForbiddenError } from "@/lib/server/errors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -177,5 +177,26 @@ describe("DELETE /api/workspaces/[id]", () => {
 
     expect(response.status).toBe(204);
     expect(mockDeleteWorkspace).toHaveBeenCalledWith(1);
+  });
+
+  it("활성 구독이 있으면 409를 반환한다", async () => {
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
+    mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
+      id: 1,
+      role: "ADMIN",
+    });
+    mockDeleteWorkspace.mockRejectedValue(
+      new ConflictError("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN"),
+    );
+
+    const { DELETE } = await import("./route");
+    const response = await DELETE(
+      new Request("http://localhost/api/workspaces/1", {
+        method: "DELETE",
+      }),
+      { params: Promise.resolve({ workspaceId: "1" }) },
+    );
+
+    expect(response.status).toBe(409);
   });
 });

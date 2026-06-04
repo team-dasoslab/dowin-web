@@ -1626,6 +1626,11 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 활성 구독으로 삭제할 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
         "404":
           description: 워크스페이스를 찾을 수 없음
           content:

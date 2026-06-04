@@ -746,14 +746,71 @@ describe("WorkspaceService", () => {
   });
 
   describe("deleteWorkspace", () => {
-    it("워크스페이스를 삭제한다", async () => {
+    it("워크스페이스를 soft delete한다", async () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
         planCode: "FREE",
       });
+      mockStorage.findBillingState.mockResolvedValue(null);
 
       await service.deleteWorkspace(1);
+
+      expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
+    });
+
+    it("활성 Polar 구독이 있으면 삭제를 막는다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "BASIC",
+      });
+      mockStorage.findBillingState.mockResolvedValue({
+        provider: "POLAR",
+        billingStatus: "ACTIVE",
+        entitlementSource: "POLAR",
+        currentPeriodEnd: null,
+      });
+
+      await expect(service.deleteWorkspace(1)).rejects.toThrow(
+        "WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN",
+      );
+      expect(mockStorage.deleteWorkspace).not.toHaveBeenCalled();
+    });
+
+    it("기간이 남은 취소 예약 Polar 구독이 있으면 삭제를 막는다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "BASIC",
+      });
+      mockStorage.findBillingState.mockResolvedValue({
+        provider: "POLAR",
+        billingStatus: "CANCELED",
+        entitlementSource: "POLAR",
+        currentPeriodEnd: new Date("2026-06-10T00:00:00.000Z"),
+      });
+
+      await expect(
+        service.deleteWorkspace(1, new Date("2026-06-04T00:00:00.000Z")),
+      ).rejects.toThrow("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN");
+      expect(mockStorage.deleteWorkspace).not.toHaveBeenCalled();
+    });
+
+    it("기간이 끝난 취소 Polar 구독은 soft delete를 허용한다", async () => {
+      mockStorage.findWorkspaceById.mockResolvedValue({
+        id: 1,
+        name: "팀",
+        planCode: "BASIC",
+      });
+      mockStorage.findBillingState.mockResolvedValue({
+        provider: "POLAR",
+        billingStatus: "CANCELED",
+        entitlementSource: "POLAR",
+        currentPeriodEnd: new Date("2026-06-01T00:00:00.000Z"),
+      });
+
+      await service.deleteWorkspace(1, new Date("2026-06-04T00:00:00.000Z"));
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
     });

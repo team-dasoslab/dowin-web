@@ -95,6 +95,28 @@ const getWorkspacePublicId = (workspace: Pick<Workspace, "id" | "uid">) => {
   return workspace.uid;
 };
 
+const hasBlockingPolarSubscriptionForDeletion = (
+  billingState: Awaited<ReturnType<WorkspaceStorage["findBillingState"]>>,
+  now: Date,
+) => {
+  if (
+    billingState?.entitlementSource !== "POLAR" ||
+    billingState.provider !== "POLAR"
+  ) {
+    return false;
+  }
+
+  if (billingState.billingStatus === "ACTIVE") {
+    return true;
+  }
+
+  if (billingState.billingStatus !== "CANCELED") {
+    return false;
+  }
+
+  return !billingState.currentPeriodEnd || billingState.currentPeriodEnd > now;
+};
+
 const toPublicWorkspace = (workspace: Workspace): PublicWorkspace => {
   return {
     id: getWorkspacePublicId(workspace),
@@ -528,10 +550,15 @@ export class WorkspaceService {
     );
   }
 
-  async deleteWorkspace(workspaceId: number): Promise<void> {
+  async deleteWorkspace(workspaceId: number, now = new Date()): Promise<void> {
     const workspace = await this.storage.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
+    }
+
+    const billingState = await this.storage.findBillingState(workspaceId);
+    if (hasBlockingPolarSubscriptionForDeletion(billingState, now)) {
+      throw new ConflictError("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN");
     }
 
     await this.storage.deleteWorkspace(workspaceId);
