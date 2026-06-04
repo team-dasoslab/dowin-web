@@ -1,4 +1,5 @@
 import type { AppBridge, AppBridgeMethods } from "@/types/bridge";
+import { openNewTab } from "@/lib/client/open-new-tab";
 import { linkBridge } from "@webview-bridge/web";
 
 export const bridge = linkBridge<AppBridge>({
@@ -79,9 +80,7 @@ export const openInBrowser = async (url: string) => {
   if (isNativeApp()) {
     return bridge.openInBrowser(url);
   }
-  if (typeof window !== "undefined") {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
+  openNewTab(url);
 };
 
 /**
