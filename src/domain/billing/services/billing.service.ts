@@ -203,8 +203,7 @@ export class BillingService {
       throw new ConflictError("BILLING_NOT_READY");
     }
 
-    let polarOperation: "customer_sessions.create" =
-      "customer_sessions.create";
+    const polarOperation = "customer_sessions.create" as const;
 
     try {
       const externalMemberId =
