@@ -6,7 +6,11 @@ import {
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+} from "@/lib/server/errors";
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
@@ -94,7 +98,10 @@ export class BillingService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const membership = await this.workspaceStorage.findMembership(internalId, userId);
+    const membership = await this.workspaceStorage.findMembership(
+      internalId,
+      userId,
+    );
     if (!membership) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -124,7 +131,9 @@ export class BillingService {
         customerKey: billingState?.customerKey ?? null,
         customerExternalRef: workspace.billingCustomerExternalRef ?? null,
         billingOwnerUserId:
-          billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+          billingState?.billingOwnerUserId ??
+          workspace.billingOwnerUserId ??
+          null,
       }),
       this.workspaceStorage.findSeatEntitlement(workspace.id),
       this.workspaceStorage.countMembers(workspace.id),
@@ -181,47 +190,59 @@ export class BillingService {
     }
 
     if (billingState && billingState.entitlementSource !== "POLAR") {
-      console.warn("[billing.portal] non-Polar entitlement cannot open portal", {
-        workspaceUid,
-        workspaceId: workspace.id,
-        userId,
-        billingStatus: billingState.billingStatus,
-        entitlementSource: billingState.entitlementSource,
-      });
+      console.warn(
+        "[billing.portal] non-Polar entitlement cannot open portal",
+        {
+          workspaceUid,
+          workspaceId: workspace.id,
+          userId,
+          billingStatus: billingState.billingStatus,
+          entitlementSource: billingState.entitlementSource,
+        },
+      );
       throw new ConflictError("BILLING_NOT_READY");
     }
 
-    const customerSessionInput = billingState?.customerKey
-      ? { customerId: billingState.customerKey }
-      : {
-          externalCustomerId:
-            workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
-        };
+    let polarOperation: "customer_sessions.create" =
+      "customer_sessions.create";
 
     try {
+      const externalMemberId =
+        workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`;
+      const customerSessionInput = billingState?.customerKey
+        ? {
+            customerId: billingState.customerKey,
+            externalMemberId,
+          }
+        : {
+            externalCustomerId:
+              workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
+            externalMemberId,
+          };
+
       const { customerPortalUrl } =
         await this.polarClient.createCustomerSession(customerSessionInput);
       return customerPortalUrl;
     } catch (error) {
       if (isPolarRecoverableError(error)) {
         const polarError = getPolarApiErrorInfo(error);
-        console.error("[billing.portal] Polar customer session request failed", {
-          workspaceUid,
-          workspaceId: workspace.id,
-          userId,
-          billingStatus: billingState?.billingStatus ?? "NONE",
-          entitlementSource: billingState?.entitlementSource ?? null,
-          hasCustomerKey: Boolean(billingState?.customerKey),
-          hasBillingCustomerExternalRef: Boolean(
-            workspace.billingCustomerExternalRef,
-          ),
-          customerSessionInputType:
-            "customerId" in customerSessionInput
-              ? "customer_id"
-              : "external_customer_id",
-          polarStatus: polarError?.status ?? null,
-          polarBody: polarError ? truncateForLog(polarError.body) : null,
-        });
+        console.error(
+          "[billing.portal] Polar portal request failed",
+          {
+            workspaceUid,
+            workspaceId: workspace.id,
+            userId,
+            polarOperation,
+            billingStatus: billingState?.billingStatus ?? "NONE",
+            entitlementSource: billingState?.entitlementSource ?? null,
+            hasCustomerKey: Boolean(billingState?.customerKey),
+            hasBillingCustomerExternalRef: Boolean(
+              workspace.billingCustomerExternalRef,
+            ),
+            polarStatus: polarError?.status ?? null,
+            polarBody: polarError ? truncateForLog(polarError.body) : null,
+          },
+        );
         throw new ConflictError("BILLING_NOT_READY");
       }
 
@@ -255,7 +276,9 @@ export class BillingService {
       customerKey: billingState?.customerKey ?? null,
       customerExternalRef: workspace.billingCustomerExternalRef ?? null,
       billingOwnerUserId:
-        billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+        billingState?.billingOwnerUserId ??
+        workspace.billingOwnerUserId ??
+        null,
     });
     if (riskSummary.requiresManualReview) {
       throw new ConflictError("BILLING_REVIEW_REQUIRED");

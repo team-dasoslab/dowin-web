@@ -227,6 +227,52 @@ describe("BillingService", () => {
     );
     expect(createCustomerSession).toHaveBeenCalledWith({
       customerId: "cus_123",
+      externalMemberId: "workspace:1",
+    });
+  });
+
+  it("seat 기반 team customer도 Polar customer session 생성에 위임한다", async () => {
+    const createCustomerSession = vi.fn().mockResolvedValue({
+      customerPortalUrl: "https://polar.sh/portal",
+    });
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+          billingCustomerExternalRef: "workspace:1",
+        }),
+        findMembership: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          entitlementSource: "POLAR",
+          customerKey: "cus_123",
+          subscriptionKey: "sub_123",
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession,
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
+      },
+    );
+
+    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
+      "https://polar.sh/portal",
+    );
+    expect(createCustomerSession).toHaveBeenCalledWith({
+      customerId: "cus_123",
+      externalMemberId: "workspace:1",
     });
   });
 
@@ -270,6 +316,7 @@ describe("BillingService", () => {
     );
     expect(createCustomerSession).toHaveBeenCalledWith({
       externalCustomerId: "workspace:1",
+      externalMemberId: "workspace:1",
     });
   });
 

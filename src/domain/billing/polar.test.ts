@@ -41,6 +41,88 @@ describe("createPolarBillingClient", () => {
     );
   });
 
+  it("customer session에 team member id를 포함할 수 있다", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          customer_portal_url: "https://polar.sh/acme/portal/session",
+        }),
+        {
+          status: 201,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createPolarBillingClient({
+      POLAR_ENV: "sandbox",
+      POLAR_ACCESS_TOKEN: "polar_oat_sandbox",
+      APP_BASE_URL: "http://localhost:3000",
+    });
+
+    await expect(
+      client?.createCustomerSession({
+        customerId: "cus_123",
+        memberId: "member_123",
+      }),
+    ).resolves.toEqual({
+      customerPortalUrl: "https://polar.sh/acme/portal/session",
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://sandbox-api.polar.sh/v1/customer-sessions",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          customer_id: "cus_123",
+          member_id: "member_123",
+        }),
+      }),
+    );
+  });
+
+  it("customer session에 external member id를 포함할 수 있다", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          customer_portal_url: "https://polar.sh/acme/portal/session",
+        }),
+        {
+          status: 201,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createPolarBillingClient({
+      POLAR_ENV: "sandbox",
+      POLAR_ACCESS_TOKEN: "polar_oat_sandbox",
+      APP_BASE_URL: "http://localhost:3000",
+    });
+
+    await expect(
+      client?.createCustomerSession({
+        customerId: "cus_123",
+        externalMemberId: "workspace-checkout:pending_123",
+      }),
+    ).resolves.toEqual({
+      customerPortalUrl: "https://polar.sh/acme/portal/session",
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://sandbox-api.polar.sh/v1/customer-sessions",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({
+          customer_id: "cus_123",
+          external_member_id: "workspace-checkout:pending_123",
+        }),
+      }),
+    );
+  });
+
   it("subscription seat 수를 PATCH /subscriptions/{id}로 변경한다", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(

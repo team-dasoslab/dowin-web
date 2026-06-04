@@ -83,9 +83,13 @@ export type PolarBillingClient = {
     input:
       | {
           customerId: string;
+          memberId?: string | null;
+          externalMemberId?: string | null;
         }
       | {
           externalCustomerId: string;
+          memberId?: string | null;
+          externalMemberId?: string | null;
         },
   ): Promise<{ customerPortalUrl: string }>;
   getCheckoutSession(input: { checkoutId: string }): Promise<{
@@ -281,9 +285,17 @@ export function createPolarBillingClient(
           "customerId" in input
             ? {
                 customer_id: input.customerId,
+                ...(input.memberId ? { member_id: input.memberId } : {}),
+                ...(input.externalMemberId
+                  ? { external_member_id: input.externalMemberId }
+                  : {}),
               }
             : {
                 external_customer_id: input.externalCustomerId,
+                ...(input.memberId ? { member_id: input.memberId } : {}),
+                ...(input.externalMemberId
+                  ? { external_member_id: input.externalMemberId }
+                  : {}),
               },
         ),
       });
