@@ -11,9 +11,9 @@ export const getDashboardLinks = (workspaceId: string): {
 }[] => [
   {
     href: `/${workspaceId}/dashboard/my`,
-    iconName: "nav-dashboard",
-    iconNameActive: "nav-dashboard-active",
-    label: "나의 대시보드",
+    iconName: "nav-home",
+    iconNameActive: "nav-home-active",
+    label: "홈",
     translationKey: "myDashboard",
   },
   {
@@ -27,14 +27,14 @@ export const getDashboardLinks = (workspaceId: string): {
     href: `/${workspaceId}/workspace/settings`,
     iconName: "nav-settings",
     iconNameActive: "nav-settings-active",
-    label: "워크스페이스 설정",
+    label: "워크스페이스",
     translationKey: "workspaceSettings",
   },
   {
     href: `/${workspaceId}/profile`,
     iconName: "nav-profile",
     iconNameActive: "nav-profile-active",
-    label: "내 프로필",
+    label: "프로필",
     translationKey: "myProfile",
   },
 ];
