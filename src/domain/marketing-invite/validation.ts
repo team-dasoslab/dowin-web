@@ -33,7 +33,7 @@ const grantedSeatCountSchema = z
   .number()
   .int("좌석 수는 정수여야 합니다.")
   .min(1, "좌석 수는 1 이상이어야 합니다.")
-  .max(10, "영구 무료 혜택은 최대 10명까지 제공할 수 있습니다.");
+  .max(10, "프로모션 코드는 최대 10명까지 제공할 수 있습니다.");
 
 export const marketingInviteCodeCreateSchema = z.object({
   code: inviteCodeSchema.optional(),

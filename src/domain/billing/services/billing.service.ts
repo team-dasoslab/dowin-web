@@ -6,7 +6,11 @@ import {
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+} from "@/lib/server/errors";
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
@@ -41,6 +45,8 @@ export type BillingOverview = {
   recentRevokedCount: number;
   requiresManualReview: boolean;
   purchasedSeatCount: number | null;
+  pendingSeatCount: number | null;
+  pendingSeatEffectiveAt: string | null;
   usedSeatCount: number;
   canManageBilling: boolean;
 };
@@ -94,7 +100,10 @@ export class BillingService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const membership = await this.workspaceStorage.findMembership(internalId, userId);
+    const membership = await this.workspaceStorage.findMembership(
+      internalId,
+      userId,
+    );
     if (!membership) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -118,16 +127,20 @@ export class BillingService {
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
-    const [riskSummary, seatEntitlement, usedSeatCount] = await Promise.all([
+    const [riskSummary, seatEntitlement, usedSeatCount, pendingSeatUpdate] =
+      await Promise.all([
       this.getBillingRiskSummary({
         workspaceId: workspace.id,
         customerKey: billingState?.customerKey ?? null,
         customerExternalRef: workspace.billingCustomerExternalRef ?? null,
         billingOwnerUserId:
-          billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+          billingState?.billingOwnerUserId ??
+          workspace.billingOwnerUserId ??
+          null,
       }),
       this.workspaceStorage.findSeatEntitlement(workspace.id),
       this.workspaceStorage.countMembers(workspace.id),
+      this.getPendingSeatUpdate(billingState),
     ]);
 
     return {
@@ -144,9 +157,42 @@ export class BillingService {
       recentRevokedCount: riskSummary.recentRevokedCount,
       requiresManualReview: riskSummary.requiresManualReview,
       purchasedSeatCount: seatEntitlement?.purchasedSeatCount ?? null,
+      pendingSeatCount: pendingSeatUpdate?.pendingSeats ?? null,
+      pendingSeatEffectiveAt:
+        pendingSeatUpdate?.pendingSeats !== null &&
+        pendingSeatUpdate?.pendingSeats !== undefined
+          ? (billingState?.currentPeriodEnd?.toISOString() ?? null)
+          : null,
       usedSeatCount,
       canManageBilling: membership?.role === "ADMIN",
     };
+  }
+
+  private async getPendingSeatUpdate(
+    billingState: Awaited<
+      ReturnType<BillingPort["findWorkspaceBillingState"]>
+    >,
+  ) {
+    if (
+      !this.polarClient ||
+      billingState?.entitlementSource !== "POLAR" ||
+      billingState.billingStatus !== "ACTIVE" ||
+      !billingState.subscriptionKey
+    ) {
+      return null;
+    }
+
+    try {
+      return await this.polarClient.getSubscriptionSeatUpdate({
+        subscriptionId: billingState.subscriptionKey,
+      });
+    } catch (error) {
+      if (isPolarRecoverableError(error)) {
+        return null;
+      }
+
+      throw error;
+    }
   }
 
   async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {
@@ -181,47 +227,83 @@ export class BillingService {
     }
 
     if (billingState && billingState.entitlementSource !== "POLAR") {
-      console.warn("[billing.portal] non-Polar entitlement cannot open portal", {
-        workspaceUid,
-        workspaceId: workspace.id,
-        userId,
-        billingStatus: billingState.billingStatus,
-        entitlementSource: billingState.entitlementSource,
-      });
+      console.warn(
+        "[billing.portal] non-Polar entitlement cannot open portal",
+        {
+          workspaceUid,
+          workspaceId: workspace.id,
+          userId,
+          billingStatus: billingState.billingStatus,
+          entitlementSource: billingState.entitlementSource,
+        },
+      );
       throw new ConflictError("BILLING_NOT_READY");
     }
 
-    const customerSessionInput = billingState?.customerKey
-      ? { customerId: billingState.customerKey }
-      : {
-          externalCustomerId:
-            workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
-        };
+    const polarClient = this.polarClient;
+    let polarOperation:
+      | "customer_seats.list"
+      | "customer_seats.assign"
+      | "customer_sessions.create" = "customer_sessions.create";
 
     try {
+      const subscriptionKey = billingState?.subscriptionKey ?? null;
+      const customerKey = billingState?.customerKey ?? null;
+      const memberId =
+        subscriptionKey && customerKey
+          ? await (async () => {
+              polarOperation = "customer_seats.list";
+              const existingMemberId =
+                await polarClient.findSubscriptionSeatMemberId({
+                  subscriptionId: subscriptionKey,
+                });
+              if (existingMemberId) {
+                return existingMemberId;
+              }
+
+              polarOperation = "customer_seats.assign";
+              return polarClient.assignSubscriptionSeat({
+                subscriptionId: subscriptionKey,
+                customerId: customerKey,
+              });
+            })()
+          : null;
+      const customerSessionInput = billingState?.customerKey
+        ? {
+            customerId: billingState.customerKey,
+            ...(memberId ? { memberId } : {}),
+          }
+        : {
+            externalCustomerId:
+              workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
+          };
+
       const { customerPortalUrl } =
-        await this.polarClient.createCustomerSession(customerSessionInput);
+        await (async () => {
+          polarOperation = "customer_sessions.create";
+          return polarClient.createCustomerSession(customerSessionInput);
+        })();
       return customerPortalUrl;
     } catch (error) {
       if (isPolarRecoverableError(error)) {
         const polarError = getPolarApiErrorInfo(error);
-        console.error("[billing.portal] Polar customer session request failed", {
-          workspaceUid,
-          workspaceId: workspace.id,
-          userId,
-          billingStatus: billingState?.billingStatus ?? "NONE",
-          entitlementSource: billingState?.entitlementSource ?? null,
-          hasCustomerKey: Boolean(billingState?.customerKey),
-          hasBillingCustomerExternalRef: Boolean(
-            workspace.billingCustomerExternalRef,
-          ),
-          customerSessionInputType:
-            "customerId" in customerSessionInput
-              ? "customer_id"
-              : "external_customer_id",
-          polarStatus: polarError?.status ?? null,
-          polarBody: polarError ? truncateForLog(polarError.body) : null,
-        });
+        console.error(
+          "[billing.portal] Polar portal request failed",
+          {
+            workspaceUid,
+            workspaceId: workspace.id,
+            userId,
+            polarOperation,
+            billingStatus: billingState?.billingStatus ?? "NONE",
+            entitlementSource: billingState?.entitlementSource ?? null,
+            hasCustomerKey: Boolean(billingState?.customerKey),
+            hasBillingCustomerExternalRef: Boolean(
+              workspace.billingCustomerExternalRef,
+            ),
+            polarStatus: polarError?.status ?? null,
+            polarBody: polarError ? truncateForLog(polarError.body) : null,
+          },
+        );
         throw new ConflictError("BILLING_NOT_READY");
       }
 
@@ -255,7 +337,9 @@ export class BillingService {
       customerKey: billingState?.customerKey ?? null,
       customerExternalRef: workspace.billingCustomerExternalRef ?? null,
       billingOwnerUserId:
-        billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+        billingState?.billingOwnerUserId ??
+        workspace.billingOwnerUserId ??
+        null,
     });
     if (riskSummary.requiresManualReview) {
       throw new ConflictError("BILLING_REVIEW_REQUIRED");
@@ -311,6 +395,91 @@ export class BillingService {
           requestedSeatCount: String(seatCount),
         },
       });
+    } catch (error) {
+      if (isPolarRecoverableError(error)) {
+        throw new ConflictError("BILLING_NOT_READY");
+      }
+
+      throw error;
+    }
+  }
+
+  async updateSubscriptionSeats(input: {
+    workspaceUid: string;
+    userId: number;
+    seatCount: number;
+  }): Promise<{
+    seatCount: number;
+    appliedSeatCount: number | null;
+    pendingSeatCount: number | null;
+    effectiveTiming: "IMMEDIATE" | "NEXT_PERIOD" | "UNCHANGED";
+  }> {
+    const { workspace, membership } = await this.getWorkspace(
+      input.workspaceUid,
+      input.userId,
+    );
+
+    if (membership.role !== "ADMIN") {
+      throw new ForbiddenError("FORBIDDEN");
+    }
+
+    const billingState = await this.billingStorage.findWorkspaceBillingState(
+      workspace.id,
+    );
+
+    if (
+      !billingState ||
+      billingState.planCode !== "BASIC" ||
+      billingState.billingStatus !== "ACTIVE" ||
+      billingState.entitlementSource !== "POLAR" ||
+      !billingState.subscriptionKey
+    ) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    if (!this.polarClient) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    const memberCount = await this.workspaceStorage.countMembers(workspace.id);
+    if (input.seatCount < memberCount) {
+      throw new ConflictError("BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT");
+    }
+
+    const seatEntitlement = await this.workspaceStorage.findSeatEntitlement(
+      workspace.id,
+    );
+    const currentSeatCount = seatEntitlement?.purchasedSeatCount ?? null;
+
+    if (!currentSeatCount) {
+      throw new ConflictError("BILLING_NOT_READY");
+    }
+
+    if (input.seatCount === currentSeatCount) {
+      return {
+        seatCount: input.seatCount,
+        appliedSeatCount: currentSeatCount,
+        pendingSeatCount: null,
+        effectiveTiming: "UNCHANGED",
+      };
+    }
+
+    const isSeatIncrease = input.seatCount > currentSeatCount;
+    const prorationBehavior = isSeatIncrease ? "prorate" : "next_period";
+
+    try {
+      const result = await this.polarClient.updateSubscriptionSeats({
+        subscriptionId: billingState.subscriptionKey,
+        seatCount: input.seatCount,
+        prorationBehavior,
+      });
+
+      return {
+        seatCount: input.seatCount,
+        appliedSeatCount: result.seats,
+        pendingSeatCount: result.pendingSeats,
+        effectiveTiming: isSeatIncrease ? "IMMEDIATE" : "NEXT_PERIOD",
+      };
     } catch (error) {
       if (isPolarRecoverableError(error)) {
         throw new ConflictError("BILLING_NOT_READY");

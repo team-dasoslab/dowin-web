@@ -28,6 +28,11 @@ type CustomerSessionResponse = {
   customerPortalUrl?: string;
 };
 
+type CustomerDetailResponse = {
+  id: string;
+  email?: string | null;
+};
+
 type CheckoutSessionDetailResponse = {
   id: string;
   status?: string;
@@ -39,6 +44,48 @@ type CheckoutSessionDetailResponse = {
   subscriptionId?: string | null;
   customer_id?: string | null;
   customerId?: string | null;
+};
+
+type SubscriptionUpdateResponse = {
+  id: string;
+  seats?: number | null;
+  pending_update?: {
+    seats?: number | null;
+  } | null;
+  pendingUpdate?: {
+    seats?: number | null;
+  } | null;
+};
+
+type SubscriptionDetailResponse = SubscriptionUpdateResponse;
+
+type SubscriptionProrationBehavior = "invoice" | "prorate" | "next_period";
+
+type SubscriptionListResponse = {
+  items?: Array<{
+    id: string;
+    customer_id?: string | null;
+    customerId?: string | null;
+    seats?: number | null;
+  }>;
+};
+
+type CustomerSeatsListResponse = {
+  seats?: Array<{
+    member_id?: string | null;
+    memberId?: string | null;
+    member?: {
+      id?: string | null;
+    } | null;
+  }>;
+};
+
+type CustomerSeatAssignResponse = {
+  member_id?: string | null;
+  memberId?: string | null;
+  member?: {
+    id?: string | null;
+  } | null;
 };
 
 export type PolarBillingClient = {
@@ -61,9 +108,11 @@ export type PolarBillingClient = {
     input:
       | {
           customerId: string;
+          memberId?: string | null;
         }
       | {
           externalCustomerId: string;
+          memberId?: string | null;
         },
   ): Promise<{ customerPortalUrl: string }>;
   getCheckoutSession(input: { checkoutId: string }): Promise<{
@@ -75,6 +124,32 @@ export type PolarBillingClient = {
     customerKey: string | null;
     seats: number | null;
   }>;
+  updateSubscriptionSeats(input: {
+    subscriptionId: string;
+    seatCount: number;
+    prorationBehavior: SubscriptionProrationBehavior;
+  }): Promise<{
+    subscriptionId: string;
+    seats: number | null;
+    pendingSeats: number | null;
+  }>;
+  getSubscriptionSeatUpdate(input: { subscriptionId: string }): Promise<{
+    subscriptionId: string;
+    seats: number | null;
+    pendingSeats: number | null;
+  }>;
+  findSubscriptionByCheckoutId(input: { checkoutId: string }): Promise<{
+    subscriptionKey: string;
+    customerKey: string | null;
+    seats: number | null;
+  } | null>;
+  findSubscriptionSeatMemberId(input: {
+    subscriptionId: string;
+  }): Promise<string | null>;
+  assignSubscriptionSeat(input: {
+    subscriptionId: string;
+    customerId: string;
+  }): Promise<string | null>;
 };
 
 class PolarApiError extends Error {
@@ -245,9 +320,11 @@ export function createPolarBillingClient(
           "customerId" in input
             ? {
                 customer_id: input.customerId,
+                ...(input.memberId ? { member_id: input.memberId } : {}),
               }
             : {
                 external_customer_id: input.externalCustomerId,
+                ...(input.memberId ? { member_id: input.memberId } : {}),
               },
         ),
       });
@@ -289,6 +366,155 @@ export function createPolarBillingClient(
             ? data.seats
             : null,
       };
+    },
+
+    async updateSubscriptionSeats({
+      subscriptionId,
+      seatCount,
+      prorationBehavior,
+    }) {
+      const response = await fetch(`${apiBaseUrl}/subscriptions/${subscriptionId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          seats: seatCount,
+          proration_behavior: prorationBehavior,
+        }),
+      });
+
+      const data = await parsePolarResponse<SubscriptionUpdateResponse>(
+        response,
+      );
+      const pendingUpdate = data.pendingUpdate ?? data.pending_update ?? null;
+
+      return {
+        subscriptionId: data.id,
+        seats:
+          typeof data.seats === "number" && Number.isFinite(data.seats)
+            ? data.seats
+            : null,
+        pendingSeats:
+          typeof pendingUpdate?.seats === "number" &&
+          Number.isFinite(pendingUpdate.seats)
+            ? pendingUpdate.seats
+            : null,
+      };
+    },
+
+    async getSubscriptionSeatUpdate({ subscriptionId }) {
+      const response = await fetch(`${apiBaseUrl}/subscriptions/${subscriptionId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await parsePolarResponse<SubscriptionDetailResponse>(
+        response,
+      );
+      const pendingUpdate = data.pendingUpdate ?? data.pending_update ?? null;
+
+      return {
+        subscriptionId: data.id,
+        seats:
+          typeof data.seats === "number" && Number.isFinite(data.seats)
+            ? data.seats
+            : null,
+        pendingSeats:
+          typeof pendingUpdate?.seats === "number" &&
+          Number.isFinite(pendingUpdate.seats)
+            ? pendingUpdate.seats
+            : null,
+      };
+    },
+
+    async findSubscriptionByCheckoutId({ checkoutId }) {
+      const url = new URL(`${apiBaseUrl}/subscriptions`);
+      url.searchParams.set("checkout_id", checkoutId);
+      url.searchParams.set("limit", "1");
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await parsePolarResponse<SubscriptionListResponse>(response);
+      const subscription = data.items?.[0];
+
+      if (!subscription?.id) {
+        return null;
+      }
+
+      return {
+        subscriptionKey: subscription.id,
+        customerKey:
+          subscription.customerId ?? subscription.customer_id ?? null,
+        seats:
+          typeof subscription.seats === "number" &&
+          Number.isFinite(subscription.seats)
+            ? subscription.seats
+            : null,
+      };
+    },
+
+    async findSubscriptionSeatMemberId({ subscriptionId }) {
+      const url = new URL(`${apiBaseUrl}/customer-seats`);
+      url.searchParams.set("subscription_id", subscriptionId);
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await parsePolarResponse<CustomerSeatsListResponse>(response);
+      const seat = data.seats?.find(
+        (candidate) =>
+          candidate.memberId ?? candidate.member_id ?? candidate.member?.id,
+      );
+
+      return seat?.memberId ?? seat?.member_id ?? seat?.member?.id ?? null;
+    },
+
+    async assignSubscriptionSeat({ subscriptionId, customerId }) {
+      const customerResponse = await fetch(`${apiBaseUrl}/customers/${customerId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const customer = await parsePolarResponse<CustomerDetailResponse>(
+        customerResponse,
+      );
+
+      const response = await fetch(`${apiBaseUrl}/customer-seats`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscription_id: subscriptionId,
+          email: customer.email ?? undefined,
+          immediate_claim: true,
+        }),
+      });
+
+      const seat = await parsePolarResponse<CustomerSeatAssignResponse>(
+        response,
+      );
+
+      return seat.memberId ?? seat.member_id ?? seat.member?.id ?? null;
     },
   };
 }

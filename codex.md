@@ -113,6 +113,7 @@ yarn tsc --noEmit
 - UI 확인은 `yarn storybook`
 - API 타입 생성은 `yarn gen:api`
 - D1 스키마 반영은 `yarn mig:local`, 원격은 `yarn mig:remote`
+- D1/Drizzle migration은 수동 생성/수동 적용하지 않는다. `drizzle-kit generate`, `drizzle-kit push`, `wrangler d1 migrations apply` 직접 실행 대신 저장소 스크립트를 사용한다.
 
 ### Phase 2. Codex 명령 규칙 고정
 
@@ -165,7 +166,7 @@ Codex에게 이 저장소에서 기대하는 기본 행동:
 
 1. `docs/dev/common/2026.03.09-database-schema.md`와 현재 `src/db` 구현 비교
 2. `src/db/schema.ts` 수정
-3. migration 생성/적용
+3. `yarn mig:local`로 migration 생성/적용
 4. 관련 Storage/Service/API 수정
 5. 테스트와 타입 검증 실행
 
@@ -210,7 +211,8 @@ API 스펙 변경:
 
 DB 변경:
 
-- migration 생성/적용 가능 여부 확인
+- `yarn mig:local` 기준으로 migration 생성/적용 가능 여부 확인
+- 원격 migration은 명시 요청이 있을 때만 `yarn mig:remote` 사용
 - 스키마와 Storage 레이어 정합성 확인
 
 ---

@@ -352,6 +352,7 @@ export const workspaces = sqliteTable("workspaces", {
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
+  deletedAt: integer("deleted_at", { mode: "timestamp" }),
 });
 
 export const workspacesRelations = relations(workspaces, ({ many }) => ({

@@ -30,6 +30,7 @@ If documents conflict with code, verify the implementation and prefer the curren
 - Use `apiSuccess`, `apiError`, and `withErrorHandler` patterns for API work.
 - Auth currently uses the `dowin_sid` session cookie pattern in active code.
 - Update `src/api-spec/openapi.yaml` first when API contracts change.
+- Do not create or apply D1/Drizzle migrations manually. For local DB migrations, use `yarn mig:local`; use `yarn mig:remote` only when explicitly asked to apply remote migrations.
 - Consider `docs/onboarding.md` and matching `docs/dev/` files for material skill, process, or architecture changes.
 - For planning or documentation work, follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md` and do not describe Dowin as a book-based/framework-based product in current-facing docs.
 

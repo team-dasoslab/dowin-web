@@ -142,7 +142,7 @@ export default function AdminPromotionsPageClient() {
             마케팅 프로모션 코드
           </h1>
           <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
-            영구 무료 혜택(Basic)을 제공하는 프로모션 초대코드를 관리합니다.
+            프로모션 코드(Basic)를 제공하는 프로모션 초대코드를 관리합니다.
           </p>
         </div>
         <Link

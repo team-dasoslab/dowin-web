@@ -28,6 +28,9 @@ type MockDb = {
   returning: ReturnType<typeof vi.fn>;
   select: ReturnType<typeof vi.fn>;
   from: ReturnType<typeof vi.fn>;
+  innerJoin: ReturnType<typeof vi.fn>;
+  orderBy: ReturnType<typeof vi.fn>;
+  limit: ReturnType<typeof vi.fn>;
   where: ReturnType<typeof vi.fn>;
   transaction?: ReturnType<typeof vi.fn>;
 };
@@ -55,6 +58,9 @@ describe("WorkspaceStorage", () => {
     returning: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
+    innerJoin: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
   } satisfies MockDb;
 
@@ -63,30 +69,32 @@ describe("WorkspaceStorage", () => {
   );
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
+    mockDb.insert.mockReturnThis();
+    mockDb.update.mockReturnThis();
+    mockDb.delete.mockReturnThis();
+    mockDb.set.mockReturnThis();
+    mockDb.values.mockReturnThis();
+    mockDb.returning.mockReturnThis();
+    mockDb.select.mockReturnThis();
+    mockDb.from.mockReturnThis();
+    mockDb.innerJoin.mockReturnThis();
+    mockDb.orderBy.mockReturnThis();
+    mockDb.limit.mockReturnThis();
+    mockDb.where.mockReturnThis();
   });
 
   describe("findUserWorkspace", () => {
     it("사용자가 소속된 워크스페이스 정보를 반환한다", async () => {
       const mockWorkspace = { id: 1, name: "Test Workspace", planCode: "FREE" };
-      mockDb.query = {
-        workspaces: {
-          findFirst: vi.fn(),
-        },
-        workspaceMembers: {
-          findFirst: vi.fn().mockResolvedValue({ workspace: mockWorkspace }),
-          findMany: vi.fn(),
-        },
-        workspaceTags: {
-          findFirst: vi.fn(),
-          findMany: vi.fn(),
-        },
-      };
+      mockDb.orderBy.mockReturnThis();
+      mockDb.limit.mockResolvedValue([{ workspace: mockWorkspace }]);
 
       const result = await storage.findUserWorkspace(123);
 
       expect(result).toEqual(mockWorkspace);
-      expect(mockDb.query.workspaceMembers.findFirst).toHaveBeenCalled();
+      expect(mockDb.innerJoin).toHaveBeenCalled();
+      expect(mockDb.where).toHaveBeenCalled();
     });
   });
 
@@ -172,15 +180,14 @@ describe("WorkspaceStorage", () => {
   describe("findMembershipByUserId", () => {
     it("사용자의 멤버십을 반환한다", async () => {
       const mockMembership = { userId: 123, role: "ADMIN" };
-      mockDb.query.workspaceMembers = {
-        findFirst: vi.fn().mockResolvedValue(mockMembership),
-        findMany: vi.fn(),
-      };
+      mockDb.orderBy.mockReturnThis();
+      mockDb.limit.mockResolvedValue([{ member: mockMembership }]);
 
       const result = await storage.findMembershipByUserId(123);
 
       expect(result).toEqual(mockMembership);
-      expect(mockDb.query.workspaceMembers.findFirst).toHaveBeenCalled();
+      expect(mockDb.innerJoin).toHaveBeenCalled();
+      expect(mockDb.where).toHaveBeenCalled();
     });
   });
 
@@ -195,30 +202,36 @@ describe("WorkspaceStorage", () => {
           workspace: { id: 3, name: "운영팀", planCode: "STANDARD" },
         },
       ];
-      mockDb.query.workspaceMembers = {
-        findFirst: vi.fn(),
-        findMany: vi.fn().mockResolvedValue(mockMemberships),
-      };
+      mockDb.orderBy.mockResolvedValue([
+        {
+          member: {
+            id: 1,
+            workspaceId: 3,
+            userId: 123,
+            role: "ADMIN",
+          },
+          workspace: { id: 3, name: "운영팀", planCode: "STANDARD" },
+        },
+      ]);
 
       const result = await storage.listUserWorkspaces(123);
 
       expect(result).toEqual(mockMemberships);
-      expect(mockDb.query.workspaceMembers.findMany).toHaveBeenCalled();
+      expect(mockDb.innerJoin).toHaveBeenCalled();
+      expect(mockDb.where).toHaveBeenCalled();
     });
   });
 
   describe("findMembership", () => {
     it("특정 워크스페이스의 멤버십을 반환한다", async () => {
       const mockMembership = { workspaceId: 1, userId: 123, role: "MEMBER" };
-      mockDb.query.workspaceMembers = {
-        findFirst: vi.fn().mockResolvedValue(mockMembership),
-        findMany: vi.fn(),
-      };
+      mockDb.limit.mockResolvedValue([{ member: mockMembership }]);
 
       const result = await storage.findMembership(1, 123);
 
       expect(result).toEqual(mockMembership);
-      expect(mockDb.query.workspaceMembers.findFirst).toHaveBeenCalled();
+      expect(mockDb.innerJoin).toHaveBeenCalled();
+      expect(mockDb.where).toHaveBeenCalled();
     });
   });
 
@@ -230,15 +243,13 @@ describe("WorkspaceStorage", () => {
         userId: 123,
         role: "MEMBER",
       };
-      mockDb.query.workspaceMembers = {
-        findFirst: vi.fn().mockResolvedValue(mockMembership),
-        findMany: vi.fn(),
-      };
+      mockDb.limit.mockResolvedValue([{ member: mockMembership }]);
 
       const result = await storage.findMembershipById(1, 9);
 
       expect(result).toEqual(mockMembership);
-      expect(mockDb.query.workspaceMembers.findFirst).toHaveBeenCalled();
+      expect(mockDb.innerJoin).toHaveBeenCalled();
+      expect(mockDb.where).toHaveBeenCalled();
     });
   });
 
@@ -274,10 +285,13 @@ describe("WorkspaceStorage", () => {
   });
 
   describe("deleteWorkspace", () => {
-    it("워크스페이스를 삭제한다", async () => {
+    it("워크스페이스를 soft delete한다", async () => {
       await storage.deleteWorkspace(1);
 
-      expect(mockDb.delete).toHaveBeenCalledWith(workspaces);
+      expect(mockDb.update).toHaveBeenCalledWith(workspaces);
+      expect(mockDb.set).toHaveBeenCalledWith({
+        deletedAt: expect.any(Date),
+      });
       expect(mockDb.where).toHaveBeenCalled();
     });
   });

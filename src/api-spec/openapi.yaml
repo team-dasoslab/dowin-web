@@ -550,12 +550,12 @@ paths:
 
   /admin/marketing-invite-codes:
     get:
-      summary: 운영자 영구 무료 혜택 초대코드 목록 조회
+      summary: 운영자 프로모션 코드 초대코드 목록 조회
       tags: [AdminMarketing]
       security: [{ adminSessionCookie: [] }]
       responses:
         "200":
-          description: 영구 무료 혜택 초대코드 목록 조회 성공
+          description: 프로모션 코드 초대코드 목록 조회 성공
           content:
             application/json:
               schema:
@@ -570,7 +570,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
     post:
-      summary: 운영자 영구 무료 혜택 초대코드 생성
+      summary: 운영자 프로모션 코드 초대코드 생성
       tags: [AdminMarketing]
       security: [{ adminSessionCookie: [] }]
       requestBody:
@@ -581,7 +581,7 @@ paths:
               $ref: "#/components/schemas/MarketingInviteCodeCreateRequest"
       responses:
         "201":
-          description: 영구 무료 혜택 초대코드 생성 성공
+          description: 프로모션 코드 초대코드 생성 성공
           content:
             application/json:
               schema:
@@ -606,7 +606,7 @@ paths:
 
   /admin/marketing-invite-codes/{id}:
     get:
-      summary: 운영자 영구 무료 혜택 초대코드 상세 조회
+      summary: 운영자 프로모션 코드 초대코드 상세 조회
       tags: [AdminMarketing]
       security: [{ adminSessionCookie: [] }]
       parameters:
@@ -616,7 +616,7 @@ paths:
           schema: { type: integer }
       responses:
         "200":
-          description: 영구 무료 혜택 초대코드 상세 조회 성공
+          description: 프로모션 코드 초대코드 상세 조회 성공
           content:
             application/json:
               schema:
@@ -634,7 +634,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
     patch:
-      summary: 운영자 영구 무료 혜택 초대코드 수정
+      summary: 운영자 프로모션 코드 초대코드 수정
       tags: [AdminMarketing]
       security: [{ adminSessionCookie: [] }]
       parameters:
@@ -650,7 +650,7 @@ paths:
               $ref: "#/components/schemas/MarketingInviteCodeUpdateRequest"
       responses:
         "200":
-          description: 영구 무료 혜택 초대코드 수정 성공
+          description: 프로모션 코드 초대코드 수정 성공
           content:
             application/json:
               schema:
@@ -680,7 +680,7 @@ paths:
 
   /admin/marketing-invite-redemptions/{id}/feedback:
     patch:
-      summary: 운영자 영구 무료 혜택 피드백 상태/메모 수정
+      summary: 운영자 프로모션 코드 피드백 상태/메모 수정
       tags: [AdminMarketing]
       security: [{ adminSessionCookie: [] }]
       parameters:
@@ -1147,7 +1147,7 @@ paths:
 
   /workspaces/beta-promotion/redeem:
     post:
-      summary: 영구 무료 혜택 초대코드로 Basic 워크스페이스 생성
+      summary: 프로모션 코드 초대코드로 Basic 워크스페이스 생성
       tags: [Workspace]
       security: [{ sessionCookie: [] }]
       requestBody:
@@ -1157,7 +1157,7 @@ paths:
             schema: { $ref: "#/components/schemas/MarketingInviteRedeemRequest" }
       responses:
         "201":
-          description: 영구 무료 혜택 워크스페이스 생성 성공
+          description: 프로모션 코드 워크스페이스 생성 성공
           content:
             application/json:
               schema: { $ref: "#/components/schemas/MarketingInviteRedeemResponse" }
@@ -1623,6 +1623,11 @@ paths:
           description: 삭제 성공
         "403":
           description: 해당 워크스페이스 관리자 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 활성 구독으로 삭제할 수 없음
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -2454,6 +2459,17 @@ paths:
             type: string
           description: 워크스페이스 public ID
       responses:
+        "200":
+          description: JSON 요청이면 billing portal URL 반환
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [portalUrl]
+                properties:
+                  portalUrl:
+                    type: string
+                    format: uri
         "307":
           description: billing portal로 리다이렉트
           headers:
@@ -2522,6 +2538,52 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "422":
           description: 입력값 또는 헤더 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/billing/seats:
+    patch:
+      summary: Basic 구독 seat 수 변경
+      tags: [Billing]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - in: path
+          name: workspaceId
+          required: true
+          schema:
+            type: string
+          description: 워크스페이스 public ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateRequest" }
+      responses:
+        "200":
+          description: seat 변경 요청 접수
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 관리자만 seat 수를 변경할 수 있음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 현재 상태에서는 seat 수를 변경할 수 없거나 현재 멤버 수보다 낮은 seat 요청
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -3498,6 +3560,43 @@ components:
           nullable: true
           description: Polar checkout ID
 
+    WorkspaceBillingSeatUpdateRequest:
+      type: object
+      required: [seatCount]
+      properties:
+        seatCount:
+          type: integer
+          minimum: 1
+          maximum: 999
+          description: 변경할 Basic 구독 seat 수. 현재 워크스페이스 멤버 수보다 낮을 수 없다.
+          example: 5
+
+    WorkspaceBillingSeatUpdateResponse:
+      type: object
+      required: [seatCount, effectiveTiming]
+      properties:
+        seatCount:
+          type: integer
+          minimum: 1
+          maximum: 999
+          description: 요청한 seat 수
+          example: 5
+        appliedSeatCount:
+          type: integer
+          nullable: true
+          description: Polar 응답 기준 즉시 반영된 seat 수. 최종 entitlement 반영은 webhook 기준이다.
+          example: 5
+        pendingSeatCount:
+          type: integer
+          nullable: true
+          description: Polar 응답 기준 다음 주기에 적용 대기 중인 seat 수
+          example: null
+        effectiveTiming:
+          type: string
+          enum: [IMMEDIATE, NEXT_PERIOD, UNCHANGED]
+          description: 요청 seat 수가 현재 구매 seat보다 크면 즉시 반영, 작으면 다음 결제주기 적용, 같으면 변경 없음
+          example: IMMEDIATE
+
     WorkspaceCheckoutCompleteRequest:
       type: object
       required: [workspaceCheckoutId]
@@ -3539,6 +3638,8 @@ components:
           recentRevokedCount,
           requiresManualReview,
           purchasedSeatCount,
+          pendingSeatCount,
+          pendingSeatEffectiveAt,
           usedSeatCount,
           canManageBilling,
         ]
@@ -3580,6 +3681,16 @@ components:
           minimum: 0
           nullable: true
           description: 현재 워크스페이스가 결제한 Basic seat 수
+        pendingSeatCount:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: 다음 결제주기부터 적용될 예정인 Basic seat 수
+        pendingSeatEffectiveAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: pendingSeatCount가 적용될 예정 시점. 알 수 없으면 null
         usedSeatCount:
           type: integer
           minimum: 0

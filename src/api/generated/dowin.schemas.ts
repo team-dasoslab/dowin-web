@@ -819,6 +819,48 @@ export interface WorkspaceBillingCheckoutResponse {
   checkoutId?: string | null;
 }
 
+export interface WorkspaceBillingSeatUpdateRequest {
+  /**
+   * 변경할 Basic 구독 seat 수. 현재 워크스페이스 멤버 수보다 낮을 수 없다.
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount: number;
+}
+
+/**
+ * 요청 seat 수가 현재 구매 seat보다 크면 즉시 반영, 작으면 다음 결제주기 적용, 같으면 변경 없음
+ */
+export type WorkspaceBillingSeatUpdateResponseEffectiveTiming = typeof WorkspaceBillingSeatUpdateResponseEffectiveTiming[keyof typeof WorkspaceBillingSeatUpdateResponseEffectiveTiming];
+
+
+export const WorkspaceBillingSeatUpdateResponseEffectiveTiming = {
+  IMMEDIATE: 'IMMEDIATE',
+  NEXT_PERIOD: 'NEXT_PERIOD',
+  UNCHANGED: 'UNCHANGED',
+} as const;
+
+export interface WorkspaceBillingSeatUpdateResponse {
+  /**
+   * 요청한 seat 수
+   * @minimum 1
+   * @maximum 999
+   */
+  seatCount: number;
+  /**
+   * Polar 응답 기준 즉시 반영된 seat 수. 최종 entitlement 반영은 webhook 기준이다.
+   * @nullable
+   */
+  appliedSeatCount?: number | null;
+  /**
+   * Polar 응답 기준 다음 주기에 적용 대기 중인 seat 수
+   * @nullable
+   */
+  pendingSeatCount?: number | null;
+  /** 요청 seat 수가 현재 구매 seat보다 크면 즉시 반영, 작으면 다음 결제주기 적용, 같으면 변경 없음 */
+  effectiveTiming: WorkspaceBillingSeatUpdateResponseEffectiveTiming;
+}
+
 export interface WorkspaceCheckoutCompleteRequest {
   /**
    * /workspaces/checkout 응답으로 받은 pending workspace checkout ID
@@ -909,6 +951,17 @@ export interface BillingOverview {
    * @nullable
    */
   purchasedSeatCount: number | null;
+  /**
+   * 다음 결제주기부터 적용될 예정인 Basic seat 수
+   * @minimum 0
+   * @nullable
+   */
+  pendingSeatCount: number | null;
+  /**
+   * pendingSeatCount가 적용될 예정 시점. 알 수 없으면 null
+   * @nullable
+   */
+  pendingSeatEffectiveAt: string | null;
   /**
    * 현재 사용 중인 seat 수. 현재는 워크스페이스 멤버 수 기준이다.
    * @minimum 0
@@ -1646,6 +1699,10 @@ export const GetWorkspacesWorkspaceIdAnalyticsExportDataView = {
   week: 'week',
   month: 'month',
 } as const;
+
+export type GetWorkspacesWorkspaceIdBillingPortal200 = {
+  portalUrl: string;
+};
 
 export type GetWorkspacesWorkspaceIdDashboardTeamParams = {
 weekStart?: string;

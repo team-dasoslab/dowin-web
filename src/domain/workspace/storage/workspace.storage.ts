@@ -16,7 +16,7 @@ import {
   workspaces,
   workspaceBillingState,
 } from "@/db/schema";
-import { and, desc, eq, gt, inArray, lt, sql } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull, lt, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 type Workspace = typeof workspaces.$inferSelect;
@@ -52,7 +52,7 @@ export class WorkspaceStorage {
         workspaceBillingState,
         eq(workspaces.id, workspaceBillingState.workspaceId),
       )
-      .where(eq(workspaces.id, workspaceId))
+      .where(and(eq(workspaces.id, workspaceId), isNull(workspaces.deletedAt)))
       .limit(1);
 
     return result[0] ?? null;
@@ -69,7 +69,7 @@ export class WorkspaceStorage {
           eq(workspaceMembers.userId, userId),
         ),
       )
-      .where(eq(workspaces.uid, uid))
+      .where(and(eq(workspaces.uid, uid), isNull(workspaces.deletedAt)))
       .limit(1);
 
     return result[0]?.workspace ?? null;
@@ -78,27 +78,29 @@ export class WorkspaceStorage {
   async findWorkspaceById(workspaceId: number): Promise<Workspace | null> {
     return (
       (await this.db.query.workspaces.findFirst({
-        where: eq(workspaces.id, workspaceId),
+        where: and(eq(workspaces.id, workspaceId), isNull(workspaces.deletedAt)),
       })) ?? null
     );
   }
 
   async resolveIdByUid(uid: string): Promise<number | null> {
     const workspace = await this.db.query.workspaces.findFirst({
-      where: eq(workspaces.uid, uid),
+      where: and(eq(workspaces.uid, uid), isNull(workspaces.deletedAt)),
       columns: { id: true },
     });
     return workspace?.id ?? null;
   }
 
   async findUserWorkspace(userId: number): Promise<Workspace | null> {
-    const firstMembership = await this.db.query.workspaceMembers.findFirst({
-      where: eq(workspaceMembers.userId, userId),
-      with: {
-        workspace: true,
-      },
-    });
-    return firstMembership?.workspace ?? null;
+    const result = await this.db
+      .select({ workspace: workspaces })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(and(eq(workspaceMembers.userId, userId), isNull(workspaces.deletedAt)))
+      .orderBy(workspaceMembers.createdAt, workspaceMembers.id)
+      .limit(1);
+
+    return result[0]?.workspace ?? null;
   }
 
   async createWorkspace(name: string): Promise<Workspace> {
@@ -288,52 +290,71 @@ export class WorkspaceStorage {
   async findMembershipByUserId(
     userId: number,
   ): Promise<WorkspaceMember | null> {
-    return (
-      (await this.db.query.workspaceMembers.findFirst({
-        where: eq(workspaceMembers.userId, userId),
-        orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
-      })) ?? null
-    );
+    const result = await this.db
+      .select({ member: workspaceMembers })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(and(eq(workspaceMembers.userId, userId), isNull(workspaces.deletedAt)))
+      .orderBy(workspaceMembers.createdAt, workspaceMembers.id)
+      .limit(1);
+
+    return result[0]?.member ?? null;
   }
 
   async listUserWorkspaces(
     userId: number,
   ): Promise<WorkspaceMembershipWithWorkspace[]> {
-    return await this.db.query.workspaceMembers.findMany({
-      where: eq(workspaceMembers.userId, userId),
-      with: {
-        workspace: true,
-      },
-      orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
-    });
+    const rows = await this.db
+      .select({ member: workspaceMembers, workspace: workspaces })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(and(eq(workspaceMembers.userId, userId), isNull(workspaces.deletedAt)))
+      .orderBy(workspaceMembers.createdAt, workspaceMembers.id);
+
+    return rows.map((row) => ({
+      ...row.member,
+      workspace: row.workspace,
+    }));
   }
 
   async findMembershipById(
     workspaceId: number,
     membershipId: number,
   ): Promise<WorkspaceMember | null> {
-    return (
-      (await this.db.query.workspaceMembers.findFirst({
-        where: and(
+    const result = await this.db
+      .select({ member: workspaceMembers })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(
+        and(
           eq(workspaceMembers.workspaceId, workspaceId),
           eq(workspaceMembers.id, membershipId),
+          isNull(workspaces.deletedAt),
         ),
-      })) ?? null
-    );
+      )
+      .limit(1);
+
+    return result[0]?.member ?? null;
   }
 
   async findMembership(
     workspaceId: number,
     userId: number,
   ): Promise<WorkspaceMember | null> {
-    return (
-      (await this.db.query.workspaceMembers.findFirst({
-        where: and(
+    const result = await this.db
+      .select({ member: workspaceMembers })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(
+        and(
           eq(workspaceMembers.workspaceId, workspaceId),
           eq(workspaceMembers.userId, userId),
+          isNull(workspaces.deletedAt),
         ),
-      })) ?? null
-    );
+      )
+      .limit(1);
+
+    return result[0]?.member ?? null;
   }
 
   async findMembers(workspaceId: number): Promise<WorkspaceMemberWithUser[]> {
@@ -418,7 +439,10 @@ export class WorkspaceStorage {
   }
 
   async deleteWorkspace(workspaceId: number): Promise<void> {
-    await this.db.delete(workspaces).where(eq(workspaces.id, workspaceId));
+    await this.db
+      .update(workspaces)
+      .set({ deletedAt: new Date() })
+      .where(and(eq(workspaces.id, workspaceId), isNull(workspaces.deletedAt)));
   }
 
   async createInvite(input: {

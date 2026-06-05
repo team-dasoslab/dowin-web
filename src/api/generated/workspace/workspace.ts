@@ -85,22 +85,22 @@ export type getWorkspacesResponse = (getWorkspacesResponseSuccess | getWorkspace
 export const getGetWorkspacesUrl = () => {
 
 
-
+  
 
   return `/api/workspaces`
 }
 
 export const getWorkspaces = async ( options?: RequestInit): Promise<getWorkspacesResponse> => {
-
+  
   return customInstance<getWorkspacesResponse>(getGetWorkspacesUrl(),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -111,7 +111,7 @@ export const getGetWorkspacesQueryKey = () => {
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = UnauthorizedErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -119,13 +119,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesQueryKey();
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspaces>>> = ({ signal }) => getWorkspaces({ signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -164,7 +164,7 @@ export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces
 
 export function useGetWorkspaces<TData = Awaited<ReturnType<typeof getWorkspaces>>, TError = UnauthorizedErrorResponse>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspaces>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesQueryOptions(options)
@@ -205,15 +205,15 @@ export type postWorkspacesResponse = (postWorkspacesResponseError)
 export const getPostWorkspacesUrl = () => {
 
 
-
+  
 
   return `/api/workspaces`
 }
 
 export const postWorkspaces = async (postWorkspacesBody: PostWorkspacesBody, options?: RequestInit): Promise<postWorkspacesResponse> => {
-
+  
   return customInstance<postWorkspacesResponse>(getPostWorkspacesUrl(),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -221,7 +221,7 @@ export const postWorkspaces = async (postWorkspacesBody: PostWorkspacesBody, opt
       postWorkspacesBody,)
   }
 );}
-
+  
 
 
 
@@ -236,7 +236,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspaces>>, {data: PostWorkspacesBody}> = (props) => {
@@ -247,7 +247,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -304,15 +304,15 @@ export type postWorkspacesCheckoutResponse = (postWorkspacesCheckoutResponseSucc
 export const getPostWorkspacesCheckoutUrl = () => {
 
 
-
+  
 
   return `/api/workspaces/checkout`
 }
 
 export const postWorkspacesCheckout = async (workspaceCheckoutRequest: WorkspaceCheckoutRequest, options?: RequestInit): Promise<postWorkspacesCheckoutResponse> => {
-
+  
   return customInstance<postWorkspacesCheckoutResponse>(getPostWorkspacesCheckoutUrl(),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -320,7 +320,7 @@ export const postWorkspacesCheckout = async (workspaceCheckoutRequest: Workspace
       workspaceCheckoutRequest,)
   }
 );}
-
+  
 
 
 
@@ -335,7 +335,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesCheckout>>, {data: WorkspaceCheckoutRequest}> = (props) => {
@@ -346,7 +346,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -408,15 +408,15 @@ export type postWorkspacesCheckoutCompleteResponse = (postWorkspacesCheckoutComp
 export const getPostWorkspacesCheckoutCompleteUrl = () => {
 
 
-
+  
 
   return `/api/workspaces/checkout/complete`
 }
 
 export const postWorkspacesCheckoutComplete = async (workspaceCheckoutCompleteRequest: WorkspaceCheckoutCompleteRequest, options?: RequestInit): Promise<postWorkspacesCheckoutCompleteResponse> => {
-
+  
   return customInstance<postWorkspacesCheckoutCompleteResponse>(getPostWorkspacesCheckoutCompleteUrl(),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -424,7 +424,7 @@ export const postWorkspacesCheckoutComplete = async (workspaceCheckoutCompleteRe
       workspaceCheckoutCompleteRequest,)
   }
 );}
-
+  
 
 
 
@@ -439,7 +439,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesCheckoutComplete>>, {data: WorkspaceCheckoutCompleteRequest}> = (props) => {
@@ -450,7 +450,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -473,7 +473,7 @@ export const usePostWorkspacesCheckoutComplete = <TError = UnauthorizedErrorResp
       return useMutation(getPostWorkspacesCheckoutCompleteMutationOptions(options), queryClient);
     }
     /**
- * @summary 영구 무료 혜택 초대코드로 Basic 워크스페이스 생성
+ * @summary 프로모션 코드 초대코드로 Basic 워크스페이스 생성
  */
 export type postWorkspacesBetaPromotionRedeemResponse201 = {
   data: MarketingInviteRedeemResponse
@@ -512,15 +512,15 @@ export type postWorkspacesBetaPromotionRedeemResponse = (postWorkspacesBetaPromo
 export const getPostWorkspacesBetaPromotionRedeemUrl = () => {
 
 
-
+  
 
   return `/api/workspaces/beta-promotion/redeem`
 }
 
 export const postWorkspacesBetaPromotionRedeem = async (marketingInviteRedeemRequest: MarketingInviteRedeemRequest, options?: RequestInit): Promise<postWorkspacesBetaPromotionRedeemResponse> => {
-
+  
   return customInstance<postWorkspacesBetaPromotionRedeemResponse>(getPostWorkspacesBetaPromotionRedeemUrl(),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -528,7 +528,7 @@ export const postWorkspacesBetaPromotionRedeem = async (marketingInviteRedeemReq
       marketingInviteRedeemRequest,)
   }
 );}
-
+  
 
 
 
@@ -543,7 +543,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>, {data: MarketingInviteRedeemRequest}> = (props) => {
@@ -554,7 +554,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -564,7 +564,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PostWorkspacesBetaPromotionRedeemMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary 영구 무료 혜택 초대코드로 Basic 워크스페이스 생성
+ * @summary 프로모션 코드 초대코드로 Basic 워크스페이스 생성
  */
 export const usePostWorkspacesBetaPromotionRedeem = <TError = UnauthorizedErrorResponse | ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>, TError,{data: MarketingInviteRedeemRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
@@ -606,22 +606,22 @@ export type getWorkspacesMeResponse = (getWorkspacesMeResponseSuccess | getWorks
 export const getGetWorkspacesMeUrl = () => {
 
 
-
+  
 
   return `/api/workspaces/me`
 }
 
 export const getWorkspacesMe = async ( options?: RequestInit): Promise<getWorkspacesMeResponse> => {
-
+  
   return customInstance<getWorkspacesMeResponse>(getGetWorkspacesMeUrl(),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -632,7 +632,7 @@ export const getGetWorkspacesMeQueryKey = () => {
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesMeQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -640,13 +640,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesMeQueryKey();
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesMe>>> = ({ signal }) => getWorkspacesMe({ signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -685,7 +685,7 @@ export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspac
 
 export function useGetWorkspacesMe<TData = Awaited<ReturnType<typeof getWorkspacesMe>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesMe>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesMeQueryOptions(options)
@@ -733,15 +733,15 @@ export type putWorkspacesCurrentResponse = (putWorkspacesCurrentResponseSuccess 
 export const getPutWorkspacesCurrentUrl = () => {
 
 
-
+  
 
   return `/api/workspaces/current`
 }
 
 export const putWorkspacesCurrent = async (workspaceCurrentUpdateRequest: WorkspaceCurrentUpdateRequest, options?: RequestInit): Promise<putWorkspacesCurrentResponse> => {
-
+  
   return customInstance<putWorkspacesCurrentResponse>(getPutWorkspacesCurrentUrl(),
-  {
+  {      
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -749,7 +749,7 @@ export const putWorkspacesCurrent = async (workspaceCurrentUpdateRequest: Worksp
       workspaceCurrentUpdateRequest,)
   }
 );}
-
+  
 
 
 
@@ -764,7 +764,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesCurrent>>, {data: WorkspaceCurrentUpdateRequest}> = (props) => {
@@ -775,7 +775,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -837,15 +837,15 @@ export type postWorkspacesJoinResponse = (postWorkspacesJoinResponseSuccess | po
 export const getPostWorkspacesJoinUrl = () => {
 
 
-
+  
 
   return `/api/workspaces/join`
 }
 
 export const postWorkspacesJoin = async (postWorkspacesJoinBody: PostWorkspacesJoinBody, options?: RequestInit): Promise<postWorkspacesJoinResponse> => {
-
+  
   return customInstance<postWorkspacesJoinResponse>(getPostWorkspacesJoinUrl(),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -853,7 +853,7 @@ export const postWorkspacesJoin = async (postWorkspacesJoinBody: PostWorkspacesJ
       postWorkspacesJoinBody,)
   }
 );}
-
+  
 
 
 
@@ -868,7 +868,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesJoin>>, {data: PostWorkspacesJoinBody}> = (props) => {
@@ -879,7 +879,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -936,15 +936,15 @@ export type postWorkspacesJoinByInviteResponse = (postWorkspacesJoinByInviteResp
 export const getPostWorkspacesJoinByInviteUrl = () => {
 
 
-
+  
 
   return `/api/workspaces/join-by-invite`
 }
 
 export const postWorkspacesJoinByInvite = async (workspaceJoinByInviteRequest: WorkspaceJoinByInviteRequest, options?: RequestInit): Promise<postWorkspacesJoinByInviteResponse> => {
-
+  
   return customInstance<postWorkspacesJoinByInviteResponse>(getPostWorkspacesJoinByInviteUrl(),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -952,7 +952,7 @@ export const postWorkspacesJoinByInvite = async (workspaceJoinByInviteRequest: W
       workspaceJoinByInviteRequest,)
   }
 );}
-
+  
 
 
 
@@ -967,7 +967,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesJoinByInvite>>, {data: WorkspaceJoinByInviteRequest}> = (props) => {
@@ -978,7 +978,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -1030,22 +1030,22 @@ export type getWorkspacesIdMembersResponse = (getWorkspacesIdMembersResponseSucc
 export const getGetWorkspacesIdMembersUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/members`
 }
 
 export const getWorkspacesIdMembers = async (id: string, options?: RequestInit): Promise<getWorkspacesIdMembersResponse> => {
-
+  
   return customInstance<getWorkspacesIdMembersResponse>(getGetWorkspacesIdMembersUrl(id),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -1056,7 +1056,7 @@ export const getGetWorkspacesIdMembersQueryKey = (id: string,) => {
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesIdMembersQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -1064,13 +1064,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesIdMembersQueryKey(id);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesIdMembers>>> = ({ signal }) => getWorkspacesIdMembers(id, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1109,7 +1109,7 @@ export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getW
 
 export function useGetWorkspacesIdMembers<TData = Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdMembers>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesIdMembersQueryOptions(id,options)
@@ -1152,22 +1152,22 @@ export type getWorkspacesIdTagsResponse = (getWorkspacesIdTagsResponseSuccess | 
 export const getGetWorkspacesIdTagsUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/tags`
 }
 
 export const getWorkspacesIdTags = async (id: string, options?: RequestInit): Promise<getWorkspacesIdTagsResponse> => {
-
+  
   return customInstance<getWorkspacesIdTagsResponse>(getGetWorkspacesIdTagsUrl(id),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -1178,7 +1178,7 @@ export const getGetWorkspacesIdTagsQueryKey = (id: string,) => {
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesIdTagsQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -1186,13 +1186,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesIdTagsQueryKey(id);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesIdTags>>> = ({ signal }) => getWorkspacesIdTags(id, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1231,7 +1231,7 @@ export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWork
 
 export function useGetWorkspacesIdTags<TData = Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdTags>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesIdTagsQueryOptions(id,options)
@@ -1284,16 +1284,16 @@ export type postWorkspacesIdTagsResponse = (postWorkspacesIdTagsResponseSuccess 
 export const getPostWorkspacesIdTagsUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/tags`
 }
 
 export const postWorkspacesIdTags = async (id: string,
     workspaceTagCreateRequest: WorkspaceTagCreateRequest, options?: RequestInit): Promise<postWorkspacesIdTagsResponse> => {
-
+  
   return customInstance<postWorkspacesIdTagsResponse>(getPostWorkspacesIdTagsUrl(id),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -1301,7 +1301,7 @@ export const postWorkspacesIdTags = async (id: string,
       workspaceTagCreateRequest,)
   }
 );}
-
+  
 
 
 
@@ -1316,7 +1316,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTags>>, {id: string;data: WorkspaceTagCreateRequest}> = (props) => {
@@ -1327,7 +1327,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -1395,7 +1395,7 @@ export const getPutWorkspacesIdTagsTagIdUrl = (id: string,
     tagId: number,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/tags/${tagId}`
 }
@@ -1403,9 +1403,9 @@ export const getPutWorkspacesIdTagsTagIdUrl = (id: string,
 export const putWorkspacesIdTagsTagId = async (id: string,
     tagId: number,
     workspaceTagUpdateRequest: WorkspaceTagUpdateRequest, options?: RequestInit): Promise<putWorkspacesIdTagsTagIdResponse> => {
-
+  
   return customInstance<putWorkspacesIdTagsTagIdResponse>(getPutWorkspacesIdTagsTagIdUrl(id,tagId),
-  {
+  {      
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -1413,7 +1413,7 @@ export const putWorkspacesIdTagsTagId = async (id: string,
       workspaceTagUpdateRequest,)
   }
 );}
-
+  
 
 
 
@@ -1428,7 +1428,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesIdTagsTagId>>, {id: string;tagId: number;data: WorkspaceTagUpdateRequest}> = (props) => {
@@ -1439,7 +1439,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -1497,23 +1497,23 @@ export const getDeleteWorkspacesIdTagsTagIdUrl = (id: string,
     tagId: number,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/tags/${tagId}`
 }
 
 export const deleteWorkspacesIdTagsTagId = async (id: string,
     tagId: number, options?: RequestInit): Promise<deleteWorkspacesIdTagsTagIdResponse> => {
-
+  
   return customInstance<deleteWorkspacesIdTagsTagIdResponse>(getDeleteWorkspacesIdTagsTagIdUrl(id,tagId),
-  {
+  {      
     ...options,
     method: 'DELETE'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -1528,7 +1528,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>, {id: string;tagId: number}> = (props) => {
@@ -1539,13 +1539,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteWorkspacesIdTagsTagIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesIdTagsTagId>>>
-
+    
     export type DeleteWorkspacesIdTagsTagIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
@@ -1591,22 +1591,22 @@ export type getWorkspacesIdInvitesResponse = (getWorkspacesIdInvitesResponseSucc
 export const getGetWorkspacesIdInvitesUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/invites`
 }
 
 export const getWorkspacesIdInvites = async (id: string, options?: RequestInit): Promise<getWorkspacesIdInvitesResponse> => {
-
+  
   return customInstance<getWorkspacesIdInvitesResponse>(getGetWorkspacesIdInvitesUrl(id),
-  {
+  {      
     ...options,
     method: 'GET'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -1617,7 +1617,7 @@ export const getGetWorkspacesIdInvitesQueryKey = (id: string,) => {
     ] as const;
     }
 
-
+    
 export const getGetWorkspacesIdInvitesQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
 
@@ -1625,13 +1625,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesIdInvitesQueryKey(id);
 
-
+  
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesIdInvites>>> = ({ signal }) => getWorkspacesIdInvites(id, { signal, ...requestOptions });
 
+      
 
-
-
+      
 
    return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -1670,7 +1670,7 @@ export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getW
 
 export function useGetWorkspacesIdInvites<TData = Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesIdInvites>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient
+ , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesIdInvitesQueryOptions(id,options)
@@ -1718,16 +1718,16 @@ export type postWorkspacesIdInvitesResponse = (postWorkspacesIdInvitesResponseSu
 export const getPostWorkspacesIdInvitesUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/invites`
 }
 
 export const postWorkspacesIdInvites = async (id: string,
     workspaceInviteCreateRequest: WorkspaceInviteCreateRequest, options?: RequestInit): Promise<postWorkspacesIdInvitesResponse> => {
-
+  
   return customInstance<postWorkspacesIdInvitesResponse>(getPostWorkspacesIdInvitesUrl(id),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -1735,7 +1735,7 @@ export const postWorkspacesIdInvites = async (id: string,
       workspaceInviteCreateRequest,)
   }
 );}
-
+  
 
 
 
@@ -1750,7 +1750,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdInvites>>, {id: string;data: WorkspaceInviteCreateRequest}> = (props) => {
@@ -1761,7 +1761,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -1824,7 +1824,7 @@ export const getPatchWorkspacesIdInvitesInviteIdStatusUrl = (id: string,
     inviteId: number,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/invites/${inviteId}/status`
 }
@@ -1832,9 +1832,9 @@ export const getPatchWorkspacesIdInvitesInviteIdStatusUrl = (id: string,
 export const patchWorkspacesIdInvitesInviteIdStatus = async (id: string,
     inviteId: number,
     workspaceInviteStatusUpdateRequest: WorkspaceInviteStatusUpdateRequest, options?: RequestInit): Promise<patchWorkspacesIdInvitesInviteIdStatusResponse> => {
-
+  
   return customInstance<patchWorkspacesIdInvitesInviteIdStatusResponse>(getPatchWorkspacesIdInvitesInviteIdStatusUrl(id,inviteId),
-  {
+  {      
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -1842,7 +1842,7 @@ export const patchWorkspacesIdInvitesInviteIdStatus = async (id: string,
       workspaceInviteStatusUpdateRequest,)
   }
 );}
-
+  
 
 
 
@@ -1857,7 +1857,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchWorkspacesIdInvitesInviteIdStatus>>, {id: string;inviteId: number;data: WorkspaceInviteStatusUpdateRequest}> = (props) => {
@@ -1868,7 +1868,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -1925,16 +1925,16 @@ export type putWorkspacesIdResponse = (putWorkspacesIdResponseSuccess | putWorks
 export const getPutWorkspacesIdUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}`
 }
 
 export const putWorkspacesId = async (id: string,
     putWorkspacesIdBody: PutWorkspacesIdBody, options?: RequestInit): Promise<putWorkspacesIdResponse> => {
-
+  
   return customInstance<putWorkspacesIdResponse>(getPutWorkspacesIdUrl(id),
-  {
+  {      
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -1942,7 +1942,7 @@ export const putWorkspacesId = async (id: string,
       putWorkspacesIdBody,)
   }
 );}
-
+  
 
 
 
@@ -1957,7 +1957,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof putWorkspacesId>>, {id: string;data: PutWorkspacesIdBody}> = (props) => {
@@ -1968,7 +1968,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -2013,10 +2013,15 @@ export type deleteWorkspacesIdResponse404 = {
   status: 404
 }
 
+export type deleteWorkspacesIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
 export type deleteWorkspacesIdResponseSuccess = (deleteWorkspacesIdResponse204) & {
   headers: Headers;
 };
-export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | deleteWorkspacesIdResponse403 | deleteWorkspacesIdResponse404) & {
+export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | deleteWorkspacesIdResponse403 | deleteWorkspacesIdResponse404 | deleteWorkspacesIdResponse409) & {
   headers: Headers;
 };
 
@@ -2025,22 +2030,22 @@ export type deleteWorkspacesIdResponse = (deleteWorkspacesIdResponseSuccess | de
 export const getDeleteWorkspacesIdUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}`
 }
 
 export const deleteWorkspacesId = async (id: string, options?: RequestInit): Promise<deleteWorkspacesIdResponse> => {
-
+  
   return customInstance<deleteWorkspacesIdResponse>(getDeleteWorkspacesIdUrl(id),
-  {
+  {      
     ...options,
     method: 'DELETE'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -2055,7 +2060,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesId>>, {id: string}> = (props) => {
@@ -2066,13 +2071,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteWorkspacesIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesId>>>
-
+    
     export type DeleteWorkspacesIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
@@ -2128,22 +2133,22 @@ export type deleteWorkspacesIdLeaveResponse = (deleteWorkspacesIdLeaveResponseSu
 export const getDeleteWorkspacesIdLeaveUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/leave`
 }
 
 export const deleteWorkspacesIdLeave = async (id: string, options?: RequestInit): Promise<deleteWorkspacesIdLeaveResponse> => {
-
+  
   return customInstance<deleteWorkspacesIdLeaveResponse>(getDeleteWorkspacesIdLeaveUrl(id),
-  {
+  {      
     ...options,
     method: 'DELETE'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -2158,7 +2163,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>, {id: string}> = (props) => {
@@ -2169,13 +2174,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteWorkspacesIdLeaveMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesIdLeave>>>
-
+    
     export type DeleteWorkspacesIdLeaveMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
@@ -2231,16 +2236,16 @@ export type postWorkspacesIdTransferAdminResponse = (postWorkspacesIdTransferAdm
 export const getPostWorkspacesIdTransferAdminUrl = (id: string,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/transfer-admin`
 }
 
 export const postWorkspacesIdTransferAdmin = async (id: string,
     workspaceTransferAdminRequest: WorkspaceTransferAdminRequest, options?: RequestInit): Promise<postWorkspacesIdTransferAdminResponse> => {
-
+  
   return customInstance<postWorkspacesIdTransferAdminResponse>(getPostWorkspacesIdTransferAdminUrl(id),
-  {
+  {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -2248,7 +2253,7 @@ export const postWorkspacesIdTransferAdmin = async (id: string,
       workspaceTransferAdminRequest,)
   }
 );}
-
+  
 
 
 
@@ -2263,7 +2268,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdTransferAdmin>>, {id: string;data: WorkspaceTransferAdminRequest}> = (props) => {
@@ -2274,7 +2279,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -2332,23 +2337,23 @@ export const getDeleteWorkspacesIdMembersMemberIdUrl = (id: string,
     memberId: number,) => {
 
 
-
+  
 
   return `/api/workspaces/${id}/members/${memberId}`
 }
 
 export const deleteWorkspacesIdMembersMemberId = async (id: string,
     memberId: number, options?: RequestInit): Promise<deleteWorkspacesIdMembersMemberIdResponse> => {
-
+  
   return customInstance<deleteWorkspacesIdMembersMemberIdResponse>(getDeleteWorkspacesIdMembersMemberIdUrl(id,memberId),
-  {
+  {      
     ...options,
     method: 'DELETE'
-
-
+    
+    
   }
 );}
-
+  
 
 
 
@@ -2363,7 +2368,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-
+      
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>, {id: string;memberId: number}> = (props) => {
@@ -2374,13 +2379,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-
+        
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteWorkspacesIdMembersMemberIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesIdMembersMemberId>>>
-
+    
     export type DeleteWorkspacesIdMembersMemberIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
@@ -2396,3 +2401,4 @@ export const useDeleteWorkspacesIdMembersMemberId = <TError = UnauthorizedErrorR
       > => {
       return useMutation(getDeleteWorkspacesIdMembersMemberIdMutationOptions(options), queryClient);
     }
+    

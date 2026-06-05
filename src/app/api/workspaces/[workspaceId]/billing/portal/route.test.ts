@@ -70,6 +70,52 @@ describe("GET /api/billing/portal", () => {
     expect(response.headers.get("location")).toBe("https://example.com/portal");
   });
 
+  it("JSON 요청이면 portal url을 반환한다", async () => {
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
+    mockGetPortalUrl.mockResolvedValue("https://example.com/portal");
+
+    const { GET } = await import("./route");
+    const response = await GET(
+      new Request("http://localhost", {
+        headers: {
+          accept: "application/json",
+        },
+      }),
+      {
+        params: Promise.resolve({ workspaceId: "ws_uid" }),
+      },
+    );
+
+    await expect(response.json()).resolves.toEqual({
+      portalUrl: "https://example.com/portal",
+    });
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
+  it("JSON 요청에서 연동 전이면 에러 응답을 반환한다", async () => {
+    mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
+    mockGetPortalUrl.mockRejectedValue(new ConflictError("BILLING_NOT_READY"));
+
+    const { GET } = await import("./route");
+    const response = await GET(
+      new Request("http://localhost/api/workspaces/ws_uid/billing/portal", {
+        headers: {
+          accept: "application/json",
+        },
+      }),
+      { params: Promise.resolve({ workspaceId: "ws_uid" }) },
+    );
+
+    await expect(response.json()).resolves.toMatchObject({
+      error: {
+        code: "BILLING_NOT_READY",
+      },
+    });
+    expect(response.status).toBe(409);
+    expect(response.headers.get("location")).toBeNull();
+  });
+
   it("연동 전에는 기존 billing 화면으로 redirect한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
     mockGetPortalUrl.mockRejectedValue(new ConflictError("BILLING_NOT_READY"));

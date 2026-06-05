@@ -1,5 +1,6 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
+import { createPolarBillingClient } from "@/domain/billing/polar";
 import { BillingService } from "@/domain/billing/services/billing.service";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
@@ -20,6 +21,7 @@ const { env } = getCloudflareContext();
   const service = new BillingService(
     new WorkspaceStorage(db),
     new BillingStorage(db),
+    createPolarBillingClient(env),
   );
 
   const result = await service.getMyBilling(workspaceId, session.userId);

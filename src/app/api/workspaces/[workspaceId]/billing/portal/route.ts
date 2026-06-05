@@ -4,7 +4,7 @@ import { createPolarBillingClient } from "@/domain/billing/polar";
 import { BillingService } from "@/domain/billing/services/billing.service";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { apiError } from "@/lib/server/api-response";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { PlatformError } from "@/lib/server/errors";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
@@ -36,6 +36,10 @@ function buildPortalFailureRedirectUrl(
   return redirectUrl;
 }
 
+function wantsJsonResponse(request: Request): boolean {
+  return request.headers.get("accept")?.includes("application/json") ?? false;
+}
+
 export const GET = withErrorHandler(
   async (
     request: Request,
@@ -50,6 +54,7 @@ export const GET = withErrorHandler(
       return await apiError("UNAUTHORIZED");
     }
 
+    const returnJson = wantsJsonResponse(request);
     const service = new BillingService(
       new WorkspaceStorage(db),
       new BillingStorage(db),
@@ -58,9 +63,17 @@ export const GET = withErrorHandler(
 
     try {
       const portalUrl = await service.getPortalUrl(workspaceId, session.userId);
+      if (returnJson) {
+        return apiSuccess({ portalUrl });
+      }
+
       return NextResponse.redirect(portalUrl);
     } catch (error) {
       if (error instanceof PlatformError) {
+        if (returnJson) {
+          return await apiError(error.code);
+        }
+
         console.warn("[billing.portal] redirecting after portal failure", {
           workspaceId,
           userId: session.userId,

@@ -16,6 +16,14 @@ export const workspaceBillingCheckoutSchema = z.object({
     .optional(),
 });
 
+export const workspaceBillingSeatUpdateSchema = z.object({
+  seatCount: z
+    .number()
+    .int("좌석 수는 정수여야 합니다.")
+    .min(1, "좌석 수는 1 이상이어야 합니다.")
+    .max(999, "좌석 수는 999 이하여야 합니다."),
+});
+
 export const adminBillingWorkspaceListQuerySchema = z.object({
   workspaceId: z.coerce.number().int().positive().optional(),
   workspaceName: z

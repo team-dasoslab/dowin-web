@@ -33,10 +33,10 @@ If docs conflict with code, verify the implementation and trust the current code
 - Auth-required routes should use `getSession`.
 - SQL must use Prepared Statement patterns through Drizzle or binding.
 - Keep backend date storage and API-facing canonical date values in UTC unless a domain doc explicitly says otherwise.
-- Schema or persisted-data changes should use repository scripts, not ad-hoc Drizzle commands.
+- Schema or persisted-data changes must use repository migration scripts, not manual SQL application, ad-hoc Drizzle commands, or direct Wrangler migration commands.
   - Local schema migration flow: `yarn mig:local`
   - Remote apply flow when explicitly needed: `yarn mig:remote`
-  - Do not run `drizzle-kit generate` directly unless the repository instructions are changed
+  - Do not run `drizzle-kit generate`, `drizzle-kit push`, or `wrangler d1 migrations apply` directly unless the repository instructions are changed
 - Backend changes that add heavy aggregation, repeated scans, or broader DB reads should include `dowin-performance-check` before completion.
 - When creating commits, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `feat|fix|docs|chore|refactor|style` with the format `<type>: <변경 요약>`.
 
@@ -78,7 +78,7 @@ If the schema changes, reflect it in `src/db/schema.ts` first and then use:
 yarn mig:local
 ```
 
-Use `yarn mig:remote` only when the task explicitly requires applying the migration remotely.
+Do not manually create or apply migration files with direct SQL/Drizzle/Wrangler commands. Use `yarn mig:remote` only when the task explicitly requires applying the migration remotely.
 
 ### 3. Start with tests when the change is backend behavior
 
