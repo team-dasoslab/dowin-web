@@ -1689,6 +1689,10 @@ export const GetWorkspacesWorkspaceIdAnalyticsExportDataView = {
   month: 'month',
 } as const;
 
+export type GetWorkspacesWorkspaceIdBillingPortal200 = {
+  portalUrl: string;
+};
+
 export type GetWorkspacesWorkspaceIdDashboardTeamParams = {
 weekStart?: string;
 cursor?: string;

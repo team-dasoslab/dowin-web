@@ -2459,6 +2459,17 @@ paths:
             type: string
           description: 워크스페이스 public ID
       responses:
+        "200":
+          description: JSON 요청이면 billing portal URL 반환
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [portalUrl]
+                properties:
+                  portalUrl:
+                    type: string
+                    format: uri
         "307":
           description: billing portal로 리다이렉트
           headers:

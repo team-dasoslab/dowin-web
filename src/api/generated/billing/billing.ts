@@ -27,6 +27,7 @@ import type {
 import type {
   BillingOverview,
   ErrorResponse,
+  GetWorkspacesWorkspaceIdBillingPortal200,
   UnauthorizedErrorResponse,
   WorkspaceBillingCheckoutRequest,
   WorkspaceBillingCheckoutResponse,
@@ -166,6 +167,11 @@ export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<
 /**
  * @summary customer portal 진입
  */
+export type getWorkspacesWorkspaceIdBillingPortalResponse200 = {
+  data: GetWorkspacesWorkspaceIdBillingPortal200
+  status: 200
+}
+
 export type getWorkspacesWorkspaceIdBillingPortalResponse307 = {
   data: void
   status: 307
@@ -186,12 +192,14 @@ export type getWorkspacesWorkspaceIdBillingPortalResponse409 = {
   status: 409
 }
 
-;
+export type getWorkspacesWorkspaceIdBillingPortalResponseSuccess = (getWorkspacesWorkspaceIdBillingPortalResponse200) & {
+  headers: Headers;
+};
 export type getWorkspacesWorkspaceIdBillingPortalResponseError = (getWorkspacesWorkspaceIdBillingPortalResponse307 | getWorkspacesWorkspaceIdBillingPortalResponse401 | getWorkspacesWorkspaceIdBillingPortalResponse403 | getWorkspacesWorkspaceIdBillingPortalResponse409) & {
   headers: Headers;
 };
 
-export type getWorkspacesWorkspaceIdBillingPortalResponse = (getWorkspacesWorkspaceIdBillingPortalResponseError)
+export type getWorkspacesWorkspaceIdBillingPortalResponse = (getWorkspacesWorkspaceIdBillingPortalResponseSuccess | getWorkspacesWorkspaceIdBillingPortalResponseError)
 
 export const getGetWorkspacesWorkspaceIdBillingPortalUrl = (workspaceId: string,) => {
 
