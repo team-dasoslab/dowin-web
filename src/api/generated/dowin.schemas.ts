@@ -952,6 +952,17 @@ export interface BillingOverview {
    */
   purchasedSeatCount: number | null;
   /**
+   * 다음 결제주기부터 적용될 예정인 Basic seat 수
+   * @minimum 0
+   * @nullable
+   */
+  pendingSeatCount: number | null;
+  /**
+   * pendingSeatCount가 적용될 예정 시점. 알 수 없으면 null
+   * @nullable
+   */
+  pendingSeatEffectiveAt: string | null;
+  /**
    * 현재 사용 중인 seat 수. 현재는 워크스페이스 멤버 수 기준이다.
    * @minimum 0
    */

@@ -3638,6 +3638,8 @@ components:
           recentRevokedCount,
           requiresManualReview,
           purchasedSeatCount,
+          pendingSeatCount,
+          pendingSeatEffectiveAt,
           usedSeatCount,
           canManageBilling,
         ]
@@ -3679,6 +3681,16 @@ components:
           minimum: 0
           nullable: true
           description: 현재 워크스페이스가 결제한 Basic seat 수
+        pendingSeatCount:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: 다음 결제주기부터 적용될 예정인 Basic seat 수
+        pendingSeatEffectiveAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: pendingSeatCount가 적용될 예정 시점. 알 수 없으면 null
         usedSeatCount:
           type: integer
           minimum: 0
