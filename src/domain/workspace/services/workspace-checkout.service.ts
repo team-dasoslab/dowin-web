@@ -8,6 +8,8 @@ import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 
 const WORKSPACE_CHECKOUT_EXPIRES_MS = 30 * 60 * 1000;
+const WORKSPACE_CHECKOUT_VERIFY_RETRY_COUNT = 3;
+const WORKSPACE_CHECKOUT_VERIFY_RETRY_DELAY_MS = 300;
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
@@ -35,6 +37,10 @@ export class WorkspaceCheckoutService {
     private workspaceStorage: WorkspacePort,
     private billingStorage: BillingPort,
     private polarClient: PolarBillingClient | null,
+    private options: {
+      verifyRetryCount?: number;
+      verifyRetryDelayMs?: number;
+    } = {},
   ) {}
 
   async prepareWorkspaceCheckout(input: {
@@ -187,7 +193,10 @@ export class WorkspaceCheckoutService {
       throw new ConflictError("BILLING_NOT_READY");
     }
 
-    const checkout = await this.getVerifiedCheckout(checkoutId);
+    const checkout = await this.getVerifiedWorkspaceSetupCheckout(
+      checkoutId,
+      pending.uid,
+    );
 
     if (
       checkout.status !== "succeeded" ||
@@ -213,6 +222,47 @@ export class WorkspaceCheckoutService {
     return { workspaceId: getWorkspacePublicId(workspace) };
   }
 
+  private async getVerifiedWorkspaceSetupCheckout(
+    checkoutId: string,
+    pendingUid: string,
+  ) {
+    const retryCount =
+      this.options.verifyRetryCount ?? WORKSPACE_CHECKOUT_VERIFY_RETRY_COUNT;
+    const retryDelayMs =
+      this.options.verifyRetryDelayMs ?? WORKSPACE_CHECKOUT_VERIFY_RETRY_DELAY_MS;
+
+    for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+      const checkout = await this.getVerifiedCheckout(checkoutId);
+
+      if (!isWorkspaceSetupCheckout(checkout, pendingUid)) {
+        return checkout;
+      }
+
+      if (checkout.subscriptionKey) {
+        return checkout;
+      }
+
+      if (attempt < retryCount) {
+        await sleep(retryDelayMs);
+      }
+    }
+
+    const fallbackSubscription =
+      await this.polarClient?.findSubscriptionByCheckoutId({ checkoutId });
+    const checkout = await this.getVerifiedCheckout(checkoutId);
+
+    if (fallbackSubscription && isWorkspaceSetupCheckout(checkout, pendingUid)) {
+      return {
+        ...checkout,
+        customerKey: checkout.customerKey ?? fallbackSubscription.customerKey,
+        subscriptionKey: fallbackSubscription.subscriptionKey,
+        seats: fallbackSubscription.seats ?? checkout.seats,
+      };
+    }
+
+    throw new ConflictError("WORKSPACE_CHECKOUT_NOT_READY");
+  }
+
   private async getVerifiedCheckout(checkoutId: string) {
     try {
       const checkout = await this.polarClient?.getCheckoutSession({ checkoutId });
@@ -233,4 +283,28 @@ export class WorkspaceCheckoutService {
       throw error;
     }
   }
+}
+
+function isWorkspaceSetupCheckout(
+  checkout: {
+    status: string | null;
+    metadata: Record<string, unknown>;
+    externalCustomerId: string | null;
+  },
+  pendingUid: string,
+) {
+  return (
+    checkout.status === "succeeded" &&
+    checkout.metadata.workspaceCheckoutId === pendingUid &&
+    checkout.metadata.flow === "workspace_setup" &&
+    checkout.externalCustomerId === `workspace-checkout:${pendingUid}`
+  );
+}
+
+function sleep(ms: number) {
+  if (ms <= 0) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

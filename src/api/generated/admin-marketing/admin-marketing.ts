@@ -43,7 +43,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary 운영자 영구 무료 혜택 초대코드 목록 조회
+ * @summary 운영자 프로모션 코드 초대코드 목록 조회
  */
 export type getAdminMarketingInviteCodesResponse200 = {
   data: MarketingInviteCodeSummary[]
@@ -146,7 +146,7 @@ export function useGetAdminMarketingInviteCodes<TData = Awaited<ReturnType<typeo
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary 운영자 영구 무료 혜택 초대코드 목록 조회
+ * @summary 운영자 프로모션 코드 초대코드 목록 조회
  */
 
 export function useGetAdminMarketingInviteCodes<TData = Awaited<ReturnType<typeof getAdminMarketingInviteCodes>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
@@ -165,7 +165,7 @@ export function useGetAdminMarketingInviteCodes<TData = Awaited<ReturnType<typeo
 
 
 /**
- * @summary 운영자 영구 무료 혜택 초대코드 생성
+ * @summary 운영자 프로모션 코드 초대코드 생성
  */
 export type postAdminMarketingInviteCodesResponse201 = {
   data: MarketingInviteCodeDetail
@@ -256,7 +256,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PostAdminMarketingInviteCodesMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary 운영자 영구 무료 혜택 초대코드 생성
+ * @summary 운영자 프로모션 코드 초대코드 생성
  */
 export const usePostAdminMarketingInviteCodes = <TError = UnauthorizedErrorResponse | ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminMarketingInviteCodes>>, TError,{data: MarketingInviteCodeCreateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
@@ -269,7 +269,7 @@ export const usePostAdminMarketingInviteCodes = <TError = UnauthorizedErrorRespo
       return useMutation(getPostAdminMarketingInviteCodesMutationOptions(options), queryClient);
     }
     /**
- * @summary 운영자 영구 무료 혜택 초대코드 상세 조회
+ * @summary 운영자 프로모션 코드 초대코드 상세 조회
  */
 export type getAdminMarketingInviteCodesIdResponse200 = {
   data: MarketingInviteCodeDetail
@@ -377,7 +377,7 @@ export function useGetAdminMarketingInviteCodesId<TData = Awaited<ReturnType<typ
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary 운영자 영구 무료 혜택 초대코드 상세 조회
+ * @summary 운영자 프로모션 코드 초대코드 상세 조회
  */
 
 export function useGetAdminMarketingInviteCodesId<TData = Awaited<ReturnType<typeof getAdminMarketingInviteCodesId>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
@@ -396,7 +396,7 @@ export function useGetAdminMarketingInviteCodesId<TData = Awaited<ReturnType<typ
 
 
 /**
- * @summary 운영자 영구 무료 혜택 초대코드 수정
+ * @summary 운영자 프로모션 코드 초대코드 수정
  */
 export type patchAdminMarketingInviteCodesIdResponse200 = {
   data: MarketingInviteCodeDetail
@@ -493,7 +493,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PatchAdminMarketingInviteCodesIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary 운영자 영구 무료 혜택 초대코드 수정
+ * @summary 운영자 프로모션 코드 초대코드 수정
  */
 export const usePatchAdminMarketingInviteCodesId = <TError = UnauthorizedErrorResponse | ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchAdminMarketingInviteCodesId>>, TError,{id: number;data: MarketingInviteCodeUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
@@ -506,7 +506,7 @@ export const usePatchAdminMarketingInviteCodesId = <TError = UnauthorizedErrorRe
       return useMutation(getPatchAdminMarketingInviteCodesIdMutationOptions(options), queryClient);
     }
     /**
- * @summary 운영자 영구 무료 혜택 피드백 상태/메모 수정
+ * @summary 운영자 프로모션 코드 피드백 상태/메모 수정
  */
 export type patchAdminMarketingInviteRedemptionsIdFeedbackResponse200 = {
   data: MarketingInviteRedemption
@@ -598,7 +598,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PatchAdminMarketingInviteRedemptionsIdFeedbackMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
- * @summary 운영자 영구 무료 혜택 피드백 상태/메모 수정
+ * @summary 운영자 프로모션 코드 피드백 상태/메모 수정
  */
 export const usePatchAdminMarketingInviteRedemptionsIdFeedback = <TError = UnauthorizedErrorResponse | ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchAdminMarketingInviteRedemptionsIdFeedback>>, TError,{id: number;data: MarketingInviteRedemptionFeedbackUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}

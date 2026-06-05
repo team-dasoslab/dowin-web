@@ -12,6 +12,8 @@ interface InfoTooltipProps {
    */
   label?: React.ReactNode;
   className?: string;
+  align?: "left" | "center" | "right";
+  side?: "top" | "bottom";
 }
 
 /**
@@ -24,7 +26,7 @@ interface InfoTooltipProps {
  * // 인라인 (카드 내부)
  * <InfoTooltip label={<h1>제목</h1>} content="설명..." />
  */
-export function InfoTooltip({ content, label, className }: InfoTooltipProps) {
+export function InfoTooltip({ content, label, className, align = "left", side = "bottom" }: InfoTooltipProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -54,6 +56,15 @@ export function InfoTooltip({ content, label, className }: InfoTooltipProps) {
     </button>
   );
 
+  const tooltipAlignClass =
+    align === "left"
+      ? "left-0"
+      : align === "right"
+      ? "right-0"
+      : "left-1/2 -translate-x-1/2";
+
+  const tooltipSideClass = side === "top" ? "bottom-full mb-2" : "top-full mt-2";
+
   /* ── 인라인 모드 (label 있음) ── */
   if (label !== undefined) {
     return (
@@ -65,7 +76,11 @@ export function InfoTooltip({ content, label, className }: InfoTooltipProps) {
         {open && (
           <div
             role="tooltip"
-            className="absolute left-0 top-full z-50 mt-2 w-72 max-w-[calc(100vw-4rem)] rounded-content border border-zinc-200 bg-white p-4 shadow-lg animate-dowin-in"
+            className={cn(
+              "absolute z-50 w-72 max-w-[calc(100vw-4rem)] rounded-content border border-zinc-200 bg-white p-4 shadow-lg animate-dowin-in",
+              tooltipAlignClass,
+              tooltipSideClass,
+            )}
           >
             <div className="text-[13px] font-medium leading-relaxed text-zinc-600 whitespace-pre-line">
               {content}
@@ -83,7 +98,11 @@ export function InfoTooltip({ content, label, className }: InfoTooltipProps) {
       {open && (
         <div
           role="tooltip"
-          className="absolute left-0 top-full z-50 mt-2 w-72 rounded-content border border-zinc-200 bg-white p-4 shadow-lg animate-dowin-in"
+          className={cn(
+            "absolute z-50 w-72 max-w-[calc(100vw-2rem)] sm:max-w-none rounded-content border border-zinc-200 bg-white p-4 shadow-lg animate-dowin-in",
+            tooltipAlignClass,
+            tooltipSideClass,
+          )}
         >
           <div className="text-[13px] font-medium leading-relaxed text-zinc-600 whitespace-pre-line">
             {content}
@@ -93,4 +112,3 @@ export function InfoTooltip({ content, label, className }: InfoTooltipProps) {
     </div>
   );
 }
-

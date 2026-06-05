@@ -41,7 +41,7 @@ describe("MarketingInviteService", () => {
   });
 
   describe("createCode", () => {
-    it("운영자가 영구 무료 혜택 코드를 생성하고 audit log를 남긴다", async () => {
+    it("운영자가 프로모션 코드를 생성하고 audit log를 남긴다", async () => {
       mockStorage.createCode.mockResolvedValue(activeCode);
       mockStorage.findCodeDetail.mockResolvedValue({
         ...activeCode,

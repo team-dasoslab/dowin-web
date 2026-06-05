@@ -232,6 +232,13 @@
       "when": 1780401104581,
       "tag": "0032_material_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "6",
+      "when": 1780549049134,
+      "tag": "0033_nifty_queen_noir",
+      "breakpoints": true
     }
   ]
 }

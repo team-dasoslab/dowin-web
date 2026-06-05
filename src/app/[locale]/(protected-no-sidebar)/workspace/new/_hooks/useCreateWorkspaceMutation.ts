@@ -1,16 +1,13 @@
 "use client";
 
-import { postWorkspacesCheckout, postWorkspacesBetaPromotionRedeem } from "@/api/generated/workspace/workspace";
-import { trackEvent } from "@/lib/client/gtag";
+import {
+  postWorkspacesBetaPromotionRedeem,
+  postWorkspacesCheckout,
+} from "@/api/generated/workspace/workspace";
 import { useRouter } from "@/i18n/routing";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
+import { trackEvent } from "@/lib/client/gtag";
 import { useState } from "react";
-
-type WorkspaceCreateError = {
-  data?: {
-    message?: string;
-  };
-};
 
 type UseCreateWorkspaceMutationParams = {
   onError: (message: string) => void;
@@ -22,7 +19,11 @@ export const useCreateWorkspaceMutation = ({
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
-  const submitCreateWorkspace = async (name: string, seatCount: number, promotionCode?: string) => {
+  const submitCreateWorkspace = async (
+    name: string,
+    seatCount: number,
+    promotionCode?: string,
+  ) => {
     setIsPending(true);
     try {
       if (promotionCode) {
@@ -75,7 +76,7 @@ export const useCreateWorkspaceMutation = ({
       window.location.assign(response.data.checkoutUrl);
     } catch (error) {
       onError(
-        getApiErrorMessage(error, "워크스페이스 생성 중 오류가 발생했습니다.")
+        getApiErrorMessage(error, "워크스페이스 생성 중 오류가 발생했습니다."),
       );
     } finally {
       setIsPending(false);

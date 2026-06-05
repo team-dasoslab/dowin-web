@@ -64,7 +64,7 @@ export default function AdminPromotionCreateClient() {
           새 프로모션 코드 생성
         </h1>
         <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
-          워크스페이스 영구 무료 혜택(Basic) 프로모션 초대코드를 새로 발급합니다.
+          워크스페이스 프로모션 코드(Basic) 프로모션 초대코드를 새로 발급합니다.
         </p>
       </div>
 

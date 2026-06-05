@@ -27,9 +27,12 @@ import type {
 import type {
   BillingOverview,
   ErrorResponse,
+  GetWorkspacesWorkspaceIdBillingPortal200,
   UnauthorizedErrorResponse,
   WorkspaceBillingCheckoutRequest,
-  WorkspaceBillingCheckoutResponse
+  WorkspaceBillingCheckoutResponse,
+  WorkspaceBillingSeatUpdateRequest,
+  WorkspaceBillingSeatUpdateResponse
 } from '../dowin.schemas';
 
 import { customInstance } from '../../mutator';
@@ -164,6 +167,11 @@ export function useGetWorkspacesWorkspaceIdBillingMe<TData = Awaited<ReturnType<
 /**
  * @summary customer portal 진입
  */
+export type getWorkspacesWorkspaceIdBillingPortalResponse200 = {
+  data: GetWorkspacesWorkspaceIdBillingPortal200
+  status: 200
+}
+
 export type getWorkspacesWorkspaceIdBillingPortalResponse307 = {
   data: void
   status: 307
@@ -184,12 +192,14 @@ export type getWorkspacesWorkspaceIdBillingPortalResponse409 = {
   status: 409
 }
 
-;
+export type getWorkspacesWorkspaceIdBillingPortalResponseSuccess = (getWorkspacesWorkspaceIdBillingPortalResponse200) & {
+  headers: Headers;
+};
 export type getWorkspacesWorkspaceIdBillingPortalResponseError = (getWorkspacesWorkspaceIdBillingPortalResponse307 | getWorkspacesWorkspaceIdBillingPortalResponse401 | getWorkspacesWorkspaceIdBillingPortalResponse403 | getWorkspacesWorkspaceIdBillingPortalResponse409) & {
   headers: Headers;
 };
 
-export type getWorkspacesWorkspaceIdBillingPortalResponse = (getWorkspacesWorkspaceIdBillingPortalResponseError)
+export type getWorkspacesWorkspaceIdBillingPortalResponse = (getWorkspacesWorkspaceIdBillingPortalResponseSuccess | getWorkspacesWorkspaceIdBillingPortalResponseError)
 
 export const getGetWorkspacesWorkspaceIdBillingPortalUrl = (workspaceId: string,) => {
 
@@ -395,5 +405,115 @@ export const usePostWorkspacesWorkspaceIdBillingCheckout = <TError = Unauthorize
         TContext
       > => {
       return useMutation(getPostWorkspacesWorkspaceIdBillingCheckoutMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary Basic 구독 seat 수 변경
+ */
+export type patchWorkspacesWorkspaceIdBillingSeatsResponse200 = {
+  data: WorkspaceBillingSeatUpdateResponse
+  status: 200
+}
+
+export type patchWorkspacesWorkspaceIdBillingSeatsResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type patchWorkspacesWorkspaceIdBillingSeatsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type patchWorkspacesWorkspaceIdBillingSeatsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type patchWorkspacesWorkspaceIdBillingSeatsResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type patchWorkspacesWorkspaceIdBillingSeatsResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type patchWorkspacesWorkspaceIdBillingSeatsResponseSuccess = (patchWorkspacesWorkspaceIdBillingSeatsResponse200) & {
+  headers: Headers;
+};
+export type patchWorkspacesWorkspaceIdBillingSeatsResponseError = (patchWorkspacesWorkspaceIdBillingSeatsResponse401 | patchWorkspacesWorkspaceIdBillingSeatsResponse403 | patchWorkspacesWorkspaceIdBillingSeatsResponse404 | patchWorkspacesWorkspaceIdBillingSeatsResponse409 | patchWorkspacesWorkspaceIdBillingSeatsResponse422) & {
+  headers: Headers;
+};
+
+export type patchWorkspacesWorkspaceIdBillingSeatsResponse = (patchWorkspacesWorkspaceIdBillingSeatsResponseSuccess | patchWorkspacesWorkspaceIdBillingSeatsResponseError)
+
+export const getPatchWorkspacesWorkspaceIdBillingSeatsUrl = (workspaceId: string,) => {
+
+
+  
+
+  return `/api/workspaces/${workspaceId}/billing/seats`
+}
+
+export const patchWorkspacesWorkspaceIdBillingSeats = async (workspaceId: string,
+    workspaceBillingSeatUpdateRequest: WorkspaceBillingSeatUpdateRequest, options?: RequestInit): Promise<patchWorkspacesWorkspaceIdBillingSeatsResponse> => {
+  
+  return customInstance<patchWorkspacesWorkspaceIdBillingSeatsResponse>(getPatchWorkspacesWorkspaceIdBillingSeatsUrl(workspaceId),
+  {      
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      workspaceBillingSeatUpdateRequest,)
+  }
+);}
+  
+
+
+
+export const getPatchWorkspacesWorkspaceIdBillingSeatsMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdBillingSeats>>, TError,{workspaceId: string;data: WorkspaceBillingSeatUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdBillingSeats>>, TError,{workspaceId: string;data: WorkspaceBillingSeatUpdateRequest}, TContext> => {
+
+const mutationKey = ['patchWorkspacesWorkspaceIdBillingSeats'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdBillingSeats>>, {workspaceId: string;data: WorkspaceBillingSeatUpdateRequest}> = (props) => {
+          const {workspaceId,data} = props ?? {};
+
+          return  patchWorkspacesWorkspaceIdBillingSeats(workspaceId,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchWorkspacesWorkspaceIdBillingSeatsMutationResult = NonNullable<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdBillingSeats>>>
+    export type PatchWorkspacesWorkspaceIdBillingSeatsMutationBody = WorkspaceBillingSeatUpdateRequest
+    export type PatchWorkspacesWorkspaceIdBillingSeatsMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary Basic 구독 seat 수 변경
+ */
+export const usePatchWorkspacesWorkspaceIdBillingSeats = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdBillingSeats>>, TError,{workspaceId: string;data: WorkspaceBillingSeatUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdBillingSeats>>,
+        TError,
+        {workspaceId: string;data: WorkspaceBillingSeatUpdateRequest},
+        TContext
+      > => {
+      return useMutation(getPatchWorkspacesWorkspaceIdBillingSeatsMutationOptions(options), queryClient);
     }
     

@@ -53,6 +53,11 @@ const createPolarClient = (
     subscriptionKey: "sub_1",
     seats: null,
   }),
+  updateSubscriptionSeats: vi.fn(),
+  getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
+  findSubscriptionByCheckoutId: vi.fn().mockResolvedValue(null),
+  findSubscriptionSeatMemberId: vi.fn().mockResolvedValue(null),
+  assignSubscriptionSeat: vi.fn().mockResolvedValue(null),
   ...overrides,
 });
 
@@ -271,6 +276,191 @@ describe("WorkspaceCheckoutService", () => {
         purchasedSeatCount: 7,
       }),
     );
+  });
+
+  it("checkout detail의 subscription id가 늦게 채워지면 재조회 후 provision한다", async () => {
+    const getCheckoutSession = vi
+      .fn()
+      .mockResolvedValueOnce({
+        checkoutId: "checkout_1",
+        status: "succeeded",
+        metadata: {
+          flow: "workspace_setup",
+          workspaceCheckoutId: "pending_ws_1",
+        },
+        externalCustomerId: "workspace-checkout:pending_ws_1",
+        customerKey: "cus_1",
+        subscriptionKey: null,
+        seats: 5,
+      })
+      .mockResolvedValueOnce({
+        checkoutId: "checkout_1",
+        status: "succeeded",
+        metadata: {
+          flow: "workspace_setup",
+          workspaceCheckoutId: "pending_ws_1",
+        },
+        externalCustomerId: "workspace-checkout:pending_ws_1",
+        customerKey: "cus_1",
+        subscriptionKey: "sub_1",
+        seats: 5,
+      });
+    const storage = createStorage({
+      findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
+        id: 10,
+        uid: "pending_ws_1",
+        userId: 9,
+        workspaceName: "운영팀",
+        requestedSeatCount: 5,
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: "checkout_1",
+        expiresAt: new Date("2026-05-28T01:00:00.000Z"),
+      }),
+      provisionCompletedWorkspaceCheckout: vi.fn().mockResolvedValue({
+        id: 3,
+        uid: "ws_public",
+      }),
+    });
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      createPolarClient({ getCheckoutSession }),
+      { verifyRetryDelayMs: 0 },
+    );
+
+    await service.completeWorkspaceCheckout({
+      userId: 9,
+      workspaceCheckoutId: "pending_ws_1",
+      checkoutId: "checkout_1",
+      now: new Date("2026-05-28T00:10:00.000Z"),
+    });
+
+    expect(getCheckoutSession).toHaveBeenCalledTimes(2);
+    expect(storage.provisionCompletedWorkspaceCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subscriptionKey: "sub_1",
+      }),
+    );
+  });
+
+  it("checkout detail에 subscription id가 없으면 checkout id로 subscription을 조회해 provision한다", async () => {
+    const getCheckoutSession = vi.fn().mockResolvedValue({
+      checkoutId: "checkout_1",
+      status: "succeeded",
+      metadata: {
+        flow: "workspace_setup",
+        workspaceCheckoutId: "pending_ws_1",
+      },
+      externalCustomerId: "workspace-checkout:pending_ws_1",
+      customerKey: "cus_checkout",
+      subscriptionKey: null,
+      seats: null,
+    });
+    const findSubscriptionByCheckoutId = vi.fn().mockResolvedValue({
+      subscriptionKey: "sub_from_checkout",
+      customerKey: "cus_subscription",
+      seats: 7,
+    });
+    const storage = createStorage({
+      findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
+        id: 10,
+        uid: "pending_ws_1",
+        userId: 9,
+        workspaceName: "운영팀",
+        requestedSeatCount: 5,
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: "checkout_1",
+        expiresAt: new Date("2026-05-28T01:00:00.000Z"),
+      }),
+      provisionCompletedWorkspaceCheckout: vi.fn().mockResolvedValue({
+        id: 3,
+        uid: "ws_public",
+      }),
+    });
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      createPolarClient({
+        getCheckoutSession,
+        findSubscriptionByCheckoutId,
+      }),
+      {
+        verifyRetryCount: 0,
+        verifyRetryDelayMs: 0,
+      },
+    );
+
+    await service.completeWorkspaceCheckout({
+      userId: 9,
+      workspaceCheckoutId: "pending_ws_1",
+      checkoutId: "checkout_1",
+      now: new Date("2026-05-28T00:10:00.000Z"),
+    });
+
+    expect(findSubscriptionByCheckoutId).toHaveBeenCalledWith({
+      checkoutId: "checkout_1",
+    });
+    expect(storage.provisionCompletedWorkspaceCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        purchasedSeatCount: 7,
+        customerKey: "cus_checkout",
+        subscriptionKey: "sub_from_checkout",
+      }),
+    );
+  });
+
+  it("checkout detail과 subscription fallback 모두 구독키를 찾지 못하면 workspace를 provision하지 않는다", async () => {
+    const getCheckoutSession = vi.fn().mockResolvedValue({
+      checkoutId: "checkout_1",
+      status: "succeeded",
+      metadata: {
+        flow: "workspace_setup",
+        workspaceCheckoutId: "pending_ws_1",
+      },
+      externalCustomerId: "workspace-checkout:pending_ws_1",
+      customerKey: "cus_1",
+      subscriptionKey: null,
+      seats: 5,
+    });
+    const storage = createStorage({
+      findPendingWorkspaceCheckoutByUid: vi.fn().mockResolvedValue({
+        id: 10,
+        uid: "pending_ws_1",
+        userId: 9,
+        workspaceName: "운영팀",
+        requestedSeatCount: 5,
+        status: "CHECKOUT_CREATED",
+        providerCheckoutId: "checkout_1",
+        expiresAt: new Date("2026-05-28T01:00:00.000Z"),
+      }),
+      provisionCompletedWorkspaceCheckout: vi.fn().mockResolvedValue({
+        id: 3,
+        uid: "ws_public",
+      }),
+    });
+    const service = new WorkspaceCheckoutService(
+      storage,
+      createBillingStorage(),
+      createPolarClient({ getCheckoutSession }),
+      {
+        verifyRetryCount: 1,
+        verifyRetryDelayMs: 0,
+      },
+    );
+
+    await expect(
+      service.completeWorkspaceCheckout({
+        userId: 9,
+        workspaceCheckoutId: "pending_ws_1",
+        checkoutId: "checkout_1",
+        now: new Date("2026-05-28T00:10:00.000Z"),
+      }),
+    ).rejects.toMatchObject({
+      code: "WORKSPACE_CHECKOUT_NOT_READY",
+      statusCode: 409,
+    });
+    expect(getCheckoutSession).toHaveBeenCalledTimes(3);
+    expect(storage.provisionCompletedWorkspaceCheckout).not.toHaveBeenCalled();
   });
 
   it("callback에 checkoutId가 없어도 pending row의 provider checkout id로 검증한다", async () => {

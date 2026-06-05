@@ -241,7 +241,10 @@ export class MarketingInviteStorage {
         );
 
       if (workspaceId !== null) {
-        await this.db.delete(workspaces).where(eq(workspaces.id, workspaceId));
+        await this.db
+          .update(workspaces)
+          .set({ deletedAt: input.now })
+          .where(eq(workspaces.id, workspaceId));
       }
 
       throw error;
