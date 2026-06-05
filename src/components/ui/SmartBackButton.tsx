@@ -44,7 +44,7 @@ export function SmartBackButton({
       type={type}
       {...props}
     >
-      <DowinIcon name="nav-back" className={iconClassName} size="14px" />
+      <DowinIcon name="nav-back" className={iconClassName} size="16px" />
       {props.children}
     </Button>
   );
