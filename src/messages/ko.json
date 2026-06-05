@@ -744,13 +744,14 @@
     "usedSeatLabel": "사용 중인 멤버",
     "seatChangeButton": "한도 변경",
     "seatChangeDialogTitle": "멤버 한도 변경",
-    "seatChangeDialogDesc": "새로운 멤버 한도를 입력하세요. 현재 멤버 수보다 낮게 설정할 수 없습니다.",
+    "seatChangeDialogDesc": "새 멤버 한도를 입력하세요.\n현재 한도: {currentLimit}명\n현재 남아 있는 멤버: {currentUsed}명\n\n한도는 현재 남아 있는 멤버 수보다 작게 줄일 수 없습니다.",
+    "seatChangePolicyTooltip": "멤버 한도는 현재 남아 있는 멤버 수 이상으로만 줄일 수 있습니다.\n\n예: 10명에서 5명으로 줄이려면 먼저 멤버를 5명까지 내보낸 뒤 한도를 5명으로 변경할 수 있습니다.\n\n한도를 낮춘 경우 다음 결제주기부터 적용되고, 한도를 높인 경우 결제 상태 갱신 후 반영됩니다.",
     "seatChangeDialogInputLabel": "멤버 한도",
     "seatChangeDialogCancel": "취소",
     "seatChangeDialogSubmit": "변경 요청",
     "seatChangeDialogSubmitting": "요청 중...",
-    "seatChangeErrorLowerThanCurrent": "현재 사용 중인 멤버 수({current}명)보다 낮게 설정할 수 없습니다.",
-    "seatChangeSuccess": "변경 요청이 접수되었습니다. 최종 반영은 결제 상태 갱신 후 적용됩니다.",
+    "seatChangeErrorLowerThanCurrent": "현재 남아 있는 멤버가 {current}명이라 한도를 {requested}명으로 줄일 수 없습니다. 먼저 멤버를 {removeCount}명 이상 내보낸 뒤 다시 시도해주세요.",
+    "seatChangeSuccess": "변경 요청이 접수되었습니다. 한도를 낮춘 경우 다음 결제주기부터, 높인 경우 결제 상태 갱신 후 반영됩니다.",
     "seatChangeMinError": "최소 1명 이상이어야 합니다.",
     "seatChangeMaxError": "최대 999명까지 가능합니다.",
     "seatChangeFailed": "요청 처리 중 오류가 발생했습니다."
@@ -965,7 +966,7 @@
     "FUTURE_DATE_NOT_ALLOWED": "미래 날짜에는 기록할 수 없습니다.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
     "BILLING_NOT_READY": "결제 연동 준비가 아직 끝나지 않았습니다.",
-    "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "현재 멤버 수보다 낮은 좌석 수는 설정할 수 없습니다. 먼저 멤버를 정리한 뒤 다시 시도해주세요.",
+    "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "남아 있는 멤버 수보다 낮은 한도는 설정할 수 없습니다. 먼저 멤버를 내보낸 뒤 다시 시도해주세요.",
     "BILLING_REVIEW_REQUIRED": "반복 환불 또는 취소 이력이 있어 결제를 바로 다시 시작할 수 없습니다. 고객지원으로 문의해주세요."
   },
   "Auth": {

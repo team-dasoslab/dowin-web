@@ -741,13 +741,14 @@
     "usedSeatLabel": "Used members",
     "seatChangeButton": "Change limit",
     "seatChangeDialogTitle": "Change member limit",
-    "seatChangeDialogDesc": "Enter a new member limit. You cannot set it lower than your current member count.",
+    "seatChangeDialogDesc": "Enter the new member limit.\nCurrent limit: {currentLimit}\nCurrent remaining members: {currentUsed}\n\nThe limit cannot be lower than the number of members still in the workspace.",
+    "seatChangePolicyTooltip": "You can only reduce the member limit to the number of members still in the workspace or higher.\n\nExample: to reduce from 10 to 5, remove members until 5 remain, then change the limit to 5.\n\nLower limits apply from the next billing cycle. Higher limits apply after the billing status is updated.",
     "seatChangeDialogInputLabel": "Member limit",
     "seatChangeDialogCancel": "Cancel",
     "seatChangeDialogSubmit": "Request change",
     "seatChangeDialogSubmitting": "Requesting...",
-    "seatChangeErrorLowerThanCurrent": "Cannot be set lower than the current used members ({current}).",
-    "seatChangeSuccess": "Change request received. Final reflection will be applied after payment status update.",
+    "seatChangeErrorLowerThanCurrent": "There are {current} members still in the workspace, so the limit cannot be reduced to {requested}. Remove at least {removeCount} members first, then try again.",
+    "seatChangeSuccess": "Change request received. Lower limits apply from the next billing cycle; higher limits apply after the billing status is updated.",
     "seatChangeMinError": "Must be at least 1.",
     "seatChangeMaxError": "Can be at most 999.",
     "seatChangeFailed": "An error occurred while processing the request."
@@ -962,7 +963,7 @@
     "FUTURE_DATE_NOT_ALLOWED": "Cannot record data for future dates.",
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
     "BILLING_NOT_READY": "Billing integration is not ready yet.",
-    "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "Seat count cannot be lower than the current number of members. Remove members first, then try again.",
+    "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "The limit cannot be lower than the members still in the workspace. Remove members first, then try again.",
     "BILLING_REVIEW_REQUIRED": "This workspace has repeated refund or cancellation history, so a new checkout cannot be started right now. Please contact support."
   },
   "Auth": {

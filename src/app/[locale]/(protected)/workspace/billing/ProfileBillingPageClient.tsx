@@ -12,6 +12,7 @@ import { useUpdateWorkspaceSeatsMutation } from "@/app/[locale]/(protected)/work
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
@@ -77,7 +78,10 @@ export function ProfileBillingPageClient() {
     const initialSeats = currentBilling.purchasedSeatCount ?? currentUsedSeats;
 
     const input = window.prompt(
-      t("seatChangeDialogDesc"),
+      t("seatChangeDialogDesc", {
+        currentLimit: initialSeats,
+        currentUsed: currentUsedSeats,
+      }),
       initialSeats.toString(),
     );
     if (input === null) return;
@@ -90,7 +94,11 @@ export function ProfileBillingPageClient() {
 
     if (count < currentUsedSeats) {
       alert(
-        t("seatChangeErrorLowerThanCurrent", { current: currentUsedSeats }),
+        t("seatChangeErrorLowerThanCurrent", {
+          current: currentUsedSeats,
+          requested: count,
+          removeCount: currentUsedSeats - count,
+        }),
       );
       return;
     }
@@ -300,16 +308,23 @@ export function ProfileBillingPageClient() {
                         {billing.purchasedSeatCount} {t("seatUnit")}
                       </span>
                       {isAdmin && isPolarEntitlement && (
-                        <Button
-                          type="button"
-                          onClick={handleSeatChangeClick}
-                          disabled={isUpdatingSeats}
-                          className="h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
-                        >
-                          {isUpdatingSeats
-                            ? t("seatChangeDialogSubmitting")
-                            : t("seatChangeButton")}
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            type="button"
+                            onClick={handleSeatChangeClick}
+                            disabled={isUpdatingSeats}
+                            className="h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
+                          >
+                            {isUpdatingSeats
+                              ? t("seatChangeDialogSubmitting")
+                              : t("seatChangeButton")}
+                          </Button>
+                          <InfoTooltip
+                            align="right"
+                            side="top"
+                            content={t("seatChangePolicyTooltip")}
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
