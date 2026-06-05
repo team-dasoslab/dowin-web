@@ -294,39 +294,63 @@ export function ProfileBillingPageClient() {
                       {billing.usedSeatCount ?? 0} {t("seatUnit")}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                        <DowinIcon name="domain-people" size="16px" />
+                  <div className="flex flex-col p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
+                          <DowinIcon name="domain-people" size="16px" />
+                        </div>
+                        <div className="flex min-w-0 items-center gap-1.5">
+                          <span className="truncate text-sm font-bold text-zinc-500">
+                            {t("purchasedSeatLabel")}
+                          </span>
+                          {isAdmin && isPolarEntitlement && (
+                            <InfoTooltip
+                              content={t("seatChangePolicyTooltip")}
+                              align="left"
+                              side="top"
+                            />
+                          )}
+                        </div>
                       </div>
-                      <span className="text-sm font-bold text-zinc-500">
-                        {t("purchasedSeatLabel")}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-black text-zinc-900">
-                        {billing.purchasedSeatCount} {t("seatUnit")}
-                      </span>
-                      {isAdmin && isPolarEntitlement && (
-                        <div className="flex items-center gap-1">
+                      <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                        <span className="whitespace-nowrap text-sm font-black text-zinc-900">
+                          {billing.purchasedSeatCount} {t("seatUnit")}
+                        </span>
+                        {isAdmin && isPolarEntitlement && (
                           <Button
                             type="button"
                             onClick={handleSeatChangeClick}
                             disabled={isUpdatingSeats}
-                            className="h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
+                            className="whitespace-nowrap h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
                           >
                             {isUpdatingSeats
                               ? t("seatChangeDialogSubmitting")
                               : t("seatChangeButton")}
                           </Button>
-                          <InfoTooltip
-                            align="right"
-                            side="top"
-                            content={t("seatChangePolicyTooltip")}
-                          />
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
+                    {billing.pendingSeatCount !== null && (
+                      <div className="mt-1 pl-11">
+                        <span className="text-[12px] font-medium leading-tight text-primary">
+                          {t("pendingSeatLabel")} (
+                          {billing.pendingSeatEffectiveAt
+                            ? t("pendingSeatValue", {
+                                count: billing.pendingSeatCount,
+                                date: formatDateLabel(
+                                  billing.pendingSeatEffectiveAt,
+                                  t("notAvailable"),
+                                  locale,
+                                ),
+                              })
+                            : t("pendingSeatValueNoDate", {
+                                count: billing.pendingSeatCount,
+                              })}
+                          )
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
