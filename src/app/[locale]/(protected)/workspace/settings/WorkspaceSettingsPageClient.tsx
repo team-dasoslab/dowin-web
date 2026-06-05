@@ -147,7 +147,7 @@ export default function WorkspaceSettingsPage() {
                   id: "weekly-report",
                   icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
                   title: dashboardT("weeklyReport"),
-                  href: getWorkspacePath(workspaceId, "/report"),
+                  href: getWorkspacePath(workspaceId, "/workspace/report"),
                 },
               ]
               : []),

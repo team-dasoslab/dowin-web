@@ -57,7 +57,7 @@ export function Sidebar() {
   const mainTabPaths = [
     "/dashboard",
     "/dashboard/my",
-    "/report",
+    "/workspace/report",
     "/setup",
     "/scoreboards",
     "/workspace/settings",

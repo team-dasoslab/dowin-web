@@ -10,7 +10,7 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { formatWeekLabel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
-import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/[workspaceId]/report/_hooks/useTeamWeeklyReport";
+import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/[workspaceId]/workspace/report/_hooks/useTeamWeeklyReport";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
