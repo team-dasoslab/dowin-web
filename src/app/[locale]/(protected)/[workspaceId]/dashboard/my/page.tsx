@@ -21,6 +21,7 @@ import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -180,6 +181,22 @@ export default function MyDashboardPage() {
             ) : (
               t("myScoreboard")
             )
+          }
+          rightElement={
+            <div className="flex flex-wrap gap-2">
+              <Button asChild className="h-9 px-3 text-[13px] font-bold rounded-button bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 transition-colors">
+                <Link href={`/${workspaceId}/scoreboards`}>
+                  <DowinIcon name="nav-archive" size="16px" className="mr-1.5" />
+                  {t("scoreboardArchive")}
+                </Link>
+              </Button>
+              <Button asChild className="h-9 px-3 text-[13px] font-bold rounded-button bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 transition-colors">
+                <Link href={`/${workspaceId}/setup?mode=update`}>
+                  <DowinIcon name="action-edit" size="16px" className="mr-1.5" />
+                  {t("manageScoreboard")}
+                </Link>
+              </Button>
+            </div>
           }
         />
 

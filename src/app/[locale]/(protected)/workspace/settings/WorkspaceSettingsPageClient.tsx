@@ -2,6 +2,7 @@
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetWorkspacesMe, useGetWorkspaces, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
@@ -137,6 +138,16 @@ export default function WorkspaceSettingsPage() {
                   icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
                   title: t("billingTitle"),
                   href: getWorkspacePath(workspaceId, "/workspace/billing"),
+                },
+              ]
+              : []),
+            ...(publicRuntimeConfig.isDevelopment
+              ? [
+                {
+                  id: "weekly-report",
+                  icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+                  title: dashboardT("weeklyReport"),
+                  href: getWorkspacePath(workspaceId, "/report"),
                 },
               ]
               : []),

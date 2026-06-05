@@ -10,44 +10,18 @@ export const getDashboardLinks = (workspaceId: string): {
   adminOnly?: boolean;
 }[] => [
   {
-    href: `/${workspaceId}/dashboard`,
-    iconName: "nav-team",
-    iconNameActive: "nav-team-active",
-    label: "팀 대시보드",
-    translationKey: "teamDashboard",
-  },
-  {
     href: `/${workspaceId}/dashboard/my`,
     iconName: "nav-dashboard",
     iconNameActive: "nav-dashboard-active",
     label: "나의 대시보드",
     translationKey: "myDashboard",
   },
-  ...(publicRuntimeConfig.isDevelopment
-    ? [
-        {
-          href: `/${workspaceId}/report`,
-          iconName: "nav-report" as IconName,
-          iconNameActive: "nav-report-active" as IconName,
-          label: "주간 리포트",
-          translationKey: "weeklyReport",
-          adminOnly: true,
-        },
-      ]
-    : []),
   {
-    href: `/${workspaceId}/scoreboards`,
-    iconName: "nav-archive",
-    iconNameActive: "nav-archive-active",
-    label: "점수판 보관함",
-    translationKey: "scoreboardArchive",
-  },
-  {
-    href: `/${workspaceId}/setup?mode=update`,
-    iconName: "action-edit",
-    iconNameActive: "action-edit-active",
-    label: "점수판 관리",
-    translationKey: "manageScoreboard",
+    href: `/${workspaceId}/dashboard`,
+    iconName: "nav-team",
+    iconNameActive: "nav-team-active",
+    label: "팀 대시보드",
+    translationKey: "teamDashboard",
   },
   {
     href: `/${workspaceId}/workspace/settings`,
