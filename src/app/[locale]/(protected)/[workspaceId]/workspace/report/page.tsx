@@ -10,7 +10,7 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { formatWeekLabel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
-import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/[workspaceId]/report/_hooks/useTeamWeeklyReport";
+import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/[workspaceId]/workspace/report/_hooks/useTeamWeeklyReport";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -242,7 +242,7 @@ export default function ReportPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             <nav className="flex gap-1 lg:block lg:space-y-1">
               {menuGroups.map((group) => {
                 const isActive = activeSection === group.id;

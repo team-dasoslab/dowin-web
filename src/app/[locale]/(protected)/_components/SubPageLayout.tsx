@@ -14,12 +14,12 @@ export function SubPageLayout({
   const tc = useTranslations("Common");
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50/50">
+    <div className="flex min-h-screen flex-col bg-zinc-50/50">
       {showBackButton && (
         <div className="mx-auto w-full max-w-[1200px] px-6 pt-6 md:px-10 md:pt-10 lg:px-12 lg:pt-12 pb-0">
           <SmartBackButton
             className="flex h-auto w-fit items-center gap-1.5 border-none bg-transparent p-0 text-[13px] font-bold text-zinc-400 shadow-none transition-colors"
-            iconClassName="h-5 w-5"
+            iconClassName="h-5 w-5 -mt-[2px]"
           >
             {tc("back")}
           </SmartBackButton>

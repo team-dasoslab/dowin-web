@@ -21,6 +21,7 @@ import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -181,6 +182,22 @@ export default function MyDashboardPage() {
               t("myScoreboard")
             )
           }
+          rightElement={
+            <div className="flex flex-wrap gap-2">
+              <Button asChild className="h-9 px-3 text-[13px] font-bold rounded-button bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 transition-colors">
+                <Link href={`/${workspaceId}/scoreboards`}>
+                  <DowinIcon name="nav-archive" size="16px" className="mr-1.5" />
+                  {t("scoreboardArchive")}
+                </Link>
+              </Button>
+              <Button asChild className="h-9 px-3 text-[13px] font-bold rounded-button bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 transition-colors">
+                <Link href={`/${workspaceId}/setup?mode=update`}>
+                  <DowinIcon name="action-edit" size="16px" className="mr-1.5" />
+                  {t("manageScoreboard")}
+                </Link>
+              </Button>
+            </div>
+          }
         />
 
         {workspace?.isOverFreeMemberLimit ? (
@@ -193,7 +210,7 @@ export default function MyDashboardPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-slate-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             <nav className="flex gap-1 lg:block lg:space-y-1">
               {menuGroups.map((group) => {
                 const isActive = activeSection === group.id;

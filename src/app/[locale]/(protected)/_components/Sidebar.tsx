@@ -30,10 +30,6 @@ export function Sidebar() {
     return true;
   }) : [];
 
-  const mobileLinks = filteredLinks.filter(
-    (link) => !["weeklyReport", "workspaceSettings"].includes(link.translationKey),
-  );
-
   const getIsActive = (href: string) => {
     const hrefPathname = href.split("?")[0];
 
@@ -61,7 +57,7 @@ export function Sidebar() {
   const mainTabPaths = [
     "/dashboard",
     "/dashboard/my",
-    "/report",
+    "/workspace/report",
     "/setup",
     "/scoreboards",
     "/workspace/settings",
@@ -172,8 +168,8 @@ export function Sidebar() {
 
       {isMainTab && (
         <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-200 bg-white px-1 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 md:hidden">
-          <div className="mx-auto grid max-w-[520px] grid-cols-5 gap-1">
-            {mobileLinks.map(
+          <div className="mx-auto grid max-w-[520px] grid-cols-4 gap-1">
+            {filteredLinks.map(
               ({ href, iconName, iconNameActive, translationKey }) => {
                 const isActive = getIsActive(href);
                 const label = t(translationKey);

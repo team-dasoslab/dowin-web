@@ -48,10 +48,17 @@ export function ProtectedContentLayout({
   const isWorkspaceNewPath =
     pathname === "/workspace/new" ||
     pathname.startsWith("/workspace/new/");
+    
+  const scoreboardsPath = workspaceId ? `/${workspaceId}/scoreboards` : "/scoreboards";
+  const setupPath = workspaceId ? `/${workspaceId}/setup` : "/setup";
+  const isScoreboardsPath = pathname === scoreboardsPath || pathname.startsWith(`${scoreboardsPath}/`);
+  const isSetupPath = pathname === setupPath || pathname.startsWith(`${setupPath}/`);
   const usesSubPageLayout =
     pathname === "/updates" ||
     pathname === pricingPath ||
     isProfilePath ||
+    isScoreboardsPath ||
+    isSetupPath ||
     (isWorkspacePath && !isWorkspaceNewPath);
   const showBackButton = pathname !== profilePath && pathname !== workspaceSettingsPath;
 

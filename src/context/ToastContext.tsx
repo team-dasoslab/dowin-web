@@ -37,7 +37,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     "/",
     workspaceId ? `/${workspaceId}/dashboard` : "/dashboard",
     workspaceId ? `/${workspaceId}/dashboard/my` : "/dashboard/my",
-    workspaceId ? `/${workspaceId}/report` : "/report",
+    workspaceId ? `/${workspaceId}/workspace/report` : "/workspace/report",
     workspaceId ? `/${workspaceId}/setup` : "/setup",
     workspaceId ? `/${workspaceId}/scoreboards` : "/scoreboards",
     workspaceId ? `/${workspaceId}/profile` : "/profile",

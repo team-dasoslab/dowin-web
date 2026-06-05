@@ -44,40 +44,7 @@ export function PeriodControls({
     <>
       {/* ─── 모바일 레이아웃 (sm 미만) ─── */}
       <div className="flex flex-col gap-3 py-2 sm:hidden select-none">
-        <div className="flex items-center justify-between gap-3">
-          <div className="inline-flex shrink-0 rounded-button border border-border bg-sub-background p-1">
-            {(["week", "month"] as const).map((view) => {
-              const isActive = selectedView === view;
-              return (
-                <button
-                  key={view}
-                  type="button"
-                  onClick={() => setSelectedView(view)}
-                  disabled={isPeriodLoading}
-                  className={`rounded-button px-3 py-1 text-[11px] font-bold transition-all ${
-                    isActive
-                      ? "bg-white text-primary border border-border shadow-sm"
-                      : "text-text-secondary"
-                  }`}
-                >
-                  {view === "week" ? t("weekView") : t("monthView")}
-                </button>
-              );
-            })}
-          </div>
-
-          <Button
-            asChild
-            className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all shrink-0"
-          >
-            <Link href={`/${workspaceId}/setup?mode=update`}>
-              <DowinIcon name="action-add" size="14px" />
-              <span className="inline">{t("addMeasure")}</span>
-            </Link>
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-5">
+        <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
           <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all focus-within:border-primary/30 shrink-0">
             <DowinIcon
               name="domain-calendar"
@@ -98,12 +65,12 @@ export function PeriodControls({
               type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
 
-            <div className="flex-1 px-3 text-center text-[12px] font-bold text-text-primary tabular-nums truncate">
+            <div className="flex-1 px-1 text-center text-[12px] font-bold text-text-primary tabular-nums truncate">
               {selectedView === "week" ? weekLabel : monthLabel}
             </div>
 
@@ -111,13 +78,13 @@ export function PeriodControls({
               type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
 
             {isResetVisible ? (
-              <div className="mx-1 h-3 w-px bg-border" />
+              <div className="mx-1 h-3 w-px shrink-0 bg-border" />
             ) : null}
 
             {isResetVisible ? (
@@ -125,35 +92,46 @@ export function PeriodControls({
                 type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
+                className="flex h-7 shrink-0 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
               >
                 <DowinIcon name="action-refresh" size="10px" />
-                <span>{t("backToToday")}</span>
+                <span className="hidden min-[360px]:inline">{t("backToToday")}</span>
               </Button>
             ) : null}
+          </div>
+
+          <div className="inline-flex shrink-0 rounded-button border border-border bg-sub-background p-1">
+            {(["week", "month"] as const).map((view) => {
+              const isActive = selectedView === view;
+              return (
+                <button
+                  key={view}
+                  type="button"
+                  onClick={() => setSelectedView(view)}
+                  disabled={isPeriodLoading}
+                  className={`rounded-button px-2 py-1 text-[11px] font-bold transition-all ${
+                    isActive
+                      ? "bg-white text-primary border border-border shadow-sm"
+                      : "text-text-secondary"
+                  }`}
+                >
+                  {view === "week" ? t("weekView") : t("monthView")}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* ─── 데스크톱 레이아웃 (sm 이상) ─── */}
       <div className="hidden sm:flex flex-col gap-4 py-2 select-none">
-        {/* Row 1: Title & Add Button */}
+        {/* Row 1: Title */}
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-base font-bold tracking-tight text-text-primary">
             {selectedView === "week"
               ? t("weeklyLeadMeasures")
               : t("monthlyAggregation")}
           </h2>
-
-          <Button
-            asChild
-            className="flex h-9 items-center justify-center gap-1.5 rounded-button border border-primary/20 bg-primary/5 px-4 text-[12px] font-bold text-primary transition-all lg:h-8 lg:px-3 lg:text-[11px]"
-          >
-            <Link href={`/${workspaceId}/setup?mode=update`}>
-              <DowinIcon name="action-add" size="14px" />
-              <span className="sm:inline">{t("addMeasure")}</span>
-            </Link>
-          </Button>
         </div>
 
         {/* Row 2: Navigation & Settings */}

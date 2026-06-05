@@ -2,6 +2,7 @@
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetWorkspacesMe, useGetWorkspaces, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
@@ -140,6 +141,16 @@ export default function WorkspaceSettingsPage() {
                 },
               ]
               : []),
+            ...(publicRuntimeConfig.isDevelopment
+              ? [
+                {
+                  id: "weekly-report",
+                  icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+                  title: dashboardT("weeklyReport"),
+                  href: getWorkspacePath(workspaceId, "/workspace/report"),
+                },
+              ]
+              : []),
             {
               id: "workspace-name",
               icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
@@ -181,7 +192,7 @@ export default function WorkspaceSettingsPage() {
 
   if (isProfileLoading || isWorkspaceLoading) {
     return (
-      <div className="min-h-screen bg-slate-50/50">
+      <div className="min-h-screen bg-zinc-50/50">
         <ProtectedPageContainer isLoading>
           <div className="h-10 rounded-content bg-sub-background" />
           <div className="h-24 rounded-content bg-sub-background" />

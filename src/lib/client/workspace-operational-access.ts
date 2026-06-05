@@ -12,7 +12,7 @@ const OPERATIONAL_PATH_SUFFIXES = [
   "/dashboard/my",
   "/setup",
   "/scoreboards",
-  "/report",
+  "/workspace/report",
   "/profile/export",
 ];
 
