@@ -176,6 +176,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -191,6 +193,8 @@ describe("BillingService", () => {
     const createCustomerSession = vi.fn().mockResolvedValue({
       customerPortalUrl: "https://polar.sh/portal",
     });
+    const findSubscriptionSeatMemberId = vi.fn().mockResolvedValue("mem_123");
+    const assignSubscriptionSeat = vi.fn();
     const service = new BillingService(
       {
         resolveIdByUid: vi.fn().mockResolvedValue(1),
@@ -209,6 +213,8 @@ describe("BillingService", () => {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
           entitlementSource: "POLAR",
           customerKey: "cus_123",
+          planCode: "BASIC",
+          subscriptionKey: "sub_123",
         }),
         getRecentBillingRiskSummary: vi.fn(),
       } as never,
@@ -219,15 +225,21 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId,
+        assignSubscriptionSeat,
       },
     );
 
     await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
       "https://polar.sh/portal",
     );
+    expect(findSubscriptionSeatMemberId).toHaveBeenCalledWith({
+      subscriptionId: "sub_123",
+    });
+    expect(assignSubscriptionSeat).not.toHaveBeenCalled();
     expect(createCustomerSession).toHaveBeenCalledWith({
       customerId: "cus_123",
-      externalMemberId: "workspace:1",
+      memberId: "mem_123",
     });
   });
 
@@ -235,6 +247,8 @@ describe("BillingService", () => {
     const createCustomerSession = vi.fn().mockResolvedValue({
       customerPortalUrl: "https://polar.sh/portal",
     });
+    const findSubscriptionSeatMemberId = vi.fn().mockResolvedValue("mem_123");
+    const assignSubscriptionSeat = vi.fn();
     const service = new BillingService(
       {
         resolveIdByUid: vi.fn().mockResolvedValue(1),
@@ -254,6 +268,7 @@ describe("BillingService", () => {
           entitlementSource: "POLAR",
           customerKey: "cus_123",
           subscriptionKey: "sub_123",
+          planCode: "BASIC",
         }),
         getRecentBillingRiskSummary: vi.fn(),
       } as never,
@@ -264,15 +279,77 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId,
+        assignSubscriptionSeat,
       },
     );
 
     await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
       "https://polar.sh/portal",
     );
+    expect(findSubscriptionSeatMemberId).toHaveBeenCalledWith({
+      subscriptionId: "sub_123",
+    });
+    expect(assignSubscriptionSeat).not.toHaveBeenCalled();
     expect(createCustomerSession).toHaveBeenCalledWith({
       customerId: "cus_123",
-      externalMemberId: "workspace:1",
+      memberId: "mem_123",
+    });
+  });
+
+  it("subscription seat가 없으면 billing owner seat를 assign한 뒤 portal session을 생성한다", async () => {
+    const createCustomerSession = vi.fn().mockResolvedValue({
+      customerPortalUrl: "https://polar.sh/portal",
+    });
+    const findSubscriptionSeatMemberId = vi.fn().mockResolvedValue(null);
+    const assignSubscriptionSeat = vi.fn().mockResolvedValue("mem_assigned");
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+          billingCustomerExternalRef: "workspace:1",
+          billingOwnerUserId: 9,
+        }),
+        findMembership: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          entitlementSource: "POLAR",
+          customerKey: "cus_123",
+          subscriptionKey: "sub_123",
+          planCode: "BASIC",
+          billingOwnerUserId: 7,
+        }),
+        getRecentBillingRiskSummary: vi.fn(),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession,
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
+        findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId,
+        assignSubscriptionSeat,
+      },
+    );
+
+    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
+      "https://polar.sh/portal",
+    );
+    expect(assignSubscriptionSeat).toHaveBeenCalledWith({
+      subscriptionId: "sub_123",
+      customerId: "cus_123",
+    });
+    expect(createCustomerSession).toHaveBeenCalledWith({
+      customerId: "cus_123",
+      memberId: "mem_assigned",
     });
   });
 
@@ -308,6 +385,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -316,7 +395,6 @@ describe("BillingService", () => {
     );
     expect(createCustomerSession).toHaveBeenCalledWith({
       externalCustomerId: "workspace:1",
-      externalMemberId: "workspace:1",
     });
   });
 
@@ -357,6 +435,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -430,6 +510,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -494,6 +576,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -551,6 +635,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -603,6 +689,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -658,6 +746,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -717,6 +807,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -772,6 +864,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 
@@ -821,6 +915,8 @@ describe("BillingService", () => {
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
         findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
       },
     );
 

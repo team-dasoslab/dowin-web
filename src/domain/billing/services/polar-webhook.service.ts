@@ -134,7 +134,37 @@ function parseWorkspaceIdFromExternalRef(value: string | null): number | null {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
+function getActiveSubscription(payload: WebhookEnvelope) {
+  if (payload.type !== "customer.state_changed") {
+    return null;
+  }
+
+  const activeSubscriptions = Array.isArray(payload.data.active_subscriptions)
+    ? payload.data.active_subscriptions
+    : [];
+
+  return asRecord(activeSubscriptions[0]);
+}
+
+function pickWorkspaceCheckoutExternalRef(
+  payload: WebhookEnvelope,
+): string | null {
+  const metadata = pickMetadataWithAny(
+    ["workspaceCheckoutId"],
+    payload.data.metadata,
+    getActiveSubscription(payload)?.metadata,
+  );
+  const workspaceCheckoutId = asString(metadata?.workspaceCheckoutId);
+
+  return workspaceCheckoutId ? `workspace-checkout:${workspaceCheckoutId}` : null;
+}
+
 function pickCustomerExternalRef(payload: WebhookEnvelope): string | null {
+  const workspaceCheckoutExternalRef = pickWorkspaceCheckoutExternalRef(payload);
+  if (workspaceCheckoutExternalRef) {
+    return workspaceCheckoutExternalRef;
+  }
+
   if (payload.type === "customer.state_changed") {
     return (
       asString(payload.data.external_id) ??
@@ -208,10 +238,7 @@ function resolveProjection(
   const customerExternalRef = pickCustomerExternalRef(payload);
 
   if (payload.type === "customer.state_changed") {
-    const activeSubscriptions = Array.isArray(payload.data.active_subscriptions)
-      ? payload.data.active_subscriptions
-      : [];
-    const activeSubscription = asRecord(activeSubscriptions[0]);
+    const activeSubscription = getActiveSubscription(payload);
 
     if (!activeSubscription) {
       const billingOwnerUserId = pickBillingOwnerUserId(payload);
@@ -464,6 +491,7 @@ export class PolarWebhookService {
     const customerExternalRef = pickCustomerExternalRef(payload);
     const workspaceIdFromExternalRef =
       parseWorkspaceIdFromExternalRef(customerExternalRef);
+    const workspaceCheckoutExternalRef = pickWorkspaceCheckoutExternalRef(payload);
     const workspaceIdFromMetadata = asNumber(
       asRecord(payload.data.metadata)?.workspaceId,
     );
@@ -473,6 +501,11 @@ export class PolarWebhookService {
         : null) ??
       (workspaceIdFromExternalRef
         ? await this.billingStorage.findWorkspaceById(workspaceIdFromExternalRef)
+        : null) ??
+      (workspaceCheckoutExternalRef
+        ? await this.billingStorage.findWorkspaceByCustomerExternalRef(
+            workspaceCheckoutExternalRef,
+          )
         : null) ??
       (customerExternalRef
         ? await this.billingStorage.findWorkspaceByCustomerExternalRef(

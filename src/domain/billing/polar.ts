@@ -28,6 +28,11 @@ type CustomerSessionResponse = {
   customerPortalUrl?: string;
 };
 
+type CustomerDetailResponse = {
+  id: string;
+  email?: string | null;
+};
+
 type CheckoutSessionDetailResponse = {
   id: string;
   status?: string;
@@ -63,6 +68,24 @@ type SubscriptionListResponse = {
   }>;
 };
 
+type CustomerSeatsListResponse = {
+  seats?: Array<{
+    member_id?: string | null;
+    memberId?: string | null;
+    member?: {
+      id?: string | null;
+    } | null;
+  }>;
+};
+
+type CustomerSeatAssignResponse = {
+  member_id?: string | null;
+  memberId?: string | null;
+  member?: {
+    id?: string | null;
+  } | null;
+};
+
 export type PolarBillingClient = {
   environment: "sandbox" | "production";
   createCheckoutSession(input: {
@@ -84,12 +107,10 @@ export type PolarBillingClient = {
       | {
           customerId: string;
           memberId?: string | null;
-          externalMemberId?: string | null;
         }
       | {
           externalCustomerId: string;
           memberId?: string | null;
-          externalMemberId?: string | null;
         },
   ): Promise<{ customerPortalUrl: string }>;
   getCheckoutSession(input: { checkoutId: string }): Promise<{
@@ -115,6 +136,13 @@ export type PolarBillingClient = {
     customerKey: string | null;
     seats: number | null;
   } | null>;
+  findSubscriptionSeatMemberId(input: {
+    subscriptionId: string;
+  }): Promise<string | null>;
+  assignSubscriptionSeat(input: {
+    subscriptionId: string;
+    customerId: string;
+  }): Promise<string | null>;
 };
 
 class PolarApiError extends Error {
@@ -286,16 +314,10 @@ export function createPolarBillingClient(
             ? {
                 customer_id: input.customerId,
                 ...(input.memberId ? { member_id: input.memberId } : {}),
-                ...(input.externalMemberId
-                  ? { external_member_id: input.externalMemberId }
-                  : {}),
               }
             : {
                 external_customer_id: input.externalCustomerId,
                 ...(input.memberId ? { member_id: input.memberId } : {}),
-                ...(input.externalMemberId
-                  ? { external_member_id: input.externalMemberId }
-                  : {}),
               },
         ),
       });
@@ -405,6 +427,59 @@ export function createPolarBillingClient(
             ? subscription.seats
             : null,
       };
+    },
+
+    async findSubscriptionSeatMemberId({ subscriptionId }) {
+      const url = new URL(`${apiBaseUrl}/customer-seats`);
+      url.searchParams.set("subscription_id", subscriptionId);
+
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await parsePolarResponse<CustomerSeatsListResponse>(response);
+      const seat = data.seats?.find(
+        (candidate) =>
+          candidate.memberId ?? candidate.member_id ?? candidate.member?.id,
+      );
+
+      return seat?.memberId ?? seat?.member_id ?? seat?.member?.id ?? null;
+    },
+
+    async assignSubscriptionSeat({ subscriptionId, customerId }) {
+      const customerResponse = await fetch(`${apiBaseUrl}/customers/${customerId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const customer = await parsePolarResponse<CustomerDetailResponse>(
+        customerResponse,
+      );
+
+      const response = await fetch(`${apiBaseUrl}/customer-seats`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscription_id: subscriptionId,
+          email: customer.email ?? undefined,
+          immediate_claim: true,
+        }),
+      });
+
+      const seat = await parsePolarResponse<CustomerSeatAssignResponse>(
+        response,
+      );
+
+      return seat.memberId ?? seat.member_id ?? seat.member?.id ?? null;
     },
   };
 }

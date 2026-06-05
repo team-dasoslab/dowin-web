@@ -55,6 +55,8 @@ const createPolarClient = (
   }),
   updateSubscriptionSeats: vi.fn(),
   findSubscriptionByCheckoutId: vi.fn().mockResolvedValue(null),
+  findSubscriptionSeatMemberId: vi.fn().mockResolvedValue(null),
+  assignSubscriptionSeat: vi.fn().mockResolvedValue(null),
   ...overrides,
 });
 

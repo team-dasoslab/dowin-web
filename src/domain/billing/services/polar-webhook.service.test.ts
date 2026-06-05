@@ -244,6 +244,12 @@ describe("PolarWebhookService", () => {
   });
 
   it("customer.state_changed가 구독 metadata의 BASIC 플랜을 반영한다", async () => {
+    const findWorkspaceByCustomerExternalRef = vi.fn().mockResolvedValue({
+      id: 13,
+      planCode: "BASIC",
+      billingCustomerExternalRef: "workspace-checkout:pending_13",
+      billingOwnerUserId: 21,
+    });
     const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
@@ -255,12 +261,7 @@ describe("PolarWebhookService", () => {
         billingCustomerExternalRef: "workspace-checkout:pending_13",
         billingOwnerUserId: 21,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn().mockResolvedValue({
-        id: 13,
-        planCode: "BASIC",
-        billingCustomerExternalRef: "workspace-checkout:pending_13",
-        billingOwnerUserId: 21,
-      }),
+      findWorkspaceByCustomerExternalRef,
       appendBillingEvent: vi.fn().mockResolvedValue({ id: 53 }),
       upsertWorkspaceBillingState,
       upsertWorkspaceSeatEntitlement,
@@ -274,7 +275,7 @@ describe("PolarWebhookService", () => {
         timestamp: "2026-05-28T00:00:00.000Z",
         data: {
           id: "cus_basic",
-          external_id: "workspace-checkout:pending_13",
+          external_id: "workspace-checkout:previous_pending",
           metadata: {},
           active_subscriptions: [
             {
@@ -285,6 +286,7 @@ describe("PolarWebhookService", () => {
                 targetPlanCode: "BASIC",
                 requestedSeatCount: "10",
                 requestedByUserId: "21",
+                workspaceCheckoutId: "pending_13",
               },
             },
           ],
@@ -293,6 +295,9 @@ describe("PolarWebhookService", () => {
       now: new Date("2026-05-28T00:00:00.000Z"),
     });
 
+    expect(findWorkspaceByCustomerExternalRef).toHaveBeenCalledWith(
+      "workspace-checkout:pending_13",
+    );
     expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
       expect.objectContaining({
         workspaceId: 13,

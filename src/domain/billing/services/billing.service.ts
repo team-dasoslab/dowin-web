@@ -203,24 +203,49 @@ export class BillingService {
       throw new ConflictError("BILLING_NOT_READY");
     }
 
-    const polarOperation = "customer_sessions.create" as const;
+    const polarClient = this.polarClient;
+    let polarOperation:
+      | "customer_seats.list"
+      | "customer_seats.assign"
+      | "customer_sessions.create" = "customer_sessions.create";
 
     try {
-      const externalMemberId =
-        workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`;
+      const subscriptionKey = billingState?.subscriptionKey ?? null;
+      const customerKey = billingState?.customerKey ?? null;
+      const memberId =
+        subscriptionKey && customerKey
+          ? await (async () => {
+              polarOperation = "customer_seats.list";
+              const existingMemberId =
+                await polarClient.findSubscriptionSeatMemberId({
+                  subscriptionId: subscriptionKey,
+                });
+              if (existingMemberId) {
+                return existingMemberId;
+              }
+
+              polarOperation = "customer_seats.assign";
+              return polarClient.assignSubscriptionSeat({
+                subscriptionId: subscriptionKey,
+                customerId: customerKey,
+              });
+            })()
+          : null;
       const customerSessionInput = billingState?.customerKey
         ? {
             customerId: billingState.customerKey,
-            externalMemberId,
+            ...(memberId ? { memberId } : {}),
           }
         : {
             externalCustomerId:
               workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
-            externalMemberId,
           };
 
       const { customerPortalUrl } =
-        await this.polarClient.createCustomerSession(customerSessionInput);
+        await (async () => {
+          polarOperation = "customer_sessions.create";
+          return polarClient.createCustomerSession(customerSessionInput);
+        })();
       return customerPortalUrl;
     } catch (error) {
       if (isPolarRecoverableError(error)) {
