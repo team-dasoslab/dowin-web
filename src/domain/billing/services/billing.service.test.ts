@@ -51,6 +51,8 @@ describe("BillingService", () => {
       recentRevokedCount: 0,
       requiresManualReview: false,
       purchasedSeatCount: null,
+      pendingSeatCount: null,
+      pendingSeatEffectiveAt: null,
       usedSeatCount: 1,
       canManageBilling: true,
     });
@@ -93,7 +95,72 @@ describe("BillingService", () => {
 
     await expect(service.getMyBilling("ws_abc", 7)).resolves.toMatchObject({
       purchasedSeatCount: 5,
+      pendingSeatCount: null,
+      pendingSeatEffectiveAt: null,
       usedSeatCount: 3,
+    });
+  });
+
+  it("Polar 구독에 예약된 seat 변경이 있으면 overview에 포함한다", async () => {
+    const getSubscriptionSeatUpdate = vi.fn().mockResolvedValue({
+      subscriptionId: "sub_123",
+      seats: 10,
+      pendingSeats: 5,
+    });
+    const currentPeriodEnd = new Date("2026-07-01T00:00:00.000Z");
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+        }),
+        findMembership: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+        countMembers: vi.fn().mockResolvedValue(5),
+        findSeatEntitlement: vi.fn().mockResolvedValue({
+          purchasedSeatCount: 10,
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          provider: "POLAR",
+          subscriptionKey: "sub_123",
+          currentPeriodEnd,
+          cancelAtPeriodEnd: false,
+          billingOwnerUserId: 7,
+        }),
+        getRecentBillingRiskSummary: vi.fn().mockResolvedValue({
+          recentRefundCount: 0,
+          recentRevokedCount: 0,
+        }),
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate,
+        findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
+      },
+    );
+
+    await expect(service.getMyBilling("ws_abc", 7)).resolves.toMatchObject({
+      purchasedSeatCount: 10,
+      pendingSeatCount: 5,
+      pendingSeatEffectiveAt: currentPeriodEnd.toISOString(),
+    });
+    expect(getSubscriptionSeatUpdate).toHaveBeenCalledWith({
+      subscriptionId: "sub_123",
     });
   });
 
@@ -175,6 +242,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -224,6 +292,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId,
         assignSubscriptionSeat,
@@ -278,6 +347,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId,
         assignSubscriptionSeat,
@@ -334,6 +404,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId,
         assignSubscriptionSeat,
@@ -384,6 +455,7 @@ describe("BillingService", () => {
         createCustomerSession,
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -434,6 +506,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -509,6 +582,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -575,6 +649,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -634,6 +709,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -688,6 +764,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -745,6 +822,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -806,6 +884,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -863,6 +942,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),
@@ -914,6 +994,7 @@ describe("BillingService", () => {
         createCustomerSession: vi.fn(),
         getCheckoutSession: vi.fn(),
         updateSubscriptionSeats,
+        getSubscriptionSeatUpdate: vi.fn().mockResolvedValue(null),
         findSubscriptionByCheckoutId: vi.fn(),
         findSubscriptionSeatMemberId: vi.fn(),
         assignSubscriptionSeat: vi.fn(),

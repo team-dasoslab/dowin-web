@@ -128,6 +128,48 @@ describe("createPolarBillingClient", () => {
     );
   });
 
+  it("subscription의 pending seat 변경을 조회한다", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: "sub_123",
+          seats: 10,
+          pending_update: {
+            seats: 5,
+          },
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createPolarBillingClient({
+      POLAR_ENV: "sandbox",
+      POLAR_ACCESS_TOKEN: "polar_oat_sandbox",
+      APP_BASE_URL: "http://localhost:3000",
+    });
+
+    await expect(
+      client?.getSubscriptionSeatUpdate({
+        subscriptionId: "sub_123",
+      }),
+    ).resolves.toEqual({
+      subscriptionId: "sub_123",
+      seats: 10,
+      pendingSeats: 5,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://sandbox-api.polar.sh/v1/subscriptions/sub_123",
+      expect.objectContaining({
+        method: "GET",
+      }),
+    );
+  });
+
   it("checkout id로 subscription을 조회한다", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
