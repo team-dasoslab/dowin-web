@@ -1,4 +1,4 @@
-import WorkspaceCheckoutCompletePageClient from "@/app/[locale]/(protected)/workspace/new/complete/WorkspaceCheckoutCompletePageClient";
+import WorkspaceCheckoutCompletePageClient from "@/app/[locale]/(protected-no-sidebar)/workspace/new/complete/WorkspaceCheckoutCompletePageClient";
 
 export default async function WorkspaceCheckoutCompletePage({
   searchParams,

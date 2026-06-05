@@ -38,6 +38,7 @@ export const usersRelations = relations(users, ({ many }) => ({
     relationName: "workspaceBillingOwner",
   }),
   requestedBillingCheckoutEvents: many(billingCheckoutEvents),
+  marketingInviteRedemptions: many(marketingInviteRedemptions),
 }));
 
 export const authRecoveryCodes = sqliteTable("auth_recovery_codes", {
@@ -351,6 +352,7 @@ export const workspaces = sqliteTable("workspaces", {
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
+  deletedAt: integer("deleted_at", { mode: "timestamp" }),
 });
 
 export const workspacesRelations = relations(workspaces, ({ many }) => ({
@@ -358,6 +360,7 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   scoreboards: many(scoreboards),
   tags: many(workspaceTags),
   invites: many(workspaceInvites),
+  marketingInviteRedemptions: many(marketingInviteRedemptions),
   teamMemos: many(teamMemos),
   contactInquiries: many(contactInquiries),
   auditLogs: many(auditLogs),
@@ -506,7 +509,13 @@ export const workspaceBillingState = sqliteTable("workspace_billing_state", {
     .notNull()
     .default("FREE"),
   entitlementSource: text("entitlement_source", {
-    enum: ["POLAR", "MANUAL_GRANT", "PARTNER", "INTERNAL_TEST"],
+    enum: [
+      "POLAR",
+      "MANUAL_GRANT",
+      "PARTNER",
+      "INTERNAL_TEST",
+      "BETA_PROMOTIONAL_GRANT",
+    ],
   }),
   customerKey: text("customer_key"),
   subscriptionKey: text("subscription_key"),
@@ -536,7 +545,7 @@ export const workspaceSeatEntitlements = sqliteTable(
     planCode: text("plan_code", { enum: ["BASIC"] }).notNull(),
     purchasedSeatCount: integer("purchased_seat_count").notNull(),
     seatSource: text("seat_source", {
-      enum: ["POLAR", "MANUAL_GRANT"],
+      enum: ["POLAR", "MANUAL_GRANT", "BETA_PROMOTIONAL_GRANT"],
     }).notNull(),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
@@ -673,6 +682,116 @@ export const workspaceInvitesRelations = relations(
     createdByUser: one(users, {
       fields: [workspaceInvites.createdByUserId],
       references: [users.id],
+    }),
+  }),
+);
+
+export const marketingInviteCodes = sqliteTable(
+  "marketing_invite_codes",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    code: text("code").notNull(),
+    campaignName: text("campaign_name").notNull(),
+    description: text("description"),
+    maxUses: integer("max_uses").notNull(),
+    usedCount: integer("used_count").notNull().default(0),
+    grantedSeatCount: integer("granted_seat_count").notNull(),
+    entitlementSource: text("entitlement_source", {
+      enum: ["BETA_PROMOTIONAL_GRANT"],
+    })
+      .notNull()
+      .default("BETA_PROMOTIONAL_GRANT"),
+    status: text("status", { enum: ["ACTIVE", "INACTIVE"] })
+      .notNull()
+      .default("ACTIVE"),
+    createdByAdminUserId: integer("created_by_admin_user_id")
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: "cascade" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("marketing_invite_codes_code_unique").on(table.code),
+    index("marketing_invite_codes_status_idx").on(table.status),
+    index("marketing_invite_codes_created_by_admin_idx").on(
+      table.createdByAdminUserId,
+    ),
+  ],
+);
+
+export const marketingInviteCodesRelations = relations(
+  marketingInviteCodes,
+  ({ one, many }) => ({
+    createdByAdminUser: one(adminUsers, {
+      fields: [marketingInviteCodes.createdByAdminUserId],
+      references: [adminUsers.id],
+    }),
+    redemptions: many(marketingInviteRedemptions),
+  }),
+);
+
+export const marketingInviteRedemptions = sqliteTable(
+  "marketing_invite_redemptions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    marketingInviteCodeId: integer("marketing_invite_code_id")
+      .notNull()
+      .references(() => marketingInviteCodes.id, { onDelete: "cascade" }),
+    redeemedByUserId: integer("redeemed_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    workspaceId: integer("workspace_id").references(() => workspaces.id, {
+      onDelete: "set null",
+    }),
+    redeemedAt: integer("redeemed_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    feedbackStatus: text("feedback_status", {
+      enum: ["NOT_REQUESTED", "REQUESTED", "RECEIVED", "DROPPED"],
+    })
+      .notNull()
+      .default("NOT_REQUESTED"),
+    acquisitionSource: text("acquisition_source", {
+      enum: ["MARKETING_INVITE"],
+    })
+      .notNull()
+      .default("MARKETING_INVITE"),
+    campaignName: text("campaign_name").notNull(),
+    operatorNote: text("operator_note"),
+  },
+  (table) => [
+    uniqueIndex("marketing_invite_redemptions_code_user_unique").on(
+      table.marketingInviteCodeId,
+      table.redeemedByUserId,
+    ),
+    uniqueIndex("marketing_invite_redemptions_workspace_unique").on(
+      table.workspaceId,
+    ),
+    index("marketing_invite_redemptions_code_idx").on(
+      table.marketingInviteCodeId,
+    ),
+    index("marketing_invite_redemptions_user_idx").on(table.redeemedByUserId),
+  ],
+);
+
+export const marketingInviteRedemptionsRelations = relations(
+  marketingInviteRedemptions,
+  ({ one }) => ({
+    inviteCode: one(marketingInviteCodes, {
+      fields: [marketingInviteRedemptions.marketingInviteCodeId],
+      references: [marketingInviteCodes.id],
+    }),
+    redeemedByUser: one(users, {
+      fields: [marketingInviteRedemptions.redeemedByUserId],
+      references: [users.id],
+    }),
+    workspace: one(workspaces, {
+      fields: [marketingInviteRedemptions.workspaceId],
+      references: [workspaces.id],
     }),
   }),
 );
@@ -921,6 +1040,8 @@ export const auditLogs = sqliteTable(
         "TEAM_MEMO",
         "USER",
         "CONTACT_INQUIRY",
+        "MARKETING_INVITE_CODE",
+        "MARKETING_INVITE_REDEMPTION",
         "ADMIN_USER",
         "ADMIN_ROLE_GRANT",
         "BILLING_PROVIDER_PRODUCT",

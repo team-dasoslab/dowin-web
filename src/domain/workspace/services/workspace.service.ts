@@ -15,7 +15,7 @@ import { customAlphabet } from "nanoid";
 type Workspace = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["findUserWorkspace"]>>
 >;
-type PublicWorkspace = Omit<Workspace, "id" | "uid"> & {
+type PublicWorkspace = Omit<Workspace, "id" | "uid" | "deletedAt"> & {
   id: string;
 };
 type WorkspaceWithPlanLimits = PublicWorkspace & {
@@ -93,6 +93,23 @@ const getWorkspacePublicId = (workspace: Pick<Workspace, "id" | "uid">) => {
   }
 
   return workspace.uid;
+};
+
+const hasBlockingPolarSubscriptionForDeletion = (
+  billingState: Awaited<ReturnType<WorkspaceStorage["findBillingState"]>>,
+) => {
+  if (
+    billingState?.entitlementSource !== "POLAR" ||
+    billingState.provider !== "POLAR"
+  ) {
+    return false;
+  }
+
+  if (billingState.billingStatus === "ACTIVE") {
+    return true;
+  }
+
+  return false;
 };
 
 const toPublicWorkspace = (workspace: Workspace): PublicWorkspace => {
@@ -532,6 +549,11 @@ export class WorkspaceService {
     const workspace = await this.storage.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
+    }
+
+    const billingState = await this.storage.findBillingState(workspaceId);
+    if (hasBlockingPolarSubscriptionForDeletion(billingState)) {
+      throw new ConflictError("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN");
     }
 
     await this.storage.deleteWorkspace(workspaceId);

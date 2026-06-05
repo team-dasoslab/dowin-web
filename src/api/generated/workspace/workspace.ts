@@ -26,6 +26,8 @@ import type {
 
 import type {
   ErrorResponse,
+  MarketingInviteRedeemRequest,
+  MarketingInviteRedeemResponse,
   PostWorkspacesBody,
   PostWorkspacesIdTransferAdmin200,
   PostWorkspacesJoin200,
@@ -469,6 +471,110 @@ export const usePostWorkspacesCheckoutComplete = <TError = UnauthorizedErrorResp
         TContext
       > => {
       return useMutation(getPostWorkspacesCheckoutCompleteMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 프로모션 코드 초대코드로 Basic 워크스페이스 생성
+ */
+export type postWorkspacesBetaPromotionRedeemResponse201 = {
+  data: MarketingInviteRedeemResponse
+  status: 201
+}
+
+export type postWorkspacesBetaPromotionRedeemResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postWorkspacesBetaPromotionRedeemResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postWorkspacesBetaPromotionRedeemResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postWorkspacesBetaPromotionRedeemResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type postWorkspacesBetaPromotionRedeemResponseSuccess = (postWorkspacesBetaPromotionRedeemResponse201) & {
+  headers: Headers;
+};
+export type postWorkspacesBetaPromotionRedeemResponseError = (postWorkspacesBetaPromotionRedeemResponse401 | postWorkspacesBetaPromotionRedeemResponse404 | postWorkspacesBetaPromotionRedeemResponse409 | postWorkspacesBetaPromotionRedeemResponse422) & {
+  headers: Headers;
+};
+
+export type postWorkspacesBetaPromotionRedeemResponse = (postWorkspacesBetaPromotionRedeemResponseSuccess | postWorkspacesBetaPromotionRedeemResponseError)
+
+export const getPostWorkspacesBetaPromotionRedeemUrl = () => {
+
+
+  
+
+  return `/api/workspaces/beta-promotion/redeem`
+}
+
+export const postWorkspacesBetaPromotionRedeem = async (marketingInviteRedeemRequest: MarketingInviteRedeemRequest, options?: RequestInit): Promise<postWorkspacesBetaPromotionRedeemResponse> => {
+  
+  return customInstance<postWorkspacesBetaPromotionRedeemResponse>(getPostWorkspacesBetaPromotionRedeemUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      marketingInviteRedeemRequest,)
+  }
+);}
+  
+
+
+
+export const getPostWorkspacesBetaPromotionRedeemMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>, TError,{data: MarketingInviteRedeemRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>, TError,{data: MarketingInviteRedeemRequest}, TContext> => {
+
+const mutationKey = ['postWorkspacesBetaPromotionRedeem'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>, {data: MarketingInviteRedeemRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postWorkspacesBetaPromotionRedeem(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostWorkspacesBetaPromotionRedeemMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>>
+    export type PostWorkspacesBetaPromotionRedeemMutationBody = MarketingInviteRedeemRequest
+    export type PostWorkspacesBetaPromotionRedeemMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 프로모션 코드 초대코드로 Basic 워크스페이스 생성
+ */
+export const usePostWorkspacesBetaPromotionRedeem = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>, TError,{data: MarketingInviteRedeemRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postWorkspacesBetaPromotionRedeem>>,
+        TError,
+        {data: MarketingInviteRedeemRequest},
+        TContext
+      > => {
+      return useMutation(getPostWorkspacesBetaPromotionRedeemMutationOptions(options), queryClient);
     }
     /**
  * @summary 현재 active 워크스페이스 정보 조회
@@ -1907,10 +2013,15 @@ export type deleteWorkspacesIdResponse404 = {
   status: 404
 }
 
+export type deleteWorkspacesIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
 export type deleteWorkspacesIdResponseSuccess = (deleteWorkspacesIdResponse204) & {
   headers: Headers;
 };
-export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | deleteWorkspacesIdResponse403 | deleteWorkspacesIdResponse404) & {
+export type deleteWorkspacesIdResponseError = (deleteWorkspacesIdResponse401 | deleteWorkspacesIdResponse403 | deleteWorkspacesIdResponse404 | deleteWorkspacesIdResponse409) & {
   headers: Headers;
 };
 

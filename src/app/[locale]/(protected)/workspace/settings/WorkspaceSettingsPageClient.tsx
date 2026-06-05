@@ -2,6 +2,7 @@
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetWorkspacesMe, useGetWorkspaces, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
@@ -42,7 +43,7 @@ export default function WorkspaceSettingsPage() {
   const workspaceId = useParams().workspaceId as string | undefined;
   const locale = useLocale();
   const { showToast } = useToast();
-  
+
   const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
   const { data: workspaceResponse, error: workspaceError, isLoading: isWorkspaceLoading } = useGetWorkspacesMe(
     { query: { retry: false } }
@@ -65,7 +66,7 @@ export default function WorkspaceSettingsPage() {
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaces = allWorkspacesResponse?.status === 200 ? allWorkspacesResponse.data : [];
-  
+
   const showBillingSurface = !isNativeApp;
   const hasWorkspace = workspace !== null;
   const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
@@ -107,10 +108,19 @@ export default function WorkspaceSettingsPage() {
     return () => container?.removeEventListener("scroll", handleScroll);
   }, [activeSection]);
 
+  const wasWorkspacePresent = useRef(false);
+  useEffect(() => {
+    if (hasWorkspace) {
+      wasWorkspacePresent.current = true;
+    }
+  }, [hasWorkspace]);
+
   useEffect(() => {
     if ((!isProfileLoading && !isWorkspaceLoading) && !hasWorkspace) {
-      showToast("error", t("noWorkspaceTitle"));
-      router.replace(getWorkspacePath(workspaceId, "/dashboard/my"));
+      if (!wasWorkspacePresent.current) {
+        showToast("error", t("noWorkspaceTitle"));
+      }
+      router.replace("/");
     }
   }, [isProfileLoading, isWorkspaceLoading, hasWorkspace, router, showToast, t, workspaceId]);
 
@@ -121,58 +131,68 @@ export default function WorkspaceSettingsPage() {
       items: hasWorkspace
         ? isWorkspaceAdmin
           ? [
-              ...(showBillingSurface
-                ? [
-                    {
-                      id: "billing",
-                      icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
-                      title: t("billingTitle"),
-                      href: getWorkspacePath(workspaceId, "/workspace/billing"),
-                    },
-                  ]
-                : []),
-              {
-                id: "workspace-name",
-                icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
-                title: t("changeWorkspaceName"),
-                onClick: () => void changeWorkspaceName(),
-              },
-              {
-                id: "members",
-                icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
-                title: t("manageMembers"),
-                href: getWorkspacePath(workspaceId, "/workspace/members"),
-              },
-              {
-                id: "invites",
-                icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
-                title: t("manageInvites"),
-                href: getWorkspacePath(workspaceId, "/workspace/invites"),
-              },
-              {
-                id: "workspace-delete",
-                icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
-                title: t("workspaceDelete"),
-                danger: true,
-                onClick: () => void deleteWorkspace(),
-              },
-            ]
+            ...(showBillingSurface
+              ? [
+                {
+                  id: "billing",
+                  icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
+                  title: t("billingTitle"),
+                  href: getWorkspacePath(workspaceId, "/workspace/billing"),
+                },
+              ]
+              : []),
+            ...(publicRuntimeConfig.isDevelopment
+              ? [
+                {
+                  id: "weekly-report",
+                  icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+                  title: dashboardT("weeklyReport"),
+                  href: getWorkspacePath(workspaceId, "/workspace/report"),
+                },
+              ]
+              : []),
+            {
+              id: "workspace-name",
+              icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
+              title: t("changeWorkspaceName"),
+              onClick: () => void changeWorkspaceName(),
+            },
+            {
+              id: "members",
+              icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
+              title: t("manageMembers"),
+              href: getWorkspacePath(workspaceId, "/workspace/members"),
+            },
+            {
+              id: "invites",
+              icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
+              title: t("manageInvites"),
+              href: getWorkspacePath(workspaceId, "/workspace/invites"),
+            },
+            {
+              id: "workspace-delete",
+              icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
+              title: t("workspaceDelete"),
+              danger: true,
+              onClick: () => void deleteWorkspace(),
+            },
+          ]
           : [
-              {
-                id: "workspace-leave",
-                icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
-                title: t("workspaceLeave"),
-                danger: true,
-                onClick: () => void leaveWorkspace(),
-              },
-            ]
+            {
+              id: "workspace-leave",
+              icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
+              title: t("workspaceLeave"),
+              danger: true,
+              onClick: () => void leaveWorkspace(),
+            },
+          ]
         : [],
     },
   ];
 
   if (isProfileLoading || isWorkspaceLoading) {
     return (
-      <div className="min-h-screen bg-slate-50/50">
+      <div className="min-h-screen bg-zinc-50/50">
         <ProtectedPageContainer isLoading>
           <div className="h-10 rounded-content bg-sub-background" />
           <div className="h-24 rounded-content bg-sub-background" />
@@ -191,8 +211,8 @@ export default function WorkspaceSettingsPage() {
             pendingAction === "workspace-name"
               ? t("loadingWorkspaceName")
               : isSwitching
-              ? commonT("processing")
-              : t("processing")
+                ? commonT("processing")
+                : t("processing")
           }
         />
       )}
@@ -222,9 +242,8 @@ export default function WorkspaceSettingsPage() {
                       container.scrollTo({ top: offsetPosition, behavior: "smooth" });
                     }
                   }}
-                  className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
-                    isActive ? "text-primary" : "text-zinc-400"
-                  }`}
+                  className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${isActive ? "text-primary" : "text-zinc-400"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     {isActive && <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />}
@@ -237,7 +256,7 @@ export default function WorkspaceSettingsPage() {
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
-            
+
             <div className="space-y-4">
               {workspace?.isOverFreeMemberLimit && (
                 <WorkspaceOverLimitBanner
@@ -267,75 +286,74 @@ export default function WorkspaceSettingsPage() {
             {/* 설정 그룹들 */}
             <div className="space-y-8 pb-24 lg:space-y-16 lg:pb-[60vh]">
               {menuGroups.filter((group) => group.items.length > 0).map((group) => (
-                  <section 
-                    key={group.id} 
-                    id={group.id} 
-                    className="space-y-5 scroll-mt-28"
-                    ref={(el) => {
-                      sectionRefs.current[group.id] = el;
-                    }}
-                  >
-                    <SectionHeader title={group.label} className="mb-4" />
-                    <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
-                      {group.items.map((item, index) => (
-                        <MenuItemRow
-                          key={item.id}
-                          item={item}
-                          isLast={index === group.items.length - 1}
-                          isActionPending={isActionPending}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ))}
-                
-                {/* 내 워크스페이스 목록 */}
-                <section 
-                  id="workspaces" 
+                <section
+                  key={group.id}
+                  id={group.id}
                   className="space-y-5 scroll-mt-28"
                   ref={(el) => {
-                    sectionRefs.current["workspaces"] = el;
+                    sectionRefs.current[group.id] = el;
                   }}
                 >
-                  <SectionHeader title={t("workspaceList")} className="mb-4" />
+                  <SectionHeader title={group.label} className="mb-4" />
                   <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
-                    {workspaces.map((ws, index) => (
-                      <div
-                        key={ws.id}
-                        className={`flex w-full items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5 ${
-                          index !== workspaces.length - 1 ? "border-b border-zinc-100" : ""
-                        }`}
-                      >
-                        <div className="flex flex-col min-w-0 text-left">
-                          <p className={`text-[14px] font-bold ${ws.id === workspace?.id ? "text-primary" : "text-text-primary"}`}>
-                            {ws.name}
-                            {ws.id === workspace?.id && <span className="ml-2 text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">{commonT("current")}</span>}
-                          </p>
-                        </div>
-                        {ws.id !== workspace?.id && (
-                          <button
-                            onClick={() => switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                            disabled={isSwitching}
-                            className="text-xs font-bold text-zinc-500 hover:text-zinc-800 transition-colors bg-zinc-100 px-3 py-1.5 rounded-button"
-                          >
-                            {commonT("switchWorkspace")}
-                          </button>
-                        )}
-                      </div>
+                    {group.items.map((item, index) => (
+                      <MenuItemRow
+                        key={item.id}
+                        item={item}
+                        isLast={index === group.items.length - 1}
+                        isActionPending={isActionPending}
+                      />
                     ))}
-                    <div className="border-t border-zinc-100">
-                      <Link
-                        href="/workspace/new"
-                        className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
-                      >
-                        <div className="w-9 h-9 rounded-button border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
-                          <DowinIcon name="action-add-active" size="16px" className="text-primary" />
-                        </div>
-                        {commonT("createWorkspace")}
-                      </Link>
-                    </div>
                   </div>
                 </section>
+              ))}
+
+              {/* 내 워크스페이스 목록 */}
+              <section
+                id="workspaces"
+                className="space-y-5 scroll-mt-28"
+                ref={(el) => {
+                  sectionRefs.current["workspaces"] = el;
+                }}
+              >
+                <SectionHeader title={t("workspaceList")} className="mb-4" />
+                <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
+                  {workspaces.map((ws, index) => (
+                    <div
+                      key={ws.id}
+                      className={`flex w-full items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5 ${index !== workspaces.length - 1 ? "border-b border-zinc-100" : ""
+                        }`}
+                    >
+                      <div className="flex flex-col min-w-0 text-left">
+                        <p className={`text-[14px] font-bold ${ws.id === workspace?.id ? "text-primary" : "text-text-primary"}`}>
+                          {ws.name}
+                          {ws.id === workspace?.id && <span className="ml-2 text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">{commonT("current")}</span>}
+                        </p>
+                      </div>
+                      {ws.id !== workspace?.id && (
+                        <button
+                          onClick={() => switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
+                          disabled={isSwitching}
+                          className="text-xs font-bold text-zinc-500 hover:text-zinc-800 transition-colors bg-zinc-100 px-3 py-1.5 rounded-button"
+                        >
+                          {commonT("switchWorkspace")}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <div className="border-t border-zinc-100">
+                    <Link
+                      href="/workspace/new"
+                      className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
+                    >
+                      <div className="w-9 h-9 rounded-button border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                        <DowinIcon name="action-add-active" size="16px" className="text-primary" />
+                      </div>
+                      {commonT("createWorkspace")}
+                    </Link>
+                  </div>
+                </div>
+              </section>
             </div>
           </div>
         </div>
@@ -349,10 +367,9 @@ function MenuItemRow({ item, isLast, isActionPending }: { item: MenuItem; isLast
   const Content = (
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-        <div className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 ${
-            item.danger
-              ? "border-danger/10 bg-danger/5 text-danger"
-              : "border-border/50 bg-sub-background text-text-muted"
+        <div className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 ${item.danger
+            ? "border-danger/10 bg-danger/5 text-danger"
+            : "border-border/50 bg-sub-background text-text-muted"
           }`}
         >
           {item.icon}
