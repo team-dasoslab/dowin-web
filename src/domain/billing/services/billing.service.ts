@@ -45,6 +45,8 @@ export type BillingOverview = {
   recentRevokedCount: number;
   requiresManualReview: boolean;
   purchasedSeatCount: number | null;
+  pendingSeatCount: number | null;
+  pendingSeatEffectiveAt: string | null;
   usedSeatCount: number;
   canManageBilling: boolean;
 };
@@ -125,7 +127,8 @@ export class BillingService {
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
-    const [riskSummary, seatEntitlement, usedSeatCount] = await Promise.all([
+    const [riskSummary, seatEntitlement, usedSeatCount, pendingSeatUpdate] =
+      await Promise.all([
       this.getBillingRiskSummary({
         workspaceId: workspace.id,
         customerKey: billingState?.customerKey ?? null,
@@ -137,6 +140,7 @@ export class BillingService {
       }),
       this.workspaceStorage.findSeatEntitlement(workspace.id),
       this.workspaceStorage.countMembers(workspace.id),
+      this.getPendingSeatUpdate(billingState),
     ]);
 
     return {
@@ -153,9 +157,42 @@ export class BillingService {
       recentRevokedCount: riskSummary.recentRevokedCount,
       requiresManualReview: riskSummary.requiresManualReview,
       purchasedSeatCount: seatEntitlement?.purchasedSeatCount ?? null,
+      pendingSeatCount: pendingSeatUpdate?.pendingSeats ?? null,
+      pendingSeatEffectiveAt:
+        pendingSeatUpdate?.pendingSeats !== null &&
+        pendingSeatUpdate?.pendingSeats !== undefined
+          ? (billingState?.currentPeriodEnd?.toISOString() ?? null)
+          : null,
       usedSeatCount,
       canManageBilling: membership?.role === "ADMIN",
     };
+  }
+
+  private async getPendingSeatUpdate(
+    billingState: Awaited<
+      ReturnType<BillingPort["findWorkspaceBillingState"]>
+    >,
+  ) {
+    if (
+      !this.polarClient ||
+      billingState?.entitlementSource !== "POLAR" ||
+      billingState.billingStatus !== "ACTIVE" ||
+      !billingState.subscriptionKey
+    ) {
+      return null;
+    }
+
+    try {
+      return await this.polarClient.getSubscriptionSeatUpdate({
+        subscriptionId: billingState.subscriptionKey,
+      });
+    } catch (error) {
+      if (isPolarRecoverableError(error)) {
+        return null;
+      }
+
+      throw error;
+    }
   }
 
   async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {

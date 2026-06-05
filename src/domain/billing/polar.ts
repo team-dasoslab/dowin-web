@@ -57,6 +57,8 @@ type SubscriptionUpdateResponse = {
   } | null;
 };
 
+type SubscriptionDetailResponse = SubscriptionUpdateResponse;
+
 type SubscriptionProrationBehavior = "invoice" | "prorate" | "next_period";
 
 type SubscriptionListResponse = {
@@ -127,6 +129,11 @@ export type PolarBillingClient = {
     seatCount: number;
     prorationBehavior: SubscriptionProrationBehavior;
   }): Promise<{
+    subscriptionId: string;
+    seats: number | null;
+    pendingSeats: number | null;
+  }>;
+  getSubscriptionSeatUpdate(input: { subscriptionId: string }): Promise<{
     subscriptionId: string;
     seats: number | null;
     pendingSeats: number | null;
@@ -379,6 +386,34 @@ export function createPolarBillingClient(
       });
 
       const data = await parsePolarResponse<SubscriptionUpdateResponse>(
+        response,
+      );
+      const pendingUpdate = data.pendingUpdate ?? data.pending_update ?? null;
+
+      return {
+        subscriptionId: data.id,
+        seats:
+          typeof data.seats === "number" && Number.isFinite(data.seats)
+            ? data.seats
+            : null,
+        pendingSeats:
+          typeof pendingUpdate?.seats === "number" &&
+          Number.isFinite(pendingUpdate.seats)
+            ? pendingUpdate.seats
+            : null,
+      };
+    },
+
+    async getSubscriptionSeatUpdate({ subscriptionId }) {
+      const response = await fetch(`${apiBaseUrl}/subscriptions/${subscriptionId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getCustomerSessionAccessToken(config)}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await parsePolarResponse<SubscriptionDetailResponse>(
         response,
       );
       const pendingUpdate = data.pendingUpdate ?? data.pending_update ?? null;
