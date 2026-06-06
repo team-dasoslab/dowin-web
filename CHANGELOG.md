@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/team-dasoslab/dowin-web/compare/v1.0.0...v1.0.1) (2026-06-06)
+
+
+### Bug Fixes
+
+* seat 변경 후 동기화 안되는 버그 개선 ([#95](https://github.com/team-dasoslab/dowin-web/issues/95)) ([f2ce96b](https://github.com/team-dasoslab/dowin-web/commit/f2ce96b2f4ab0ba0720dd2975bdf5f01da365075))
+
 ## 1.0.0 (2026-06-06)
 
 
