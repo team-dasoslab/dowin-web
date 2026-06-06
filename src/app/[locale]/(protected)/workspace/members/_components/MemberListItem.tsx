@@ -36,11 +36,11 @@ export function MemberListItem({
 
   return (
     <div
-      className={`flex items-center justify-between gap-3 bg-white px-4 py-3 ${
+      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white px-4 py-3 ${
         index < totalCount - 1 ? "border-b border-border" : ""
       }`}
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto">
         <UserAvatar
           avatarKey={member.avatarKey}
           avatarSeed={member.nickname}
@@ -70,7 +70,7 @@ export function MemberListItem({
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex w-full items-center justify-end gap-2 pl-[52px] sm:w-auto sm:pl-0 mt-1 sm:mt-0">
         {canTransferAdmin ? (
           <Button
             type="button"
