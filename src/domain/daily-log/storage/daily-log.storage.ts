@@ -28,13 +28,14 @@ export class DailyLogStorage {
     leadMeasureId: number,
     logDate: string,
     value: boolean,
+    count = 1,
   ): Promise<DailyLogRecord> {
     const [record] = (await this.db
       .insert(dailyLogs)
-      .values({ leadMeasureId, logDate, value })
+      .values({ leadMeasureId, logDate, value, count })
       .onConflictDoUpdate({
         target: [dailyLogs.leadMeasureId, dailyLogs.logDate],
-        set: { value },
+        set: { value, count },
       })
       .returning()) as DailyLogRecord[];
 

@@ -1,6 +1,9 @@
 "use client";
 
-import { TeamDashboardMember, TeamDashboardMemberRole } from "@/api/generated/dowin.schemas";
+import {
+  TeamDashboardMember,
+  TeamDashboardMemberRole,
+} from "@/api/generated/dowin.schemas";
 import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
 import { TeamMemberMemoPanel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberMemoPanel";
@@ -79,8 +82,12 @@ export function WeeklyTable({
   const hasMemos = memos.length > 0;
 
   const handleComposeClick = () => {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
-      const content = window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 1599px)").matches
+    ) {
+      const content =
+        window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
 
       if (!content) {
         return;
@@ -184,7 +191,13 @@ export function WeeklyTable({
 
                 <div className="mt-3 grid grid-cols-7 gap-1.5">
                   {weekDates.map((date, index) => {
-                    const value = leadMeasure.logs?.[date] ?? null;
+                    const logData = leadMeasure.logs?.[date] as import("@/api/generated/dowin.schemas").DailyLogCell | null | undefined;
+                    const isAchieved = logData?.achieved ?? false;
+                    const count = logData?.count ?? null;
+                    const typedLead = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                    const trackingMode = typedLead.trackingMode;
+                    const dailyTargetCount = typedLead.dailyTargetCount ?? 1;
+                    const isCount = trackingMode === "COUNT";
 
                     return (
                       <div
@@ -198,17 +211,35 @@ export function WeeklyTable({
                         >
                           {t(DAY_KEYS[index])}
                         </p>
-                        <span
-                          className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
-                            value === true
-                              ? "text-green-600"
-                              : date === today
-                                ? "text-primary/50"
-                                : "text-text-muted"
-                          }`}
-                        >
-                          {value === true ? "○" : ""}
-                        </span>
+                        {isCount ? (
+                          <span
+                            className={`inline-flex h-7 min-w-[1.75rem] px-1 items-center justify-center text-[10px] font-bold ${
+                              isAchieved
+                                ? "text-green-600"
+                                : count != null && count > 0
+                                  ? "text-text-primary"
+                                  : date === today
+                                    ? "text-primary/50"
+                                    : "text-text-muted"
+                            }`}
+                          >
+                            {count != null && count > 0
+                              ? `${count}/${dailyTargetCount}`
+                              : ""}
+                          </span>
+                        ) : (
+                          <span
+                            className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                              isAchieved
+                                ? "text-green-600"
+                                : date === today
+                                  ? "text-primary/50"
+                                  : "text-text-muted"
+                            }`}
+                          >
+                            {isAchieved ? "○" : ""}
+                          </span>
+                        )}
                       </div>
                     );
                   })}
@@ -269,9 +300,11 @@ export function WeeklyTable({
                   {member.leadMeasures?.map((leadMeasure) => {
                     const achievedCount = leadMeasure.achieved ?? 0;
                     const targetValue = leadMeasure.targetValue ?? 0;
+                    const weeklyTotal =
+                      (leadMeasure as { total?: number }).total ?? targetValue;
                     const rate =
-                      targetValue > 0
-                        ? Math.round((achievedCount / targetValue) * 100)
+                      weeklyTotal > 0
+                        ? Math.round((achievedCount / weeklyTotal) * 100)
                         : 0;
 
                     return (
@@ -283,21 +316,45 @@ export function WeeklyTable({
                           />
                         </td>
                         {weekDates.map((date) => {
-                          const value = leadMeasure.logs?.[date] ?? null;
+                          const logData = leadMeasure.logs?.[date] as import("@/api/generated/dowin.schemas").DailyLogCell | null | undefined;
+                          const isAchieved = logData?.achieved ?? false;
+                          const count = logData?.count ?? null;
+                          const typedLeadDesktop = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                          const trackingMode = typedLeadDesktop.trackingMode;
+                          const dailyTargetCount = typedLeadDesktop.dailyTargetCount ?? 1;
+                          const isCount = trackingMode === "COUNT";
 
                           return (
                             <td key={date} className="py-3 text-center">
-                              <span
-                                className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
-                                  value === true
-                                    ? "text-green-600"
-                                    : date === today
-                                      ? "text-primary/50"
-                                      : "text-text-muted"
-                                }`}
-                              >
-                                {value === true ? "○" : ""}
-                              </span>
+                              {isCount ? (
+                                <span
+                                  className={`inline-flex h-7 min-w-[1.75rem] px-1 items-center justify-center text-[10px] font-bold ${
+                                    isAchieved
+                                      ? "text-green-600"
+                                      : count != null && count > 0
+                                        ? "text-text-primary"
+                                        : date === today
+                                          ? "text-primary/50"
+                                          : "text-text-muted"
+                                  }`}
+                                >
+                                  {count != null && count > 0
+                                    ? `${count}/${dailyTargetCount}`
+                                    : ""}
+                                </span>
+                              ) : (
+                                <span
+                                  className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                                    isAchieved
+                                      ? "text-green-600"
+                                      : date === today
+                                        ? "text-primary/50"
+                                        : "text-text-muted"
+                                  }`}
+                                >
+                                  {isAchieved ? "○" : ""}
+                                </span>
+                              )}
                             </td>
                           );
                         })}
@@ -323,7 +380,7 @@ export function WeeklyTable({
                                   : "text-text-secondary"
                               }`}
                             >
-                              {achievedCount}/{targetValue}
+                              {achievedCount}/{weeklyTotal}
                             </span>
                           </div>
                         </td>

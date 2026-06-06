@@ -1,6 +1,6 @@
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
-import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { MonthlyMobileCards } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/MonthlyMobileCards";
+import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
@@ -166,7 +166,7 @@ export function MonthlyBoardSection({
                                 return count;
                               }
 
-                              return leadMeasure.logs?.[date] === true
+                              return leadMeasure.logs?.[date]?.achieved
                                 ? count + 1
                                 : count;
                             },
@@ -204,7 +204,7 @@ export function MonthlyBoardSection({
                                   >
                                     <span
                                       className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-bold ${
-                                        value === true
+                                        value?.achieved
                                           ? "border-primary bg-primary text-white"
                                           : date === null
                                             ? "border-transparent bg-transparent text-transparent"
@@ -213,7 +213,7 @@ export function MonthlyBoardSection({
                                               : "border-border bg-sub-background text-text-muted"
                                       }`}
                                     >
-                                      {value === true ? (
+                                      {value?.achieved ? (
                                         <DowinIcon name="action-checkmark" size="14px" />
                                       ) : null}
                                     </span>

@@ -104,6 +104,7 @@
     "sun": "일",
     "dismissUpdate": "이 업데이트 잠시 숨기기",
     "newFeatureNotice": "새로운 기능 안내",
+    "dailyCountTitle": "하루 목표 설정",
     "My": {
       "logSaveFailed": "기록 저장에 실패했습니다.",
       "Celebration": {
@@ -326,6 +327,9 @@
     "targetMax": "최대: {n}",
     "modeWeekly": "매주",
     "modeMonthly": "매달",
+    "trackingModeBoolean": "체크형",
+    "trackingModeCount": "카운트형",
+    "dailyCountTitle": "하루 목표 설정",
     "modeAtLeast": "이상",
     "modeExactly": "딱",
     "deleteTagConfirm": "이 태그를 삭제하시겠습니까?",

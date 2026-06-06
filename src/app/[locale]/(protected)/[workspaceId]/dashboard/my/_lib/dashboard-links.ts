@@ -1,5 +1,4 @@
 import { IconName } from "@/components/ui/DowinIcon";
-import { publicRuntimeConfig } from "@/config/public-runtime-config";
 
 export const getDashboardLinks = (workspaceId: string): {
   href: string;
