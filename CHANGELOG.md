@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/team-dasoslab/dowin-web/compare/v1.0.1...v1.1.0) (2026-06-06)
+
+
+### Features
+
+* 액션 아이템 카운트 기능 추가 ([#98](https://github.com/team-dasoslab/dowin-web/issues/98)) ([6d2781c](https://github.com/team-dasoslab/dowin-web/commit/6d2781cd50e0e03cb55c99d7a8f95fa49fc173c4))
+
 ## [1.0.1](https://github.com/team-dasoslab/dowin-web/compare/v1.0.0...v1.0.1) (2026-06-06)
 
 
