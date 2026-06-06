@@ -56,6 +56,7 @@ type BillingPort = Pick<
   | "findWorkspaceBillingState"
   | "findActiveProviderProduct"
   | "getRecentBillingRiskSummary"
+  | "upsertWorkspaceSeatEntitlement"
 >;
 
 type BillingRiskScope = {
@@ -143,6 +144,22 @@ export class BillingService {
       this.getPendingSeatUpdate(billingState),
     ]);
 
+    const purchasedSeatCount = this.getAuthoritativePurchasedSeatCount(
+      seatEntitlement?.purchasedSeatCount ?? null,
+      pendingSeatUpdate?.seats ?? null,
+    );
+
+    if (
+      purchasedSeatCount !== null &&
+      purchasedSeatCount !== (seatEntitlement?.purchasedSeatCount ?? null)
+    ) {
+      await this.billingStorage.upsertWorkspaceSeatEntitlement({
+        workspaceId: workspace.id,
+        purchasedSeatCount,
+        seatSource: "POLAR",
+      });
+    }
+
     return {
       workspaceId: getWorkspacePublicId(workspace),
       workspaceName: workspace.name,
@@ -156,7 +173,7 @@ export class BillingService {
       recentRefundCount: riskSummary.recentRefundCount,
       recentRevokedCount: riskSummary.recentRevokedCount,
       requiresManualReview: riskSummary.requiresManualReview,
-      purchasedSeatCount: seatEntitlement?.purchasedSeatCount ?? null,
+      purchasedSeatCount,
       pendingSeatCount: pendingSeatUpdate?.pendingSeats ?? null,
       pendingSeatEffectiveAt:
         pendingSeatUpdate?.pendingSeats !== null &&
@@ -193,6 +210,21 @@ export class BillingService {
 
       throw error;
     }
+  }
+
+  private getAuthoritativePurchasedSeatCount(
+    projectedSeatCount: number | null,
+    polarSeatCount: number | null,
+  ) {
+    if (
+      typeof polarSeatCount === "number" &&
+      Number.isInteger(polarSeatCount) &&
+      polarSeatCount > 0
+    ) {
+      return polarSeatCount;
+    }
+
+    return projectedSeatCount;
   }
 
   async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {
@@ -473,10 +505,24 @@ export class BillingService {
         seatCount: input.seatCount,
         prorationBehavior,
       });
+      const appliedSeatCount =
+        typeof result.seats === "number" &&
+        Number.isInteger(result.seats) &&
+        result.seats > 0
+          ? result.seats
+          : null;
+
+      if (appliedSeatCount !== null && appliedSeatCount !== currentSeatCount) {
+        await this.billingStorage.upsertWorkspaceSeatEntitlement({
+          workspaceId: workspace.id,
+          purchasedSeatCount: appliedSeatCount,
+          seatSource: "POLAR",
+        });
+      }
 
       return {
         seatCount: input.seatCount,
-        appliedSeatCount: result.seats,
+        appliedSeatCount,
         pendingSeatCount: result.pendingSeats,
         effectiveTiming: isSeatIncrease ? "IMMEDIATE" : "NEXT_PERIOD",
       };
