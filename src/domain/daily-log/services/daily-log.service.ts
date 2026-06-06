@@ -1,4 +1,5 @@
 import {
+  BadRequestError,
   ForbiddenError,
   NotFoundError,
 } from "@/lib/server/errors";
@@ -57,6 +58,20 @@ type DailyLogStoragePort = Pick<
   "upsertLog" | "deleteLog" | "findLogsForLeadMeasures"
 >;
 
+type DailyLogUpsertInput =
+  | { value: true }
+  | { count: number };
+
+type DailyLogCell = {
+  value: boolean;
+  count: number;
+  achieved: boolean;
+};
+
+type DailyLogResponse = DailyLogRecord & {
+  achieved: boolean;
+};
+
 export class DailyLogService {
   constructor(
     private workspaceStorage: DailyLogWorkspacePort,
@@ -70,8 +85,8 @@ export class DailyLogService {
     leadMeasureId: number,
     userId: number,
     date: string,
-    value: boolean,
-  ): Promise<DailyLogRecord> {
+    input: DailyLogUpsertInput,
+  ): Promise<DailyLogResponse> {
     assertPastWeekLogEditable(date);
     const { measure, workspace } = await this.getOwnedLeadMeasureWithWorkspace(
       workspaceUid,
@@ -84,7 +99,18 @@ export class DailyLogService {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
     }
 
-    return await this.dailyLogStorage.upsertLog(leadMeasureId, date, value);
+    const count = getValidatedUpsertCount(measure, input);
+    const record = await this.dailyLogStorage.upsertLog(
+      leadMeasureId,
+      date,
+      true,
+      count,
+    );
+
+    return {
+      ...record,
+      achieved: isLogAchieved(measure, record),
+    };
   }
 
   async deleteLog(workspaceUid: string, leadMeasureId: number, userId: number, date: string): Promise<void> {
@@ -111,9 +137,12 @@ export class DailyLogService {
       name: string;
       period: "WEEKLY" | "MONTHLY";
       targetValue: number;
+      trackingMode: "BOOLEAN" | "COUNT";
+      dailyTargetCount: number;
       tags: LeadMeasureTagRecord[];
-      logs: Record<string, boolean | null>;
+      logs: Record<string, DailyLogCell | null>;
       achieved: number;
+      total: number;
       achievementRate: number;
       guide: {
         kind: "adjust" | "change";
@@ -150,17 +179,17 @@ export class DailyLogService {
       leadMeasures: measures.map((measure) => {
         const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
         const logMap = Object.fromEntries(
-          weekDates.map((date) => [date, null as boolean | null]),
+          weekDates.map((date) => [date, null as DailyLogCell | null]),
         );
         let achieved = 0;
         let previousAchieved = 0;
 
         for (const log of measureLogs) {
           if (log.logDate in logMap) {
-            logMap[log.logDate] = log.value;
+            logMap[log.logDate] = getLogCell(measure, log);
           }
 
-          if (!log.value) {
+          if (!isLogAchieved(measure, log)) {
             continue;
           }
 
@@ -182,9 +211,12 @@ export class DailyLogService {
           name: measure.name,
           period: measure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
           targetValue: measure.targetValue,
+          trackingMode: getTrackingMode(measure),
+          dailyTargetCount: getDailyTargetCount(measure),
           tags: measure.tags ?? [],
           logs: logMap,
           achieved,
+          total: measure.targetValue,
           achievementRate: getAchievementRate(achieved, measure.targetValue),
           guide: shouldIncludeGuide
             ? getWeeklyGuide({
@@ -221,9 +253,12 @@ export class DailyLogService {
       name: string;
       period: "DAILY" | "WEEKLY" | "MONTHLY";
       targetValue: number;
+      trackingMode: "BOOLEAN" | "COUNT";
+      dailyTargetCount: number;
       tags: LeadMeasureTagRecord[];
-      logs: Record<string, boolean | null>;
+      logs: Record<string, DailyLogCell | null>;
       achieved: number;
+      total: number;
       achievementRate: number;
     }>;
   }> {
@@ -265,7 +300,7 @@ export class DailyLogService {
     const leadMeasures = measures.map((measure) => {
       const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
       const logMap = Object.fromEntries(
-        monthDates.map((date) => [date, null as boolean | null]),
+        monthDates.map((date) => [date, null as DailyLogCell | null]),
       );
       let achieved = 0;
       let monthlySummaryAchieved = 0;
@@ -276,13 +311,13 @@ export class DailyLogService {
           log.logDate >= normalizedMonthStart && log.logDate <= monthEnd;
 
         if (isInMonth) {
-          logMap[log.logDate] = log.value;
-          if (log.value) {
+          logMap[log.logDate] = getLogCell(measure, log);
+          if (isLogAchieved(measure, log)) {
             achieved += 1;
           }
         }
 
-        if (!log.value) {
+        if (!isLogAchieved(measure, log)) {
           continue;
         }
 
@@ -321,9 +356,12 @@ export class DailyLogService {
         name: measure.name,
         period: measure.period,
         targetValue: measure.targetValue,
+        trackingMode: getTrackingMode(measure),
+        dailyTargetCount: getDailyTargetCount(measure),
         tags: measure.tags ?? [],
         logs: logMap,
         achieved,
+        total: measure.targetValue,
         achievementRate: getAchievementRate(achieved, measure.targetValue),
       };
     });
@@ -495,7 +533,7 @@ function calculateMonthlySummary({
   weekStarts,
 }: {
   logs: DailyLogRecord[];
-  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue">>;
+  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue" | "trackingMode" | "dailyTargetCount">>;
   monthEnd: string;
   monthStart: string;
   weekStarts: string[];
@@ -507,7 +545,11 @@ function calculateMonthlySummary({
 
     if (measure.period === "MONTHLY") {
       const monthlyCount = measureLogs.reduce((count, log) => {
-        if (log.logDate >= monthStart && log.logDate <= monthEnd && log.value) {
+        if (
+          log.logDate >= monthStart &&
+          log.logDate <= monthEnd &&
+          isLogAchieved(measure, log)
+        ) {
           return count + 1;
         }
 
@@ -519,7 +561,7 @@ function calculateMonthlySummary({
 
     const weeklyCounts = new Map<string, number>();
     for (const log of measureLogs) {
-      if (!log.value) {
+      if (!isLogAchieved(measure, log)) {
         continue;
       }
 
@@ -563,12 +605,80 @@ function isMonthlySummaryMeasure(
   measure: LeadMeasureSummaryRecord,
 ): measure is LeadMeasureSummaryRecord & {
   period: "DAILY" | "WEEKLY" | "MONTHLY";
+  trackingMode: "BOOLEAN" | "COUNT";
+  dailyTargetCount: number;
 } {
   return (
     measure.period === "DAILY" ||
     measure.period === "WEEKLY" ||
     measure.period === "MONTHLY"
   );
+}
+
+function getValidatedUpsertCount(
+  measure: Pick<LeadMeasureRecord, "trackingMode">,
+  input: DailyLogUpsertInput,
+) {
+  if (getTrackingMode(measure) === "COUNT") {
+    if (!("count" in input)) {
+      throw new BadRequestError("VALIDATION_ERROR", {
+        value: ["횟수형 액션 아이템에는 count를 입력해야 합니다."],
+      });
+    }
+
+    return input.count;
+  }
+
+  if ("count" in input) {
+    throw new BadRequestError("VALIDATION_ERROR", {
+      count: ["완료형 액션 아이템에는 value를 입력해야 합니다."],
+    });
+  }
+
+  return 1;
+}
+
+function getLogCell(
+  measure: Pick<LeadMeasureRecord, "trackingMode" | "dailyTargetCount">,
+  log: Pick<DailyLogRecord, "value" | "count">,
+): DailyLogCell {
+  if (!log.value) {
+    return { value: false, count: 0, achieved: false };
+  }
+
+  const count = log.count ?? 1;
+  return {
+    value: true,
+    count,
+    achieved: isLogAchieved(measure, log),
+  };
+}
+
+function isLogAchieved(
+  measure: Pick<LeadMeasureRecord, "trackingMode" | "dailyTargetCount">,
+  log: Pick<DailyLogRecord, "value" | "count">,
+) {
+  if (!log.value) {
+    return false;
+  }
+
+  if (getTrackingMode(measure) !== "COUNT") {
+    return true;
+  }
+
+  return (log.count ?? 1) >= getDailyTargetCount(measure);
+}
+
+function getTrackingMode(
+  measure: Pick<LeadMeasureRecord, "trackingMode">,
+): "BOOLEAN" | "COUNT" {
+  return measure.trackingMode ?? "BOOLEAN";
+}
+
+function getDailyTargetCount(
+  measure: Pick<LeadMeasureRecord, "dailyTargetCount">,
+) {
+  return measure.dailyTargetCount ?? 1;
 }
 
 function groupLogsByLeadMeasure(logs: DailyLogRecord[]) {

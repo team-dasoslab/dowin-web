@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 const periodSchema = z.enum(["DAILY", "WEEKLY", "MONTHLY"]);
+const trackingModeSchema = z.enum(["BOOLEAN", "COUNT"]);
 const tagIdsSchema = z.array(z.number().int().positive()).max(3).optional();
+const DAILY_TARGET_COUNT_MAX = 20;
 
 const validateTargetValueByPeriod = (
   targetValue: number,
@@ -23,6 +25,13 @@ export const leadMeasureCreateSchema = z
     name: z.string().trim().min(1, "선행지표 이름은 필수입니다."),
     targetValue: z.number().int().min(1, "목표 횟수는 1 이상이어야 합니다."),
     period: periodSchema,
+    trackingMode: trackingModeSchema.default("BOOLEAN"),
+    dailyTargetCount: z
+      .number()
+      .int()
+      .min(1, "하루 목표 횟수는 1 이상이어야 합니다.")
+      .max(DAILY_TARGET_COUNT_MAX, `하루 목표 횟수는 ${DAILY_TARGET_COUNT_MAX}회를 초과할 수 없습니다.`)
+      .default(1),
     tagIds: tagIdsSchema,
   })
   .superRefine((value, ctx) => {
@@ -52,6 +61,13 @@ export const leadMeasureUpdateSchema = z
       .min(1, "목표 횟수는 1 이상이어야 합니다.")
       .optional(),
     period: periodSchema.optional(),
+    trackingMode: trackingModeSchema.optional(),
+    dailyTargetCount: z
+      .number()
+      .int()
+      .min(1, "하루 목표 횟수는 1 이상이어야 합니다.")
+      .max(DAILY_TARGET_COUNT_MAX, `하루 목표 횟수는 ${DAILY_TARGET_COUNT_MAX}회를 초과할 수 없습니다.`)
+      .optional(),
     tagIds: tagIdsSchema,
   })
   .superRefine((value, ctx) => {

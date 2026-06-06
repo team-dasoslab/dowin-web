@@ -1,6 +1,6 @@
+import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
-import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
@@ -10,7 +10,9 @@ type MonthlyLeadMeasure = NonNullable<
 >[number];
 
 type MonthlyMobileCardsProps = {
-  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
+  activeLeadMeasures: ReturnType<
+    typeof useDashboardScoreboard
+  >["activeLeadMeasures"];
   monthWeeks: ReturnType<typeof getMonthCalendarWeeks>;
   monthLabel?: string;
   monthlyLeadMeasures: MonthlyLeadMeasure[];
@@ -139,7 +141,7 @@ function MonthlyMobileMeasureCard({
       return count;
     }
 
-    return leadMeasure.logs?.[date] === true ? count + 1 : count;
+    return leadMeasure.logs?.[date]?.achieved ? count + 1 : count;
   }, 0);
 
   return (
@@ -174,11 +176,13 @@ function MonthlyMobileMeasureCard({
   );
 }
 
+import type { DailyLogCell } from "@/api/generated/dowin.schemas";
+
 type MonthlyMobileMeasureDayProps = {
   date: string | null;
   dayLabel: string;
   today: string;
-  value: boolean | null;
+  value: DailyLogCell | null;
 };
 
 function MonthlyMobileMeasureDay({
@@ -200,7 +204,7 @@ function MonthlyMobileMeasureDay({
       </p>
       <span
         className={`inline-flex h-9 w-full items-center justify-center rounded-md border text-xs font-bold ${
-          value === true
+          value?.achieved
             ? "border-primary bg-primary text-white"
             : date === null
               ? "border-transparent bg-transparent text-transparent"
@@ -209,7 +213,7 @@ function MonthlyMobileMeasureDay({
                 : "border-border bg-white text-text-muted"
         }`}
       >
-        {value === true ? (
+        {value?.achieved ? (
           <DowinIcon name="action-checkmark" size="14px" />
         ) : date ? (
           date.slice(8, 10)

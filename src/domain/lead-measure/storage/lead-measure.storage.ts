@@ -16,7 +16,7 @@ export type LeadMeasureForPushRecord = Pick<
 >;
 export type LeadMeasureSummaryRecord = Pick<
   LeadMeasureRecord,
-  "id" | "targetValue" | "period"
+  "id" | "targetValue" | "period" | "trackingMode" | "dailyTargetCount"
 >;
 
 export type CreateLeadMeasureInput = {
@@ -24,6 +24,8 @@ export type CreateLeadMeasureInput = {
   name: string;
   targetValue: number;
   period: "DAILY" | "WEEKLY" | "MONTHLY";
+  trackingMode?: "BOOLEAN" | "COUNT";
+  dailyTargetCount?: number;
   tagIds?: number[];
 };
 
@@ -140,6 +142,8 @@ export class LeadMeasureStorage {
         id: true,
         targetValue: true,
         period: true,
+        trackingMode: true,
+        dailyTargetCount: true,
       },
     })) as LeadMeasureSummaryRecord[];
   }

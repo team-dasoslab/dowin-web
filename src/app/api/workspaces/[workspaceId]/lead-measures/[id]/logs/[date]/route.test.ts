@@ -75,6 +75,8 @@ describe("PUT /api/lead-measures/:id/logs/:date", () => {
 
     expect(response.status).toBe(403);
     expect(body.error.code).toBe("WORKSPACE_SEAT_LIMIT_EXCEEDED");
-    expect(mockUpsertLog).toHaveBeenCalledWith("1", 10, 1, "2026-04-21", true);
+    expect(mockUpsertLog).toHaveBeenCalledWith("1", 10, 1, "2026-04-21", {
+      value: true,
+    });
   });
 });

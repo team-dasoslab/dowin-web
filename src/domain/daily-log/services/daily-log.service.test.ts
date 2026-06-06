@@ -46,7 +46,7 @@ describe("DailyLogService", () => {
   });
 
   it("이번 주 이전 날짜는 기록할 수 없다", async () => {
-    await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-05", true)).rejects.toThrow(
+    await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-05", { value: true })).rejects.toThrow(
       "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
     );
     expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
@@ -75,15 +75,66 @@ describe("DailyLogService", () => {
       leadMeasureId: 10,
       logDate: "2026-04-09",
       value: true,
+      count: 1,
     });
 
-    await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-09", true)).resolves.toEqual({
+    await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-09", { value: true })).resolves.toEqual({
       id: 1,
       leadMeasureId: 10,
       logDate: "2026-04-09",
       value: true,
+      count: 1,
+      achieved: true,
     });
-    expect(upsertLog).toHaveBeenCalledWith(10, "2026-04-09", true);
+    expect(upsertLog).toHaveBeenCalledWith(10, "2026-04-09", true, 1);
+  });
+
+  it("횟수형 지표는 count를 저장하고 하루 목표 이상일 때 달성으로 반환한다", async () => {
+    resolveIdByUid.mockResolvedValue(2);
+    findWorkspaceById.mockResolvedValue({ id: 2 });
+    findMembership.mockResolvedValue(true);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      trackingMode: "COUNT",
+      dailyTargetCount: 3,
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+    upsertLog.mockResolvedValue({
+      id: 1,
+      leadMeasureId: 10,
+      logDate: "2026-04-09",
+      value: true,
+      count: 3,
+    });
+
+    await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-09", { count: 3 })).resolves.toEqual({
+      id: 1,
+      leadMeasureId: 10,
+      logDate: "2026-04-09",
+      value: true,
+      count: 3,
+      achieved: true,
+    });
+    expect(upsertLog).toHaveBeenCalledWith(10, "2026-04-09", true, 3);
+  });
+
+  it("횟수형 지표에는 Boolean 입력을 허용하지 않는다", async () => {
+    resolveIdByUid.mockResolvedValue(2);
+    findWorkspaceById.mockResolvedValue({ id: 2 });
+    findMembership.mockResolvedValue(true);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      trackingMode: "COUNT",
+      dailyTargetCount: 3,
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+
+    await expect(
+      service.upsertLog("ws_uid", 10, 100, "2026-04-09", { value: true }),
+    ).rejects.toThrow("VALIDATION_ERROR");
+    expect(upsertLog).not.toHaveBeenCalled();
   });
 
   it("FREE 플랜 멤버 한도 초과 상태에서는 기록할 수 없다", async () => {
@@ -98,7 +149,7 @@ describe("DailyLogService", () => {
     });
 
     await expect(
-      service.upsertLog("ws_uid", 10, 100, "2026-04-09", true),
+      service.upsertLog("ws_uid", 10, 100, "2026-04-09", { value: true }),
     ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
     expect(upsertLog).not.toHaveBeenCalled();
   });
@@ -115,7 +166,7 @@ describe("DailyLogService", () => {
     });
 
     await expect(
-      service.upsertLog("ws_uid", 10, 100, "2026-04-09", true),
+      service.upsertLog("ws_uid", 10, 100, "2026-04-09", { value: true }),
     ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
     expect(upsertLog).not.toHaveBeenCalled();
   });
@@ -131,7 +182,7 @@ describe("DailyLogService", () => {
     });
 
     await expect(
-      service.upsertLog("ws_uid", 10, 100, "2026-04-09", true),
+      service.upsertLog("ws_uid", 10, 100, "2026-04-09", { value: true }),
     ).rejects.toThrow("LEAD_MEASURE_ARCHIVED");
   });
 
@@ -217,6 +268,47 @@ describe("DailyLogService", () => {
         tags: [{ id: 1, name: "운동" }],
         achieved: 5,
         achievementRate: 100,
+      }),
+    ]);
+  });
+
+  it("횟수형 주간 기록은 하루 목표를 채운 날짜만 achieved에 반영한다", async () => {
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
+    findOwnedScoreboardSummary.mockResolvedValue({ id: 2, status: "ACTIVE" });
+    findLeadMeasuresByScoreboard.mockResolvedValue([
+      {
+        id: 10,
+        name: "주 3일 DM",
+        targetValue: 3,
+        period: "WEEKLY",
+        trackingMode: "COUNT",
+        dailyTargetCount: 3,
+        status: "ACTIVE",
+        createdAt: oldCreatedAt,
+        tags: [],
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-04-06", value: true, count: 2 },
+      { leadMeasureId: 10, logDate: "2026-04-07", value: true, count: 3 },
+      { leadMeasureId: 10, logDate: "2026-04-08", value: true, count: 5 },
+    ]);
+
+    const result = await service.getWeeklyLogs("ws_uid", 2, 100, "2026-04-06");
+
+    expect(result.leadMeasures).toEqual([
+      expect.objectContaining({
+        id: 10,
+        achieved: 2,
+        total: 3,
+        achievementRate: 66.7,
+        logs: expect.objectContaining({
+          "2026-04-06": { value: true, count: 2, achieved: false },
+          "2026-04-07": { value: true, count: 3, achieved: true },
+          "2026-04-08": { value: true, count: 5, achieved: true },
+        }),
       }),
     ]);
   });

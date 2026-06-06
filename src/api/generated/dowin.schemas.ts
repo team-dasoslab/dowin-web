@@ -1095,6 +1095,14 @@ export const LeadMeasurePeriod = {
   MONTHLY: 'MONTHLY',
 } as const;
 
+export type LeadMeasureTrackingMode = typeof LeadMeasureTrackingMode[keyof typeof LeadMeasureTrackingMode];
+
+
+export const LeadMeasureTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
+
 export type LeadMeasureStatus = typeof LeadMeasureStatus[keyof typeof LeadMeasureStatus];
 
 
@@ -1114,6 +1122,12 @@ export interface LeadMeasure {
   name?: string;
   targetValue?: number;
   period?: LeadMeasurePeriod;
+  trackingMode?: LeadMeasureTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount?: number;
   status?: LeadMeasureStatus;
   tags?: LeadMeasureTag[];
   createdAt?: string;
@@ -1139,11 +1153,25 @@ export const LeadMeasureCreateRequestPeriod = {
   MONTHLY: 'MONTHLY',
 } as const;
 
+export type LeadMeasureCreateRequestTrackingMode = typeof LeadMeasureCreateRequestTrackingMode[keyof typeof LeadMeasureCreateRequestTrackingMode];
+
+
+export const LeadMeasureCreateRequestTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
+
 export interface LeadMeasureCreateRequest {
   name: string;
   /** @minimum 1 */
   targetValue: number;
   period: LeadMeasureCreateRequestPeriod;
+  trackingMode?: LeadMeasureCreateRequestTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount?: number;
   /** @maxItems 3 */
   tagIds?: number[];
 }
@@ -1157,11 +1185,25 @@ export const LeadMeasureUpdateRequestPeriod = {
   MONTHLY: 'MONTHLY',
 } as const;
 
+export type LeadMeasureUpdateRequestTrackingMode = typeof LeadMeasureUpdateRequestTrackingMode[keyof typeof LeadMeasureUpdateRequestTrackingMode];
+
+
+export const LeadMeasureUpdateRequestTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
+
 export interface LeadMeasureUpdateRequest {
   name?: string;
   /** @minimum 1 */
   targetValue?: number;
   period?: LeadMeasureUpdateRequestPeriod;
+  trackingMode?: LeadMeasureUpdateRequestTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount?: number;
   /** @maxItems 3 */
   tagIds?: number[];
 }
@@ -1186,18 +1228,58 @@ export interface WorkspaceTagUpdateRequest {
 }
 
 export interface DailyLog {
-  id?: number;
-  leadMeasureId?: number;
-  logDate?: string;
-  value?: boolean;
-  createdAt?: string;
+  id: number;
+  leadMeasureId: number;
+  logDate: string;
+  value: boolean;
+  /** @minimum 1 */
+  count: number;
+  achieved: boolean;
+  createdAt: string;
 }
 
-export interface DailyLogUpsertRequest {
+export interface DailyLogBooleanUpsertRequest {
   value: boolean;
 }
 
-export type WeeklyLogItemLogs = {[key: string]: boolean | null};
+export interface DailyLogCountUpsertRequest {
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  count: number;
+}
+
+export type DailyLogUpsertRequest = DailyLogBooleanUpsertRequest | DailyLogCountUpsertRequest;
+
+/**
+ * @nullable
+ */
+export type DailyLogCell = {
+  value: boolean;
+  /** @minimum 0 */
+  count: number;
+  achieved: boolean;
+} | null;
+
+export type WeeklyLogItemPeriod = typeof WeeklyLogItemPeriod[keyof typeof WeeklyLogItemPeriod];
+
+
+export const WeeklyLogItemPeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
+export type WeeklyLogItemTrackingMode = typeof WeeklyLogItemTrackingMode[keyof typeof WeeklyLogItemTrackingMode];
+
+
+export const WeeklyLogItemTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
+
+export type WeeklyLogItemLogs = {[key: string]: DailyLogCell | null};
 
 export type WeeklyLogGuideKind = typeof WeeklyLogGuideKind[keyof typeof WeeklyLogGuideKind];
 
@@ -1215,11 +1297,19 @@ export interface WeeklyLogGuide {
 export interface WeeklyLogItem {
   id?: number;
   name?: string;
+  period?: WeeklyLogItemPeriod;
   targetValue?: number;
+  trackingMode?: WeeklyLogItemTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount?: number;
   tags?: LeadMeasureTag[];
   guide?: WeeklyLogGuide | null;
   logs?: WeeklyLogItemLogs;
   achieved?: number;
+  total?: number;
   achievementRate?: number;
 }
 
@@ -1233,20 +1323,36 @@ export type MonthlyLogItemPeriod = typeof MonthlyLogItemPeriod[keyof typeof Mont
 
 
 export const MonthlyLogItemPeriod = {
+  DAILY: 'DAILY',
   WEEKLY: 'WEEKLY',
   MONTHLY: 'MONTHLY',
 } as const;
 
-export type MonthlyLogItemLogs = {[key: string]: boolean | null};
+export type MonthlyLogItemTrackingMode = typeof MonthlyLogItemTrackingMode[keyof typeof MonthlyLogItemTrackingMode];
+
+
+export const MonthlyLogItemTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
+
+export type MonthlyLogItemLogs = {[key: string]: DailyLogCell | null};
 
 export interface MonthlyLogItem {
   id?: number;
   name?: string;
   period?: MonthlyLogItemPeriod;
   targetValue?: number;
+  trackingMode?: MonthlyLogItemTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount?: number;
   tags?: LeadMeasureTag[];
   logs?: MonthlyLogItemLogs;
   achieved?: number;
+  total?: number;
   achievementRate?: number;
 }
 
@@ -1291,14 +1397,45 @@ export const AnalyticsExportLeadMeasureBreakdownPeriod = {
   MONTHLY: 'MONTHLY',
 } as const;
 
+export type AnalyticsExportLeadMeasureBreakdownTrackingMode = typeof AnalyticsExportLeadMeasureBreakdownTrackingMode[keyof typeof AnalyticsExportLeadMeasureBreakdownTrackingMode];
+
+
+export const AnalyticsExportLeadMeasureBreakdownTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
+
 export interface AnalyticsExportLeadMeasureBreakdown {
   leadMeasureId: number;
   name: string;
   period: AnalyticsExportLeadMeasureBreakdownPeriod;
+  trackingMode: AnalyticsExportLeadMeasureBreakdownTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount: number;
   achieved: number;
   total: number;
   achievementRate: number;
 }
+
+export type AnalyticsExportDailyRowPeriod = typeof AnalyticsExportDailyRowPeriod[keyof typeof AnalyticsExportDailyRowPeriod];
+
+
+export const AnalyticsExportDailyRowPeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+} as const;
+
+export type AnalyticsExportDailyRowTrackingMode = typeof AnalyticsExportDailyRowTrackingMode[keyof typeof AnalyticsExportDailyRowTrackingMode];
+
+
+export const AnalyticsExportDailyRowTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
 
 export type AnalyticsExportDailyRowStatus = typeof AnalyticsExportDailyRowStatus[keyof typeof AnalyticsExportDailyRowStatus];
 
@@ -1313,7 +1450,16 @@ export interface AnalyticsExportDailyRow {
   date: string;
   leadMeasureId: number;
   leadMeasureName: string;
+  period: AnalyticsExportDailyRowPeriod;
+  trackingMode: AnalyticsExportDailyRowTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount: number;
   status: AnalyticsExportDailyRowStatus;
+  /** @minimum 0 */
+  count: number;
 }
 
 export interface AnalyticsExportDataResponse {
@@ -1332,15 +1478,30 @@ export const TeamDashboardMemberMeasurePeriod = {
   MONTHLY: 'MONTHLY',
 } as const;
 
-export type TeamDashboardMemberMeasureLogs = {[key: string]: boolean | null};
+export type TeamDashboardMemberMeasureTrackingMode = typeof TeamDashboardMemberMeasureTrackingMode[keyof typeof TeamDashboardMemberMeasureTrackingMode];
+
+
+export const TeamDashboardMemberMeasureTrackingMode = {
+  BOOLEAN: 'BOOLEAN',
+  COUNT: 'COUNT',
+} as const;
+
+export type TeamDashboardMemberMeasureLogs = {[key: string]: DailyLogCell | null};
 
 export interface TeamDashboardMemberMeasure {
   id?: number;
   name?: string;
   period?: TeamDashboardMemberMeasurePeriod;
   targetValue?: number;
+  trackingMode?: TeamDashboardMemberMeasureTrackingMode;
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  dailyTargetCount?: number;
   tags?: LeadMeasureTag[];
   achieved?: number;
+  total?: number;
   achievementRate?: number;
   logs?: TeamDashboardMemberMeasureLogs;
 }

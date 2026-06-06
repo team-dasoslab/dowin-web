@@ -885,6 +885,10 @@ export const leadMeasures = sqliteTable("lead_measures", {
   period: text("period", { enum: ["DAILY", "WEEKLY", "MONTHLY"] })
     .notNull()
     .default("DAILY"),
+  trackingMode: text("tracking_mode", { enum: ["BOOLEAN", "COUNT"] })
+    .notNull()
+    .default("BOOLEAN"),
+  dailyTargetCount: integer("daily_target_count").notNull().default(1),
   status: text("status", { enum: ["ACTIVE", "ARCHIVED"] })
     .notNull()
     .default("ACTIVE"),
@@ -951,6 +955,7 @@ export const dailyLogs = sqliteTable(
       .references(() => leadMeasures.id, { onDelete: "cascade" }),
     logDate: text("log_date").notNull(),
     value: integer("value", { mode: "boolean" }).notNull(),
+    count: integer("count").notNull().default(1),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),

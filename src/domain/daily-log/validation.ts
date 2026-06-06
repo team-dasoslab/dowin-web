@@ -1,10 +1,20 @@
 import { z } from "zod";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+const DAILY_LOG_COUNT_MAX = 20;
 
-export const dailyLogUpsertSchema = z.object({
-  value: z.literal(true),
-});
+export const dailyLogUpsertSchema = z.union([
+  z
+    .object({
+      value: z.literal(true),
+    })
+    .strict(),
+  z
+    .object({
+      count: z.number().int().min(1).max(DAILY_LOG_COUNT_MAX),
+    })
+    .strict(),
+]);
 
 export const dailyLogDateParamSchema = z.object({
   leadMeasureId: z.coerce.number().int().positive(),

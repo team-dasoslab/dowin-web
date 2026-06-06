@@ -1,9 +1,7 @@
 import { getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
 
 interface PeriodControlsProps {
   monthLabel?: string;
@@ -33,7 +31,6 @@ export function PeriodControls({
   isPeriodLoading,
 }: PeriodControlsProps) {
   const t = useTranslations("Dashboard");
-  const workspaceId = useParams().workspaceId as string;
   const currentWeekStart = getWeekDates(today)[0] ?? today;
   const isResetVisible =
     selectedView === "month"

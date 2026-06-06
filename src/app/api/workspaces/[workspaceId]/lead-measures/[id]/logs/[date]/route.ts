@@ -60,7 +60,7 @@ const { env } = getCloudflareContext();
     const result = await createService(db).upsertLog(workspaceId, validatedParams.data.leadMeasureId,
       session.userId,
       validatedParams.data.date,
-      parsed.data.value,
+      parsed.data,
     );
     return apiSuccess(result);
   },

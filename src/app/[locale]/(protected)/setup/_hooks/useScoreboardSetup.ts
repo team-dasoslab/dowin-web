@@ -46,10 +46,10 @@ import {
 } from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
+import { generateId } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
-import { generateId } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export const useScoreboardSetup = () => {
@@ -85,8 +85,9 @@ export const useScoreboardSetup = () => {
     });
   const availableTags: SetupTag[] =
     workspaceTagsResponse?.status === 200 ? workspaceTagsResponse.data : [];
-  const workspaceTagsQueryKey =
-    workspaceId ? getGetWorkspacesIdTagsQueryKey(workspaceId) : null;
+  const workspaceTagsQueryKey = workspaceId
+    ? getGetWorkspacesIdTagsQueryKey(workspaceId)
+    : null;
 
   const {
     data: activeScoreboardResponse,
@@ -115,9 +116,10 @@ export const useScoreboardSetup = () => {
     !isActiveScoreboardLoading &&
     hasNoActiveScoreboard;
 
-
   const { data: leadMeasuresResponse, isLoading: isLeadMeasuresLoading } =
-    useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures(workspaceId, scoreboardId ?? 0,
+    useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures(
+      workspaceId,
+      scoreboardId ?? 0,
       isEditMode ? { status: "all" } : undefined,
       {
         query: {
@@ -127,24 +129,39 @@ export const useScoreboardSetup = () => {
     );
   const createScoreboardMutation = usePostWorkspacesWorkspaceIdScoreboards();
   const updateScoreboardMutation = usePutWorkspacesWorkspaceIdScoreboardsId();
-  const archiveScoreboardMutation = usePostWorkspacesWorkspaceIdScoreboardsIdArchive();
+  const archiveScoreboardMutation =
+    usePostWorkspacesWorkspaceIdScoreboardsIdArchive();
   const createLeadMeasureMutation =
     usePostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures();
   const updateLeadMeasureMutation = usePutWorkspacesWorkspaceIdLeadMeasuresId();
-  const archiveLeadMeasureMutation = usePostWorkspacesWorkspaceIdLeadMeasuresIdArchive();
-  const reactivateLeadMeasureMutation = usePostWorkspacesWorkspaceIdLeadMeasuresIdReactivate();
-  const deleteLeadMeasureMutation = useDeleteWorkspacesWorkspaceIdLeadMeasuresId();
+  const archiveLeadMeasureMutation =
+    usePostWorkspacesWorkspaceIdLeadMeasuresIdArchive();
+  const reactivateLeadMeasureMutation =
+    usePostWorkspacesWorkspaceIdLeadMeasuresIdReactivate();
+  const deleteLeadMeasureMutation =
+    useDeleteWorkspacesWorkspaceIdLeadMeasuresId();
   const createWorkspaceTagMutation = usePostWorkspacesIdTags();
   const updateWorkspaceTagMutation = usePutWorkspacesIdTagsTagId();
   const deleteWorkspaceTagMutation = useDeleteWorkspacesIdTagsTagId();
 
   useEffect(() => {
-    if (!isEditMode && mode === "update" && !isActiveScoreboardLoading && hasNoActiveScoreboard) {
+    if (
+      !isEditMode &&
+      mode === "update" &&
+      !isActiveScoreboardLoading &&
+      hasNoActiveScoreboard
+    ) {
       const currentUrl = new URL(window.location.href);
       currentUrl.searchParams.set("mode", "create");
       router.replace(currentUrl.pathname + currentUrl.search);
     }
-  }, [isEditMode, mode, isActiveScoreboardLoading, hasNoActiveScoreboard, router]);
+  }, [
+    isEditMode,
+    mode,
+    isActiveScoreboardLoading,
+    hasNoActiveScoreboard,
+    router,
+  ]);
 
   useEffect(() => {
     if (
@@ -169,6 +186,9 @@ export const useScoreboardSetup = () => {
             leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
             monthlyTargetMax,
           ),
+          trackingMode:
+            ((leadMeasure as { trackingMode?: string }).trackingMode === "COUNT" ? "COUNT" : "BOOLEAN") as import("@/api/generated/dowin.schemas").LeadMeasureCreateRequestTrackingMode,
+          dailyTargetCount: (leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ?? 1,
           tags:
             leadMeasure.tags?.map((tag: { id: number; name: string }) => ({
               id: tag.id,
@@ -238,7 +258,11 @@ export const useScoreboardSetup = () => {
       (measure) => measure.status === "ACTIVE" && !measure.isDeleted,
     ).length;
 
-    if (targetMeasure.status === "ACTIVE" && !isExisting && activeMeasuresCount <= 1) {
+    if (
+      targetMeasure.status === "ACTIVE" &&
+      !isExisting &&
+      activeMeasuresCount <= 1
+    ) {
       return;
     }
 
@@ -251,9 +275,7 @@ export const useScoreboardSetup = () => {
       return;
     }
 
-    setMeasures((previous) =>
-      previous.filter((measure) => measure.id !== id),
-    );
+    setMeasures((previous) => previous.filter((measure) => measure.id !== id));
   };
 
   const restoreMeasureRow = (id: string) => {
@@ -424,7 +446,9 @@ export const useScoreboardSetup = () => {
 
           return {
             ...measure,
-            tags: measure.tags.filter((tag: { id: number }) => tag.id !== optimisticTag.id),
+            tags: measure.tags.filter(
+              (tag: { id: number }) => tag.id !== optimisticTag.id,
+            ),
           };
         }),
       );
@@ -587,7 +611,8 @@ export const useScoreboardSetup = () => {
   ) => {
     const invalidations = [
       queryClient.invalidateQueries({
-        queryKey: getGetWorkspacesWorkspaceIdScoreboardsActiveQueryKey(workspaceId),
+        queryKey:
+          getGetWorkspacesWorkspaceIdScoreboardsActiveQueryKey(workspaceId),
       }),
       queryClient.invalidateQueries({
         queryKey: getGetWorkspacesWorkspaceIdScoreboardsQueryKey(workspaceId),
@@ -597,18 +622,20 @@ export const useScoreboardSetup = () => {
     if (targetScoreboardId !== null) {
       invalidations.push(
         queryClient.invalidateQueries({
-          queryKey: getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(
-            workspaceId,
-            targetScoreboardId,
-            undefined,
-          ),
+          queryKey:
+            getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(
+              workspaceId,
+              targetScoreboardId,
+              undefined,
+            ),
         }),
         queryClient.invalidateQueries({
-          queryKey: getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(
-            workspaceId,
-            targetScoreboardId,
-            { status: "all" },
-          ),
+          queryKey:
+            getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey(
+              workspaceId,
+              targetScoreboardId,
+              { status: "all" },
+            ),
         }),
       );
     }
@@ -647,7 +674,8 @@ export const useScoreboardSetup = () => {
       const startDate = new Date().toISOString().split("T")[0];
 
       if (!isEditMode) {
-        const createdScoreboard = await createScoreboardMutation.mutateAsync({ workspaceId,
+        const createdScoreboard = await createScoreboardMutation.mutateAsync({
+          workspaceId,
           data: {
             goalName,
             lagMeasure,
@@ -667,12 +695,15 @@ export const useScoreboardSetup = () => {
 
         const createdMeasureIds: number[] = [];
         for (const measure of validMeasures) {
-          const result = await createLeadMeasureMutation.mutateAsync({ workspaceId,
+          const result = await createLeadMeasureMutation.mutateAsync({
+            workspaceId,
             scoreboardId: createdScoreboardId,
             data: {
               name: measure.name,
               targetValue: measure.targetValue,
               period: measure.period,
+              trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureCreateRequestTrackingMode,
+              dailyTargetCount: measure.dailyTargetCount,
               tagIds: measure.tags.map((tag: { id: number }) => tag.id),
             },
           });
@@ -700,7 +731,8 @@ export const useScoreboardSetup = () => {
       }
 
       if (scoreboardId !== null) {
-        await updateScoreboardMutation.mutateAsync({ workspaceId,
+        await updateScoreboardMutation.mutateAsync({
+          workspaceId,
           id: scoreboardId,
           data: {
             goalName,
@@ -713,18 +745,22 @@ export const useScoreboardSetup = () => {
         for (const measure of validMeasures) {
           if (measure.existingId !== null) {
             if (measure.initialStatus === "ARCHIVED") {
-              await reactivateLeadMeasureMutation.mutateAsync({ workspaceId,
+              await reactivateLeadMeasureMutation.mutateAsync({
+                workspaceId,
                 id: measure.existingId,
               });
             }
 
             nextExistingIds.add(measure.existingId);
-            await updateLeadMeasureMutation.mutateAsync({ workspaceId,
+            await updateLeadMeasureMutation.mutateAsync({
+              workspaceId,
               id: measure.existingId,
               data: {
                 name: measure.name,
                 targetValue: measure.targetValue,
                 period: measure.period,
+                trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureUpdateRequestTrackingMode,
+                dailyTargetCount: measure.dailyTargetCount,
                 tagIds: measure.tags.map((tag: { id: number }) => tag.id),
               },
             });
@@ -732,12 +768,15 @@ export const useScoreboardSetup = () => {
           }
 
           const createdLeadMeasure =
-            await createLeadMeasureMutation.mutateAsync({ workspaceId,
+            await createLeadMeasureMutation.mutateAsync({
+              workspaceId,
               scoreboardId,
               data: {
                 name: measure.name,
                 targetValue: measure.targetValue,
                 period: measure.period,
+                trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureCreateRequestTrackingMode,
+                dailyTargetCount: measure.dailyTargetCount,
                 tagIds: measure.tags.map((tag: { id: number }) => tag.id),
               },
             });
@@ -765,7 +804,8 @@ export const useScoreboardSetup = () => {
             measure.status === "ARCHIVED" &&
             !nextExistingIds.has(measure.existingId)
           ) {
-            await archiveLeadMeasureMutation.mutateAsync({ workspaceId,
+            await archiveLeadMeasureMutation.mutateAsync({
+              workspaceId,
               id: measure.existingId,
             });
           }
@@ -773,7 +813,8 @@ export const useScoreboardSetup = () => {
 
         for (const deletedMeasure of deletedExistingMeasures) {
           if (deletedMeasure.existingId !== null) {
-            await deleteLeadMeasureMutation.mutateAsync({ workspaceId,
+            await deleteLeadMeasureMutation.mutateAsync({
+              workspaceId,
               id: deletedMeasure.existingId,
             });
           }
@@ -796,7 +837,8 @@ export const useScoreboardSetup = () => {
     }
 
     try {
-      await archiveScoreboardMutation.mutateAsync({ workspaceId,
+      await archiveScoreboardMutation.mutateAsync({
+        workspaceId,
         id: scoreboardId,
       });
       await invalidateScoreboardQueries(scoreboardId);

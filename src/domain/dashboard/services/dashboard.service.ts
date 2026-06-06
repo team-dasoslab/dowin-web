@@ -35,6 +35,8 @@ type TeamScoreboard = {
     name: string;
     targetValue: number;
     period: "DAILY" | "WEEKLY" | "MONTHLY";
+    trackingMode: "BOOLEAN" | "COUNT";
+    dailyTargetCount: number;
     status: "ACTIVE" | "ARCHIVED";
     tags: Array<{ id: number; name: string }>;
   }>;
@@ -49,7 +51,7 @@ type DailyLogLookupPort = {
     leadMeasureIds: number[],
     rangeStart: string,
     rangeEnd: string,
-  ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean }>>;
+  ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean; count?: number }>>;
 };
 
 const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
@@ -60,6 +62,11 @@ type WorkspaceMemberLookup = Awaited<
 type DailyLogLookup = Awaited<
   ReturnType<DailyLogLookupPort["findLogsForLeadMeasures"]>
 >[number];
+type DailyLogCell = {
+  value: boolean;
+  count: number;
+  achieved: boolean;
+};
 
 export class DashboardService {
   constructor(
@@ -213,7 +220,7 @@ function buildTeamDashboard({
         .filter((leadMeasure) => leadMeasure.status === "ACTIVE")
         .map((leadMeasure) => {
           const logMap = Object.fromEntries(
-            weekDates.map((date) => [date, null as boolean | null]),
+            weekDates.map((date) => [date, null as DailyLogCell | null]),
           );
           const measureLogs = logsByLeadMeasure.get(leadMeasure.id) ?? [];
           const weeklyLogs = measureLogs.filter(
@@ -221,10 +228,12 @@ function buildTeamDashboard({
           );
 
           for (const log of weeklyLogs) {
-            logMap[log.logDate] = log.value;
+            logMap[log.logDate] = getLogCell(leadMeasure, log);
           }
 
-          const achieved = weeklyLogs.filter((log) => log.value).length;
+          const achieved = weeklyLogs.filter((log) =>
+            isLogAchieved(leadMeasure, log),
+          ).length;
           const achievementRate = getAchievementRate(
             achieved,
             leadMeasure.targetValue,
@@ -235,8 +244,11 @@ function buildTeamDashboard({
             name: leadMeasure.name,
             targetValue: leadMeasure.targetValue,
             period: leadMeasure.period,
+            trackingMode: getTrackingMode(leadMeasure),
+            dailyTargetCount: getDailyTargetCount(leadMeasure),
             tags: leadMeasure.tags,
             achieved,
+            total: leadMeasure.targetValue,
             achievementRate,
             logs: logMap,
           };
@@ -261,7 +273,7 @@ function buildTeamDashboard({
       const weekStartsInMonth = getWeekStartsInMonth(monthDates);
       const monthlyAchieved = monthlyMeasures.reduce((sum, leadMeasure) => {
         const truthyLogs = (logsByLeadMeasure.get(leadMeasure.id) ?? []).filter(
-          (log) => log.value
+          (log) => isLogAchieved(leadMeasure, log)
         );
 
         if (leadMeasure.period === "MONTHLY") {
@@ -313,8 +325,11 @@ function buildTeamDashboard({
           name: leadMeasure.name,
           period: leadMeasure.period,
           targetValue: leadMeasure.targetValue,
+          trackingMode: leadMeasure.trackingMode,
+          dailyTargetCount: leadMeasure.dailyTargetCount,
           tags: leadMeasure.tags,
           achieved: leadMeasure.achieved,
+          total: leadMeasure.total,
           achievementRate: leadMeasure.achievementRate,
           logs: leadMeasure.logs,
         })),
@@ -355,7 +370,7 @@ function buildWeeklyTrend({
     const achieved = weeklyLeadMeasures.reduce((sum, leadMeasure) => {
       const truthyLogCount = (logsByLeadMeasure.get(leadMeasure.id) ?? []).filter(
         (log) =>
-          log.value &&
+          isLogAchieved(leadMeasure, log) &&
           log.logDate >= weekStart &&
           log.logDate <= weekEnd,
       ).length;
@@ -397,6 +412,49 @@ function buildLogsByLeadMeasure(logs: DailyLogLookup[]) {
   }
 
   return logsByLeadMeasure;
+}
+
+function getLogCell(
+  measure: Pick<TeamScoreboard["leadMeasures"][number], "trackingMode" | "dailyTargetCount">,
+  log: DailyLogLookup,
+): DailyLogCell {
+  if (!log.value) {
+    return { value: false, count: 0, achieved: false };
+  }
+
+  const count = log.count ?? 1;
+  return {
+    value: true,
+    count,
+    achieved: isLogAchieved(measure, log),
+  };
+}
+
+function isLogAchieved(
+  measure: Pick<TeamScoreboard["leadMeasures"][number], "trackingMode" | "dailyTargetCount">,
+  log: Pick<DailyLogLookup, "value" | "count">,
+) {
+  if (!log.value) {
+    return false;
+  }
+
+  if (getTrackingMode(measure) !== "COUNT") {
+    return true;
+  }
+
+  return (log.count ?? 1) >= getDailyTargetCount(measure);
+}
+
+function getTrackingMode(
+  measure: Pick<TeamScoreboard["leadMeasures"][number], "trackingMode">,
+): "BOOLEAN" | "COUNT" {
+  return measure.trackingMode ?? "BOOLEAN";
+}
+
+function getDailyTargetCount(
+  measure: Pick<TeamScoreboard["leadMeasures"][number], "dailyTargetCount">,
+) {
+  return measure.dailyTargetCount ?? 1;
 }
 
 function getActiveLeadMeasureIds(scoreboards: TeamScoreboard[]) {
