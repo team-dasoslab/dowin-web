@@ -70,6 +70,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - `dashboard/my` 기간 탐색(`view`, `date` query)과 축하 confetti 인터랙션 구현 완료
 - `dashboard` 팀 뷰 주간 히스토리 탐색 및 Free 6개월 / 유료 전체 기간 정책 연동 완료
 - Setup 선행지표 횟수 입력 제한 적용 완료 (`WEEKLY` 최대 7회, `MONTHLY`는 점수판 시작월 최대 일수 기준)
+- 선행지표 기록 방식은 `BOOLEAN`/`COUNT`를 지원하며, `COUNT`는 `dailyTargetCount` 이상인 날짜만 집계에 +1로 반영
 - Setup 점수판 생성 화면에 입력 품질 가이드용 코치마크 적용 완료
   - `react-joyride` 기반 3단계 안내
   - 로컬 스토리지(`dowin.setup.coachmark.v1.dismissed`) 기준 1회 노출
@@ -415,6 +416,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - `DELETE /api/lead-measures/:id/logs/:date`
 - `GET /api/scoreboards/:id/logs/weekly`
 - `GET /api/scoreboards/:id/logs/monthly`
+- Daily Log는 `BOOLEAN` 지표의 O 기록과 `COUNT` 지표의 count 기록을 모두 지원한다.
 - `dashboard/my` 연동 완료
 - 낙관적 업데이트와 실패 롤백 적용 완료
 
