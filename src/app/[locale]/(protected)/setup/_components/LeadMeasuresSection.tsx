@@ -238,33 +238,62 @@ function LeadMeasureRow({
       />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="grid w-full grid-cols-2 gap-1 rounded-content border border-zinc-200 bg-zinc-50/50 p-1 sm:w-auto sm:shrink-0 sm:flex">
-          {(["WEEKLY", "MONTHLY"] as const).map((period) => (
-            <Button
-              key={period}
-              type="button"
-              disabled={isMutating}
-              onClick={() => {
-                handleMeasureChange(measure.id, "period", period);
-                handleMeasureChange(
-                  measure.id,
-                  "targetValue",
-                  period === "WEEKLY" ? 3 : 1,
-                );
-              }}
-              className={`rounded-button px-3 py-2 text-sm font-bold transition-all sm:px-4 ${
-                measure.period === period
-                  ? "border border-zinc-200/50 bg-white text-primary shadow-sm"
-                  : "text-zinc-400"
-              }`}
-            >
-              {period === "WEEKLY" ? t("modeWeekly") : t("modeMonthly")}
-            </Button>
-          ))}
+        <div className="relative flex w-full rounded-content bg-zinc-100/80 p-1 sm:w-auto">
+          {(["WEEKLY", "MONTHLY"] as const).map((period) => {
+            const isActive = measure.period === period;
+            return (
+              <Button
+                key={period}
+                type="button"
+                disabled={isMutating}
+                onClick={() => {
+                  handleMeasureChange(measure.id, "period", period);
+                  handleMeasureChange(
+                    measure.id,
+                    "targetValue",
+                    period === "WEEKLY" ? 3 : 1,
+                  );
+                }}
+                className={`relative z-10 flex-1 rounded-[10px] py-2.5 text-[14px] font-bold transition-all duration-200 sm:px-6 ${
+                  isActive
+                    ? "bg-white text-zinc-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+                    : "text-zinc-400 hover:text-zinc-600"
+                }`}
+              >
+                {period === "WEEKLY" ? "매주" : "매달"}
+              </Button>
+            );
+          })}
         </div>
 
-        <div className="flex items-center justify-between gap-2 sm:justify-start">
-          <div className="flex items-center overflow-hidden rounded-content border border-zinc-200 bg-white">
+        <div className="relative flex w-full rounded-content bg-zinc-100/80 p-1 sm:w-auto">
+          {(["BOOLEAN", "COUNT"] as const).map((mode) => {
+            const isActive = measure.trackingMode === mode;
+            return (
+              <Button
+                key={mode}
+                type="button"
+                disabled={isMutating}
+                onClick={() => handleMeasureChange(measure.id, "trackingMode", mode)}
+                className={`relative z-10 flex-1 whitespace-nowrap rounded-[10px] py-2.5 text-[14px] font-bold transition-all duration-200 sm:px-6 ${
+                  isActive
+                    ? "bg-white text-zinc-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+                    : "text-zinc-400 hover:text-zinc-600"
+                }`}
+              >
+                {mode === "BOOLEAN" ? t("trackingModeBoolean") : t("trackingModeCount")}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 rounded-content bg-zinc-50/30 p-3 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
+            {measure.period === "WEEKLY" ? "매주" : "매달"}
+          </span>
+          <div className="flex shrink-0 items-center overflow-hidden rounded-content border border-zinc-200 bg-white shadow-sm">
             <Button
               type="button"
               disabled={isMutating || measure.targetValue <= 1}
@@ -280,7 +309,7 @@ function LeadMeasureRow({
             >
               <DowinIcon name="action-subtract" size="16px" />
             </Button>
-            <div className="flex h-11 min-w-14 items-center justify-center border-x border-zinc-200 px-3 font-mono text-base font-black text-zinc-900">
+            <div className="flex h-11 min-w-12 items-center justify-center border-x border-zinc-200 px-3 font-mono text-base font-black text-zinc-900">
               {measure.targetValue}
             </div>
             <Button
@@ -303,14 +332,58 @@ function LeadMeasureRow({
               <DowinIcon name="action-add" size="16px" />
             </Button>
           </div>
-          <span className="whitespace-nowrap text-xs font-medium text-text-secondary">
-            {measure.period === "WEEKLY"
-              ? t("timesPerWeek")
-              : t("timesPerMonth")}
+          <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
+            {measure.trackingMode === "COUNT" ? "일" : "회"}
           </span>
         </div>
-      </div>
 
+        {measure.trackingMode === "COUNT" && (
+          <>
+            <span className="hidden text-zinc-300 sm:inline">·</span>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
+                하루에
+              </span>
+              <div className="flex shrink-0 items-center overflow-hidden rounded-content border border-zinc-200 bg-white shadow-sm">
+                <Button
+                  type="button"
+                  disabled={isMutating || measure.dailyTargetCount <= 1}
+                  onClick={() =>
+                    handleMeasureChange(
+                      measure.id,
+                      "dailyTargetCount",
+                      measure.dailyTargetCount - 1,
+                    )
+                  }
+                  className="flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors disabled:opacity-30"
+                >
+                  <DowinIcon name="action-subtract" size="16px" />
+                </Button>
+                <div className="flex h-11 min-w-12 items-center justify-center border-x border-zinc-200 px-3 font-mono text-base font-black text-zinc-900">
+                  {measure.dailyTargetCount}
+                </div>
+                <Button
+                  type="button"
+                  disabled={isMutating || measure.dailyTargetCount >= 20}
+                  onClick={() =>
+                    handleMeasureChange(
+                      measure.id,
+                      "dailyTargetCount",
+                      measure.dailyTargetCount + 1,
+                    )
+                  }
+                  className="flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors disabled:opacity-30"
+                >
+                  <DowinIcon name="action-add" size="16px" />
+                </Button>
+              </div>
+              <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
+                회
+              </span>
+            </div>
+          </>
+        )}
+      </div>
       <div
         className="rounded-content border border-zinc-200 bg-zinc-50/30"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
