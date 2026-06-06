@@ -79,7 +79,7 @@ export function WeeklyTable({
   const hasMemos = memos.length > 0;
 
   const handleComposeClick = () => {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 1599px)").matches) {
       const content = window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
 
       if (!content) {
