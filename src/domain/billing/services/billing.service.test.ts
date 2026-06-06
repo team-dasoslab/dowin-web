@@ -164,6 +164,73 @@ describe("BillingService", () => {
     });
   });
 
+  it("Polar 현재 seat가 DB projection보다 최신이면 overview와 projection을 보정한다", async () => {
+    const getSubscriptionSeatUpdate = vi.fn().mockResolvedValue({
+      subscriptionId: "sub_123",
+      seats: 20,
+      pendingSeats: 5,
+    });
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
+    const currentPeriodEnd = new Date("2026-07-06T00:00:00.000Z");
+    const service = new BillingService(
+      {
+        resolveIdByUid: vi.fn().mockResolvedValue(1),
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "ws_abc",
+          name: "Dowin",
+          planCode: "BASIC",
+        }),
+        findMembership: vi.fn().mockResolvedValue({
+          role: "ADMIN",
+        }),
+        countMembers: vi.fn().mockResolvedValue(5),
+        findSeatEntitlement: vi.fn().mockResolvedValue({
+          purchasedSeatCount: 10,
+        }),
+      } as never,
+      {
+        findWorkspaceBillingState: vi.fn().mockResolvedValue({
+          planCode: "BASIC",
+          billingStatus: "ACTIVE",
+          entitlementSource: "POLAR",
+          provider: "POLAR",
+          subscriptionKey: "sub_123",
+          currentPeriodEnd,
+          cancelAtPeriodEnd: false,
+          billingOwnerUserId: 7,
+        }),
+        getRecentBillingRiskSummary: vi.fn().mockResolvedValue({
+          recentRefundCount: 0,
+          recentRevokedCount: 0,
+        }),
+        upsertWorkspaceSeatEntitlement,
+      } as never,
+      {
+        environment: "sandbox",
+        createCheckoutSession: vi.fn(),
+        createCustomerSession: vi.fn(),
+        getCheckoutSession: vi.fn(),
+        updateSubscriptionSeats: vi.fn(),
+        getSubscriptionSeatUpdate,
+        findSubscriptionByCheckoutId: vi.fn(),
+        findSubscriptionSeatMemberId: vi.fn(),
+        assignSubscriptionSeat: vi.fn(),
+      },
+    );
+
+    await expect(service.getMyBilling("ws_abc", 7)).resolves.toMatchObject({
+      purchasedSeatCount: 20,
+      pendingSeatCount: 5,
+      pendingSeatEffectiveAt: currentPeriodEnd.toISOString(),
+    });
+    expect(upsertWorkspaceSeatEntitlement).toHaveBeenCalledWith({
+      workspaceId: 1,
+      purchasedSeatCount: 20,
+      seatSource: "POLAR",
+    });
+  });
+
   it("billing risk 조회는 workspace, customer, owner 범위를 함께 전달한다", async () => {
     const getRecentBillingRiskSummary = vi.fn().mockResolvedValue({
       recentRefundCount: 1,
@@ -792,6 +859,7 @@ describe("BillingService", () => {
       seats: 6,
       pendingSeats: null,
     });
+    const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
     const service = new BillingService(
       {
         resolveIdByUid: vi.fn().mockResolvedValue(1),
@@ -815,6 +883,7 @@ describe("BillingService", () => {
           subscriptionKey: "sub_123",
         }),
         getRecentBillingRiskSummary: vi.fn(),
+        upsertWorkspaceSeatEntitlement,
       } as never,
       {
         environment: "sandbox",
@@ -845,6 +914,11 @@ describe("BillingService", () => {
       subscriptionId: "sub_123",
       seatCount: 6,
       prorationBehavior: "prorate",
+    });
+    expect(upsertWorkspaceSeatEntitlement).toHaveBeenCalledWith({
+      workspaceId: 1,
+      purchasedSeatCount: 6,
+      seatSource: "POLAR",
     });
   });
 
