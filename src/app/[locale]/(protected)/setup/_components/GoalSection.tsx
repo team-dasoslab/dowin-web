@@ -16,10 +16,10 @@ export function GoalSection({
   const t = useTranslations("Setup");
 
   return (
-    <Card className="p-6 md:p-8 space-y-6" data-coachmark="setup-goal">
+    <Card className="p-6 md:p-8 space-y-6 border-none rounded-[24px]" data-coachmark="setup-goal">
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-bold text-zinc-900">
+          <label className="block text-lg font-bold text-zinc-900 tracking-tight">
             {t("goalQuestion")}
           </label>
         </div>
@@ -28,7 +28,7 @@ export function GoalSection({
           disabled={isMutating}
           onChange={(e) => setGoalName(e.target.value)}
           placeholder={t("goalPlaceholder")}
-          className="w-full rounded-content border border-zinc-200 bg-zinc-50/50 px-5 py-4 text-base focus:border-primary outline-none transition-all placeholder:text-zinc-300"
+          className="w-full rounded-[16px] border-none bg-[#F2F4F6] px-5 py-4 text-[17px] font-semibold text-zinc-900 focus:bg-[#E8F3FF] focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-zinc-400"
           required
         />
       </div>

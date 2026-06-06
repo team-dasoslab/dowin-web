@@ -62,7 +62,7 @@ export function LeadMeasuresSection({
   ).length;
 
   return (
-    <Card data-coachmark="setup-lead">
+    <Card className="border-none rounded-[24px] overflow-hidden" data-coachmark="setup-lead">
       <div className="divide-y divide-zinc-200/60">
         {activeMeasures.map((measure, index) => (
           <LeadMeasureRow
@@ -89,14 +89,14 @@ export function LeadMeasuresSection({
         ))}
       </div>
 
-      <div className="border-t border-dashed border-zinc-200 bg-zinc-50/30 px-4 py-4 sm:px-8 sm:py-5">
+      <div className="bg-white px-4 py-6 sm:px-8">
         <Button
           type="button"
           disabled={isMutating}
           onClick={addMeasureRow}
-          className="flex w-full items-center justify-center gap-2 rounded-content border border-zinc-200 bg-white py-3 text-sm font-bold text-zinc-500 transition-all"
+          className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#E8F3FF] py-4 text-[15px] font-bold text-primary transition-all active:scale-95"
         >
-          <DowinIcon name="action-add" size="16px" />
+          <DowinIcon name="action-add" size="18px" />
           {t("addLeadMeasure")}
         </Button>
       </div>
@@ -233,7 +233,7 @@ function LeadMeasureRow({
           handleMeasureChange(measure.id, "name", e.target.value)
         }
         placeholder={t("leadMeasurePlaceholder")}
-        className="w-full rounded-content border border-zinc-200 bg-zinc-50/50 px-5 py-4 text-base outline-none transition-all placeholder:text-zinc-300 focus:border-primary"
+        className="w-full rounded-[16px] border-none bg-[#F2F4F6] px-5 py-4 text-[17px] font-semibold text-zinc-900 focus:bg-[#E8F3FF] focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-zinc-400"
         required
       />
 
@@ -293,7 +293,7 @@ function LeadMeasureRow({
           <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
             {measure.period === "WEEKLY" ? "매주" : "매달"}
           </span>
-          <div className="flex shrink-0 items-center overflow-hidden rounded-content border border-zinc-200 bg-white shadow-sm">
+          <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-[#F2F4F6]">
             <Button
               type="button"
               disabled={isMutating || measure.targetValue <= 1}
@@ -304,12 +304,12 @@ function LeadMeasureRow({
                   measure.targetValue - 1,
                 )
               }
-              className="flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors disabled:opacity-30"
+              className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
               aria-label={t("decrement")}
             >
               <DowinIcon name="action-subtract" size="16px" />
             </Button>
-            <div className="flex h-11 min-w-12 items-center justify-center border-x border-zinc-200 px-3 font-mono text-base font-black text-zinc-900">
+            <div className="flex h-12 min-w-12 items-center justify-center px-2 font-mono text-[17px] font-black text-zinc-900">
               {measure.targetValue}
             </div>
             <Button
@@ -326,13 +326,13 @@ function LeadMeasureRow({
                   measure.targetValue + 1,
                 )
               }
-              className="flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors disabled:opacity-30"
+              className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
               aria-label={t("increment")}
             >
               <DowinIcon name="action-add" size="16px" />
             </Button>
           </div>
-          <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
+          <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
             {measure.trackingMode === "COUNT" ? "일" : "회"}
           </span>
         </div>
@@ -341,10 +341,10 @@ function LeadMeasureRow({
           <>
             <span className="hidden text-zinc-300 sm:inline">·</span>
             <div className="flex items-center gap-2 sm:gap-3">
-              <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
+              <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
                 하루에
               </span>
-              <div className="flex shrink-0 items-center overflow-hidden rounded-content border border-zinc-200 bg-white shadow-sm">
+              <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-[#F2F4F6]">
                 <Button
                   type="button"
                   disabled={isMutating || measure.dailyTargetCount <= 1}
@@ -355,11 +355,11 @@ function LeadMeasureRow({
                       measure.dailyTargetCount - 1,
                     )
                   }
-                  className="flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors disabled:opacity-30"
+                  className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
                 >
                   <DowinIcon name="action-subtract" size="16px" />
                 </Button>
-                <div className="flex h-11 min-w-12 items-center justify-center border-x border-zinc-200 px-3 font-mono text-base font-black text-zinc-900">
+                <div className="flex h-12 min-w-12 items-center justify-center px-2 font-mono text-[17px] font-black text-zinc-900">
                   {measure.dailyTargetCount}
                 </div>
                 <Button
@@ -372,12 +372,12 @@ function LeadMeasureRow({
                       measure.dailyTargetCount + 1,
                     )
                   }
-                  className="flex h-11 w-11 items-center justify-center text-zinc-400 transition-colors disabled:opacity-30"
+                  className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
                 >
                   <DowinIcon name="action-add" size="16px" />
                 </Button>
               </div>
-              <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
+              <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
                 회
               </span>
             </div>
@@ -385,18 +385,18 @@ function LeadMeasureRow({
         )}
       </div>
       <div
-        className="rounded-content border border-zinc-200 bg-zinc-50/30"
+        className="rounded-[16px] bg-[#F2F4F6]"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
       >
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
           <div className="flex min-w-0 flex-1 items-start gap-3">
             <DowinIcon
               name="status-tag"
-              size="14px"
-              className="mt-1 shrink-0 text-primary/60"
+              size="16px"
+              className="mt-0.5 shrink-0 text-primary"
             />
             <div className="min-w-0 flex-1 space-y-2">
-              <p className="text-[11px] font-black uppercase tracking-wider text-zinc-400">
+              <p className="text-[12px] font-bold text-zinc-500">
                 {t("tagLabel")}
               </p>
               {measure.tags.length > 0 ? (
@@ -407,7 +407,7 @@ function LeadMeasureRow({
                       type="button"
                       disabled={isMutating}
                       onClick={() => toggleMeasureTag(measure.id, tag)}
-                      className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-[11px] font-bold text-white transition-all active:scale-95"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-white transition-all active:scale-95 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
                     >
                       #{tag.name}
                       <DowinIcon name="action-dismiss" size="12px" />
@@ -415,7 +415,7 @@ function LeadMeasureRow({
                   ))}
                 </div>
               ) : (
-                <p className="text-sm font-medium text-zinc-400">
+                <p className="text-[14px] font-medium text-zinc-400">
                   {t("noTags")}
                 </p>
               )}
@@ -426,10 +426,10 @@ function LeadMeasureRow({
             type="button"
             disabled={isMutating}
             onClick={() => setIsTagEditorOpen((previous) => !previous)}
-            className={`w-full shrink-0 rounded-button border px-4 py-2 text-xs font-bold transition-all sm:w-auto ${
+            className={`w-full shrink-0 rounded-[12px] px-4 py-2.5 text-[13px] font-bold transition-all sm:w-auto ${
               isTagEditorOpen
-                ? "border-zinc-900 bg-zinc-900 text-white"
-                : "border-zinc-200 bg-white text-zinc-600"
+                ? "bg-zinc-900 text-white"
+                : "bg-white text-zinc-700 shadow-sm"
             }`}
           >
             {isTagEditorOpen ? t("done") : t("select")}
@@ -437,12 +437,12 @@ function LeadMeasureRow({
         </div>
 
         {isTagEditorOpen ? (
-          <div className="space-y-3 border-t border-zinc-200 px-3 py-3">
+          <div className="space-y-4 border-t border-zinc-200/50 px-4 py-4 sm:px-5">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[11px] text-text-muted">
+              <p className="text-[12px] font-medium text-zinc-500">
                 {t("tagLimit", { n: MAX_MEASURE_TAGS })}
               </p>
-              <span className="text-[11px] text-text-muted">
+              <span className="text-[12px] font-bold text-zinc-500">
                 {measure.tags.length}/{MAX_MEASURE_TAGS}
               </span>
             </div>
@@ -460,7 +460,7 @@ function LeadMeasureRow({
                 return (
                   <div
                     key={tag.id}
-                    className="relative flex items-center gap-1 rounded-full border border-zinc-200 bg-white pr-1"
+                    className="relative flex items-center gap-1 rounded-full bg-white px-1 py-0.5 shadow-sm"
                   >
                     {editingTagId === tag.id ? (
                       <>
@@ -487,7 +487,7 @@ function LeadMeasureRow({
                               setEditingTagName("");
                             }
                           }}
-                          className="h-8 min-w-0 border-0 bg-transparent px-3 py-0 text-xs font-semibold text-zinc-700 focus-visible:ring-0"
+                          className="h-8 min-w-0 border-none bg-transparent px-3 py-0 text-[13px] font-semibold text-zinc-700 focus-visible:ring-0"
                         />
                         <Button
                           type="button"
@@ -502,7 +502,7 @@ function LeadMeasureRow({
                               },
                             );
                           }}
-                          className="rounded-full px-2 py-1 text-[11px] font-bold text-primary"
+                          className="rounded-full px-3 py-1 text-[12px] font-bold text-primary active:scale-95 transition-transform"
                         >
                           {t("save")}
                         </Button>
@@ -513,7 +513,7 @@ function LeadMeasureRow({
                             setEditingTagId(null);
                             setEditingTagName("");
                           }}
-                          className="rounded-full px-2 py-1 text-[11px] font-bold text-zinc-400"
+                          className="rounded-full px-3 py-1 text-[12px] font-bold text-zinc-400 active:scale-95 transition-transform"
                         >
                           {t("cancel")}
                         </Button>
@@ -524,7 +524,7 @@ function LeadMeasureRow({
                           type="button"
                           disabled={isMutating}
                           onClick={() => toggleMeasureTag(measure.id, tag)}
-                          className="rounded-full px-3 py-2 text-xs font-semibold text-zinc-600 transition-colors"
+                          className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-zinc-700 transition-colors hover:text-zinc-900 active:scale-95"
                         >
                           #{tag.name}
                         </Button>
@@ -537,13 +537,13 @@ function LeadMeasureRow({
                                 previous === tag.id ? null : tag.id,
                               )
                             }
-                            className="rounded-full p-1.5 text-zinc-400 transition-colors"
+                            className="rounded-full p-2 text-zinc-400 transition-colors hover:text-zinc-600 active:bg-zinc-100"
                             aria-label={t("edit")}
                           >
                             <DowinIcon name="action-more" size="14px" />
                           </Button>
                           {openActionTagId === tag.id ? (
-                            <div className="absolute right-0 top-8 z-10 min-w-[120px] overflow-hidden rounded-content border border-zinc-200 bg-white shadow-lg">
+                            <div className="absolute right-0 top-10 z-10 min-w-[120px] overflow-hidden rounded-[12px] border-none bg-white shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
                               <Button
                                 type="button"
                                 disabled={isMutating || isTagMutationPending}
@@ -552,9 +552,9 @@ function LeadMeasureRow({
                                   setEditingTagName(tag.name);
                                   setOpenActionTagId(null);
                                 }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-zinc-600 transition-colors"
+                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
                               >
-                                <DowinIcon name="action-edit" size="12px" />
+                                <DowinIcon name="action-edit" size="14px" />
                                 {t("edit")}
                               </Button>
                               <Button
@@ -566,9 +566,9 @@ function LeadMeasureRow({
                                   }
                                   setOpenActionTagId(null);
                                 }}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-semibold text-red-500 transition-colors"
+                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-red-500 transition-colors hover:bg-red-50"
                               >
-                                <DowinIcon name="action-delete" size="12px" />
+                                <DowinIcon name="action-delete" size="14px" />
                                 {t("delete")}
                               </Button>
                             </div>
@@ -598,7 +598,7 @@ function LeadMeasureRow({
                   }
                 }}
                 placeholder={t("newTagPlaceholder", { n: MAX_TAG_NAME_LENGTH })}
-                className="h-10 flex-1 rounded-content border border-zinc-200 bg-white px-4 text-sm"
+                className="h-[48px] flex-1 rounded-[12px] border-none bg-white px-4 text-[14px] shadow-sm focus:ring-2 focus:ring-primary/20"
               />
               <Button
                 type="button"
@@ -610,7 +610,7 @@ function LeadMeasureRow({
                     }
                   });
                 }}
-                className="rounded-button bg-primary px-4 py-2 text-sm font-bold text-white transition-opacity"
+                className="rounded-[12px] bg-primary px-5 py-3 text-[14px] font-bold text-white transition-transform active:scale-95 sm:h-[48px]"
               >
                 {t("addTag")}
               </Button>
@@ -640,7 +640,7 @@ function ArchivedMeasuresSection({
   const t = useTranslations("Setup");
 
   return (
-    <div className="border-t border-zinc-200/60 bg-zinc-50/20 px-4 py-5 sm:px-8 sm:py-6">
+    <div className="bg-zinc-100/50 px-4 py-6 sm:px-8 sm:py-8">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h3 className="text-sm font-bold text-zinc-900">
@@ -656,11 +656,11 @@ function ArchivedMeasuresSection({
       </div>
 
       {archivedMeasures.length === 0 ? (
-        <div className="mt-4 rounded-content border border-dashed border-zinc-200 bg-white/70 px-4 py-5 text-sm text-zinc-400">
+        <div className="mt-5 rounded-[16px] bg-white/60 px-4 py-6 text-center text-[14px] font-medium text-zinc-400">
           {t("noArchivedMeasures")}
         </div>
       ) : (
-        <div className="mt-4 overflow-hidden rounded-xl border border-zinc-200/80 bg-white divide-y divide-zinc-100">
+        <div className="mt-5 overflow-hidden rounded-[16px] bg-white">
           {archivedMeasures.map((measure) => {
             if (measure.isDeleted) {
               return (
@@ -680,7 +680,7 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => restoreMeasureRow(measure.id)}
-                    className="flex h-8 items-center gap-1 rounded-button border border-zinc-200 bg-white px-3 text-xs font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
+                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-[#F2F4F6] px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
                   >
                     <span>{t("cancelDelete")}</span>
                   </Button>
@@ -734,19 +734,19 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => reactivateMeasureRow(measure.id)}
-                    className="flex h-8 items-center gap-1 rounded-button border border-zinc-200 bg-white px-3 text-xs font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
+                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-[#F2F4F6] px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
                   >
-                    <DowinIcon name="action-undo" size="12px" />
+                    <DowinIcon name="action-undo" size="14px" />
                     <span>{t("reactivateMeasure")}</span>
                   </Button>
                   <Button
                     type="button"
                     disabled={isMutating}
                     onClick={() => removeMeasureRow(measure.id)}
-                    className="flex h-8 items-center gap-1 rounded-button border border-transparent bg-transparent px-3 text-xs font-bold text-red-500 transition-all active:scale-95 disabled:opacity-55"
+                    className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-red-50 text-red-500 transition-all active:scale-95 disabled:opacity-55 sm:w-auto sm:px-4 sm:bg-transparent"
                   >
-                    <DowinIcon name="action-delete" size="12px" className="text-red-400" />
-                    <span>{t("delete")}</span>
+                    <DowinIcon name="action-delete" size="14px" className="sm:mr-1.5" />
+                    <span className="hidden sm:inline font-bold text-[13px]">{t("delete")}</span>
                   </Button>
                 </div>
               </div>

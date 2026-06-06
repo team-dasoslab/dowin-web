@@ -20,18 +20,19 @@ export function SetupManageSection({
   return (
     <div className="space-y-2">
       <ActionRow
+        className="border-none rounded-[24px]"
         title={t("archiveLabel")}
         description={t("archiveDesc")}
         action={
           <Button
             type="button"
-            disabled={isMutating}
+            disabled={isArchivePending}
             onClick={() => {
-              if (confirm(t("confirmArchive"))) {
-                void archive();
+              if (confirm(t("archiveConfirm"))) {
+                archive();
               }
             }}
-            className="flex shrink-0 items-center gap-1.5 rounded-content border border-zinc-200 px-3 py-1.5 text-xs font-bold text-text-secondary transition-colors"
+            className="rounded-[12px] bg-[#F2F4F6] px-5 py-2.5 text-[14px] font-bold text-zinc-600 transition-all active:scale-95"
           >
             {isArchivePending ? (
               <InlineSpinner

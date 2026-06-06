@@ -13,7 +13,7 @@ import {
   SETUP_COACHMARK_STORAGE_KEY,
 } from "@/app/[locale]/(protected)/setup/_lib/setup-coachmark";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { SectionHeader } from "@/components/ui/SectionHeader";
+
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -140,7 +140,7 @@ export default function SetupPage() {
   const isMutating = isSubmitPending || isArchivePending;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-[#F2F4F6]">
       <SetupCoachmark
         isRunning={isCoachmarkRunning}
         mode={coachmarkMode}
@@ -165,8 +165,8 @@ export default function SetupPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 네비게이션 & 액션 ── */}
-          <aside className="sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-8 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-            <nav className="flex gap-1 lg:block lg:space-y-1">
+          <aside className="sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto bg-[#F2F4F6]/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-8 lg:overflow-visible lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+            <nav className="flex gap-2 lg:block lg:space-y-2">
               {menuGroups.map((group) => {
                 const isActive = activeSection === group.id;
                 return (
@@ -185,19 +185,14 @@ export default function SetupPage() {
                           });
                         }
                     }}
-                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
+                    className={`flex shrink-0 items-center rounded-[14px] px-4 py-3 text-left text-[15px] font-bold transition-all lg:w-full ${
                       isActive
-                        ? "text-primary"
-                        : "text-zinc-400"
+                        ? "bg-white text-zinc-900"
+                        : "text-zinc-500 hover:bg-white/50"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      {isActive && (
-                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
-                      )}
-                      <span className={isActive ? "" : "lg:pl-4"}>
-                        {group.label}
-                      </span>
+                      <span>{group.label}</span>
                     </div>
                   </button>
                 );
@@ -216,8 +211,8 @@ export default function SetupPage() {
             className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]"
           >
             {/* Dowin 섹션 */}
-            <section id="dowin" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("dowinShort")} />
+            <section id="dowin" className="space-y-4 scroll-mt-28">
+              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("dowinShort")}</h2>
               <GoalSection
                 goalName={goalName}
                 isMutating={isMutating}
@@ -226,8 +221,8 @@ export default function SetupPage() {
             </section>
 
             {/* 결과지표 섹션 */}
-            <section id="lag" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("lagMeasureLabel")} />
+            <section id="lag" className="space-y-4 scroll-mt-28">
+              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("lagMeasureLabel")}</h2>
               <LagMeasureSection
                 isMutating={isMutating}
                 lagMeasure={lagMeasure}
@@ -236,8 +231,8 @@ export default function SetupPage() {
             </section>
 
             {/* 행동지표 섹션 */}
-            <section id="lead" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("leadMeasureHead")} />
+            <section id="lead" className="space-y-4 scroll-mt-28">
+              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("leadMeasureHead")}</h2>
               <LeadMeasuresSection
                 addMeasureRow={addMeasureRow}
                 availableTags={availableTags}
@@ -265,8 +260,8 @@ export default function SetupPage() {
 
             {/* 관리 섹션 (수정 모드일 때만) */}
             {isEditMode && (
-              <section id="manage" className="space-y-5 scroll-mt-28">
-                <SectionHeader title={t("manage")} />
+              <section id="manage" className="space-y-4 scroll-mt-28">
+                <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("manage")}</h2>
                 <SetupManageSection
                   archive={archive}
                   isArchivePending={isArchivePending}
@@ -275,12 +270,14 @@ export default function SetupPage() {
               </section>
             )}
 
-            <div className="border-t border-zinc-200/60 pt-6">
-              <SetupSubmitButton
-                isEditMode={isEditMode}
-                isMutating={isMutating}
-                isSubmitPending={isSubmitPending}
-              />
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 p-4 pb-safe shadow-[0_-8px_16px_rgba(0,0,0,0.02)] backdrop-blur-md lg:static lg:bg-transparent lg:p-0 lg:pt-8 lg:shadow-none">
+              <div className="mx-auto max-w-[800px]">
+                <SetupSubmitButton
+                  isEditMode={isEditMode}
+                  isMutating={isMutating}
+                  isSubmitPending={isSubmitPending}
+                />
+              </div>
             </div>
           </form>
         </div>
@@ -292,7 +289,7 @@ export default function SetupPage() {
 
 function SetupSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-[#F2F4F6]">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-12 rounded-content bg-sub-background" />
