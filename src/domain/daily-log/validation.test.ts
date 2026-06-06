@@ -13,6 +13,17 @@ describe("DailyLog Validation", () => {
     expect(result.success).toBe(true);
   });
 
+  it("횟수형 기록 저장 요청은 count를 허용한다", () => {
+    const result = dailyLogUpsertSchema.safeParse({ count: 3 });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("count는 1 이상 20 이하만 허용한다", () => {
+    expect(dailyLogUpsertSchema.safeParse({ count: 0 }).success).toBe(false);
+    expect(dailyLogUpsertSchema.safeParse({ count: 21 }).success).toBe(false);
+  });
+
   it("미선택 상태는 DELETE로만 처리하고 false payload는 거부한다", () => {
     const result = dailyLogUpsertSchema.safeParse({ value: false });
 

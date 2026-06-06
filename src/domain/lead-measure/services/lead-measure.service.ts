@@ -12,11 +12,11 @@ import {
 
 type DailyLogSummaryPort = {
   countLogsByLeadMeasure(leadMeasureId: number): Promise<number>;
-  countTrueLogsByLeadMeasures(
+  findLogsForLeadMeasures(
     leadMeasureIds: number[],
     weekStart: string,
     weekEnd: string,
-  ): Promise<Record<number, number>>;
+  ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean; count?: number }>>;
 };
 
 type LeadMeasureStoragePort = Pick<
@@ -53,11 +53,12 @@ export class LeadMeasureService {
       status,
     );
     const { weekStart, weekEnd } = getCurrentWeekRange();
-    const counts = await this.dailyLogStorage.countTrueLogsByLeadMeasures(
+    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
       weekStart,
       weekEnd,
     );
+    const counts = countAchievedLogsByLeadMeasure(measures, logs);
 
     return measures.map((measure) => ({
       ...measure,
@@ -82,11 +83,13 @@ export class LeadMeasureService {
       throw new ForbiddenError("SCOREBOARD_ARCHIVED");
     }
 
-    validateTargetValue(input.targetValue, input.period, scoreboard.startDate);
+    const normalizedInput = normalizeLeadMeasureInput(input);
+    validateTargetValue(normalizedInput.targetValue, normalizedInput.period, scoreboard.startDate);
+    validateDailyTargetCount(normalizedInput.dailyTargetCount);
     await this.assertWorkspaceTagOwnership(scoreboard.workspaceId, input.tagIds ?? []);
 
     return await this.leadMeasureStorage.createLeadMeasure({
-      ...input,
+      ...normalizedInput,
       scoreboardId,
     });
   }
@@ -105,10 +108,14 @@ export class LeadMeasureService {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
     }
 
+    const normalizedInput = normalizeLeadMeasureUpdateInput(input, measure);
     validateTargetValue(
-      input.targetValue ?? measure.targetValue,
-      input.period ?? measure.period,
+      normalizedInput.targetValue ?? measure.targetValue,
+      normalizedInput.period ?? measure.period,
       measure.scoreboard.startDate,
+    );
+    validateDailyTargetCount(
+      normalizedInput.dailyTargetCount ?? measure.dailyTargetCount,
     );
     await this.assertWorkspaceTagOwnership(
       measure.scoreboard.workspaceId,
@@ -116,7 +123,7 @@ export class LeadMeasureService {
       input.tagIds !== undefined,
     );
 
-    return await this.leadMeasureStorage.updateLeadMeasure(id, input);
+    return await this.leadMeasureStorage.updateLeadMeasure(id, normalizedInput);
   }
 
   async archiveLeadMeasure(workspaceUid: string, id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
@@ -281,6 +288,79 @@ function validateTargetValue(
       targetValue: [`월간 목표 횟수는 ${monthlyMax}회를 초과할 수 없습니다.`],
     });
   }
+}
+
+function validateDailyTargetCount(dailyTargetCount: number) {
+  if (dailyTargetCount > 20) {
+    throw new BadRequestError("VALIDATION_ERROR", {
+      dailyTargetCount: ["하루 목표 횟수는 20회를 초과할 수 없습니다."],
+    });
+  }
+}
+
+function normalizeLeadMeasureInput<T extends {
+  trackingMode?: "BOOLEAN" | "COUNT";
+  dailyTargetCount?: number;
+}>(input: T): T & {
+  trackingMode: "BOOLEAN" | "COUNT";
+  dailyTargetCount: number;
+} {
+  const trackingMode = input.trackingMode ?? "BOOLEAN";
+  return {
+    ...input,
+    trackingMode,
+    dailyTargetCount:
+      trackingMode === "COUNT" ? input.dailyTargetCount ?? 1 : 1,
+  };
+}
+
+function normalizeLeadMeasureUpdateInput(
+  input: UpdateLeadMeasureInput,
+  measure: Pick<LeadMeasureWithScoreboard, "trackingMode" | "dailyTargetCount">,
+): UpdateLeadMeasureInput {
+  const trackingMode = input.trackingMode ?? measure.trackingMode;
+
+  if (trackingMode === "BOOLEAN" && input.trackingMode === "BOOLEAN") {
+    return { ...input, dailyTargetCount: 1 };
+  }
+
+  if (trackingMode === "COUNT" && input.dailyTargetCount === undefined) {
+    return {
+      ...input,
+      dailyTargetCount: measure.dailyTargetCount ?? 1,
+    };
+  }
+
+  return input;
+}
+
+function countAchievedLogsByLeadMeasure(
+  measures: LeadMeasureRecordWithTags[],
+  logs: Array<{ leadMeasureId: number; value: boolean; count?: number }>,
+) {
+  const measuresById = new Map(measures.map((measure) => [measure.id, measure]));
+
+  return logs.reduce<Record<number, number>>((acc, log) => {
+    if (!log.value) {
+      return acc;
+    }
+
+    const measure = measuresById.get(log.leadMeasureId);
+    if (!measure) {
+      return acc;
+    }
+
+    const count = log.count ?? 1;
+    const isAchieved =
+      measure.trackingMode === "COUNT"
+        ? count >= measure.dailyTargetCount
+        : true;
+    if (isAchieved) {
+      acc[log.leadMeasureId] = (acc[log.leadMeasureId] ?? 0) + 1;
+    }
+
+    return acc;
+  }, {});
 }
 
 function getDaysInMonthFromIsoDate(isoDate: string) {

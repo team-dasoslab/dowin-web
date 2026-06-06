@@ -12,6 +12,8 @@ type ActiveLeadMeasure = {
   name: string;
   targetValue: number;
   period: "DAILY" | "WEEKLY" | "MONTHLY";
+  trackingMode: "BOOLEAN" | "COUNT";
+  dailyTargetCount: number;
   status: "ACTIVE" | "ARCHIVED";
 };
 
@@ -27,7 +29,7 @@ type DailyLogPort = {
     leadMeasureIds: number[],
     rangeStart: string,
     rangeEnd: string,
-  ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean }>>;
+  ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean; count?: number }>>;
 };
 
 type ExportStatus = "ACHIEVED" | "MISSED" | "NOT_RECORDED";
@@ -36,6 +38,8 @@ type ExportMeasureBreakdown = {
   leadMeasureId: number;
   name: string;
   period: "DAILY" | "WEEKLY" | "MONTHLY";
+  trackingMode: "BOOLEAN" | "COUNT";
+  dailyTargetCount: number;
   achieved: number;
   total: number;
   achievementRate: number;
@@ -45,7 +49,11 @@ type ExportRow = {
   date: string;
   leadMeasureId: number;
   leadMeasureName: string;
+  period: "DAILY" | "WEEKLY" | "MONTHLY";
+  trackingMode: "BOOLEAN" | "COUNT";
+  dailyTargetCount: number;
   status: ExportStatus;
+  count: number;
 };
 
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
@@ -103,20 +111,24 @@ export class AnalyticsService {
       input.to,
     );
 
-    const logsByMeasureDate = new Map<string, boolean>();
+    const measuresById = new Map(
+      measures.map((measure) => [measure.id, measure]),
+    );
+    const logsByMeasureDate = new Map<string, { value: boolean; count: number }>();
     const trueCountByMeasureBucket = new Map<string, number>();
 
     for (const log of logs) {
-      logsByMeasureDate.set(
-        getMeasureDateKey(log.leadMeasureId, log.logDate),
-        log.value,
-      );
-      if (!log.value) {
+      const measure = measuresById.get(log.leadMeasureId);
+      if (!measure) {
         continue;
       }
 
-      const measure = measures.find((item) => item.id === log.leadMeasureId);
-      if (!measure) {
+      logsByMeasureDate.set(
+        getMeasureDateKey(log.leadMeasureId, log.logDate),
+        { value: log.value, count: log.value ? log.count ?? 1 : 0 },
+      );
+
+      if (!isLogAchieved(measure, log)) {
         continue;
       }
 
@@ -141,6 +153,8 @@ export class AnalyticsService {
         leadMeasureId: measure.id,
         name: measure.name,
         period: measure.period,
+        trackingMode: getTrackingMode(measure),
+        dailyTargetCount: getDailyTargetCount(measure),
         achieved,
         total,
         achievementRate: getRate(achieved, total),
@@ -150,13 +164,14 @@ export class AnalyticsService {
     const dailyRows: ExportRow[] = [];
     for (const date of dateRange) {
       for (const measure of measures) {
-        const value = logsByMeasureDate.get(
+        const log = logsByMeasureDate.get(
           getMeasureDateKey(measure.id, date),
         );
+        const count = log?.count ?? 0;
         const status: ExportStatus =
-          value === true
+          log && isCountAchieved(measure, count)
             ? "ACHIEVED"
-            : value === false
+            : log
               ? "MISSED"
               : "NOT_RECORDED";
 
@@ -164,7 +179,11 @@ export class AnalyticsService {
           date,
           leadMeasureId: measure.id,
           leadMeasureName: measure.name,
+          period: measure.period,
+          trackingMode: getTrackingMode(measure),
+          dailyTargetCount: getDailyTargetCount(measure),
           status,
+          count,
         });
       }
     }
@@ -211,6 +230,40 @@ function getMeasureDateKey(leadMeasureId: number, date: string) {
 
 function getMeasureBucketKey(leadMeasureId: number, bucket: string) {
   return `${leadMeasureId}:${bucket}`;
+}
+
+function isLogAchieved(
+  measure: Pick<ActiveLeadMeasure, "trackingMode" | "dailyTargetCount">,
+  log: { value: boolean; count?: number },
+) {
+  if (!log.value) {
+    return false;
+  }
+
+  return isCountAchieved(measure, log.count ?? 1);
+}
+
+function isCountAchieved(
+  measure: Pick<ActiveLeadMeasure, "trackingMode" | "dailyTargetCount">,
+  count: number,
+) {
+  if (getTrackingMode(measure) !== "COUNT") {
+    return count > 0;
+  }
+
+  return count >= getDailyTargetCount(measure);
+}
+
+function getTrackingMode(
+  measure: Pick<ActiveLeadMeasure, "trackingMode">,
+): "BOOLEAN" | "COUNT" {
+  return measure.trackingMode ?? "BOOLEAN";
+}
+
+function getDailyTargetCount(
+  measure: Pick<ActiveLeadMeasure, "dailyTargetCount">,
+) {
+  return measure.dailyTargetCount ?? 1;
 }
 
 function getBucketKey(period: "DAILY" | "WEEKLY" | "MONTHLY", date: string) {
