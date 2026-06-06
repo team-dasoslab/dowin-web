@@ -109,7 +109,16 @@ export function PricingPageClient() {
 
           {billing.entitlementSource && billing.entitlementSource !== "POLAR" ? (
             <div className="rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
-              {t("nonPolarEntitlementNotice")}
+              <span>
+                {t.rich("nonPolarEntitlementNotice", {
+                  contact: (chunks) => (
+                    <Link
+                      href={getWorkspacePath(workspaceId, "/profile/contact")}
+                      className="underline underline-offset-2 hover:text-amber-900"
+                    >{chunks}</Link>
+                  ),
+                })}
+              </span>
             </div>
           ) : null}
 
