@@ -8,6 +8,8 @@ export type MeasureInput = {
   name: string;
   period: "WEEKLY" | "MONTHLY";
   targetValue: number;
+  trackingMode: "BOOLEAN" | "COUNT";
+  dailyTargetCount: number;
   tags: SetupTag[];
   isDeleted?: boolean;
 };
@@ -73,5 +75,7 @@ export const createEmptyMeasure = (): MeasureInput => ({
   name: "",
   period: "WEEKLY",
   targetValue: 3,
+  trackingMode: "BOOLEAN",
+  dailyTargetCount: 1,
   tags: [],
 });
