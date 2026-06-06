@@ -7,13 +7,11 @@ import { useTranslations } from "next-intl";
 interface SetupManageSectionProps {
   archive: () => Promise<boolean>;
   isArchivePending: boolean;
-  isMutating: boolean;
 }
 
 export function SetupManageSection({
   archive,
   isArchivePending,
-  isMutating,
 }: SetupManageSectionProps) {
   const t = useTranslations("Setup");
 
