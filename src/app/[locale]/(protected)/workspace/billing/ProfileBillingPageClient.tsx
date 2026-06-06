@@ -228,17 +228,17 @@ export function ProfileBillingPageClient() {
                 size="14px"
                 className="mt-0.5 shrink-0"
               />
-              {t.rich("nonPolarEntitlementNotice", {
-                source: getEntitlementSourceLabel(billing.entitlementSource, t),
-                contact: (chunks) => (
-                  <Link
-                    href={getWorkspacePath(workspaceId, "/profile/contact")}
-                    className="underline underline-offset-2 hover:text-amber-900"
-                  >
-                    {chunks}
-                  </Link>
-                ),
-              })}
+              <span>
+                {t.rich("nonPolarEntitlementNotice", {
+                  source: getEntitlementSourceLabel(billing.entitlementSource, t),
+                  contact: (chunks) => (
+                    <Link
+                      href={getWorkspacePath(workspaceId, "/profile/contact")}
+                      className="underline underline-offset-2 hover:text-amber-900"
+                    >{chunks}</Link>
+                  ),
+                })}
+              </span>
             </div>
           ) : null}
         </div>
