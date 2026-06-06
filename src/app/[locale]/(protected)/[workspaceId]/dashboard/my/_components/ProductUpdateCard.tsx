@@ -4,6 +4,8 @@ import type { ProductUpdate } from "@/content/product-updates";
 import { Link } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 
 interface ProductUpdateCardProps {
   onDismiss: () => void;
@@ -16,6 +18,8 @@ export function ProductUpdateCard({
 }: ProductUpdateCardProps) {
   const t = useTranslations("Dashboard");
   const updateT = useTranslations("ProductUpdates");
+  const params = useParams();
+  const workspaceId = params.workspaceId as string | undefined;
 
   return (
     <Card className="overflow-hidden rounded-lg border border-border">
@@ -63,7 +67,7 @@ export function ProductUpdateCard({
               asChild
               className="justify-center rounded-lg border border-border bg-white px-3 py-2 text-xs font-bold text-text-secondary"
             >
-              <Link href="/updates">{t("viewAllUpdates")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile/updates")}>{t("viewAllUpdates")}</Link>
             </Button>
           </div>
         </div>
