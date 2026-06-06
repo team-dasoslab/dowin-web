@@ -747,7 +747,7 @@
     "pendingSeatValueNoDate": "다음 결제주기부터 {count}명",
     "seatChangeButton": "한도 변경",
     "seatChangeDialogTitle": "멤버 한도 변경",
-    "seatChangeDialogDesc": "새 멤버 한도를 입력하세요.\n현재 한도: {currentLimit}명\n현재 남아 있는 멤버: {currentUsed}명\n\n한도는 현재 남아 있는 멤버 수보다 작게 줄일 수 없습니다.",
+    "seatChangeDialogDesc": "새 멤버 한도를 입력하세요.",
     "seatChangePolicyTooltip": "멤버 한도는 현재 남아 있는 멤버 수 이상으로만 줄일 수 있습니다.\n\n예: 10명에서 5명으로 줄이려면 먼저 멤버를 5명까지 내보낸 뒤 한도를 5명으로 변경할 수 있습니다.\n\n한도를 낮춘 경우 다음 결제주기부터 적용되고, 한도를 높인 경우 결제 상태 갱신 후 반영됩니다.",
     "seatChangeDialogInputLabel": "멤버 한도",
     "seatChangeDialogCancel": "취소",

@@ -744,7 +744,7 @@
     "pendingSeatValueNoDate": "{count} members from the next billing cycle",
     "seatChangeButton": "Change limit",
     "seatChangeDialogTitle": "Change member limit",
-    "seatChangeDialogDesc": "Enter the new member limit.\nCurrent limit: {currentLimit}\nCurrent remaining members: {currentUsed}\n\nThe limit cannot be lower than the number of members still in the workspace.",
+    "seatChangeDialogDesc": "Enter the new member limit.",
     "seatChangePolicyTooltip": "You can only reduce the member limit to the number of members still in the workspace or higher.\n\nExample: to reduce from 10 to 5, remove members until 5 remain, then change the limit to 5.\n\nLower limits apply from the next billing cycle. Higher limits apply after the billing status is updated.",
     "seatChangeDialogInputLabel": "Member limit",
     "seatChangeDialogCancel": "Cancel",
