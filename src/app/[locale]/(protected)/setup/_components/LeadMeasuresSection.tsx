@@ -656,7 +656,7 @@ function ArchivedMeasuresSection({
       </div>
 
       {archivedMeasures.length === 0 ? (
-        <div className="mt-5 rounded-[24px] bg-zinc-50/80 px-4 py-8 text-center text-[14px] font-medium text-zinc-500">
+        <div className="mt-5 rounded-[24px] bg-zinc-100 px-4 py-8 text-center text-[14px] font-medium text-zinc-600">
           {t("noArchivedMeasures")}
         </div>
       ) : (

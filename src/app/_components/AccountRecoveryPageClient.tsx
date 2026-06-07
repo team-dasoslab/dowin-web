@@ -120,9 +120,9 @@ export default function AccountRecoveryPageClient() {
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] bg-white border border-zinc-200 rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="flex flex-col items-center text-center space-y-5 mb-10">
-          <div className="w-16 h-16 bg-white border border-zinc-200 rounded-2xl flex items-center justify-center">
+          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
             <DowinIcon
               name="auth-key-large"
               className="text-text-primary"
@@ -142,7 +142,7 @@ export default function AccountRecoveryPageClient() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
+              <label className="text-sm font-semibold text-zinc-900 ml-1">
                 {t("recoveryPage.codeLabel")}
               </label>
               <Input
@@ -150,7 +150,7 @@ export default function AccountRecoveryPageClient() {
                 value={recoveryCode}
                 onChange={(e) => setRecoveryCode(e.target.value)}
                 placeholder="6JYS-B959TK"
-                className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold uppercase tracking-wider"
+                className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5 uppercase tracking-wider"
                 required
                 disabled={isPending || Boolean(recoveryAccount)}
               />
@@ -161,24 +161,24 @@ export default function AccountRecoveryPageClient() {
 
             {recoveryAccount && (
               <div className="space-y-6 animate-fade-in-up">
-                <div className="rounded-content border border-border bg-sub-background p-5 space-y-4">
-                  <p className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em]">
+                <div className="rounded-[24px] border-none bg-zinc-100/50 p-5 space-y-4">
+                  <p className="text-xs font-bold text-zinc-500">
                     {t("recoveryPage.accountFound")}
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-text-muted uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-zinc-500">
                         {t("nickname")}
                       </p>
-                      <p className="text-sm font-bold text-text-primary truncate">
+                      <p className="text-[15px] font-bold text-zinc-900 truncate">
                         {recoveryAccount.nickname}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[10px] font-black text-text-muted uppercase tracking-wider">
+                      <p className="text-[11px] font-semibold text-zinc-500">
                         {t("id")}
                       </p>
-                      <p className="text-sm font-bold text-text-primary truncate">
+                      <p className="text-[15px] font-bold text-zinc-900 truncate">
                         {recoveryAccount.customId}
                       </p>
                     </div>
@@ -186,7 +186,7 @@ export default function AccountRecoveryPageClient() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
+                  <label className="text-sm font-semibold text-zinc-900 ml-1">
                     {t("recoveryPage.newPassword")}
                   </label>
                   <Input
@@ -194,7 +194,7 @@ export default function AccountRecoveryPageClient() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
+                    className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
                     required
                     disabled={isPending}
                   />
@@ -204,16 +204,16 @@ export default function AccountRecoveryPageClient() {
           </div>
 
           {notice && (
-            <div className="p-4 bg-success/5 border border-success/10 rounded-content">
-              <p className="text-success text-[12px] font-bold text-center leading-tight">
+            <div className="p-4 bg-blue-50 rounded-[24px]">
+              <p className="text-blue-500 text-[13px] font-bold text-center leading-tight">
                 {notice}
               </p>
             </div>
           )}
 
           {error && (
-            <div className="p-4 bg-danger/5 border border-danger/10 rounded-content animate-shake">
-              <p className="text-danger text-[12px] font-bold text-center leading-tight">
+            <div className="p-4 bg-red-50 rounded-[24px] animate-shake">
+              <p className="text-red-500 text-[13px] font-bold text-center leading-tight">
                 {error}
               </p>
             </div>
@@ -224,11 +224,10 @@ export default function AccountRecoveryPageClient() {
               type="submit"
               disabled={isPending}
               className={`
-                w-full py-4 flex items-center justify-center gap-3 rounded-button text-[15px] font-black transition-all
-                ${
-                  isPending
-                    ? "bg-sub-background text-text-muted cursor-not-allowed border border-border"
-                    : "bg-text-primary text-white"
+                h-[52px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-bold transition-colors
+                ${isPending
+                  ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                  : "bg-primary text-white hover:bg-primary/90"
                 }
               `}
             >
