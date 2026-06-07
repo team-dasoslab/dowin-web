@@ -160,7 +160,7 @@ export default function ProfileMembersPage() {
             </div>
           </div>
 
-          <div className="flex flex-col divide-y divide-zinc-100">
+          <div className="flex flex-col gap-2">
             {members.length === 0 ? (
               <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
                 {t("noMembers")}

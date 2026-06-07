@@ -285,7 +285,7 @@ export default function ProfileInvitesPage() {
             </Button>
           </div>
 
-          <div className="flex flex-col divide-y divide-zinc-100">
+          <div className="flex flex-col gap-2">
             {invites.length === 0 ? (
               <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
                 {t("noInvites")}
@@ -308,7 +308,7 @@ export default function ProfileInvitesPage() {
                 return (
                   <div
                     key={inviteId > 0 ? inviteId : `${code}-${index}`}
-                    className="flex flex-col gap-2 py-4"
+                    className="flex flex-col gap-2 rounded-[16px] px-4 py-4 transition-colors hover:bg-zinc-50 -mx-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
