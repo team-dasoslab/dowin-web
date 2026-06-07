@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/team-dasoslab/dowin-web/compare/v1.1.0...v1.1.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* 소소한 개선 ([#100](https://github.com/team-dasoslab/dowin-web/issues/100)) ([77acdee](https://github.com/team-dasoslab/dowin-web/commit/77acdee668187b8fe12ed3625be47c7d7c41ad0c))
+
 ## [1.1.0](https://github.com/team-dasoslab/dowin-web/compare/v1.0.1...v1.1.0) (2026-06-06)
 
 
