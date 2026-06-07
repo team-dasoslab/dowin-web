@@ -330,7 +330,7 @@ export default function WorkspaceSettingsPage() {
                       href="/workspace/new"
                       className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
                     >
-                      <div className="w-9 h-9 rounded-[16px] border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                      <div className="w-9 h-9 rounded-[12px] border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
                         <DowinIcon name="action-add-active" size="16px" className="text-primary" />
                       </div>
                       {commonT("createWorkspace")}
@@ -357,7 +357,7 @@ function MenuItemRow({
   const Content = (
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-        <div className={`w-9 h-9 rounded-[16px] flex items-center justify-center flex-shrink-0 ${item.danger
+        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${item.danger
             ? "bg-danger/5 text-danger"
             : "bg-zinc-100 text-zinc-500"
           }`}
