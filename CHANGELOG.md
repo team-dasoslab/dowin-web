@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/team-dasoslab/dowin-web/compare/v1.1.1...v1.1.2) (2026-06-07)
+
+
+### Bug Fixes
+
+* 브랜딩 개선 ([#102](https://github.com/team-dasoslab/dowin-web/issues/102)) ([bad48d0](https://github.com/team-dasoslab/dowin-web/commit/bad48d068e6fe276dd291c2f6315cda20114798b))
+
 ## [1.1.1](https://github.com/team-dasoslab/dowin-web/compare/v1.1.0...v1.1.1) (2026-06-07)
 
 
