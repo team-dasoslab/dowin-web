@@ -149,9 +149,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               {isLoading ? (
                 <div className="h-6 w-24 animate-pulse rounded-full bg-zinc-200" />
-              ) : (
-                <PeriodBadge label={weekLabel} size="md" />
-              )}
+              ) : null}
             </div>
           }
         />
@@ -166,6 +164,16 @@ export default function DashboardPage() {
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="summary" className="space-y-5 scroll-mt-28">
               <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("memberSummary")}</h2>
+              <TeamPeriodControls
+                isPeriodLoading={isPeriodLoading}
+                isPreviousDisabled={isPreviousDisabled}
+                isResetVisible={isResetVisible}
+                movePeriod={movePeriod}
+                resetToToday={resetToToday}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                weekLabel={weekLabel}
+              />
 
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -200,16 +208,7 @@ export default function DashboardPage() {
               <div className="px-1">
                 <h2 className="text-[22px] font-bold tracking-tight text-zinc-900">{t("teamWeeklyScoreboard")}</h2>
               </div>
-              <TeamPeriodControls
-                isPeriodLoading={isPeriodLoading}
-                isPreviousDisabled={isPreviousDisabled}
-                isResetVisible={isResetVisible}
-                movePeriod={movePeriod}
-                resetToToday={resetToToday}
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                weekLabel={weekLabel}
-              />
+
 
               {isLoading ? (
                 <div className="space-y-6">

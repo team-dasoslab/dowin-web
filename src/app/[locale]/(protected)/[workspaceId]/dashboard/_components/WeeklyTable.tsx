@@ -135,10 +135,10 @@ export function WeeklyTable({
                 <Button
                   type="button"
                   onClick={onToggleView}
-                  className={`rounded-[14px] px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                  className={`h-10 px-4 text-[13px] font-black rounded-[16px] transition-all active:scale-95 ${
                     memoMode === "view"
-                      ? "bg-primary/10 text-primary"
-                      : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
+                      : "bg-white text-zinc-900 hover:bg-zinc-50"
                   }`}
                 >
                   {t("viewMemos")}
@@ -147,10 +147,10 @@ export function WeeklyTable({
               <Button
                 type="button"
                 onClick={handleComposeClick}
-                className={`rounded-[14px] px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                className={`h-10 px-4 text-[13px] font-black rounded-[16px] transition-all active:scale-95 ${
                   memoMode === "compose"
-                    ? "bg-primary/10 text-primary"
-                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                    ? "bg-primary/10 text-primary hover:bg-primary/20"
+                    : "bg-white text-zinc-900 hover:bg-zinc-50"
                 }`}
               >
                 {t("memoButton")}
