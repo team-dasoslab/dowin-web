@@ -412,7 +412,7 @@ function InvitePageSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("ProfileInvites");
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
@@ -437,7 +437,7 @@ function NoAccessState() {
   const t = useTranslations("ProfileInvites");
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">

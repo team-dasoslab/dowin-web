@@ -872,7 +872,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
 
 function ReportLoadingState() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer spacing="compact">
         <div className="h-16 w-48 animate-pulse rounded-content bg-zinc-200" />
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
@@ -898,7 +898,7 @@ function ReportNoWorkspaceState() {
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
@@ -923,7 +923,7 @@ function ReportForbiddenState({ workspaceId }: { workspaceId: string }) {
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
@@ -950,7 +950,7 @@ function ReportErrorState({ onRetry, workspaceId }: { onRetry: () => void, works
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
