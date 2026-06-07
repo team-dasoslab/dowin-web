@@ -21,10 +21,10 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
   const hasScoreboard = member.hasScoreboard ?? false;
 
   return (
-    <Card
-      className={`bg-white border border-zinc-200 rounded-content p-6 space-y-4 transition-colors ${
+    <div
+      className={`bg-white rounded-[24px] p-6 space-y-4 transition-colors ${
         isMe
-          ? "border-primary/40 ring-1 ring-primary/20"
+          ? "ring-1 ring-primary/20"
           : ""
       }`}
     >
@@ -55,7 +55,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-text-secondary bg-sub-background border border-border rounded-content px-3 py-2">
+      <div className="flex items-center gap-2 text-xs text-text-secondary bg-zinc-50/50 rounded-[16px] px-4 py-3">
         <DowinIcon name="domain-target-arrow" size="12px" className="text-text-muted flex-shrink-0" />
         <span className="truncate">
           {hasScoreboard ? member.lagMeasure : t("noScoreboardDesc")}
@@ -66,7 +66,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
         <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("weeklyAchievement")}</span>
           <Badge
-            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-content border ${getRateTone(weeklyAchievementRate)}`}
+            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-[8px] border-none ${getRateTone(weeklyAchievementRate)}`}
           >
             {hasScoreboard ? `${weeklyAchievementRate}%` : tc("unsetTitle")}
           </Badge>
@@ -74,12 +74,12 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
         <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("monthlyAchievement")}</span>
           <Badge
-            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-content border ${getRateTone(monthlyAchievementRate)}`}
+            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-[8px] border-none ${getRateTone(monthlyAchievementRate)}`}
           >
             {hasScoreboard ? `${monthlyAchievementRate}%` : tc("unsetTitle")}
           </Badge>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

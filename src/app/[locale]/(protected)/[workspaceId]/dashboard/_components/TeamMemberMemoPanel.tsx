@@ -170,7 +170,7 @@ export function TeamMemberMemoPanel({
                   aria-label={t("closeMemo")}
                 />
                 <div
-                  className="absolute inset-x-0 bottom-0 border-t border-border bg-white px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
+                  className="absolute inset-x-0 bottom-0 bg-white px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
                 >
                   <div className="flex items-center gap-2">
                     <Input
@@ -183,7 +183,7 @@ export function TeamMemberMemoPanel({
                         }
                       }}
                       placeholder={t("addComment")}
-                      className="h-10 flex-1 rounded-button border border-border bg-white px-3 text-sm text-text-primary placeholder:text-text-muted"
+                      className="h-10 flex-1 rounded-[16px] border-none bg-zinc-100 px-3 text-sm text-text-primary placeholder:text-text-muted"
                       disabled={isCreatePending}
                     />
                     <Button
@@ -280,7 +280,7 @@ export function TeamMemberMemoPanel({
       {shouldShowMemoRail && (
         <div className="hidden space-y-3 md:hidden xl:absolute xl:left-[calc(100%+20px)] xl:top-8 xl:block xl:w-[300px]">
           {isComposeMode ? (
-            <Card className="rounded-content border border-border bg-white p-2.5 shadow-none">
+            <div className="rounded-[24px] bg-white p-2.5">
               <div className="flex items-center gap-2">
                 <Input
                   value={memoDraft}
@@ -305,7 +305,7 @@ export function TeamMemberMemoPanel({
                   <DowinIcon name="action-send" size="16px" />
                 </Button>
               </div>
-            </Card>
+            </div>
           ) : null}
 
           {memoMode === "view" && (
@@ -363,11 +363,11 @@ function MemoCard({
   const isOptimisticMemo = memo.id <= 0;
 
   return (
-    <Card
-      className={`rounded-content border px-4 py-3 transition-colors ${
+    <div
+      className={`rounded-[16px] px-4 py-3 transition-colors ${
         memo.isResolved
-          ? "border-primary/20 bg-primary/5"
-          : "border-border bg-white"
+          ? "bg-zinc-50/50"
+          : "bg-white"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -390,7 +390,7 @@ function MemoCard({
           </div>
         </div>
         {canResolveMemo || canDeleteMemo ? (
-          <div className="flex items-center overflow-hidden rounded-lg border border-border bg-white">
+          <div className="flex items-center overflow-hidden rounded-[12px] bg-zinc-100">
             {canResolveMemo ? (
               <button
                 type="button"
@@ -398,8 +398,8 @@ function MemoCard({
                 disabled={isResolvePending || isOptimisticMemo}
                 className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 ${
                   memo.isResolved
-                    ? "border-primary/25 bg-primary/10 text-primary"
-                    : "text-text-muted"
+                    ? "bg-primary/10 text-primary"
+                    : "text-text-muted hover:bg-zinc-200"
                 }`}
                 aria-label={t("verifyMemo")}
               >
@@ -411,7 +411,7 @@ function MemoCard({
                 type="button"
                 onClick={() => void onDelete(memo.id)}
                 disabled={isDeletePending || isOptimisticMemo}
-                className={`inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors disabled:opacity-50 ${ canResolveMemo ? "border-l border-border" : "" }`}
+                className="inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors disabled:opacity-50 hover:bg-zinc-200"
                 aria-label={t("deleteMemo")}
               >
                 <DowinIcon name="action-delete" size="16px" />
@@ -429,15 +429,15 @@ function MemoCard({
       >
         {memo.content}
       </p>
-    </Card>
+    </div>
   );
 }
 
 function MemoStatusCard({ message }: { message: string }) {
   return (
-    <Card className="rounded-content border border-border bg-white px-4 py-4">
+    <div className="rounded-[16px] bg-white px-4 py-4">
       <p className="text-sm text-text-muted">{message}</p>
-    </Card>
+    </div>
   );
 }
 

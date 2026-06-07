@@ -14,7 +14,6 @@ import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
@@ -166,7 +165,7 @@ export default function DashboardPage() {
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="summary" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("memberSummary")} />
+              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("memberSummary")}</h2>
 
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -178,7 +177,7 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : members.length === 0 ? (
-                <div className="border border-border rounded-content p-8 text-center text-text-muted text-sm">
+                <div className="bg-white rounded-[24px] p-8 text-center text-text-muted text-sm">
                   {t("noMembers")}
                 </div>
               ) : (
@@ -198,10 +197,9 @@ export default function DashboardPage() {
               id="scoreboard"
               className="space-y-6 overflow-visible scroll-mt-28"
             >
-              <SectionHeader
-                title={t("teamWeeklyScoreboard")}
-                description={t("teamWeeklyScoreboardDesc")}
-              />
+              <div className="px-1">
+                <h2 className="text-[22px] font-bold tracking-tight text-zinc-900">{t("teamWeeklyScoreboard")}</h2>
+              </div>
               <TeamPeriodControls
                 isPeriodLoading={isPeriodLoading}
                 isPreviousDisabled={isPreviousDisabled}

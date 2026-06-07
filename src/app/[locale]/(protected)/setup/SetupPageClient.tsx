@@ -232,7 +232,6 @@ export default function SetupPage() {
                 <SetupManageSection
                   archive={archive}
                   isArchivePending={isArchivePending}
-                  isMutating={isMutating}
                 />
               </section>
             )}

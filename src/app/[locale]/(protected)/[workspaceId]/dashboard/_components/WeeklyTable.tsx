@@ -135,10 +135,10 @@ export function WeeklyTable({
                 <Button
                   type="button"
                   onClick={onToggleView}
-                  className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                  className={`rounded-[14px] px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
                     memoMode === "view"
-                      ? "border-primary/25 bg-primary/10 text-primary"
-                      : "border-border bg-white text-text-secondary"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                   }`}
                 >
                   {t("viewMemos")}
@@ -147,10 +147,10 @@ export function WeeklyTable({
               <Button
                 type="button"
                 onClick={handleComposeClick}
-                className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                className={`rounded-[14px] px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
                   memoMode === "compose"
-                    ? "border-primary/25 bg-primary/10 text-primary"
-                    : "border-border bg-white text-text-secondary"
+                    ? "bg-primary/10 text-primary"
+                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                 }`}
               >
                 {t("memoButton")}
@@ -174,7 +174,7 @@ export function WeeklyTable({
             return (
               <div
                 key={`${member.userId}-${leadMeasure.id}-mobile`}
-                className="rounded-content border border-zinc-200 bg-white p-5"
+                className="rounded-[24px] bg-white p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <LeadMeasureSummary name={leadMeasure.name} />
@@ -249,10 +249,10 @@ export function WeeklyTable({
           })}
         </div>
 
-        <div className="hidden overflow-hidden rounded-content border border-zinc-200 md:block">
+        <div className="hidden overflow-hidden rounded-[24px] bg-white md:block">
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
-              <div className="bg-zinc-100 border-b border-zinc-200">
+              <div className="bg-zinc-50/50">
                 <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[38%]" />
