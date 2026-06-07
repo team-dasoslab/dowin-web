@@ -103,20 +103,32 @@ export default function ProfileMembersPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer>
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title={t("header")} />
 
-        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
-            <DowinIcon name="domain-people" size="20px" />
+        <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5">
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
+              <DowinIcon name="domain-people" size="20px" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-bold tracking-tight text-zinc-900">
+                {workspace.name}
+              </h1>
+              <p className="mt-0.5 truncate text-xs text-zinc-500">
+                {t("membersCountDesc", { count: members.length })}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h1 className="text-lg font-bold tracking-tight text-text-primary">
-              {workspace.name}
-            </h1>
-            <p className="mt-0.5 text-xs text-text-muted">
-              {t("membersCountDesc", { count: members.length })}
-            </p>
+          <div className="flex shrink-0 items-center">
+            <Button
+              asChild
+              className="h-9 rounded-[12px] bg-zinc-100 px-3.5 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
+            >
+              <Link href={getWorkspacePath(workspaceParamId, "/workspace/invites")}>
+                {t("invitesCardButton")}
+              </Link>
+            </Button>
           </div>
         </div>
 
@@ -128,45 +140,30 @@ export default function ProfileMembersPage() {
           />
         ) : null}
 
-        <div className="flex items-center justify-between gap-3 rounded-[24px] bg-white p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("invitesCardTitle")}
-            </h2>
-            <p className="text-[11px] text-text-muted">
-              {t("invitesCardDesc")}
-            </p>
-          </div>
-          <Button
-            asChild
-            className="btn-dowin-primary rounded-content px-3 py-2 text-xs font-bold"
-          >
-            <Link href={getWorkspacePath(workspaceParamId, "/workspace/invites")}>
-              {t("invitesCardButton")}
-            </Link>
-          </Button>
-        </div>
-
-        <div className="space-y-4 rounded-[24px] bg-white p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("currentMembersTitle")}
-              <span
-                className={`ml-2 text-xs font-semibold ${
-                  isAtOrOverMemberLimit ? "text-danger" : "text-text-secondary"
-                }`}
-              >
-                {`${members.length} / ${memberLimit}`}
+        <div className="space-y-4 rounded-[24px] bg-white p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="space-y-1">
+              <h2 className="text-sm font-bold text-zinc-900">
+                {t("currentMembersTitle")}
+              </h2>
+            </div>
+            <div
+              className={`flex shrink-0 items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-bold tracking-tight ${
+                isAtOrOverMemberLimit
+                  ? "bg-red-50 text-red-600"
+                  : "bg-zinc-100 text-zinc-600"
+              }`}
+            >
+              <span>{members.length}</span>
+              <span className={isAtOrOverMemberLimit ? "text-red-400" : "text-zinc-400"}>
+                / {memberLimit}
               </span>
-            </h2>
-            <p className="text-[11px] text-text-muted">
-              {t("currentMembersDesc")}
-            </p>
+            </div>
           </div>
 
           <div className="overflow-hidden rounded-[16px] bg-zinc-50/50">
             {members.length === 0 ? (
-              <div className="bg-white px-4 py-10 text-center text-sm text-text-muted">
+              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
                 {t("noMembers")}
               </div>
             ) : (

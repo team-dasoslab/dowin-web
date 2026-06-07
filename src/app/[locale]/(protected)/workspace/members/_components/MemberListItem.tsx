@@ -36,9 +36,7 @@ export function MemberListItem({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white px-4 py-3 ${
-        index < totalCount - 1 ? "border-b border-border" : ""
-      }`}
+      className="flex flex-col justify-between gap-3 bg-white px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4"
     >
       <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto">
         <UserAvatar
@@ -49,20 +47,20 @@ export function MemberListItem({
         />
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <p className="truncate text-sm font-semibold text-text-primary">
+            <p className="truncate text-sm font-semibold text-zinc-900">
               {nickname}
             </p>
             <Badge
               className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                 member.role === "ADMIN"
                   ? "bg-primary/10 text-primary"
-                  : "bg-sub-background text-text-muted"
+                  : "bg-zinc-100 text-zinc-500"
               }`}
             >
               {member.role === "ADMIN" ? "ADMIN" : "MEMBER"}
             </Badge>
             {isSelf ? (
-              <Badge className="rounded-full bg-sub-background px-2 py-0.5 text-[10px] font-bold text-text-muted">
+              <Badge className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold text-zinc-500">
                 {t("me")}
               </Badge>
             ) : null}
@@ -76,9 +74,8 @@ export function MemberListItem({
             type="button"
             disabled={isPendingTransfer || isPendingDelete}
             onClick={() => onTransferAdmin(memberId, nickname)}
-            className="flex min-w-fit items-center justify-center gap-1.5 rounded-content border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary transition-colors"
+            className="flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] bg-primary/10 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
           >
-            <DowinIcon name="status-locked" size="14px" />
             <span>{isPendingTransfer ? t("processing") : t("transferAdmin")}</span>
           </Button>
         ) : null}
@@ -87,13 +84,12 @@ export function MemberListItem({
           type="button"
           disabled={!canRemove || isPendingDelete || isPendingTransfer}
           onClick={() => onRemove(memberId, nickname)}
-          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-content px-3 py-2 text-xs font-bold transition-colors ${
+          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] px-3 py-2 text-xs font-bold transition-colors ${
             canRemove
-              ? "border border-danger/20 bg-danger/5 text-danger"
-              : "cursor-not-allowed border border-border bg-sub-background text-text-muted"
+              ? "bg-red-50 text-red-600 hover:bg-red-100"
+              : "cursor-not-allowed bg-zinc-100 text-zinc-400"
           }`}
         >
-          <DowinIcon name="action-member-remove" size="14px" />
           <span>{isPendingDelete ? t("processing") : t("remove")}</span>
         </Button>
       </div>

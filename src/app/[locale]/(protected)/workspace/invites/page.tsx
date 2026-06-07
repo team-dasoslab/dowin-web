@@ -119,7 +119,7 @@ export default function ProfileInvitesPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer>
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
@@ -127,10 +127,10 @@ export default function ProfileInvitesPage() {
             <DowinIcon name="domain-ticket-diagonal" size="20px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold tracking-tight text-text-primary">
+            <h1 className="text-lg font-bold tracking-tight text-zinc-900">
               {workspace.name}
             </h1>
-            <p className="mt-0.5 text-xs text-text-muted">
+            <p className="mt-0.5 text-xs text-zinc-500">
               {t("invitesCountDesc", {
                 total: invites.length,
                 active: activeInviteCount,
@@ -147,24 +147,24 @@ export default function ProfileInvitesPage() {
           />
         ) : null}
 
-        <div className="space-y-4 rounded-[24px] bg-white p-4">
+        <div className="space-y-4 rounded-[24px] bg-white p-5">
           <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
+            <h2 className="text-sm font-bold text-zinc-900">
               {t("newInviteTitle")}
             </h2>
-            <p className="text-[11px] text-text-muted">{t("newInviteDesc")}</p>
+            <p className="text-[11px] text-zinc-500">{t("newInviteDesc")}</p>
           </div>
 
-          <div className="space-y-3 rounded-[16px] bg-zinc-50/50 p-3">
+          <div className="space-y-3 rounded-[16px] bg-zinc-50/50 p-4">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold text-text-secondary">
+              <p className="text-[11px] font-bold text-zinc-600">
                 {t("maxUsesLabel")}
               </p>
-              <p className="text-[11px] text-text-muted">{t("maxUsesLimit")}</p>
+              <p className="text-[11px] text-zinc-500">{t("maxUsesLimit")}</p>
             </div>
 
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-11 min-w-0 items-center gap-2 rounded-[12px] bg-white border border-zinc-200/60 px-3 text-xs text-text-secondary">
+              <label className="flex h-11 min-w-0 items-center gap-2 rounded-[12px] bg-white px-4 text-xs text-zinc-600">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -178,9 +178,9 @@ export default function ProfileInvitesPage() {
                     handleMaxUsesInputChange(event.target.value)
                   }
                   placeholder={t("maxUsesPlaceholder")}
-                  className="h-full min-w-0 border-0 bg-transparent p-0 text-right text-sm font-semibold text-text-primary outline-none focus-visible:ring-0"
+                  className="h-full min-w-0 border-0 bg-transparent p-0 text-right text-sm font-semibold text-zinc-900 outline-none focus-visible:ring-0"
                 />
-                <span className="shrink-0 text-[11px] text-text-muted">
+                <span className="shrink-0 text-[11px] text-zinc-500">
                   {t("maxUsesUnit")}
                 </span>
               </label>
@@ -191,8 +191,8 @@ export default function ProfileInvitesPage() {
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
                 className={`h-11 rounded-[12px] px-4 text-xs font-bold ${
                   isCreatingInvite || isOverFreeMemberLimit
-                    ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
-                    : "btn-dowin-primary"
+                    ? "cursor-not-allowed bg-zinc-200 text-zinc-400"
+                    : "bg-primary text-white"
                 }`}
               >
                 {isCreatingInvite ? t("creatingButton") : t("createButton")}
@@ -207,8 +207,8 @@ export default function ProfileInvitesPage() {
                   onClick={() => selectPresetMaxUses(value)}
                   className={`h-7 rounded-full px-2.5 text-[11px] font-bold ${
                     Number(maxUsesInput) === value
-                      ? "border border-primary/20 bg-primary/10 text-primary"
-                      : "border border-border bg-white text-text-muted"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-white text-zinc-500"
                   }`}
                 >
                   {t("presetUnit", { count: value })}
@@ -229,17 +229,17 @@ export default function ProfileInvitesPage() {
           </div>
         </div>
 
-        <div className="space-y-4 rounded-[24px] bg-white p-4">
+        <div className="space-y-4 rounded-[24px] bg-white p-5">
           <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
+            <h2 className="text-sm font-bold text-zinc-900">
               {t("inviteListTitle")}
             </h2>
-            <p className="text-[11px] text-text-muted">{t("inviteListDesc")}</p>
+            <p className="text-[11px] text-zinc-500">{t("inviteListDesc")}</p>
           </div>
 
-          <div className="overflow-hidden rounded-[16px] border border-zinc-100">
+          <div className="overflow-hidden rounded-[16px] bg-zinc-50/50">
             {invites.length === 0 ? (
-              <div className="bg-white px-4 py-10 text-center text-sm text-text-muted">
+              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
                 {t("noInvites")}
               </div>
             ) : (
@@ -256,20 +256,18 @@ export default function ProfileInvitesPage() {
                 return (
                   <div
                     key={inviteId > 0 ? inviteId : `${code}-${index}`}
-                    className={`space-y-3 bg-white px-4 py-3 ${
-                      index < invites.length - 1 ? "border-b border-zinc-100" : ""
-                    }`}
+                    className="space-y-3 bg-white px-4 py-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
-                        <p className="truncate font-mono text-sm font-bold tracking-wide text-text-primary">
+                        <p className="truncate font-mono text-sm font-bold tracking-wide text-zinc-900">
                           {code || t("noCode")}
                         </p>
                         <Badge
                           className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                             isActive
                               ? "bg-primary/10 text-primary"
-                              : "border border-border bg-white text-text-secondary"
+                              : "bg-zinc-100 text-zinc-600"
                           }`}
                         >
                           {isActive ? t("active") : t("inactive")}
@@ -280,7 +278,7 @@ export default function ProfileInvitesPage() {
                         <Button
                           type="button"
                           onClick={() => void copyInviteCode(inviteId, code)}
-                          className="h-8 rounded-[12px] border border-zinc-200/60 bg-white px-2.5 text-[11px] font-bold text-text-primary hover:bg-zinc-50"
+                          className="h-8 rounded-[12px] bg-zinc-100 px-2.5 text-[11px] font-bold text-zinc-700 hover:bg-zinc-200"
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
@@ -326,7 +324,7 @@ export default function ProfileInvitesPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-2">
-                      <span className="text-[10px] font-bold tracking-wide text-text-muted">
+                      <span className="text-[10px] font-bold tracking-wide text-zinc-500">
                         {t("usageLabel", { usage: usageLabel })}
                       </span>
                       {isActive && isOverFreeMemberLimit ? (

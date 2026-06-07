@@ -170,7 +170,7 @@ export function ProfileBillingPageClient() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="space-y-8 lg:space-y-12">
+      <ProtectedPageContainer className="max-w-[640px] space-y-6">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="space-y-4">
@@ -192,7 +192,7 @@ export function ProfileBillingPageClient() {
                   type="button"
                   onClick={() => void openPortal()}
                   disabled={isPortalPending}
-                  className="h-10 rounded-button border border-zinc-200 bg-white px-5 text-sm font-black text-zinc-600 transition-colors"
+                  className="h-10 rounded-[12px] bg-zinc-100 px-5 text-sm font-bold text-zinc-700 hover:bg-zinc-200 transition-colors"
                 >
                   {isPortalPending ? t("portalLoading") : t("portalButton")}
                 </Button>
@@ -243,7 +243,7 @@ export function ProfileBillingPageClient() {
         </div>
 
         <section className="space-y-4">
-          <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("currentPlanTitle")}</h2>
+          <h2 className="px-1 text-lg font-bold tracking-tight text-zinc-900">{t("currentPlanTitle")}</h2>
           <div className="divide-y divide-zinc-100 rounded-[24px] bg-white overflow-hidden">
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-3">
@@ -327,7 +327,7 @@ export function ProfileBillingPageClient() {
                             type="button"
                             onClick={handleSeatChangeClick}
                             disabled={isUpdatingSeats}
-                            className="whitespace-nowrap h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
+                            className="whitespace-nowrap h-8 rounded-[12px] bg-zinc-100 px-3 text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors"
                           >
                             {isUpdatingSeats
                               ? t("seatChangeDialogSubmitting")
@@ -393,7 +393,7 @@ export function ProfileBillingPageClient() {
                 <Button
                   type="button"
                   onClick={() => void refetch()}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-button border border-primary/20 bg-white px-4 text-[12px] font-bold text-primary transition-all"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] bg-primary px-4 text-[12px] font-bold text-white transition-all"
                 >
                   <DowinIcon
                     name="action-refresh"
@@ -475,7 +475,7 @@ function BillingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
+              className="rounded-[12px] bg-zinc-100 px-5 py-3 text-sm font-bold text-zinc-900 hover:bg-zinc-200 transition-colors"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -603,7 +603,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
           <Button
             type="button"
             onClick={onRefresh}
-            className="btn-dowin-primary h-12 w-full text-[15px] font-black"
+            className="rounded-[12px] bg-primary text-white h-12 w-full text-[15px] font-bold hover:bg-primary/90 transition-colors"
           >
             {t("refresh")}
           </Button>
