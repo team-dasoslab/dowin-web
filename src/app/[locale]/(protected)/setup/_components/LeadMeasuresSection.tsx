@@ -5,7 +5,7 @@ import {
   type SetupTag,
 } from "@/app/[locale]/(protected)/setup/_lib/measure";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+
 import { Input } from "@/components/ui/Input";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
@@ -62,7 +62,7 @@ export function LeadMeasuresSection({
   ).length;
 
   return (
-    <Card className="border-none rounded-[24px] overflow-hidden" data-coachmark="setup-lead">
+    <div className="bg-white rounded-[24px] overflow-hidden" data-coachmark="setup-lead">
       <div className="divide-y divide-zinc-200/60">
         {activeMeasures.map((measure, index) => (
           <LeadMeasureRow
@@ -108,7 +108,7 @@ export function LeadMeasuresSection({
         removeMeasureRow={removeMeasureRow}
         restoreMeasureRow={restoreMeasureRow}
       />
-    </Card>
+    </div>
   );
 }
 
@@ -200,7 +200,7 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating || measuresCount <= 1}
                 onClick={() => archiveMeasureRow(measure.id)}
-                className="rounded-content px-3 py-1 text-xs font-bold text-zinc-500 transition-colors disabled:opacity-40"
+                className="flex h-8 items-center gap-1.5 rounded-button bg-zinc-100 px-3 text-[12px] font-bold text-text-primary transition-colors disabled:opacity-40 hover:bg-zinc-200"
               >
                 {t("archiveMeasure")}
               </Button>
@@ -208,7 +208,7 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating}
                 onClick={() => removeMeasureRow(measure.id)}
-                className="rounded-content px-3 py-1 text-xs font-bold text-red-500 transition-colors"
+                className="flex h-8 items-center gap-1.5 rounded-button bg-red-50 px-3 text-[12px] font-bold text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
               >
                 {t("delete")}
               </Button>
@@ -218,7 +218,7 @@ function LeadMeasureRow({
               type="button"
               disabled={isMutating}
               onClick={() => removeMeasureRow(measure.id)}
-              className="rounded-content px-3 py-1 text-xs font-bold text-red-500 transition-colors"
+              className="flex h-8 items-center gap-1.5 rounded-button bg-red-50 px-3 text-[12px] font-bold text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
             >
               {t("delete")}
             </Button>
@@ -233,7 +233,7 @@ function LeadMeasureRow({
           handleMeasureChange(measure.id, "name", e.target.value)
         }
         placeholder={t("leadMeasurePlaceholder")}
-        className="w-full rounded-[16px] border-none bg-zinc-100 px-5 py-4 text-[17px] font-semibold text-zinc-900 focus:bg-[#E8F3FF] focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-zinc-400"
+        className="h-11 w-full rounded-[12px] border-none bg-zinc-100 px-4 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
         required
       />
 
@@ -598,7 +598,7 @@ function LeadMeasureRow({
                   }
                 }}
                 placeholder={t("newTagPlaceholder", { n: MAX_TAG_NAME_LENGTH })}
-                className="h-[48px] flex-1 rounded-[12px] border-none bg-white px-4 text-[14px] shadow-sm focus:ring-2 focus:ring-primary/20"
+                className="h-11 flex-1 rounded-[12px] border-none bg-white px-4 text-[14px] font-medium shadow-sm transition-colors placeholder:text-zinc-500 focus:ring-4 focus:ring-primary/5"
               />
               <Button
                 type="button"
@@ -640,10 +640,10 @@ function ArchivedMeasuresSection({
   const t = useTranslations("Setup");
 
   return (
-    <div className="bg-zinc-100/50 px-4 py-6 sm:px-8 sm:py-8">
+    <div className="px-4 py-6 sm:px-8 sm:py-8">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h3 className="text-sm font-bold text-zinc-900">
+          <h3 className="text-[16px] font-bold text-zinc-900">
             {t("archivedMeasuresTitle")}
           </h3>
           <p className="text-xs text-text-secondary">
@@ -656,11 +656,11 @@ function ArchivedMeasuresSection({
       </div>
 
       {archivedMeasures.length === 0 ? (
-        <div className="mt-5 rounded-[16px] bg-white/60 px-4 py-6 text-center text-[14px] font-medium text-zinc-400">
+        <div className="mt-5 rounded-[24px] bg-zinc-50/80 px-4 py-8 text-center text-[14px] font-medium text-zinc-500">
           {t("noArchivedMeasures")}
         </div>
       ) : (
-        <div className="mt-5 overflow-hidden rounded-[16px] bg-white">
+        <div className="mt-5 overflow-hidden rounded-[24px] bg-zinc-50/80">
           {archivedMeasures.map((measure) => {
             if (measure.isDeleted) {
               return (

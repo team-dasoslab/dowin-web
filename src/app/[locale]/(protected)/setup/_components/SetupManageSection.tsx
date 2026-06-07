@@ -37,9 +37,7 @@ export function SetupManageSection({
                 size="sm"
                 className="border-text-secondary/20 border-t-text-secondary"
               />
-            ) : (
-              <DowinIcon name="action-archive" size="14px" />
-            )}
+            ) : null}
             {isArchivePending ? t("archivingBtn") : t("archiveBtn")}
           </Button>
         }
