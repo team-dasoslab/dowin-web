@@ -235,39 +235,29 @@ function ContactInquiryComposer({
               </div>
 
               {/* Reply Email */}
-              <div className="flex flex-col gap-2.5">
-                <label className="text-[13px] font-black tracking-wide text-zinc-900">
-                  {t("replyEmailLabel")}
-                </label>
-                <Input
-                  type="email"
-                  value={form.values.replyEmail}
-                  onChange={(event) =>
-                    form.setField("replyEmail", event.target.value)
-                  }
-                  placeholder={t("replyEmailPlaceholder")}
-                  disabled={isSubmitting}
-                  className="h-12 w-full rounded-[12px] border-none bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-primary/5"
-                />
-                <FieldError message={form.errors.replyEmail} />
-              </div>
+              <Input
+                label={t("replyEmailLabel")}
+                type="email"
+                value={form.values.replyEmail}
+                onChange={(event) =>
+                  form.setField("replyEmail", event.target.value)
+                }
+                placeholder={t("replyEmailPlaceholder")}
+                disabled={isSubmitting}
+              />
+              <FieldError message={form.errors.replyEmail} />
 
               {/* Subject */}
-              <div className="flex flex-col gap-2.5">
-                <label className="text-[13px] font-black tracking-wide text-zinc-900">
-                  {t("subjectLabel")}
-                </label>
-                <Input
-                  value={form.values.subject}
-                  onChange={(event) =>
-                    form.setField("subject", event.target.value)
-                  }
-                  placeholder={t("subjectPlaceholder")}
-                  disabled={isSubmitting}
-                  className="h-12 w-full rounded-[12px] border-none bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-primary/5"
-                />
-                <FieldError message={form.errors.subject} />
-              </div>
+              <Input
+                label={t("subjectLabel")}
+                value={form.values.subject}
+                onChange={(event) =>
+                  form.setField("subject", event.target.value)
+                }
+                placeholder={t("subjectPlaceholder")}
+                disabled={isSubmitting}
+              />
+              <FieldError message={form.errors.subject} />
 
               {/* Message */}
               <div className="flex flex-col gap-2.5">

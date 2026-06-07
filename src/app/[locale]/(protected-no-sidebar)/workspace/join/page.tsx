@@ -45,21 +45,16 @@ export default function JoinWorkspacePage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="space-y-4">
-            <label className="text-[11px] block font-black text-zinc-400 uppercase tracking-widest ml-1">
-              {t("label")}
-            </label>
-            <Input
-              type="text"
-              value={inviteCode}
-              disabled={isPending}
-              onChange={(e) => handleInviteCodeChange(e.target.value)}
-              placeholder={t("placeholder")}
-              autoFocus
-              className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
-              required
-            />
-          </div>
+          <Input
+            label={t("label")}
+            type="text"
+            value={inviteCode}
+            disabled={isPending}
+            onChange={(e) => handleInviteCodeChange(e.target.value)}
+            placeholder={t("placeholder")}
+            autoFocus
+            required
+          />
 
           {error && (
             <div className="p-4 bg-danger/5 border border-danger/10 rounded-[16px]">

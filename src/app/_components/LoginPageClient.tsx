@@ -312,48 +312,33 @@ export default function LoginPageClient() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-5">
             {mode === "signup" && (
-              <div className="space-y-2 animate-fade-in-up">
-                <label className="text-sm font-semibold text-zinc-900 ml-1">
-                  {t("nickname")}
-                </label>
-                <Input
-                  type="text"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  placeholder={t("nicknamePlaceholder")}
-                  className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
-                  required
-                />
-              </div>
+              <Input
+                label={t("nickname")}
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder={t("nicknamePlaceholder")}
+                containerClassName="animate-fade-in-up"
+                required
+              />
             )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-zinc-900 ml-1">
-                {t("id")}
-              </label>
-              <Input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                placeholder={t("idPlaceholder")}
-                className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
-                required
-              />
-            </div>
+            <Input
+              label={t("id")}
+              type="text"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+              placeholder={t("idPlaceholder")}
+              required
+            />
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-zinc-900 ml-1">
-                {t("password")}
-              </label>
-              <PasswordInput
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                placeholder={t("passwordPlaceholder")}
-                className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 pr-14 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
-                toggleClassName="absolute right-4 top-1/2 flex -translate-y-1/2 items-center text-zinc-500 transition-colors"
-                required
-              />
-            </div>
+            <PasswordInput
+              label={t("password")}
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder={t("passwordPlaceholder")}
+              required
+            />
           </div>
 
           {error && (

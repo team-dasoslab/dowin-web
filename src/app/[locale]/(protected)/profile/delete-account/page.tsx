@@ -92,18 +92,13 @@ function PasswordField({
   value,
 }: PasswordFieldProps) {
   return (
-    <label className="block space-y-2">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-text-primary">{label}</span>
-      </div>
-      <PasswordInput
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className="h-11 w-full rounded-[12px] border-none bg-zinc-100 px-3 pr-20 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-red-500/10"
-        toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors"
-      />
-    </label>
+    <PasswordInput
+      label={label}
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      className="focus:ring-red-500/10"
+    />
   );
 }
 
@@ -123,17 +118,15 @@ function TextField({
   value,
 }: TextFieldProps) {
   return (
-    <label className="block space-y-2">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-text-primary">{label}</span>
-      </div>
+    <div className="space-y-1">
       <Input
+        label={label}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-[12px] border-none bg-zinc-100 px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-red-500/10"
+        className="focus:ring-red-500/10"
       />
-      {hint ? <p className="text-[11px] text-text-muted">{hint}</p> : null}
-    </label>
+      {hint ? <p className="text-[11px] text-zinc-500 pl-1">{hint}</p> : null}
+    </div>
   );
 }

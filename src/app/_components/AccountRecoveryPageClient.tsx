@@ -141,20 +141,18 @@ export default function AccountRecoveryPageClient() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-zinc-900 ml-1">
-                {t("recoveryPage.codeLabel")}
-              </label>
+            <div>
               <Input
+                label={t("recoveryPage.codeLabel")}
                 type="text"
                 value={recoveryCode}
                 onChange={(e) => setRecoveryCode(e.target.value)}
                 placeholder="6JYS-B959TK"
-                className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5 uppercase tracking-wider"
+                className="uppercase tracking-wider"
                 required
                 disabled={isPending || Boolean(recoveryAccount)}
               />
-              <p className="text-[11px] text-text-muted font-medium ml-1">
+              <p className="text-[11px] text-text-muted font-medium ml-1 mt-2">
                 {t("recoveryPage.codeHint")}
               </p>
             </div>
@@ -185,20 +183,14 @@ export default function AccountRecoveryPageClient() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-zinc-900 ml-1">
-                    {t("recoveryPage.newPassword")}
-                  </label>
-                  <Input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
-                    required
-                    disabled={isPending}
-                  />
-                </div>
+                <PasswordInput
+                  label={t("recoveryPage.newPassword")}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  disabled={isPending}
+                />
               </div>
             )}
           </div>
