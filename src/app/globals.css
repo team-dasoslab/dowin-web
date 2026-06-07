@@ -24,7 +24,7 @@
     "Segoe UI Symbol", "Noto Color Emoji";
 
   --radius-content: 0.5rem;
-  --radius-button: 0.375rem;
+  --radius-button: 0.75rem;
 
   /* === Safe Area Insets (Synced via Bridge) === */
   --safe-area-inset-top: 0px;

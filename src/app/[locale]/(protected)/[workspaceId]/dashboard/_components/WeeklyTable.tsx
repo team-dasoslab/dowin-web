@@ -135,7 +135,7 @@ export function WeeklyTable({
                 <Button
                   type="button"
                   onClick={onToggleView}
-                  className={`h-10 px-4 text-[13px] font-black rounded-[16px] transition-all active:scale-95 ${
+                  className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all active:scale-95 ${
                     memoMode === "view"
                       ? "bg-primary/10 text-primary hover:bg-primary/20"
                       : "bg-white text-zinc-900 hover:bg-zinc-50"
@@ -147,7 +147,7 @@ export function WeeklyTable({
               <Button
                 type="button"
                 onClick={handleComposeClick}
-                className={`h-10 px-4 text-[13px] font-black rounded-[16px] transition-all active:scale-95 ${
+                className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all active:scale-95 ${
                   memoMode === "compose"
                     ? "bg-primary/10 text-primary hover:bg-primary/20"
                     : "bg-white text-zinc-900 hover:bg-zinc-50"
