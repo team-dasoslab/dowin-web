@@ -85,7 +85,7 @@
     "monthlyAchievementRate": "Monthly Achievement",
     "monthlyAchievementRateWithMonth": "Monthly Achievement ({month})",
     "recentTrend": "Last 4 Weeks Trend",
-    "viewAllUpdates": "View all updates",
+    "viewAllUpdates": "What's New",
     "monthlyBoardTitle": "Monthly Board",
     "monthlyBoardDesc": "View all records for the selected month by week.",
     "noMonthlyMeasures": "No monthly action items for this month.",
@@ -874,7 +874,7 @@
     "loadFailedDesc": "Please try again shortly."
   },
   "ProductUpdates": {
-    "header": "Product Updates",
+    "header": "What's New",
     "recommendedBadge": "Recommended",
     "latestTitle": "Newest Features",
     "latestDesc": "Quickly browse what's new and try them out.",
