@@ -55,7 +55,7 @@ export default function NewWorkspacePage() {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
       {isPending && (
         <LoadingOverlay message={promotionCode ? t("loadingPromo") : t("loading")} />
