@@ -112,15 +112,6 @@ export function PeriodControls({
 
       {/* ─── 데스크톱 레이아웃 (sm 이상) ─── */}
       <div className="hidden sm:flex flex-col gap-4 py-2 select-none">
-        {/* Row 1: Title */}
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-[18px] font-black tracking-tight text-zinc-900">
-            {selectedView === "week"
-              ? t("weeklyLeadMeasures")
-              : t("monthlyAggregation")}
-          </h2>
-        </div>
-
         {/* Row 2: Navigation & Settings */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
           <div className="flex items-center gap-2">

@@ -195,7 +195,7 @@ function WeeklyMobileCardDay({
                 setOpenPopover(!openPopover);
               }
             }}
-            className={`flex aspect-square w-full items-center justify-center rounded-[14px] p-0 transition-all active:scale-95 ${
+            className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
               isAchieved
                 ? "bg-primary text-white"
                 : (count ?? 0) > 0
@@ -308,7 +308,7 @@ function WeeklyMobileCardDay({
               void toggleLog(leadMeasureId, date);
             }
           }}
-          className={`flex aspect-square w-full items-center justify-center rounded-[14px] p-0 transition-all active:scale-95 ${
+          className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
             isAchieved
               ? "bg-primary text-white"
               : isToday

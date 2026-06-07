@@ -48,7 +48,7 @@ export function SegmentedControl<T extends string>({
             disabled={disabled}
             className={`flex-1 font-black whitespace-nowrap transition-all ${buttonClasses[size]} ${
               isActive
-                ? "bg-white text-zinc-900 shadow-sm"
+                ? "bg-white text-zinc-900 "
                 : "text-zinc-500 hover:text-zinc-700"
             }`}
           >

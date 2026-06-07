@@ -269,7 +269,7 @@ export function WeeklyBoardSection({
                                         : `${leadMeasure.id}-${date}`,
                                     )
                                   }
-                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center rounded-[12px] p-0 transition-all active:scale-95 ${
+                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
                                     isAchievedDaily
                                       ? "bg-primary text-white"
                                       : count > 0
@@ -336,7 +336,7 @@ export function WeeklyBoardSection({
                                     void toggleLog(leadMeasureId, date);
                                   }
                                 }}
-                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center rounded-[12px] p-0 transition-all active:scale-95 ${
+                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
                                   currentValue === true
                                     ? "bg-primary text-white"
                                     : isToday

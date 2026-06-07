@@ -87,9 +87,9 @@ function MonthlyMobileWeekCard({
   const t = useTranslations("Dashboard");
 
   return (
-    <div className="rounded-[24px] bg-white p-5">
-      <div className="flex items-center justify-between gap-2 border-b-2 border-zinc-50 pb-4">
-        <p className="text-[15px] font-black text-zinc-900">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-2 px-1 pt-2">
+        <p className="text-[14px] font-black text-zinc-900">
           {t("weekNumber", { n: weekIndex + 1 })}
         </p>
         <p className="text-[12px] font-mono font-medium text-zinc-500">
@@ -103,7 +103,7 @@ function MonthlyMobileWeekCard({
         </p>
       </div>
 
-      <div className="mt-3 space-y-3">
+      <div className="space-y-3">
         {monthlyLeadMeasures.map((leadMeasure) => (
           <MonthlyMobileMeasureCard
             key={`${monthLabel}-${weekIndex}-${leadMeasure.id}-mobile`}
@@ -145,9 +145,11 @@ function MonthlyMobileMeasureCard({
   }, 0);
 
   return (
-    <div className="rounded-[20px] bg-zinc-50 p-4">
+    <div className="rounded-[24px] bg-white p-5">
       <div className="flex items-start justify-between gap-3">
-        <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
+        <div className="min-w-0">
+          <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
+        </div>
         <AchievementProgress
           achievedCount={visibleAchievedCount}
           periodLabel={
@@ -156,18 +158,18 @@ function MonthlyMobileMeasureCard({
               : t("monthlyLabel")
           }
           targetValue={targetValue}
-          trackBackgroundClassName="bg-white"
-          valueTextSizeClassName="text-xs"
         />
       </div>
 
-      <div className="mt-4 grid grid-cols-7 gap-1.5">
+      <div className="mt-3 grid grid-cols-7 gap-1.5">
         {weekDatesInMonth.map((date, dayIndex) => (
           <MonthlyMobileMeasureDay
             key={`${leadMeasure.id}-${localizedDays[dayIndex]}-${date ?? "empty"}-mobile`}
             date={date}
             dayLabel={localizedDays[dayIndex]}
             today={today}
+            trackingMode={(leadMeasure as { trackingMode?: string }).trackingMode}
+            dailyTargetCount={(leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ?? 1}
             value={date ? (leadMeasure.logs?.[date] ?? null) : null}
           />
         ))}
@@ -182,6 +184,8 @@ type MonthlyMobileMeasureDayProps = {
   date: string | null;
   dayLabel: string;
   today: string;
+  trackingMode?: string;
+  dailyTargetCount?: number;
   value: DailyLogCell | null;
 };
 
@@ -189,9 +193,13 @@ function MonthlyMobileMeasureDay({
   date,
   dayLabel,
   today,
+  trackingMode,
+  dailyTargetCount = 1,
   value,
 }: MonthlyMobileMeasureDayProps) {
   const isToday = date === today;
+  const isCount = trackingMode === "COUNT";
+  const count = value?.count ?? 0;
 
   return (
     <div className="space-y-1 text-center">
@@ -202,25 +210,41 @@ function MonthlyMobileMeasureDay({
       >
         {dayLabel}
       </p>
-      <span
-        className={`inline-flex h-10 w-full items-center justify-center rounded-[12px] text-[13px] font-black transition-colors ${
-          value?.achieved
-            ? "bg-primary text-white"
-            : date === null
-              ? "bg-transparent text-transparent"
-              : isToday
-                ? "bg-primary/10 text-primary"
-                : "bg-white text-zinc-400 shadow-sm border border-zinc-200/50"
-        }`}
-      >
-        {value?.achieved ? (
-          <DowinIcon name="action-checkmark" size="14px" />
-        ) : date ? (
-          date.slice(8, 10)
-        ) : (
-          "."
-        )}
-      </span>
+      {isCount ? (
+        <span
+          className={`mx-auto flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all ${
+            value?.achieved
+              ? "bg-primary text-white"
+              : count > 0
+                ? "bg-[#E8F3FF] text-primary"
+                : date === null
+                  ? "bg-transparent text-transparent"
+                  : isToday
+                    ? "bg-primary/5 text-primary"
+                    : "bg-zinc-100 text-zinc-500"
+          }`}
+        >
+          <span className="text-[12px] font-bold tracking-tighter leading-none">
+            {count > 0 ? `${count}/${dailyTargetCount}` : ""}
+          </span>
+        </span>
+      ) : (
+        <span
+          className={`mx-auto flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-colors ${
+            value?.achieved
+              ? "bg-primary text-white"
+              : date === null
+                ? "bg-transparent text-transparent"
+                : isToday
+                  ? "bg-[#E8F3FF] text-primary"
+                  : "bg-zinc-100 text-zinc-400"
+          }`}
+        >
+          {value?.achieved ? (
+            <DowinIcon name="action-checkmark" size="14px" />
+          ) : null}
+        </span>
+      )}
     </div>
   );
 }
