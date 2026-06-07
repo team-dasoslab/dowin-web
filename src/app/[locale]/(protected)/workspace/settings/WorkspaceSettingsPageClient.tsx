@@ -8,7 +8,6 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -243,7 +242,7 @@ export default function WorkspaceSettingsPage() {
                 />
               )}
 
-              <Card className="rounded-content border border-zinc-200 bg-white px-4 py-4 flex items-center justify-between gap-4 sm:px-8 sm:py-8 sm:gap-6">
+              <div className="rounded-[24px] bg-white px-4 py-4 flex items-center justify-between gap-4 sm:px-8 sm:py-8 sm:gap-6">
                 <div className="flex flex-col min-w-0 text-left">
                   <h2 className="text-xl font-bold text-text-primary truncate tracking-tight">
                     {workspace.name}
@@ -253,11 +252,11 @@ export default function WorkspaceSettingsPage() {
                   </p>
                 </div>
                 {!isNativeApp ? (
-                  <span className="inline-flex h-6 items-center rounded-button border border-primary/20 bg-primary/5 px-2.5 text-[10px] font-black tracking-wider text-primary">
+                  <span className="inline-flex h-6 items-center rounded-[8px] bg-primary/5 px-2.5 text-[10px] font-black tracking-wider text-primary">
                     {t("basicPlanName")}
                   </span>
                 ) : null}
-              </Card>
+              </div>
             </div>
 
             {/* 설정 그룹들 */}
@@ -271,8 +270,8 @@ export default function WorkspaceSettingsPage() {
                     sectionRefs.current[group.id] = el;
                   }}
                 >
-                  <SectionHeader title={group.label} className="mb-4" />
-                  <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
+                  <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{group.label}</h2>
+                  <div className="rounded-[24px] overflow-hidden bg-white">
                     {group.items.map((item, index) => (
                       <MenuItemRow
                         key={item.id}
@@ -293,8 +292,8 @@ export default function WorkspaceSettingsPage() {
                   sectionRefs.current["workspaces"] = el;
                 }}
               >
-                <SectionHeader title={t("workspaceList")} className="mb-4" />
-                <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
+                <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{t("workspaceList")}</h2>
+                <div className="rounded-[24px] overflow-hidden bg-white">
                   {workspaces.map((ws, index) => (
                     <div
                       key={ws.id}
@@ -344,9 +343,9 @@ function MenuItemRow({ item, isLast, isActionPending }: { item: MenuItem; isLast
   const Content = (
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-        <div className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 ${item.danger
-            ? "border-danger/10 bg-danger/5 text-danger"
-            : "border-border/50 bg-sub-background text-text-muted"
+        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${item.danger
+            ? "bg-danger/5 text-danger"
+            : "bg-zinc-100 text-zinc-500"
           }`}
         >
           {item.icon}

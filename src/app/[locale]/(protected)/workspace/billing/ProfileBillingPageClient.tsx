@@ -14,7 +14,6 @@ import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { Logo } from "@/components/ui/Logo";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
@@ -175,9 +174,9 @@ export function ProfileBillingPageClient() {
         <ProtectedPageHeader title={t("header")} />
 
         <div className="space-y-4">
-          <Card className="flex items-center justify-between gap-4 border-zinc-200 bg-white p-5 md:p-6">
+          <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5 md:p-6">
             <div className="flex min-w-0 items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-zinc-50 text-primary">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-zinc-50 text-primary">
                 <DowinIcon name="domain-wallet" size="24px" />
               </div>
               <div className="min-w-0">
@@ -199,10 +198,10 @@ export function ProfileBillingPageClient() {
                 </Button>
               ) : null}
             </div>
-          </Card>
+          </div>
 
           {!isAdmin ? (
-            <div className="flex items-start gap-2.5 rounded-content border border-zinc-200 bg-zinc-100/50 px-4 py-3 text-[12px] font-medium leading-relaxed text-zinc-500">
+            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-white px-4 py-3 text-[12px] font-medium leading-relaxed text-zinc-500">
               <DowinIcon
                 name="status-locked"
                 size="14px"
@@ -213,7 +212,7 @@ export function ProfileBillingPageClient() {
           ) : null}
 
           {billing.entitlementSource === "BETA_PROMOTIONAL_GRANT" ? (
-            <div className="flex items-start gap-2.5 rounded-content border border-primary/20 bg-primary/5 px-4 py-3 text-[12px] font-bold leading-relaxed text-primary">
+            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-primary/5 px-4 py-3 text-[12px] font-bold leading-relaxed text-primary">
               <DowinIcon
                 name="status-info"
                 size="14px"
@@ -222,7 +221,7 @@ export function ProfileBillingPageClient() {
               Basic 프로모션 혜택이 적용되어 있어요.
             </div>
           ) : billing.entitlementSource && !isPolarEntitlement ? (
-            <div className="flex items-start gap-2.5 rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
               <DowinIcon
                 name="status-info"
                 size="14px"
@@ -244,8 +243,8 @@ export function ProfileBillingPageClient() {
         </div>
 
         <section className="space-y-4">
-          <SectionHeader title={t("currentPlanTitle")} />
-          <Card className="divide-y divide-zinc-100 border-zinc-200 bg-white">
+          <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("currentPlanTitle")}</h2>
+          <div className="divide-y divide-zinc-100 rounded-[24px] bg-white overflow-hidden">
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
@@ -377,13 +376,13 @@ export function ProfileBillingPageClient() {
                 )}
               </span>
             </div>
-          </Card>
+          </div>
         </section>
 
         {isReturningFromCheckout || requiresManualReview ? (
           <div className="space-y-4">
             {isReturningFromCheckout ? (
-              <Card className="space-y-3 border-primary/20 bg-primary/5 p-5">
+              <div className="space-y-3 rounded-[24px] bg-primary/5 p-5">
                 <div className="flex items-center gap-2 text-primary">
                   <DowinIcon name="status-info" size="18px" />
                   <p className="text-[14px] font-black">{t("pendingTitle")}</p>
@@ -403,11 +402,11 @@ export function ProfileBillingPageClient() {
                   />
                   {t("refresh")}
                 </Button>
-              </Card>
+              </div>
             ) : null}
 
             {requiresManualReview ? (
-              <Card className="space-y-3 border-red-200 bg-red-50 p-5">
+              <div className="space-y-3 rounded-[24px] bg-red-50 p-5">
                 <div className="flex items-center gap-2 text-red-600">
                   <DowinIcon name="status-locked" size="18px" />
                   <p className="text-[14px] font-black">
@@ -420,13 +419,13 @@ export function ProfileBillingPageClient() {
                     revokedCount: billing.recentRevokedCount,
                   })}
                 </p>
-              </Card>
+              </div>
             ) : null}
           </div>
         ) : null}
 
         <section>
-          <Card className="border-zinc-200 bg-zinc-100/50 p-5">
+          <div className="rounded-[24px] bg-white p-5">
             <h3 className="flex items-center gap-2 text-[14px] font-black text-zinc-900">
               <DowinIcon
                 name="status-info"
@@ -438,7 +437,7 @@ export function ProfileBillingPageClient() {
             <p className="mt-2 text-[12px] font-medium leading-relaxed text-zinc-500">
               {t("downgradePolicyDesc")}
             </p>
-          </Card>
+          </div>
         </section>
 
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
@@ -562,7 +561,7 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+        <div className="w-full space-y-6 rounded-[24px] bg-white p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Logo size="32px" />
           </div>
@@ -577,7 +576,7 @@ function NoWorkspaceState() {
           <div className="flex justify-center pt-2">
             <NoWorkspaceActions />
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
@@ -589,7 +588,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+        <div className="w-full space-y-6 rounded-[24px] bg-white p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">
             <DowinIcon name="status-locked" size="32px" />
           </div>
@@ -608,7 +607,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
           >
             {t("refresh")}
           </Button>
-        </Card>
+        </div>
       </div>
     </div>
   );

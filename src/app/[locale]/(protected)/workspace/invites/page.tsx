@@ -122,8 +122,8 @@ export default function ProfileInvitesPage() {
       <ProtectedPageContainer>
         <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
+        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="domain-ticket-diagonal" size="20px" />
           </div>
           <div className="min-w-0">
@@ -137,7 +137,7 @@ export default function ProfileInvitesPage() {
               })}
             </p>
           </div>
-        </Card>
+        </div>
 
         {isOverFreeMemberLimit ? (
           <WorkspaceOverLimitBanner
@@ -147,7 +147,7 @@ export default function ProfileInvitesPage() {
           />
         ) : null}
 
-        <Card className="space-y-4 rounded-content border border-border p-4">
+        <div className="space-y-4 rounded-[24px] bg-white p-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               {t("newInviteTitle")}
@@ -155,7 +155,7 @@ export default function ProfileInvitesPage() {
             <p className="text-[11px] text-text-muted">{t("newInviteDesc")}</p>
           </div>
 
-          <div className="space-y-3 rounded-content border border-border bg-white p-3">
+          <div className="space-y-3 rounded-[16px] bg-zinc-50/50 p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[11px] font-bold text-text-secondary">
                 {t("maxUsesLabel")}
@@ -164,7 +164,7 @@ export default function ProfileInvitesPage() {
             </div>
 
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-11 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
+              <label className="flex h-11 min-w-0 items-center gap-2 rounded-[12px] bg-white border border-zinc-200/60 px-3 text-xs text-text-secondary">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -189,7 +189,7 @@ export default function ProfileInvitesPage() {
                 type="button"
                 onClick={() => void handleCreateInvite()}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
-                className={`h-11 rounded-content px-4 text-xs font-bold ${
+                className={`h-11 rounded-[12px] px-4 text-xs font-bold ${
                   isCreatingInvite || isOverFreeMemberLimit
                     ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
                     : "btn-dowin-primary"
@@ -227,9 +227,9 @@ export default function ProfileInvitesPage() {
               </p>
             ) : null}
           </div>
-        </Card>
+        </div>
 
-        <Card className="space-y-4 rounded-content border border-border p-4">
+        <div className="space-y-4 rounded-[24px] bg-white p-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               {t("inviteListTitle")}
@@ -237,7 +237,7 @@ export default function ProfileInvitesPage() {
             <p className="text-[11px] text-text-muted">{t("inviteListDesc")}</p>
           </div>
 
-          <div className="overflow-hidden rounded-content border border-border">
+          <div className="overflow-hidden rounded-[16px] border border-zinc-100">
             {invites.length === 0 ? (
               <div className="bg-white px-4 py-10 text-center text-sm text-text-muted">
                 {t("noInvites")}
@@ -257,7 +257,7 @@ export default function ProfileInvitesPage() {
                   <div
                     key={inviteId > 0 ? inviteId : `${code}-${index}`}
                     className={`space-y-3 bg-white px-4 py-3 ${
-                      index < invites.length - 1 ? "border-b border-border" : ""
+                      index < invites.length - 1 ? "border-b border-zinc-100" : ""
                     }`}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -280,7 +280,7 @@ export default function ProfileInvitesPage() {
                         <Button
                           type="button"
                           onClick={() => void copyInviteCode(inviteId, code)}
-                          className="h-8 rounded-content border border-border bg-white px-2.5 text-[11px] font-bold text-text-primary"
+                          className="h-8 rounded-[12px] border border-zinc-200/60 bg-white px-2.5 text-[11px] font-bold text-text-primary hover:bg-zinc-50"
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
@@ -340,7 +340,7 @@ export default function ProfileInvitesPage() {
               })
             )}
           </div>
-        </Card>
+        </div>
       </ProtectedPageContainer>
     </div>
   );
@@ -364,8 +364,8 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
+        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <Logo size="24px" />
           </div>
           <div className="space-y-1">
@@ -377,7 +377,7 @@ function NoWorkspaceState() {
           <div className="flex justify-center">
             <NoWorkspaceActions />
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
@@ -389,8 +389,8 @@ function NoAccessState() {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
+        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
@@ -405,7 +405,7 @@ function NoAccessState() {
           >
             <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
           </Button>
-        </Card>
+        </div>
       </div>
     </div>
   );
