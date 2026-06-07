@@ -15,19 +15,13 @@ export function SectionHeader({
   ...props
 }: SectionHeaderProps) {
   return (
-    <div className={cn("space-y-1.5", className)} {...props}>
-      <div className="flex items-center gap-3 px-1">
-        <h3 className="text-[13px] font-black text-zinc-400 uppercase tracking-wider shrink-0">
+    <div className={cn("px-1 mb-4", className)} {...props}>
+      <div className="flex items-center gap-2">
+        <h2 className="text-[22px] font-bold tracking-tight text-zinc-900">
           {title}
-        </h3>
-        {badge && <div className="shrink-0">{badge}</div>}
-        <div className="h-px flex-1 bg-zinc-200/60" />
+        </h2>
+        {badge && <div>{badge}</div>}
       </div>
-      {description && (
-        <p className="px-1 text-[11px] text-text-muted leading-relaxed">
-          {description}
-        </p>
-      )}
     </div>
   );
 }

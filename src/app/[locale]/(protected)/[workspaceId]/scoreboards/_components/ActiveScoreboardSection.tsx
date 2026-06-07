@@ -49,7 +49,7 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="px-3 py-1.5 border border-border text-text-secondary rounded-lg text-xs font-bold transition-colors whitespace-nowrap flex-shrink-0"
+              className="flex h-8 items-center gap-1.5 rounded-button bg-zinc-100 px-3 text-[12px] font-bold text-text-primary transition-colors hover:bg-zinc-200 whitespace-nowrap flex-shrink-0"
             >
               {pendingActionId === activeScoreboardId && (
                 <InlineSpinner
@@ -75,8 +75,8 @@ function EmptyActiveScoreboardCard() {
   const td = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center space-y-4">
-      <div className="w-12 h-12 bg-primary/10 rounded-content mx-auto flex items-center justify-center">
+    <div className="rounded-[24px] bg-zinc-50/50 p-8 text-center space-y-4">
+      <div className="w-12 h-12 bg-white rounded-[16px] shadow-sm mx-auto flex items-center justify-center">
          <Logo size="24px" className="text-primary" />
       </div>
       <div className="space-y-1">
@@ -95,6 +95,6 @@ function EmptyActiveScoreboardCard() {
           </Link>
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }

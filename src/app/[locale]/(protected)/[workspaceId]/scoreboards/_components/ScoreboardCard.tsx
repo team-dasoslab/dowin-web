@@ -23,7 +23,7 @@ export function ScoreboardCard({
   const t = useTranslations("Scoreboard");
 
   return (
-    <Card className="border border-border rounded-content p-5 space-y-4 bg-white">
+    <div className="rounded-[24px] bg-white p-5 space-y-4">
       <div className="space-y-2">
         <h2 className="text-base font-bold text-text-primary leading-tight">
           {goalName || t("unnamedScoreboard")}
@@ -46,6 +46,6 @@ export function ScoreboardCard({
           {action}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
