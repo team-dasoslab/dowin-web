@@ -244,7 +244,7 @@ export function ProfileBillingPageClient() {
 
         <section className="space-y-4">
           <h2 className="px-1 text-lg font-bold tracking-tight text-zinc-900">{t("currentPlanTitle")}</h2>
-          <div className="divide-y divide-zinc-100 rounded-[24px] bg-white overflow-hidden">
+          <div className="divide-y divide-zinc-100 rounded-[24px] bg-white">
             <div className="flex items-center justify-between p-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
