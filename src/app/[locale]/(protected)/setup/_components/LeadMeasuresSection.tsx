@@ -5,6 +5,7 @@ import {
   type SetupTag,
 } from "@/app/[locale]/(protected)/setup/_lib/measure";
 import { Button } from "@/components/ui/Button";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
 import { Input } from "@/components/ui/Input";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -238,53 +239,39 @@ function LeadMeasureRow({
       />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex w-full rounded-[16px] bg-zinc-100/80 p-1 sm:w-auto">
-          {(["WEEKLY", "MONTHLY"] as const).map((period) => {
-            const isActive = measure.period === period;
-            return (
-              <Button
-                key={period}
-                type="button"
-                disabled={isMutating}
-                onClick={() => {
-                  handleMeasureChange(measure.id, "period", period);
-                  handleMeasureChange(
-                    measure.id,
-                    "targetValue",
-                    period === "WEEKLY" ? 3 : 1,
-                  );
-                }}
-                className={`relative z-10 flex-1 rounded-[10px] py-2.5 text-[14px] font-bold transition-all duration-200 sm:px-6 ${
-                  isActive
-                    ? "bg-white text-zinc-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
-                    : "text-zinc-400 hover:text-zinc-600"
-                }`}
-              >
-                {period === "WEEKLY" ? "매주" : "매달"}
-              </Button>
-            );
-          })}
+        <div className="relative flex w-full sm:w-auto">
+          <SegmentedControl
+            options={[
+              { value: "WEEKLY", label: "매주" },
+              { value: "MONTHLY", label: "매달" },
+            ]}
+            value={measure.period}
+            onChange={(period) => {
+              handleMeasureChange(measure.id, "period", period);
+              handleMeasureChange(
+                measure.id,
+                "targetValue",
+                period === "WEEKLY" ? 3 : 1,
+              );
+            }}
+            disabled={isMutating}
+            size="lg"
+            className="w-full sm:w-auto"
+          />
         </div>
 
-        <div className="relative flex w-full rounded-[16px] bg-zinc-100/80 p-1 sm:w-auto">
-          {(["BOOLEAN", "COUNT"] as const).map((mode) => {
-            const isActive = measure.trackingMode === mode;
-            return (
-              <Button
-                key={mode}
-                type="button"
-                disabled={isMutating}
-                onClick={() => handleMeasureChange(measure.id, "trackingMode", mode)}
-                className={`relative z-10 flex-1 whitespace-nowrap rounded-[10px] py-2.5 text-[14px] font-bold transition-all duration-200 sm:px-6 ${
-                  isActive
-                    ? "bg-white text-zinc-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
-                    : "text-zinc-400 hover:text-zinc-600"
-                }`}
-              >
-                {mode === "BOOLEAN" ? t("trackingModeBoolean") : t("trackingModeCount")}
-              </Button>
-            );
-          })}
+        <div className="relative flex w-full sm:w-auto">
+          <SegmentedControl
+            options={[
+              { value: "BOOLEAN", label: t("trackingModeBoolean") },
+              { value: "COUNT", label: t("trackingModeCount") },
+            ]}
+            value={measure.trackingMode}
+            onChange={(mode) => handleMeasureChange(measure.id, "trackingMode", mode)}
+            disabled={isMutating}
+            size="lg"
+            className="w-full sm:w-auto"
+          />
         </div>
       </div>
 
