@@ -161,11 +161,11 @@ export default function NewWorkspacePage() {
             type="submit"
             disabled={isPending || !name.trim() || !seatCount.trim()}
             className={`
-              h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform active:scale-[0.98]
+              h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors active:scale-[0.98]
               ${
                 isPending || !name.trim() || !seatCount.trim()
                   ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-                  : "bg-primary text-white"
+                  : "bg-zinc-900 text-white hover:bg-zinc-800"
               }
             `}
           >

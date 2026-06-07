@@ -339,7 +339,6 @@ function NoScoreboardState() {
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Logo size="20px" className="text-primary" />}
           title={t("noScoreboardTitle")}
           description={
             <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>
@@ -347,7 +346,7 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
+              className="h-[56px] w-full flex items-center justify-center px-8 text-[16px] font-black rounded-[24px] bg-zinc-900 text-white hover:bg-zinc-800 transition-colors active:scale-[0.98]"
             >
               <Link href={`/${workspaceId}/setup?mode=create`}>{t("createScoreboard")}</Link>
             </Button>
