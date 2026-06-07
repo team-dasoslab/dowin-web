@@ -17,6 +17,7 @@ import {
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import Link from "next/link";
 import AdminModal from "@/app/admin/_components/AdminModal";
@@ -210,7 +211,7 @@ export default function AdminPromotionsPageClient() {
                           <span className="text-[14px] font-bold text-text-primary block">
                             {code.code}
                           </span>
-                          <button
+                          <Button
                             type="button"
                             onClick={(e) => handleCopyCode(e, code.code)}
                             className="flex items-center gap-1 px-2.5 py-1.5 text-text-muted hover:text-text-primary transition-colors bg-white rounded-button border border-border hover:bg-zinc-50 shadow-sm"
@@ -218,7 +219,7 @@ export default function AdminPromotionsPageClient() {
                           >
                             <Copy size={14} strokeWidth={2.5} />
                             <span className="text-[12px] font-bold">복사</span>
-                          </button>
+                          </Button>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -228,7 +229,7 @@ export default function AdminPromotionsPageClient() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <button
+                          <Button
                             type="button"
                             role="switch"
                             aria-checked={code.status === "ACTIVE"}
@@ -244,7 +245,7 @@ export default function AdminPromotionsPageClient() {
                                 code.status === "ACTIVE" ? "translate-x-[7px]" : "-translate-x-[7px]"
                               }`}
                             />
-                          </button>
+                          </Button>
                           <span
                             className={`text-[12px] font-black px-2 py-0.5 rounded-full border ${
                               code.status === "ACTIVE"
@@ -357,7 +358,7 @@ export default function AdminPromotionsPageClient() {
                     비활성화 시 코드 사용이 즉시 차단됩니다.
                   </span>
                 </div>
-                <button
+                <Button
                   type="button"
                   role="switch"
                   aria-checked={editStatus === "ACTIVE"}
@@ -376,7 +377,7 @@ export default function AdminPromotionsPageClient() {
                       editStatus === "ACTIVE" ? "translate-x-[9px]" : "-translate-x-[9px]"
                     }`}
                   />
-                </button>
+                </Button>
               </div>
             </div>
 

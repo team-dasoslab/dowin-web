@@ -119,7 +119,7 @@ export default function NewWorkspacePage() {
 
           <div className="space-y-2">
             {!promotionCode ? (
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   const code = window.prompt(t("promotionCodePlaceholder"));
@@ -127,23 +127,23 @@ export default function NewWorkspacePage() {
                     handlePromotionCodeChange(code.trim().toUpperCase());
                   }
                 }}
-                className="text-[13px] font-semibold text-primary hover:text-primary-light transition-colors"
+                className="text-[13px] font-semibold text-primary hover:text-primary-light transition-colors min-h-0 p-0"
               >
                 프로모션 코드 등록
-              </button>
+              </Button>
             ) : (
               <div className="flex items-center justify-between p-4 bg-primary/5 border border-primary/10 rounded-[16px]">
                 <div className="space-y-0.5">
                   <span className="text-[11px] font-black text-primary block">적용된 프로모션 코드</span>
                   <span className="text-sm font-bold text-zinc-900">{promotionCode}</span>
                 </div>
-                <button
+                <Button
                   type="button"
                   onClick={() => handlePromotionCodeChange("")}
-                  className="text-[12px] font-bold text-zinc-400 hover:text-zinc-600 px-2 py-1"
+                  className="text-[12px] font-bold text-zinc-400 hover:text-zinc-600 px-2 py-1 min-h-0"
                 >
                   취소
-                </button>
+                </Button>
               </div>
             )}
           </div>

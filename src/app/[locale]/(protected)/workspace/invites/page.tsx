@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Input } from "@/components/ui/Input";
+import { Switch } from "@/components/ui/Switch";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -252,36 +253,36 @@ export default function ProfileInvitesPage() {
           </div>
 
           <div className="flex gap-2 pb-2">
-            <button
+            <Button
               onClick={() => setFilter("ALL")}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "ALL"
                   ? "bg-zinc-900 text-white"
                   : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
               }`}
             >
               {t("filterAll")}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setFilter("ACTIVE")}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "ACTIVE"
                   ? "bg-zinc-900 text-white"
                   : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
               }`}
             >
               {t("filterActive")}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setFilter("INACTIVE")}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "INACTIVE"
                   ? "bg-zinc-900 text-white"
                   : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
               }`}
             >
               {t("filterInactive")}
-            </button>
+            </Button>
           </div>
 
           <div className="flex flex-col divide-y divide-zinc-100">
@@ -343,34 +344,21 @@ export default function ProfileInvitesPage() {
                           )}
                         </Button>
 
-                        <button
-                          type="button"
+                        <Switch
                           disabled={
                             inviteId <= 0 ||
                             isPendingToggle ||
                             isActivationBlocked
                           }
-                          aria-label={isActive ? t("inactive") : t("active")}
-                          onClick={() =>
+                          checked={isActive}
+                          onCheckedChange={() =>
                             void toggleInviteStatus(
                               inviteId,
                               isActive ? "INACTIVE" : "ACTIVE",
                             )
                           }
-                          className={`relative inline-flex h-[22px] w-[42px] flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out ${
-                            inviteId <= 0 || isPendingToggle
-                              ? "cursor-not-allowed opacity-60"
-                              : isActivationBlocked
-                                ? "cursor-not-allowed opacity-60"
-                              : "cursor-pointer"
-                          } ${isActive ? "bg-primary" : "bg-border"}`}
-                        >
-                          <span
-                            className={`pointer-events-none inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow-sm ring-0 transition duration-300 ${
-                              isActive ? "translate-x-[20px]" : "translate-x-0"
-                            }`}
-                          />
-                        </button>
+                          aria-label={isActive ? t("inactive") : t("active")}
+                        />
                       </div>
                     </div>
 

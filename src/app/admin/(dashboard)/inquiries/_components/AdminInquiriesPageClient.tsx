@@ -17,6 +17,7 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/context/ToastContext";
 import AdminModal from "@/app/admin/_components/AdminModal";
 
@@ -229,7 +230,7 @@ export default function AdminInquiriesPageClient() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
+                        <Button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleOpenEdit(inquiry);
@@ -237,7 +238,7 @@ export default function AdminInquiriesPageClient() {
                           className="px-3 py-1.5 border border-border bg-white text-[13px] font-black text-text-primary rounded-button transition-all"
                         >
                           상세 및 수정
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -342,13 +343,13 @@ export default function AdminInquiriesPageClient() {
                 <label className="text-xs font-bold text-zinc-600 ml-1">
                   답변 요약
                 </label>
-                <textarea
+                <Textarea
                   value={editAnswer}
                   onChange={(e) => setEditAnswer(e.target.value)}
                   placeholder="문의 처리에 대한 요약을 적어주세요..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary resize-none placeholder:text-text-muted"
-                ></textarea>
+                  className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary resize-none placeholder:text-text-muted min-h-[auto]"
+                />
               </div>
 
               <Button

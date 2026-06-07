@@ -400,13 +400,13 @@ export default function AdminBillingPageClient() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
+                      <Button
                         type="button"
                         onClick={() => handleUseProduct(product)}
                         className="px-3 py-1.5 border border-border bg-white text-[13px] font-black text-text-primary rounded-button transition-all"
                       >
                         불러오기
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -522,7 +522,7 @@ export default function AdminBillingPageClient() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
+                        <Button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleOpenOverride(ws);
@@ -530,7 +530,7 @@ export default function AdminBillingPageClient() {
                           className="px-3 py-1.5 border border-border bg-white text-[13px] font-black text-text-primary rounded-button transition-all"
                         >
                           상세 및 수정
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}

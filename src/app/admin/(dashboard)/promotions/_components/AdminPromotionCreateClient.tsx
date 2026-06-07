@@ -5,6 +5,7 @@ import { usePostAdminMarketingInviteCodes } from "@/api/generated/admin-marketin
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { Card } from "@/components/ui/Card";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { useToast } from "@/context/ToastContext";
@@ -111,13 +112,13 @@ export default function AdminPromotionCreateClient() {
             <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
               설명
             </label>
-            <textarea
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="캠페인에 대한 운영자 메모를 남겨주세요."
               rows={3}
-              className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary resize-none placeholder:text-text-muted"
-            ></textarea>
+              className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary resize-none placeholder:text-text-muted min-h-[auto]"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

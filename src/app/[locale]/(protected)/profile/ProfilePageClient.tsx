@@ -21,6 +21,7 @@ import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/use
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
+import { Button } from "@/components/ui/Button";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -430,13 +431,13 @@ function MenuItemRow({
   if (item.onClick) {
     return (
       <div className={itemWrapperClassName}>
-        <button
+        <Button
           disabled={isActionPending}
           onClick={item.onClick}
-          className="block w-full text-left transition-colors hover:bg-zinc-50"
+          className="block w-full text-left transition-colors hover:bg-zinc-50 justify-start items-stretch rounded-none h-auto p-0 font-normal"
         >
           {Content}
-        </button>
+        </Button>
       </div>
     );
   }

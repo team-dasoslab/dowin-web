@@ -2,6 +2,7 @@
 
 import { useEffect, ReactNode } from "react";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -56,9 +57,10 @@ export default function AdminModal({
           ) : (
             <div />
           )}
-          <button
+          <Button
+            type="button"
             onClick={onClose}
-            className="text-text-muted transition-all p-2 rounded-full"
+            className="text-text-muted transition-all p-2 rounded-full bg-transparent hover:bg-zinc-100 min-h-0"
             aria-label="Close"
           >
             <svg
@@ -75,7 +77,7 @@ export default function AdminModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
         {children}
       </Card>

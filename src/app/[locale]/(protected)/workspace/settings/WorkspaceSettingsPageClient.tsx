@@ -11,6 +11,7 @@ import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link, useRouter } from "@/i18n/routing";
@@ -313,14 +314,14 @@ export default function WorkspaceSettingsPage() {
                               {commonT("current")}
                             </div>
                           ) : (
-                            <button
+                            <Button
                               type="button"
                               disabled={isActionPending}
                               onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              className="flex h-8 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
+                              className="flex h-8 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 transition-colors hover:bg-zinc-200 min-h-0"
                             >
                             {commonT("switchWorkspace")}
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -380,9 +381,9 @@ function MenuItemRow({
   if (item.onClick) {
     return (
       <div className={itemWrapperClassName}>
-        <button disabled={isActionPending} onClick={item.onClick} className="block w-full text-left transition-colors hover:bg-zinc-50">
+        <Button disabled={isActionPending} onClick={item.onClick} className="block w-full text-left transition-colors hover:bg-zinc-50 justify-start items-stretch rounded-none h-auto p-0 font-normal">
           {Content}
-        </button>
+        </Button>
       </div>
     );
   }
