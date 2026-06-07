@@ -216,7 +216,7 @@ export default function ProfilePage() {
           icon: <DowinIcon name="status-announcement" className="w-4 h-4" />,
           title: t("newFeatures"),
           description: t("newFeaturesDesc"),
-          href: "/updates",
+          href: getWorkspacePath(workspaceId, "/profile/updates"),
         },
         /* {
           id: "install-guide-ios",
