@@ -65,7 +65,7 @@ export function ProductUpdateCard({
             </Button>
             <Button
               asChild
-              className="justify-center rounded-[14px] bg-[#F2F4F6] h-10 px-5 text-[13px] font-bold text-zinc-700 transition-all active:scale-95 border-none shadow-none hover:bg-zinc-200/50"
+              className="justify-center rounded-[14px] bg-zinc-100 h-10 px-5 text-[13px] font-bold text-zinc-700 transition-all active:scale-95 border-none shadow-none hover:bg-zinc-200/50"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile/updates")}>{t("viewAllUpdates")}</Link>
             </Button>

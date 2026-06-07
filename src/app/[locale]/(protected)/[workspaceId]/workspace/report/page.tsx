@@ -229,7 +229,7 @@ export default function ReportPage() {
   const hasMembers = summary.totalCount > 0;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={tDashboard("weeklyReport")}
@@ -859,7 +859,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
 
   return (
     <Card className="overflow-hidden border border-zinc-200 bg-white">
-      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-zinc-100 bg-zinc-50/50 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-text-muted md:grid">
+      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-zinc-100 bg-zinc-100 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-text-muted md:grid">
         <span>{t("focus.table.member")}</span>
         <span className="text-center">{t("focus.table.status")}</span>
         <span className="text-center">{t("focus.table.score")}</span>

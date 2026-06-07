@@ -102,7 +102,7 @@ export default function ProfileMembersPage() {
     workspace.isOverFreeMemberLimit || members.length >= memberLimit;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer>
         <ProtectedPageHeader title={t("header")} />
 
@@ -200,7 +200,7 @@ export default function ProfileMembersPage() {
 
 function MembersPageSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer isLoading>
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-24 rounded-content bg-sub-background" />

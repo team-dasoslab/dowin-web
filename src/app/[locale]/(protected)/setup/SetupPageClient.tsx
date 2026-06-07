@@ -140,7 +140,7 @@ export default function SetupPage() {
   const isMutating = isSubmitPending || isArchivePending;
 
   return (
-    <div className="min-h-screen bg-[#F2F4F6]">
+    <div className="min-h-screen bg-zinc-100">
       <SetupCoachmark
         isRunning={isCoachmarkRunning}
         mode={coachmarkMode}
@@ -165,7 +165,7 @@ export default function SetupPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 네비게이션 & 액션 ── */}
-          <aside className="sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto bg-[#F2F4F6]/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-8 lg:overflow-visible lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+          <aside className="sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto bg-zinc-100/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-8 lg:overflow-visible lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             <nav className="flex gap-2 lg:block lg:space-y-2">
               {menuGroups.map((group) => {
                 const isActive = activeSection === group.id;
@@ -289,7 +289,7 @@ export default function SetupPage() {
 
 function SetupSkeleton() {
   return (
-    <div className="min-h-screen bg-[#F2F4F6]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-10 rounded-content bg-sub-background" />
         <div className="h-12 rounded-content bg-sub-background" />

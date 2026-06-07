@@ -252,7 +252,7 @@ export function WeeklyTable({
         <div className="hidden overflow-hidden rounded-content border border-zinc-200 md:block">
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
-              <div className="bg-zinc-50/50 border-b border-zinc-200">
+              <div className="bg-zinc-100 border-b border-zinc-200">
                 <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[38%]" />

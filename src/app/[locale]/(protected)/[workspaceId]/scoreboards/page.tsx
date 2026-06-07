@@ -70,7 +70,7 @@ export default function ScoreboardsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       {pendingActionId !== null && (
         <LoadingOverlay message={t("changingStatus")} />
       )}
@@ -169,7 +169,7 @@ export default function ScoreboardsPage() {
 
 function ScoreboardsSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-16 rounded-content bg-sub-background" />
         <div className="h-44 rounded-content bg-sub-background" />
@@ -183,7 +183,7 @@ function ScoreboardsNoWorkspaceState() {
   const t = useTranslations("Scoreboard");
   const td = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50 flex items-center justify-center p-8">
+    <div className="min-h-screen bg-zinc-100 flex items-center justify-center p-8">
       <div className="max-w-[420px] w-full space-y-10 animate-dowin-in">
         <div className="w-14 h-14 bg-primary/10 rounded-content flex items-center justify-center">
           <Logo className="text-primary" size="28px" />

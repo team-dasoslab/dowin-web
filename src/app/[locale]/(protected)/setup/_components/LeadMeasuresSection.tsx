@@ -164,7 +164,7 @@ function LeadMeasureRow({
 
   if (measure.isDeleted) {
     return (
-      <div className="flex flex-col gap-4 p-4 sm:p-8 bg-zinc-50/50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 p-4 sm:p-8 bg-zinc-100 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full shrink-0">
             {t("deletedBadge")}
@@ -233,7 +233,7 @@ function LeadMeasureRow({
           handleMeasureChange(measure.id, "name", e.target.value)
         }
         placeholder={t("leadMeasurePlaceholder")}
-        className="w-full rounded-[16px] border-none bg-[#F2F4F6] px-5 py-4 text-[17px] font-semibold text-zinc-900 focus:bg-[#E8F3FF] focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-zinc-400"
+        className="w-full rounded-[16px] border-none bg-zinc-100 px-5 py-4 text-[17px] font-semibold text-zinc-900 focus:bg-[#E8F3FF] focus:ring-2 focus:ring-primary/20 outline-none transition-all placeholder:text-zinc-400"
         required
       />
 
@@ -293,7 +293,7 @@ function LeadMeasureRow({
           <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
             {measure.period === "WEEKLY" ? "매주" : "매달"}
           </span>
-          <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-[#F2F4F6]">
+          <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-zinc-100">
             <Button
               type="button"
               disabled={isMutating || measure.targetValue <= 1}
@@ -344,7 +344,7 @@ function LeadMeasureRow({
               <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
                 하루에
               </span>
-              <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-[#F2F4F6]">
+              <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-zinc-100">
                 <Button
                   type="button"
                   disabled={isMutating || measure.dailyTargetCount <= 1}
@@ -385,7 +385,7 @@ function LeadMeasureRow({
         )}
       </div>
       <div
-        className="rounded-[16px] bg-[#F2F4F6]"
+        className="rounded-[16px] bg-zinc-100"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
       >
         <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
@@ -666,7 +666,7 @@ function ArchivedMeasuresSection({
               return (
                 <div
                   key={measure.id}
-                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 bg-zinc-50/50"
+                  className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 bg-zinc-100"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-[11px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full shrink-0">
@@ -680,7 +680,7 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => restoreMeasureRow(measure.id)}
-                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-[#F2F4F6] px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
+                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-zinc-100 px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
                   >
                     <span>{t("cancelDelete")}</span>
                   </Button>
@@ -734,7 +734,7 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => reactivateMeasureRow(measure.id)}
-                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-[#F2F4F6] px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
+                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-zinc-100 px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
                   >
                     <DowinIcon name="action-undo" size="14px" />
                     <span>{t("reactivateMeasure")}</span>

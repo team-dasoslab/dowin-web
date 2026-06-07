@@ -170,7 +170,7 @@ export function ProfileBillingPageClient() {
       billing.billingStatus === "CANCELED");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer className="space-y-8 lg:space-y-12">
         <ProtectedPageHeader title={t("header")} />
 
@@ -468,7 +468,7 @@ function BillingUnavailableInAppState() {
   const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <EmptyStatePanel
           title={t("appUnavailableTitle")}
@@ -539,7 +539,7 @@ function getEntitlementSourceLabel(
 
 function ProfileBillingSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer isLoading>
         <div className="h-10 w-48 rounded-content bg-zinc-100" />
         <div className="h-32 rounded-content bg-zinc-100" />
@@ -560,7 +560,7 @@ function NoWorkspaceState() {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -587,7 +587,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">

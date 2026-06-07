@@ -62,7 +62,7 @@ export function ScoreboardOverviewSection({
           {/* Lag Measure Section */}
           <div className="px-6 pt-3 pb-5 sm:px-8 sm:pt-4 sm:pb-6 space-y-2">
             <div className="flex items-center gap-2">
-              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-[#F2F4F6] text-zinc-500 text-[11px] font-bold tracking-tight uppercase">
+              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-zinc-100 text-zinc-500 text-[11px] font-bold tracking-tight uppercase">
                 {t("lagMeasureLabel")}
               </div>
             </div>

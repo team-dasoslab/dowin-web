@@ -42,7 +42,7 @@ export function PeriodControls({
       {/* ─── 모바일 레이아웃 (sm 미만) ─── */}
       <div className="flex flex-col gap-3 py-2 sm:hidden select-none">
         <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#F2F4F6] transition-all focus-within:ring-2 focus-within:ring-primary/20 shrink-0">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-zinc-100 transition-all focus-within:ring-2 focus-within:ring-primary/20 shrink-0">
             <DowinIcon
               name="domain-calendar"
               size="16px"
@@ -62,7 +62,7 @@ export function PeriodControls({
               type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-[#F2F4F6] transition-colors disabled:opacity-30"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
@@ -75,7 +75,7 @@ export function PeriodControls({
               type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-[#F2F4F6] transition-colors disabled:opacity-30"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
@@ -89,15 +89,14 @@ export function PeriodControls({
                 type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-8 shrink-0 items-center gap-1 rounded-[12px] px-3 text-[11px] font-bold text-zinc-500 hover:bg-[#F2F4F6] transition-colors"
+                className="flex h-8 shrink-0 items-center gap-1 rounded-[12px] px-3 text-[11px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"
               >
-                <DowinIcon name="action-refresh" size="10px" />
                 <span className="hidden min-[360px]:inline">{t("backToToday")}</span>
               </Button>
             ) : null}
           </div>
 
-          <div className="inline-flex shrink-0 rounded-[16px] bg-[#F2F4F6] p-1 h-10">
+          <div className="inline-flex shrink-0 rounded-[16px] bg-zinc-100 p-1 h-10">
             {(["week", "month"] as const).map((view) => {
               const isActive = selectedView === view;
               return (
@@ -156,7 +155,7 @@ export function PeriodControls({
                 type="button"
                 onClick={() => movePeriod(-1)}
                 disabled={isPreviousDisabled || isPeriodLoading}
-                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-[#F2F4F6] transition-colors disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
               >
                 <DowinIcon name="nav-chevron-left" size="14px" />
               </Button>
@@ -169,7 +168,7 @@ export function PeriodControls({
                 type="button"
                 onClick={() => movePeriod(1)}
                 disabled={isPeriodLoading}
-                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-[#F2F4F6] transition-colors disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
               >
                 <DowinIcon name="nav-chevron-right" size="14px" />
               </Button>
@@ -183,9 +182,8 @@ export function PeriodControls({
                   type="button"
                   onClick={resetToToday}
                   disabled={isPeriodLoading}
-                  className="flex h-8 items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-bold text-zinc-500 hover:bg-[#F2F4F6] transition-colors"
+                  className="flex h-8 items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"
                 >
-                  <DowinIcon name="action-refresh" size="10px" />
                   <span>{t("backToToday")}</span>
                 </Button>
               )}
@@ -193,7 +191,7 @@ export function PeriodControls({
           </div>
 
           {/* Secondary Group: View Toggle (At the very end) */}
-          <div className="inline-flex w-fit shrink-0 rounded-[16px] bg-[#F2F4F6] p-1.5 h-10 lg:ml-auto">
+          <div className="inline-flex w-fit shrink-0 rounded-[16px] bg-zinc-100 p-1.5 h-10 lg:ml-auto">
             {(["week", "month"] as const).map((view) => {
               const isActive = selectedView === view;
               return (

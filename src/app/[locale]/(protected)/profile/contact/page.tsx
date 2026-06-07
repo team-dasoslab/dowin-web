@@ -42,7 +42,7 @@ export default function ProfileContactPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-zinc-50/50">
+      <div className="min-h-screen bg-zinc-100">
         <ProtectedPageContainer className="space-y-6 lg:space-y-8">
           <ProtectedPageHeader
             title={t("listTitle")}
@@ -247,7 +247,7 @@ function ContactInquiryComposer({
                   }
                   placeholder={t("replyEmailPlaceholder")}
                   disabled={isSubmitting}
-                  className="h-12 w-full rounded-button border border-zinc-200 bg-zinc-50/50 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
+                  className="h-12 w-full rounded-button border border-zinc-200 bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
                 />
                 <FieldError message={form.errors.replyEmail} />
               </div>
@@ -264,7 +264,7 @@ function ContactInquiryComposer({
                   }
                   placeholder={t("subjectPlaceholder")}
                   disabled={isSubmitting}
-                  className="h-12 w-full rounded-button border border-zinc-200 bg-zinc-50/50 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
+                  className="h-12 w-full rounded-button border border-zinc-200 bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
                 />
                 <FieldError message={form.errors.subject} />
               </div>
@@ -289,7 +289,7 @@ function ContactInquiryComposer({
                   placeholder={t("messagePlaceholder")}
                   disabled={isSubmitting}
                   rows={8}
-                  className="min-h-[160px] w-full rounded-content border border-zinc-200 bg-zinc-50/50 px-4 py-3 text-[14px] font-bold leading-6 text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
+                  className="min-h-[160px] w-full rounded-content border border-zinc-200 bg-zinc-100 px-4 py-3 text-[14px] font-bold leading-6 text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
                 />
                 <FieldError message={form.errors.message} />
               </div>
@@ -308,7 +308,7 @@ function ContactInquiryComposer({
                   </div>
                 </div>
 
-                <label className="flex items-start gap-3 rounded-content border border-zinc-200 bg-zinc-50/50 p-4 transition-colors">
+                <label className="flex items-start gap-3 rounded-content border border-zinc-200 bg-zinc-100 p-4 transition-colors">
                   <input
                     type="checkbox"
                     checked={form.values.privacyConsent}

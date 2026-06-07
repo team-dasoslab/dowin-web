@@ -80,7 +80,7 @@ function CountPopoverContent({
             min="0"
             value={localCount}
             onChange={(e) => setLocalCount(parseInt(e.target.value, 10) || 0)}
-            className="w-32 text-5xl font-black text-primary text-center bg-[#F2F4F6] rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
+            className="w-32 text-5xl font-black text-primary text-center bg-zinc-100 rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
             placeholder="0"
           />
           <span className="text-2xl text-text-muted/40 font-bold mb-2">
@@ -90,13 +90,13 @@ function CountPopoverContent({
 
         <div className="flex w-full gap-2 mt-3">
           <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-[#F2F4F6] text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-[#F2F4F6]"
+            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-zinc-100 text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-zinc-100"
             onClick={() => setLocalCount(Math.max(0, localCount - 1))}
           >
             -
           </Button>
           <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-[#F2F4F6] text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-[#F2F4F6]"
+            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-zinc-100 text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-zinc-100"
             onClick={() => setLocalCount(localCount + 1)}
           >
             +
@@ -276,7 +276,7 @@ export function WeeklyBoardSection({
                                         ? "bg-[#E8F3FF] text-primary"
                                         : date === today
                                           ? "bg-primary/5 text-primary"
-                                          : "bg-[#F2F4F6] text-zinc-500 hover:bg-zinc-100"
+                                          : "bg-zinc-100 text-zinc-500 hover:bg-zinc-100"
                                   } ${
                                     !isEditable
                                       ? "cursor-not-allowed opacity-50"
@@ -336,12 +336,12 @@ export function WeeklyBoardSection({
                                     void toggleLog(leadMeasureId, date);
                                   }
                                 }}
-                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center rounded-full p-0 transition-all active:scale-95 ${
+                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center rounded-[12px] p-0 transition-all active:scale-95 ${
                                   currentValue === true
                                     ? "bg-primary text-white"
                                     : isToday
                                       ? "bg-[#E8F3FF] text-primary"
-                                      : "bg-[#F2F4F6] text-zinc-400 hover:bg-zinc-100"
+                                      : "bg-zinc-100 text-zinc-400 hover:bg-zinc-100"
                                 } ${
                                   isPending || !isEditable
                                     ? "cursor-not-allowed opacity-50"

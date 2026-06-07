@@ -28,8 +28,8 @@ export function TeamPeriodControls({
   return (
     <div className="flex flex-col gap-2 py-2 select-none">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
-        <div className="flex items-center gap-5 sm:gap-3">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all focus-within:border-primary/30">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-white transition-all focus-within:ring-2 focus-within:ring-primary/20 hover:bg-zinc-50 shrink-0">
             <DowinIcon
               name="domain-calendar"
               size="16px"
@@ -44,17 +44,17 @@ export function TeamPeriodControls({
             />
           </div>
 
-          <div className="flex flex-1 items-center justify-between gap-1 rounded-button border border-border bg-white p-1 sm:justify-start lg:flex-none">
+          <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-white p-1.5 h-10 sm:justify-start lg:flex-none">
             <Button
               type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+              className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
 
-            <div className="flex-1 px-3 text-center text-[12px] font-bold text-text-primary tabular-nums sm:flex-none">
+            <div className="flex-1 px-4 text-center text-[13px] font-bold text-zinc-900 tabular-nums sm:flex-none">
               {weekLabel}
             </div>
 
@@ -62,13 +62,13 @@ export function TeamPeriodControls({
               type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+              className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
 
             {isResetVisible ? (
-              <div className="mx-1 h-3 w-px bg-border sm:block" />
+              <div className="mx-1 h-4 w-px bg-zinc-200 sm:block" />
             ) : null}
 
             {isResetVisible ? (
@@ -76,9 +76,8 @@ export function TeamPeriodControls({
                 type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
+                className="flex h-8 items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"
               >
-                <DowinIcon name="action-refresh" size="10px" />
                 <span>{t("backToToday")}</span>
               </Button>
             ) : null}

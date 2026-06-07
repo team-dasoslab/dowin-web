@@ -166,7 +166,7 @@ export default function MyDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F2F4F6]">
+    <div className="min-h-screen bg-zinc-100">
       {celebrationLevel ? (
         <DashboardCelebrationOverlay level={celebrationLevel} />
       ) : null}
@@ -183,13 +183,13 @@ export default function MyDashboardPage() {
           }
           rightElement={
             <div className="flex flex-wrap gap-2">
-              <Button asChild className="h-10 px-4 text-[14px] font-bold rounded-[14px] bg-[#F2F4F6] text-zinc-700 hover:bg-zinc-200/50 transition-all active:scale-95 border-none shadow-none">
+              <Button asChild className="h-10 px-4 text-[14px] font-bold rounded-[14px] bg-zinc-100 text-zinc-700 hover:bg-zinc-200/50 transition-all active:scale-95 border-none shadow-none">
                 <Link href={`/${workspaceId}/scoreboards`}>
                   <DowinIcon name="nav-archive" size="16px" className="mr-1.5" />
                   {t("scoreboardArchive")}
                 </Link>
               </Button>
-              <Button asChild className="h-10 px-4 text-[14px] font-bold rounded-[14px] bg-[#F2F4F6] text-zinc-700 hover:bg-zinc-200/50 transition-all active:scale-95 border-none shadow-none">
+              <Button asChild className="h-10 px-4 text-[14px] font-bold rounded-[14px] bg-zinc-100 text-zinc-700 hover:bg-zinc-200/50 transition-all active:scale-95 border-none shadow-none">
                 <Link href={`/${workspaceId}/setup?mode=update`}>
                   <DowinIcon name="action-edit" size="16px" className="mr-1.5" />
                   {t("manageScoreboard")}
@@ -209,7 +209,7 @@ export default function MyDashboardPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto bg-[#F2F4F6]/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-2 lg:overflow-visible lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
+          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto bg-zinc-100/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-2 lg:overflow-visible lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
             <nav className="flex gap-2 lg:block lg:space-y-2">
               {menuGroups.map((group) => {
                 const isActive = activeSection === group.id;
@@ -332,7 +332,7 @@ function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
 
 function MyDashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-[#F2F4F6]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-16 rounded-content bg-sub-background" />
         <div className="h-24 rounded-content bg-sub-background" />
@@ -349,7 +349,7 @@ function MyDashboardSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-[#F2F4F6]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}
@@ -368,7 +368,7 @@ function NoScoreboardState() {
   const t = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <div className="min-h-screen bg-[#F2F4F6]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}

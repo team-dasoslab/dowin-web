@@ -16,7 +16,7 @@ export function ProtectedLayoutShell({
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-zinc-50/50">
+    <div className="flex h-full flex-col overflow-hidden bg-zinc-100">
       {sidebar}
       <main
         id="main-scroll-container"

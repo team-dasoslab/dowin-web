@@ -28,7 +28,7 @@ export default function ProfileDeleteAccountPage() {
   });
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer>
         <ProtectedPageHeader title={t("header")} />
 
