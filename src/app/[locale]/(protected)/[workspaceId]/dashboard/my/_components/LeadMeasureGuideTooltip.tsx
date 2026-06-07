@@ -86,7 +86,7 @@ export function LeadMeasureGuideTooltip({
         <>
           <div className="fixed inset-0 z-10" onClick={onClose} />
           <div
-            className="fixed z-20 w-56 rounded-lg border border-border bg-white p-3 shadow-lg"
+            className="fixed z-20 w-56 rounded-[16px] bg-zinc-900 p-4 shadow-xl"
             style={
               position
                 ? {
@@ -98,13 +98,13 @@ export function LeadMeasureGuideTooltip({
           >
             <div className="mb-2 flex items-center gap-1.5">
               <DowinIcon name={iconName} size="14px" className={style.iconClassName} />
-              <p className="text-[10px] font-bold text-text-primary">
+              <p className="text-[11px] font-black text-white">
                 {guide.kind === WeeklyLogGuideKind.change
                   ? t("changeProposal")
                   : t("adjustProposal")}
               </p>
             </div>
-            <p className="text-[11px] leading-5 text-text-secondary">
+            <p className="text-[12px] font-medium leading-relaxed text-zinc-400 mt-1">
               {guide.description}
             </p>
           </div>

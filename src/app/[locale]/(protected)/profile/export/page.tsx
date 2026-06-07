@@ -11,7 +11,6 @@ import { useProfileExportData } from "@/app/[locale]/(protected)/profile/export/
 import { useProfileExportForm } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportForm";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useNativeApp } from "@/context/NativeAppContext";
@@ -71,11 +70,11 @@ export default function ProfileExportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer>
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title="데이터 내보내기" />
 
-        <Card className="border border-border rounded-content px-6 py-5 flex items-center gap-4">
+        <div className="rounded-[24px] bg-white px-6 py-5 flex items-center gap-4">
           <UserAvatar
             avatarKey={user?.avatarKey}
             avatarSeed={user?.nickname}
@@ -84,75 +83,75 @@ export default function ProfileExportPage() {
             className="flex-shrink-0"
           />
           <div className="min-w-0">
-            <h1 className="text-lg font-bold text-text-primary tracking-tight">
+            <h1 className="text-lg font-black text-zinc-900 tracking-tight">
               {user?.nickname ?? "사용자"}님의 CSV 다운로드
             </h1>
-            <div className="mt-0.5 flex items-center gap-2 text-xs text-text-muted">
+            <div className="mt-0.5 flex items-center gap-2 text-xs font-medium text-zinc-500">
               <span className="truncate">{workspace?.name}</span>
               <span
                 className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-bold ${
                   isExportAvailable
                     ? "bg-primary/10 text-primary"
-                    : "bg-sub-background text-text-secondary"
+                    : "bg-zinc-100 text-zinc-500"
                 }`}
               >
                 Basic
               </span>
             </div>
           </div>
-        </Card>
+        </div>
 
         {!isExportAvailable ? (
-          <Card className="border border-border rounded-content p-4 space-y-2 bg-sub-background">
-            <p className="text-sm font-bold text-text-primary">
+          <div className="rounded-[24px] p-4 space-y-2 bg-zinc-100">
+            <p className="text-sm font-black text-zinc-900">
               CSV 다운로드는 현재 제공되지 않습니다.
             </p>
-            <p className="text-[11px] leading-relaxed text-text-muted">
+            <p className="text-[11px] leading-relaxed text-zinc-500">
               현재는 앱 안에서 기록과 조회를 계속 사용할 수 있습니다.
             </p>
-          </Card>
+          </div>
         ) : null}
 
-        <Card className="border border-border rounded-content p-4 space-y-4">
+        <div className="rounded-[24px] bg-white p-6 space-y-5">
           <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
+            <h2 className="text-[15px] font-black text-zinc-900">
               내보내기 조건
             </h2>
-            <p className="text-[11px] text-text-muted">
+            <p className="text-[12px] font-medium text-zinc-500">
               기간(최대 92일)과 선행지표를 선택해 CSV 파일로 내려받습니다.
             </p>
           </div>
 
-          <div className="grid gap-2 sm:grid-cols-2">
-            <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
-              <span className="shrink-0 text-[11px]">시작일</span>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-zinc-50 px-4 text-xs text-zinc-600">
+              <span className="shrink-0 text-[12px] font-bold">시작일</span>
               <input
                 type="date"
                 value={exportFrom}
                 onChange={(event) => handleExportFromChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
+                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-zinc-900 outline-none"
               />
             </label>
-            <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
-              <span className="shrink-0 text-[11px]">종료일</span>
+            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-zinc-50 px-4 text-xs text-zinc-600">
+              <span className="shrink-0 text-[12px] font-bold">종료일</span>
               <input
                 type="date"
                 value={exportTo}
                 onChange={(event) => handleExportToChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
+                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-zinc-900 outline-none"
               />
             </label>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold text-text-muted">
+              <p className="text-[12px] font-bold text-zinc-500">
                 선행지표 선택
               </p>
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                className="h-7 rounded-lg border border-border bg-white px-2.5 text-[11px] font-bold text-text-secondary"
+                className="h-8 rounded-[12px] bg-zinc-100 px-3 text-[11px] font-black text-zinc-600 transition-colors hover:bg-zinc-200"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -164,7 +163,7 @@ export default function ProfileExportPage() {
                 return (
                   <label
                     key={measure.id}
-                    className="flex items-center gap-2 rounded-content border border-border px-2.5 py-2 text-xs text-text-primary"
+                    className="flex items-center gap-2 rounded-[12px] bg-zinc-50 px-3 py-2 text-[13px] font-bold text-zinc-900"
                   >
                     <input
                       type="checkbox"
@@ -179,7 +178,7 @@ export default function ProfileExportPage() {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 rounded-content border border-border bg-sub-background px-3 py-2 text-xs text-text-secondary">
+          <label className="flex items-center gap-2 rounded-[12px] border-none bg-zinc-100 px-3 py-2 text-xs text-zinc-600">
             <input
               type="checkbox"
               checked={splitByWeek}
@@ -189,15 +188,15 @@ export default function ProfileExportPage() {
             <span>주차별로 섹션 분리해서 내보내기</span>
           </label>
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[11px] text-text-muted">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
+            <p className="text-[12px] font-medium text-zinc-500">
               선택 지표 {selectedExportMeasureIds.length}개
             </p>
             <Button
               type="button"
               onClick={() => void exportCsv()}
               disabled={isExporting || !isExportAvailable}
-              className="h-9 w-full rounded-content bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
+              className="h-9 w-full rounded-[12px] bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
               <DowinIcon name="action-download" size="14px" />
               {isExportAvailable
@@ -207,7 +206,7 @@ export default function ProfileExportPage() {
                 : "현재 사용 불가"}
             </Button>
           </div>
-        </Card>
+        </div>
       </ProtectedPageContainer>
     </div>
   );
@@ -218,7 +217,7 @@ function ExportUnavailableInAppState() {
   const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
@@ -227,7 +226,7 @@ function ExportUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="w-fit rounded-content border border-border bg-white px-5 py-3 text-sm font-semibold text-text-primary"
+              className="w-fit rounded-[16px] bg-zinc-100 px-5 py-3 text-sm font-black text-zinc-900 transition-colors hover:bg-zinc-200"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
             </Button>
@@ -241,8 +240,8 @@ function ExportUnavailableInAppState() {
 function ProfileExportHeader() {
   return (
     <header className="flex items-center justify-between">
-      <SmartBackButton className="w-8 h-8 rounded-content border border-border flex items-center justify-center text-text-muted transition-colors" />
-      <p className="text-xs text-text-muted">데이터 내보내기</p>
+      <SmartBackButton className="w-9 h-9 rounded-[16px] bg-zinc-100 flex items-center justify-center text-zinc-500 transition-colors hover:bg-zinc-200" />
+      <p className="text-[13px] font-bold text-zinc-500">데이터 내보내기</p>
       <div className="w-8" />
     </header>
   );
@@ -250,11 +249,11 @@ function ProfileExportHeader() {
 
 function ExportSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
-        <div className="h-[420px] rounded-content bg-sub-background" />
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer isLoading className="max-w-[640px]">
+        <div className="h-10 rounded-[16px] bg-zinc-200" />
+        <div className="h-24 rounded-[24px] bg-zinc-200" />
+        <div className="h-[420px] rounded-[24px] bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );
@@ -262,7 +261,7 @@ function ExportSkeleton() {
 
 function NoWorkspaceState() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
@@ -284,7 +283,7 @@ function NoWorkspaceState() {
 function NoScoreboardState() {
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel

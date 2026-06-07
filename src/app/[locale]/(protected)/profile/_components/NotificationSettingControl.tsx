@@ -226,7 +226,7 @@ export function NotificationSettingControl({
         />
       </button>
       {!isNativeApp ? (
-        <span className="text-[11px] font-medium text-text-muted">
+        <span className="text-[11px] font-medium text-zinc-500">
           {t("appOnly")}
         </span>
       ) : null}

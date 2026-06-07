@@ -15,7 +15,6 @@ import { useInviteActions } from "@/app/[locale]/(protected)/workspace/invites/_
 import { useInviteForm } from "@/app/[locale]/(protected)/workspace/invites/_hooks/useInviteForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";
@@ -23,7 +22,7 @@ import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 
 import { useTranslations } from "next-intl";
@@ -96,6 +95,17 @@ export default function ProfileInvitesPage() {
   ).length;
   const isOverFreeMemberLimit = Boolean(workspace?.isOverFreeMemberLimit);
 
+  const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
+
+  const filteredInvites = useMemo(() => {
+    return invites.filter((invite) => {
+      if (filter === "ALL") return true;
+      if (filter === "ACTIVE") return invite.status === "ACTIVE";
+      if (filter === "INACTIVE") return invite.status !== "ACTIVE";
+      return true;
+    });
+  }, [invites, filter]);
+
   const handleCreateInvite = async () => {
     const maxUses = getValidatedMaxUses();
     if (maxUses === null) {
@@ -118,26 +128,26 @@ export default function ProfileInvitesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer>
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
+        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="domain-ticket-diagonal" size="20px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold tracking-tight text-text-primary">
+            <h1 className="text-[18px] font-black tracking-tight text-zinc-900">
               {workspace.name}
             </h1>
-            <p className="mt-0.5 text-xs text-text-muted">
+            <p className="mt-0.5 text-[13px] font-medium text-zinc-500">
               {t("invitesCountDesc", {
                 total: invites.length,
                 active: activeInviteCount,
               })}
             </p>
           </div>
-        </Card>
+        </div>
 
         {isOverFreeMemberLimit ? (
           <WorkspaceOverLimitBanner
@@ -147,24 +157,23 @@ export default function ProfileInvitesPage() {
           />
         ) : null}
 
-        <Card className="space-y-4 rounded-content border border-border p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
+        <div className="space-y-5 rounded-[24px] bg-white p-6">
+          <div>
+            <h2 className="text-[15px] font-black text-zinc-900">
               {t("newInviteTitle")}
             </h2>
-            <p className="text-[11px] text-text-muted">{t("newInviteDesc")}</p>
           </div>
 
-          <div className="space-y-3 rounded-content border border-border bg-white p-3">
+          <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold text-text-secondary">
+              <p className="text-[12px] font-bold text-zinc-600">
                 {t("maxUsesLabel")}
               </p>
-              <p className="text-[11px] text-text-muted">{t("maxUsesLimit")}</p>
+              <p className="text-[11px] font-medium text-zinc-400">{t("maxUsesLimit")}</p>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-11 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <label className="flex h-12 min-w-0 items-center gap-2 rounded-[16px] bg-zinc-50 px-4 text-xs font-bold text-zinc-600 transition-colors focus-within:bg-zinc-100">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -178,9 +187,9 @@ export default function ProfileInvitesPage() {
                     handleMaxUsesInputChange(event.target.value)
                   }
                   placeholder={t("maxUsesPlaceholder")}
-                  className="h-full min-w-0 border-0 bg-transparent p-0 text-right text-sm font-semibold text-text-primary outline-none focus-visible:ring-0"
+                  className="h-full min-w-0 border-0 bg-transparent p-0 text-right text-sm font-semibold text-zinc-900 outline-none focus-visible:ring-0"
                 />
-                <span className="shrink-0 text-[11px] text-text-muted">
+                <span className="shrink-0 text-[11px] text-zinc-500">
                   {t("maxUsesUnit")}
                 </span>
               </label>
@@ -189,10 +198,10 @@ export default function ProfileInvitesPage() {
                 type="button"
                 onClick={() => void handleCreateInvite()}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
-                className={`h-11 rounded-content px-4 text-xs font-bold ${
+                className={`h-12 rounded-[16px] px-5 text-[14px] font-black transition-colors ${
                   isCreatingInvite || isOverFreeMemberLimit
-                    ? "cursor-not-allowed border border-border bg-sub-background text-text-muted"
-                    : "btn-dowin-primary"
+                    ? "cursor-not-allowed bg-zinc-100 text-zinc-400"
+                    : "bg-primary/10 text-primary hover:bg-primary/20"
                 }`}
               >
                 {isCreatingInvite ? t("creatingButton") : t("createButton")}
@@ -205,10 +214,10 @@ export default function ProfileInvitesPage() {
                   key={value}
                   type="button"
                   onClick={() => selectPresetMaxUses(value)}
-                  className={`h-7 rounded-full px-2.5 text-[11px] font-bold ${
+                  className={`h-8 rounded-full px-3 text-[12px] font-bold transition-colors ${
                     Number(maxUsesInput) === value
-                      ? "border border-primary/20 bg-primary/10 text-primary"
-                      : "border border-border bg-white text-text-muted"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
                   }`}
                 >
                   {t("presetUnit", { count: value })}
@@ -227,23 +236,65 @@ export default function ProfileInvitesPage() {
               </p>
             ) : null}
           </div>
-        </Card>
+        </div>
 
-        <Card className="space-y-4 rounded-content border border-border p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("inviteListTitle")}
-            </h2>
-            <p className="text-[11px] text-text-muted">{t("inviteListDesc")}</p>
+        <div className="space-y-5 rounded-[24px] bg-white p-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-[15px] font-black text-zinc-900">
+                {t("inviteListTitle")}
+              </h2>
+            </div>
+            <div className="flex shrink-0 items-center gap-1 rounded-full bg-zinc-100 px-3.5 py-1.5 text-[13px] font-bold tracking-tight text-zinc-600">
+              <span>{activeInviteCount}</span>
+              <span className="text-zinc-400">/ {invites.length}</span>
+            </div>
           </div>
 
-          <div className="overflow-hidden rounded-content border border-border">
+          <div className="flex gap-2 pb-2">
+            <button
+              onClick={() => setFilter("ALL")}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                filter === "ALL"
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+              }`}
+            >
+              {t("filterAll")}
+            </button>
+            <button
+              onClick={() => setFilter("ACTIVE")}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                filter === "ACTIVE"
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+              }`}
+            >
+              {t("filterActive")}
+            </button>
+            <button
+              onClick={() => setFilter("INACTIVE")}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                filter === "INACTIVE"
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+              }`}
+            >
+              {t("filterInactive")}
+            </button>
+          </div>
+
+          <div className="flex flex-col divide-y divide-zinc-100">
             {invites.length === 0 ? (
-              <div className="bg-white px-4 py-10 text-center text-sm text-text-muted">
+              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
                 {t("noInvites")}
               </div>
+            ) : filteredInvites.length === 0 ? (
+              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
+                선택한 필터에 해당하는 초대코드가 없습니다.
+              </div>
             ) : (
-              invites.map((invite, index) => {
+              filteredInvites.map((invite, index) => {
                 const inviteId = invite.id ?? 0;
                 const code = invite.code ?? "";
                 const isActive = invite.status === "ACTIVE";
@@ -256,20 +307,18 @@ export default function ProfileInvitesPage() {
                 return (
                   <div
                     key={inviteId > 0 ? inviteId : `${code}-${index}`}
-                    className={`space-y-3 bg-white px-4 py-3 ${
-                      index < invites.length - 1 ? "border-b border-border" : ""
-                    }`}
+                    className="flex flex-col gap-2 py-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
-                        <p className="truncate font-mono text-sm font-bold tracking-wide text-text-primary">
+                        <p className="truncate font-mono text-sm font-bold tracking-wide text-zinc-900">
                           {code || t("noCode")}
                         </p>
                         <Badge
                           className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                             isActive
                               ? "bg-primary/10 text-primary"
-                              : "border border-border bg-white text-text-secondary"
+                              : "bg-zinc-100 text-zinc-600"
                           }`}
                         >
                           {isActive ? t("active") : t("inactive")}
@@ -280,7 +329,7 @@ export default function ProfileInvitesPage() {
                         <Button
                           type="button"
                           onClick={() => void copyInviteCode(inviteId, code)}
-                          className="h-8 rounded-content border border-border bg-white px-2.5 text-[11px] font-bold text-text-primary"
+                          className="h-8 rounded-[12px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 hover:bg-zinc-200"
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
@@ -325,22 +374,22 @@ export default function ProfileInvitesPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-2">
-                      <span className="text-[10px] font-bold tracking-wide text-text-muted">
+                    <div className="flex items-center">
+                      <span className="text-[12px] font-medium text-zinc-500">
                         {t("usageLabel", { usage: usageLabel })}
                       </span>
+                    </div>
                       {isActive && isOverFreeMemberLimit ? (
                         <span className="text-[10px] font-semibold text-danger">
                           {t("activeInviteOverLimit")}
                         </span>
                       ) : null}
-                    </div>
                   </div>
                 );
               })
             )}
           </div>
-        </Card>
+        </div>
       </ProtectedPageContainer>
     </div>
   );
@@ -348,12 +397,12 @@ export default function ProfileInvitesPage() {
 
 function InvitePageSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
-        <div className="h-44 rounded-content bg-sub-background" />
-        <div className="h-72 rounded-content bg-sub-background" />
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer isLoading className="max-w-[640px]">
+        <div className="h-10 rounded-content bg-zinc-200" />
+        <div className="h-24 rounded-content bg-zinc-200" />
+        <div className="h-44 rounded-content bg-zinc-200" />
+        <div className="h-72 rounded-content bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );
@@ -362,10 +411,10 @@ function InvitePageSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("ProfileInvites");
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
+        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <Logo size="24px" />
           </div>
           <div className="space-y-1">
@@ -377,7 +426,7 @@ function NoWorkspaceState() {
           <div className="flex justify-center">
             <NoWorkspaceActions />
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
@@ -387,10 +436,10 @@ function NoAccessState() {
   const t = useTranslations("ProfileInvites");
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
+        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
@@ -405,7 +454,7 @@ function NoAccessState() {
           >
             <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
           </Button>
-        </Card>
+        </div>
       </div>
     </div>
   );

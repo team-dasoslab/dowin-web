@@ -15,7 +15,7 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   const Comp = asChild ? Slot : "button";
-  return <Comp className={cn("inline-flex items-center justify-center rounded-button", className)} ref={ref} {...props} />;
+  return <Comp className={cn("inline-flex items-center justify-center rounded-2xl", className)} ref={ref} {...props} />;
 };
 
 Button.displayName = "Button";

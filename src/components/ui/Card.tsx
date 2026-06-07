@@ -9,7 +9,8 @@ export const Card = ({ className, ref, ...props }: CardProps) => {
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-content border border-zinc-200 bg-white",
+        "overflow-hidden border border-zinc-200 bg-white",
+        className?.includes("rounded-") ? "" : "rounded-content",
         className,
       )}
       ref={ref}

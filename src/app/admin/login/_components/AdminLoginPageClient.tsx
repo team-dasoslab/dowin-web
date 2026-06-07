@@ -61,33 +61,22 @@ export default function AdminLoginPageClient() {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                운영자 아이디
-              </label>
-              <Input
-                type="text"
-                value={loginId}
-                onChange={(e) => setLoginId(e.target.value)}
-                placeholder="아이디를 입력하세요"
-                className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
-                required
-              />
-            </div>
+            <Input
+              label="운영자 아이디"
+              type="text"
+              value={loginId}
+              onChange={(e) => setLoginId(e.target.value)}
+              placeholder="아이디를 입력하세요"
+              required
+            />
 
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                비밀번호
-              </label>
-              <PasswordInput
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="비밀번호를 입력하세요"
-                className="w-full rounded-content border border-border bg-sub-background px-5 py-4 pr-14 text-sm font-bold outline-none transition-all placeholder:text-text-muted focus:border-primary focus:bg-white"
-                toggleClassName="absolute right-4 top-1/2 flex -tranzinc-y-1/2 items-center text-text-muted transition-colors"
-                required
-              />
-            </div>
+            <PasswordInput
+              label="비밀번호"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호를 입력하세요"
+              required
+            />
           </div>
 
           {error && (

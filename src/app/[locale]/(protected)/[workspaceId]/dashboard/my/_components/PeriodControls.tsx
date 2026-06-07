@@ -1,6 +1,7 @@
 import { getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useTranslations } from "next-intl";
 
 interface PeriodControlsProps {
@@ -42,7 +43,7 @@ export function PeriodControls({
       {/* ─── 모바일 레이아웃 (sm 미만) ─── */}
       <div className="flex flex-col gap-3 py-2 sm:hidden select-none">
         <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all focus-within:border-primary/30 shrink-0">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-white transition-all focus-within:ring-2 focus-within:ring-primary/20 shrink-0">
             <DowinIcon
               name="domain-calendar"
               size="16px"
@@ -57,17 +58,17 @@ export function PeriodControls({
             />
           </div>
 
-          <div className="flex flex-1 items-center justify-between gap-1 rounded-button border border-border bg-white p-1">
+          <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-white p-1.5 h-10">
             <Button
               type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
 
-            <div className="flex-1 px-1 text-center text-[12px] font-bold text-text-primary tabular-nums truncate">
+            <div className="flex-1 px-1 text-center text-[13px] font-black text-zinc-900 tabular-nums truncate">
               {selectedView === "week" ? weekLabel : monthLabel}
             </div>
 
@@ -75,13 +76,13 @@ export function PeriodControls({
               type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
 
             {isResetVisible ? (
-              <div className="mx-1 h-3 w-px shrink-0 bg-border" />
+              <div className="mx-1 h-4 w-px shrink-0 bg-zinc-200" />
             ) : null}
 
             {isResetVisible ? (
@@ -89,53 +90,33 @@ export function PeriodControls({
                 type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-7 shrink-0 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
+                className="flex h-8 shrink-0 items-center gap-1 rounded-[12px] px-3 text-[11px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"
               >
-                <DowinIcon name="action-refresh" size="10px" />
                 <span className="hidden min-[360px]:inline">{t("backToToday")}</span>
               </Button>
             ) : null}
           </div>
 
-          <div className="inline-flex shrink-0 rounded-button border border-border bg-sub-background p-1">
-            {(["week", "month"] as const).map((view) => {
-              const isActive = selectedView === view;
-              return (
-                <button
-                  key={view}
-                  type="button"
-                  onClick={() => setSelectedView(view)}
-                  disabled={isPeriodLoading}
-                  className={`rounded-button px-2 py-1 text-[11px] font-bold transition-all ${
-                    isActive
-                      ? "bg-white text-primary border border-border shadow-sm"
-                      : "text-text-secondary"
-                  }`}
-                >
-                  {view === "week" ? t("weekView") : t("monthView")}
-                </button>
-              );
-            })}
-          </div>
+          <SegmentedControl
+            options={[
+              { value: "week", label: t("weekView") },
+              { value: "month", label: t("monthView") },
+            ]}
+            value={selectedView}
+            onChange={setSelectedView}
+            disabled={isPeriodLoading}
+            size="sm"
+          />
         </div>
       </div>
 
       {/* ─── 데스크톱 레이아웃 (sm 이상) ─── */}
       <div className="hidden sm:flex flex-col gap-4 py-2 select-none">
-        {/* Row 1: Title */}
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-bold tracking-tight text-text-primary">
-            {selectedView === "week"
-              ? t("weeklyLeadMeasures")
-              : t("monthlyAggregation")}
-          </h2>
-        </div>
-
         {/* Row 2: Navigation & Settings */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
           <div className="flex items-center gap-2">
             {/* Utility: Calendar Picker */}
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-button border border-border bg-white transition-all focus-within:border-primary/30">
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-[16px] bg-white transition-all hover:bg-zinc-50">
               <DowinIcon
                 name="domain-calendar"
                 size="16px"
@@ -151,17 +132,17 @@ export function PeriodControls({
             </div>
 
             {/* Primary Group: Date Navigation */}
-            <div className="flex flex-1 items-center justify-between gap-1 rounded-button border border-border bg-white p-1 sm:justify-start lg:flex-none">
+            <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-white p-1.5 h-10 sm:justify-start lg:flex-none">
               <Button
                 type="button"
                 onClick={() => movePeriod(-1)}
                 disabled={isPreviousDisabled || isPeriodLoading}
-                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
               >
                 <DowinIcon name="nav-chevron-left" size="14px" />
               </Button>
 
-              <div className="flex-1 px-3 text-center text-[12px] font-bold text-text-primary tabular-nums sm:flex-none">
+              <div className="flex-1 px-4 text-center text-[13px] font-black text-zinc-900 tabular-nums sm:flex-none">
                 {selectedView === "week" ? weekLabel : monthLabel}
               </div>
 
@@ -169,13 +150,13 @@ export function PeriodControls({
                 type="button"
                 onClick={() => movePeriod(1)}
                 disabled={isPeriodLoading}
-                className="flex h-7 w-7 items-center justify-center rounded-button text-text-secondary disabled:opacity-30"
+                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
               >
                 <DowinIcon name="nav-chevron-right" size="14px" />
               </Button>
 
               {isResetVisible && (
-                <div className="mx-1 h-3 w-px bg-border sm:block" />
+                <div className="mx-1 h-4 w-px bg-zinc-200 sm:block" />
               )}
 
               {isResetVisible && (
@@ -183,9 +164,8 @@ export function PeriodControls({
                   type="button"
                   onClick={resetToToday}
                   disabled={isPeriodLoading}
-                  className="flex h-7 items-center gap-1 rounded-button px-2 text-[10px] font-bold text-text-secondary"
+                  className="flex h-8 items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"
                 >
-                  <DowinIcon name="action-refresh" size="10px" />
                   <span>{t("backToToday")}</span>
                 </Button>
               )}
@@ -193,26 +173,17 @@ export function PeriodControls({
           </div>
 
           {/* Secondary Group: View Toggle (At the very end) */}
-          <div className="inline-flex w-fit shrink-0 rounded-button border border-border bg-sub-background p-1 lg:ml-auto">
-            {(["week", "month"] as const).map((view) => {
-              const isActive = selectedView === view;
-              return (
-                <button
-                  key={view}
-                  type="button"
-                  onClick={() => setSelectedView(view)}
-                  disabled={isPeriodLoading}
-                  className={`rounded-button px-3 py-1 text-[11px] font-bold transition-all ${
-                    isActive
-                      ? "bg-white text-primary border border-border shadow-sm"
-                      : "text-text-secondary"
-                  }`}
-                >
-                  {view === "week" ? t("weekView") : t("monthView")}
-                </button>
-              );
-            })}
-          </div>
+          <SegmentedControl
+            options={[
+              { value: "week", label: t("weekView") },
+              { value: "month", label: t("monthView") },
+            ]}
+            value={selectedView}
+            onChange={setSelectedView}
+            disabled={isPeriodLoading}
+            size="md"
+            className="lg:ml-auto w-fit"
+          />
         </div>
       </div>
     </>

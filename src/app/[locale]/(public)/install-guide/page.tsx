@@ -60,7 +60,7 @@ const steps = [
 
 export default function InstallGuidePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex max-w-[560px] flex-col gap-6 p-4 pb-10 animate-dowin-in md:p-8">
         <header className="flex items-center justify-between">
           <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors" />

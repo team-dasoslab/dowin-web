@@ -10,10 +10,9 @@ import { TeamPeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/das
 import { MemberCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/MemberCard";
 import { WeeklyTable } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamDashboard";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
-import { PeriodBadge } from "@/components/ui/PeriodBadge";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
@@ -136,7 +135,7 @@ export default function DashboardPage() {
     members.find((member) => member.userId === myUserId)?.role ?? null;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer
         className={cn(
           "relative transition-[left] duration-300 ease-out xl:origin-top space-y-6 lg:space-y-12",
@@ -148,74 +147,44 @@ export default function DashboardPage() {
           rightElement={
             <div className="flex items-center gap-2">
               {isLoading ? (
-                <div className="h-6 w-24 animate-pulse rounded-full bg-zinc-100" />
-              ) : (
-                <PeriodBadge label={weekLabel} size="md" />
-              )}
+                <div className="h-6 w-24 animate-pulse rounded-full bg-zinc-200" />
+              ) : null}
             </div>
           }
         />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
-          {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-            <nav className="flex gap-1 lg:block lg:space-y-1">
-              {menuGroups.map((group) => {
-                const isActive = activeSection === group.id;
-                return (
-                  <button
-                    key={group.id}
-                    onClick={() => {
-                      const element = document.getElementById(group.id);
-                      const container = document.getElementById(
-                        "main-scroll-container",
-                      );
-                      if (container && element) {
-                        const headerOffset = 100;
-                        const elementPosition = element.offsetTop;
-                        const offsetPosition = elementPosition - headerOffset;
-                        container.scrollTo({
-                          top: offsetPosition,
-                          behavior: "smooth",
-                        });
-                      }
-                    }}
-                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
-                      isActive
-                        ? "text-primary"
-                        : "text-zinc-400"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {isActive && (
-                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
-                      )}
-                      <span className={isActive ? "" : "lg:pl-4"}>
-                        {group.label}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+          <PageSidebarNav
+            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            activeId={activeSection}
+          />
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="summary" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("memberSummary")} />
+              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("memberSummary")}</h2>
+              <TeamPeriodControls
+                isPeriodLoading={isPeriodLoading}
+                isPreviousDisabled={isPreviousDisabled}
+                isResetVisible={isResetVisible}
+                movePeriod={movePeriod}
+                resetToToday={resetToToday}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                weekLabel={weekLabel}
+              />
 
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="h-28 w-full animate-pulse rounded-content bg-zinc-50"
+                      className="h-28 w-full animate-pulse rounded-content bg-zinc-200"
                     />
                   ))}
                 </div>
               ) : members.length === 0 ? (
-                <div className="border border-border rounded-content p-8 text-center text-text-muted text-sm">
+                <div className="bg-white rounded-[24px] p-8 text-center text-text-muted text-sm">
                   {t("noMembers")}
                 </div>
               ) : (
@@ -235,27 +204,17 @@ export default function DashboardPage() {
               id="scoreboard"
               className="space-y-6 overflow-visible scroll-mt-28"
             >
-              <SectionHeader
-                title={t("teamWeeklyScoreboard")}
-                description={t("teamWeeklyScoreboardDesc")}
-              />
-              <TeamPeriodControls
-                isPeriodLoading={isPeriodLoading}
-                isPreviousDisabled={isPreviousDisabled}
-                isResetVisible={isResetVisible}
-                movePeriod={movePeriod}
-                resetToToday={resetToToday}
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                weekLabel={weekLabel}
-              />
+              <div className="px-1">
+                <h2 className="text-[22px] font-bold tracking-tight text-zinc-900">{t("teamWeeklyScoreboard")}</h2>
+              </div>
+
 
               {isLoading ? (
                 <div className="space-y-6">
                   {[1, 2].map((i) => (
                     <div
                       key={i}
-                      className="h-64 w-full animate-pulse rounded-content bg-zinc-50"
+                      className="h-64 w-full animate-pulse rounded-content bg-zinc-200"
                     />
                   ))}
                 </div>
@@ -312,14 +271,14 @@ export default function DashboardPage() {
 
 function DashboardLoadingState() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-content bg-sub-background" />
+        <div className="h-16 rounded-content bg-zinc-200" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-content bg-sub-background" />
-          <div className="h-48 rounded-content bg-sub-background" />
+          <div className="h-48 rounded-content bg-zinc-200" />
+          <div className="h-48 rounded-content bg-zinc-200" />
         </div>
-        <div className="h-64 rounded-content bg-sub-background" />
+        <div className="h-64 rounded-content bg-zinc-200" />
       </div>
     </div>
   );
@@ -328,7 +287,7 @@ function DashboardLoadingState() {
 function DashboardNoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}
@@ -345,16 +304,15 @@ function DashboardNoScoreboardState() {
   const t = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Logo size="20px" className="text-primary" />}
           title={t("noScoreboardTitle")}
           description={t("noScoreboardDesc")}
           actions={
             <Button
               asChild
-              className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
+              className="h-[56px] w-full flex items-center justify-center px-8 text-[16px] font-black rounded-[24px] bg-zinc-900 text-white hover:bg-zinc-800 transition-colors active:scale-[0.98]"
             >
               <Link href={`/${workspaceId}/setup?mode=create`}>{t("createScoreboard")}</Link>
             </Button>

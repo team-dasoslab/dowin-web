@@ -202,25 +202,25 @@ export default function LoginPageClient() {
 
   if (recoveryCodes) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+      <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-        <Card className="w-full max-w-[480px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+        <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
           <div className="space-y-4 text-center mb-8">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 uppercase leading-none">
               {t("recovery.title")}
             </h1>
-            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
+            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep">
               {t("recovery.description")}
             </p>
           </div>
 
-          <div className="mt-8 rounded-content border border-border bg-sub-background p-4 sm:p-6">
+          <div className="mt-8 rounded-[24px] border-none bg-zinc-50 p-4 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               {recoveryCodes.map((code) => (
                 <div
                   key={code}
-                  className="rounded-button border border-border bg-sub-background px-3 py-3 text-center text-[13px] sm:text-sm font-black tracking-wider sm:tracking-widest text-text-primary truncate"
+                  className="rounded-[12px] border-none bg-white px-3 py-4 text-center text-[15px] sm:text-[16px] font-mono font-bold tracking-widest text-zinc-900 truncate"
                 >
                   {code}
                 </div>
@@ -229,59 +229,61 @@ export default function LoginPageClient() {
           </div>
 
           {error && (
-            <div className="mt-6 p-4 bg-danger/5 border border-danger/10 rounded-content">
+            <div className="mt-6 p-4 bg-danger/5 border border-danger/10 rounded-[16px]">
               <p className="text-danger text-[12px] font-bold text-center leading-tight">
                 {error}
               </p>
             </div>
           )}
 
-          <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <Button
-              type="button"
-              onClick={handleCopyRecoveryCodes}
-              className="w-full rounded-button py-4 text-[13px] font-bold border border-border bg-white text-text-primary transition-all"
-            >
-              {isCopied ? (
-                <span className="inline-flex items-center gap-2">
-                  <DowinIcon
-                    name="status-checkmark"
-                    size="16px"
-                    className="text-success"
-                  />
-                  {t("recovery.copied")}
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-2">
-                  <DowinIcon
-                    name="action-copy"
-                    size="16px"
-                    className="opacity-50"
-                  />
-                  {t("recovery.copy")}
-                </span>
-              )}
-            </Button>
-            <Button
-              type="button"
-              onClick={handleDownloadRecoveryCodes}
-              className="w-full rounded-button py-4 text-[13px] font-bold border border-border bg-white text-text-primary transition-all"
-            >
-              {t("recovery.saveTxt")}
-            </Button>
+          <div className="mt-10 flex flex-col gap-3">
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                onClick={handleCopyRecoveryCodes}
+                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors active:scale-[0.98]"
+              >
+                {isCopied ? (
+                  <span className="inline-flex items-center gap-2">
+                    <DowinIcon
+                      name="status-checkmark"
+                      size="16px"
+                      className="text-success"
+                    />
+                    {t("recovery.copied")}
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-2">
+                    <DowinIcon
+                      name="action-copy"
+                      size="16px"
+                      className="opacity-50"
+                    />
+                    {t("recovery.copy")}
+                  </span>
+                )}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleDownloadRecoveryCodes}
+                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors active:scale-[0.98]"
+              >
+                {t("recovery.saveTxt")}
+              </Button>
+            </div>
             <Button
               type="button"
               onClick={() => {
                 router.push("/workspace/new");
               }}
-              className="w-full rounded-button py-4 text-[13px] font-black bg-text-primary text-white transition-all"
+              className="w-full h-[56px] rounded-[24px] text-[17px] font-bold border-none bg-primary text-white transition-transform active:scale-[0.98]"
             >
               {t("continue")}
             </Button>
           </div>
         </Card>
 
-        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
+        <p className="absolute bottom-8 text-[11px] font-bold text-zinc-400 tracking-widest">
           © 2026 Dasoslab. All rights reserved.
         </p>
       </div>
@@ -289,19 +291,19 @@ export default function LoginPageClient() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-50/50 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] bg-white border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-12">
-          <div className="w-16 h-16 bg-white border border-border rounded-content flex items-center justify-center">
-            <Logo size="32px" className="text-text-primary" />
+          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center">
+            <Logo size="32px" className="text-zinc-900" />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 leading-none">
               {mode === "login" ? t("login") : t("signup")}
             </h1>
-            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
+            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep">
               {mode === "login" ? t("subtitle") : t("signupSubtitle")}
             </p>
           </div>
@@ -310,67 +312,52 @@ export default function LoginPageClient() {
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="space-y-5">
             {mode === "signup" && (
-              <div className="space-y-2 animate-fade-in-up">
-                <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                  {t("nickname")}
-                </label>
-                <Input
-                  type="text"
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  placeholder={t("nicknamePlaceholder")}
-                  className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
-                  required
-                />
-              </div>
+              <Input
+                label={t("nickname")}
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder={t("nicknamePlaceholder")}
+                containerClassName="animate-fade-in-up"
+                required
+              />
             )}
 
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                {t("id")}
-              </label>
-              <Input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                placeholder={t("idPlaceholder")}
-                className="w-full px-5 py-4 bg-sub-background border border-border rounded-content text-sm focus:border-primary focus:bg-white outline-none transition-all placeholder:text-text-muted font-bold"
-                required
-              />
-            </div>
+            <Input
+              label={t("id")}
+              type="text"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+              placeholder={t("idPlaceholder")}
+              required
+            />
 
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1">
-                {t("password")}
-              </label>
-              <PasswordInput
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                placeholder={t("passwordPlaceholder")}
-                className="w-full rounded-content border border-border bg-sub-background px-5 py-4 pr-14 text-sm font-bold outline-none transition-all placeholder:text-text-muted focus:border-primary focus:bg-white"
-                toggleClassName="absolute right-4 top-1/2 flex -tranzinc-y-1/2 items-center text-text-muted transition-colors"
-                required
-              />
-            </div>
+            <PasswordInput
+              label={t("password")}
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              placeholder={t("passwordPlaceholder")}
+              required
+            />
           </div>
 
           {error && (
-            <div className="p-4 bg-danger/5 border border-danger/10 rounded-content animate-shake">
+            <div className="p-4 bg-danger/5 border border-danger/10 rounded-[16px] animate-shake">
               <p className="text-danger text-[12px] font-bold text-center leading-tight">
                 {error}
               </p>
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <Button
               type="submit"
               disabled={isPending}
               className={`
-                w-full py-4 flex items-center justify-center gap-3 rounded-button text-[15px] font-black transition-all
+                h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform active:scale-[0.98]
                 ${isPending
-                  ? "bg-sub-background text-text-muted cursor-not-allowed border border-border"
-                  : "bg-text-primary text-white"
+                  ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                  : "bg-primary text-white"
                 }
               `}
             >
@@ -387,38 +374,39 @@ export default function LoginPageClient() {
               )}
             </Button>
 
-            <div className="text-center space-y-3">
-              {mode === "login" ? (
-                <>
-                  <Link
-                    href="/account-recovery"
-                    className="block text-[13px] font-bold text-text-muted transition-colors"
-                  >
-                    {t("forgotPassword")}
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => resetErrorAndSwitchMode("signup")}
-                    className="text-[13px] font-bold text-primary transition-colors"
-                  >
-                    {t("noAccount")}
-                  </button>
-                </>
-              ) : (
+            {mode === "login" ? (
+              <div className="flex items-center justify-center gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => resetErrorAndSwitchMode("signup")}
+                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
+                >
+                  {t("signup")}
+                </button>
+                <span className="h-3 w-[1px] bg-zinc-300" />
+                <Link
+                  href="/account-recovery"
+                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
+                >
+                  {t("recoveryPage.title")}
+                </Link>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center pt-4">
                 <button
                   type="button"
                   onClick={() => resetErrorAndSwitchMode("login")}
-                  className="text-[13px] font-bold text-primary transition-colors"
+                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
                 >
-                  {t("hasAccount")}
+                  {t("login")}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </form>
       </Card>
 
-      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
+      <p className="absolute bottom-8 text-[11px] font-bold text-zinc-400 tracking-widest">
         © 2026 Dasoslab. All rights reserved.
       </p>
     </div>

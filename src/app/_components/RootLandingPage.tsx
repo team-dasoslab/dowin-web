@@ -486,16 +486,16 @@ export function RootLandingPage() {
         <div className="absolute left-1/2 top-1/2 -z-10 h-[400px] w-[400px] -tranzinc-x-1/2 -tranzinc-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
 
         <div className="mx-auto flex max-w-[900px] flex-col items-center px-6 text-center">
-          <h2 className="whitespace-pre-line text-[40px] font-black leading-[1.1] tracking-tighter text-text-primary uppercase md:text-[64px]">
+          <h2 className="whitespace-pre-line text-[40px] font-black leading-[1.1] tracking-tighter text-zinc-900 uppercase md:text-[64px]">
             {t("Footer.headline")}
           </h2>
-          <p className="mt-6 max-w-[600px] whitespace-pre-line text-[18px] font-medium leading-relaxed text-text-secondary break-keep md:text-[20px]">
+          <p className="mt-6 max-w-[600px] whitespace-pre-line text-[18px] font-medium leading-relaxed text-zinc-500 break-keep md:text-[20px]">
             {t("Footer.description")}
           </p>
           <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row">
             <Button
               asChild
-              className="flex h-[64px] min-w-[240px] items-center justify-center rounded-button bg-text-primary px-10 text-[18px] font-black text-white"
+              className="flex h-[64px] min-w-[240px] items-center justify-center rounded-[16px] bg-zinc-900 px-10 text-[18px] font-black text-white"
             >
               <Link href="/login" className="text-white">
                 {t("Footer.cta")}

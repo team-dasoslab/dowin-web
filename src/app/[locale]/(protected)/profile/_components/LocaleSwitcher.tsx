@@ -36,7 +36,7 @@ export function LocaleSwitcher() {
       <select
         value={locale}
         onChange={(e) => handleLocaleChange(e.target.value as "ko" | "en")}
-        className="h-9 min-w-[100px] cursor-pointer rounded-button border border-border bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:border-primary focus:bg-white"
+        className="h-9 min-w-[100px] cursor-pointer rounded-[12px] border-none bg-zinc-100 px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-zinc-200"
       >
         <option value="ko">{t("languageKo")}</option>
         <option value="en">{t("languageEn")}</option>

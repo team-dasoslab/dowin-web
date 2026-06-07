@@ -3,7 +3,6 @@
 import { ScoreboardCard } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ScoreboardCard";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -49,7 +48,7 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="px-3 py-1.5 border border-border text-text-secondary rounded-lg text-xs font-bold transition-colors whitespace-nowrap flex-shrink-0"
+              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-4 text-[13px] font-black text-zinc-900 transition-colors hover:bg-zinc-200 whitespace-nowrap flex-shrink-0"
             >
               {pendingActionId === activeScoreboardId && (
                 <InlineSpinner
@@ -75,26 +74,26 @@ function EmptyActiveScoreboardCard() {
   const td = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center space-y-4">
-      <div className="w-12 h-12 bg-primary/10 rounded-content mx-auto flex items-center justify-center">
+    <div className="rounded-[24px] bg-zinc-50/50 p-8 text-center space-y-4">
+      <div className="w-12 h-12 bg-white rounded-[16px] shadow-sm mx-auto flex items-center justify-center">
          <Logo size="24px" className="text-primary" />
       </div>
       <div className="space-y-1">
-        <p className="text-sm font-semibold text-text-primary">
+        <p className="text-[15px] font-black text-zinc-900">
           {t("noActive")}
         </p>
-        <p className="text-xs text-text-muted">{t("noActiveDesc")}</p>
+        <p className="text-[13px] font-medium text-zinc-500">{t("noActiveDesc")}</p>
       </div>
       <div className="flex justify-center">
         <Button
           asChild
-          className="btn-dowin-primary px-4 py-2 text-xs font-bold"
+          className="btn-dowin-primary rounded-[16px] px-5 py-3 text-[14px] font-black"
         >
           <Link href={`/${workspaceId}/setup?mode=create`}>
             {td("createScoreboard")}
           </Link>
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }

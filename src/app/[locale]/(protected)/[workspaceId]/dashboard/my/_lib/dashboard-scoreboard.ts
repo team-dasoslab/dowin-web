@@ -124,7 +124,11 @@ export const updateWeeklyLogsCache = (
               ? { value: true, count: 0, achieved: true }
               : value,
         };
-        const achieved = Object.values(nextLogs).filter(Boolean).length;
+        const achieved = Object.values(nextLogs).filter((log) => {
+          if (!log) return false;
+          if (typeof log === "object" && "achieved" in log) return log.achieved;
+          return true; // For legacy boolean logs
+        }).length;
         const targetValue = leadMeasure.targetValue ?? 0;
         const achievementRate =
           targetValue > 0

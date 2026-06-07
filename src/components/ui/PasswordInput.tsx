@@ -1,6 +1,7 @@
 import { Input, type InputProps } from "@/components/ui/Input";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 type PasswordInputProps = Omit<InputProps, "type"> & {
   toggleClassName?: string;
@@ -17,24 +18,27 @@ export const PasswordInput = ({
 
   return (
     <div className={wrapperClassName}>
-      <div className="relative">
-        <Input
-          {...props}
-          type={isVisible ? "text" : "password"}
-          className={className}
-        />
-        <button
-          type="button"
-          onClick={() => setIsVisible((previous) => !previous)}
-          className={toggleClassName}
-        >
-          {isVisible ? (
-            <DowinIcon name="auth-eye-off" size="14px" />
-          ) : (
-            <DowinIcon name="auth-eye" size="14px" />
-          )}
-        </button>
-      </div>
+      <Input
+        {...props}
+        type={isVisible ? "text" : "password"}
+        className={className}
+        rightElement={
+          <button
+            type="button"
+            onClick={() => setIsVisible((previous) => !previous)}
+            className={cn(
+              "flex items-center text-zinc-400 hover:text-zinc-600 transition-colors",
+              toggleClassName
+            )}
+          >
+            {isVisible ? (
+              <DowinIcon name="auth-eye-off" size="18px" />
+            ) : (
+              <DowinIcon name="auth-eye" size="18px" />
+            )}
+          </button>
+        }
+      />
     </div>
   );
 };

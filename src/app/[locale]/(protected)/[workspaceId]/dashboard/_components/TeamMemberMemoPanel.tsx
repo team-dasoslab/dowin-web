@@ -6,11 +6,9 @@ import {
   TeamDashboardMemberRole,
 } from "@/api/generated/dowin.schemas";
 import { useMobileViewSheet } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useMobileViewSheet";
-import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Input } from "@/components/ui/Input";
+import { UserAvatar } from "@/components/UserAvatar";
 import { useTranslations } from "next-intl";
 import { TouchEvent, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -170,10 +168,10 @@ export function TeamMemberMemoPanel({
                   aria-label={t("closeMemo")}
                 />
                 <div
-                  className="absolute inset-x-0 bottom-0 border-t border-border bg-white px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
+                  className="absolute inset-x-0 bottom-0 bg-white px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
                 >
                   <div className="flex items-center gap-2">
-                    <Input
+                    <input
                       value={memoDraft}
                       onChange={(event) => setMemoDraft(event.target.value)}
                       onKeyDown={(event) => {
@@ -183,14 +181,14 @@ export function TeamMemberMemoPanel({
                         }
                       }}
                       placeholder={t("addComment")}
-                      className="h-10 flex-1 rounded-button border border-border bg-white px-3 text-sm text-text-primary placeholder:text-text-muted"
+                      className="h-10 flex-1 rounded-[16px] border-none bg-zinc-100 px-4 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
                       disabled={isCreatePending}
                     />
                     <Button
                       type="button"
                       onClick={() => void handleAddMemo()}
                       disabled={!memoDraft.trim() || isCreatePending}
-                      className="inline-flex h-10 w-10 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
                       aria-label={t("submitMemo")}
                     >
                       <DowinIcon name="action-send" size="16px" />
@@ -211,7 +209,7 @@ export function TeamMemberMemoPanel({
                   aria-label={t("closeMemo")}
                 />
                 <div
-                  className="absolute inset-x-0 bottom-0 max-h-[78dvh] overflow-hidden rounded-t-[28px] bg-white pb-[var(--safe-area-inset-bottom,0px)] shadow-[0_-18px_40px_rgba(15,23,42,0.18)] transition-transform duration-200 ease-out"
+                  className="absolute inset-x-0 bottom-0 max-h-[78dvh] overflow-hidden rounded-t-[28px] bg-white pb-[var(--safe-area-inset-bottom,0px)] transition-transform duration-200 ease-out"
                   style={{
                     transform: isMobileViewSheetClosing
                       ? "translateY(100%)"
@@ -235,10 +233,10 @@ export function TeamMemberMemoPanel({
                         size={28}
                       />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-text-primary">
+                        <p className="truncate text-sm font-bold text-zinc-900">
                           {member.nickname}
                         </p>
-                        <p className="truncate text-xs text-text-muted">
+                        <p className="truncate text-xs text-zinc-500">
                           {t("viewMemos")}
                         </p>
                       </div>
@@ -280,9 +278,9 @@ export function TeamMemberMemoPanel({
       {shouldShowMemoRail && (
         <div className="hidden space-y-3 md:hidden xl:absolute xl:left-[calc(100%+20px)] xl:top-8 xl:block xl:w-[300px]">
           {isComposeMode ? (
-            <Card className="rounded-content border border-border bg-white p-2.5 shadow-none">
+            <div className="rounded-[24px] bg-white p-2.5">
               <div className="flex items-center gap-2">
-                <Input
+                <input
                   value={memoDraft}
                   onChange={(event) => setMemoDraft(event.target.value)}
                   onKeyDown={(event) => {
@@ -292,20 +290,20 @@ export function TeamMemberMemoPanel({
                     }
                   }}
                   placeholder={t("addComment")}
-                  className="h-8 flex-1 border-0 bg-transparent px-2 text-xs text-text-primary outline-none placeholder:text-text-muted"
+                  className="h-8 flex-1 border-0 bg-transparent px-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:outline-none focus:ring-0 w-full"
                   disabled={isCreatePending}
                 />
                 <Button
                   type="button"
                   onClick={() => void handleAddMemo()}
                   disabled={!memoDraft.trim() || isCreatePending}
-                  className="inline-flex h-8 w-8 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
                   aria-label={t("submitMemo")}
                 >
                   <DowinIcon name="action-send" size="16px" />
                 </Button>
               </div>
-            </Card>
+            </div>
           ) : null}
 
           {memoMode === "view" && (
@@ -363,11 +361,11 @@ function MemoCard({
   const isOptimisticMemo = memo.id <= 0;
 
   return (
-    <Card
-      className={`rounded-content border px-4 py-3 transition-colors ${
+    <div
+      className={`rounded-[16px] px-4 py-3 transition-colors ${
         memo.isResolved
-          ? "border-primary/20 bg-primary/5"
-          : "border-border bg-white"
+          ? "bg-zinc-50"
+          : "bg-white"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -380,17 +378,17 @@ function MemoCard({
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="truncate text-xs font-bold text-text-primary">
+              <p className="truncate text-xs font-bold text-zinc-900">
                 {memo.author.nickname}
               </p>
-              <span className="text-[11px] text-text-muted">
+              <span className="text-[11px] text-zinc-500">
                 {formatRelativeTime(memo.createdAt, t)}
               </span>
             </div>
           </div>
         </div>
         {canResolveMemo || canDeleteMemo ? (
-          <div className="flex items-center overflow-hidden rounded-lg border border-border bg-white">
+          <div className="flex items-center overflow-hidden rounded-[12px] bg-zinc-100">
             {canResolveMemo ? (
               <button
                 type="button"
@@ -398,8 +396,8 @@ function MemoCard({
                 disabled={isResolvePending || isOptimisticMemo}
                 className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 ${
                   memo.isResolved
-                    ? "border-primary/25 bg-primary/10 text-primary"
-                    : "text-text-muted"
+                    ? "bg-primary/10 text-primary"
+                    : "text-zinc-400 hover:bg-zinc-200"
                 }`}
                 aria-label={t("verifyMemo")}
               >
@@ -411,7 +409,7 @@ function MemoCard({
                 type="button"
                 onClick={() => void onDelete(memo.id)}
                 disabled={isDeletePending || isOptimisticMemo}
-                className={`inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors disabled:opacity-50 ${ canResolveMemo ? "border-l border-border" : "" }`}
+                className="inline-flex h-8 w-8 items-center justify-center text-zinc-400 transition-colors disabled:opacity-50 hover:bg-zinc-200"
                 aria-label={t("deleteMemo")}
               >
                 <DowinIcon name="action-delete" size="16px" />
@@ -423,21 +421,21 @@ function MemoCard({
       <p
         className={`mt-2 text-sm leading-6 ${
           memo.isResolved
-            ? "text-text-secondary line-through"
-            : "text-text-primary"
+            ? "text-zinc-400 line-through"
+            : "text-zinc-900"
         }`}
       >
         {memo.content}
       </p>
-    </Card>
+    </div>
   );
 }
 
 function MemoStatusCard({ message }: { message: string }) {
   return (
-    <Card className="rounded-content border border-border bg-white px-4 py-4">
-      <p className="text-sm text-text-muted">{message}</p>
-    </Card>
+    <div className="rounded-[16px] bg-white px-4 py-4">
+      <p className="text-sm text-zinc-500">{message}</p>
+    </div>
   );
 }
 

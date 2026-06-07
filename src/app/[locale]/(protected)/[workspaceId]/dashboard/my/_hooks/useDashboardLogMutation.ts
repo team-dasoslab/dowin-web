@@ -195,10 +195,13 @@ export const useDashboardLogMutation = ({
             queryKey: weeklyLogsQueryKey ?? undefined,
           });
 
+          const leadMeasure = weeklyById.get(leadMeasureId);
+          const dailyTargetCount = leadMeasure?.dailyTargetCount ?? 1;
+
           // Build a DailyLogCell to pass into the optimistic cache.
           const cacheValue: import("@/api/generated/dowin.schemas").DailyLogCell | null =
             "count" in data && typeof data.count === "number"
-              ? { value: data.count > 0, count: data.count, achieved: false }
+              ? { value: data.count > 0, count: data.count, achieved: data.count >= dailyTargetCount }
               : { value: !!("value" in data && data.value), count: 0, achieved: !!("value" in data && data.value) };
           return createToggleLogContext(leadMeasureId, date, cacheValue);
         },

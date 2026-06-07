@@ -15,7 +15,6 @@ import { MemberListItem } from "@/app/[locale]/(protected)/workspace/members/_co
 import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/workspace/members/_hooks/useRemoveWorkspaceMember";
 import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/workspace/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -102,23 +101,35 @@ export default function ProfileMembersPage() {
     workspace.isOverFreeMemberLimit || members.length >= memberLimit;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer>
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center gap-4 rounded-lg border border-border px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <DowinIcon name="domain-people" size="20px" />
+        <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5">
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
+              <DowinIcon name="domain-people" size="20px" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-bold tracking-tight text-zinc-900">
+                {workspace.name}
+              </h1>
+              <p className="mt-0.5 truncate text-xs text-zinc-500">
+                {t("membersCountDesc", { count: members.length })}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h1 className="text-lg font-bold tracking-tight text-text-primary">
-              {workspace.name}
-            </h1>
-            <p className="mt-0.5 text-xs text-text-muted">
-              {t("membersCountDesc", { count: members.length })}
-            </p>
+          <div className="flex shrink-0 items-center">
+            <Button
+              asChild
+              className="h-9 rounded-[12px] bg-zinc-100 px-3.5 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
+            >
+              <Link href={getWorkspacePath(workspaceParamId, "/workspace/invites")}>
+                {t("invitesCardButton")}
+              </Link>
+            </Button>
           </div>
-        </Card>
+        </div>
 
         {workspace.isOverFreeMemberLimit ? (
           <WorkspaceOverLimitBanner
@@ -128,45 +139,30 @@ export default function ProfileMembersPage() {
           />
         ) : null}
 
-        <Card className="flex items-center justify-between gap-3 rounded-lg border border-border p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("invitesCardTitle")}
-            </h2>
-            <p className="text-[11px] text-text-muted">
-              {t("invitesCardDesc")}
-            </p>
-          </div>
-          <Button
-            asChild
-            className="btn-dowin-primary rounded-content px-3 py-2 text-xs font-bold"
-          >
-            <Link href={getWorkspacePath(workspaceParamId, "/workspace/invites")}>
-              {t("invitesCardButton")}
-            </Link>
-          </Button>
-        </Card>
-
-        <Card className="space-y-4 rounded-lg border border-border p-4">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-text-primary">
-              {t("currentMembersTitle")}
-              <span
-                className={`ml-2 text-xs font-semibold ${
-                  isAtOrOverMemberLimit ? "text-danger" : "text-text-secondary"
-                }`}
-              >
-                {`${members.length} / ${memberLimit}`}
+        <div className="space-y-4 rounded-[24px] bg-white p-5">
+          <div className="flex items-center justify-between gap-3">
+            <div className="space-y-1">
+              <h2 className="text-sm font-bold text-zinc-900">
+                {t("currentMembersTitle")}
+              </h2>
+            </div>
+            <div
+              className={`flex shrink-0 items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-bold tracking-tight ${
+                isAtOrOverMemberLimit
+                  ? "bg-red-50 text-red-600"
+                  : "bg-zinc-100 text-zinc-600"
+              }`}
+            >
+              <span>{members.length}</span>
+              <span className={isAtOrOverMemberLimit ? "text-red-400" : "text-zinc-400"}>
+                / {memberLimit}
               </span>
-            </h2>
-            <p className="text-[11px] text-text-muted">
-              {t("currentMembersDesc")}
-            </p>
+            </div>
           </div>
 
-          <div className="overflow-hidden rounded-content border border-border">
+          <div className="flex flex-col divide-y divide-zinc-100">
             {members.length === 0 ? (
-              <div className="bg-white px-4 py-10 text-center text-sm text-text-muted">
+              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
                 {t("noMembers")}
               </div>
             ) : (
@@ -192,7 +188,7 @@ export default function ProfileMembersPage() {
               })
             )}
           </div>
-        </Card>
+        </div>
       </ProtectedPageContainer>
     </div>
   );
@@ -200,11 +196,11 @@ export default function ProfileMembersPage() {
 
 function MembersPageSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
-        <div className="h-72 rounded-content bg-sub-background" />
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer isLoading className="max-w-[640px]">
+        <div className="h-10 rounded-content bg-zinc-200" />
+        <div className="h-24 rounded-content bg-zinc-200" />
+        <div className="h-72 rounded-content bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );
@@ -213,9 +209,9 @@ function MembersPageSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("ProfileMembers");
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Logo size="24px" />
           </div>
@@ -228,7 +224,7 @@ function NoWorkspaceState() {
           <div className="flex justify-center">
             <NoWorkspaceActions />
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
@@ -238,9 +234,9 @@ function NoAccessState() {
   const t = useTranslations("ProfileMembers");
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-4 rounded-content border border-border p-6 text-center">
+        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <DowinIcon name="status-locked" size="20px" />
           </div>
@@ -256,7 +252,7 @@ function NoAccessState() {
           >
             <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
           </Button>
-        </Card>
+        </div>
       </div>
     </div>
   );
