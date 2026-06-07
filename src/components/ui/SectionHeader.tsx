@@ -16,7 +16,7 @@ export function SectionHeader({
   return (
     <div className={cn("px-1 mb-4", className)} {...props}>
       <div className="flex items-center gap-2">
-        <h2 className="text-[22px] font-bold tracking-tight text-zinc-900">
+        <h2 className="text-[18px] md:text-[22px] font-bold tracking-tight text-zinc-900">
           {title}
         </h2>
         {badge && <div>{badge}</div>}
