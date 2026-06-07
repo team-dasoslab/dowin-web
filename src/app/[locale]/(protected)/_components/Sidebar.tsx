@@ -71,7 +71,7 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="fixed inset-x-0 top-0 z-[110] hidden h-[64px] border-b border-zinc-200 bg-white/95 backdrop-blur-sm md:flex items-center">
+      <aside className="fixed inset-x-0 top-0 z-[110] hidden h-[64px] border-b border-zinc-200 bg-white/95 backdrop-blur-sm lg:flex items-center">
         <div className="flex items-center justify-between w-full max-w-[1200px] mx-auto px-4 md:px-10 lg:px-12 gap-8">
           <div className="flex-shrink-0 w-[200px]">
             {/* Workspace Pill */}
@@ -103,7 +103,7 @@ export function Sidebar() {
                     key={href}
                     href={href}
                     className={cn(
-                      "flex items-center justify-center min-w-[110px] whitespace-nowrap h-full border-b-[3px] transition-all text-[15px]",
+                      "flex items-center justify-center px-4 min-w-fit whitespace-nowrap h-full border-b-[3px] transition-all text-[15px]",
                       isActive
                         ? "border-primary text-primary font-bold"
                         : "border-transparent text-zinc-500 font-semibold",
@@ -121,7 +121,7 @@ export function Sidebar() {
       </aside>
 
       {isMainTab && (
-        <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-200 bg-white px-1 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 md:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-200 bg-white px-1 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 lg:hidden">
           <div className="mx-auto grid max-w-[520px] grid-cols-4 gap-1">
             {filteredLinks.map(
               ({ href, iconName, iconNameActive, translationKey }) => {

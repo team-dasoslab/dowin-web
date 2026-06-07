@@ -20,7 +20,7 @@ export function ProtectedLayoutShell({
       {sidebar}
       <main
         id="main-scroll-container"
-        className="flex-1 overflow-y-auto overflow-x-hidden md:pt-[64px]"
+        className="flex-1 overflow-y-auto overflow-x-hidden lg:pt-[64px]"
       >
         {children}
       </main>
