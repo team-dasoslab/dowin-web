@@ -16,12 +16,10 @@ import { type CelebrationLevel } from "@/app/[locale]/(protected)/[workspaceId]/
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -29,6 +27,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 
 export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
@@ -167,7 +166,7 @@ export default function MyDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       {celebrationLevel ? (
         <DashboardCelebrationOverlay level={celebrationLevel} />
       ) : null}
@@ -175,7 +174,7 @@ export default function MyDashboardPage() {
         <ProtectedPageHeader
           title={
             isProfileLoading ? (
-              <div className="h-8 w-48 animate-pulse rounded-content bg-zinc-100" />
+              <div className="h-8 w-48 animate-pulse rounded-content bg-zinc-200" />
             ) : nickname ? (
               t("userScoreboard", { nickname })
             ) : (
@@ -184,15 +183,13 @@ export default function MyDashboardPage() {
           }
           rightElement={
             <div className="flex flex-wrap gap-2">
-              <Button asChild className="h-9 px-3 text-[13px] font-bold rounded-button bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 transition-colors">
+              <Button asChild className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all active:scale-95">
                 <Link href={`/${workspaceId}/scoreboards`}>
-                  <DowinIcon name="nav-archive" size="16px" className="mr-1.5" />
                   {t("scoreboardArchive")}
                 </Link>
               </Button>
-              <Button asChild className="h-9 px-3 text-[13px] font-bold rounded-button bg-white text-zinc-700 border border-zinc-200 hover:bg-zinc-50 transition-colors">
+              <Button asChild className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all active:scale-95">
                 <Link href={`/${workspaceId}/setup?mode=update`}>
-                  <DowinIcon name="action-edit" size="16px" className="mr-1.5" />
                   {t("manageScoreboard")}
                 </Link>
               </Button>
@@ -209,53 +206,15 @@ export default function MyDashboardPage() {
         ) : null}
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
-          {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-            <nav className="flex gap-1 lg:block lg:space-y-1">
-              {menuGroups.map((group) => {
-                const isActive = activeSection === group.id;
-                return (
-                  <button
-                    key={group.id}
-                    onClick={() => {
-                      const element = document.getElementById(group.id);
-                      const container = document.getElementById(
-                        "main-scroll-container",
-                      );
-                      if (container && element) {
-                        const headerOffset = 100;
-                        const elementPosition = element.offsetTop;
-                        const offsetPosition = elementPosition - headerOffset;
-                        container.scrollTo({
-                          top: offsetPosition,
-                          behavior: "smooth",
-                        });
-                      }
-                    }}
-                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
-                      isActive
-                        ? "text-primary"
-                        : "text-zinc-400"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {isActive && (
-                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
-                      )}
-                      <span className={isActive ? "" : "lg:pl-4"}>
-                        {group.label}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+          <PageSidebarNav
+            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            activeId={activeSection}
+          />
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-48">
-            <section id="overview" className="space-y-5 scroll-mt-28">
-              <SectionHeader title={t("recentTrend")} />
+            <section id="overview" className="space-y-4 scroll-mt-28">
+              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("recentTrend")}</h2>
               <ScoreboardOverviewSection
                 activeScoreboard={activeScoreboard}
                 isWeeklyTrendLoading={isWeeklyTrendLoading}
@@ -272,8 +231,8 @@ export default function MyDashboardPage() {
               />
             ) : null}
 
-            <section id="scoreboard" className="space-y-3 scroll-mt-28">
-              <SectionHeader title={t("executionBoard")} />
+            <section id="scoreboard" className="space-y-4 scroll-mt-28">
+              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("executionBoard")}</h2>
               <PeriodControls
                 monthLabel={monthLabel}
                 movePeriod={movePeriod}
@@ -289,9 +248,9 @@ export default function MyDashboardPage() {
               />
 
               {isLoading ? (
-                <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-50" />
+                <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-200" />
               ) : activeLeadMeasures.length === 0 ? (
-                <div className="border border-border rounded-lg p-8 text-center text-text-muted text-sm">
+                <div className="rounded-[24px] bg-white py-12 text-center text-zinc-500 font-medium text-[15px]">
                   {t("noActiveMeasures")}
                 </div>
               ) : selectedView === "month" ? (
@@ -338,15 +297,15 @@ function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
 
 function MyDashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
+        <div className="h-16 rounded-content bg-zinc-200" />
+        <div className="h-24 rounded-content bg-zinc-200" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-content bg-sub-background" />
-          <div className="h-48 rounded-content bg-sub-background" />
+          <div className="h-48 rounded-content bg-zinc-200" />
+          <div className="h-48 rounded-content bg-zinc-200" />
         </div>
-        <div className="h-72 rounded-content bg-sub-background" />
+        <div className="h-72 rounded-content bg-zinc-200" />
       </div>
     </div>
   );
@@ -355,7 +314,7 @@ function MyDashboardSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}
@@ -374,10 +333,9 @@ function NoScoreboardState() {
   const t = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
-          icon={<Logo size="20px" className="text-primary" />}
           title={t("noScoreboardTitle")}
           description={
             <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>
@@ -385,7 +343,7 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm rounded-button"
+              className="h-[56px] w-full flex items-center justify-center px-8 text-[16px] font-black rounded-[24px] bg-zinc-900 text-white hover:bg-zinc-800 transition-colors active:scale-[0.98]"
             >
               <Link href={`/${workspaceId}/setup?mode=create`}>{t("createScoreboard")}</Link>
             </Button>

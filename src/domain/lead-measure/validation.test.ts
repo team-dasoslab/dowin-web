@@ -16,6 +16,30 @@ describe("LeadMeasure Validation", () => {
     expect(result.success).toBe(true);
   });
 
+  it("횟수형 생성 요청은 하루 목표 횟수를 허용한다", () => {
+    const result = leadMeasureCreateSchema.safeParse({
+      name: "주 3일 DM",
+      targetValue: 3,
+      period: "WEEKLY",
+      trackingMode: "COUNT",
+      dailyTargetCount: 10,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("하루 목표 횟수는 20회를 초과할 수 없다", () => {
+    const result = leadMeasureCreateSchema.safeParse({
+      name: "주 3일 DM",
+      targetValue: 3,
+      period: "WEEKLY",
+      trackingMode: "COUNT",
+      dailyTargetCount: 21,
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it("목표 횟수가 1 미만이면 실패한다", () => {
     const result = leadMeasureCreateSchema.safeParse({
       name: "매일 물 2L 마시기",

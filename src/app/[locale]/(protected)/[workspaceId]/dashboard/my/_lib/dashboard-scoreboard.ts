@@ -4,14 +4,16 @@ import {
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
   getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200,
 } from "@/api/generated/daily-log/daily-log";
-import { toNumberId } from "@/lib/client/frontend-api";
 import { getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
+import { toNumberId } from "@/lib/client/frontend-api";
 
 export type WeeklyLogsQueryData =
   | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200
   | undefined;
 
-export type DailyLogValue = boolean | null;
+import type { DailyLogCell } from "@/api/generated/dowin.schemas";
+
+export type DailyLogValue = DailyLogCell | null;
 
 export type DashboardView = "week" | "month";
 
@@ -35,7 +37,12 @@ export type WeeklyTrendPoint = {
   rate: number;
 };
 
-export const getNextLogValue = (value: DailyLogValue): DailyLogValue => {
+export const getNextLogValue = (
+  value: DailyLogValue | boolean | null,
+): boolean | null => {
+  if (value && typeof value === "object") {
+    return value.value ? null : true;
+  }
   return value === true ? null : true;
 };
 
@@ -70,7 +77,10 @@ export const computeWeeklyRate = (
     (leadMeasure: { period?: string }) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure) => [leadMeasure.id ?? null, leadMeasure]),
+    weeklyLeadMeasures.map((leadMeasure) => [
+      leadMeasure.id ?? null,
+      leadMeasure,
+    ]),
   );
 
   const achieved = weeklyTargetMeasures.reduce((accumulator, leadMeasure) => {
@@ -109,14 +119,22 @@ export const updateWeeklyLogsCache = (
 
         const nextLogs = {
           ...(leadMeasure.logs ?? {}),
-          [date]: value,
+          [date]:
+            value && typeof value !== "object"
+              ? { value: true, count: 0, achieved: true }
+              : value,
         };
-        const achieved = Object.values(nextLogs).filter(Boolean).length;
+        const achieved = Object.values(nextLogs).filter((log) => {
+          if (!log) return false;
+          if (typeof log === "object" && "achieved" in log) return log.achieved;
+          return true; // For legacy boolean logs
+        }).length;
         const targetValue = leadMeasure.targetValue ?? 0;
         const achievementRate =
           targetValue > 0
-            ? Math.round((Math.min(achieved, targetValue) / targetValue) * 1000) /
-            10
+            ? Math.round(
+                (Math.min(achieved, targetValue) / targetValue) * 1000,
+              ) / 10
             : 0;
 
         return {

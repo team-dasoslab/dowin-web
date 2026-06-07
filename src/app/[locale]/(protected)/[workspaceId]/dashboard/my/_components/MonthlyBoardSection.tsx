@@ -1,6 +1,6 @@
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
-import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { MonthlyMobileCards } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/MonthlyMobileCards";
+import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
@@ -20,8 +20,6 @@ export function MonthlyBoardSection({
   monthLabel,
   monthWeeks,
   monthlyLeadMeasures,
-  monthlyOverallRate,
-  monthlySummary,
   today,
 }: MonthlyBoardSectionProps) {
   const t = useTranslations("Dashboard");
@@ -43,28 +41,10 @@ export function MonthlyBoardSection({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-content border border-border bg-white px-5 py-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p className="text-xs font-bold text-text-primary">
-              {t("monthlyBoardTitle")}
-            </p>
-            <p className="text-[11px] text-text-muted">
-              {t("monthlyBoardDesc")}
-            </p>
-          </div>
-          <p className="text-[11px] text-text-muted">
-            {t("totalAchieved", {
-              achieved: monthlySummary?.achieved ?? 0,
-              total: monthlySummary?.total ?? 0,
-            })}{" "}
-            · {monthlyOverallRate}%
-          </p>
-        </div>
-      </div>
+
 
       {monthlyLeadMeasures.length === 0 ? (
-        <div className="rounded-content border border-border bg-white p-8 text-center text-sm text-text-muted">
+        <div className="rounded-[24px] bg-white p-8 text-center text-[14px] font-medium text-zinc-500">
           {t("noMonthlyMeasures")}
         </div>
       ) : (
@@ -81,14 +61,14 @@ export function MonthlyBoardSection({
             {monthWeeks.map((weekDatesInMonth, weekIndex) => (
               <div
                 key={`${monthLabel}-week-${weekIndex + 1}`}
-                className="overflow-hidden rounded-content border border-border bg-white"
+                className="overflow-hidden rounded-[24px] bg-white"
               >
-                <div className="border-b border-border bg-sub-background px-5 py-3">
+                <div className="border-b-2 border-zinc-50 bg-white px-6 py-4">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-bold text-text-primary">
+                    <p className="text-[14px] font-black text-zinc-900">
                       {t("weekNumber", { n: weekIndex + 1 })}
                     </p>
-                    <p className="text-[11px] font-mono text-text-muted">
+                    <p className="text-[12px] font-mono font-medium text-zinc-500">
                       {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
                       {" – "}
                       {weekDatesInMonth
@@ -102,7 +82,7 @@ export function MonthlyBoardSection({
 
                 <div className="overflow-x-auto">
                   <div className="min-w-[600px]">
-                    <div className="border-b border-border bg-sub-background">
+                    <div className="border-b-2 border-zinc-50 bg-white">
                       <table className="w-full table-fixed text-xs">
                         <colgroup>
                           <col className="w-[34%]" />
@@ -114,7 +94,7 @@ export function MonthlyBoardSection({
                         </colgroup>
                         <thead>
                           <tr>
-                            <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                            <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                               {t("leadMeasureHead")}
                             </th>
                             {localizedDays.map((label, dayIndex) => {
@@ -125,7 +105,7 @@ export function MonthlyBoardSection({
                                 <th
                                   key={`${weekIndex}-${label}`}
                                   className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
-                                    isToday ? "text-primary" : "text-text-muted"
+                                    isToday ? "text-primary" : "text-zinc-500"
                                   }`}
                                 >
                                   <div>{label}</div>
@@ -135,10 +115,10 @@ export function MonthlyBoardSection({
                                 </th>
                               );
                             })}
-                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                               {t("period")}
                             </th>
-                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                               {t("achievement")}
                             </th>
                           </tr>
@@ -155,7 +135,7 @@ export function MonthlyBoardSection({
                         <col className="w-[10%]" />
                         <col className="w-[16%]" />
                       </colgroup>
-                      <tbody className="divide-y divide-border">
+                      <tbody className="divide-y-2 divide-zinc-50">
                         {monthlyLeadMeasures.map((leadMeasure) => {
                           const targetValue = leadMeasure.targetValue ?? 0;
                           const tags =
@@ -166,7 +146,7 @@ export function MonthlyBoardSection({
                                 return count;
                               }
 
-                              return leadMeasure.logs?.[date] === true
+                              return leadMeasure.logs?.[date]?.achieved
                                 ? count + 1
                                 : count;
                             },
@@ -202,33 +182,65 @@ export function MonthlyBoardSection({
                                     key={`${weekIndex}-${leadMeasure.id}-${localizedDays[dayIndex]}`}
                                     className="py-3 text-center"
                                   >
-                                    <span
-                                      className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-bold ${
-                                        value === true
-                                          ? "border-primary bg-primary text-white"
-                                          : date === null
-                                            ? "border-transparent bg-transparent text-transparent"
-                                            : isToday
-                                              ? "border-primary/30 bg-primary/5 text-primary"
-                                              : "border-border bg-sub-background text-text-muted"
-                                      }`}
-                                    >
-                                      {value === true ? (
-                                        <DowinIcon name="action-checkmark" size="14px" />
-                                      ) : null}
-                                    </span>
-                                  </td>
+                                  {(() => {
+                                    const typedLead = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                                    const trackingMode = typedLead.trackingMode;
+                                    const dailyTargetCount = typedLead.dailyTargetCount ?? 1;
+                                    const isCount = trackingMode === "COUNT";
+                                    const count = value?.count ?? 0;
+                                    
+                                    if (isCount) {
+                                      return (
+                                        <span
+                                          className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
+                                            value?.achieved
+                                              ? "bg-primary text-white"
+                                              : count > 0
+                                                ? "bg-[#E8F3FF] text-primary"
+                                                : date === null
+                                                  ? "bg-transparent text-transparent"
+                                                  : isToday
+                                                    ? "bg-primary/5 text-primary"
+                                                    : "bg-zinc-100 text-zinc-500"
+                                          }`}
+                                        >
+                                          <span className="text-[10px] font-bold tracking-tighter leading-none">
+                                            {count > 0 ? `${count}/${dailyTargetCount}` : ""}
+                                          </span>
+                                        </span>
+                                      );
+                                    }
+
+                                    return (
+                                      <span
+                                        className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-colors ${
+                                          value?.achieved
+                                            ? "bg-primary text-white"
+                                            : date === null
+                                              ? "bg-transparent text-transparent"
+                                              : isToday
+                                                ? "bg-[#E8F3FF] text-primary"
+                                                : "bg-zinc-100 text-zinc-400"
+                                        }`}
+                                      >
+                                        {value?.achieved ? (
+                                          <DowinIcon name="action-checkmark" size="14px" />
+                                        ) : null}
+                                      </span>
+                                    );
+                                  })()}
+                                </td>
                                 );
                               })}
 
-                              <td className="px-3 py-4 text-center text-[11px] text-text-secondary">
+                              <td className="px-3 py-4 text-center text-[12px] font-medium text-zinc-500">
                                 {leadMeasure.period === "WEEKLY"
                                   ? t("weeklyLabel")
                                   : t("monthlyLabel")}
                               </td>
                               <td className="px-3 py-4 text-center">
                                 <div className="flex flex-col items-center gap-1.5">
-                                  <div className="h-1 w-10 overflow-hidden rounded-full border border-border bg-sub-background">
+                                  <div className="h-1.5 w-12 overflow-hidden rounded-full bg-zinc-100">
                                     <div
                                       className={`h-full rounded-full transition-all duration-500 ${
                                         rate >= 100
@@ -241,10 +253,10 @@ export function MonthlyBoardSection({
                                     />
                                   </div>
                                   <span
-                                    className={`font-mono text-[10px] font-bold ${
+                                    className={`font-mono text-[11px] font-black ${
                                       rate >= 100
                                         ? "text-green-600"
-                                        : "text-text-secondary"
+                                        : "text-zinc-500"
                                     }`}
                                   >
                                     {visibleAchievedCount}/{targetValue}

@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.1.2](https://github.com/team-dasoslab/dowin-web/compare/v1.1.1...v1.1.2) (2026-06-07)
+
+
+### Bug Fixes
+
+* 브랜딩 개선 ([#102](https://github.com/team-dasoslab/dowin-web/issues/102)) ([bad48d0](https://github.com/team-dasoslab/dowin-web/commit/bad48d068e6fe276dd291c2f6315cda20114798b))
+
+## [1.1.1](https://github.com/team-dasoslab/dowin-web/compare/v1.1.0...v1.1.1) (2026-06-07)
+
+
+### Bug Fixes
+
+* 소소한 개선 ([#100](https://github.com/team-dasoslab/dowin-web/issues/100)) ([77acdee](https://github.com/team-dasoslab/dowin-web/commit/77acdee668187b8fe12ed3625be47c7d7c41ad0c))
+
+## [1.1.0](https://github.com/team-dasoslab/dowin-web/compare/v1.0.1...v1.1.0) (2026-06-06)
+
+
+### Features
+
+* 액션 아이템 카운트 기능 추가 ([#98](https://github.com/team-dasoslab/dowin-web/issues/98)) ([6d2781c](https://github.com/team-dasoslab/dowin-web/commit/6d2781cd50e0e03cb55c99d7a8f95fa49fc173c4))
+
 ## [1.0.1](https://github.com/team-dasoslab/dowin-web/compare/v1.0.0...v1.0.1) (2026-06-06)
 
 

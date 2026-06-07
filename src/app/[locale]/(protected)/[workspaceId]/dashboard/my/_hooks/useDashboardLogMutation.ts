@@ -9,12 +9,13 @@ import {
   useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
   usePutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
 } from "@/api/generated/daily-log/daily-log";
+import type { DailyLogUpsertRequest } from "@/api/generated/dowin.schemas";
 import {
   DailyLogValue,
   DashboardView,
-  getNextLogValue,
   ToggleLogContext,
   WeeklyLogsQueryData,
+  getNextLogValue,
   updateWeeklyLogsCache,
 } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-scoreboard";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
@@ -29,7 +30,7 @@ type UseDashboardLogMutationParams = {
   scoreboardId: number | null;
   selectedView: DashboardView;
   showToast: (type: "success" | "error", message: string) => void;
-  weeklyById: Map<number | null, { logs?: Record<string, DailyLogValue> }>;
+  weeklyById: Map<number | null, { logs?: Record<string, import("@/api/generated/dowin.schemas").DailyLogCell | null>; trackingMode?: string; dailyTargetCount?: number }>;
   weeklyLogsQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey
   > | null;
@@ -152,87 +153,195 @@ export const useDashboardLogMutation = ({
     void invalidateToggleQueries(context);
   };
 
-  const updateLogMutation = usePutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate<
-    unknown,
-    ToggleLogContext
-  >({
-    mutation: {
-      mutationFn: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: boolean } }) => {
-        const response = await putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(
-          workspaceId,
+  const updateLogMutation =
+    usePutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate<
+      unknown,
+      ToggleLogContext
+    >({
+      mutation: {
+        mutationFn: async ({
           leadMeasureId,
           date,
           data,
-        );
+        }: {
+          leadMeasureId: number;
+          date: string;
+          data: DailyLogUpsertRequest;
+        }) => {
+          const response =
+            await putWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(
+              workspaceId,
+              leadMeasureId,
+              date,
+              data,
+            );
 
-        if (response.status >= 400) {
-          throw response;
-        }
+          if (response.status >= 400) {
+            throw response;
+          }
 
-        return response;
-      },
-      onMutate: async ({ leadMeasureId, date, data }: { leadMeasureId: number; date: string; data: { value: boolean } }) => {
-        await queryClient.cancelQueries({
-          queryKey: weeklyLogsQueryKey ?? undefined,
-        });
-
-        return createToggleLogContext(leadMeasureId, date, data.value);
-      },
-      onError: (error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
-        handleToggleLogError(error, context);
-      },
-      onSettled: (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
-        handleToggleLogSettled(context);
-      },
-    },
-  });
-
-  const deleteLogMutation = useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate<
-    unknown,
-    ToggleLogContext
-  >({
-    mutation: {
-      mutationFn: async ({ leadMeasureId, date }: { leadMeasureId: number; date: string }) => {
-        const response = await deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(
-          workspaceId,
+          return response;
+        },
+        onMutate: async ({
           leadMeasureId,
           date,
-        );
+          data,
+        }: {
+          leadMeasureId: number;
+          date: string;
+          data: DailyLogUpsertRequest;
+        }) => {
+          await queryClient.cancelQueries({
+            queryKey: weeklyLogsQueryKey ?? undefined,
+          });
 
-        if (response.status >= 400) {
-          throw response;
-        }
+          const leadMeasure = weeklyById.get(leadMeasureId);
+          const dailyTargetCount = leadMeasure?.dailyTargetCount ?? 1;
 
-        return response;
+          // Build a DailyLogCell to pass into the optimistic cache.
+          const cacheValue: import("@/api/generated/dowin.schemas").DailyLogCell | null =
+            "count" in data && typeof data.count === "number"
+              ? { value: data.count > 0, count: data.count, achieved: data.count >= dailyTargetCount }
+              : { value: !!("value" in data && data.value), count: 0, achieved: !!("value" in data && data.value) };
+          return createToggleLogContext(leadMeasureId, date, cacheValue);
+        },
+        onError: (
+          error: unknown,
+          _variables: unknown,
+          context: ToggleLogContext | undefined,
+        ) => {
+          handleToggleLogError(error, context);
+        },
+        onSettled: (
+          _data: unknown,
+          _error: unknown,
+          _variables: unknown,
+          context: ToggleLogContext | undefined,
+        ) => {
+          handleToggleLogSettled(context);
+        },
       },
-      onMutate: async ({ leadMeasureId, date }: { leadMeasureId: number; date: string }) => {
-        await queryClient.cancelQueries({
-          queryKey: weeklyLogsQueryKey ?? undefined,
-        });
+    });
 
-        return createToggleLogContext(leadMeasureId, date, null);
-      },
-      onError: (error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
-        handleToggleLogError(error, context);
-      },
-      onSettled: (_data: unknown, _error: unknown, _variables: unknown, context: ToggleLogContext | undefined) => {
-        handleToggleLogSettled(context);
-      },
-    },
-  });
+  const deleteLogMutation =
+    useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate<
+      unknown,
+      ToggleLogContext
+    >({
+      mutation: {
+        mutationFn: async ({
+          leadMeasureId,
+          date,
+        }: {
+          leadMeasureId: number;
+          date: string;
+        }) => {
+          const response =
+            await deleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate(
+              workspaceId,
+              leadMeasureId,
+              date,
+            );
 
-  const toggleLog = async (leadMeasureId: number, date: string) => {
+          if (response.status >= 400) {
+            throw response;
+          }
+
+          return response;
+        },
+        onMutate: async ({
+          leadMeasureId,
+          date,
+        }: {
+          leadMeasureId: number;
+          date: string;
+        }) => {
+          await queryClient.cancelQueries({
+            queryKey: weeklyLogsQueryKey ?? undefined,
+          });
+
+          return createToggleLogContext(leadMeasureId, date, null);
+        },
+        onError: (
+          error: unknown,
+          _variables: unknown,
+          context: ToggleLogContext | undefined,
+        ) => {
+          handleToggleLogError(error, context);
+        },
+        onSettled: (
+          _data: unknown,
+          _error: unknown,
+          _variables: unknown,
+          context: ToggleLogContext | undefined,
+        ) => {
+          handleToggleLogSettled(context);
+        },
+      },
+    });
+
+  const toggleLog = async (
+    leadMeasureId: number,
+    date: string,
+    countValue?: number,
+  ) => {
     if (scoreboardId === null) {
       return;
     }
 
-    const currentValue = weeklyById.get(leadMeasureId)?.logs?.[date] ?? null;
-    const nextValue = getNextLogValue(currentValue);
+    const leadMeasure = weeklyById.get(leadMeasureId);
+    const trackingMode = leadMeasure?.trackingMode || "BOOLEAN";
+    const currentValue = leadMeasure?.logs?.[date] ?? null;
+
     const currentLogKey = `${leadMeasureId}:${date}`;
 
     if (pendingLogKeys.has(currentLogKey)) {
       return;
     }
+
+    if (trackingMode === "COUNT") {
+      if (countValue === undefined || countValue === 0) {
+        await deleteLogMutation.mutateAsync({
+          workspaceId,
+          leadMeasureId,
+          date,
+        });
+        trackEvent("daily_log_checked", {
+          checked_value: "undone",
+          lead_measure_id_hash: hashId(leadMeasureId),
+          log_date: date,
+          scoreboard_id_hash: hashId(scoreboardId),
+          view_type: selectedView,
+        });
+        return;
+      }
+
+      await updateLogMutation.mutateAsync({
+        workspaceId,
+        data: { count: countValue },
+        date,
+        leadMeasureId,
+      });
+      trackEvent("daily_log_checked", {
+        checked_value: "done",
+        lead_measure_id_hash: hashId(leadMeasureId),
+        log_date: date,
+        scoreboard_id_hash: hashId(scoreboardId),
+        view_type: selectedView,
+      });
+
+      const pushContext = consumePushFollowupContext();
+      if (pushContext) {
+        trackEvent("push_followup_log_checked", {
+          campaign_id: hashId(pushContext.campaignId),
+          push_type: pushContext.pushType,
+        });
+      }
+      return;
+    }
+
+    // BOOLEAN MODE
+    const nextValue = getNextLogValue(currentValue);
 
     if (nextValue === null) {
       await deleteLogMutation.mutateAsync({

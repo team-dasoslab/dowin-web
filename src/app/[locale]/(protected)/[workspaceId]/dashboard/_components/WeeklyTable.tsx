@@ -1,6 +1,9 @@
 "use client";
 
-import { TeamDashboardMember, TeamDashboardMemberRole } from "@/api/generated/dowin.schemas";
+import {
+  TeamDashboardMember,
+  TeamDashboardMemberRole,
+} from "@/api/generated/dowin.schemas";
 import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
 import { TeamMemberMemoPanel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberMemoPanel";
@@ -79,8 +82,12 @@ export function WeeklyTable({
   const hasMemos = memos.length > 0;
 
   const handleComposeClick = () => {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
-      const content = window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 1599px)").matches
+    ) {
+      const content =
+        window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
 
       if (!content) {
         return;
@@ -111,15 +118,15 @@ export function WeeklyTable({
                 alt={`${member.nickname ?? "사용자"} 아바타`}
                 size={20}
               />
-              <span className="truncate text-xs font-bold text-text-primary">
+              <span className="truncate text-[13px] font-black text-zinc-900">
                 {member.nickname}
               </span>
               {isMe ? (
-                <span className="shrink-0 rounded-content border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+                <span className="shrink-0 rounded-[12px] border border-primary/25 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                   {tc("me")}
                 </span>
               ) : null}
-              <span className="hidden truncate text-xs text-text-secondary sm:inline">
+              <span className="hidden truncate text-[12px] font-medium text-zinc-500 sm:inline">
                 — {member.goalName}
               </span>
             </div>
@@ -128,10 +135,10 @@ export function WeeklyTable({
                 <Button
                   type="button"
                   onClick={onToggleView}
-                  className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                  className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all active:scale-95 ${
                     memoMode === "view"
-                      ? "border-primary/25 bg-primary/10 text-primary"
-                      : "border-border bg-white text-text-secondary"
+                      ? "bg-primary/10 text-primary hover:bg-primary/20"
+                      : "bg-white text-zinc-900 hover:bg-zinc-50"
                   }`}
                 >
                   {t("viewMemos")}
@@ -140,10 +147,10 @@ export function WeeklyTable({
               <Button
                 type="button"
                 onClick={handleComposeClick}
-                className={`rounded-content border px-2.5 py-1.5 text-xs font-bold transition-colors sm:px-3 sm:py-2 ${
+                className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all active:scale-95 ${
                   memoMode === "compose"
-                    ? "border-primary/25 bg-primary/10 text-primary"
-                    : "border-border bg-white text-text-secondary"
+                    ? "bg-primary/10 text-primary hover:bg-primary/20"
+                    : "bg-white text-zinc-900 hover:bg-zinc-50"
                 }`}
               >
                 {t("memoButton")}
@@ -151,7 +158,7 @@ export function WeeklyTable({
             </div>
           </div>
           <div className="sm:hidden">
-            <p className="text-[11px] leading-relaxed text-text-secondary">
+            <p className="text-[12px] font-medium leading-relaxed text-zinc-500">
               {member.goalName}
             </p>
           </div>
@@ -167,7 +174,7 @@ export function WeeklyTable({
             return (
               <div
                 key={`${member.userId}-${leadMeasure.id}-mobile`}
-                className="rounded-content border border-zinc-200 bg-white p-5"
+                className="rounded-[24px] bg-white p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <LeadMeasureSummary name={leadMeasure.name} />
@@ -184,7 +191,13 @@ export function WeeklyTable({
 
                 <div className="mt-3 grid grid-cols-7 gap-1.5">
                   {weekDates.map((date, index) => {
-                    const value = leadMeasure.logs?.[date] ?? null;
+                    const logData = leadMeasure.logs?.[date] as import("@/api/generated/dowin.schemas").DailyLogCell | null | undefined;
+                    const isAchieved = logData?.achieved ?? false;
+                    const count = logData?.count ?? null;
+                    const typedLead = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                    const trackingMode = typedLead.trackingMode;
+                    const dailyTargetCount = typedLead.dailyTargetCount ?? 1;
+                    const isCount = trackingMode === "COUNT";
 
                     return (
                       <div
@@ -198,17 +211,35 @@ export function WeeklyTable({
                         >
                           {t(DAY_KEYS[index])}
                         </p>
-                        <span
-                          className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
-                            value === true
-                              ? "text-green-600"
-                              : date === today
-                                ? "text-primary/50"
-                                : "text-text-muted"
-                          }`}
-                        >
-                          {value === true ? "○" : ""}
-                        </span>
+                        {isCount ? (
+                          <span
+                            className={`inline-flex h-7 min-w-[1.75rem] px-1 items-center justify-center text-[10px] font-bold ${
+                              isAchieved
+                                ? "text-green-600"
+                                : count != null && count > 0
+                                  ? "text-text-primary"
+                                  : date === today
+                                    ? "text-primary/50"
+                                    : "text-text-muted"
+                            }`}
+                          >
+                            {count != null && count > 0
+                              ? `${count}/${dailyTargetCount}`
+                              : ""}
+                          </span>
+                        ) : (
+                          <span
+                            className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                              isAchieved
+                                ? "text-green-600"
+                                : date === today
+                                  ? "text-primary/50"
+                                  : "text-text-muted"
+                            }`}
+                          >
+                            {isAchieved ? "○" : ""}
+                          </span>
+                        )}
                       </div>
                     );
                   })}
@@ -218,10 +249,10 @@ export function WeeklyTable({
           })}
         </div>
 
-        <div className="hidden overflow-hidden rounded-content border border-zinc-200 md:block">
+        <div className="hidden overflow-hidden rounded-[24px] bg-white md:block">
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
-              <div className="bg-zinc-50/50 border-b border-zinc-200">
+              <div className="border-b-2 border-zinc-50 bg-white">
                 <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[38%]" />
@@ -232,7 +263,7 @@ export function WeeklyTable({
                   </colgroup>
                   <thead>
                     <tr>
-                      <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                      <th className="py-3 px-5 text-left text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
                         {t("leadMeasureHead")}
                       </th>
                       {DAY_KEYS.map((dayKey, index) => (
@@ -242,14 +273,14 @@ export function WeeklyTable({
                             weekDates[index] === today
                               ? "text-primary"
                               : weekDates[index] > today
-                                ? "text-text-muted/50"
-                                : "text-text-muted"
+                                ? "text-zinc-500/50"
+                                : "text-zinc-500"
                           }`}
                         >
                           {t(dayKey)}
                         </th>
                       ))}
-                      <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
+                      <th className="py-3 px-3 text-center text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
                         {t("achievementTab")}
                       </th>
                     </tr>
@@ -265,13 +296,15 @@ export function WeeklyTable({
                   ))}
                   <col className="w-[14%]" />
                 </colgroup>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y-2 divide-zinc-50">
                   {member.leadMeasures?.map((leadMeasure) => {
                     const achievedCount = leadMeasure.achieved ?? 0;
                     const targetValue = leadMeasure.targetValue ?? 0;
+                    const weeklyTotal =
+                      (leadMeasure as { total?: number }).total ?? targetValue;
                     const rate =
-                      targetValue > 0
-                        ? Math.round((achievedCount / targetValue) * 100)
+                      weeklyTotal > 0
+                        ? Math.round((achievedCount / weeklyTotal) * 100)
                         : 0;
 
                     return (
@@ -279,36 +312,60 @@ export function WeeklyTable({
                         <td className="py-4 px-5">
                           <LeadMeasureSummary
                             name={leadMeasure.name}
-                            nameClassName="block text-sm font-semibold text-text-primary"
+                            nameClassName="block text-sm font-semibold text-zinc-900"
                           />
                         </td>
                         {weekDates.map((date) => {
-                          const value = leadMeasure.logs?.[date] ?? null;
+                          const logData = leadMeasure.logs?.[date] as import("@/api/generated/dowin.schemas").DailyLogCell | null | undefined;
+                          const isAchieved = logData?.achieved ?? false;
+                          const count = logData?.count ?? null;
+                          const typedLeadDesktop = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                          const trackingMode = typedLeadDesktop.trackingMode;
+                          const dailyTargetCount = typedLeadDesktop.dailyTargetCount ?? 1;
+                          const isCount = trackingMode === "COUNT";
 
                           return (
                             <td key={date} className="py-3 text-center">
-                              <span
-                                className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
-                                  value === true
-                                    ? "text-green-600"
-                                    : date === today
-                                      ? "text-primary/50"
-                                      : "text-text-muted"
-                                }`}
-                              >
-                                {value === true ? "○" : ""}
-                              </span>
+                              {isCount ? (
+                                <span
+                                  className={`inline-flex h-7 min-w-[1.75rem] px-1 items-center justify-center text-[10px] font-bold ${
+                                    isAchieved
+                                      ? "text-green-600"
+                                      : count != null && count > 0
+                                        ? "text-zinc-900"
+                                        : date === today
+                                          ? "text-primary/50"
+                                          : "text-text-muted"
+                                  }`}
+                                >
+                                  {count != null && count > 0
+                                    ? `${count}/${dailyTargetCount}`
+                                    : ""}
+                                </span>
+                              ) : (
+                                <span
+                                  className={`inline-flex h-7 w-7 items-center justify-center text-sm font-bold ${
+                                    isAchieved
+                                      ? "text-green-600"
+                                      : date === today
+                                        ? "text-primary/50"
+                                        : "text-text-muted"
+                                  }`}
+                                >
+                                  {isAchieved ? "○" : ""}
+                                </span>
+                              )}
                             </td>
                           );
                         })}
                         <td className="py-4 px-3 text-center">
                           <div className="flex flex-col items-center gap-1.5">
-                            <span className="text-[10px] text-text-muted">
+                            <span className="text-[11px] font-medium text-zinc-500">
                               {leadMeasure.period === "MONTHLY"
                                 ? t("monthView")
                                 : t("weekView")}
                             </span>
-                            <div className="h-1 w-10 overflow-hidden rounded-full border border-border bg-sub-background">
+                            <div className="h-1.5 w-12 overflow-hidden rounded-full bg-zinc-100">
                               <div
                                 className={`h-full rounded-full transition-all duration-500 ${
                                   rate >= 100 ? "bg-green-500" : "bg-primary"
@@ -317,13 +374,13 @@ export function WeeklyTable({
                               />
                             </div>
                             <span
-                              className={`font-mono text-[10px] font-bold ${
+                              className={`font-mono text-[11px] font-black ${
                                 rate >= 100
                                   ? "text-green-600"
-                                  : "text-text-secondary"
+                                  : "text-zinc-500"
                               }`}
                             >
-                              {achievedCount}/{targetValue}
+                              {achievedCount}/{weeklyTotal}
                             </span>
                           </div>
                         </td>

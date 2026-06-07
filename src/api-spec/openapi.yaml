@@ -3820,6 +3820,8 @@ components:
         name: { type: string }
         targetValue: { type: integer }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         status: { type: string, enum: [ACTIVE, ARCHIVED] }
         tags:
           type: array
@@ -3848,6 +3850,8 @@ components:
         name: { type: string }
         targetValue: { type: integer, minimum: 1 }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT], default: BOOLEAN }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20, default: 1 }
         tagIds:
           type: array
           maxItems: 3
@@ -3860,6 +3864,8 @@ components:
         name: { type: string }
         targetValue: { type: integer, minimum: 1 }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         tagIds:
           type: array
           maxItems: 3
@@ -3900,27 +3906,58 @@ components:
 
     DailyLog:
       type: object
+      required: [id, leadMeasureId, logDate, value, count, achieved, createdAt]
       properties:
         id: { type: integer }
         leadMeasureId: { type: integer }
         logDate: { type: string, format: date }
         value: { type: boolean }
+        count: { type: integer, minimum: 1 }
+        achieved: { type: boolean }
         createdAt: { type: string, format: date-time }
 
     DailyLogUpsertRequest:
+      oneOf:
+        - $ref: "#/components/schemas/DailyLogBooleanUpsertRequest"
+        - $ref: "#/components/schemas/DailyLogCountUpsertRequest"
+
+    DailyLogBooleanUpsertRequest:
       type: object
       required: [value]
+      additionalProperties: false
       properties:
         value:
           type: boolean
           enum: [true]
+
+    DailyLogCountUpsertRequest:
+      type: object
+      required: [count]
+      additionalProperties: false
+      properties:
+        count:
+          type: integer
+          minimum: 1
+          maximum: 20
+
+    DailyLogCell:
+      type: object
+      nullable: true
+      required: [value, count, achieved]
+      properties:
+        value: { type: boolean }
+        count: { type: integer, minimum: 0 }
+        achieved: { type: boolean }
 
     WeeklyLogItem:
       type: object
       properties:
         id: { type: integer }
         name: { type: string }
+        period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
         targetValue: { type: integer }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         tags:
           type: array
           items: { $ref: "#/components/schemas/LeadMeasureTag" }
@@ -3931,9 +3968,9 @@ components:
         logs:
           type: object
           additionalProperties:
-            type: boolean
-            nullable: true
+            $ref: "#/components/schemas/DailyLogCell"
         achieved: { type: integer }
+        total: { type: integer }
         achievementRate: { type: number }
 
     WeeklyLogGuide:
@@ -3960,17 +3997,19 @@ components:
       properties:
         id: { type: integer }
         name: { type: string }
-        period: { type: string, enum: [WEEKLY, MONTHLY] }
+        period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
         targetValue: { type: integer }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         tags:
           type: array
           items: { $ref: "#/components/schemas/LeadMeasureTag" }
         logs:
           type: object
           additionalProperties:
-            type: boolean
-            nullable: true
+            $ref: "#/components/schemas/DailyLogCell"
         achieved: { type: integer }
+        total: { type: integer }
         achievementRate: { type: number }
 
     MonthlyLogsResponse:
@@ -4012,23 +4051,49 @@ components:
 
     AnalyticsExportLeadMeasureBreakdown:
       type: object
-      required: [leadMeasureId, name, period, achieved, total, achievementRate]
+      required:
+        [
+          leadMeasureId,
+          name,
+          period,
+          trackingMode,
+          dailyTargetCount,
+          achieved,
+          total,
+          achievementRate,
+        ]
       properties:
         leadMeasureId: { type: integer }
         name: { type: string }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         achieved: { type: integer }
         total: { type: integer }
         achievementRate: { type: number }
 
     AnalyticsExportDailyRow:
       type: object
-      required: [date, leadMeasureId, leadMeasureName, status]
+      required:
+        [
+          date,
+          leadMeasureId,
+          leadMeasureName,
+          period,
+          trackingMode,
+          dailyTargetCount,
+          status,
+          count,
+        ]
       properties:
         date: { type: string, format: date }
         leadMeasureId: { type: integer }
         leadMeasureName: { type: string }
+        period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         status: { type: string, enum: [ACHIEVED, MISSED, NOT_RECORDED] }
+        count: { type: integer, minimum: 0 }
 
     AnalyticsExportDataResponse:
       type: object
@@ -4054,16 +4119,18 @@ components:
         name: { type: string }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
         targetValue: { type: integer }
+        trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         tags:
           type: array
           items: { $ref: "#/components/schemas/LeadMeasureTag" }
         achieved: { type: integer }
+        total: { type: integer }
         achievementRate: { type: number }
         logs:
           type: object
           additionalProperties:
-            type: boolean
-            nullable: true
+            $ref: "#/components/schemas/DailyLogCell"
 
     TeamDashboardMember:
       type: object

@@ -18,7 +18,7 @@ export function LeadMeasureSummary({
   guide = null,
   guideActive = false,
   name,
-  nameClassName = "text-sm font-semibold text-text-primary",
+  nameClassName = "text-sm font-semibold text-zinc-900",
   onGuideClose,
   onGuideToggle,
   tags = [],

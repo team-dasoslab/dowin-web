@@ -18,7 +18,7 @@ describe("LeadMeasureService", () => {
   const deleteLeadMeasure = vi.fn();
   const findTagsByIdsInWorkspace = vi.fn();
   const countLogsByLeadMeasure = vi.fn();
-  const countTrueLogsByLeadMeasures = vi.fn();
+  const findLogsForLeadMeasures = vi.fn();
 
   const service = new LeadMeasureService(
     { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findBillingState, findPlanLimit },
@@ -33,7 +33,7 @@ describe("LeadMeasureService", () => {
       deleteLeadMeasure,
       findTagsByIdsInWorkspace,
     },
-    { countLogsByLeadMeasure, countTrueLogsByLeadMeasures },
+    { countLogsByLeadMeasure, findLogsForLeadMeasures },
   );
 
   beforeEach(() => {
@@ -55,7 +55,13 @@ describe("LeadMeasureService", () => {
     findLeadMeasuresByScoreboard.mockResolvedValue([
       { id: 10, name: "매일 물 2L", targetValue: 7, status: "ACTIVE" },
     ]);
-    countTrueLogsByLeadMeasures.mockResolvedValue({ 10: 5 });
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 10, logDate: "2026-04-06", value: true, count: 1 },
+      { leadMeasureId: 10, logDate: "2026-04-07", value: true, count: 1 },
+      { leadMeasureId: 10, logDate: "2026-04-08", value: true, count: 1 },
+      { leadMeasureId: 10, logDate: "2026-04-09", value: true, count: 1 },
+      { leadMeasureId: 10, logDate: "2026-04-10", value: true, count: 1 },
+    ]);
 
     const result = await service.getLeadMeasures("ws_uid", 2, 100, "active");
 
@@ -131,6 +137,8 @@ describe("LeadMeasureService", () => {
       name: "주 3회 운동",
       targetValue: 3,
       period: "WEEKLY",
+      trackingMode: "BOOLEAN",
+      dailyTargetCount: 1,
       tagIds: [3],
     });
     expect(result.tags).toEqual([{ id: 3, name: "운동" }]);

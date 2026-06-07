@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
-import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import {
@@ -41,12 +40,12 @@ export function ScoreboardOverviewSection({
   return (
     <div className="flex flex-col gap-3">
       {/* ── WIG & Lag Measure Hero Card (Vertical Stack Design) ── */}
-      <Card className="border border-zinc-200 bg-white">
+      <div className="flex flex-col rounded-[24px] bg-white">
         <div className="flex flex-col">
           {/* Primary Goal (WIG) */}
           <div className="px-6 pt-5 pb-3 sm:px-8 sm:pt-6 sm:pb-4 space-y-2">
             <div className="flex items-center gap-2">
-              <div className="inline-flex items-center px-2 py-0.5 rounded-button border border-primary/10 bg-primary/5 text-primary text-[10px] font-bold tracking-tight shadow-sm shadow-primary/5 uppercase">
+              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-[#E8F3FF] text-primary text-[11px] font-bold tracking-tight uppercase">
                 {t("dowinLabel")}
               </div>
             </div>
@@ -55,14 +54,14 @@ export function ScoreboardOverviewSection({
                 {activeScoreboard.goalName}
               </h2>
             ) : (
-              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-100" />
+              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-200" />
             )}
           </div>
 
           {/* Lag Measure Section */}
           <div className="px-6 pt-3 pb-5 sm:px-8 sm:pt-4 sm:pb-6 space-y-2">
             <div className="flex items-center gap-2">
-              <div className="inline-flex items-center px-2 py-0.5 rounded-button border border-zinc-200 bg-zinc-50 text-text-secondary text-[10px] font-bold tracking-tight shadow-sm shadow-zinc-100/50 uppercase">
+              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-zinc-100 text-zinc-500 text-[11px] font-bold tracking-tight uppercase">
                 {t("lagMeasureLabel")}
               </div>
             </div>
@@ -71,15 +70,15 @@ export function ScoreboardOverviewSection({
                 {activeScoreboard.lagMeasure}
               </p>
             ) : (
-              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-50" />
+              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-200" />
             )}
           </div>
         </div>
-      </Card>
+      </div>
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-5">
         {/* ── Consolidated Achievement Card (Vertical Stack) ── */}
-        <Card className="flex flex-row divide-x divide-zinc-100 lg:flex-col lg:divide-x-0 lg:divide-y lg:col-span-1">
+        <div className="flex flex-row divide-x divide-zinc-50 lg:flex-col lg:divide-x-0 lg:divide-y lg:divide-zinc-50 lg:col-span-1 rounded-[24px] bg-white">
           {/* Weekly Section */}
           <div className="flex flex-1 flex-col items-start p-4 gap-3">
             <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
@@ -111,7 +110,7 @@ export function ScoreboardOverviewSection({
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* ── Recent Trend (Expanded) ── */}
         <DashboardWeeklyTrendSection
@@ -180,7 +179,7 @@ function DashboardWeeklyTrendSection({
   const t = useTranslations("Dashboard");
 
   return (
-    <Card className={cn("flex flex-col p-4", className)}>
+    <div className={cn("flex flex-col p-5 rounded-[24px] bg-white", className)}>
       <div className="flex items-center justify-between mb-3">
         <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
           {t("recentTrend")}
@@ -188,13 +187,13 @@ function DashboardWeeklyTrendSection({
       </div>
 
       {isLoading ? (
-        <div className="flex-1 animate-pulse rounded-lg bg-zinc-50" />
+        <div className="flex-1 animate-pulse rounded-lg bg-zinc-200" />
       ) : (
         <div className="h-[140px] lg:h-auto lg:flex-1 w-full min-h-[140px]">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
@@ -223,8 +222,8 @@ function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
             return (
-              <div className="rounded-md border border-zinc-200 bg-white/90 px-2 py-1 shadow-sm backdrop-blur-sm">
-                <p className="font-mono text-[10px] font-bold text-primary">
+              <div className="rounded-[12px] bg-zinc-800 px-3 py-1.5 shadow-none">
+                <p className="font-mono text-[11px] font-bold text-white">
                   {payload[0].value}%
                 </p>
               </div>
