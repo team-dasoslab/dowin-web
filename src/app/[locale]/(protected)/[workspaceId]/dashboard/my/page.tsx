@@ -184,13 +184,13 @@ export default function MyDashboardPage() {
           }
           rightElement={
             <div className="flex flex-wrap gap-2">
-              <Button asChild className="h-10 px-4 text-[13px] font-black rounded-[14px] bg-white text-zinc-900 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:bg-zinc-50 transition-all active:scale-95">
+              <Button asChild className="h-10 px-4 text-[13px] font-black rounded-[16px] bg-white text-zinc-900 hover:bg-zinc-50 transition-all active:scale-95">
                 <Link href={`/${workspaceId}/scoreboards`}>
                   <DowinIcon name="nav-archive" size="16px" className="mr-1.5 text-zinc-500" />
                   {t("scoreboardArchive")}
                 </Link>
               </Button>
-              <Button asChild className="h-10 px-4 text-[13px] font-black rounded-[14px] bg-white text-zinc-900 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:bg-zinc-50 transition-all active:scale-95">
+              <Button asChild className="h-10 px-4 text-[13px] font-black rounded-[16px] bg-white text-zinc-900 hover:bg-zinc-50 transition-all active:scale-95">
                 <Link href={`/${workspaceId}/setup?mode=update`}>
                   <DowinIcon name="action-edit" size="16px" className="mr-1.5 text-zinc-500" />
                   {t("manageScoreboard")}
