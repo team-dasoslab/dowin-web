@@ -63,7 +63,7 @@ export function LeadMeasuresSection({
 
   return (
     <div className="bg-white rounded-[24px] overflow-hidden" data-coachmark="setup-lead">
-      <div className="divide-y divide-zinc-200/60">
+      <div className="divide-y-2 divide-zinc-50">
         {activeMeasures.map((measure, index) => (
           <LeadMeasureRow
             key={measure.id}
@@ -164,12 +164,12 @@ function LeadMeasureRow({
 
   if (measure.isDeleted) {
     return (
-      <div className="flex flex-col gap-4 p-4 sm:p-8 bg-zinc-100 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 p-4 sm:p-8 bg-zinc-50 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-[11px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full shrink-0">
+          <span className="text-[11px] font-bold text-red-500 bg-red-50 border-none px-2 py-0.5 rounded-full shrink-0">
             {t("deletedBadge")}
           </span>
-          <span className="text-sm font-semibold text-zinc-400 truncate max-w-[200px] sm:max-w-[400px]">
+          <span className="text-sm font-semibold text-zinc-500 truncate max-w-[200px] sm:max-w-[400px]">
             {measure.name || t("unnamedArchivedMeasure")}
           </span>
         </div>
@@ -177,7 +177,7 @@ function LeadMeasureRow({
           type="button"
           disabled={isMutating}
           onClick={() => restoreMeasureRow(measure.id)}
-          className="w-full sm:w-auto rounded-content border border-zinc-200 bg-white px-4 py-2 text-xs font-bold text-zinc-600 transition-all active:scale-95 shrink-0"
+          className="w-full sm:w-auto rounded-[16px] border-none bg-zinc-200/50 px-5 py-3 text-[13px] font-black text-zinc-600 transition-all active:scale-95 shrink-0"
         >
           {t("cancelDelete")}
         </Button>
@@ -200,7 +200,7 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating || measuresCount <= 1}
                 onClick={() => archiveMeasureRow(measure.id)}
-                className="flex h-8 items-center gap-1.5 rounded-button bg-zinc-100 px-3 text-[12px] font-bold text-text-primary transition-colors disabled:opacity-40 hover:bg-zinc-200"
+                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-4 text-[13px] font-black text-zinc-900 transition-colors disabled:opacity-40 hover:bg-zinc-200"
               >
                 {t("archiveMeasure")}
               </Button>
@@ -208,7 +208,7 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating}
                 onClick={() => removeMeasureRow(measure.id)}
-                className="flex h-8 items-center gap-1.5 rounded-button bg-red-50 px-3 text-[12px] font-bold text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
+                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-red-50 px-4 text-[13px] font-black text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
               >
                 {t("delete")}
               </Button>
@@ -218,7 +218,7 @@ function LeadMeasureRow({
               type="button"
               disabled={isMutating}
               onClick={() => removeMeasureRow(measure.id)}
-              className="flex h-8 items-center gap-1.5 rounded-button bg-red-50 px-3 text-[12px] font-bold text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
+              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-red-50 px-4 text-[13px] font-black text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
             >
               {t("delete")}
             </Button>
@@ -238,7 +238,7 @@ function LeadMeasureRow({
       />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex w-full rounded-content bg-zinc-100/80 p-1 sm:w-auto">
+        <div className="relative flex w-full rounded-[16px] bg-zinc-100/80 p-1 sm:w-auto">
           {(["WEEKLY", "MONTHLY"] as const).map((period) => {
             const isActive = measure.period === period;
             return (
@@ -266,7 +266,7 @@ function LeadMeasureRow({
           })}
         </div>
 
-        <div className="relative flex w-full rounded-content bg-zinc-100/80 p-1 sm:w-auto">
+        <div className="relative flex w-full rounded-[16px] bg-zinc-100/80 p-1 sm:w-auto">
           {(["BOOLEAN", "COUNT"] as const).map((mode) => {
             const isActive = measure.trackingMode === mode;
             return (
@@ -288,7 +288,7 @@ function LeadMeasureRow({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-content bg-zinc-50/30 p-3 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
+      <div className="flex flex-col gap-3 rounded-[24px] bg-zinc-50/50 p-4 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
             {measure.period === "WEEKLY" ? "매주" : "매달"}

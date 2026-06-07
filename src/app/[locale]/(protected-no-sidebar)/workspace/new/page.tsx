@@ -60,7 +60,7 @@ export default function NewWorkspacePage() {
       {isPending && (
         <LoadingOverlay message={promotionCode ? t("loadingPromo") : t("loading")} />
       )}
-      <div className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <div className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
         {/* 상단 내비게이션 */}
         <div className="flex items-center">
           <SmartBackButton className="w-9 h-9 rounded-full bg-zinc-100 border-none flex items-center justify-center text-zinc-600 transition-transform active:scale-[0.98] shrink-0" />

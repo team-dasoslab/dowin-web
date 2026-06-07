@@ -87,12 +87,12 @@ function MonthlyMobileWeekCard({
   const t = useTranslations("Dashboard");
 
   return (
-    <div className="rounded-content border border-border bg-white p-4">
-      <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
-        <p className="text-sm font-bold text-text-primary">
+    <div className="rounded-[24px] bg-white p-5">
+      <div className="flex items-center justify-between gap-2 border-b-2 border-zinc-50 pb-4">
+        <p className="text-[15px] font-black text-zinc-900">
           {t("weekNumber", { n: weekIndex + 1 })}
         </p>
-        <p className="text-[11px] font-mono text-text-muted">
+        <p className="text-[12px] font-mono font-medium text-zinc-500">
           {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
           {" – "}
           {weekDatesInMonth
@@ -145,7 +145,7 @@ function MonthlyMobileMeasureCard({
   }, 0);
 
   return (
-    <div className="rounded-content border border-border bg-sub-background/40 p-3">
+    <div className="rounded-[20px] bg-zinc-50 p-4">
       <div className="flex items-start justify-between gap-3">
         <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
         <AchievementProgress
@@ -161,7 +161,7 @@ function MonthlyMobileMeasureCard({
         />
       </div>
 
-      <div className="mt-3 grid grid-cols-7 gap-1.5">
+      <div className="mt-4 grid grid-cols-7 gap-1.5">
         {weekDatesInMonth.map((date, dayIndex) => (
           <MonthlyMobileMeasureDay
             key={`${leadMeasure.id}-${localizedDays[dayIndex]}-${date ?? "empty"}-mobile`}
@@ -196,21 +196,21 @@ function MonthlyMobileMeasureDay({
   return (
     <div className="space-y-1 text-center">
       <p
-        className={`text-[10px] font-bold ${
-          isToday ? "text-primary" : "text-text-muted"
+        className={`text-[11px] font-bold ${
+          isToday ? "text-primary" : "text-zinc-400"
         }`}
       >
         {dayLabel}
       </p>
       <span
-        className={`inline-flex h-9 w-full items-center justify-center rounded-md border text-xs font-bold ${
+        className={`inline-flex h-10 w-full items-center justify-center rounded-[12px] text-[13px] font-black transition-colors ${
           value?.achieved
-            ? "border-primary bg-primary text-white"
+            ? "bg-primary text-white"
             : date === null
-              ? "border-transparent bg-transparent text-transparent"
+              ? "bg-transparent text-transparent"
               : isToday
-                ? "border-primary/30 bg-primary/5 text-primary"
-                : "border-border bg-white text-text-muted"
+                ? "bg-primary/10 text-primary"
+                : "bg-white text-zinc-400 shadow-sm border border-zinc-200/50"
         }`}
       >
         {value?.achieved ? (

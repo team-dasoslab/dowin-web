@@ -194,8 +194,8 @@ export default function WorkspaceSettingsPage() {
     return (
       <div className="min-h-screen bg-zinc-100">
         <ProtectedPageContainer isLoading>
-          <div className="h-10 rounded-content bg-sub-background" />
-          <div className="h-24 rounded-content bg-sub-background" />
+          <div className="h-10 rounded-[24px] bg-zinc-200/50" />
+          <div className="h-24 rounded-[24px] bg-zinc-200/50" />
         </ProtectedPageContainer>
       </div>
     );
@@ -244,10 +244,10 @@ export default function WorkspaceSettingsPage() {
 
               <div className="rounded-[24px] bg-white px-4 py-4 flex items-center justify-between gap-4 sm:px-8 sm:py-8 sm:gap-6">
                 <div className="flex flex-col min-w-0 text-left">
-                  <h2 className="text-xl font-bold text-text-primary truncate tracking-tight">
+                  <h2 className="text-xl font-black text-zinc-900 truncate tracking-tight">
                     {workspace.name}
                   </h2>
-                  <p className="text-sm font-medium text-text-secondary mt-1">
+                  <p className="text-sm font-medium text-zinc-500 mt-1">
                     {isWorkspaceAdmin ? t("workspaceAdmin") : t("workspaceMember")}
                   </p>
                 </div>
@@ -270,7 +270,7 @@ export default function WorkspaceSettingsPage() {
                     sectionRefs.current[group.id] = el;
                   }}
                 >
-                  <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{group.label}</h2>
+                  <h2 className="px-1 mb-4 text-[22px] font-black tracking-tight text-zinc-900">{group.label}</h2>
                   <div className="rounded-[24px] overflow-hidden bg-white">
                     {group.items.map((item) => (
                       <MenuItemRow
@@ -291,7 +291,7 @@ export default function WorkspaceSettingsPage() {
                   sectionRefs.current["workspaces"] = el;
                 }}
               >
-                <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{t("workspaceList")}</h2>
+                <h2 className="px-1 mb-4 text-[22px] font-black tracking-tight text-zinc-900">{t("workspaceList")}</h2>
                 <div className="rounded-[24px] overflow-hidden bg-white">
                   {workspaces.map((ws) => (
                     <div
@@ -299,27 +299,27 @@ export default function WorkspaceSettingsPage() {
                       className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors hover:bg-zinc-50 sm:px-6 sm:py-5"
                     >
                       <div className="flex min-w-0 flex-col text-left">
-                        <span className="truncate text-[14px] font-bold text-text-primary">
+                        <span className="truncate text-[14px] font-black text-zinc-900">
                           {ws.name}
                         </span>
-                        <span className="mt-0.5 truncate text-[12px] font-medium text-text-secondary">
+                        <span className="mt-0.5 truncate text-[12px] font-medium text-zinc-500">
                           {ws.role === "ADMIN" ? t("workspaceAdmin") : t("workspaceMember")}
                         </span>
                       </div>
 
                       <div className="flex-shrink-0">
                         {ws.id === workspaceId ? (
-                          <div className="flex h-8 items-center gap-1.5 rounded-button bg-primary/10 px-3 text-[12px] font-bold text-primary">
-                            <DowinIcon name="status-checkmark" size="14px" />
-                            {commonT("current")}
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled={isActionPending}
-                            onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                            className="flex h-8 items-center gap-1.5 rounded-button bg-zinc-100 px-3 text-[12px] font-bold text-text-primary transition-colors hover:bg-zinc-200"
-                          >
+                            <div className="flex h-8 items-center gap-1.5 rounded-[16px] bg-primary/10 px-3 text-[12px] font-bold text-primary">
+                              <DowinIcon name="status-checkmark" size="14px" />
+                              {commonT("current")}
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled={isActionPending}
+                              onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
+                              className="flex h-8 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
+                            >
                             {commonT("switchWorkspace")}
                           </button>
                         )}
@@ -331,7 +331,7 @@ export default function WorkspaceSettingsPage() {
                       href="/workspace/new"
                       className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
                     >
-                      <div className="w-9 h-9 rounded-button border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                      <div className="w-9 h-9 rounded-[16px] border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
                         <DowinIcon name="action-add-active" size="16px" className="text-primary" />
                       </div>
                       {commonT("createWorkspace")}
@@ -358,7 +358,7 @@ function MenuItemRow({
   const Content = (
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${item.danger
+        <div className={`w-9 h-9 rounded-[16px] flex items-center justify-center flex-shrink-0 ${item.danger
             ? "bg-danger/5 text-danger"
             : "bg-zinc-100 text-zinc-500"
           }`}
@@ -366,14 +366,14 @@ function MenuItemRow({
           {item.icon}
         </div>
         <div className="text-left min-w-0">
-          <p className={`text-[14px] font-bold ${item.danger ? "text-danger" : "text-text-primary"}`}>
+          <p className={`text-[14px] font-black ${item.danger ? "text-danger" : "text-zinc-900"}`}>
             {item.title}
           </p>
-          {item.description && <p className="text-[12px] text-text-secondary mt-0.5">{item.description}</p>}
+          {item.description && <p className="text-[12px] text-zinc-500 mt-0.5">{item.description}</p>}
         </div>
       </div>
       <div className="flex-shrink-0">
-        {item.rightElement ? item.rightElement : <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />}
+        {item.rightElement ? item.rightElement : <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-zinc-400/50" />}
       </div>
     </div>
   );

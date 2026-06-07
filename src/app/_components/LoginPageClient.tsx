@@ -205,7 +205,7 @@ export default function LoginPageClient() {
       <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-        <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
           <div className="space-y-4 text-center mb-8">
             <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
               {t("recovery.title")}
@@ -294,7 +294,7 @@ export default function LoginPageClient() {
     <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-12">
           <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
             <Logo size="32px" className="text-text-primary" />

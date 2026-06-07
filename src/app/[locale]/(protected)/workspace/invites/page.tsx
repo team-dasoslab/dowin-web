@@ -134,14 +134,14 @@ export default function ProfileInvitesPage() {
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
+          <div className="flex h-14 w-14 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="domain-ticket-diagonal" size="20px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold tracking-tight text-zinc-900">
+            <h1 className="text-[18px] font-black tracking-tight text-zinc-900">
               {workspace.name}
             </h1>
-            <p className="mt-0.5 text-xs text-zinc-500">
+            <p className="mt-0.5 text-[13px] font-medium text-zinc-500">
               {t("invitesCountDesc", {
                 total: invites.length,
                 active: activeInviteCount,
@@ -158,9 +158,9 @@ export default function ProfileInvitesPage() {
           />
         ) : null}
 
-        <div className="space-y-4 rounded-[24px] bg-white p-5">
+        <div className="space-y-5 rounded-[24px] bg-white p-6">
           <div>
-            <h2 className="text-sm font-bold text-zinc-900">
+            <h2 className="text-[15px] font-black text-zinc-900">
               {t("newInviteTitle")}
             </h2>
           </div>
@@ -173,8 +173,8 @@ export default function ProfileInvitesPage() {
               <p className="text-[11px] font-medium text-zinc-400">{t("maxUsesLimit")}</p>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-12 min-w-0 items-center gap-2 rounded-[12px] bg-zinc-100 px-4 text-xs text-zinc-600 transition-colors focus-within:bg-zinc-200/50">
+            <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+              <label className="flex h-12 min-w-0 items-center gap-2 rounded-[16px] bg-zinc-50 px-4 text-xs font-bold text-zinc-600 transition-colors focus-within:bg-zinc-100">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -199,7 +199,7 @@ export default function ProfileInvitesPage() {
                 type="button"
                 onClick={() => void handleCreateInvite()}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
-                className={`h-12 rounded-[12px] px-4 text-[13px] font-bold transition-colors ${
+                className={`h-12 rounded-[16px] px-5 text-[14px] font-black transition-colors ${
                   isCreatingInvite || isOverFreeMemberLimit
                     ? "cursor-not-allowed bg-zinc-100 text-zinc-400"
                     : "bg-primary/10 text-primary hover:bg-primary/20"
@@ -239,10 +239,10 @@ export default function ProfileInvitesPage() {
           </div>
         </div>
 
-        <div className="space-y-4 rounded-[24px] bg-white p-5">
+        <div className="space-y-5 rounded-[24px] bg-white p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-bold text-zinc-900">
+              <h2 className="text-[15px] font-black text-zinc-900">
                 {t("inviteListTitle")}
               </h2>
             </div>

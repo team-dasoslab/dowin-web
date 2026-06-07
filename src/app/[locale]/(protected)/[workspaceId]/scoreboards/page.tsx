@@ -109,7 +109,7 @@ export default function ScoreboardsPage() {
                 title={t("archivedScoreboards")}
                 description={t("archivedScoreboardsDesc")}
                 badge={
-                  <div className="px-2 py-0.5 rounded-md border border-border bg-sub-background text-[10px] font-black text-text-muted uppercase tracking-tight">
+                  <div className="px-2.5 py-1 rounded-[12px] bg-zinc-200/50 text-[11px] font-black text-zinc-500 uppercase tracking-tight">
                     {t("totalCount", { count: archivedScoreboards.length })}
                   </div>
                 }
@@ -134,9 +134,9 @@ function ScoreboardsSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-content bg-sub-background" />
-        <div className="h-44 rounded-content bg-sub-background" />
-        <div className="h-72 rounded-content bg-sub-background" />
+        <div className="h-16 rounded-[24px] bg-zinc-200/50" />
+        <div className="h-44 rounded-[24px] bg-zinc-200/50" />
+        <div className="h-72 rounded-[24px] bg-zinc-200/50" />
       </div>
     </div>
   );
@@ -152,10 +152,10 @@ function ScoreboardsNoWorkspaceState() {
           <Logo className="text-primary" size="28px" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+          <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
             {td("noWorkspaceTitle")}
           </h1>
-          <p className="text-sm text-text-secondary leading-relaxed">
+          <p className="text-[14px] font-medium text-zinc-500 leading-relaxed">
             {t("noWorkspaceArchiveDesc")}
           </p>
         </div>

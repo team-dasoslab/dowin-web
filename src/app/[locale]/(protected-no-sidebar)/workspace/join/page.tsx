@@ -28,7 +28,7 @@ export default function JoinWorkspacePage() {
     <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
       {isPending && <LoadingOverlay message={t("loading")} />}
-      <div className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+      <div className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
         <div className="flex items-center">
           <SmartBackButton className="w-9 h-9 rounded-full bg-zinc-100 border-none flex items-center justify-center text-zinc-600 transition-transform active:scale-[0.98] shrink-0" />
         </div>

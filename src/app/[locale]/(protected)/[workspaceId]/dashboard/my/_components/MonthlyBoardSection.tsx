@@ -43,17 +43,17 @@ export function MonthlyBoardSection({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-content border border-border bg-white px-5 py-3">
+      <div className="rounded-[24px] bg-white px-6 py-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-bold text-text-primary">
+            <p className="text-[14px] font-black text-zinc-900">
               {t("monthlyBoardTitle")}
             </p>
-            <p className="text-[11px] text-text-muted">
+            <p className="text-[12px] font-medium text-zinc-500">
               {t("monthlyBoardDesc")}
             </p>
           </div>
-          <p className="text-[11px] text-text-muted">
+          <p className="text-[12px] font-bold text-zinc-500">
             {t("totalAchieved", {
               achieved: monthlySummary?.achieved ?? 0,
               total: monthlySummary?.total ?? 0,
@@ -64,7 +64,7 @@ export function MonthlyBoardSection({
       </div>
 
       {monthlyLeadMeasures.length === 0 ? (
-        <div className="rounded-content border border-border bg-white p-8 text-center text-sm text-text-muted">
+        <div className="rounded-[24px] bg-white p-8 text-center text-[14px] font-medium text-zinc-500">
           {t("noMonthlyMeasures")}
         </div>
       ) : (
@@ -81,14 +81,14 @@ export function MonthlyBoardSection({
             {monthWeeks.map((weekDatesInMonth, weekIndex) => (
               <div
                 key={`${monthLabel}-week-${weekIndex + 1}`}
-                className="overflow-hidden rounded-content border border-border bg-white"
+                className="overflow-hidden rounded-[24px] bg-white"
               >
-                <div className="border-b border-border bg-sub-background px-5 py-3">
+                <div className="border-b-2 border-zinc-50 bg-zinc-50/50 px-6 py-4">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-bold text-text-primary">
+                    <p className="text-[14px] font-black text-zinc-900">
                       {t("weekNumber", { n: weekIndex + 1 })}
                     </p>
-                    <p className="text-[11px] font-mono text-text-muted">
+                    <p className="text-[12px] font-mono font-medium text-zinc-500">
                       {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
                       {" – "}
                       {weekDatesInMonth
@@ -102,7 +102,7 @@ export function MonthlyBoardSection({
 
                 <div className="overflow-x-auto">
                   <div className="min-w-[600px]">
-                    <div className="border-b border-border bg-sub-background">
+                    <div className="border-b-2 border-zinc-50 bg-zinc-50/50">
                       <table className="w-full table-fixed text-xs">
                         <colgroup>
                           <col className="w-[34%]" />
@@ -114,7 +114,7 @@ export function MonthlyBoardSection({
                         </colgroup>
                         <thead>
                           <tr>
-                            <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                            <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                               {t("leadMeasureHead")}
                             </th>
                             {localizedDays.map((label, dayIndex) => {
@@ -125,7 +125,7 @@ export function MonthlyBoardSection({
                                 <th
                                   key={`${weekIndex}-${label}`}
                                   className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
-                                    isToday ? "text-primary" : "text-text-muted"
+                                    isToday ? "text-primary" : "text-zinc-500"
                                   }`}
                                 >
                                   <div>{label}</div>
@@ -135,10 +135,10 @@ export function MonthlyBoardSection({
                                 </th>
                               );
                             })}
-                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                               {t("period")}
                             </th>
-                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                               {t("achievement")}
                             </th>
                           </tr>
@@ -155,7 +155,7 @@ export function MonthlyBoardSection({
                         <col className="w-[10%]" />
                         <col className="w-[16%]" />
                       </colgroup>
-                      <tbody className="divide-y divide-border">
+                      <tbody className="divide-y-2 divide-zinc-50">
                         {monthlyLeadMeasures.map((leadMeasure) => {
                           const targetValue = leadMeasure.targetValue ?? 0;
                           const tags =
@@ -203,14 +203,14 @@ export function MonthlyBoardSection({
                                     className="py-3 text-center"
                                   >
                                     <span
-                                      className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-bold ${
+                                      className={`inline-flex h-8 w-8 items-center justify-center rounded-[12px] text-sm font-bold transition-colors ${
                                         value?.achieved
-                                          ? "border-primary bg-primary text-white"
+                                          ? "bg-primary text-white"
                                           : date === null
-                                            ? "border-transparent bg-transparent text-transparent"
+                                            ? "bg-transparent text-transparent"
                                             : isToday
-                                              ? "border-primary/30 bg-primary/5 text-primary"
-                                              : "border-border bg-sub-background text-text-muted"
+                                              ? "bg-primary/10 text-primary"
+                                              : "border border-zinc-200/50 bg-white text-zinc-400 shadow-sm"
                                       }`}
                                     >
                                       {value?.achieved ? (
@@ -221,14 +221,14 @@ export function MonthlyBoardSection({
                                 );
                               })}
 
-                              <td className="px-3 py-4 text-center text-[11px] text-text-secondary">
+                              <td className="px-3 py-4 text-center text-[12px] font-medium text-zinc-500">
                                 {leadMeasure.period === "WEEKLY"
                                   ? t("weeklyLabel")
                                   : t("monthlyLabel")}
                               </td>
                               <td className="px-3 py-4 text-center">
                                 <div className="flex flex-col items-center gap-1.5">
-                                  <div className="h-1 w-10 overflow-hidden rounded-full border border-border bg-sub-background">
+                                  <div className="h-1.5 w-12 overflow-hidden rounded-full bg-zinc-100">
                                     <div
                                       className={`h-full rounded-full transition-all duration-500 ${
                                         rate >= 100
@@ -241,10 +241,10 @@ export function MonthlyBoardSection({
                                     />
                                   </div>
                                   <span
-                                    className={`font-mono text-[10px] font-bold ${
+                                    className={`font-mono text-[11px] font-black ${
                                       rate >= 100
                                         ? "text-green-600"
-                                        : "text-text-secondary"
+                                        : "text-zinc-500"
                                     }`}
                                   >
                                     {visibleAchievedCount}/{targetValue}

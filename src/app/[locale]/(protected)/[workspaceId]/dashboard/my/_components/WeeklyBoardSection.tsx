@@ -157,7 +157,7 @@ export function WeeklyBoardSection({
       <div className="relative hidden overflow-hidden rounded-[24px] bg-white md:block">
         <div className="overflow-x-auto">
           <div className="min-w-[600px]">
-            <div className="border-b border-zinc-100 bg-white">
+            <div className="border-b-2 border-zinc-50 bg-white">
               <table className="w-full table-fixed text-xs">
                 <colgroup>
                   <col className="w-[38%]" />
@@ -168,7 +168,7 @@ export function WeeklyBoardSection({
                 </colgroup>
                 <thead>
                   <tr>
-                    <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                    <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                       {t("leadMeasureHead")}
                     </th>
                     {localizedDays.map((day, index) => (
@@ -177,13 +177,13 @@ export function WeeklyBoardSection({
                         className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
                           weekDates[index] === today
                             ? "text-primary"
-                            : "text-text-muted"
+                            : "text-zinc-500"
                         }`}
                       >
                         {day}
                       </th>
                     ))}
-                    <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                    <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-zinc-500">
                       {t("achievement")}
                     </th>
                   </tr>
@@ -199,7 +199,7 @@ export function WeeklyBoardSection({
                 ))}
                 <col className="w-[14%]" />
               </colgroup>
-              <tbody className="divide-y divide-zinc-50">
+              <tbody className="divide-y-2 divide-zinc-50">
                 {activeLeadMeasures.map((leadMeasure) => {
                   const leadMeasureId = toNumberId(leadMeasure.id);
                   const weekly = weeklyById.get(leadMeasureId);
@@ -219,7 +219,7 @@ export function WeeklyBoardSection({
                           guide={guide}
                           guideActive={activeGuideId === leadMeasureId}
                           name={leadMeasure.name}
-                          nameClassName="block text-sm font-semibold text-text-primary"
+                          nameClassName="block text-sm font-semibold text-zinc-900"
                           onGuideClose={() => setActiveGuideId(null)}
                           onGuideToggle={() =>
                             setActiveGuideId((currentId) =>
@@ -363,12 +363,12 @@ export function WeeklyBoardSection({
 
                       <td className="px-3 py-4 text-center">
                         <div className="flex flex-col items-center gap-1.5">
-                          <span className="text-[10px] text-text-muted">
+                          <span className="text-[11px] font-medium text-zinc-500">
                             {leadMeasure.period === "MONTHLY"
                               ? t("monthlyLabel")
                               : t("weeklyLabel")}
                           </span>
-                          <div className="h-1 w-10 overflow-hidden rounded-full border border-border bg-sub-background">
+                          <div className="h-1.5 w-12 overflow-hidden rounded-full bg-zinc-100">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
                                 rate >= 100 ? "bg-green-500" : "bg-primary"
@@ -377,10 +377,10 @@ export function WeeklyBoardSection({
                             />
                           </div>
                           <span
-                            className={`font-mono text-[10px] font-bold ${
+                            className={`font-mono text-[11px] font-black ${
                               rate >= 100
                                 ? "text-green-600"
-                                : "text-text-secondary"
+                                : "text-zinc-500"
                             }`}
                           >
                             {achievedCount}/{weeklyTotal}

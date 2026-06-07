@@ -49,7 +49,7 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="flex h-8 items-center gap-1.5 rounded-button bg-zinc-100 px-3 text-[12px] font-bold text-text-primary transition-colors hover:bg-zinc-200 whitespace-nowrap flex-shrink-0"
+              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-4 text-[13px] font-black text-zinc-900 transition-colors hover:bg-zinc-200 whitespace-nowrap flex-shrink-0"
             >
               {pendingActionId === activeScoreboardId && (
                 <InlineSpinner
@@ -80,15 +80,15 @@ function EmptyActiveScoreboardCard() {
          <Logo size="24px" className="text-primary" />
       </div>
       <div className="space-y-1">
-        <p className="text-sm font-semibold text-text-primary">
+        <p className="text-[15px] font-black text-zinc-900">
           {t("noActive")}
         </p>
-        <p className="text-xs text-text-muted">{t("noActiveDesc")}</p>
+        <p className="text-[13px] font-medium text-zinc-500">{t("noActiveDesc")}</p>
       </div>
       <div className="flex justify-center">
         <Button
           asChild
-          className="btn-dowin-primary px-4 py-2 text-xs font-bold"
+          className="btn-dowin-primary rounded-[16px] px-5 py-3 text-[14px] font-black"
         >
           <Link href={`/${workspaceId}/setup?mode=create`}>
             {td("createScoreboard")}
