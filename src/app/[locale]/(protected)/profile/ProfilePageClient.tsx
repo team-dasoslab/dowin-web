@@ -369,11 +369,10 @@ export default function ProfilePage() {
 
 
                     <div className="rounded-[24px] overflow-hidden bg-white">
-                      {group.items.map((item, index) => (
+                      {group.items.map((item) => (
                         <MenuItemRow
                           key={item.id}
                           item={item}
-                          isLast={index === group.items.length - 1}
                           isActionPending={isActionPending}
                         />
                       ))}
@@ -390,14 +389,12 @@ export default function ProfilePage() {
 
 function MenuItemRow({
   item,
-  isLast,
   isActionPending,
 }: {
   item: MenuItem;
-  isLast: boolean;
   isActionPending: boolean;
 }) {
-  const itemWrapperClassName = isLast ? "" : "border-b border-zinc-100";
+  const itemWrapperClassName = "";
 
   const Content = (
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
@@ -437,7 +434,7 @@ function MenuItemRow({
         <button
           disabled={isActionPending}
           onClick={item.onClick}
-          className="w-full bg-white text-left"
+          className="block w-full text-left transition-colors hover:bg-zinc-50"
         >
           {Content}
         </button>
@@ -448,7 +445,7 @@ function MenuItemRow({
   if (item.href) {
     return (
       <div className={itemWrapperClassName}>
-        <Link href={item.href} className="block w-full bg-white">
+        <Link href={item.href} className="block w-full transition-colors hover:bg-zinc-50">
           {Content}
         </Link>
       </div>

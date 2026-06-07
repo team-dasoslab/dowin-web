@@ -272,11 +272,10 @@ export default function WorkspaceSettingsPage() {
                 >
                   <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{group.label}</h2>
                   <div className="rounded-[24px] overflow-hidden bg-white">
-                    {group.items.map((item, index) => (
+                    {group.items.map((item) => (
                       <MenuItemRow
                         key={item.id}
                         item={item}
-                        isLast={index === group.items.length - 1}
                         isActionPending={isActionPending}
                       />
                     ))}
@@ -287,37 +286,47 @@ export default function WorkspaceSettingsPage() {
               {/* 내 워크스페이스 목록 */}
               <section
                 id="workspaces"
-                className="space-y-5 scroll-mt-28"
+                className="space-y-3 scroll-mt-28"
                 ref={(el) => {
                   sectionRefs.current["workspaces"] = el;
                 }}
               >
                 <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{t("workspaceList")}</h2>
                 <div className="rounded-[24px] overflow-hidden bg-white">
-                  {workspaces.map((ws, index) => (
+                  {workspaces.map((ws) => (
                     <div
                       key={ws.id}
-                      className={`flex w-full items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5 ${index !== workspaces.length - 1 ? "border-b border-zinc-100" : ""
-                        }`}
+                      className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors hover:bg-zinc-50 sm:px-6 sm:py-5"
                     >
-                      <div className="flex flex-col min-w-0 text-left">
-                        <p className={`text-[14px] font-bold ${ws.id === workspace?.id ? "text-primary" : "text-text-primary"}`}>
+                      <div className="flex min-w-0 flex-col text-left">
+                        <span className="truncate text-[14px] font-bold text-text-primary">
                           {ws.name}
-                          {ws.id === workspace?.id && <span className="ml-2 text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">{commonT("current")}</span>}
-                        </p>
+                        </span>
+                        <span className="mt-0.5 truncate text-[12px] font-medium text-text-secondary">
+                          {ws.role === "ADMIN" ? t("workspaceAdmin") : t("workspaceMember")}
+                        </span>
                       </div>
-                      {ws.id !== workspace?.id && (
-                        <button
-                          onClick={() => switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                          disabled={isSwitching}
-                          className="text-xs font-bold text-zinc-500 hover:text-zinc-800 transition-colors bg-zinc-100 px-3 py-1.5 rounded-button"
-                        >
-                          {commonT("switchWorkspace")}
-                        </button>
-                      )}
+
+                      <div className="flex-shrink-0">
+                        {ws.id === workspaceId ? (
+                          <div className="flex h-8 items-center gap-1.5 rounded-button bg-primary/10 px-3 text-[12px] font-bold text-primary">
+                            <DowinIcon name="status-checkmark" size="14px" />
+                            {commonT("current")}
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={isActionPending}
+                            onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
+                            className="flex h-8 items-center gap-1.5 rounded-button bg-zinc-100 px-3 text-[12px] font-bold text-text-primary transition-colors hover:bg-zinc-200"
+                          >
+                            {commonT("switchWorkspace")}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
-                  <div className="border-t border-zinc-100">
+                  <div className="rounded-[24px] overflow-hidden bg-white">
                     <Link
                       href="/workspace/new"
                       className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
@@ -338,8 +347,14 @@ export default function WorkspaceSettingsPage() {
   );
 }
 
-function MenuItemRow({ item, isLast, isActionPending }: { item: MenuItem; isLast: boolean; isActionPending: boolean; }) {
-  const itemWrapperClassName = isLast ? "" : "border-b border-zinc-100";
+function MenuItemRow({
+  item,
+  isActionPending,
+}: {
+  item: MenuItem;
+  isActionPending: boolean;
+}) {
+  const itemWrapperClassName = "";
   const Content = (
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -366,7 +381,7 @@ function MenuItemRow({ item, isLast, isActionPending }: { item: MenuItem; isLast
   if (item.onClick) {
     return (
       <div className={itemWrapperClassName}>
-        <button disabled={isActionPending} onClick={item.onClick} className="w-full bg-white text-left">
+        <button disabled={isActionPending} onClick={item.onClick} className="block w-full text-left transition-colors hover:bg-zinc-50">
           {Content}
         </button>
       </div>
@@ -376,7 +391,7 @@ function MenuItemRow({ item, isLast, isActionPending }: { item: MenuItem; isLast
   if (item.href) {
     return (
       <div className={itemWrapperClassName}>
-        <Link href={item.href} className="block w-full bg-white">
+        <Link href={item.href} className="block w-full transition-colors hover:bg-zinc-50">
           {Content}
         </Link>
       </div>
