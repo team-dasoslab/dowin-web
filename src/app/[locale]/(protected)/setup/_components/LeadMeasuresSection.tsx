@@ -371,6 +371,7 @@ function LeadMeasureRow({
           </>
         )}
       </div>
+      {/* 
       <div
         className="rounded-[16px] bg-zinc-100"
         data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
@@ -605,6 +606,7 @@ function LeadMeasureRow({
           </div>
         ) : null}
       </div>
+      */}
     </div>
   );
 }
