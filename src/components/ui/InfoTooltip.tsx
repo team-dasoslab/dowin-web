@@ -48,11 +48,11 @@ export function InfoTooltip({ content, label, className, align = "left", side = 
       aria-expanded={open}
       onClick={() => setOpen((v) => !v)}
       className={cn(
-        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-zinc-400",
-        open && "text-primary",
+        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-zinc-400 hover:text-zinc-600 transition-colors active:scale-[0.95]",
+        open && "text-zinc-800 bg-zinc-100",
       )}
     >
-      <DowinIcon name="status-info" size="16px" />
+      <DowinIcon name="status-info" size="18px" />
     </button>
   );
 
@@ -77,12 +77,12 @@ export function InfoTooltip({ content, label, className, align = "left", side = 
           <div
             role="tooltip"
             className={cn(
-              "absolute z-50 w-72 max-w-[calc(100vw-4rem)] rounded-content border border-zinc-200 bg-white p-4 shadow-lg animate-dowin-in",
+              "absolute z-50 w-72 max-w-[calc(100vw-4rem)] rounded-[16px] border-none bg-zinc-900 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-dowin-in",
               tooltipAlignClass,
               tooltipSideClass,
             )}
           >
-            <div className="text-[13px] font-medium leading-relaxed text-zinc-600 whitespace-pre-line">
+            <div className="text-[14px] font-semibold leading-relaxed text-white whitespace-pre-line">
               {content}
             </div>
           </div>
@@ -99,12 +99,12 @@ export function InfoTooltip({ content, label, className, align = "left", side = 
         <div
           role="tooltip"
           className={cn(
-            "absolute z-50 w-72 max-w-[calc(100vw-2rem)] sm:max-w-none rounded-content border border-zinc-200 bg-white p-4 shadow-lg animate-dowin-in",
+            "absolute z-50 w-72 max-w-[calc(100vw-2rem)] sm:max-w-none rounded-[16px] border-none bg-zinc-900 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-dowin-in",
             tooltipAlignClass,
             tooltipSideClass,
           )}
         >
-          <div className="text-[13px] font-medium leading-relaxed text-zinc-600 whitespace-pre-line">
+          <div className="text-[14px] font-semibold leading-relaxed text-white whitespace-pre-line">
             {content}
           </div>
         </div>

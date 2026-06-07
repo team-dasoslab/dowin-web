@@ -9,6 +9,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { formatWeekLabel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
 import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/[workspaceId]/workspace/report/_hooks/useTeamWeeklyReport";
 import { Button } from "@/components/ui/Button";
@@ -229,7 +230,7 @@ export default function ReportPage() {
   const hasMembers = summary.totalCount > 0;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={tDashboard("weeklyReport")}
@@ -241,48 +242,10 @@ export default function ReportPage() {
         />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
-          {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-            <nav className="flex gap-1 lg:block lg:space-y-1">
-              {menuGroups.map((group) => {
-                const isActive = activeSection === group.id;
-                return (
-                  <button
-                    key={group.id}
-                    onClick={() => {
-                      const element = document.getElementById(group.id);
-                      const container = document.getElementById(
-                        "main-scroll-container",
-                      );
-                      if (container && element) {
-                        const headerOffset = 100;
-                        const elementPosition = element.offsetTop;
-                        const offsetPosition = elementPosition - headerOffset;
-                        container.scrollTo({
-                          top: offsetPosition,
-                          behavior: "smooth",
-                        });
-                      }
-                    }}
-                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
-                      isActive
-                        ? "text-primary"
-                        : "text-zinc-400"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {isActive && (
-                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
-                      )}
-                      <span className={isActive ? "" : "lg:pl-4"}>
-                        {group.label}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+          <PageSidebarNav
+            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            activeId={activeSection}
+          />
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
@@ -859,7 +822,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
 
   return (
     <Card className="overflow-hidden border border-zinc-200 bg-white">
-      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-zinc-100 bg-zinc-50/50 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-text-muted md:grid">
+      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-zinc-100 bg-zinc-100 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-text-muted md:grid">
         <span>{t("focus.table.member")}</span>
         <span className="text-center">{t("focus.table.status")}</span>
         <span className="text-center">{t("focus.table.score")}</span>
@@ -909,21 +872,21 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
 
 function ReportLoadingState() {
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer spacing="compact">
-        <div className="h-16 w-48 animate-pulse rounded-content bg-sub-background" />
+        <div className="h-16 w-48 animate-pulse rounded-content bg-zinc-200" />
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
-          <aside className="hidden w-[240px] space-y-2 lg:block">
+          <div className="hidden w-[240px] space-y-2 lg:block">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-10 rounded-button bg-sub-background animate-pulse"
+                className="h-10 rounded-button bg-zinc-200 animate-pulse"
               />
             ))}
-          </aside>
+          </div>
           <div className="flex-1 space-y-10">
-            <div className="h-64 rounded-content bg-sub-background animate-pulse" />
-            <div className="h-48 rounded-content bg-sub-background animate-pulse" />
+            <div className="h-64 rounded-content bg-zinc-200 animate-pulse" />
+            <div className="h-48 rounded-content bg-zinc-200 animate-pulse" />
           </div>
         </div>
       </ProtectedPageContainer>
@@ -935,7 +898,7 @@ function ReportNoWorkspaceState() {
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
@@ -960,7 +923,7 @@ function ReportForbiddenState({ workspaceId }: { workspaceId: string }) {
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
@@ -987,7 +950,7 @@ function ReportErrorState({ onRetry, workspaceId }: { onRetry: () => void, works
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">

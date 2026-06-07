@@ -1,5 +1,4 @@
 import { formatDate } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_lib/scoreboards";
-import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { ReactNode } from "react";
@@ -23,13 +22,13 @@ export function ScoreboardCard({
   const t = useTranslations("Scoreboard");
 
   return (
-    <Card className="border border-border rounded-content p-5 space-y-4 bg-white">
+    <div className="rounded-[24px] bg-white p-6 space-y-5">
       <div className="space-y-2">
-        <h2 className="text-base font-bold text-text-primary leading-tight">
+        <h2 className="text-[18px] font-black text-zinc-900 leading-tight">
           {goalName || t("unnamedScoreboard")}
         </h2>
-        <div className="flex items-center gap-2 text-sm text-text-secondary">
-          <DowinIcon name="domain-target-arrow" size="14px" className="text-text-muted flex-shrink-0" />
+        <div className="flex items-center gap-2 text-[14px] font-medium text-zinc-500">
+          <DowinIcon name="domain-target-arrow" size="16px" className="text-zinc-400 flex-shrink-0" />
           <span className="leading-relaxed">
             {lagMeasure || t("noLagMeasure")}
           </span>
@@ -46,6 +45,6 @@ export function ScoreboardCard({
           {action}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

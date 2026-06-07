@@ -5,6 +5,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { ActiveScoreboardSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ActiveScoreboardSection";
 import { ArchivedScoreboardsSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ArchivedScoreboardsSection";
 import { useScoreboardArchive } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_hooks/useScoreboardArchive";
@@ -70,7 +71,7 @@ export default function ScoreboardsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       {pendingActionId !== null && (
         <LoadingOverlay message={t("changingStatus")} />
       )}
@@ -81,48 +82,10 @@ export default function ScoreboardsPage() {
         />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
-          {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-            <nav className="flex gap-1 lg:block lg:space-y-1">
-              {menuGroups.map((group) => {
-                const isActive = activeSection === group.id;
-                return (
-                  <button
-                    key={group.id}
-                    onClick={() => {
-                      const element = document.getElementById(group.id);
-                      const container = document.getElementById(
-                        "main-scroll-container",
-                      );
-                      if (container && element) {
-                        const headerOffset = 100;
-                        const elementPosition = element.offsetTop;
-                        const offsetPosition = elementPosition - headerOffset;
-                        container.scrollTo({
-                          top: offsetPosition,
-                          behavior: "smooth",
-                        });
-                      }
-                    }}
-                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
-                      isActive
-                        ? "text-primary"
-                        : "text-zinc-400"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {isActive && (
-                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
-                      )}
-                      <span className={isActive ? "" : "lg:pl-4"}>
-                        {group.label}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+          <PageSidebarNav
+            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            activeId={activeSection}
+          />
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
@@ -146,7 +109,7 @@ export default function ScoreboardsPage() {
                 title={t("archivedScoreboards")}
                 description={t("archivedScoreboardsDesc")}
                 badge={
-                  <div className="px-2 py-0.5 rounded-md border border-border bg-sub-background text-[10px] font-black text-text-muted uppercase tracking-tight">
+                  <div className="px-2.5 py-1 rounded-[12px] bg-zinc-200/50 text-[11px] font-black text-zinc-500 uppercase tracking-tight">
                     {t("totalCount", { count: archivedScoreboards.length })}
                   </div>
                 }
@@ -169,11 +132,11 @@ export default function ScoreboardsPage() {
 
 function ScoreboardsSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-content bg-sub-background" />
-        <div className="h-44 rounded-content bg-sub-background" />
-        <div className="h-72 rounded-content bg-sub-background" />
+        <div className="h-16 rounded-[24px] bg-zinc-200" />
+        <div className="h-44 rounded-[24px] bg-zinc-200" />
+        <div className="h-72 rounded-[24px] bg-zinc-200" />
       </div>
     </div>
   );
@@ -183,16 +146,16 @@ function ScoreboardsNoWorkspaceState() {
   const t = useTranslations("Scoreboard");
   const td = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-50/50 flex items-center justify-center p-8">
+    <div className="min-h-screen bg-zinc-100 flex items-center justify-center p-8">
       <div className="max-w-[420px] w-full space-y-10 animate-dowin-in">
         <div className="w-14 h-14 bg-primary/10 rounded-content flex items-center justify-center">
           <Logo className="text-primary" size="28px" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">
+          <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
             {td("noWorkspaceTitle")}
           </h1>
-          <p className="text-sm text-text-secondary leading-relaxed">
+          <p className="text-[14px] font-medium text-zinc-500 leading-relaxed">
             {t("noWorkspaceArchiveDesc")}
           </p>
         </div>

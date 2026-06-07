@@ -10,17 +10,15 @@ import {
 import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
 import { useUpdateWorkspaceSeatsMutation } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useUpdateWorkspaceSeatsMutation";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { Logo } from "@/components/ui/Logo";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
-import { Activity } from "lucide-react";
+// import { Activity } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -170,16 +168,13 @@ export function ProfileBillingPageClient() {
       billing.billingStatus === "CANCELED");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer className="space-y-8 lg:space-y-12">
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer className="max-w-[640px] space-y-6">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="space-y-4">
-          <Card className="flex items-center justify-between gap-4 border-zinc-200 bg-white p-5 md:p-6">
-            <div className="flex min-w-0 items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-zinc-50 text-primary">
-                <DowinIcon name="domain-wallet" size="24px" />
-              </div>
+          <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5 md:p-6">
+            <div className="flex min-w-0 items-center">
               <div className="min-w-0">
                 <h2 className="text-lg font-black tracking-tight text-zinc-900">
                   {billing.workspaceName}
@@ -193,16 +188,16 @@ export function ProfileBillingPageClient() {
                   type="button"
                   onClick={() => void openPortal()}
                   disabled={isPortalPending}
-                  className="h-10 rounded-button border border-zinc-200 bg-white px-5 text-sm font-black text-zinc-600 transition-colors"
+                  className="h-10 rounded-[12px] bg-zinc-100 px-5 text-sm font-bold text-zinc-700 hover:bg-zinc-200 transition-colors"
                 >
                   {isPortalPending ? t("portalLoading") : t("portalButton")}
                 </Button>
               ) : null}
             </div>
-          </Card>
+          </div>
 
           {!isAdmin ? (
-            <div className="flex items-start gap-2.5 rounded-content border border-zinc-200 bg-zinc-100/50 px-4 py-3 text-[12px] font-medium leading-relaxed text-zinc-500">
+            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-white px-4 py-3 text-[12px] font-medium leading-relaxed text-zinc-500">
               <DowinIcon
                 name="status-locked"
                 size="14px"
@@ -213,7 +208,7 @@ export function ProfileBillingPageClient() {
           ) : null}
 
           {billing.entitlementSource === "BETA_PROMOTIONAL_GRANT" ? (
-            <div className="flex items-start gap-2.5 rounded-content border border-primary/20 bg-primary/5 px-4 py-3 text-[12px] font-bold leading-relaxed text-primary">
+            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-primary/5 px-4 py-3 text-[12px] font-bold leading-relaxed text-primary">
               <DowinIcon
                 name="status-info"
                 size="14px"
@@ -222,7 +217,7 @@ export function ProfileBillingPageClient() {
               Basic 프로모션 혜택이 적용되어 있어요.
             </div>
           ) : billing.entitlementSource && !isPolarEntitlement ? (
-            <div className="flex items-start gap-2.5 rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
               <DowinIcon
                 name="status-info"
                 size="14px"
@@ -244,32 +239,22 @@ export function ProfileBillingPageClient() {
         </div>
 
         <section className="space-y-4">
-          <SectionHeader title={t("currentPlanTitle")} />
-          <Card className="divide-y divide-zinc-100 border-zinc-200 bg-white">
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                  <DowinIcon name="domain-target-arrow" size="16px" />
-                </div>
-                <span className="text-sm font-bold text-zinc-500">
-                  {t("planLabel")}
-                </span>
-              </div>
-              <span className="text-sm font-black text-primary">
+          <h2 className="px-1 text-lg font-bold tracking-tight text-zinc-900">{t("currentPlanTitle")}</h2>
+          <div className="rounded-[24px] bg-white py-2">
+            <div className="flex items-center justify-between px-6 py-4">
+              <span className="text-[15px] font-medium text-zinc-600">
+                {t("planLabel")}
+              </span>
+              <span className="text-[15px] font-bold text-primary">
                 {t("basicPlanName")}
               </span>
             </div>
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                  <Activity size={16} />
-                </div>
-                <span className="text-sm font-bold text-zinc-500">
-                  {t("statusLabel")}
-                </span>
-              </div>
+            <div className="flex items-center justify-between px-6 py-4">
+              <span className="text-[15px] font-medium text-zinc-600">
+                {t("statusLabel")}
+              </span>
               <span
-                className={`text-sm font-black ${
+                className={`text-[15px] font-bold ${
                   billing.billingStatus === "ACTIVE" ||
                   billing.billingStatus === "CANCELED"
                     ? "text-success"
@@ -287,40 +272,30 @@ export function ProfileBillingPageClient() {
               (billing.billingStatus === "ACTIVE" ||
                 billing.billingStatus === "CANCELED") && (
                 <>
-                  <div className="flex items-center justify-between p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                        <DowinIcon name="domain-people" size="16px" />
-                      </div>
-                      <span className="text-sm font-bold text-zinc-500">
-                        {t("usedSeatLabel")}
-                      </span>
-                    </div>
-                    <span className="text-sm font-black text-zinc-900">
+                  <div className="flex items-center justify-between px-6 py-4">
+                    <span className="text-[15px] font-medium text-zinc-600">
+                      {t("usedSeatLabel")}
+                    </span>
+                    <span className="text-[15px] font-bold text-zinc-900">
                       {billing.usedSeatCount ?? 0} {t("seatUnit")}
                     </span>
                   </div>
-                  <div className="flex flex-col p-5">
+                  <div className="flex flex-col px-6 py-4">
                     <div className="flex items-center justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                          <DowinIcon name="domain-people" size="16px" />
-                        </div>
-                        <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="truncate text-sm font-bold text-zinc-500">
-                            {t("purchasedSeatLabel")}
-                          </span>
-                          {isAdmin && isPolarEntitlement && (
-                            <InfoTooltip
-                              content={t("seatChangePolicyTooltip")}
-                              align="left"
-                              side="top"
-                            />
-                          )}
-                        </div>
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <span className="truncate text-[15px] font-medium text-zinc-600">
+                          {t("purchasedSeatLabel")}
+                        </span>
+                        {isAdmin && isPolarEntitlement && (
+                          <InfoTooltip
+                            content={t("seatChangePolicyTooltip")}
+                            align="left"
+                            side="top"
+                          />
+                        )}
                       </div>
                       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                        <span className="whitespace-nowrap text-sm font-black text-zinc-900">
+                        <span className="whitespace-nowrap text-[15px] font-bold text-zinc-900">
                           {billing.purchasedSeatCount} {t("seatUnit")}
                         </span>
                         {isAdmin && isPolarEntitlement && (
@@ -328,7 +303,7 @@ export function ProfileBillingPageClient() {
                             type="button"
                             onClick={handleSeatChangeClick}
                             disabled={isUpdatingSeats}
-                            className="whitespace-nowrap h-8 rounded-button border border-zinc-200 bg-white px-3 text-xs font-black text-zinc-600 transition-colors"
+                            className="whitespace-nowrap h-8 rounded-[12px] bg-zinc-100 px-3 text-xs font-bold text-zinc-700 hover:bg-zinc-200 transition-colors"
                           >
                             {isUpdatingSeats
                               ? t("seatChangeDialogSubmitting")
@@ -338,8 +313,8 @@ export function ProfileBillingPageClient() {
                       </div>
                     </div>
                     {billing.pendingSeatCount !== null && (
-                      <div className="mt-1 pl-11">
-                        <span className="text-[12px] font-medium leading-tight text-primary">
+                      <div className="mt-1">
+                        <span className="text-[13px] font-semibold leading-tight text-primary">
                           {t("pendingSeatLabel")} (
                           {billing.pendingSeatEffectiveAt
                             ? t("pendingSeatValue", {
@@ -360,16 +335,11 @@ export function ProfileBillingPageClient() {
                   </div>
                 </>
               )}
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                  <DowinIcon name="domain-calendar" size="16px" />
-                </div>
-                <span className="text-sm font-bold text-zinc-500">
-                  {t(getPeriodEndLabelKey(billing.billingStatus))}
-                </span>
-              </div>
-              <span className="text-sm font-black text-zinc-900">
+            <div className="flex items-center justify-between px-6 py-4">
+              <span className="text-[15px] font-medium text-zinc-600">
+                {t(getPeriodEndLabelKey(billing.billingStatus))}
+              </span>
+              <span className="text-[15px] font-bold text-zinc-900">
                 {formatDateLabel(
                   billing.currentPeriodEnd,
                   t("notAvailable"),
@@ -377,13 +347,13 @@ export function ProfileBillingPageClient() {
                 )}
               </span>
             </div>
-          </Card>
+          </div>
         </section>
 
         {isReturningFromCheckout || requiresManualReview ? (
           <div className="space-y-4">
             {isReturningFromCheckout ? (
-              <Card className="space-y-3 border-primary/20 bg-primary/5 p-5">
+              <div className="space-y-3 rounded-[24px] bg-primary/5 p-5">
                 <div className="flex items-center gap-2 text-primary">
                   <DowinIcon name="status-info" size="18px" />
                   <p className="text-[14px] font-black">{t("pendingTitle")}</p>
@@ -394,7 +364,7 @@ export function ProfileBillingPageClient() {
                 <Button
                   type="button"
                   onClick={() => void refetch()}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-button border border-primary/20 bg-white px-4 text-[12px] font-bold text-primary transition-all"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] bg-primary px-4 text-[12px] font-bold text-white transition-all"
                 >
                   <DowinIcon
                     name="action-refresh"
@@ -403,11 +373,11 @@ export function ProfileBillingPageClient() {
                   />
                   {t("refresh")}
                 </Button>
-              </Card>
+              </div>
             ) : null}
 
             {requiresManualReview ? (
-              <Card className="space-y-3 border-red-200 bg-red-50 p-5">
+              <div className="space-y-3 rounded-[24px] bg-red-50 p-5">
                 <div className="flex items-center gap-2 text-red-600">
                   <DowinIcon name="status-locked" size="18px" />
                   <p className="text-[14px] font-black">
@@ -420,13 +390,13 @@ export function ProfileBillingPageClient() {
                     revokedCount: billing.recentRevokedCount,
                   })}
                 </p>
-              </Card>
+              </div>
             ) : null}
           </div>
         ) : null}
 
         <section>
-          <Card className="border-zinc-200 bg-zinc-100/50 p-5">
+          <div className="rounded-[24px] bg-white p-5">
             <h3 className="flex items-center gap-2 text-[14px] font-black text-zinc-900">
               <DowinIcon
                 name="status-info"
@@ -438,7 +408,7 @@ export function ProfileBillingPageClient() {
             <p className="mt-2 text-[12px] font-medium leading-relaxed text-zinc-500">
               {t("downgradePolicyDesc")}
             </p>
-          </Card>
+          </div>
         </section>
 
         <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
@@ -468,7 +438,7 @@ function BillingUnavailableInAppState() {
   const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <EmptyStatePanel
           title={t("appUnavailableTitle")}
@@ -476,7 +446,7 @@ function BillingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
+              className="rounded-[12px] bg-zinc-100 px-5 py-3 text-sm font-bold text-zinc-900 hover:bg-zinc-200 transition-colors"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -539,18 +509,18 @@ function getEntitlementSourceLabel(
 
 function ProfileBillingSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-50/50">
-      <ProtectedPageContainer isLoading>
-        <div className="h-10 w-48 rounded-content bg-zinc-100" />
-        <div className="h-32 rounded-content bg-zinc-100" />
-        <div className="space-y-4">
-          <div className="h-6 w-32 rounded-content bg-zinc-100" />
-          <div className="grid grid-cols-2 gap-4">
-            <div className="h-24 rounded-content bg-zinc-100" />
-            <div className="h-24 rounded-content bg-zinc-100" />
+    <div className="min-h-screen bg-zinc-100">
+      <ProtectedPageContainer isLoading className="max-w-[640px] space-y-6">
+        <div className="h-10 w-48 rounded-[24px] bg-zinc-200" />
+        <div className="h-32 rounded-[24px] bg-zinc-200" />
+        <div className="space-y-3">
+          <div className="h-6 w-32 rounded-[16px] bg-zinc-200" />
+          <div className="space-y-2">
+            <div className="h-24 rounded-[16px] bg-zinc-200" />
+            <div className="h-24 rounded-[16px] bg-zinc-200" />
           </div>
         </div>
-        <div className="h-48 rounded-content bg-zinc-100" />
+        <div className="h-48 rounded-[24px] bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );
@@ -560,9 +530,9 @@ function NoWorkspaceState() {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+        <div className="w-full space-y-6 rounded-[24px] bg-white p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Logo size="32px" />
           </div>
@@ -577,7 +547,7 @@ function NoWorkspaceState() {
           <div className="flex justify-center pt-2">
             <NoWorkspaceActions />
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
@@ -587,9 +557,9 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-50/50">
+    <div className="min-h-screen bg-zinc-100">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+        <div className="w-full space-y-6 rounded-[24px] bg-white p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">
             <DowinIcon name="status-locked" size="32px" />
           </div>
@@ -604,11 +574,11 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
           <Button
             type="button"
             onClick={onRefresh}
-            className="btn-dowin-primary h-12 w-full text-[15px] font-black"
+            className="rounded-[12px] bg-primary text-white h-12 w-full text-[15px] font-bold hover:bg-primary/90 transition-colors"
           >
             {t("refresh")}
           </Button>
-        </Card>
+        </div>
       </div>
     </div>
   );

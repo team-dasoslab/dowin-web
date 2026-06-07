@@ -85,7 +85,7 @@
     "monthlyAchievementRate": "Monthly Achievement",
     "monthlyAchievementRateWithMonth": "Monthly Achievement ({month})",
     "recentTrend": "Last 4 Weeks Trend",
-    "viewAllUpdates": "View all updates",
+    "viewAllUpdates": "What's New",
     "monthlyBoardTitle": "Monthly Board",
     "monthlyBoardDesc": "View all records for the selected month by week.",
     "noMonthlyMeasures": "No monthly action items for this month.",
@@ -266,7 +266,7 @@
   },
   "Setup": {
     "header": "Scoreboard Settings",
-    "editTitle": "Edit Current Goal",
+    "editTitle": "Manage Scoreboard",
     "createTitle": "Set Next Scoreboard",
     "description": "Set a single goal and define your measures.",
     "archiving": "Archiving scoreboard...",
@@ -474,6 +474,10 @@
     "copiedLabel": "Copied",
     "active": "ACTIVE",
     "inactive": "INACTIVE",
+    "filterAll": "All", 
+    "filterActive": "Active", 
+    "filterInactive": "Inactive", 
+
     "usageLabel": "Usage {usage}",
     "noWorkspaceTitle": "No Workspace Found",
     "noWorkspaceDesc": "Invite management is available after creating a workspace.",
@@ -870,7 +874,7 @@
     "loadFailedDesc": "Please try again shortly."
   },
   "ProductUpdates": {
-    "header": "Product Updates",
+    "header": "What's New",
     "recommendedBadge": "Recommended",
     "latestTitle": "Newest Features",
     "latestDesc": "Quickly browse what's new and try them out.",
@@ -1038,7 +1042,7 @@
       "promotionCodePlaceholder": "Enter code",
       "button": "Create Workspace",
       "buttonPromo": "Create",
-      "goToJoinText": "Have an invite code?",
+      "goToJoinText": "Join with an invite code",
       "goToJoinButton": "Join Workspace",
       "checkoutButton": "Pay and Create",
       "loading": "Preparing checkout...",

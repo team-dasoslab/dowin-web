@@ -12,8 +12,8 @@ export function AchievementProgress({
   achievedCount,
   periodLabel,
   targetValue,
-  trackBackgroundClassName = "bg-sub-background",
-  valueTextSizeClassName = "text-sm",
+  trackBackgroundClassName = "bg-zinc-100",
+  valueTextSizeClassName = "text-[12px]",
 }: AchievementProgressProps) {
   const t = useTranslations("Dashboard");
   const rate =
@@ -22,12 +22,12 @@ export function AchievementProgress({
 
   return (
     <div className="shrink-0 text-right">
-      <p className="text-[10px] text-text-muted">
+      <p className="text-[11px] font-medium text-zinc-500">
         {periodLabel ?? t("achievementTab")}
       </p>
       <div className="mt-1 flex flex-row items-center justify-end gap-1.5">
         <div
-          className={`h-1 w-12 overflow-hidden rounded-full border border-border ${trackBackgroundClassName}`}
+          className={`h-1.5 w-12 overflow-hidden rounded-full ${trackBackgroundClassName}`}
         >
           <div
             className={`h-full rounded-full transition-all duration-500 ${
@@ -37,8 +37,8 @@ export function AchievementProgress({
           />
         </div>
         <p
-          className={`${valueTextSizeClassName} font-bold font-mono ${
-            isCompleted ? "text-green-600" : "text-text-secondary"
+          className={`${valueTextSizeClassName} font-black font-mono ${
+            isCompleted ? "text-green-600" : "text-zinc-500"
           }`}
         >
           {achievedCount}/{targetValue}

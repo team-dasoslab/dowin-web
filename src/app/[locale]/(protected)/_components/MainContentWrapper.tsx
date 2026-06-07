@@ -30,7 +30,7 @@ export function MainContentWrapper({ children }: MainContentWrapperProps) {
   return (
     <div
       className={cn(
-        "transition-[padding] duration-200 ease-out md:pb-0",
+        "transition-[padding] duration-200 ease-out lg:pb-0",
         isMainTab 
           ? "pb-[calc(5.25rem+var(--safe-area-inset-bottom,0px))]" 
           : "pb-[var(--safe-area-inset-bottom,0px)]"

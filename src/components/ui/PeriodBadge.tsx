@@ -20,7 +20,7 @@ export function PeriodBadge({
   return (
     <div
       className={cn(
-        "flex items-center rounded-button border border-zinc-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all",
+        "flex items-center rounded-[16px] bg-zinc-100 transition-all",
         isMd ? "gap-2 px-3 py-1.5" : "gap-1.5 px-2.5 py-1",
         className,
       )}
