@@ -17,7 +17,6 @@ import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Card } from "@/components/ui/Card";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";

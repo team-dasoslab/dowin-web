@@ -1,14 +1,11 @@
 "use client";
 
-import { ProductUpdateCard } from "@/app/[locale]/(protected)/profile/updates/_components/ProductUpdateCard";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { ProductUpdateCard } from "@/app/[locale]/(protected)/profile/updates/_components/ProductUpdateCard";
 import { useNativeApp } from "@/context/NativeAppContext";
-import { Link } from "@/i18n/routing";
 import {
   getLatestMajorProductUpdate,
   getProductUpdates,
@@ -31,8 +28,8 @@ export default function UpdatesPage() {
 
   return (
     <ProtectedPageContainer className="max-w-[640px]">
-      <ProtectedPageHeader 
-        title={t("header")} 
+      <ProtectedPageHeader
+        title={t("header")}
         rightElement={
           <div className="flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1.5 text-xs font-bold tracking-tight text-primary">
             <span>{t("updateCount", { count: updates.length })}</span>
@@ -73,8 +70,6 @@ export default function UpdatesPage() {
         </div>
       </div>
       */}
-
-
 
       <section className="space-y-4 pt-4">
         <div className="space-y-3">

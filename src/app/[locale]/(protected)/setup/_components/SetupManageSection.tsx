@@ -1,7 +1,6 @@
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { ActionRow } from "@/components/ui/ActionRow";
 import { Button } from "@/components/ui/Button";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 interface SetupManageSectionProps {

@@ -3,10 +3,9 @@ import { useParams } from "next/navigation";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { getDashboardLinks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-links";
-import { cn } from "@/lib/utils";
-import { Link, usePathname } from "@/i18n/routing";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { useSidebar } from "@/context/SidebarContext";
+import { Link, usePathname } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 
@@ -16,7 +15,6 @@ export function Sidebar() {
   const pathname = usePathname();
   const params = useParams();
   const workspaceId = params.workspaceId as string | undefined;
-  const { isCollapsed, toggleSidebar } = useSidebar();
 
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
@@ -25,10 +23,12 @@ export function Sidebar() {
   const workspaceName = profile?.workspaceName;
   const role = profile?.role;
 
-  const filteredLinks = workspaceId ? getDashboardLinks(workspaceId).filter((link) => {
-    if (link.adminOnly && role !== "ADMIN") return false;
-    return true;
-  }) : [];
+  const filteredLinks = workspaceId
+    ? getDashboardLinks(workspaceId).filter((link) => {
+        if (link.adminOnly && role !== "ADMIN") return false;
+        return true;
+      })
+    : [];
 
   const getIsActive = (href: string) => {
     const hrefPathname = href.split("?")[0];
@@ -94,26 +94,24 @@ export function Sidebar() {
 
           {/* Navigation Links */}
           <nav className="flex-1 flex items-center justify-center gap-2 overflow-x-auto scrollbar-none h-[64px]">
-            {filteredLinks.map(
-              ({ href, iconName, iconNameActive, translationKey }) => {
-                const isActive = getIsActive(href);
+            {filteredLinks.map(({ href, translationKey }) => {
+              const isActive = getIsActive(href);
 
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      "flex items-center justify-center px-4 min-w-fit whitespace-nowrap h-full border-b-[3px] transition-all text-[15px]",
-                      isActive
-                        ? "border-primary text-primary font-bold"
-                        : "border-transparent text-zinc-500 font-semibold",
-                    )}
-                  >
-                    <span>{t(translationKey)}</span>
-                  </Link>
-                );
-              },
-            )}
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    "flex items-center justify-center px-4 min-w-fit whitespace-nowrap h-full border-b-[3px] transition-all text-[15px]",
+                    isActive
+                      ? "border-primary text-primary font-bold"
+                      : "border-transparent text-zinc-500 font-semibold",
+                  )}
+                >
+                  <span>{t(translationKey)}</span>
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="w-[200px] flex-shrink-0" />

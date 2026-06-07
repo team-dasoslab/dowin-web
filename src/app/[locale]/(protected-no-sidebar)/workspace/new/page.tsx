@@ -14,7 +14,6 @@ import { InfoTooltip } from "@/components/ui/InfoTooltip";
 
 export default function NewWorkspacePage() {
   const t = useTranslations("Workspace.new");
-  const tCommon = useTranslations("Common");
   const {
     error,
     getValidatedName,

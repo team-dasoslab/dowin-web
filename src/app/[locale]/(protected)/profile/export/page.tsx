@@ -11,7 +11,6 @@ import { useProfileExportData } from "@/app/[locale]/(protected)/profile/export/
 import { useProfileExportForm } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportForm";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useNativeApp } from "@/context/NativeAppContext";

@@ -12,7 +12,6 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";

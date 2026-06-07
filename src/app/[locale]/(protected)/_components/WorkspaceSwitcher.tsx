@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { useGetWorkspaces, useGetWorkspacesMe, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
-import { Logo } from "@/components/ui/Logo";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -14,7 +13,7 @@ interface WorkspaceSwitcherProps {
   isCollapsed: boolean;
 }
 
-export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
   const commonT = useTranslations("Common");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);

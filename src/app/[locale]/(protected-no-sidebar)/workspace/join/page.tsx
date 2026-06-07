@@ -13,7 +13,6 @@ import { useTranslations } from "next-intl";
 
 export default function JoinWorkspacePage() {
   const t = useTranslations("Workspace.join");
-  const tCommon = useTranslations("Common");
   const { isPending, submitJoinWorkspace } = useJoinWorkspaceMutation({
     onError: (message) => {
       setError(message);

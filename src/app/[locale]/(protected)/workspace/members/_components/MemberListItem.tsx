@@ -20,8 +20,6 @@ import { useTranslations } from "next-intl";
 
 export function MemberListItem({
   member,
-  index,
-  totalCount,
   isPendingDelete,
   isPendingTransfer,
   onRemove,

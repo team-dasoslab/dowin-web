@@ -2,7 +2,6 @@
 
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import type { ProductUpdate } from "@/content/product-updates";
 import { Link } from "@/i18n/routing";
 

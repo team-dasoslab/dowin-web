@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
-import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import {

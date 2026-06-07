@@ -15,7 +15,6 @@ import { useInviteActions } from "@/app/[locale]/(protected)/workspace/invites/_
 import { useInviteForm } from "@/app/[locale]/(protected)/workspace/invites/_hooks/useInviteForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Input } from "@/components/ui/Input";
 import { Link } from "@/i18n/routing";

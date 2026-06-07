@@ -15,7 +15,6 @@ import { MemberListItem } from "@/app/[locale]/(protected)/workspace/members/_co
 import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/workspace/members/_hooks/useRemoveWorkspaceMember";
 import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/workspace/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";

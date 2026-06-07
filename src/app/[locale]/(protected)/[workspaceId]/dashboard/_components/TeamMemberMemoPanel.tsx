@@ -6,11 +6,9 @@ import {
   TeamDashboardMemberRole,
 } from "@/api/generated/dowin.schemas";
 import { useMobileViewSheet } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useMobileViewSheet";
-import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Input } from "@/components/ui/Input";
+import { UserAvatar } from "@/components/UserAvatar";
 import { useTranslations } from "next-intl";
 import { TouchEvent, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";

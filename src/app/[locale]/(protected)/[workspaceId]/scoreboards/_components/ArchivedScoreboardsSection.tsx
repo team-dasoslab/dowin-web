@@ -3,7 +3,6 @@
 import { ScoreboardCard } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ScoreboardCard";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 

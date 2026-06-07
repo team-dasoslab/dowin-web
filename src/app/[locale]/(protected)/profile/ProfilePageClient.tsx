@@ -19,7 +19,6 @@ import {
 } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { Card } from "@/components/ui/Card";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";

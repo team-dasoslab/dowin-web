@@ -9,7 +9,6 @@ interface SectionHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function SectionHeader({
   title,
-  description,
   badge,
   className,
   ...props

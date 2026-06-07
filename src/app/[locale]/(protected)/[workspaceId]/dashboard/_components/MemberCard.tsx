@@ -2,7 +2,6 @@ import { TeamDashboardMember } from "@/api/generated/dowin.schemas";
 import { getRateTone } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 

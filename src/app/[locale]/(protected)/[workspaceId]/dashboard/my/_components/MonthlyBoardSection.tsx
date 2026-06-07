@@ -20,8 +20,6 @@ export function MonthlyBoardSection({
   monthLabel,
   monthWeeks,
   monthlyLeadMeasures,
-  monthlyOverallRate,
-  monthlySummary,
   today,
 }: MonthlyBoardSectionProps) {
   const t = useTranslations("Dashboard");

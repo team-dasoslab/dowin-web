@@ -1,6 +1,4 @@
 import {
-  MAX_MEASURE_TAGS,
-  MAX_TAG_NAME_LENGTH,
   type MeasureInput,
   type SetupTag,
 } from "@/app/[locale]/(protected)/setup/_lib/measure";
@@ -10,7 +8,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Input } from "@/components/ui/Input";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface LeadMeasuresSectionProps {
   addMeasureRow: () => void;
@@ -38,20 +36,14 @@ interface LeadMeasuresSectionProps {
 export function LeadMeasuresSection({
   addMeasureRow,
   archiveMeasureRow,
-  availableTags,
   coachmarkTarget,
-  createTag,
-  deleteTag,
   handleMeasureChange,
   isMutating,
-  isTagMutationPending,
   measures,
   monthlyTargetMax,
   reactivateMeasureRow,
-  renameTag,
   removeMeasureRow,
   restoreMeasureRow,
-  toggleMeasureTag,
 }: LeadMeasuresSectionProps) {
   const t = useTranslations("Setup");
   const activeMeasures = measures.filter((measure) => measure.status === "ACTIVE");
@@ -69,23 +61,17 @@ export function LeadMeasuresSection({
           <LeadMeasureRow
             key={measure.id}
             archiveMeasureRow={archiveMeasureRow}
-            availableTags={availableTags}
-            createTag={createTag}
-            deleteTag={deleteTag}
             handleMeasureChange={handleMeasureChange}
             index={index}
             isMutating={isMutating}
             isTagCoachmarkTarget={
               coachmarkTarget === "lead-measure-tags" && index === 0
             }
-            isTagMutationPending={isTagMutationPending}
             measure={measure}
             measuresCount={activeCount}
             monthlyTargetMax={monthlyTargetMax}
             removeMeasureRow={removeMeasureRow}
             restoreMeasureRow={restoreMeasureRow}
-            renameTag={renameTag}
-            toggleMeasureTag={toggleMeasureTag}
           />
         ))}
       </div>
@@ -115,49 +101,31 @@ export function LeadMeasuresSection({
 
 function LeadMeasureRow({
   archiveMeasureRow,
-  availableTags,
-  createTag,
-  deleteTag,
   handleMeasureChange,
   index,
   isMutating,
   isTagCoachmarkTarget,
-  isTagMutationPending,
   measure,
   measuresCount,
   monthlyTargetMax,
   removeMeasureRow,
   restoreMeasureRow,
-  renameTag,
-  toggleMeasureTag,
 }: {
   archiveMeasureRow: (id: string) => void;
-  availableTags: SetupTag[];
-  createTag: (measureId: string, rawName: string) => Promise<boolean>;
-  deleteTag: (tagId: number) => Promise<boolean>;
   handleMeasureChange: LeadMeasuresSectionProps["handleMeasureChange"];
   index: number;
   isMutating: boolean;
   isTagCoachmarkTarget: boolean;
-  isTagMutationPending: boolean;
   measure: MeasureInput;
   measuresCount: number;
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
   restoreMeasureRow: (id: string) => void;
-  renameTag: (tagId: number, rawName: string) => Promise<boolean>;
-  toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
 }) {
-  const [draftTagName, setDraftTagName] = useState("");
-  const [isTagEditorOpen, setIsTagEditorOpen] = useState(false);
-  const [editingTagId, setEditingTagId] = useState<number | null>(null);
-  const [editingTagName, setEditingTagName] = useState("");
-  const [openActionTagId, setOpenActionTagId] = useState<number | null>(null);
+  // Tag states removed
 
   useEffect(() => {
-    if (isTagCoachmarkTarget) {
-      setIsTagEditorOpen(true);
-    }
+    // If coachmark logic needed for tag editor, it's removed since editor is commented out
   }, [isTagCoachmarkTarget]);
 
   const t = useTranslations("Setup");

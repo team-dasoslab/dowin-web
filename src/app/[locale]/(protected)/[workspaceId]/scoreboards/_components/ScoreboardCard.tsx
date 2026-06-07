@@ -1,5 +1,4 @@
 import { formatDate } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_lib/scoreboards";
-import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { ReactNode } from "react";

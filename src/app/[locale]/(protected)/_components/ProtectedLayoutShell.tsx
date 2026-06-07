@@ -1,7 +1,5 @@
 "use client";
 
-import { useSidebar } from "@/context/SidebarContext";
-import { cn } from "@/lib/utils";
 import React from "react";
 
 interface ProtectedLayoutShellProps {
@@ -13,8 +11,6 @@ export function ProtectedLayoutShell({
   children,
   sidebar,
 }: ProtectedLayoutShellProps) {
-  const { isCollapsed } = useSidebar();
-
   return (
     <div className="flex h-full flex-col bg-zinc-100">
       {sidebar}

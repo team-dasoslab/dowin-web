@@ -13,7 +13,6 @@ import { useTeamDashboard } from "@/app/[locale]/(protected)/[workspaceId]/dashb
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
-import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
