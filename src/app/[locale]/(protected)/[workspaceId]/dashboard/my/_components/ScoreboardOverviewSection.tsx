@@ -36,40 +36,32 @@ export function ScoreboardOverviewSection({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* ── WIG & Lag Measure Hero Card (Vertical Stack Design) ── */}
-      <div className="flex flex-col rounded-[24px] bg-white">
-        <div className="flex flex-col">
-          {/* Primary Goal (WIG) */}
-          <div className="px-6 pt-5 pb-3 sm:px-8 sm:pt-6 sm:pb-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-[#E8F3FF] text-primary text-[11px] font-bold tracking-tight uppercase">
-                {t("dowinLabel")}
-              </div>
-            </div>
-            {activeScoreboard ? (
-              <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl break-words leading-[1.2]">
-                {activeScoreboard.goalName}
-              </h2>
-            ) : (
-              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-200" />
-            )}
-          </div>
+      {/* ── Goal Section ── */}
+      <div className="flex flex-col rounded-[24px] bg-white p-6 sm:p-8 space-y-7">
+        <div className="space-y-2">
+          <p className="text-[14px] font-bold text-zinc-500">
+            {t("dowinLabel")}
+          </p>
+          {activeScoreboard ? (
+            <h2 className="text-[26px] font-black tracking-tight text-zinc-900 sm:text-[32px] break-words leading-tight">
+              {activeScoreboard.goalName}
+            </h2>
+          ) : (
+            <div className="h-9 w-3/4 animate-pulse rounded-[12px] bg-zinc-200" />
+          )}
+        </div>
 
-          {/* Lag Measure Section */}
-          <div className="px-6 pt-3 pb-5 sm:px-8 sm:pt-4 sm:pb-6 space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-zinc-100 text-zinc-500 text-[11px] font-bold tracking-tight uppercase">
-                {t("lagMeasureLabel")}
-              </div>
-            </div>
-            {activeScoreboard ? (
-              <p className="text-sm font-medium text-text-secondary leading-relaxed break-words">
-                {activeScoreboard.lagMeasure}
-              </p>
-            ) : (
-              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-200" />
-            )}
-          </div>
+        <div className="space-y-2">
+          <p className="text-[14px] font-bold text-zinc-500">
+            {t("lagMeasureLabel")}
+          </p>
+          {activeScoreboard ? (
+            <p className="text-[17px] font-bold text-zinc-800 leading-snug break-words">
+              {activeScoreboard.lagMeasure}
+            </p>
+          ) : (
+            <div className="h-6 w-1/2 animate-pulse rounded-[12px] bg-zinc-200" />
+          )}
         </div>
       </div>
 
