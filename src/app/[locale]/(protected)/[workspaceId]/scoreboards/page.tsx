@@ -134,9 +134,9 @@ function ScoreboardsSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-[24px] bg-zinc-200/50" />
-        <div className="h-44 rounded-[24px] bg-zinc-200/50" />
-        <div className="h-72 rounded-[24px] bg-zinc-200/50" />
+        <div className="h-16 rounded-[24px] bg-zinc-200" />
+        <div className="h-44 rounded-[24px] bg-zinc-200" />
+        <div className="h-72 rounded-[24px] bg-zinc-200" />
       </div>
     </div>
   );

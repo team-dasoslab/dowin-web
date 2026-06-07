@@ -198,10 +198,10 @@ export default function ProfileMembersPage() {
 function MembersPageSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
-        <div className="h-72 rounded-content bg-sub-background" />
+      <ProtectedPageContainer isLoading className="max-w-[640px]">
+        <div className="h-10 rounded-content bg-zinc-200" />
+        <div className="h-24 rounded-content bg-zinc-200" />
+        <div className="h-72 rounded-content bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );

@@ -194,8 +194,8 @@ export default function WorkspaceSettingsPage() {
     return (
       <div className="min-h-screen bg-zinc-100">
         <ProtectedPageContainer isLoading>
-          <div className="h-10 rounded-[24px] bg-zinc-200/50" />
-          <div className="h-24 rounded-[24px] bg-zinc-200/50" />
+          <div className="h-10 rounded-[24px] bg-zinc-200" />
+          <div className="h-24 rounded-[24px] bg-zinc-200" />
         </ProtectedPageContainer>
       </div>
     );

@@ -257,11 +257,11 @@ function SetupSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-10 rounded-content bg-sub-background" />
-        <div className="h-12 rounded-content bg-sub-background" />
-        <div className="h-44 rounded-content bg-sub-background" />
-        <div className="h-44 rounded-content bg-sub-background" />
-        <div className="h-64 rounded-content bg-sub-background" />
+        <div className="h-10 rounded-content bg-zinc-200" />
+        <div className="h-12 rounded-content bg-zinc-200" />
+        <div className="h-44 rounded-content bg-zinc-200" />
+        <div className="h-44 rounded-content bg-zinc-200" />
+        <div className="h-64 rounded-content bg-zinc-200" />
       </div>
     </div>
   );

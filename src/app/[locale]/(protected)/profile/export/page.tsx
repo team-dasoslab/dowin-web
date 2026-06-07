@@ -251,10 +251,10 @@ function ProfileExportHeader() {
 function ExportSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-[16px] bg-zinc-200/50" />
-        <div className="h-24 rounded-[24px] bg-zinc-200/50" />
-        <div className="h-[420px] rounded-[24px] bg-zinc-200/50" />
+      <ProtectedPageContainer isLoading className="max-w-[640px]">
+        <div className="h-10 rounded-[16px] bg-zinc-200" />
+        <div className="h-24 rounded-[24px] bg-zinc-200" />
+        <div className="h-[420px] rounded-[24px] bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );

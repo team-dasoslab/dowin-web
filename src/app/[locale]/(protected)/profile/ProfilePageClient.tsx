@@ -461,12 +461,12 @@ function ProfileSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
+        <div className="h-10 rounded-content bg-zinc-200" />
+        <div className="h-24 rounded-content bg-zinc-200" />
         <div className="space-y-4">
-          <div className="h-44 rounded-content bg-sub-background" />
-          <div className="h-36 rounded-content bg-sub-background" />
-          <div className="h-28 rounded-content bg-sub-background" />
+          <div className="h-44 rounded-content bg-zinc-200" />
+          <div className="h-36 rounded-content bg-zinc-200" />
+          <div className="h-28 rounded-content bg-zinc-200" />
         </div>
       </ProtectedPageContainer>
     </div>

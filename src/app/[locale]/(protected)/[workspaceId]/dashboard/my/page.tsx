@@ -175,7 +175,7 @@ export default function MyDashboardPage() {
         <ProtectedPageHeader
           title={
             isProfileLoading ? (
-              <div className="h-8 w-48 animate-pulse rounded-content bg-zinc-100" />
+              <div className="h-8 w-48 animate-pulse rounded-content bg-zinc-200" />
             ) : nickname ? (
               t("userScoreboard", { nickname })
             ) : (
@@ -251,7 +251,7 @@ export default function MyDashboardPage() {
               />
 
               {isLoading ? (
-                <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-50" />
+                <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-200" />
               ) : activeLeadMeasures.length === 0 ? (
                 <div className="rounded-[24px] bg-white py-12 text-center text-zinc-500 font-medium text-[15px]">
                   {t("noActiveMeasures")}
@@ -302,13 +302,13 @@ function MyDashboardSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-content bg-sub-background" />
-        <div className="h-24 rounded-content bg-sub-background" />
+        <div className="h-16 rounded-content bg-zinc-200" />
+        <div className="h-24 rounded-content bg-zinc-200" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-content bg-sub-background" />
-          <div className="h-48 rounded-content bg-sub-background" />
+          <div className="h-48 rounded-content bg-zinc-200" />
+          <div className="h-48 rounded-content bg-zinc-200" />
         </div>
-        <div className="h-72 rounded-content bg-sub-background" />
+        <div className="h-72 rounded-content bg-zinc-200" />
       </div>
     </div>
   );

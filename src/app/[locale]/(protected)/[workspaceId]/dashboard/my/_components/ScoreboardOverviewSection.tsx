@@ -55,7 +55,7 @@ export function ScoreboardOverviewSection({
                 {activeScoreboard.goalName}
               </h2>
             ) : (
-              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-100" />
+              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-200" />
             )}
           </div>
 
@@ -71,7 +71,7 @@ export function ScoreboardOverviewSection({
                 {activeScoreboard.lagMeasure}
               </p>
             ) : (
-              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-50" />
+              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-200" />
             )}
           </div>
         </div>
@@ -188,7 +188,7 @@ function DashboardWeeklyTrendSection({
       </div>
 
       {isLoading ? (
-        <div className="flex-1 animate-pulse rounded-lg bg-zinc-50" />
+        <div className="flex-1 animate-pulse rounded-lg bg-zinc-200" />
       ) : (
         <div className="h-[140px] lg:h-auto lg:flex-1 w-full min-h-[140px]">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />

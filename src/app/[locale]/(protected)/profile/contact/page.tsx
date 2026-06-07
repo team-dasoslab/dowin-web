@@ -440,11 +440,11 @@ function InquiryListSkeleton() {
         >
           <div className="space-y-3">
             <div className="flex gap-2">
-              <div className="h-6 w-20 rounded-full bg-zinc-100" />
-              <div className="h-6 w-24 rounded-full bg-zinc-100" />
+              <div className="h-6 w-20 rounded-full bg-zinc-200" />
+              <div className="h-6 w-24 rounded-full bg-zinc-200" />
             </div>
-            <div className="h-5 w-3/5 rounded bg-zinc-100" />
-            <div className="h-4 w-4/5 rounded bg-zinc-100" />
+            <div className="h-5 w-3/5 rounded bg-zinc-200" />
+            <div className="h-4 w-4/5 rounded bg-zinc-200" />
           </div>
         </div>
       ))}

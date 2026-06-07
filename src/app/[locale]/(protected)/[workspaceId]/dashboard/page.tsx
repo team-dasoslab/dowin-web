@@ -148,7 +148,7 @@ export default function DashboardPage() {
           rightElement={
             <div className="flex items-center gap-2">
               {isLoading ? (
-                <div className="h-6 w-24 animate-pulse rounded-full bg-zinc-100" />
+                <div className="h-6 w-24 animate-pulse rounded-full bg-zinc-200" />
               ) : (
                 <PeriodBadge label={weekLabel} size="md" />
               )}
@@ -172,7 +172,7 @@ export default function DashboardPage() {
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="h-28 w-full animate-pulse rounded-content bg-zinc-50"
+                      className="h-28 w-full animate-pulse rounded-content bg-zinc-200"
                     />
                   ))}
                 </div>
@@ -216,7 +216,7 @@ export default function DashboardPage() {
                   {[1, 2].map((i) => (
                     <div
                       key={i}
-                      className="h-64 w-full animate-pulse rounded-content bg-zinc-50"
+                      className="h-64 w-full animate-pulse rounded-content bg-zinc-200"
                     />
                   ))}
                 </div>
@@ -275,12 +275,12 @@ function DashboardLoadingState() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-content bg-sub-background" />
+        <div className="h-16 rounded-content bg-zinc-200" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-content bg-sub-background" />
-          <div className="h-48 rounded-content bg-sub-background" />
+          <div className="h-48 rounded-content bg-zinc-200" />
+          <div className="h-48 rounded-content bg-zinc-200" />
         </div>
-        <div className="h-64 rounded-content bg-sub-background" />
+        <div className="h-64 rounded-content bg-zinc-200" />
       </div>
     </div>
   );

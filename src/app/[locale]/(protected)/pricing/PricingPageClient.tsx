@@ -274,12 +274,12 @@ function PricingSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer isLoading>
-        <div className="h-10 w-48 rounded-content bg-zinc-100" />
-        <div className="h-56 rounded-content bg-zinc-100" />
+        <div className="h-10 w-48 rounded-content bg-zinc-200" />
+        <div className="h-56 rounded-content bg-zinc-200" />
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="h-32 rounded-content bg-zinc-100" />
-          <div className="h-32 rounded-content bg-zinc-100" />
-          <div className="h-32 rounded-content bg-zinc-100" />
+          <div className="h-32 rounded-content bg-zinc-200" />
+          <div className="h-32 rounded-content bg-zinc-200" />
+          <div className="h-32 rounded-content bg-zinc-200" />
         </div>
       </ProtectedPageContainer>
     </div>

@@ -874,19 +874,19 @@ function ReportLoadingState() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <ProtectedPageContainer spacing="compact">
-        <div className="h-16 w-48 animate-pulse rounded-content bg-sub-background" />
+        <div className="h-16 w-48 animate-pulse rounded-content bg-zinc-200" />
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
           <div className="hidden w-[240px] space-y-2 lg:block">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-10 rounded-button bg-sub-background animate-pulse"
+                className="h-10 rounded-button bg-zinc-200 animate-pulse"
               />
             ))}
           </div>
           <div className="flex-1 space-y-10">
-            <div className="h-64 rounded-content bg-sub-background animate-pulse" />
-            <div className="h-48 rounded-content bg-sub-background animate-pulse" />
+            <div className="h-64 rounded-content bg-zinc-200 animate-pulse" />
+            <div className="h-48 rounded-content bg-zinc-200 animate-pulse" />
           </div>
         </div>
       </ProtectedPageContainer>

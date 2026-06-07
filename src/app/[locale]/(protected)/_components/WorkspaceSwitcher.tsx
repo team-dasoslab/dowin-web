@@ -55,7 +55,7 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
     return (
       <div
         className={cn(
-          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-zinc-100 transition-all",
+          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-zinc-200 transition-all",
           "px-4",
         )}
       />
