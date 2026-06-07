@@ -173,7 +173,7 @@ export function TeamMemberMemoPanel({
                   className="absolute inset-x-0 bottom-0 bg-white px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
                 >
                   <div className="flex items-center gap-2">
-                    <Input
+                    <input
                       value={memoDraft}
                       onChange={(event) => setMemoDraft(event.target.value)}
                       onKeyDown={(event) => {
@@ -183,14 +183,14 @@ export function TeamMemberMemoPanel({
                         }
                       }}
                       placeholder={t("addComment")}
-                      className="h-10 flex-1 rounded-[16px] border-none bg-zinc-100 px-3 text-sm text-zinc-900 placeholder:text-zinc-400"
+                      className="h-10 flex-1 rounded-[16px] border-none bg-zinc-100 px-4 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none"
                       disabled={isCreatePending}
                     />
                     <Button
                       type="button"
                       onClick={() => void handleAddMemo()}
                       disabled={!memoDraft.trim() || isCreatePending}
-                      className="inline-flex h-10 w-10 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
+                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
                       aria-label={t("submitMemo")}
                     >
                       <DowinIcon name="action-send" size="16px" />
@@ -282,7 +282,7 @@ export function TeamMemberMemoPanel({
           {isComposeMode ? (
             <div className="rounded-[24px] bg-white p-2.5">
               <div className="flex items-center gap-2">
-                <Input
+                <input
                   value={memoDraft}
                   onChange={(event) => setMemoDraft(event.target.value)}
                   onKeyDown={(event) => {
@@ -292,14 +292,14 @@ export function TeamMemberMemoPanel({
                     }
                   }}
                   placeholder={t("addComment")}
-                  className="h-8 flex-1 border-0 bg-transparent px-2 text-xs text-zinc-900 outline-none placeholder:text-zinc-400"
+                  className="h-8 flex-1 border-0 bg-transparent px-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:outline-none focus:ring-0 w-full"
                   disabled={isCreatePending}
                 />
                 <Button
                   type="button"
                   onClick={() => void handleAddMemo()}
                   disabled={!memoDraft.trim() || isCreatePending}
-                  className="inline-flex h-8 w-8 items-center justify-center bg-primary/20 text-primary disabled:opacity-40"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
                   aria-label={t("submitMemo")}
                 >
                   <DowinIcon name="action-send" size="16px" />
