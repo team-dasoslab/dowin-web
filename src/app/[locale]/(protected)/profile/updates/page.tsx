@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductUpdateCard } from "@/app/[locale]/(protected)/updates/_components/ProductUpdateCard";
+import { ProductUpdateCard } from "@/app/[locale]/(protected)/profile/updates/_components/ProductUpdateCard";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
