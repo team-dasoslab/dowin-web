@@ -23,6 +23,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/Button";
 import { Link, useRouter } from "@/i18n/routing";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -364,7 +365,7 @@ export default function ProfilePage() {
                     }}
                     className="space-y-5 scroll-mt-28"
                   >
-                    <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{group.label}</h2>
+                    <SectionHeader title={group.label} />
 
 
 

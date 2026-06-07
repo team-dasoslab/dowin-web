@@ -11,6 +11,7 @@ import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { useNativeApp } from "@/context/NativeAppContext";
@@ -270,7 +271,7 @@ export default function WorkspaceSettingsPage() {
                     sectionRefs.current[group.id] = el;
                   }}
                 >
-                  <h2 className="px-1 mb-4 text-[22px] font-black tracking-tight text-zinc-900">{group.label}</h2>
+                  <SectionHeader title={group.label} />
                   <div className="rounded-[24px] overflow-hidden bg-white">
                     {group.items.map((item) => (
                       <MenuItemRow
@@ -291,7 +292,7 @@ export default function WorkspaceSettingsPage() {
                   sectionRefs.current["workspaces"] = el;
                 }}
               >
-                <h2 className="px-1 mb-4 text-[22px] font-black tracking-tight text-zinc-900">{t("workspaceList")}</h2>
+                <SectionHeader title={t("workspaceList")} />
                 <div className="rounded-[24px] overflow-hidden bg-white">
                   {workspaces.map((ws) => (
                     <div
