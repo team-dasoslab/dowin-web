@@ -474,6 +474,10 @@
     "copiedLabel": "Copied",
     "active": "ACTIVE",
     "inactive": "INACTIVE",
+    "filterAll": "All", 
+    "filterActive": "Active", 
+    "filterInactive": "Inactive", 
+
     "usageLabel": "Usage {usage}",
     "noWorkspaceTitle": "No Workspace Found",
     "noWorkspaceDesc": "Invite management is available after creating a workspace.",

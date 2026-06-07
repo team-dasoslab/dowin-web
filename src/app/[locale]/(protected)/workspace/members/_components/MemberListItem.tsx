@@ -36,7 +36,7 @@ export function MemberListItem({
 
   return (
     <div
-      className="flex flex-col justify-between gap-3 bg-white px-4 py-3.5 sm:flex-row sm:items-center sm:gap-4"
+      className="flex flex-col justify-between gap-3 bg-white px-4 py-4 sm:flex-row sm:items-center sm:gap-4"
     >
       <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto">
         <UserAvatar
@@ -76,6 +76,7 @@ export function MemberListItem({
             onClick={() => onTransferAdmin(memberId, nickname)}
             className="flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] bg-primary/10 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
           >
+            <DowinIcon name="status-locked" size="14px" />
             <span>{isPendingTransfer ? t("processing") : t("transferAdmin")}</span>
           </Button>
         ) : null}
@@ -90,6 +91,7 @@ export function MemberListItem({
               : "cursor-not-allowed bg-zinc-100 text-zinc-400"
           }`}
         >
+          <DowinIcon name="action-member-remove" size="14px" />
           <span>{isPendingDelete ? t("processing") : t("remove")}</span>
         </Button>
       </div>

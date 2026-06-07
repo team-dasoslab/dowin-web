@@ -23,7 +23,7 @@ import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 
 import { useTranslations } from "next-intl";
@@ -96,6 +96,17 @@ export default function ProfileInvitesPage() {
   ).length;
   const isOverFreeMemberLimit = Boolean(workspace?.isOverFreeMemberLimit);
 
+  const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
+
+  const filteredInvites = useMemo(() => {
+    return invites.filter((invite) => {
+      if (filter === "ALL") return true;
+      if (filter === "ACTIVE") return invite.status === "ACTIVE";
+      if (filter === "INACTIVE") return invite.status !== "ACTIVE";
+      return true;
+    });
+  }, [invites, filter]);
+
   const handleCreateInvite = async () => {
     const maxUses = getValidatedMaxUses();
     if (maxUses === null) {
@@ -148,23 +159,22 @@ export default function ProfileInvitesPage() {
         ) : null}
 
         <div className="space-y-4 rounded-[24px] bg-white p-5">
-          <div className="space-y-1">
+          <div>
             <h2 className="text-sm font-bold text-zinc-900">
               {t("newInviteTitle")}
             </h2>
-            <p className="text-[11px] text-zinc-500">{t("newInviteDesc")}</p>
           </div>
 
-          <div className="space-y-3 rounded-[16px] bg-zinc-50/50 p-4">
+          <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold text-zinc-600">
+              <p className="text-[12px] font-bold text-zinc-600">
                 {t("maxUsesLabel")}
               </p>
-              <p className="text-[11px] text-zinc-500">{t("maxUsesLimit")}</p>
+              <p className="text-[11px] font-medium text-zinc-400">{t("maxUsesLimit")}</p>
             </div>
 
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-11 min-w-0 items-center gap-2 rounded-[12px] bg-white px-4 text-xs text-zinc-600">
+              <label className="flex h-12 min-w-0 items-center gap-2 rounded-[12px] bg-zinc-100 px-4 text-xs text-zinc-600 transition-colors focus-within:bg-zinc-200/50">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -189,10 +199,10 @@ export default function ProfileInvitesPage() {
                 type="button"
                 onClick={() => void handleCreateInvite()}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
-                className={`h-11 rounded-[12px] px-4 text-xs font-bold ${
+                className={`h-12 rounded-[12px] px-4 text-[13px] font-bold transition-colors ${
                   isCreatingInvite || isOverFreeMemberLimit
-                    ? "cursor-not-allowed bg-zinc-200 text-zinc-400"
-                    : "bg-primary text-white"
+                    ? "cursor-not-allowed bg-zinc-100 text-zinc-400"
+                    : "bg-primary/10 text-primary hover:bg-primary/20"
                 }`}
               >
                 {isCreatingInvite ? t("creatingButton") : t("createButton")}
@@ -205,10 +215,10 @@ export default function ProfileInvitesPage() {
                   key={value}
                   type="button"
                   onClick={() => selectPresetMaxUses(value)}
-                  className={`h-7 rounded-full px-2.5 text-[11px] font-bold ${
+                  className={`h-8 rounded-full px-3 text-[12px] font-bold transition-colors ${
                     Number(maxUsesInput) === value
                       ? "bg-primary/10 text-primary"
-                      : "bg-white text-zinc-500"
+                      : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
                   }`}
                 >
                   {t("presetUnit", { count: value })}
@@ -230,20 +240,62 @@ export default function ProfileInvitesPage() {
         </div>
 
         <div className="space-y-4 rounded-[24px] bg-white p-5">
-          <div className="space-y-1">
-            <h2 className="text-sm font-bold text-zinc-900">
-              {t("inviteListTitle")}
-            </h2>
-            <p className="text-[11px] text-zinc-500">{t("inviteListDesc")}</p>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-zinc-900">
+                {t("inviteListTitle")}
+              </h2>
+            </div>
+            <div className="flex shrink-0 items-center gap-1 rounded-full bg-zinc-100 px-3.5 py-1.5 text-[13px] font-bold tracking-tight text-zinc-600">
+              <span>{activeInviteCount}</span>
+              <span className="text-zinc-400">/ {invites.length}</span>
+            </div>
           </div>
 
-          <div className="overflow-hidden rounded-[16px] bg-zinc-50/50">
+          <div className="flex gap-2 pb-2">
+            <button
+              onClick={() => setFilter("ALL")}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                filter === "ALL"
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+              }`}
+            >
+              {t("filterAll")}
+            </button>
+            <button
+              onClick={() => setFilter("ACTIVE")}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                filter === "ACTIVE"
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+              }`}
+            >
+              {t("filterActive")}
+            </button>
+            <button
+              onClick={() => setFilter("INACTIVE")}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors ${
+                filter === "INACTIVE"
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+              }`}
+            >
+              {t("filterInactive")}
+            </button>
+          </div>
+
+          <div className="flex flex-col divide-y divide-zinc-100">
             {invites.length === 0 ? (
               <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
                 {t("noInvites")}
               </div>
+            ) : filteredInvites.length === 0 ? (
+              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
+                선택한 필터에 해당하는 초대코드가 없습니다.
+              </div>
             ) : (
-              invites.map((invite, index) => {
+              filteredInvites.map((invite, index) => {
                 const inviteId = invite.id ?? 0;
                 const code = invite.code ?? "";
                 const isActive = invite.status === "ACTIVE";
@@ -256,7 +308,7 @@ export default function ProfileInvitesPage() {
                 return (
                   <div
                     key={inviteId > 0 ? inviteId : `${code}-${index}`}
-                    className="space-y-3 bg-white px-4 py-4"
+                    className="flex flex-col gap-2 py-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
@@ -278,7 +330,7 @@ export default function ProfileInvitesPage() {
                         <Button
                           type="button"
                           onClick={() => void copyInviteCode(inviteId, code)}
-                          className="h-8 rounded-[12px] bg-zinc-100 px-2.5 text-[11px] font-bold text-zinc-700 hover:bg-zinc-200"
+                          className="h-8 rounded-[12px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 hover:bg-zinc-200"
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
@@ -323,16 +375,16 @@ export default function ProfileInvitesPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-border pt-2">
-                      <span className="text-[10px] font-bold tracking-wide text-zinc-500">
+                    <div className="flex items-center">
+                      <span className="text-[12px] font-medium text-zinc-500">
                         {t("usageLabel", { usage: usageLabel })}
                       </span>
+                    </div>
                       {isActive && isOverFreeMemberLimit ? (
                         <span className="text-[10px] font-semibold text-danger">
                           {t("activeInviteOverLimit")}
                         </span>
                       ) : null}
-                    </div>
                   </div>
                 );
               })
