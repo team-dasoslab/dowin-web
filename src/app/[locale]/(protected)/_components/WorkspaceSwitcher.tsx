@@ -55,7 +55,7 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
     return (
       <div
         className={cn(
-          "flex h-10 w-[200px] animate-pulse items-center rounded-content bg-zinc-100 transition-all",
+          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-zinc-100 transition-all",
           "px-4",
         )}
       />
@@ -72,22 +72,22 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
         className={cn(
-          "flex h-10 w-fit items-center gap-1 rounded-lg transition-all px-3",
-          isOpen ? "bg-zinc-100" : "bg-transparent hover:bg-zinc-50",
+          "flex h-10 w-fit items-center gap-1.5 rounded-[12px] transition-all px-3",
+          isOpen ? "bg-zinc-100" : "bg-transparent hover:bg-zinc-100/80",
         )}
       >
-        <span className="truncate text-[15px] font-bold text-primary whitespace-nowrap transition-all duration-300 pt-[2px]">
+        <span className="truncate text-[16px] font-bold text-zinc-900 whitespace-nowrap transition-all duration-300 pt-[2px]">
           {me.name}
         </span>
         <DowinIcon 
           name="nav-chevron-down" 
           size="16px" 
-          className={cn("text-primary shrink-0 transition-transform duration-200", isOpen && "rotate-180")} 
+          className={cn("text-zinc-400 shrink-0 transition-transform duration-200", isOpen && "rotate-180")} 
         />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-full rounded-content border border-zinc-200 bg-white py-1 shadow-lg z-50">
+        <div className="absolute top-full left-0 mt-2 w-full rounded-[20px] border border-zinc-200 bg-white p-2 z-50">
           {workspaces.map((ws) => (
             <button
               key={ws.id}
@@ -98,18 +98,18 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
                 }
               }}
               className={cn(
-                "flex w-full items-center px-4 py-2 text-sm transition-colors hover:bg-zinc-100",
-                ws.id === me.id ? "font-bold text-primary" : "text-zinc-700"
+                "flex w-full items-center rounded-[12px] px-3 py-3 text-[15px] transition-colors hover:bg-zinc-100",
+                ws.id === me.id ? "font-bold text-zinc-900 bg-zinc-50/50" : "font-medium text-zinc-600"
               )}
             >
               <span className="truncate">{ws.name}</span>
             </button>
           ))}
-          <div className="border-t border-zinc-100 my-1" />
+          <div className="border-t border-zinc-100 my-2 mx-1" />
           <Link
             href="/workspace/new"
             onClick={() => setIsOpen(false)}
-            className="flex w-full items-center px-4 py-2 text-sm transition-colors hover:bg-zinc-100 text-primary font-medium gap-2"
+            className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-zinc-100 text-zinc-600 font-bold gap-2"
           >
             <DowinIcon name="action-add-active" size="14px" />
             <span>{commonT("createWorkspace")}</span>
