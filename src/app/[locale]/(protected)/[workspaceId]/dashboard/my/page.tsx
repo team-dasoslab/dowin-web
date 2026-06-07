@@ -28,6 +28,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 
 export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
@@ -208,43 +209,10 @@ export default function MyDashboardPage() {
         ) : null}
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
-          {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto bg-zinc-100/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-2 lg:overflow-visible lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-            <nav className="flex gap-2 lg:block lg:space-y-2">
-              {menuGroups.map((group) => {
-                const isActive = activeSection === group.id;
-                return (
-                  <button
-                    key={group.id}
-                    onClick={() => {
-                      const element = document.getElementById(group.id);
-                      const container = document.getElementById(
-                        "main-scroll-container",
-                      );
-                      if (container && element) {
-                        const headerOffset = 100;
-                        const elementPosition = element.offsetTop;
-                        const offsetPosition = elementPosition - headerOffset;
-                        container.scrollTo({
-                          top: offsetPosition,
-                          behavior: "smooth",
-                        });
-                      }
-                    }}
-                    className={`flex shrink-0 items-center rounded-[14px] px-4 py-3 text-left text-[15px] font-bold transition-all lg:w-full ${
-                      isActive
-                        ? "bg-white text-zinc-900"
-                        : "text-zinc-500 hover:bg-white/50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span>{group.label}</span>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+          <PageSidebarNav
+            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            activeId={activeSection}
+          />
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-48">

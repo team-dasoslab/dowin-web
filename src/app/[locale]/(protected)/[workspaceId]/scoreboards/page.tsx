@@ -5,6 +5,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { ActiveScoreboardSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ActiveScoreboardSection";
 import { ArchivedScoreboardsSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ArchivedScoreboardsSection";
 import { useScoreboardArchive } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_hooks/useScoreboardArchive";
@@ -81,48 +82,10 @@ export default function ScoreboardsPage() {
         />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
-          {/* ── 좌측 네비게이션 ── */}
-          <aside className="scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto border-y border-zinc-200/60 bg-zinc-50/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-1 lg:overflow-visible lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none">
-            <nav className="flex gap-1 lg:block lg:space-y-1">
-              {menuGroups.map((group) => {
-                const isActive = activeSection === group.id;
-                return (
-                  <button
-                    key={group.id}
-                    onClick={() => {
-                      const element = document.getElementById(group.id);
-                      const container = document.getElementById(
-                        "main-scroll-container",
-                      );
-                      if (container && element) {
-                        const headerOffset = 100;
-                        const elementPosition = element.offsetTop;
-                        const offsetPosition = elementPosition - headerOffset;
-                        container.scrollTo({
-                          top: offsetPosition,
-                          behavior: "smooth",
-                        });
-                      }
-                    }}
-                    className={`flex shrink-0 items-center rounded-button px-3 py-2 text-left text-[13px] font-bold transition-all lg:w-full lg:px-4 lg:text-[14px] ${
-                      isActive
-                        ? "text-primary"
-                        : "text-zinc-400"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {isActive && (
-                        <div className="hidden w-1 h-4 bg-primary rounded-full lg:block" />
-                      )}
-                      <span className={isActive ? "" : "lg:pl-4"}>
-                        {group.label}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
+          <PageSidebarNav
+            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            activeId={activeSection}
+          />
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
