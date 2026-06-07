@@ -123,18 +123,18 @@ export default function AccountRecoveryPageClient() {
 
       <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-10">
-          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
+          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center">
             <DowinIcon
               name="auth-key-large"
-              className="text-text-primary"
               size="32px"
+              className="text-zinc-900"
             />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 uppercase leading-none">
               {t("recoveryPage.title")}
             </h1>
-            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep px-4">
+            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep px-4">
               {t("recoveryPage.description")}
             </p>
           </div>
@@ -153,7 +153,7 @@ export default function AccountRecoveryPageClient() {
                 required
                 disabled={isPending || Boolean(recoveryAccount)}
               />
-              <p className="text-[11px] text-text-muted font-medium ml-1 mt-2">
+              <p className="text-[11px] text-zinc-400 font-medium ml-1 mt-2">
                 {t("recoveryPage.codeHint")}
               </p>
             </div>
@@ -240,7 +240,7 @@ export default function AccountRecoveryPageClient() {
             <div className="text-center">
               <Link
                 href="/login"
-                className="text-[13px] font-bold text-text-muted transition-colors"
+                className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
               >
                 {t("recoveryPage.backToLogin")}
               </Link>
@@ -249,7 +249,7 @@ export default function AccountRecoveryPageClient() {
         </form>
       </Card>
 
-      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
+      <p className="absolute bottom-8 text-[11px] font-bold text-zinc-400 tracking-widest">
         © 2026 Dasoslab. All rights reserved.
       </p>
     </div>

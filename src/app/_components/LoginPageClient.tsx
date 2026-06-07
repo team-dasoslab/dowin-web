@@ -207,10 +207,10 @@ export default function LoginPageClient() {
 
         <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
           <div className="space-y-4 text-center mb-8">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 uppercase leading-none">
               {t("recovery.title")}
             </h1>
-            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
+            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep">
               {t("recovery.description")}
             </p>
           </div>
@@ -220,7 +220,7 @@ export default function LoginPageClient() {
               {recoveryCodes.map((code) => (
                 <div
                   key={code}
-                  className="rounded-[12px] border-none bg-white px-3 py-4 text-center text-[15px] sm:text-[16px] font-mono font-bold tracking-widest text-zinc-900 truncate shadow-sm"
+                  className="rounded-[12px] border-none bg-white px-3 py-4 text-center text-[15px] sm:text-[16px] font-mono font-bold tracking-widest text-zinc-900 truncate"
                 >
                   {code}
                 </div>
@@ -229,7 +229,7 @@ export default function LoginPageClient() {
           </div>
 
           {error && (
-            <div className="mt-6 p-4 bg-danger/5 border border-danger/10 rounded-content">
+            <div className="mt-6 p-4 bg-danger/5 border border-danger/10 rounded-[16px]">
               <p className="text-danger text-[12px] font-bold text-center leading-tight">
                 {error}
               </p>
@@ -283,7 +283,7 @@ export default function LoginPageClient() {
           </div>
         </Card>
 
-        <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
+        <p className="absolute bottom-8 text-[11px] font-bold text-zinc-400 tracking-widest">
           © 2026 Dasoslab. All rights reserved.
         </p>
       </div>
@@ -296,14 +296,14 @@ export default function LoginPageClient() {
 
       <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-12">
-          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
-            <Logo size="32px" className="text-text-primary" />
+          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center">
+            <Logo size="32px" className="text-zinc-900" />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-[24px] font-black tracking-tighter text-text-primary leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 leading-none">
               {mode === "login" ? t("login") : t("signup")}
             </h1>
-            <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
+            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep">
               {mode === "login" ? t("subtitle") : t("signupSubtitle")}
             </p>
           </div>
@@ -342,7 +342,7 @@ export default function LoginPageClient() {
           </div>
 
           {error && (
-            <div className="p-4 bg-danger/5 border border-danger/10 rounded-content animate-shake">
+            <div className="p-4 bg-danger/5 border border-danger/10 rounded-[16px] animate-shake">
               <p className="text-danger text-[12px] font-bold text-center leading-tight">
                 {error}
               </p>
@@ -406,7 +406,7 @@ export default function LoginPageClient() {
         </form>
       </Card>
 
-      <p className="absolute bottom-8 text-[11px] font-bold text-text-muted tracking-widest">
+      <p className="absolute bottom-8 text-[11px] font-bold text-zinc-400 tracking-widest">
         © 2026 Dasoslab. All rights reserved.
       </p>
     </div>

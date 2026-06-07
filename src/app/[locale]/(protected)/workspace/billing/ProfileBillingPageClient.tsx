@@ -540,16 +540,16 @@ function ProfileBillingSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer isLoading>
-        <div className="h-10 w-48 rounded-content bg-zinc-100" />
-        <div className="h-32 rounded-content bg-zinc-100" />
-        <div className="space-y-4">
-          <div className="h-6 w-32 rounded-content bg-zinc-100" />
-          <div className="grid grid-cols-2 gap-4">
-            <div className="h-24 rounded-content bg-zinc-100" />
-            <div className="h-24 rounded-content bg-zinc-100" />
+        <div className="h-10 w-48 rounded-[24px] bg-zinc-200/50" />
+        <div className="h-32 rounded-[24px] bg-zinc-200/50" />
+        <div className="space-y-3">
+          <div className="h-6 w-32 rounded-[16px] bg-zinc-200/50" />
+          <div className="space-y-2">
+            <div className="h-24 rounded-[16px] bg-zinc-200/50" />
+            <div className="h-24 rounded-[16px] bg-zinc-200/50" />
           </div>
         </div>
-        <div className="h-48 rounded-content bg-zinc-100" />
+        <div className="h-48 rounded-[24px] bg-zinc-200/50" />
       </ProtectedPageContainer>
     </div>
   );

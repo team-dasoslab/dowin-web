@@ -183,7 +183,7 @@ export function TeamMemberMemoPanel({
                         }
                       }}
                       placeholder={t("addComment")}
-                      className="h-10 flex-1 rounded-[16px] border-none bg-zinc-100 px-3 text-sm text-text-primary placeholder:text-text-muted"
+                      className="h-10 flex-1 rounded-[16px] border-none bg-zinc-100 px-3 text-sm text-zinc-900 placeholder:text-zinc-400"
                       disabled={isCreatePending}
                     />
                     <Button
@@ -211,7 +211,7 @@ export function TeamMemberMemoPanel({
                   aria-label={t("closeMemo")}
                 />
                 <div
-                  className="absolute inset-x-0 bottom-0 max-h-[78dvh] overflow-hidden rounded-t-[28px] bg-white pb-[var(--safe-area-inset-bottom,0px)] shadow-[0_-18px_40px_rgba(15,23,42,0.18)] transition-transform duration-200 ease-out"
+                  className="absolute inset-x-0 bottom-0 max-h-[78dvh] overflow-hidden rounded-t-[28px] bg-white pb-[var(--safe-area-inset-bottom,0px)] transition-transform duration-200 ease-out"
                   style={{
                     transform: isMobileViewSheetClosing
                       ? "translateY(100%)"
@@ -235,10 +235,10 @@ export function TeamMemberMemoPanel({
                         size={28}
                       />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-bold text-text-primary">
+                        <p className="truncate text-sm font-bold text-zinc-900">
                           {member.nickname}
                         </p>
-                        <p className="truncate text-xs text-text-muted">
+                        <p className="truncate text-xs text-zinc-500">
                           {t("viewMemos")}
                         </p>
                       </div>
@@ -292,7 +292,7 @@ export function TeamMemberMemoPanel({
                     }
                   }}
                   placeholder={t("addComment")}
-                  className="h-8 flex-1 border-0 bg-transparent px-2 text-xs text-text-primary outline-none placeholder:text-text-muted"
+                  className="h-8 flex-1 border-0 bg-transparent px-2 text-xs text-zinc-900 outline-none placeholder:text-zinc-400"
                   disabled={isCreatePending}
                 />
                 <Button
@@ -366,7 +366,7 @@ function MemoCard({
     <div
       className={`rounded-[16px] px-4 py-3 transition-colors ${
         memo.isResolved
-          ? "bg-zinc-50/50"
+          ? "bg-zinc-50"
           : "bg-white"
       }`}
     >
@@ -380,10 +380,10 @@ function MemoCard({
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="truncate text-xs font-bold text-text-primary">
+              <p className="truncate text-xs font-bold text-zinc-900">
                 {memo.author.nickname}
               </p>
-              <span className="text-[11px] text-text-muted">
+              <span className="text-[11px] text-zinc-500">
                 {formatRelativeTime(memo.createdAt, t)}
               </span>
             </div>
@@ -399,7 +399,7 @@ function MemoCard({
                 className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 ${
                   memo.isResolved
                     ? "bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-zinc-200"
+                    : "text-zinc-400 hover:bg-zinc-200"
                 }`}
                 aria-label={t("verifyMemo")}
               >
@@ -411,7 +411,7 @@ function MemoCard({
                 type="button"
                 onClick={() => void onDelete(memo.id)}
                 disabled={isDeletePending || isOptimisticMemo}
-                className="inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors disabled:opacity-50 hover:bg-zinc-200"
+                className="inline-flex h-8 w-8 items-center justify-center text-zinc-400 transition-colors disabled:opacity-50 hover:bg-zinc-200"
                 aria-label={t("deleteMemo")}
               >
                 <DowinIcon name="action-delete" size="16px" />
@@ -423,8 +423,8 @@ function MemoCard({
       <p
         className={`mt-2 text-sm leading-6 ${
           memo.isResolved
-            ? "text-text-secondary line-through"
-            : "text-text-primary"
+            ? "text-zinc-400 line-through"
+            : "text-zinc-900"
         }`}
       >
         {memo.content}
@@ -436,7 +436,7 @@ function MemoCard({
 function MemoStatusCard({ message }: { message: string }) {
   return (
     <div className="rounded-[16px] bg-white px-4 py-4">
-      <p className="text-sm text-text-muted">{message}</p>
+      <p className="text-sm text-zinc-500">{message}</p>
     </div>
   );
 }
