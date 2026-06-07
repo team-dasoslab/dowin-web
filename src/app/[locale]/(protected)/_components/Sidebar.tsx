@@ -71,98 +71,52 @@ export function Sidebar() {
 
   return (
     <>
-      <aside
-        className={cn(
-          "fixed left-0 top-0 z-[110] hidden h-screen flex-col border-r border-zinc-200 bg-white transition-[width] duration-300 ease-in-out md:flex",
-          isCollapsed ? "w-[64px] p-2" : "w-[80px] p-4 lg:w-[240px]",
-        )}
-      >
-        {/* Workspace Pill */}
-        {isProfileLoading ? (
-          <div
-            className={cn(
-              "mb-6 flex h-10 w-full animate-pulse items-center rounded-content bg-zinc-100 transition-all",
-              isCollapsed ? "justify-center" : "lg:px-4",
+      <aside className="fixed inset-x-0 top-0 z-[110] hidden h-[64px] border-b border-zinc-200 bg-white/95 backdrop-blur-sm md:flex items-center">
+        <div className="flex items-center justify-between w-full max-w-[1200px] mx-auto px-4 md:px-10 lg:px-12 gap-8">
+          <div className="flex-shrink-0 w-[200px]">
+            {/* Workspace Pill */}
+            {isProfileLoading ? (
+              <div className="flex h-10 w-full animate-pulse items-center rounded-content bg-zinc-100 transition-all px-4" />
+            ) : workspaceName ? (
+              <WorkspaceSwitcher isCollapsed={false} />
+            ) : (
+              <Link
+                href="/workspace/new"
+                className="flex h-10 w-full items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4"
+              >
+                <DowinIcon name="action-add-active" size="16px" />
+                <span className="truncate text-[13px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
+                  {commonT("createWorkspace")}
+                </span>
+              </Link>
             )}
-          />
-        ) : workspaceName ? (
-          <WorkspaceSwitcher isCollapsed={isCollapsed} />
-        ) : (
-          <Link
-            href="/workspace/new"
-            className={cn(
-              "mb-6 flex h-10 w-full items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all",
-              isCollapsed ? "justify-center gap-0 px-0" : "justify-center px-0 lg:justify-start lg:gap-3 lg:px-4",
-            )}
-          >
-            <DowinIcon name="action-add-active" size="16px" />
-            <span
-              className={cn(
-                "hidden truncate text-[13px] font-bold lg:block whitespace-nowrap transition-all duration-300",
-                isCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100",
-              )}
-            >
-              {commonT("createWorkspace")}
-            </span>
-          </Link>
-        )}
+          </div>
 
-        {/* Navigation Links */}
-        <nav className="flex-1 space-y-2">
-          {filteredLinks.map(
-            ({ href, iconName, iconNameActive, translationKey }) => {
-              const isActive = getIsActive(href);
+          {/* Navigation Links */}
+          <nav className="flex-1 flex items-center justify-center gap-2 overflow-x-auto scrollbar-none h-[64px]">
+            {filteredLinks.map(
+              ({ href, iconName, iconNameActive, translationKey }) => {
+                const isActive = getIsActive(href);
 
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    "flex h-11 w-full items-center rounded-button transition-all",
-                    isActive
-                      ? "bg-zinc-100 text-zinc-950"
-                      : "text-zinc-400",
-                    isCollapsed ? "justify-center gap-0 px-0" : "justify-center px-0 lg:justify-start lg:gap-3 lg:px-4",
-                  )}
-                >
-                  <DowinIcon
-                    name={isActive ? iconNameActive : iconName}
-                    size="20px"
+                return (
+                  <Link
+                    key={href}
+                    href={href}
                     className={cn(
-                      "shrink-0 transition-transform",
-                      isActive && "scale-105",
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "hidden text-[14px] font-bold lg:block whitespace-nowrap transition-all duration-300",
-                      isCollapsed ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100",
+                      "flex items-center justify-center min-w-[110px] whitespace-nowrap h-full border-b-[3px] transition-all text-[15px]",
+                      isActive
+                        ? "border-primary text-primary font-bold"
+                        : "border-transparent text-zinc-500 font-semibold",
                     )}
                   >
-                    {t(translationKey)}
-                  </span>
-                </Link>
-              );
-            },
-          )}
-        </nav>
-
-        {/* Collapse Toggle */}
-        <div className="hidden lg:block">
-          <button
-            onClick={toggleSidebar}
-            className={cn(
-              "flex h-11 items-center rounded-button text-zinc-400 transition-all",
-              isCollapsed ? "w-full justify-center px-0" : "ml-auto w-11 justify-center",
+                    <span>{t(translationKey)}</span>
+                  </Link>
+                );
+              },
             )}
-            title={isCollapsed ? commonT("open") : commonT("close")}
-          >
-            <DowinIcon
-              name={isCollapsed ? "nav-chevron-right" : "nav-chevron-left"}
-              size="20px"
-              className="shrink-0"
-            />
-          </button>
+          </nav>
+
+          <div className="w-[200px] flex-shrink-0" />
         </div>
       </aside>
 

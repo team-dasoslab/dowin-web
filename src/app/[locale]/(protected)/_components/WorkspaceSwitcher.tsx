@@ -55,8 +55,8 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
     return (
       <div
         className={cn(
-          "mb-6 flex h-10 w-full animate-pulse items-center rounded-content bg-zinc-100 transition-all",
-          isCollapsed ? "justify-center" : "lg:px-4",
+          "flex h-10 w-[200px] animate-pulse items-center rounded-content bg-zinc-100 transition-all",
+          "px-4",
         )}
       />
     );
@@ -67,33 +67,27 @@ export function WorkspaceSwitcher({ isCollapsed }: WorkspaceSwitcherProps) {
   }
 
   return (
-    <div className="relative mb-6 w-full" ref={containerRef}>
+    <div className="relative w-[200px] -ml-2" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
         className={cn(
-          "flex h-10 w-full items-center rounded-content bg-primary/10 transition-all hover:bg-primary/15",
-          isCollapsed ? "justify-center gap-0 px-0" : "justify-center px-0 lg:justify-between lg:gap-3 lg:px-4",
+          "flex h-10 w-fit items-center gap-1 rounded-lg transition-all px-3",
+          isOpen ? "bg-zinc-100" : "bg-transparent hover:bg-zinc-50",
         )}
       >
-        <div className={cn("flex items-center overflow-hidden", isCollapsed ? "gap-0" : "gap-3")}>
-          <Logo size="20px" className="text-primary shrink-0" />
-          <span
-            className={cn(
-              "hidden truncate text-sm font-bold text-primary lg:block whitespace-nowrap transition-all duration-300",
-              isCollapsed ? "w-0 opacity-0" : "w-auto opacity-100",
-            )}
-          >
-            {me.name}
-          </span>
-        </div>
-        {!isCollapsed && (
-          <DowinIcon name="nav-chevron-down" size="16px" className="text-primary shrink-0 hidden lg:block" />
-        )}
+        <span className="truncate text-[15px] font-bold text-primary whitespace-nowrap transition-all duration-300 pt-[2px]">
+          {me.name}
+        </span>
+        <DowinIcon 
+          name="nav-chevron-down" 
+          size="16px" 
+          className={cn("text-primary shrink-0 transition-transform duration-200", isOpen && "rotate-180")} 
+        />
       </button>
 
-      {isOpen && !isCollapsed && (
-        <div className="absolute top-full left-0 mt-1 w-[200px] lg:w-full rounded-content border border-zinc-200 bg-white py-1 shadow-lg z-50">
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-full rounded-content border border-zinc-200 bg-white py-1 shadow-lg z-50">
           {workspaces.map((ws) => (
             <button
               key={ws.id}
