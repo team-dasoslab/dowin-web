@@ -29,23 +29,23 @@ export default function ProfileDeleteAccountPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer>
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center gap-4 rounded-content border border-red-200 bg-red-50/60 px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-content bg-red-100 text-red-600">
-            <DowinIcon name="status-warning" size="20px" />
+        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-red-100 text-red-600">
+            <DowinIcon name="status-warning" size="24px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold tracking-tight text-text-primary">
+            <h1 className="text-[17px] font-bold tracking-tight text-zinc-900">
               {t("cardTitle")}
             </h1>
-            <p className="mt-0.5 text-xs text-text-muted">{t("cardDesc")}</p>
+            <p className="mt-1 text-[13px] font-medium text-zinc-600 leading-relaxed">{t("cardDesc")}</p>
           </div>
-        </Card>
+        </div>
 
-        <Card className="space-y-5 rounded-content border border-border p-5">
-          <div className="rounded-content border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="space-y-5 rounded-[24px] bg-white p-5">
+          <div className="rounded-[16px] bg-red-50 px-4 py-3 text-sm text-red-700">
             {t("warningText")}
           </div>
 
@@ -68,11 +68,11 @@ export default function ProfileDeleteAccountPage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => void submit()}
-            className="h-11 w-full rounded-content bg-red-600 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-11 w-full rounded-[12px] bg-red-600 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>
-        </Card>
+        </div>
       </ProtectedPageContainer>
     </div>
   );
@@ -100,7 +100,7 @@ function PasswordField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-content border border-border bg-white px-3 pr-20 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-red-300"
+        className="h-11 w-full rounded-[12px] border-none bg-zinc-100 px-3 pr-20 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-red-500/10"
         toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors"
       />
     </label>
@@ -131,7 +131,7 @@ function TextField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-content border border-border bg-white px-3 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-red-300"
+        className="h-11 w-full rounded-[12px] border-none bg-zinc-100 px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-red-500/10"
       />
       {hint ? <p className="text-[11px] text-text-muted">{hint}</p> : null}
     </label>

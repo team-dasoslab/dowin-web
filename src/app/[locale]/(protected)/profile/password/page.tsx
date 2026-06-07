@@ -31,22 +31,22 @@ export default function ProfilePasswordPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer>
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title={t("header")} />
 
-        <Card className="flex items-center gap-4 rounded-content border border-border px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
-            <DowinIcon name="domain-key" size="20px" />
+        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
+            <DowinIcon name="domain-key" size="24px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-bold tracking-tight text-text-primary">
+            <h1 className="text-[17px] font-bold tracking-tight text-zinc-900">
               {t("cardTitle")}
             </h1>
-            <p className="mt-0.5 text-xs text-text-muted">{t("cardDesc")}</p>
+            <p className="mt-1 text-[13px] font-medium text-zinc-500 leading-relaxed">{t("cardDesc")}</p>
           </div>
-        </Card>
+        </div>
 
-        <Card className="space-y-5 rounded-content border border-border p-5">
+        <div className="space-y-5 rounded-[24px] bg-white p-5">
           <PasswordField
             label={t("currentPasswordLabel")}
             value={currentPassword}
@@ -73,11 +73,11 @@ export default function ProfilePasswordPage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => void submit()}
-            className="btn-dowin-primary h-11 w-full rounded-content text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-dowin-primary h-11 w-full rounded-[12px] text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>
-        </Card>
+        </div>
       </ProtectedPageContainer>
     </div>
   );
@@ -107,7 +107,7 @@ function PasswordField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-content border border-border bg-white px-3 pr-20 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-primary"
+        className="h-11 w-full rounded-[12px] border-none bg-zinc-100 px-3 pr-20 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
         toggleClassName="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-1 text-[11px] font-semibold text-text-muted transition-colors"
       />
       {hint ? <p className="text-[11px] text-text-muted">{hint}</p> : null}

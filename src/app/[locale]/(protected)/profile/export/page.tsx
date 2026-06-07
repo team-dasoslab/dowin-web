@@ -72,10 +72,10 @@ export default function ProfileExportPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer>
+      <ProtectedPageContainer className="max-w-[640px]">
         <ProtectedPageHeader title="데이터 내보내기" />
 
-        <Card className="border border-border rounded-content px-6 py-5 flex items-center gap-4">
+        <div className="rounded-[24px] bg-white px-6 py-5 flex items-center gap-4">
           <UserAvatar
             avatarKey={user?.avatarKey}
             avatarSeed={user?.nickname}
@@ -100,20 +100,20 @@ export default function ProfileExportPage() {
               </span>
             </div>
           </div>
-        </Card>
+        </div>
 
         {!isExportAvailable ? (
-          <Card className="border border-border rounded-content p-4 space-y-2 bg-sub-background">
+          <div className="rounded-[24px] p-4 space-y-2 bg-zinc-100">
             <p className="text-sm font-bold text-text-primary">
               CSV 다운로드는 현재 제공되지 않습니다.
             </p>
             <p className="text-[11px] leading-relaxed text-text-muted">
               현재는 앱 안에서 기록과 조회를 계속 사용할 수 있습니다.
             </p>
-          </Card>
+          </div>
         ) : null}
 
-        <Card className="border border-border rounded-content p-4 space-y-4">
+        <div className="rounded-[24px] bg-white p-4 space-y-4">
           <div className="space-y-1">
             <h2 className="text-sm font-bold text-text-primary">
               내보내기 조건
@@ -124,7 +124,7 @@ export default function ProfileExportPage() {
           </div>
 
           <div className="grid gap-2 sm:grid-cols-2">
-            <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
+            <label className="flex h-9 min-w-0 items-center gap-2 rounded-[12px] border border-zinc-200/60 bg-white px-3 text-xs text-text-secondary">
               <span className="shrink-0 text-[11px]">시작일</span>
               <input
                 type="date"
@@ -133,7 +133,7 @@ export default function ProfileExportPage() {
                 className="min-w-0 flex-1 bg-transparent font-mono text-text-primary outline-none"
               />
             </label>
-            <label className="flex h-9 min-w-0 items-center gap-2 rounded-content border border-border bg-white px-3 text-xs text-text-secondary">
+            <label className="flex h-9 min-w-0 items-center gap-2 rounded-[12px] border border-zinc-200/60 bg-white px-3 text-xs text-text-secondary">
               <span className="shrink-0 text-[11px]">종료일</span>
               <input
                 type="date"
@@ -152,7 +152,7 @@ export default function ProfileExportPage() {
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                className="h-7 rounded-lg border border-border bg-white px-2.5 text-[11px] font-bold text-text-secondary"
+                className="h-7 rounded-[8px] border border-zinc-200/60 bg-white px-2.5 text-[11px] font-bold text-zinc-500"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -164,7 +164,7 @@ export default function ProfileExportPage() {
                 return (
                   <label
                     key={measure.id}
-                    className="flex items-center gap-2 rounded-content border border-border px-2.5 py-2 text-xs text-text-primary"
+                    className="flex items-center gap-2 rounded-[12px] border border-zinc-200/60 bg-white px-2.5 py-2 text-xs text-text-primary"
                   >
                     <input
                       type="checkbox"
@@ -179,7 +179,7 @@ export default function ProfileExportPage() {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 rounded-content border border-border bg-sub-background px-3 py-2 text-xs text-text-secondary">
+          <label className="flex items-center gap-2 rounded-[12px] border-none bg-zinc-100 px-3 py-2 text-xs text-zinc-600">
             <input
               type="checkbox"
               checked={splitByWeek}
@@ -197,7 +197,7 @@ export default function ProfileExportPage() {
               type="button"
               onClick={() => void exportCsv()}
               disabled={isExporting || !isExportAvailable}
-              className="h-9 w-full rounded-content bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
+              className="h-9 w-full rounded-[12px] bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
             >
               <DowinIcon name="action-download" size="14px" />
               {isExportAvailable
@@ -207,7 +207,7 @@ export default function ProfileExportPage() {
                 : "현재 사용 불가"}
             </Button>
           </div>
-        </Card>
+        </div>
       </ProtectedPageContainer>
     </div>
   );

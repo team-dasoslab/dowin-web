@@ -7,7 +7,6 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
 import {
@@ -194,7 +193,7 @@ export default function ProfilePage() {
                     onChange={(event) => {
                       void updateDailySettings(event.target.value);
                     }}
-                    className="h-9 cursor-pointer rounded-button border border-border bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:border-primary focus:bg-white disabled:cursor-not-allowed disabled:bg-sub-background disabled:text-text-muted"
+                    className="h-9 cursor-pointer rounded-[12px] border-none bg-zinc-100 px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {TIME_OPTIONS.map((time) => (
                       <option key={time} value={time}>
@@ -331,7 +330,7 @@ export default function ProfilePage() {
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
             {/* 프로필 요약 카드 */}
             <div className="space-y-4">
-              <Card className="border border-zinc-200 rounded-content px-4 py-4 flex items-center gap-4 bg-white sm:px-8 sm:py-8 sm:gap-6">
+              <div className="rounded-[24px] bg-white px-4 py-4 flex items-center gap-4 sm:px-8 sm:py-8 sm:gap-6">
                 <UserAvatar
                   avatarKey={avatarKey}
                   avatarSeed={nickname}
@@ -347,7 +346,7 @@ export default function ProfilePage() {
                     @{customId}
                   </p>
                 </div>
-              </Card>
+              </div>
 
 
             </div>
@@ -365,11 +364,11 @@ export default function ProfilePage() {
                     }}
                     className="space-y-5 scroll-mt-28"
                   >
-                    <SectionHeader title={group.label} className="mb-4" />
+                    <h2 className="px-1 mb-4 text-[22px] font-bold tracking-tight text-zinc-900">{group.label}</h2>
 
 
 
-                    <div className="border border-zinc-200 rounded-content overflow-hidden bg-white">
+                    <div className="rounded-[24px] overflow-hidden bg-white">
                       {group.items.map((item, index) => (
                         <MenuItemRow
                           key={item.id}
@@ -404,10 +403,10 @@ function MenuItemRow({
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <div
-          className={`w-9 h-9 rounded-button border flex items-center justify-center flex-shrink-0 ${
+          className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${
             item.danger
-              ? "border-danger/10 bg-danger/5 text-danger"
-              : "border-border/50 bg-sub-background text-text-muted"
+              ? "bg-danger/5 text-danger"
+              : "bg-zinc-100 text-zinc-500"
           }`}
         >
           {item.icon}

@@ -49,10 +49,10 @@ export function ProductUpdateCard({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none text-text-muted">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none text-zinc-500">
             <DowinIcon name="domain-calendar" size="12px" />
             <span>{update.publishedAt}</span>
-            <span className="text-border">•</span>
+            <span className="text-zinc-300">•</span>
             <span>{updateT(`tags.${update.tag}`)}</span>
           </div>
 

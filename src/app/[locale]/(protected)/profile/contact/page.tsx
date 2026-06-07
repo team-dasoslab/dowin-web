@@ -43,7 +43,7 @@ export default function ProfileContactPage() {
   return (
     <>
       <div className="min-h-screen bg-zinc-100">
-        <ProtectedPageContainer className="space-y-6 lg:space-y-8">
+        <ProtectedPageContainer className="max-w-[760px]">
           <ProtectedPageHeader
             title={t("listTitle")}
             rightElement={
@@ -173,7 +173,7 @@ function ContactInquiryComposer({
           onClick={onClose}
           aria-label={t("cancelButton")}
         />
-        <div className="relative w-full max-w-[640px] overflow-hidden rounded-[28px] bg-white border border-zinc-100 md:rounded-content">
+        <div className="relative w-full max-w-[640px] overflow-hidden rounded-[24px] bg-white">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-5">
             <div>
@@ -220,7 +220,7 @@ function ContactInquiryComposer({
                         onClick={() =>
                           form.setField("category", category.value)
                         }
-                        className={`inline-flex items-center justify-center h-10 rounded-button px-5 text-[13px] font-bold transition-all active:scale-[0.98] ${
+                        className={`inline-flex items-center justify-center h-10 rounded-[12px] px-5 text-[13px] font-bold transition-all active:scale-[0.98] ${
                           isSelected
                             ? "bg-primary border border-primary text-white"
                             : "bg-white border border-zinc-200 text-zinc-500"
@@ -247,7 +247,7 @@ function ContactInquiryComposer({
                   }
                   placeholder={t("replyEmailPlaceholder")}
                   disabled={isSubmitting}
-                  className="h-12 w-full rounded-button border border-zinc-200 bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
+                  className="h-12 w-full rounded-[12px] border-none bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-primary/5"
                 />
                 <FieldError message={form.errors.replyEmail} />
               </div>
@@ -264,7 +264,7 @@ function ContactInquiryComposer({
                   }
                   placeholder={t("subjectPlaceholder")}
                   disabled={isSubmitting}
-                  className="h-12 w-full rounded-button border border-zinc-200 bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
+                  className="h-12 w-full rounded-[12px] border-none bg-zinc-100 px-4 text-[14px] font-bold text-zinc-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-primary/5"
                 />
                 <FieldError message={form.errors.subject} />
               </div>
@@ -289,14 +289,14 @@ function ContactInquiryComposer({
                   placeholder={t("messagePlaceholder")}
                   disabled={isSubmitting}
                   rows={8}
-                  className="min-h-[160px] w-full rounded-content border border-zinc-200 bg-zinc-100 px-4 py-3 text-[14px] font-bold leading-6 text-zinc-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/5"
+                  className="min-h-[160px] w-full rounded-[16px] border-none bg-zinc-100 px-4 py-3 text-[14px] font-bold leading-6 text-zinc-900 outline-none transition focus:bg-white focus:ring-4 focus:ring-primary/5"
                 />
                 <FieldError message={form.errors.message} />
               </div>
 
               {/* Notice & Privacy */}
               <div className="space-y-4">
-                <div className="rounded-content border border-zinc-100 bg-zinc-50/70 p-5">
+                <div className="rounded-[16px] bg-zinc-50/70 p-5">
                   <div className="space-y-3 text-[13px] leading-6 text-zinc-500">
                     <p className="font-black text-zinc-900">
                       {t("noticeTitle")}
@@ -308,7 +308,7 @@ function ContactInquiryComposer({
                   </div>
                 </div>
 
-                <label className="flex items-start gap-3 rounded-content border border-zinc-200 bg-zinc-100 p-4 transition-colors">
+                <label className="flex items-start gap-3 rounded-[16px] bg-zinc-100 p-4 transition-colors">
                   <input
                     type="checkbox"
                     checked={form.values.privacyConsent}
@@ -384,14 +384,14 @@ function StatusPill({
 }) {
   const statusClassName =
     status === ContactInquirySummaryStatus.RESOLVED
-      ? "border-success/20 bg-success/10 text-success"
+      ? "bg-success/10 text-success"
       : status === ContactInquirySummaryStatus.IN_PROGRESS
-        ? "border-primary/20 bg-primary/10 text-primary"
-        : "border-zinc-200 bg-zinc-100 text-zinc-600";
+        ? "bg-primary/10 text-primary"
+        : "bg-zinc-100 text-zinc-600";
 
   return (
     <span
-      className={`inline-flex items-center h-6 rounded-button border px-2.5 text-[10px] font-black tracking-wide ${statusClassName}`}
+      className={`inline-flex items-center h-6 rounded-[8px] px-2.5 text-[10px] font-black tracking-wide ${statusClassName}`}
     >
       {t(`status.${status}`)}
     </span>
@@ -418,7 +418,7 @@ function ListStatusCard({
   onAction?: () => void;
 }) {
   return (
-    <Card className="border-zinc-200 bg-white p-8 text-center">
+    <div className="rounded-[24px] bg-white p-8 text-center">
       <div className="mx-auto max-w-[440px] space-y-3">
         <h3 className="text-lg font-black tracking-tight text-zinc-900">
           {title}
@@ -436,7 +436,7 @@ function ListStatusCard({
           </div>
         ) : null}
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -444,9 +444,9 @@ function InquiryListSkeleton() {
   return (
     <div className="grid gap-3">
       {Array.from({ length: 3 }).map((_, index) => (
-        <Card
+        <div
           key={index}
-          className="animate-pulse border-zinc-200 bg-white p-4"
+          className="animate-pulse rounded-[24px] bg-white p-4"
         >
           <div className="space-y-3">
             <div className="flex gap-2">
@@ -456,7 +456,7 @@ function InquiryListSkeleton() {
             <div className="h-5 w-3/5 rounded bg-zinc-100" />
             <div className="h-4 w-4/5 rounded bg-zinc-100" />
           </div>
-        </Card>
+        </div>
       ))}
     </div>
   );
@@ -470,7 +470,7 @@ function CategoryPill({
   t: ReturnType<typeof useTranslations<"ProfileContact">>;
 }) {
   return (
-    <span className="inline-flex items-center h-6 rounded-button bg-primary/5 border border-primary/10 px-2.5 text-[10px] font-black tracking-wide text-primary">
+    <span className="inline-flex items-center h-6 rounded-[8px] bg-primary/5 px-2.5 text-[10px] font-black tracking-wide text-primary">
       {getCategoryLabel(category, t)}
     </span>
   );
@@ -516,7 +516,7 @@ function InquiryCard({
   locale: string;
 }) {
   return (
-    <div className="w-full rounded-content border border-zinc-200 bg-white p-4 text-left transition">
+    <div className="w-full rounded-[24px] bg-white p-5 text-left transition">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
