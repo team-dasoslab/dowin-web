@@ -175,10 +175,7 @@ export function ProfileBillingPageClient() {
 
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5 md:p-6">
-            <div className="flex min-w-0 items-center gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-zinc-50 text-primary">
-                <DowinIcon name="domain-wallet" size="24px" />
-              </div>
+            <div className="flex min-w-0 items-center">
               <div className="min-w-0">
                 <h2 className="text-lg font-black tracking-tight text-zinc-900">
                   {billing.workspaceName}
@@ -244,31 +241,21 @@ export function ProfileBillingPageClient() {
 
         <section className="space-y-4">
           <h2 className="px-1 text-lg font-bold tracking-tight text-zinc-900">{t("currentPlanTitle")}</h2>
-          <div className="divide-y divide-zinc-100 rounded-[24px] bg-white">
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                  <DowinIcon name="domain-target-arrow" size="16px" />
-                </div>
-                <span className="text-sm font-bold text-zinc-500">
-                  {t("planLabel")}
-                </span>
-              </div>
-              <span className="text-sm font-black text-primary">
+          <div className="rounded-[24px] bg-white py-2">
+            <div className="flex items-center justify-between px-6 py-4">
+              <span className="text-[15px] font-medium text-zinc-600">
+                {t("planLabel")}
+              </span>
+              <span className="text-[15px] font-bold text-primary">
                 {t("basicPlanName")}
               </span>
             </div>
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                  <Activity size={16} />
-                </div>
-                <span className="text-sm font-bold text-zinc-500">
-                  {t("statusLabel")}
-                </span>
-              </div>
+            <div className="flex items-center justify-between px-6 py-4">
+              <span className="text-[15px] font-medium text-zinc-600">
+                {t("statusLabel")}
+              </span>
               <span
-                className={`text-sm font-black ${
+                className={`text-[15px] font-bold ${
                   billing.billingStatus === "ACTIVE" ||
                   billing.billingStatus === "CANCELED"
                     ? "text-success"
@@ -286,40 +273,30 @@ export function ProfileBillingPageClient() {
               (billing.billingStatus === "ACTIVE" ||
                 billing.billingStatus === "CANCELED") && (
                 <>
-                  <div className="flex items-center justify-between p-5">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                        <DowinIcon name="domain-people" size="16px" />
-                      </div>
-                      <span className="text-sm font-bold text-zinc-500">
-                        {t("usedSeatLabel")}
-                      </span>
-                    </div>
-                    <span className="text-sm font-black text-zinc-900">
+                  <div className="flex items-center justify-between px-6 py-4">
+                    <span className="text-[15px] font-medium text-zinc-600">
+                      {t("usedSeatLabel")}
+                    </span>
+                    <span className="text-[15px] font-bold text-zinc-900">
                       {billing.usedSeatCount ?? 0} {t("seatUnit")}
                     </span>
                   </div>
-                  <div className="flex flex-col p-5">
+                  <div className="flex flex-col px-6 py-4">
                     <div className="flex items-center justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                          <DowinIcon name="domain-people" size="16px" />
-                        </div>
-                        <div className="flex min-w-0 items-center gap-1.5">
-                          <span className="truncate text-sm font-bold text-zinc-500">
-                            {t("purchasedSeatLabel")}
-                          </span>
-                          {isAdmin && isPolarEntitlement && (
-                            <InfoTooltip
-                              content={t("seatChangePolicyTooltip")}
-                              align="left"
-                              side="top"
-                            />
-                          )}
-                        </div>
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <span className="truncate text-[15px] font-medium text-zinc-600">
+                          {t("purchasedSeatLabel")}
+                        </span>
+                        {isAdmin && isPolarEntitlement && (
+                          <InfoTooltip
+                            content={t("seatChangePolicyTooltip")}
+                            align="left"
+                            side="top"
+                          />
+                        )}
                       </div>
                       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-                        <span className="whitespace-nowrap text-sm font-black text-zinc-900">
+                        <span className="whitespace-nowrap text-[15px] font-bold text-zinc-900">
                           {billing.purchasedSeatCount} {t("seatUnit")}
                         </span>
                         {isAdmin && isPolarEntitlement && (
@@ -337,8 +314,8 @@ export function ProfileBillingPageClient() {
                       </div>
                     </div>
                     {billing.pendingSeatCount !== null && (
-                      <div className="mt-1 pl-11">
-                        <span className="text-[12px] font-medium leading-tight text-primary">
+                      <div className="mt-1">
+                        <span className="text-[13px] font-semibold leading-tight text-primary">
                           {t("pendingSeatLabel")} (
                           {billing.pendingSeatEffectiveAt
                             ? t("pendingSeatValue", {
@@ -359,16 +336,11 @@ export function ProfileBillingPageClient() {
                   </div>
                 </>
               )}
-            <div className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-50 text-zinc-400">
-                  <DowinIcon name="domain-calendar" size="16px" />
-                </div>
-                <span className="text-sm font-bold text-zinc-500">
-                  {t(getPeriodEndLabelKey(billing.billingStatus))}
-                </span>
-              </div>
-              <span className="text-sm font-black text-zinc-900">
+            <div className="flex items-center justify-between px-6 py-4">
+              <span className="text-[15px] font-medium text-zinc-600">
+                {t(getPeriodEndLabelKey(billing.billingStatus))}
+              </span>
+              <span className="text-[15px] font-bold text-zinc-900">
                 {formatDateLabel(
                   billing.currentPeriodEnd,
                   t("notAvailable"),

@@ -252,7 +252,7 @@ export default function WorkspaceSettingsPage() {
                   </p>
                 </div>
                 {!isNativeApp ? (
-                  <span className="inline-flex h-6 items-center rounded-[8px] bg-primary/5 px-2.5 text-[10px] font-black tracking-wider text-primary">
+                  <span className="inline-flex h-[32px] shrink-0 items-center rounded-[12px] bg-primary/10 px-4 text-[13px] font-bold text-primary">
                     {t("basicPlanName")}
                   </span>
                 ) : null}
