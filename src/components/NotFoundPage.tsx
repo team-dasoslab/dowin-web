@@ -1,9 +1,9 @@
 "use client";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Link from "next/link";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 
 type Locale = "ko" | "en";
 
@@ -14,7 +14,6 @@ const COPY: Record<
     title: string;
     description: string;
     goHome: string;
-    info: string;
   }
 > = {
   ko: {
@@ -23,7 +22,6 @@ const COPY: Record<
     description:
       "주소가 바뀌었거나, 삭제되었거나, 잘못 입력되었을 수 있습니다.",
     goHome: "홈으로 이동",
-    info: "계속 같은 문제가 보이면 경로 구조와 locale 라우팅 설정을 함께 확인하세요.",
   },
   en: {
     badge: "404 NOT FOUND",
@@ -31,7 +29,6 @@ const COPY: Record<
     description:
       "The address may be wrong, changed, or the page may have been removed.",
     goHome: "Go home",
-    info: "If this keeps happening, check the route structure and locale routing setup.",
   },
 };
 
@@ -45,46 +42,41 @@ export function NotFoundPage({
   const copy = COPY[locale];
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-background">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(94,106,210,0.14),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(132,204,22,0.14),transparent_24%)]" />
+    <main className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-4 py-10 sm:px-6">
-        <Card className="card-dowin w-full max-w-xl animate-dowin-in rounded-[28px] border border-border/80 bg-white/90 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8">
-          <div className="space-y-6">
-            <div className="flex items-center justify-between gap-3">
-              <Badge className="rounded-md border border-primary/15 bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
-                {copy.badge}
-              </Badge>
+      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-left">
+        <div className="space-y-5">
+          <div className="flex items-center justify-between">
+            <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
+              <Logo size="32px" className="text-zinc-900" />
             </div>
-
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-                Dowin
-              </p>
-              <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
-                {copy.title}
-              </h1>
-              <p className="max-w-md text-sm leading-6 text-text-secondary sm:text-base">
-                {copy.description}
-              </p>
-            </div>
-
-            <Button
-              asChild
-              className="btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm"
-            >
-              <Link href={homeHref}>
-                <DowinIcon name="nav-home" size="16px" />
-                {copy.goHome}
-              </Link>
-            </Button>
-
-            <div className="rounded-2xl border border-dashed border-border bg-sub-background/80 px-4 py-3 text-xs leading-5 text-text-muted">
-              {copy.info}
+            <div className="text-[11px] font-black tracking-widest uppercase text-zinc-400 bg-zinc-100 px-3 py-1.5 rounded-full">
+              {copy.badge}
             </div>
           </div>
-        </Card>
-      </div>
+
+          <div className="space-y-2">
+            <h1 className="text-[24px] font-black tracking-tight text-zinc-900 leading-none">
+              {copy.title}
+            </h1>
+            <div className="text-[15px] font-medium text-zinc-500 tracking-tight break-keep pt-1 leading-relaxed">
+              {copy.description}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <Button
+            asChild
+            className="h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors active:scale-[0.98] bg-zinc-900 text-white hover:bg-zinc-800"
+          >
+            <Link href={homeHref}>
+              {copy.goHome}
+            </Link>
+          </Button>
+        </div>
+      </Card>
     </main>
   );
 }
