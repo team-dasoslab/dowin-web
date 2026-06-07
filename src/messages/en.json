@@ -266,7 +266,7 @@
   },
   "Setup": {
     "header": "Scoreboard Settings",
-    "editTitle": "Edit Current Goal",
+    "editTitle": "Manage Scoreboard",
     "createTitle": "Set Next Scoreboard",
     "description": "Set a single goal and define your measures.",
     "archiving": "Archiving scoreboard...",
