@@ -55,7 +55,8 @@ export default function AdminProductCreateClient() {
 
       showToast("success", "새로운 Polar product ID가 등록되었습니다.");
       router.push("/admin/products");
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
       showToast("error", error?.response?.data?.message || "알 수 없는 오류");
     }
   };
