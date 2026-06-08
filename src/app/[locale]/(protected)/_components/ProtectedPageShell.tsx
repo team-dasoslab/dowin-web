@@ -53,7 +53,7 @@ export function ProtectedPageHeader({
       )}
     >
       <div className="min-w-0">
-        <h1 className="text-[28px] md:text-[32px] font-bold tracking-tight text-zinc-900">
+        <h1 className="text-[24px] md:text-[32px] font-bold tracking-tight text-zinc-900">
           {title}
         </h1>
       </div>

@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
@@ -183,12 +184,13 @@ function ContactInquiryComposer({
                 {t("formTitle")}
               </h2>
             </div>
-            <button
+            <Button
+              type="button"
               onClick={onClose}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-400 transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-400 transition-colors p-0 min-h-0"
             >
               <DowinIcon name="action-dismiss" size="24px" />
-            </button>
+            </Button>
           </div>
 
           {/* Form Content */}
@@ -212,7 +214,7 @@ function ContactInquiryComposer({
                   {categories.map((category) => {
                     const isSelected = form.values.category === category.value;
                     return (
-                      <button
+                      <Button
                         key={category.value}
                         type="button"
                         disabled={isSubmitting}
@@ -226,7 +228,7 @@ function ContactInquiryComposer({
                         }`}
                       >
                         {category.label}
-                      </button>
+                      </Button>
                     );
                   })}
                 </div>
@@ -270,7 +272,7 @@ function ContactInquiryComposer({
                     })}
                   </span>
                 </div>
-                <textarea
+                <Textarea
                   value={form.values.message}
                   onChange={(event) =>
                     form.setField("message", event.target.value)

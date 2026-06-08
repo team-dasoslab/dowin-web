@@ -23,6 +23,7 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export default function SetupPage() {
   const t = useTranslations("Setup");
@@ -179,7 +180,7 @@ export default function SetupPage() {
           >
             {/* Dowin 섹션 */}
             <section id="dowin" className="space-y-4 scroll-mt-28">
-              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("dowinShort")}</h2>
+              <SectionHeader title={t("dowinShort")} />
               <GoalSection
                 goalName={goalName}
                 isMutating={isMutating}
@@ -189,7 +190,7 @@ export default function SetupPage() {
 
             {/* 결과지표 섹션 */}
             <section id="lag" className="space-y-4 scroll-mt-28">
-              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("lagMeasureLabel")}</h2>
+              <SectionHeader title={t("lagMeasureLabel")} />
               <LagMeasureSection
                 isMutating={isMutating}
                 lagMeasure={lagMeasure}
@@ -199,7 +200,7 @@ export default function SetupPage() {
 
             {/* 행동지표 섹션 */}
             <section id="lead" className="space-y-4 scroll-mt-28">
-              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("leadMeasureHead")}</h2>
+              <SectionHeader title={t("leadMeasureHead")} />
               <LeadMeasuresSection
                 addMeasureRow={addMeasureRow}
                 availableTags={availableTags}
@@ -228,7 +229,7 @@ export default function SetupPage() {
             {/* 관리 섹션 (수정 모드일 때만) */}
             {isEditMode && (
               <section id="manage" className="space-y-4 scroll-mt-28">
-                <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("manage")}</h2>
+                <SectionHeader title={t("manage")} />
                 <SetupManageSection
                   archive={archive}
                   isArchivePending={isArchivePending}

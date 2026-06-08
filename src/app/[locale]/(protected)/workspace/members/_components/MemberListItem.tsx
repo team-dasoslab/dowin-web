@@ -34,7 +34,7 @@ export function MemberListItem({
 
   return (
     <div
-      className="flex flex-col justify-between gap-3 bg-white px-4 py-4 sm:flex-row sm:items-center sm:gap-4"
+      className="flex flex-col justify-between gap-3 bg-white px-4 py-4 sm:flex-row sm:items-center sm:gap-4 transition-colors hover:bg-zinc-50 rounded-[16px] -mx-4"
     >
       <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto">
         <UserAvatar
