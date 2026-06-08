@@ -127,7 +127,7 @@ export default function DashboardPage() {
     [membersWithScoreboard, myUserId],
   );
 
-  const { exportRef, isExporting, saveImage } = useScoreboardImageExport({
+  const { exportRef, isExporting, isShareSupported, saveImage } = useScoreboardImageExport({
     member: myMember,
     weekStart: dashboard?.weekStart ?? null,
   });
@@ -196,7 +196,7 @@ export default function DashboardPage() {
                     disabled={isExporting}
                     className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 active:scale-95 transition-all w-full sm:w-auto"
                   >
-                    {isExporting ? t("savingImage") : t("saveScoreboardImage")}
+                    {isShareSupported ? t("shareScoreboard") : t("saveScoreboardImage")}
                   </Button>
                 ) : null}
               </div>

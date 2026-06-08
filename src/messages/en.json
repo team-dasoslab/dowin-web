@@ -56,6 +56,7 @@
     "viewMemos": "View Memos",
     "memoButton": "Write Memo",
     "saveScoreboardImage": "Save my scoreboard as image",
+    "shareScoreboard": "Share my scoreboard",
     "savingImage": "Saving...",
     "scoreboardImageSaved": "Scoreboard image saved.",
     "scoreboardImageSaveFailed": "Could not save the scoreboard image.",

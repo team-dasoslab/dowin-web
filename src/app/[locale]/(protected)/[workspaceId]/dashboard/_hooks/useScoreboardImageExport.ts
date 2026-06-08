@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TeamDashboardMember } from "@/api/generated/dowin.schemas";
 import { getSafeImageFilename } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/scoreboard-image";
 import { useToast } from "@/context/ToastContext";
@@ -21,8 +21,14 @@ export function useScoreboardImageExport({
 }: UseScoreboardImageExportInput) {
   const exportRef = useRef<HTMLDivElement | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [isShareSupported, setIsShareSupported] = useState(false);
   const { showToast } = useToast();
   const t = useTranslations("Dashboard");
+
+  useEffect(() => {
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    setIsShareSupported(typeof navigator !== "undefined" && !!navigator.share && isTouchDevice);
+  }, []);
 
   const saveImage = async () => {
     if (!member || !exportRef.current || isExporting) return;
@@ -47,6 +53,29 @@ export function useScoreboardImageExport({
         weekStart,
       });
 
+      // iOS/Mobile: Try Web Share API first so it can be saved to Photos or shared
+      try {
+        const res = await fetch(dataUrl);
+        const blob = await res.blob();
+        const file = new File([blob], filename, { type: "image/png" });
+
+        if (isShareSupported && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: t("scoreboardImageTitle", { fallback: "팀 주간 점수판" }),
+          });
+          showToast("success", t("scoreboardImageSaved"));
+          onSuccess?.();
+          return;
+        }
+      } catch (shareErr) {
+        if (shareErr instanceof Error && shareErr.name === "AbortError") {
+          // User cancelled the share sheet, no need to fallback
+          return;
+        }
+      }
+
+      // Desktop / Unsupported browsers: Fallback to traditional anchor download
       const link = document.createElement("a");
       link.download = filename;
       link.href = dataUrl;
@@ -58,7 +87,6 @@ export function useScoreboardImageExport({
       showToast("success", t("scoreboardImageSaved"));
       onSuccess?.();
     } catch (err) {
-      console.error("Failed to export scoreboard image:", err);
       showToast("error", t("scoreboardImageSaveFailed"));
       onError?.();
     } finally {
@@ -69,6 +97,7 @@ export function useScoreboardImageExport({
   return {
     exportRef,
     isExporting,
+    isShareSupported,
     saveImage,
   };
 }
