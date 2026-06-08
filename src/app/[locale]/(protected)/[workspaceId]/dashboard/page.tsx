@@ -10,6 +10,8 @@ import { TeamPeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/das
 import { MemberCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/MemberCard";
 import { WeeklyTable } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamDashboard";
+import { useScoreboardImageExport } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useScoreboardImageExport";
+import { ScoreboardImageCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/ScoreboardImageCard";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
@@ -120,6 +122,16 @@ export default function DashboardPage() {
     (member) => member.hasScoreboard,
   );
 
+  const myMember = useMemo(
+    () => membersWithScoreboard.find((member) => member.userId === myUserId) ?? null,
+    [membersWithScoreboard, myUserId],
+  );
+
+  const { exportRef, isExporting, saveImage } = useScoreboardImageExport({
+    member: myMember,
+    weekStart: dashboard?.weekStart ?? null,
+  });
+
   if (isLoading) {
     return <DashboardLoadingState />;
   }
@@ -164,16 +176,30 @@ export default function DashboardPage() {
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="summary" className="space-y-5 scroll-mt-28">
               <SectionHeader title={t("memberSummary")} />
-              <TeamPeriodControls
-                isPeriodLoading={isPeriodLoading}
-                isPreviousDisabled={isPreviousDisabled}
-                isResetVisible={isResetVisible}
-                movePeriod={movePeriod}
-                resetToToday={resetToToday}
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                weekLabel={weekLabel}
-              />
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <TeamPeriodControls
+                    isPeriodLoading={isPeriodLoading}
+                    isPreviousDisabled={isPreviousDisabled}
+                    isResetVisible={isResetVisible}
+                    movePeriod={movePeriod}
+                    resetToToday={resetToToday}
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    weekLabel={weekLabel}
+                  />
+                </div>
+                {myMember ? (
+                  <Button
+                    type="button"
+                    onClick={saveImage}
+                    disabled={isExporting}
+                    className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 active:scale-95 transition-all w-full sm:w-auto"
+                  >
+                    {isExporting ? t("savingImage") : t("saveScoreboardImage")}
+                  </Button>
+                ) : null}
+              </div>
 
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -209,6 +235,21 @@ export default function DashboardPage() {
                 <SectionHeader title={t("teamWeeklyScoreboard")} />
               </div>
 
+              <div
+                aria-hidden="true"
+                className="pointer-events-none fixed left-[-10000px] top-0"
+              >
+                <div ref={exportRef}>
+                  {myMember && dashboard ? (
+                    <ScoreboardImageCard
+                      workspaceName={dashboard.workspaceName ?? "Dowin"}
+                      member={myMember}
+                      weekDates={weekDates}
+                      weekLabel={weekLabel}
+                    />
+                  ) : null}
+                </div>
+              </div>
 
               {isLoading ? (
                 <div className="space-y-6">
