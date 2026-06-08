@@ -1,6 +1,6 @@
 {
   "name": "dowin",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "private": true,
   "packageManager": "yarn@4.10.0",
   "scripts": {
@@ -37,6 +37,7 @@
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.1",
+    "html-to-image": "^1.11.13",
     "lucide-react": "^1.9.0",
     "nanoid": "^5.1.6",
     "next": "^16.1.6",
