@@ -200,7 +200,7 @@ export function WeeklyBoardSection({
                 <col className="w-[14%]" />
               </colgroup>
               <tbody className="divide-y-2 divide-zinc-50">
-                {activeLeadMeasures.map((leadMeasure, index) => {
+                {activeLeadMeasures.map((leadMeasure) => {
                   const leadMeasureId = toNumberId(leadMeasure.id);
                   const weekly = weeklyById.get(leadMeasureId);
                   const guide = weeklyGuideById.get(leadMeasureId);
