@@ -46,6 +46,7 @@ export function useScoreboardImageExport({
         cacheBust: true,
         pixelRatio: 2,
         backgroundColor: "#f4f4f5",
+        width: 1080,
       });
 
       const filename = getSafeImageFilename({
@@ -62,7 +63,6 @@ export function useScoreboardImageExport({
         if (isShareSupported && navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
-            title: t("scoreboardImageTitle", { fallback: "팀 주간 점수판" }),
           });
           showToast("success", t("scoreboardImageSaved"));
           onSuccess?.();
