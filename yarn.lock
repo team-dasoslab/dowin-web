@@ -8072,6 +8072,7 @@ __metadata:
     eslint: "npm:^9"
     eslint-config-next: "npm:15.4.6"
     eslint-plugin-storybook: "npm:^10.2.19"
+    html-to-image: "npm:^1.11.13"
     husky: "npm:^9.0.0"
     jsdom: "npm:^28.1.0"
     lucide-react: "npm:^1.9.0"
@@ -10187,6 +10188,13 @@ __metadata:
   version: 2.0.2
   resolution: "html-escaper@npm:2.0.2"
   checksum: 10c0/208e8a12de1a6569edbb14544f4567e6ce8ecc30b9394fcaa4e7bb1e60c12a7c9a1ed27e31290817157e8626f3a4f29e76c8747030822eb84a6abb15c255f0a0
+  languageName: node
+  linkType: hard
+
+"html-to-image@npm:^1.11.13":
+  version: 1.11.13
+  resolution: "html-to-image@npm:1.11.13"
+  checksum: 10c0/03bd7192d87b99499e37ff12a8e2b41ddce4cf8e33a93dfadff18df0f213434c7f1ba8328db2158f4805da07b7aec3c90aec3152908281153217e86784218b10
   languageName: node
   linkType: hard
 
