@@ -5,9 +5,6 @@ import { useTranslations } from "next-intl";
 import {
   Area,
   AreaChart,
-  Cell,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -39,74 +36,75 @@ export function ScoreboardOverviewSection({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* ── WIG & Lag Measure Hero Card (Vertical Stack Design) ── */}
-      <div className="flex flex-col rounded-[24px] bg-white">
-        <div className="flex flex-col">
-          {/* Primary Goal (WIG) */}
-          <div className="px-6 pt-5 pb-3 sm:px-8 sm:pt-6 sm:pb-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-[#E8F3FF] text-primary text-[11px] font-bold tracking-tight uppercase">
-                {t("dowinLabel")}
-              </div>
-            </div>
-            {activeScoreboard ? (
-              <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl break-words leading-[1.2]">
-                {activeScoreboard.goalName}
-              </h2>
-            ) : (
-              <div className="h-8 w-3/4 animate-pulse rounded-content bg-zinc-200" />
-            )}
-          </div>
+      {/* ── Goal Section ── */}
+      <div className="flex flex-col rounded-[24px] bg-white p-6 sm:p-8 space-y-7">
+        <div className="space-y-2">
+          <p className="text-[14px] font-bold text-zinc-500">
+            {t("dowinLabel")}
+          </p>
+          {activeScoreboard ? (
+            <h2 className="text-[26px] font-black tracking-tight text-zinc-900 sm:text-[32px] break-words leading-tight">
+              {activeScoreboard.goalName}
+            </h2>
+          ) : (
+            <div className="h-9 w-3/4 animate-pulse rounded-[12px] bg-zinc-200" />
+          )}
+        </div>
 
-          {/* Lag Measure Section */}
-          <div className="px-6 pt-3 pb-5 sm:px-8 sm:pt-4 sm:pb-6 space-y-2">
-            <div className="flex items-center gap-2">
-              <div className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-zinc-100 text-zinc-500 text-[11px] font-bold tracking-tight uppercase">
-                {t("lagMeasureLabel")}
-              </div>
-            </div>
-            {activeScoreboard ? (
-              <p className="text-sm font-medium text-text-secondary leading-relaxed break-words">
-                {activeScoreboard.lagMeasure}
-              </p>
-            ) : (
-              <div className="h-5 w-1/2 animate-pulse rounded-content bg-zinc-200" />
-            )}
-          </div>
+        <div className="space-y-2">
+          <p className="text-[14px] font-bold text-zinc-500">
+            {t("lagMeasureLabel")}
+          </p>
+          {activeScoreboard ? (
+            <p className="text-[17px] font-bold text-zinc-800 leading-snug break-words">
+              {activeScoreboard.lagMeasure}
+            </p>
+          ) : (
+            <div className="h-6 w-1/2 animate-pulse rounded-[12px] bg-zinc-200" />
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-5">
-        {/* ── Consolidated Achievement Card (Vertical Stack) ── */}
-        <div className="flex flex-row divide-x divide-zinc-50 lg:flex-col lg:divide-x-0 lg:divide-y lg:divide-zinc-50 lg:col-span-1 rounded-[24px] bg-white">
+        <div className="flex flex-row gap-3 lg:flex-col lg:gap-3 lg:col-span-1">
           {/* Weekly Section */}
-          <div className="flex flex-1 flex-col items-start p-4 gap-3">
-            <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+          <div className="flex flex-1 flex-col justify-between p-5 rounded-[24px] bg-white">
+            <p className="text-[13px] font-bold text-zinc-500">
               {t("weeklyAchievementRate")}
             </p>
-            <div className="relative h-20 w-20 self-center">
-              <AchievementDonut rate={weeklyOverallRate} />
-              <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-                <span className={cn("font-mono text-2xl font-bold leading-none", getRateColor(weeklyOverallRate))}>
+            <div className="mt-3 flex flex-col gap-3">
+              <div className="flex items-baseline gap-0.5">
+                <span className={cn("text-[32px] font-black tracking-tighter leading-none", getRateColor(weeklyOverallRate))}>
                   {weeklyOverallRate}
                 </span>
-                <span className="text-[10px] font-bold text-text-muted">%</span>
+                <span className="text-[18px] font-bold text-zinc-400 leading-none">%</span>
+              </div>
+              <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(weeklyOverallRate))}
+                  style={{ width: `${Math.min(weeklyOverallRate, 100)}%` }}
+                />
               </div>
             </div>
           </div>
 
           {/* Monthly Section */}
-          <div className="flex flex-1 flex-col items-start p-4 gap-3">
-            <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+          <div className="flex flex-1 flex-col justify-between p-5 rounded-[24px] bg-white">
+            <p className="text-[13px] font-bold text-zinc-500">
               {t("monthlyAchievementRate")}
             </p>
-            <div className="relative h-20 w-20 self-center">
-              <AchievementDonut rate={monthlyOverallRate} />
-              <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-                <span className={cn("font-mono text-2xl font-bold leading-none", getRateColor(monthlyOverallRate))}>
+            <div className="mt-3 flex flex-col gap-3">
+              <div className="flex items-baseline gap-0.5">
+                <span className={cn("text-[32px] font-black tracking-tighter leading-none", getRateColor(monthlyOverallRate))}>
                   {monthlyOverallRate}
                 </span>
-                <span className="text-[10px] font-bold text-text-muted">%</span>
+                <span className="text-[18px] font-bold text-zinc-400 leading-none">%</span>
+              </div>
+              <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+                <div
+                  className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(monthlyOverallRate))}
+                  style={{ width: `${Math.min(monthlyOverallRate, 100)}%` }}
+                />
               </div>
             </div>
           </div>
@@ -123,48 +121,17 @@ export function ScoreboardOverviewSection({
   );
 }
 
-function AchievementDonut({ rate }: { rate: number }) {
-  const data = [
-    { name: "achieved", value: Math.min(rate, 100) },
-    { name: "remaining", value: Math.max(0, 100 - rate) },
-  ];
-
-  const COLORS = {
-    achieved: getRateColorHex(rate),
-    remaining: "#f4f4f5", // Zinc-100
-  };
-
-  return (
-    <PieChart width={80} height={80}>
-      <Pie
-        data={data}
-        cx="50%"
-        cy="50%"
-        innerRadius={28}
-        outerRadius={32}
-        paddingAngle={0}
-        dataKey="value"
-        startAngle={90}
-        endAngle={-270}
-        stroke="none"
-      >
-        <Cell fill={COLORS.achieved} />
-        <Cell fill={COLORS.remaining} />
-      </Pie>
-    </PieChart>
-  );
-}
-
 function getRateColor(v: number) {
-  if (v >= 80) return "text-green-600";
-  if (v >= 50) return "text-amber-600";
-  return "text-primary";
+  if (v >= 80) return "text-success";
+  if (v >= 50) return "text-primary";
+  return "text-zinc-800";
 }
 
-function getRateColorHex(v: number) {
-  if (v >= 80) return "#16a34a"; // Green-600
-  if (v >= 50) return "#d97706"; // Amber-600
-  return "#3a64c7"; // Primary
+function getRateBgColor(v: number) {
+  if (v >= 80) return "bg-success";
+  if (v >= 50) return "bg-primary";
+  if (v > 0) return "bg-zinc-800";
+  return "bg-transparent";
 }
 
 function DashboardWeeklyTrendSection({
@@ -180,8 +147,8 @@ function DashboardWeeklyTrendSection({
 
   return (
     <div className={cn("flex flex-col p-5 rounded-[24px] bg-white", className)}>
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[15px] font-bold text-zinc-800">
           {t("recentTrend")}
         </p>
       </div>
@@ -210,20 +177,20 @@ function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
 
   return (
     <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} initialDimension={{ width: 10, height: 10 }}>
-      <AreaChart data={data} margin={{ top: 10, right: 5, left: 5, bottom: 0 }}>
+      <AreaChart data={data} margin={{ top: 25, right: 10, left: 10, bottom: 0 }}>
         <defs>
           <linearGradient id="rateGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.15} />
+            <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.2} />
             <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <Tooltip
-          cursor={{ stroke: "rgba(0,0,0,0.05)", strokeWidth: 1 }}
+          cursor={{ stroke: "rgba(0,0,0,0.05)", strokeWidth: 2, strokeDasharray: "4 4" }}
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
             return (
-              <div className="rounded-[12px] bg-zinc-800 px-3 py-1.5 shadow-none">
-                <p className="font-mono text-[11px] font-bold text-white">
+              <div className="rounded-[12px] bg-zinc-800 px-3 py-1.5 shadow-xl">
+                <p className="font-mono text-[12px] font-bold text-white">
                   {payload[0].value}%
                 </p>
               </div>
@@ -234,18 +201,26 @@ function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
           dataKey="name"
           axisLine={false}
           tickLine={false}
-          tick={{ fontSize: 11, fill: "#9ca3af" }}
-          dy={4}
+          tick={{ fontSize: 11, fill: "#9ca3af", fontWeight: 600 }}
+          dy={8}
         />
         <YAxis domain={[0, 100]} hide />
         <Area
           type="monotone"
           dataKey="rate"
           stroke="var(--color-primary)"
-          strokeWidth={2}
+          strokeWidth={3}
           fill="url(#rateGrad)"
-          dot={{ r: 2, fill: "var(--color-primary)", strokeWidth: 0 }}
-          activeDot={{ r: 4, fill: "var(--color-primary)", strokeWidth: 0 }}
+          activeDot={{ r: 6, fill: "var(--color-primary)", stroke: "#fff", strokeWidth: 3 }}
+          dot={(props: { cx?: number; cy?: number; index?: number }) => {
+            const { cx, cy, index } = props;
+            if (index === data.length - 1) {
+              return (
+                <circle key={`dot-${index}`} cx={cx} cy={cy} r={4} fill="var(--color-primary)" stroke="#fff" strokeWidth={2} />
+              );
+            }
+            return <svg key={`dot-${index}`} />;
+          }}
           animationDuration={1000}
         />
       </AreaChart>

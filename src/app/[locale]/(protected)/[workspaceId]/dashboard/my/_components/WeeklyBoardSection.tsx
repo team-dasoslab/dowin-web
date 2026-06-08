@@ -52,7 +52,7 @@ function CountPopoverContent({
       className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
       onClick={(e) => e.stopPropagation()}
     >
-      <button className="absolute top-3 right-3 p-2" onClick={onClose}>
+      <Button className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100" onClick={onClose}>
         <svg
           width="20"
           height="20"
@@ -67,7 +67,7 @@ function CountPopoverContent({
           <path d="M18 6 6 18" />
           <path d="m6 6 12 12" />
         </svg>
-      </button>
+      </Button>
       <h3 className="text-lg font-bold text-center text-text-primary mb-1 pr-6 pl-6">
         {title}
       </h3>

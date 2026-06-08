@@ -28,6 +28,7 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
@@ -214,7 +215,7 @@ export default function MyDashboardPage() {
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-48">
             <section id="overview" className="space-y-4 scroll-mt-28">
-              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("recentTrend")}</h2>
+              <SectionHeader title={t("recentTrend")} />
               <ScoreboardOverviewSection
                 activeScoreboard={activeScoreboard}
                 isWeeklyTrendLoading={isWeeklyTrendLoading}
@@ -232,7 +233,7 @@ export default function MyDashboardPage() {
             ) : null}
 
             <section id="scoreboard" className="space-y-4 scroll-mt-28">
-              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("executionBoard")}</h2>
+              <SectionHeader title={t("executionBoard")} />
               <PeriodControls
                 monthLabel={monthLabel}
                 movePeriod={movePeriod}

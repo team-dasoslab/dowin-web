@@ -376,13 +376,13 @@ export default function LoginPageClient() {
 
             {mode === "login" ? (
               <div className="flex items-center justify-center gap-4 pt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => resetErrorAndSwitchMode("signup")}
-                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
+                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800 min-h-0 p-0"
                 >
                   {t("signup")}
-                </button>
+                </Button>
                 <span className="h-3 w-[1px] bg-zinc-300" />
                 <Link
                   href="/account-recovery"
@@ -393,13 +393,13 @@ export default function LoginPageClient() {
               </div>
             ) : (
               <div className="flex items-center justify-center pt-4">
-                <button
+                <Button
                   type="button"
                   onClick={() => resetErrorAndSwitchMode("login")}
-                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
+                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800 min-h-0 p-0"
                 >
                   {t("login")}
-                </button>
+                </Button>
               </div>
             )}
           </div>

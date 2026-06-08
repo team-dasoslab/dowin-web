@@ -390,11 +390,11 @@ function MemoCard({
         {canResolveMemo || canDeleteMemo ? (
           <div className="flex items-center overflow-hidden rounded-[12px] bg-zinc-100">
             {canResolveMemo ? (
-              <button
+              <Button
                 type="button"
                 onClick={() => void onResolve(memo)}
                 disabled={isResolvePending || isOptimisticMemo}
-                className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 ${
+                className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 rounded-none p-0 min-h-0 ${
                   memo.isResolved
                     ? "bg-primary/10 text-primary"
                     : "text-zinc-400 hover:bg-zinc-200"
@@ -402,18 +402,18 @@ function MemoCard({
                 aria-label={t("verifyMemo")}
               >
                 <DowinIcon name="action-checkmark" size="16px" />
-              </button>
+              </Button>
             ) : null}
             {canDeleteMemo ? (
-              <button
+              <Button
                 type="button"
                 onClick={() => void onDelete(memo.id)}
                 disabled={isDeletePending || isOptimisticMemo}
-                className="inline-flex h-8 w-8 items-center justify-center text-zinc-400 transition-colors disabled:opacity-50 hover:bg-zinc-200"
+                className="inline-flex h-8 w-8 items-center justify-center text-zinc-400 transition-colors disabled:opacity-50 hover:bg-zinc-200 rounded-none p-0 min-h-0"
                 aria-label={t("deleteMemo")}
               >
                 <DowinIcon name="action-delete" size="16px" />
-              </button>
+              </Button>
             ) : null}
           </div>
         ) : null}

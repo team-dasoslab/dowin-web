@@ -2,6 +2,7 @@
 
 import { useEffect, ReactNode } from "react";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -41,11 +42,11 @@ export default function AdminModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <Card
-        className={`bg-white border border-border rounded-content w-full ${maxWidth} max-h-[90vh] overflow-y-auto p-6 animate-dowin-in space-y-6 select-text`}
+      <div
+        className={`bg-white shadow-none border-none rounded-[24px] w-full ${maxWidth} max-h-[90vh] overflow-y-auto p-6 sm:p-8 animate-dowin-in space-y-6 select-text`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -56,9 +57,10 @@ export default function AdminModal({
           ) : (
             <div />
           )}
-          <button
+          <Button
+            type="button"
             onClick={onClose}
-            className="text-text-muted transition-all p-2 rounded-full"
+            className="text-text-muted transition-all p-2 rounded-full bg-transparent hover:bg-zinc-100 min-h-0"
             aria-label="Close"
           >
             <svg
@@ -75,10 +77,10 @@ export default function AdminModal({
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
         {children}
-      </Card>
+      </div>
     </div>
   );
 }

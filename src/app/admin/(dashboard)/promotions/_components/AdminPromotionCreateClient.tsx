@@ -5,9 +5,11 @@ import { usePostAdminMarketingInviteCodes } from "@/api/generated/admin-marketin
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { Card } from "@/components/ui/Card";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { useToast } from "@/context/ToastContext";
+import AdminFormLayout from "@/app/admin/_components/AdminFormLayout";
 import { generatePromotionCode } from "@/lib/utils";
 
 export default function AdminPromotionCreateClient() {
@@ -58,17 +60,12 @@ export default function AdminPromotionCreateClient() {
   };
 
   return (
-    <div className="space-y-8 animate-dowin-in max-w-2xl mx-auto">
-      <div className="space-y-1.5">
-        <h1 className="text-[28px] font-black tracking-tighter text-text-primary leading-tight">
-          새 프로모션 코드 생성
-        </h1>
-        <p className="text-[14px] text-text-secondary font-medium tracking-tight break-keep">
-          워크스페이스 프로모션 코드(Basic) 프로모션 초대코드를 새로 발급합니다.
-        </p>
-      </div>
-
-      <Card className="bg-white border border-border rounded-content overflow-hidden p-6">
+    <AdminFormLayout
+      title="새 프로모션 코드 생성"
+      description="워크스페이스 프로모션 코드(Basic) 프로모션 초대코드를 새로 발급합니다."
+      backHref="/admin/promotions"
+    >
+      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
@@ -80,13 +77,13 @@ export default function AdminPromotionCreateClient() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="예: DOWIN2026BETA"
-                className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                 required
               />
               <Button
                 type="button"
                 onClick={() => setCode(generatePromotionCode())}
-                className="shrink-0 px-4 py-3 bg-sub-background border border-border text-text-primary font-black text-[13px] rounded-button transition-all hover:bg-zinc-100"
+                className="shrink-0 px-4 py-3 bg-primary/10 text-primary font-bold text-[14px] rounded-[16px] transition-colors hover:bg-primary/20"
               >
                 자동 생성
               </Button>
@@ -102,7 +99,7 @@ export default function AdminPromotionCreateClient() {
               value={campaignName}
               onChange={(e) => setCampaignName(e.target.value)}
               placeholder="예: 초기 클로즈드 베타 피드백 모집"
-              className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
               required
             />
           </div>
@@ -111,13 +108,13 @@ export default function AdminPromotionCreateClient() {
             <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
               설명
             </label>
-            <textarea
+            <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="캠페인에 대한 운영자 메모를 남겨주세요."
               rows={3}
-              className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary resize-none placeholder:text-text-muted"
-            ></textarea>
+              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900 resize-none placeholder:text-zinc-400 min-h-[auto]"
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -130,7 +127,7 @@ export default function AdminPromotionCreateClient() {
                 value={maxUses}
                 min={1}
                 onChange={(e) => setMaxUses(e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                 required
               />
             </div>
@@ -145,30 +142,23 @@ export default function AdminPromotionCreateClient() {
                 min={1}
                 max={10}
                 onChange={(e) => setGrantedSeatCount(e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                 required
               />
             </div>
           </div>
 
-          <div className="pt-4 flex items-center gap-3">
+          <div className="pt-4 flex justify-end">
             <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="flex-1 py-3.5 bg-text-primary text-white font-black text-[13px] rounded-button transition-all flex items-center justify-center gap-2"
+              className="px-8 py-3.5 bg-text-primary text-white font-black text-[14px] rounded-button transition-all flex items-center justify-center gap-2"
             >
               {createMutation.isPending ? <InlineSpinner /> : <span>생성하기</span>}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => router.back()}
-              className="px-6 py-3.5 bg-white border border-border text-text-primary font-black text-[13px] rounded-button transition-all hover:bg-sub-background"
-            >
-              취소
             </Button>
           </div>
         </form>
       </Card>
-    </div>
+    </AdminFormLayout>
   );
 }
