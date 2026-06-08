@@ -22,8 +22,8 @@ import { useToast } from "@/context/ToastContext";
 import AdminModal from "@/app/admin/_components/AdminModal";
 
 export default function AdminInquiriesPageClient() {
-  const [status, setStatus] = useState<string>("");
-  const [category, setCategory] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
+  const [filterCategory, setFilterCategory] = useState<string>("ALL");
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   // Edit Modal States
@@ -38,10 +38,7 @@ export default function AdminInquiriesPageClient() {
     data: listData,
     isLoading: isListLoading,
     refetch,
-  } = useGetAdminContactInquiries({
-    status: status ? (status as GetAdminContactInquiriesStatus) : undefined,
-    category: category ? (category as GetAdminContactInquiriesCategory) : undefined,
-  });
+  } = useGetAdminContactInquiries({});
 
   const { data: detailData, isLoading: isDetailLoading } =
     useGetAdminContactInquiriesId(selectedId as number, {
@@ -107,6 +104,12 @@ export default function AdminInquiriesPageClient() {
     ? (listData.data as ContactInquirySummary[])
     : [];
 
+  const filteredInquiries = inquiries.filter((inq) => {
+    if (filterStatus !== "ALL" && inq.status !== filterStatus) return false;
+    if (filterCategory !== "ALL" && inq.category !== filterCategory) return false;
+    return true;
+  });
+
   const detail = detailData?.data as ContactInquiryDetail | undefined;
 
   return (
@@ -120,53 +123,65 @@ export default function AdminInquiriesPageClient() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-          <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 mb-2 block">
-            처리 상태
-          </label>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
-          >
-            <option value="">전체 상태</option>
-            <option value="RECEIVED">접수됨 (Received)</option>
-            <option value="IN_PROGRESS">처리 중 (In Progress)</option>
-            <option value="RESOLVED">해결됨 (Resolved)</option>
-          </select>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-wrap gap-2">
+          {["ALL", "RECEIVED", "IN_PROGRESS", "RESOLVED"].map((s) => (
+            <button
+              key={s}
+              onClick={() => setFilterStatus(s)}
+              className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all shadow-sm ${
+                filterStatus === s
+                  ? "bg-zinc-900 text-white"
+                  : "bg-white text-zinc-600 hover:bg-zinc-50"
+              }`}
+            >
+              {s === "ALL"
+                ? "전체 상태"
+                : s === "RECEIVED"
+                ? "접수됨"
+                : s === "IN_PROGRESS"
+                ? "처리 중"
+                : "해결됨"}
+            </button>
+          ))}
         </div>
-
-        <div>
-          <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 mb-2 block">
-            문의 카테고리
-          </label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
-          >
-            <option value="">전체 카테고리</option>
-            <option value="GENERAL">일반 (General)</option>
-            <option value="BILLING">결제 (Billing)</option>
-            <option value="BUG_OR_ACCOUNT">계정/버그 (Bug or Account)</option>
-          </select>
+        <div className="flex flex-wrap gap-2">
+          {["ALL", "GENERAL", "BILLING", "BUG_OR_ACCOUNT"].map((c) => (
+            <button
+              key={c}
+              onClick={() => setFilterCategory(c)}
+              className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all shadow-sm ${
+                filterCategory === c
+                  ? "bg-zinc-900 text-white"
+                  : "bg-white text-zinc-600 hover:bg-zinc-50"
+              }`}
+            >
+              {c === "ALL"
+                ? "전체 카테고리"
+                : c === "GENERAL"
+                ? "일반"
+                : c === "BILLING"
+                ? "결제"
+                : "계정/버그"}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="w-full">
-        <Card className="bg-white border border-border rounded-content overflow-hidden">
+      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden">
+        <div className="w-full">
+        <div className="overflow-hidden">
           {isListLoading ? (
             <div className="p-12 text-center">
               <InlineSpinner />
             </div>
-          ) : inquiries.length === 0 ? (
+          ) : filteredInquiries.length === 0 ? (
             <div className="p-12 text-center text-[13px] font-bold text-text-muted">
               등록된 문의 내역이 없습니다.
             </div>
           ) : (
-            <div className="divide-y divide-border overflow-x-auto">
-              <table className="min-w-full divide-y divide-border text-left">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left">
                 <thead className="bg-sub-background/40">
                   <tr>
                     <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
@@ -189,12 +204,12 @@ export default function AdminInquiriesPageClient() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
-                  {inquiries.map((inquiry: ContactInquirySummary) => (
+                <tbody className="bg-white">
+                  {filteredInquiries.map((inquiry: ContactInquirySummary) => (
                     <tr
                       key={inquiry.id}
-                      className="cursor-pointer transition-colors"
                       onClick={() => handleOpenEdit(inquiry)}
+                      className="cursor-pointer hover:bg-zinc-50/50 transition-colors"
                     >
                       <td className="px-6 py-4">
                         <span className="text-[15px] font-black text-text-primary block">
@@ -207,7 +222,7 @@ export default function AdminInquiriesPageClient() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-[12px] font-black px-2.5 py-1 border border-border bg-sub-background text-text-primary rounded-full uppercase tracking-wider w-fit">
+                        <span className="text-[12px] font-black px-3 py-1 bg-zinc-100 text-zinc-600 rounded-full uppercase tracking-wider w-fit">
                           {inquiry.category}
                         </span>
                       </td>
@@ -223,7 +238,7 @@ export default function AdminInquiriesPageClient() {
                               ? "bg-success/5 text-success border-success/10"
                               : inquiry.status === "IN_PROGRESS"
                                 ? "bg-warning/5 text-warning border-warning/10"
-                                : "bg-sub-background text-text-secondary border-border"
+                                : "bg-zinc-100 text-zinc-600 border-none"
                           }`}
                         >
                           {inquiry.status}
@@ -235,7 +250,7 @@ export default function AdminInquiriesPageClient() {
                             e.stopPropagation();
                             handleOpenEdit(inquiry);
                           }}
-                          className="px-3 py-1.5 border border-border bg-white text-[13px] font-black text-text-primary rounded-button transition-all"
+                          className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-[13px] font-bold text-primary rounded-[12px] transition-colors"
                         >
                           상세 및 수정
                         </Button>
@@ -246,8 +261,9 @@ export default function AdminInquiriesPageClient() {
               </table>
             </div>
           )}
-        </Card>
+        </div>
       </div>
+      </Card>
 
       <AdminModal
         isOpen={Boolean(selectedId && detailData?.data)}
@@ -261,7 +277,7 @@ export default function AdminInquiriesPageClient() {
           </div>
         ) : (
           <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-4 bg-zinc-50 p-3.5 rounded-content border border-border">
+            <div className="grid grid-cols-2 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none">
               <div>
                 <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
                   사용자 ID
@@ -293,7 +309,7 @@ export default function AdminInquiriesPageClient() {
               <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
                 문의 내용
               </span>
-              <div className="text-sm font-medium text-zinc-800 bg-zinc-50 p-4 rounded-content border border-border leading-relaxed break-words whitespace-pre-wrap">
+              <div className="text-sm font-medium text-zinc-800 bg-zinc-50 p-5 rounded-[24px] border-none leading-relaxed break-words whitespace-pre-wrap">
                 {detail?.message}
               </div>
             </div>
@@ -307,7 +323,7 @@ export default function AdminInquiriesPageClient() {
               </span>
             </div>
 
-            <div className="border-t border-border pt-4 space-y-4 animate-fade-in">
+            <div className="pt-4 space-y-4 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-zinc-600 ml-1">
@@ -316,7 +332,7 @@ export default function AdminInquiriesPageClient() {
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as AdminContactInquiryUpdateRequestStatus)}
-                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                   >
                     <option value="RECEIVED">접수됨 (Received)</option>
                     <option value="IN_PROGRESS">처리 중 (In Progress)</option>
@@ -333,7 +349,7 @@ export default function AdminInquiriesPageClient() {
                     value={changeReason}
                     onChange={(e) => setChangeReason(e.target.value)}
                     placeholder="상태 변경의 이유를 적어주세요..."
-                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                     required
                   />
                 </div>
@@ -348,7 +364,7 @@ export default function AdminInquiriesPageClient() {
                   onChange={(e) => setEditAnswer(e.target.value)}
                   placeholder="문의 처리에 대한 요약을 적어주세요..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary resize-none placeholder:text-text-muted min-h-[auto]"
+                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900 resize-none placeholder:text-zinc-400 min-h-[auto]"
                 />
               </div>
 

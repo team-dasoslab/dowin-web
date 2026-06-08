@@ -42,11 +42,11 @@ export default function AdminModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
-      <Card
-        className={`bg-white border border-border rounded-content w-full ${maxWidth} max-h-[90vh] overflow-y-auto p-6 animate-dowin-in space-y-6 select-text`}
+      <div
+        className={`bg-white shadow-none border-none rounded-[24px] w-full ${maxWidth} max-h-[90vh] overflow-y-auto p-6 sm:p-8 animate-dowin-in space-y-6 select-text`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -80,7 +80,7 @@ export default function AdminModal({
           </Button>
         </div>
         {children}
-      </Card>
+      </div>
     </div>
   );
 }

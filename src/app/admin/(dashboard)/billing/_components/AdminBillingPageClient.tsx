@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-  useGetAdminBillingProviderProducts,
   useGetAdminBillingWorkspaces,
-  usePostAdminBillingProviderProducts,
   useGetAdminBillingWorkspacesWorkspaceId,
   usePostAdminBillingWorkspacesWorkspaceIdManualOverride,
 } from "@/api/generated/admin-billing/admin-billing";
@@ -15,9 +13,6 @@ import { Input } from "@/components/ui/Input";
 import { useToast } from "@/context/ToastContext";
 import AdminModal from "@/app/admin/_components/AdminModal";
 import {
-  AdminBillingProviderProduct,
-  AdminBillingProviderProductUpsertRequestEnvironment,
-  AdminBillingProviderProductUpsertRequestPlanCode,
   AdminBillingManualOverrideRequestPlanCode,
   AdminBillingManualOverrideRequestBillingStatus,
   AdminBillingManualOverrideRequestEntitlementSource,
@@ -51,6 +46,10 @@ export default function AdminBillingPageClient() {
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<number | null>(null);
 
+  // Frontend Filters
+  const [filterPlan, setFilterPlan] = useState<string>("ALL");
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
+
   // Manual Override Form States
   const [editPlanCode, setEditPlanCode] = useState<AdminBillingManualOverrideRequestPlanCode>("FREE");
   const [editBillingStatus, setEditBillingStatus] = useState<AdminBillingManualOverrideRequestBillingStatus>("NONE");
@@ -61,22 +60,8 @@ export default function AdminBillingPageClient() {
   const [editCustomerKey, setEditCustomerKey] = useState<string>("");
   const [editSubscriptionKey, setEditSubscriptionKey] = useState<string>("");
   const [changeReason, setChangeReason] = useState<string>("워크스페이스 결제 정보 보정");
-  const [productEnvironment, setProductEnvironment] =
-    useState<AdminBillingProviderProductUpsertRequestEnvironment>("production");
-  const [productPlanCode, setProductPlanCode] =
-    useState<AdminBillingProviderProductUpsertRequestPlanCode>("BASIC");
-  const [providerProductId, setProviderProductId] = useState<string>("");
-  const [productIsActive, setProductIsActive] = useState<boolean>(true);
-  const [productChangeReason, setProductChangeReason] =
-    useState<string>("Polar product ID 등록");
 
   const { showToast } = useToast();
-
-  const {
-    data: productData,
-    isLoading: isProductLoading,
-    refetch: refetchProducts,
-  } = useGetAdminBillingProviderProducts();
 
   const { data: listData, isLoading: isListLoading, refetch } = useGetAdminBillingWorkspaces({
     workspaceId: workspaceId ? Number(workspaceId) : undefined,
@@ -92,7 +77,6 @@ export default function AdminBillingPageClient() {
     }
   );
 
-  const productMutation = usePostAdminBillingProviderProducts();
   const overrideMutation = usePostAdminBillingWorkspacesWorkspaceIdManualOverride();
 
   useEffect(() => {
@@ -132,21 +116,13 @@ export default function AdminBillingPageClient() {
     setChangeReason("워크스페이스 결제 정보 보정");
   };
 
-  const handleUseProduct = (product: AdminBillingProviderProduct) => {
-    setProductEnvironment(product.environment);
-    setProductPlanCode(product.planCode);
-    setProviderProductId(product.providerProductId);
-    setProductIsActive(product.isActive);
-    setProductChangeReason("Polar product ID 수정");
-  };
-
   useEffect(() => {
     const nextStatusOptions =
       editPlanCode === "BASIC" || editPlanCode === "STANDARD"
         ? STANDARD_BILLING_STATUSES
         : FREE_BILLING_STATUSES;
 
-    if (!nextStatusOptions.includes(editBillingStatus)) {
+    if (!nextStatusOptions.includes(editBillingStatus as AdminBillingManualOverrideRequestBillingStatus)) {
       setEditBillingStatus(nextStatusOptions[0] ?? "NONE");
     }
 
@@ -165,44 +141,6 @@ export default function AdminBillingPageClient() {
     }
   }, [editPlanCode, editBillingStatus, editEntitlementSource]);
 
-  const handleSaveProduct = async () => {
-    if (!providerProductId.trim()) {
-      showToast("error", "Provider product ID를 입력해주세요.");
-      return;
-    }
-
-    if (!productChangeReason.trim()) {
-      showToast("error", "변경 사유를 입력해주세요.");
-      return;
-    }
-
-    try {
-      const response = await productMutation.mutateAsync({
-        data: {
-          provider: "POLAR",
-          environment: productEnvironment,
-          planCode: productPlanCode,
-          providerProductId: providerProductId.trim(),
-          isActive: productIsActive,
-          changeReason: productChangeReason.trim(),
-        },
-      });
-
-      if (response.status === 200) {
-        showToast("success", "Product 매핑이 저장되었습니다.");
-        refetchProducts();
-      } else {
-        showToast("error", "Product 매핑 저장에 실패했습니다.");
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      showToast(
-        "error",
-        error?.response?.data?.message || error?.message || "Product 매핑 저장에 실패했습니다.",
-      );
-    }
-  };
-
   const handleSaveOverride = async () => {
     if (!selectedWorkspaceId) return;
     if (!changeReason) {
@@ -215,7 +153,7 @@ export default function AdminBillingPageClient() {
         workspaceId: selectedWorkspaceId,
         data: {
           planCode: editPlanCode,
-          billingStatus: editBillingStatus,
+          billingStatus: editBillingStatus as AdminBillingManualOverrideRequestBillingStatus,
           entitlementSource: editEntitlementSource || null,
           currentPeriodEnd: editPeriodEnd ? new Date(editPeriodEnd).toISOString() : null,
           cancelAtPeriodEnd: editCancelAtEnd,
@@ -245,9 +183,12 @@ export default function AdminBillingPageClient() {
   const workspaces: AdminBillingWorkspaceSummary[] = Array.isArray(listData?.data)
     ? (listData.data as AdminBillingWorkspaceSummary[])
     : [];
-  const products: AdminBillingProviderProduct[] = Array.isArray(productData?.data)
-    ? (productData.data as AdminBillingProviderProduct[])
-    : [];
+
+  const filteredWorkspaces = workspaces.filter((ws) => {
+    if (filterPlan !== "ALL" && ws.planCode !== filterPlan) return false;
+    if (filterStatus !== "ALL" && ws.billingStatus !== filterStatus) return false;
+    return true;
+  });
 
   const detail = detailData?.data as AdminBillingWorkspaceSummary | undefined;
   const availableStatuses =
@@ -270,151 +211,7 @@ export default function AdminBillingPageClient() {
         </p>
       </div>
 
-      <Card className="bg-white border border-border rounded-content p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="space-y-1">
-            <h2 className="text-[18px] font-black tracking-tight text-text-primary">
-              Polar product 매핑
-            </h2>
-            <p className="text-[13px] font-bold leading-relaxed text-text-secondary">
-              가입 checkout과 플랜 checkout에서 사용할 Polar product ID를 환경별로 관리합니다.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[140px_120px_minmax(260px,1fr)_120px] gap-3 lg:min-w-[720px]">
-            <select
-              value={productEnvironment}
-              onChange={(e) =>
-                setProductEnvironment(
-                  e.target.value as AdminBillingProviderProductUpsertRequestEnvironment,
-                )
-              }
-              className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
-            >
-              <option value="production">production</option>
-              <option value="sandbox">sandbox</option>
-            </select>
-            <select
-              value={productPlanCode}
-              onChange={(e) =>
-                setProductPlanCode(
-                  e.target.value as AdminBillingProviderProductUpsertRequestPlanCode,
-                )
-              }
-              className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
-            >
-              <option value="BASIC">BASIC</option>
-              <option value="STANDARD">STANDARD</option>
-            </select>
-            <Input
-              type="text"
-              value={providerProductId}
-              onChange={(e) => setProviderProductId(e.target.value)}
-              placeholder="Polar product ID"
-              className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
-            />
-            <Button
-              type="button"
-              onClick={handleSaveProduct}
-              disabled={productMutation.isPending}
-              className="w-full py-3 bg-text-primary text-white font-black text-[13px] rounded-button transition-all flex items-center justify-center gap-2"
-            >
-              {productMutation.isPending ? <InlineSpinner /> : <span>저장</span>}
-            </Button>
-          </div>
-        </div>
 
-        <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_180px]">
-          <Input
-            type="text"
-            value={productChangeReason}
-            onChange={(e) => setProductChangeReason(e.target.value)}
-            placeholder="변경 사유"
-            className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
-          />
-          <label className="flex items-center gap-2 px-4 py-3 border border-border rounded-button bg-white">
-            <input
-              type="checkbox"
-              checked={productIsActive}
-              onChange={(e) => setProductIsActive(e.target.checked)}
-              className="rounded border-border text-primary focus:ring-primary h-4 w-4"
-            />
-            <span className="text-[13px] font-black text-text-primary">
-              active
-            </span>
-          </label>
-        </div>
-
-        <div className="mt-4 overflow-x-auto border border-border rounded-content">
-          {isProductLoading ? (
-            <div className="p-8 text-center">
-              <InlineSpinner />
-            </div>
-          ) : products.length === 0 ? (
-            <div className="p-8 text-center text-[13px] font-bold text-text-muted">
-              등록된 product 매핑이 없습니다.
-            </div>
-          ) : (
-            <table className="min-w-full text-left">
-              <thead className="bg-sub-background/40">
-                <tr>
-                  <th className="px-4 py-3 text-[12px] font-black text-text-muted uppercase">
-                    Env
-                  </th>
-                  <th className="px-4 py-3 text-[12px] font-black text-text-muted uppercase">
-                    Plan
-                  </th>
-                  <th className="px-4 py-3 text-[12px] font-black text-text-muted uppercase">
-                    Product ID
-                  </th>
-                  <th className="px-4 py-3 text-[12px] font-black text-text-muted uppercase">
-                    Active
-                  </th>
-                  <th className="px-4 py-3 text-[12px] font-black text-text-muted uppercase text-right">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td className="px-4 py-3 text-[13px] font-bold text-text-primary">
-                      {product.environment}
-                    </td>
-                    <td className="px-4 py-3 text-[13px] font-bold text-text-primary">
-                      {product.planCode}
-                    </td>
-                    <td className="px-4 py-3 text-[13px] font-bold text-text-primary">
-                      <code className="break-all text-[12px]">
-                        {product.providerProductId}
-                      </code>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`text-[12px] font-black px-2.5 py-1 rounded-full border ${
-                          product.isActive
-                            ? "bg-success/5 text-success border-success/10"
-                            : "bg-sub-background text-text-secondary border-border"
-                        }`}
-                      >
-                        {product.isActive ? "ACTIVE" : "INACTIVE"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Button
-                        type="button"
-                        onClick={() => handleUseProduct(product)}
-                        className="px-3 py-1.5 border border-border bg-white text-[13px] font-black text-text-primary rounded-button transition-all"
-                      >
-                        불러오기
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -426,7 +223,7 @@ export default function AdminBillingPageClient() {
             value={workspaceId}
             onChange={(e) => setWorkspaceId(e.target.value)}
             placeholder="ID로 검색하세요..."
-            className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+            className="w-full px-4 py-3 bg-white shadow-sm border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
           />
         </div>
         <div>
@@ -438,24 +235,57 @@ export default function AdminBillingPageClient() {
             value={workspaceName}
             onChange={(e) => setWorkspaceName(e.target.value)}
             placeholder="이름으로 검색하세요..."
-            className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+            className="w-full px-4 py-3 bg-white shadow-sm border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
           />
         </div>
       </div>
 
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-wrap gap-2">
+          {["ALL", "FREE", "BASIC", "STANDARD"].map((plan) => (
+            <button
+              key={plan}
+              onClick={() => setFilterPlan(plan)}
+              className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all shadow-sm ${
+                filterPlan === plan
+                  ? "bg-zinc-900 text-white"
+                  : "bg-white text-zinc-600 hover:bg-zinc-50"
+              }`}
+            >
+              {plan === "ALL" ? "전체 플랜" : plan}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {["ALL", "NONE", "ACTIVE", "CANCELED", "EXPIRED", "REVOKED"].map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all shadow-sm ${
+                filterStatus === status
+                  ? "bg-zinc-900 text-white"
+                  : "bg-white text-zinc-600 hover:bg-zinc-50"
+              }`}
+            >
+              {status === "ALL" ? "전체 상태" : status}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="w-full">
-        <Card className="bg-white border border-border rounded-content overflow-hidden">
+        <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden">
           {isListLoading ? (
             <div className="p-12 text-center">
               <InlineSpinner />
             </div>
-          ) : workspaces.length === 0 ? (
+          ) : filteredWorkspaces.length === 0 ? (
             <div className="p-12 text-center text-[13px] font-bold text-text-muted">
               워크스페이스 결제 정보가 없습니다.
             </div>
           ) : (
-            <div className="divide-y divide-border overflow-x-auto">
-              <table className="min-w-full divide-y divide-border text-left">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left">
                 <thead className="bg-sub-background/40">
                   <tr>
                     <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
@@ -478,7 +308,7 @@ export default function AdminBillingPageClient() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="bg-white">
                   {workspaces.map((ws: AdminBillingWorkspaceSummary) => (
                     <tr
                       key={ws.workspaceId}
@@ -494,7 +324,7 @@ export default function AdminBillingPageClient() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-[12px] font-black px-2.5 py-1 border border-border bg-sub-background text-text-primary rounded-full uppercase tracking-wider block w-fit">
+                        <span className="text-[12px] font-black px-3 py-1 bg-zinc-100 text-zinc-600 rounded-full uppercase tracking-wider block w-fit">
                           {ws.planCode}
                         </span>
                       </td>
@@ -510,7 +340,7 @@ export default function AdminBillingPageClient() {
                               ? "bg-success/5 text-success border-success/10"
                               : ws.billingStatus === "CANCELED"
                                 ? "bg-warning/5 text-warning border-warning/10"
-                                : "bg-sub-background text-text-secondary border-border"
+                                : "bg-zinc-100 text-zinc-600 border-none"
                           }`}
                         >
                           {ws.billingStatus}
@@ -527,7 +357,7 @@ export default function AdminBillingPageClient() {
                             e.stopPropagation();
                             handleOpenOverride(ws);
                           }}
-                          className="px-3 py-1.5 border border-border bg-white text-[13px] font-black text-text-primary rounded-button transition-all"
+                          className="px-4 py-2 bg-primary/10 hover:bg-primary/20 text-[13px] font-bold text-primary rounded-[12px] transition-colors"
                         >
                           상세 및 수정
                         </Button>
@@ -553,7 +383,7 @@ export default function AdminBillingPageClient() {
           </div>
         ) : (
           <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-4 bg-zinc-50 p-4 rounded-content border border-border">
+            <div className="grid grid-cols-2 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none">
               <div>
                 <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
                   워크스페이스 명
@@ -572,7 +402,7 @@ export default function AdminBillingPageClient() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-zinc-50 p-4 rounded-content border border-border">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none">
               <div>
                 <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
                   제공업체 (PG)
@@ -619,7 +449,7 @@ export default function AdminBillingPageClient() {
               </div>
             </div>
 
-            <div className="border-t border-border pt-4 mt-2 space-y-4 animate-fade-in">
+            <div className="pt-4 mt-2 space-y-4 animate-fade-in">
               <h4 className="text-xs font-bold tracking-tight text-zinc-700 uppercase">
                 결제 정보 수동 보정
               </h4>
@@ -636,7 +466,7 @@ export default function AdminBillingPageClient() {
                         e.target.value as AdminBillingManualOverrideRequestPlanCode
                       )
                     }
-                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                   >
                     <option value="FREE">FREE</option>
                     <option value="BASIC">BASIC</option>
@@ -655,7 +485,7 @@ export default function AdminBillingPageClient() {
                         e.target.value as AdminBillingManualOverrideRequestBillingStatus
                       )
                     }
-                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                   >
                     {availableStatuses.map((status) => (
                       <option key={status} value={status}>
@@ -675,7 +505,7 @@ export default function AdminBillingPageClient() {
                         e.target.value as EditableEntitlementSource
                       )
                     }
-                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                   >
                     {availableEntitlementSources.map((source) => (
                       <option key={source || "none"} value={source}>
@@ -700,7 +530,7 @@ export default function AdminBillingPageClient() {
                     type="date"
                     value={editPeriodEnd}
                     onChange={(e) => setEditPeriodEnd(e.target.value)}
-                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                   />
                 </div>
 
@@ -715,7 +545,7 @@ export default function AdminBillingPageClient() {
                     onChange={(e) => setEditSeatCount(e.target.value)}
                     disabled={editPlanCode === "FREE"}
                     placeholder="지정 안 함 (자동 설정)"
-                    className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary disabled:bg-zinc-100 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900 disabled:bg-zinc-200 disabled:text-zinc-500 disabled:cursor-not-allowed"
                   />
                   <p className="px-1 text-[11px] font-medium leading-relaxed text-zinc-500 mt-1">
                     빈 값이면 기존 값 유지 또는 현재 멤버 수 기준으로 자동 설정
@@ -729,7 +559,7 @@ export default function AdminBillingPageClient() {
                   checked={editCancelAtEnd}
                   onChange={(e) => setEditCancelAtEnd(e.target.checked)}
                   disabled={editPlanCode === "FREE"}
-                  className="rounded border-border text-primary focus:ring-primary h-4 w-4"
+                  className="rounded border-none bg-white text-primary focus:ring-primary h-4 w-4"
                   id="cancel-at-end-root"
                 />
                 <label
@@ -754,7 +584,7 @@ export default function AdminBillingPageClient() {
                     value={editCustomerKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border border-border rounded-button text-sm outline-none transition-all font-bold text-text-primary cursor-not-allowed select-all"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-zinc-500 cursor-not-allowed select-all"
                   />
                 </div>
 
@@ -767,7 +597,7 @@ export default function AdminBillingPageClient() {
                     value={editSubscriptionKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border border-border rounded-button text-sm outline-none transition-all font-bold text-text-primary cursor-not-allowed select-all"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-zinc-500 cursor-not-allowed select-all"
                   />
                 </div>
               </div>
@@ -781,7 +611,7 @@ export default function AdminBillingPageClient() {
                   value={changeReason}
                   onChange={(e) => setChangeReason(e.target.value)}
                   placeholder="수동 보정 사유를 적어주세요..."
-                  className="w-full px-4 py-3 bg-white border border-border rounded-button text-sm focus:border-primary outline-none transition-all font-bold text-text-primary"
+                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
                   required
                 />
               </div>

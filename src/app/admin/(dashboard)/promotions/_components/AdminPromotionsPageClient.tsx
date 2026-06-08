@@ -27,6 +27,7 @@ export default function AdminPromotionsPageClient() {
   const { showToast } = useToast();
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>("ALL");
 
   // List Data
   const { data: listData, isLoading: isListLoading, refetch: refetchList } = useGetAdminMarketingInviteCodes();
@@ -135,6 +136,11 @@ export default function AdminPromotionsPageClient() {
     ? (listData.data as MarketingInviteCodeSummary[])
     : [];
 
+  const filteredCodes = codes.filter((c) => {
+    if (filterStatus !== "ALL" && c.status !== filterStatus) return false;
+    return true;
+  });
+
   return (
     <div className="space-y-8 animate-dowin-in">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -154,19 +160,35 @@ export default function AdminPromotionsPageClient() {
         </Link>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {["ALL", "ACTIVE", "INACTIVE", "EXPIRED"].map((s) => (
+          <button
+            key={s}
+            onClick={() => setFilterStatus(s)}
+            className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all shadow-sm ${
+              filterStatus === s
+                ? "bg-zinc-900 text-white"
+                : "bg-white text-zinc-600 hover:bg-zinc-50"
+            }`}
+          >
+            {s === "ALL" ? "전체 상태" : s}
+          </button>
+        ))}
+      </div>
+
       <div className="w-full">
-        <Card className="bg-white border border-border rounded-content overflow-hidden">
+        <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden">
           {isListLoading ? (
             <div className="p-12 text-center">
               <InlineSpinner />
             </div>
-          ) : codes.length === 0 ? (
+          ) : filteredCodes.length === 0 ? (
             <div className="p-12 text-center text-[13px] font-bold text-text-muted">
               생성된 프로모션 코드가 없습니다.
             </div>
           ) : (
-            <div className="divide-y divide-border overflow-x-auto">
-              <table className="min-w-full divide-y divide-border text-left">
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left">
                 <thead className="bg-sub-background/40">
                   <tr>
                     <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
@@ -189,12 +211,12 @@ export default function AdminPromotionsPageClient() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
-                  {codes.map((code) => (
+                <tbody className="bg-white">
+                  {filteredCodes.map((code) => (
                     <tr
                       key={code.id}
-                      className="cursor-pointer transition-colors"
                       onClick={() => setSelectedId(code.id)}
+                      className="cursor-pointer hover:bg-zinc-50/50 transition-colors"
                     >
                       <td className="px-6 py-4">
                         <span className="text-[15px] font-black text-text-primary block">
@@ -211,15 +233,14 @@ export default function AdminPromotionsPageClient() {
                           <span className="text-[14px] font-bold text-text-primary block">
                             {code.code}
                           </span>
-                          <Button
-                            type="button"
+                          <button
                             onClick={(e) => handleCopyCode(e, code.code)}
-                            className="flex items-center gap-1 px-2.5 py-1.5 text-text-muted hover:text-text-primary transition-colors bg-white rounded-button border border-border hover:bg-zinc-50 shadow-sm"
+                            className="flex items-center gap-1 px-3 py-2 text-zinc-500 hover:text-zinc-900 transition-colors bg-zinc-50 rounded-[12px] border-none hover:bg-zinc-100 shadow-none"
                             title="코드 복사"
                           >
                             <Copy size={14} strokeWidth={2.5} />
                             <span className="text-[12px] font-bold">복사</span>
-                          </Button>
+                          </button>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -235,7 +256,7 @@ export default function AdminPromotionsPageClient() {
                             aria-checked={code.status === "ACTIVE"}
                             disabled={patchCodeMutation.isPending}
                             onClick={(e) => handleUpdateListStatus(e, code.id, code.status as MarketingInviteCodeStatus)}
-                            className={`relative inline-flex h-[20px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                            className={`relative inline-flex h-[20px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full border-none transition-colors duration-200 ease-in-out focus:outline-none ${
                               code.status === "ACTIVE" ? "bg-primary" : "bg-zinc-200"
                             } ${patchCodeMutation.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
@@ -250,7 +271,7 @@ export default function AdminPromotionsPageClient() {
                             className={`text-[12px] font-black px-2 py-0.5 rounded-full border ${
                               code.status === "ACTIVE"
                                 ? "bg-success/5 text-success border-success/10"
-                                : "bg-sub-background text-text-secondary border-border"
+                                : "bg-zinc-100 text-zinc-600 border-none"
                             }`}
                           >
                             {code.status}
@@ -287,7 +308,7 @@ export default function AdminPromotionsPageClient() {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="space-y-6 bg-zinc-50 p-5 rounded-content border border-border">
+            <div className="space-y-6 bg-zinc-50 p-6 rounded-[24px]">
               <div className="space-y-4">
                 <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest">
                   기본 정보
@@ -349,7 +370,7 @@ export default function AdminPromotionsPageClient() {
                 </div>
               </div>
 
-              <div className="pt-5 border-t border-border/70 flex items-center justify-between">
+              <div className="pt-2 flex items-center justify-between">
                 <div className="space-y-1">
                   <label className="text-[13px] font-black text-text-primary block">
                     프로모션 활성화
@@ -367,7 +388,7 @@ export default function AdminPromotionsPageClient() {
                     const newStatus = editStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
                     handleUpdateStatus(newStatus);
                   }}
-                  className={`relative inline-flex h-[26px] w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  className={`relative inline-flex h-[26px] w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-full border-none transition-colors duration-200 ease-in-out focus:outline-none ${
                     editStatus === "ACTIVE" ? "bg-primary" : "bg-zinc-200"
                   } ${patchCodeMutation.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
@@ -385,12 +406,12 @@ export default function AdminPromotionsPageClient() {
               <h3 className="text-sm font-black text-text-primary">Redemptions (사용 내역)</h3>
               
               {(!detailData.redemptions || detailData.redemptions.length === 0) ? (
-                <div className="py-6 text-center text-[12px] font-bold text-text-muted border border-dashed border-border rounded-content">
+                <div className="py-6 text-center text-[12px] font-bold text-text-muted border border-dashed border-zinc-200 rounded-[24px]">
                   아직 사용 내역이 없습니다.
                 </div>
               ) : (
-                <div className="divide-y divide-border overflow-x-auto border border-border rounded-content">
-                  <table className="min-w-full divide-y divide-border text-left">
+                <div className="overflow-x-auto border-none rounded-[24px] bg-white">
+                  <table className="min-w-full text-left">
                     <thead className="bg-zinc-50">
                       <tr>
                         <th className="px-4 py-3 text-[11px] font-black tracking-wider text-text-muted uppercase">
@@ -410,34 +431,36 @@ export default function AdminPromotionsPageClient() {
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-border bg-white">
-                      {detailData.redemptions.map((redemption: MarketingInviteRedemption) => (
-                        <tr key={redemption.id}>
+                    <tbody className="bg-white">
+                      {detailData.redemptions.map((r: MarketingInviteRedemption) => (
+                        <tr key={r.id}>
                           <td className="px-4 py-3 text-xs font-black text-text-primary">
-                            #{redemption.id}
+                            #{r.id}
                           </td>
                           <td className="px-4 py-3 text-xs font-bold text-text-primary">
-                            {redemption.workspaceId}
+                            {r.workspaceId}
                           </td>
                           <td className="px-4 py-3 text-xs font-medium text-text-secondary">
-                            {new Date(redemption.redeemedAt).toLocaleString()}
+                            {new Date(r.redeemedAt).toLocaleString()}
                           </td>
                           <td className="px-4 py-3">
                             <span
                               className={`text-[10px] font-black px-2 py-1 rounded-full border ${
-                                redemption.feedbackStatus === "RECEIVED"
+                                r.feedbackStatus === "RECEIVED"
                                   ? "bg-success/5 text-success border-success/10"
-                                  : "bg-sub-background text-text-secondary border-border"
+                                  : "bg-zinc-100 text-zinc-600 border-none"
                               }`}
                             >
-                              {redemption.feedbackStatus}
+                              {r.feedbackStatus}
                             </span>
                           </td>
                           <td className="px-4 py-3 space-y-2 min-w-[200px]">
                             <select
-                              onChange={(e) => handleUpdateFeedback(redemption.id, e.target.value as MarketingInviteFeedbackStatus)}
-                              value={redemption.feedbackStatus}
-                              className="w-full px-2 py-1.5 bg-zinc-50 border border-border rounded-button text-[11px] focus:border-primary outline-none font-bold text-text-primary"
+                              value={r.feedbackStatus || "PENDING"}
+                              onChange={(e) =>
+                                handleUpdateFeedback(r.id, e.target.value as MarketingInviteFeedbackStatus)
+                              }
+                              className="w-full px-3 py-2 bg-zinc-100 border-none rounded-[12px] text-[12px] focus:ring-2 focus:ring-primary/20 outline-none font-bold text-zinc-900"
                               disabled={patchFeedbackMutation.isPending}
                             >
                               <option value="NOT_REQUESTED">미요청</option>
@@ -445,14 +468,16 @@ export default function AdminPromotionsPageClient() {
                               <option value="RECEIVED">수신완료</option>
                               <option value="DROPPED">드롭됨</option>
                             </select>
-                            <Input
+                            <input
                               type="text"
-                              placeholder="메모 후 블러 시 자동 저장"
-                              className="w-full px-2 py-1.5 bg-white border border-border rounded-button text-[11px] focus:border-primary outline-none font-medium text-text-primary"
+                              value={operatorNote}
+                              onChange={(e) => setOperatorNote(e.target.value)}
+                              placeholder="노트 작성..."
+                              className="w-full px-3 py-2 bg-zinc-100 border-none rounded-[12px] text-[12px] focus:ring-2 focus:ring-primary/20 outline-none font-medium text-zinc-900"
                               onBlur={(e) => {
                                 if (e.target.value) {
                                   setOperatorNote(e.target.value);
-                                  handleUpdateFeedback(redemption.id, redemption.feedbackStatus);
+                                  handleUpdateFeedback(r.id, r.feedbackStatus);
                                   e.target.value = "";
                                 }
                               }}
