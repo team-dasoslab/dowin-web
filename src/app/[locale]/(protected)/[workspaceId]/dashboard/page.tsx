@@ -11,6 +11,7 @@ import { MemberCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_
 import { WeeklyTable } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/WeeklyTable";
 import { useTeamDashboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamDashboard";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
@@ -162,7 +163,7 @@ export default function DashboardPage() {
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
             <section id="summary" className="space-y-5 scroll-mt-28">
-              <h2 className="px-1 text-[22px] font-bold tracking-tight text-zinc-900">{t("memberSummary")}</h2>
+              <SectionHeader title={t("memberSummary")} />
               <TeamPeriodControls
                 isPeriodLoading={isPeriodLoading}
                 isPreviousDisabled={isPreviousDisabled}
@@ -205,7 +206,7 @@ export default function DashboardPage() {
               className="space-y-6 overflow-visible scroll-mt-28"
             >
               <div className="px-1">
-                <h2 className="text-[22px] font-bold tracking-tight text-zinc-900">{t("teamWeeklyScoreboard")}</h2>
+                <SectionHeader title={t("teamWeeklyScoreboard")} />
               </div>
 
 

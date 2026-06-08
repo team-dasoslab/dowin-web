@@ -336,12 +336,12 @@ function ChartLegendTooltip({
 }) {
   return (
     <div className="relative">
-      <button
+      <Button
         type="button"
         onClick={onToggle}
         onMouseEnter={onToggle}
         onMouseLeave={onClose}
-        className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted transition-colors"
+        className="flex items-center gap-1.5 text-[11px] font-bold text-text-muted transition-colors p-0 min-h-0 bg-transparent hover:bg-transparent"
       >
         <span
           className="inline-block h-2 w-2 rounded-full"
@@ -349,7 +349,7 @@ function ChartLegendTooltip({
         />
         {label}
         <DowinIcon name="status-info" size={10} className="text-zinc-300 ml-0.5" />
-      </button>
+      </Button>
       {active && (
         <>
           <div className="fixed inset-0 z-10 sm:hidden" onClick={onClose} />
@@ -675,15 +675,15 @@ function WinRateOverview({
                     {t("winOverview.activeWinRate")}
                   </p>
                   <div className="relative">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setShowInfo(!showInfo)}
                       onMouseEnter={() => setShowInfo(true)}
                       onMouseLeave={() => setShowInfo(false)}
-                      className="text-zinc-400 transition-colors outline-none"
+                      className="text-zinc-400 transition-colors outline-none p-0 min-h-0 bg-transparent hover:bg-transparent"
                     >
                       <DowinIcon name="status-info" size={12} />
-                    </button>
+                    </Button>
                     {showInfo && (
                       <div className="absolute top-full right-0 mt-2 w-64 rounded-content border border-zinc-200 bg-white p-4 shadow-xl z-[60] animate-dowin-in">
                         <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-primary">
@@ -771,13 +771,13 @@ function StatusBoardCard({
                 </span>
               ))}
               {hasMore && !expanded && (
-                <button
+                <Button
                   type="button"
                   onClick={() => setExpanded(true)}
-                  className="rounded bg-zinc-50 px-1.5 py-0.5 text-[11px] font-bold text-text-muted"
+                  className="rounded bg-zinc-50 px-1.5 py-0.5 text-[11px] font-bold text-text-muted p-0 min-h-0 hover:bg-zinc-100"
                 >
                   +{names.length - COLLAPSED_MAX}
-                </button>
+                </Button>
               )}
             </div>
           ) : (
@@ -786,13 +786,13 @@ function StatusBoardCard({
             </p>
           )}
           {expanded && hasMore && (
-            <button
+            <Button
               type="button"
               onClick={() => setExpanded(false)}
-              className="mt-2 text-[11px] font-bold text-primary"
+              className="mt-2 text-[11px] font-bold text-primary p-0 min-h-0 bg-transparent hover:bg-transparent"
             >
               {t("common.collapse")}
-            </button>
+            </Button>
           )}
         </div>
       </div>

@@ -19,6 +19,7 @@ import {
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Switch } from "@/components/ui/Switch";
 
 type NotificationSettingControlProps = {
   disabled?: boolean;
@@ -208,23 +209,14 @@ export function NotificationSettingControl({
       className="flex flex-wrap items-center justify-end gap-2"
       data-coachmark="profile-personal-reminder"
     >
-      <button
-        type="button"
+      <Switch
         disabled={isToggleDisabled}
-        onClick={() => {
-          void (isRegistered ? handleDisable() : handleEnable());
+        checked={isRegistered}
+        onCheckedChange={(checked) => {
+          void (checked ? handleEnable() : handleDisable());
         }}
-        className={`relative inline-flex h-[22px] w-[42px] flex-shrink-0 items-center rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${
-          isRegistered ? "bg-primary" : "bg-border"
-        }`}
         aria-label={isRegistered ? t("toggleOff") : t("toggleOn")}
-      >
-        <span
-          className={`pointer-events-none inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow-sm ring-0 transition duration-300 ${
-            isRegistered ? "translate-x-[20px]" : "translate-x-0"
-          }`}
-        />
-      </button>
+      />
       {!isNativeApp ? (
         <span className="text-[11px] font-medium text-zinc-500">
           {t("appOnly")}
