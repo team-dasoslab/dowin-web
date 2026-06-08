@@ -27,7 +27,10 @@ export function ScoreboardImageCard({
   const today = new Date().toISOString().split("T")[0];
 
   return (
-    <div className="w-[1080px] bg-zinc-100 p-12 text-zinc-950">
+    <div 
+      className="w-[1080px] min-w-[1080px] bg-zinc-100 p-12 text-zinc-950"
+      style={{ width: "1080px" }}
+    >
       <div className="rounded-[24px] bg-white p-10 shadow-sm">
         {/* Header */}
         <div className="flex items-center justify-between pb-2">

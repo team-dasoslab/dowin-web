@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.2](https://github.com/team-dasoslab/dowin-web/compare/v1.2.1...v1.2.2) (2026-06-08)
+
+
+### Bug Fixes
+
+* 이미지 레이아웃 조정 및 문구 제거 ([cd4ba95](https://github.com/team-dasoslab/dowin-web/commit/cd4ba95fd30e0a5639b1f059684cdf9cd285bbe5))
+
+## [1.2.1](https://github.com/team-dasoslab/dowin-web/compare/v1.2.0...v1.2.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* setup-node corepack error ([22d4eb0](https://github.com/team-dasoslab/dowin-web/commit/22d4eb0d80b7c6487abc1f4390909ba37d063076))
+
 ## [1.2.0](https://github.com/team-dasoslab/dowin-web/compare/v1.1.2...v1.2.0) (2026-06-08)
 
 
