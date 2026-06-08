@@ -2,7 +2,6 @@
 
 import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/dowin.schemas";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { InfoTooltip } from "@/components/ui/InfoTooltip";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -15,13 +14,11 @@ type LeadMeasureGuideTooltipProps = {
 
 const guideStyles = {
   [WeeklyLogGuideKind.change]: {
-    icon: "nav-compass",
     popupIconClassName: "text-rose-500",
     buttonClassName: "text-rose-400 hover:text-rose-600 hover:bg-rose-50",
     activeClassName: "text-rose-600 bg-rose-100",
   },
   [WeeklyLogGuideKind.adjust]: {
-    icon: "nav-settings",
     popupIconClassName: "text-amber-500",
     buttonClassName: "text-amber-400 hover:text-amber-600 hover:bg-amber-50",
     activeClassName: "text-amber-600 bg-amber-100",
@@ -35,7 +32,6 @@ export function LeadMeasureGuideTooltip({
   onToggle,
 }: LeadMeasureGuideTooltipProps) {
   const style = guideStyles[guide.kind];
-  const iconName = style.icon;
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [position, setPosition] = useState<{ left: number; bottom: number } | null>(
     null,
@@ -77,7 +73,7 @@ export function LeadMeasureGuideTooltip({
   return (
     <div className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
       <button
-        ref={triggerRef as any}
+        ref={triggerRef}
         type="button"
         aria-expanded={active}
         onClick={(e) => {

@@ -51,7 +51,7 @@ export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
 
   return (
     <div className="space-y-3 md:hidden">
-      {activeLeadMeasures.map((leadMeasure, index) => (
+      {activeLeadMeasures.map((leadMeasure) => (
         <WeeklyMobileCard
           key={`weekly-mobile-${leadMeasure.id}`}
           {...props}
