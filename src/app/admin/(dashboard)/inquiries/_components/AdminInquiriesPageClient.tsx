@@ -1,20 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   useGetAdminContactInquiries,
 } from "@/api/generated/admin-contact/admin-contact";
 import {
   ContactInquirySummary,
-  GetAdminContactInquiriesStatus,
-  GetAdminContactInquiriesCategory,
 } from "@/api/generated/dowin.schemas";
 import { InlineSpinner } from "@/components/InlineSpinner";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Textarea } from "@/components/ui/Textarea";
-import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 
 export default function AdminInquiriesPageClient() {
@@ -26,7 +20,6 @@ export default function AdminInquiriesPageClient() {
   const {
     data: listData,
     isLoading: isListLoading,
-    refetch,
   } = useGetAdminContactInquiries({});
 
   const inquiries: ContactInquirySummary[] = Array.isArray(listData?.data)

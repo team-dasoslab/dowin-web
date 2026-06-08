@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   useGetAdminMarketingInviteCodes,
   usePatchAdminMarketingInviteCodesId,
@@ -11,7 +11,6 @@ import {
 } from "@/api/generated/dowin.schemas";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import Link from "next/link";
