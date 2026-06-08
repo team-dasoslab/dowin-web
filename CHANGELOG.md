@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/team-dasoslab/dowin-web/compare/v1.1.2...v1.2.0) (2026-06-08)
+
+
+### Features
+
+* 점수판 이미지로 저장/공유 기능 ([#107](https://github.com/team-dasoslab/dowin-web/issues/107)) ([6f91141](https://github.com/team-dasoslab/dowin-web/commit/6f91141e6f9e36cccfa41779a0d1f7836e7ff2a2))
+
 ## [1.1.2](https://github.com/team-dasoslab/dowin-web/compare/v1.1.1...v1.1.2) (2026-06-07)
 
 
