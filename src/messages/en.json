@@ -122,7 +122,9 @@
       "Guide": {
         "ariaLabel": "View action item guide",
         "changeProposal": "Proposal for action item change",
-        "adjustProposal": "Proposal for target adjustment"
+        "adjustProposal": "Proposal for target adjustment",
+        "changeProposalDesc": "No records for 2 consecutive weeks. Try changing this action item.",
+        "adjustProposalDesc": "Less than 50% for 2 consecutive weeks. Try lowering the target a bit."
       }
     },
     "Team": {
@@ -1290,7 +1292,7 @@
     "info": "Please double-check the URL you entered. If it's a protected path, you may be redirected to the home page depending on your login status."
   },
   "Notification": {
-    "dailyReminderTitle": "Remind",
+    "dailyReminderTitle": "Dowin",
     "dailyReminderBody": "Did you record your lead measures today? Check them now!"
   },
   "PushNotification": {

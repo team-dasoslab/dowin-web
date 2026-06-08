@@ -1,28 +1,27 @@
 "use client";
 
 import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/dowin.schemas";
-import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 type LeadMeasureGuideTooltipProps = {
-  active: boolean;
+  active?: boolean;
   guide: WeeklyLogGuide;
-  onClose: () => void;
-  onToggle: () => void;
+  onClose?: () => void;
+  onToggle?: () => void;
 };
 
 const guideStyles = {
   [WeeklyLogGuideKind.change]: {
-    icon: "nav-compass",
-    iconClassName: "text-rose-600",
-    triggerClassName: "text-rose-600",
+    popupIconClassName: "text-rose-500",
+    buttonClassName: "text-rose-400 hover:text-rose-600 hover:bg-rose-50",
+    activeClassName: "text-rose-600 bg-rose-100",
   },
   [WeeklyLogGuideKind.adjust]: {
-    icon: "nav-settings",
-    iconClassName: "text-amber-500",
-    triggerClassName: "text-amber-500",
+    popupIconClassName: "text-amber-500",
+    buttonClassName: "text-amber-400 hover:text-amber-600 hover:bg-amber-50",
+    activeClassName: "text-amber-600 bg-amber-100",
   },
 } as const;
 
@@ -33,9 +32,8 @@ export function LeadMeasureGuideTooltip({
   onToggle,
 }: LeadMeasureGuideTooltipProps) {
   const style = guideStyles[guide.kind];
-  const iconName = style.icon;
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const [position, setPosition] = useState<{ left: number; top: number } | null>(
+  const [position, setPosition] = useState<{ left: number; bottom: number } | null>(
     null,
   );
 
@@ -52,9 +50,11 @@ export function LeadMeasureGuideTooltip({
       }
 
       setPosition({
-                left: Math.max(8, Math.min(rect.left, window.innerWidth - 240)),
-                top: rect.bottom + 8,
-              });
+        // Align left with padding, keeping it within window width
+        left: Math.max(8, Math.min(rect.left, window.innerWidth - 296)), // 296 is w-72 (288) + 8px padding
+        // Position above the button
+        bottom: window.innerHeight - rect.top + 8,
+      });
     };
 
     updatePosition();
@@ -71,41 +71,48 @@ export function LeadMeasureGuideTooltip({
   const t = useTranslations("Dashboard.My.Guide");
 
   return (
-    <div className="relative">
-      <Button
+    <div className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
+      <button
         ref={triggerRef}
         type="button"
-        onClick={onToggle}
-        className={`inline-flex h-4 w-4 items-center justify-center transition-colors ${style.triggerClassName}`}
+        aria-expanded={active}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onToggle) onToggle();
+        }}
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors active:scale-[0.95] ${
+          active ? style.activeClassName : style.buttonClassName
+        }`}
         aria-label={t("ariaLabel")}
       >
-        <DowinIcon name="status-info" size="12px" className={style.iconClassName} />
-      </Button>
+        <DowinIcon name="status-info" size="18px" />
+      </button>
 
       {active ? (
         <>
-          <div className="fixed inset-0 z-10" onClick={onClose} />
+          <div className="fixed inset-0 z-[100]" onClick={onClose} />
           <div
-            className="fixed z-20 w-56 rounded-[16px] bg-zinc-900 p-4 shadow-xl"
+            className="fixed z-[110] w-72 max-w-[calc(100vw-2rem)] sm:max-w-none rounded-[16px] border-none bg-zinc-900 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-dowin-in"
             style={
               position
                 ? {
                     left: position.left,
-                    top: position.top - 112,
+                    bottom: position.bottom,
                   }
                 : undefined
             }
           >
             <div className="mb-2 flex items-center gap-1.5">
-              <DowinIcon name={iconName} size="14px" className={style.iconClassName} />
-              <p className="text-[11px] font-black text-white">
+              <p className="text-[14px] font-semibold leading-relaxed text-white">
                 {guide.kind === WeeklyLogGuideKind.change
                   ? t("changeProposal")
                   : t("adjustProposal")}
               </p>
             </div>
-            <p className="text-[12px] font-medium leading-relaxed text-zinc-400 mt-1">
-              {guide.description}
+            <p className="text-[14px] font-semibold leading-relaxed text-white/80 mt-2">
+              {guide.kind === WeeklyLogGuideKind.change
+                ? t("changeProposalDesc")
+                : t("adjustProposalDesc")}
             </p>
           </div>
         </>

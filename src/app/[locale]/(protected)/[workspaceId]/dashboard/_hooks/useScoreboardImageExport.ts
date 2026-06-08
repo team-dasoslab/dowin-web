@@ -86,7 +86,7 @@ export function useScoreboardImageExport({
 
       showToast("success", t("scoreboardImageSaved"));
       onSuccess?.();
-    } catch (err) {
+    } catch {
       showToast("error", t("scoreboardImageSaveFailed"));
       onError?.();
     } finally {

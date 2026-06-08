@@ -22,7 +22,6 @@ export function ScoreboardImageCard({
   weekLabel,
 }: ScoreboardImageCardProps) {
   const t = useTranslations("Dashboard");
-  const tc = useTranslations("Common");
 
   const today = new Date().toISOString().split("T")[0];
 

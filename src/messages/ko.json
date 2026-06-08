@@ -122,7 +122,9 @@
       "Guide": {
         "ariaLabel": "액션 아이템 가이드 보기",
         "changeProposal": "액션 아이템 변경 제안",
-        "adjustProposal": "횟수 조정 제안"
+        "adjustProposal": "횟수 조정 제안",
+        "changeProposalDesc": "2주 연속 기록이 없어요. 이 선행지표는 다른 행동으로 바꿔보세요.",
+        "adjustProposalDesc": "2주 연속 50% 미만이에요. 이 선행지표는 횟수를 조금 낮춰보세요."
       }
     },
     "Team": {
@@ -1292,7 +1294,7 @@
     "info": "입력한 URL을 다시 확인해 주세요. 보호된 경로라면 로그인 상태에 따라 홈으로 이동할 수도 있습니다."
   },
   "Notification": {
-    "dailyReminderTitle": "리마인드",
+    "dailyReminderTitle": "Dowin",
     "dailyReminderBody": "오늘의 액션 아이템을 기록했나요? 지금 바로 체크해보세요!"
   },
   "PushNotification": {
