@@ -14,6 +14,9 @@ interface InfoTooltipProps {
   className?: string;
   align?: "left" | "center" | "right";
   side?: "top" | "bottom";
+  triggerClassName?: string;
+  activeTriggerClassName?: string;
+  triggerIcon?: React.ReactNode;
 }
 
 /**
@@ -26,7 +29,16 @@ interface InfoTooltipProps {
  * // 인라인 (카드 내부)
  * <InfoTooltip label={<h1>제목</h1>} content="설명..." />
  */
-export function InfoTooltip({ content, label, className, align = "left", side = "bottom" }: InfoTooltipProps) {
+export function InfoTooltip({
+  content,
+  label,
+  className,
+  align = "left",
+  side = "bottom",
+  triggerClassName = "text-zinc-400 hover:text-zinc-600 transition-colors",
+  activeTriggerClassName = "text-zinc-800 bg-zinc-100",
+  triggerIcon = <DowinIcon name="status-info" size="18px" />,
+}: InfoTooltipProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,11 +60,12 @@ export function InfoTooltip({ content, label, className, align = "left", side = 
       aria-expanded={open}
       onClick={() => setOpen((v) => !v)}
       className={cn(
-        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-zinc-400 hover:text-zinc-600 transition-colors active:scale-[0.95]",
-        open && "text-zinc-800 bg-zinc-100",
+        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full active:scale-[0.95]",
+        triggerClassName,
+        open && activeTriggerClassName,
       )}
     >
-      <DowinIcon name="status-info" size="18px" />
+      {triggerIcon}
     </button>
   );
 
