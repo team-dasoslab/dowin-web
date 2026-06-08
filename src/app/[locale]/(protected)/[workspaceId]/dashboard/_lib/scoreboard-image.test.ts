@@ -25,7 +25,7 @@ describe("scoreboard-image", () => {
         nickname: "User <:*?>|",
         weekStart: "2026-06-08",
       });
-      expect(result).toBe("dowin-User----------2026-06-08-scoreboard.png");
+      expect(result).toBe("dowin-User--------2026-06-08-scoreboard.png");
     });
   });
 
