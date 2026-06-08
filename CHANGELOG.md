@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.3](https://github.com/team-dasoslab/dowin-web/compare/v1.2.2...v1.2.3) (2026-06-08)
+
+
+### Bug Fixes
+
+* lint ([f0bb6da](https://github.com/team-dasoslab/dowin-web/commit/f0bb6da8151160b50ae8679f562ad223dd09c6c8))
+* 공통 툴팁 적용 및 다국어 적용 ([55c814b](https://github.com/team-dasoslab/dowin-web/commit/55c814bf15fbcb72106b78423e1c9bca605b5de2))
+
 ## [1.2.2](https://github.com/team-dasoslab/dowin-web/compare/v1.2.1...v1.2.2) (2026-06-08)
 
 
