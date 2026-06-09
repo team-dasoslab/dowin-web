@@ -1031,7 +1031,7 @@
       "resetSuccess": "Password reset successful. Please proceed to login.",
       "findButton": "Find Account",
       "resetButton": "Reset Password",
-      "backToLogin": "Back to Login",
+      "backToLogin": "Log in",
       "errors": {
         "checkCode": "Please check your recovery code.",
         "resetFailed": "Failed to reset password."
