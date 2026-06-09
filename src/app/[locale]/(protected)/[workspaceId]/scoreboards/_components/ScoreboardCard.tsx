@@ -2,7 +2,7 @@ import { formatDate } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { PeriodBadge } from "@/components/ui/PeriodBadge";
 import { ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 type ScoreboardCardProps = {
   goalName?: string;
@@ -20,6 +20,8 @@ export function ScoreboardCard({
   startDate,
 }: ScoreboardCardProps) {
   const t = useTranslations("Scoreboard");
+  const locale = useLocale();
+  const fallbackDate = t("noDateFallback");
 
   return (
     <div className="rounded-[24px] bg-white p-6 space-y-5">
@@ -38,7 +40,7 @@ export function ScoreboardCard({
       <div className="flex items-center justify-between gap-3 pt-4 border-t border-zinc-50">
         <div className="flex-shrink-0">
           <PeriodBadge
-            label={`${t("activePeriod")} ${formatDate(startDate)} - ${endDate ? formatDate(endDate) : t("inProgress")}`}
+            label={`${t("activePeriod")} ${formatDate(startDate, locale, fallbackDate)} - ${endDate ? formatDate(endDate, locale, fallbackDate) : t("inProgress")}`}
           />
         </div>
         <div className="flex-shrink-0">

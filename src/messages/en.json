@@ -271,7 +271,8 @@
     "unnamedScoreboard": "Unnamed Scoreboard",
     "noLagMeasure": "No lag measure set.",
     "activePeriod": "Active Period",
-    "inProgress": "In Progress"
+    "inProgress": "In Progress",
+    "noDateFallback": "Date not set"
   },
   "Setup": {
     "header": "Scoreboard Settings",
