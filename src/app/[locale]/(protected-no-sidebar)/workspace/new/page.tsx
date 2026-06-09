@@ -95,8 +95,8 @@ export default function NewWorkspacePage() {
             required
           />
 
-          <div className="space-y-4">
-            <label className="text-[11px] block font-black text-zinc-400 uppercase tracking-widest ml-1">
+          <div className="space-y-2">
+            <label className="text-sm block font-semibold text-zinc-900 ml-1">
               {t("seatLabel")}
             </label>
             {promotionCode ? (
