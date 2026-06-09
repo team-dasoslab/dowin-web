@@ -210,8 +210,8 @@ function LeadMeasureRow({
         <div className="relative flex w-full sm:w-auto">
           <SegmentedControl
             options={[
-              { value: "WEEKLY", label: "매주" },
-              { value: "MONTHLY", label: "매달" },
+              { value: "WEEKLY", label: t("modeWeekly") },
+              { value: "MONTHLY", label: t("modeMonthly") },
             ]}
             value={measure.period}
             onChange={(period) => {
@@ -246,7 +246,7 @@ function LeadMeasureRow({
       <div className="flex flex-col gap-3 rounded-[24px] bg-zinc-50/50 p-4 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
-            {measure.period === "WEEKLY" ? "매주" : "매달"}
+            {measure.period === "WEEKLY" ? t("modeWeekly") : t("modeMonthly")}
           </span>
           <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-zinc-100">
             <Button
@@ -288,7 +288,7 @@ function LeadMeasureRow({
             </Button>
           </div>
           <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
-            {measure.trackingMode === "COUNT" ? "일" : "회"}
+            {measure.trackingMode === "COUNT" ? t("unitDay") : t("unitTimes")}
           </span>
         </div>
 
@@ -297,7 +297,7 @@ function LeadMeasureRow({
             <span className="hidden text-zinc-300 sm:inline">·</span>
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
-                하루에
+                {t("perDay")}
               </span>
               <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-zinc-100">
                 <Button
@@ -333,7 +333,7 @@ function LeadMeasureRow({
                 </Button>
               </div>
               <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
-                회
+                {t("unitTimes")}
               </span>
             </div>
           </>
