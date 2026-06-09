@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/Button";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import type { ProductUpdate } from "@/content/product-updates";
 import { Link } from "@/i18n/routing";
-import { DowinIcon } from "@/components/ui/DowinIcon";
+import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { getWorkspacePath } from "@/lib/client/workspace-path";
 
 interface ProductUpdateCardProps {
   onDismiss: () => void;
@@ -58,15 +58,17 @@ export function ProductUpdateCard({
           <div className="flex flex-row flex-wrap items-center gap-2 pt-0.5">
             <Button
               asChild
-              className="justify-center rounded-[14px] bg-primary h-10 px-5 text-[13px] font-bold text-white transition-all active:scale-95 shadow-none"
+              className="justify-center rounded-[14px] bg-primary h-10 px-5 text-[13px] font-bold text-white transition-all shadow-none"
             >
               <Link href={update.ctaHref}>{updateT("ctaLabel")}</Link>
             </Button>
             <Button
               asChild
-              className="justify-center rounded-[14px] bg-zinc-100 h-10 px-5 text-[13px] font-bold text-zinc-700 transition-all active:scale-95 border-none shadow-none hover:bg-zinc-200/50"
+              className="justify-center rounded-[14px] bg-zinc-100 h-10 px-5 text-[13px] font-bold text-zinc-700 transition-all border-none shadow-none hover:bg-zinc-200/50"
             >
-              <Link href={getWorkspacePath(workspaceId, "/profile/updates")}>{t("viewAllUpdates")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile/updates")}>
+                {t("viewAllUpdates")}
+              </Link>
             </Button>
           </div>
         </div>

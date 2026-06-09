@@ -31,7 +31,7 @@ export function ArchivedScoreboardsSection({
     <section className="space-y-3">
 
       {archivedScoreboards.length === 0 ? (
-        <div className="rounded-[24px] bg-zinc-50/50 p-8 text-center text-[13px] font-medium text-zinc-500">
+        <div className="rounded-[24px] bg-white p-8 text-center text-[13px] font-medium text-zinc-500">
           {t("noArchived")}
         </div>
       ) : (

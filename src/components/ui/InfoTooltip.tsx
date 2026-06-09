@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
 
 interface InfoTooltipProps {
@@ -60,7 +60,7 @@ export function InfoTooltip({
       aria-expanded={open}
       onClick={() => setOpen((v) => !v)}
       className={cn(
-        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full active:scale-[0.95]",
+        "flex h-6 w-6 shrink-0 items-center justify-center rounded-full ",
         triggerClassName,
         open && activeTriggerClassName,
       )}
@@ -73,10 +73,11 @@ export function InfoTooltip({
     align === "left"
       ? "left-0"
       : align === "right"
-      ? "right-0"
-      : "left-1/2 -translate-x-1/2";
+        ? "right-0"
+        : "left-1/2 -translate-x-1/2";
 
-  const tooltipSideClass = side === "top" ? "bottom-full mb-2" : "top-full mt-2";
+  const tooltipSideClass =
+    side === "top" ? "bottom-full mb-2" : "top-full mt-2";
 
   /* ── 인라인 모드 (label 있음) ── */
   if (label !== undefined) {
@@ -106,7 +107,10 @@ export function InfoTooltip({
 
   /* ── 팝오버 모드 (label 없음, 아이콘만) ── */
   return (
-    <div ref={ref} className={cn("relative inline-flex items-center", className)}>
+    <div
+      ref={ref}
+      className={cn("relative inline-flex items-center", className)}
+    >
       {iconButton}
       {open && (
         <div

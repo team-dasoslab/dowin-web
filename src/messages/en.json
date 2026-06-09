@@ -256,7 +256,7 @@
     "onlyOneActiveDesc": "Only one scoreboard can be active at a time.",
     "archivedScoreboards": "Archived Scoreboards",
     "archivedScoreboardsDesc": "View your past scoreboards and reactivate them if needed.",
-    "totalCount": "Total: {count}",
+    "totalCount": "TOTAL {count}",
     "noArchived": "No archived scoreboards yet.",
     "noActive": "No active scoreboard",
     "noActiveDesc": "Reactivate an archived scoreboard or create a new one.",
@@ -271,7 +271,8 @@
     "unnamedScoreboard": "Unnamed Scoreboard",
     "noLagMeasure": "No lag measure set.",
     "activePeriod": "Active Period",
-    "inProgress": "In Progress"
+    "inProgress": "In Progress",
+    "noDateFallback": "Date not set"
   },
   "Setup": {
     "header": "Scoreboard Settings",
@@ -337,6 +338,9 @@
     "trackingModeBoolean": "Check",
     "trackingModeCount": "Count",
     "dailyCountTitle": "Set Daily Target",
+    "unitDay": "days",
+    "unitTimes": "times",
+    "perDay": "Per day",
     "modeAtLeast": "At least",
     "modeExactly": "Exactly",
     "deleteTagConfirm": "Do you want to delete this tag?",
@@ -698,6 +702,8 @@
     "entitlementSourceManualGrant": "Admin grant",
     "entitlementSourcePartner": "Partner grant",
     "entitlementSourceInternalTest": "Internal test",
+    "entitlementSourceBetaPromotionalGrant": "Marketing promotional grant (Beta Promotional Grant)",
+    "betaPromotionalGrantNotice": "Basic promotion benefits are currently applied.",
     "nonPolarEntitlementNotice": "You're currently using Basic features through {source}. If you need to change or cancel your subscription, please <contact>contact support</contact>.",
     "memberNotice": "Changing payment methods, canceling, and re-subscribing are currently limited to workspace admins.",
     "checkoutNoticeTitle": "Before you upgrade",
@@ -1031,7 +1037,7 @@
       "resetSuccess": "Password reset successful. Please proceed to login.",
       "findButton": "Find Account",
       "resetButton": "Reset Password",
-      "backToLogin": "Back to Login",
+      "backToLogin": "Log in",
       "errors": {
         "checkCode": "Please check your recovery code.",
         "resetFailed": "Failed to reset password."
@@ -1049,6 +1055,9 @@
       "seatAutoApplied": "Max seats from promotion automatically applied.",
       "promotionCodeLabel": "Promotion Code (Optional)",
       "promotionCodePlaceholder": "Enter code",
+      "registerPromotionCode": "Register Promotion Code",
+      "appliedPromotionCode": "Applied Promotion Code",
+      "cancelPromotionCode": "Cancel",
       "button": "Create Workspace",
       "buttonPromo": "Create",
       "goToJoinText": "Join with an invite code",
