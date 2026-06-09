@@ -6,9 +6,9 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Logo } from "@/components/ui/Logo";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { Link } from "@/i18n/routing";
-import { Logo } from "@/components/ui/Logo";
 import { useTranslations } from "next-intl";
 
 export default function JoinWorkspacePage() {
@@ -29,7 +29,7 @@ export default function JoinWorkspacePage() {
       {isPending && <LoadingOverlay message={t("loading")} />}
       <div className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
         <div className="flex items-center">
-          <SmartBackButton className="w-9 h-9 rounded-full bg-zinc-100 border-none flex items-center justify-center text-zinc-600 transition-transform active:scale-[0.98] shrink-0" />
+          <SmartBackButton className="w-9 h-9 rounded-full bg-zinc-100 border-none flex items-center justify-center text-zinc-600 transition-transform shrink-0" />
         </div>
 
         <div className="space-y-5">
@@ -67,17 +67,13 @@ export default function JoinWorkspacePage() {
             <Button
               type="submit"
               disabled={isPending || inviteCode.trim().length === 0}
-              className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors active:scale-[0.98] ${
+              className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors ${
                 isPending || inviteCode.trim().length === 0
                   ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
                   : "bg-zinc-900 text-white hover:bg-zinc-800"
               }`}
             >
-              {isPending ? (
-                <InlineSpinner size="sm" />
-              ) : (
-                t("button")
-              )}
+              {isPending ? <InlineSpinner size="sm" /> : t("button")}
             </Button>
           </div>
         </form>

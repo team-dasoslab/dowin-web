@@ -1,9 +1,6 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
-import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
-import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { MonthlyBoardSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/MonthlyBoardSection";
 import { PeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/PeriodControls";
 import { ProductUpdateCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ProductUpdateCard";
@@ -14,8 +11,17 @@ import { useLoginPushPrompt } from "@/app/[locale]/(protected)/[workspaceId]/das
 import { useMyDashboardPageState } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useMyDashboardPageState";
 import { type CelebrationLevel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-celebration";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
+import { EmptyStatePanel } from "@/app/[locale]/(protected)/_components/EmptyStatePanel";
+import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
@@ -23,12 +29,6 @@ import { hashId } from "@/lib/client/id-hash";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ProtectedPageContainer,
-  ProtectedPageHeader,
-} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { PageSidebarNav } from "@/components/PageSidebarNav";
-import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
@@ -184,12 +184,18 @@ export default function MyDashboardPage() {
           }
           rightElement={
             <div className="flex flex-wrap gap-2">
-              <Button asChild className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all active:scale-95">
+              <Button
+                asChild
+                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all "
+              >
                 <Link href={`/${workspaceId}/scoreboards`}>
                   {t("scoreboardArchive")}
                 </Link>
               </Button>
-              <Button asChild className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all active:scale-95">
+              <Button
+                asChild
+                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all "
+              >
                 <Link href={`/${workspaceId}/setup?mode=update`}>
                   {t("manageScoreboard")}
                 </Link>
@@ -208,7 +214,10 @@ export default function MyDashboardPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           <PageSidebarNav
-            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            items={menuGroups.map((group) => ({
+              id: group.id,
+              label: group.label,
+            }))}
             activeId={activeSection}
           />
 
@@ -344,9 +353,11 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="h-[56px] w-full flex items-center justify-center px-8 text-[16px] font-black rounded-[24px] bg-zinc-900 text-white hover:bg-zinc-800 transition-colors active:scale-[0.98]"
+              className="h-[56px] w-full flex items-center justify-center px-8 text-[16px] font-black rounded-[24px] bg-zinc-900 text-white hover:bg-zinc-800 transition-colors "
             >
-              <Link href={`/${workspaceId}/setup?mode=create`}>{t("createScoreboard")}</Link>
+              <Link href={`/${workspaceId}/setup?mode=create`}>
+                {t("createScoreboard")}
+              </Link>
             </Button>
           }
         />

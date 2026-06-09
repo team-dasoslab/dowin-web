@@ -22,7 +22,7 @@ export function SetupSubmitButton({
       type="submit"
       form={formId}
       disabled={isMutating}
-      className={`flex w-full items-center justify-center gap-2 rounded-[16px] py-4 text-[17px] font-bold transition-all active:scale-95 ${
+      className={`flex w-full items-center justify-center gap-2 rounded-[16px] py-4 text-[17px] font-bold transition-all ${
         isMutating
           ? "cursor-not-allowed bg-primary/50 text-white"
           : "bg-primary text-white hover:bg-primary/90"

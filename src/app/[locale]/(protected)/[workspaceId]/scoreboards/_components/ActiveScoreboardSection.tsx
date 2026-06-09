@@ -74,8 +74,8 @@ function EmptyActiveScoreboardCard() {
   const td = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <div className="rounded-[24px] bg-zinc-50/50 p-8 text-center space-y-4">
-      <div className="w-12 h-12 bg-white rounded-[16px] shadow-sm mx-auto flex items-center justify-center">
+    <div className="rounded-[24px] bg-white p-8 text-center space-y-4">
+      <div className="w-12 h-12 bg-primary/5 rounded-[16px] shadow-sm mx-auto flex items-center justify-center">
          <Logo size="24px" className="text-primary" />
       </div>
       <div className="space-y-1">

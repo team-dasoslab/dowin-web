@@ -120,8 +120,13 @@ function WeeklyMobileCard({
             pendingLogKeys={pendingLogKeys}
             today={today}
             toggleLog={toggleLog}
-            trackingMode={(leadMeasure as { trackingMode?: string }).trackingMode}
-            dailyTargetCount={(leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ?? 1}
+            trackingMode={
+              (leadMeasure as { trackingMode?: string }).trackingMode
+            }
+            dailyTargetCount={
+              (leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ??
+              1
+            }
             value={
               weekly?.logs?.[date] === undefined ? null : weekly.logs[date]
             }
@@ -195,7 +200,7 @@ function WeeklyMobileCardDay({
                 setOpenPopover(!openPopover);
               }
             }}
-            className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
+            className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all ${
               isAchieved
                 ? "bg-primary text-white"
                 : (count ?? 0) > 0
@@ -221,10 +226,10 @@ function WeeklyMobileCardDay({
                     setOpenPopover(false);
                   }}
                 />
-                  <div
-                    className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                <div
+                  className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <Button
                     className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100"
                     onClick={() => setOpenPopover(false)}
@@ -285,7 +290,7 @@ function WeeklyMobileCardDay({
                       </Button>
                     </div>
                     <Button
-                      className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white active:scale-95 transition-all"
+                      className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white transition-all"
                       onClick={() => {
                         handleCountSave(localCount);
                         setOpenPopover(false);
@@ -308,7 +313,7 @@ function WeeklyMobileCardDay({
               void toggleLog(leadMeasureId, date);
             }
           }}
-          className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
+          className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all ${
             isAchieved
               ? "bg-primary text-white"
               : isToday

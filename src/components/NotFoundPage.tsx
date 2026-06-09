@@ -1,8 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
+import Link from "next/link";
 
 type Locale = "ko" | "en";
 
@@ -68,11 +68,9 @@ export function NotFoundPage({
         <div className="space-y-4">
           <Button
             asChild
-            className="h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors active:scale-[0.98] bg-zinc-900 text-white hover:bg-zinc-800"
+            className="h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors bg-zinc-900 text-white hover:bg-zinc-800"
           >
-            <Link href={homeHref}>
-              {copy.goHome}
-            </Link>
+            <Link href={homeHref}>{copy.goHome}</Link>
           </Button>
         </div>
       </Card>

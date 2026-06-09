@@ -29,7 +29,7 @@ export function SetupManageSection({
                 archive();
               }
             }}
-            className="rounded-[12px] bg-zinc-100 px-5 py-2.5 text-[14px] font-bold text-zinc-600 transition-all active:scale-95"
+            className="rounded-[12px] bg-zinc-100 px-5 py-2.5 text-[14px] font-bold text-zinc-600 transition-all "
           >
             {isArchivePending ? (
               <InlineSpinner

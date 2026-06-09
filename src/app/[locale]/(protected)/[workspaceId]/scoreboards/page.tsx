@@ -109,7 +109,7 @@ export default function ScoreboardsPage() {
                 title={t("archivedScoreboards")}
                 description={t("archivedScoreboardsDesc")}
                 badge={
-                  <div className="px-2.5 py-1 rounded-[12px] bg-zinc-200/50 text-[11px] font-black text-zinc-500 uppercase tracking-tight">
+                  <div className="px-2.5 py-1 rounded-[12px] bg-primary/10 text-[11px] font-black text-primary uppercase tracking-tight">
                     {t("totalCount", { count: archivedScoreboards.length })}
                   </div>
                 }

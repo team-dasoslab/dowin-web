@@ -135,7 +135,7 @@ export function WeeklyTable({
                 <Button
                   type="button"
                   onClick={onToggleView}
-                  className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all active:scale-95 ${
+                  className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all ${
                     memoMode === "view"
                       ? "bg-primary/10 text-primary hover:bg-primary/20"
                       : "bg-white text-zinc-900 hover:bg-zinc-50"
@@ -147,7 +147,7 @@ export function WeeklyTable({
               <Button
                 type="button"
                 onClick={handleComposeClick}
-                className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all active:scale-95 ${
+                className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all ${
                   memoMode === "compose"
                     ? "bg-primary/10 text-primary hover:bg-primary/20"
                     : "bg-white text-zinc-900 hover:bg-zinc-50"
@@ -191,10 +191,16 @@ export function WeeklyTable({
 
                 <div className="mt-3 grid grid-cols-7 gap-1.5">
                   {weekDates.map((date, index) => {
-                    const logData = leadMeasure.logs?.[date] as import("@/api/generated/dowin.schemas").DailyLogCell | null | undefined;
+                    const logData = leadMeasure.logs?.[date] as
+                      | import("@/api/generated/dowin.schemas").DailyLogCell
+                      | null
+                      | undefined;
                     const isAchieved = logData?.achieved ?? false;
                     const count = logData?.count ?? null;
-                    const typedLead = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                    const typedLead = leadMeasure as {
+                      trackingMode?: string;
+                      dailyTargetCount?: number;
+                    };
                     const trackingMode = typedLead.trackingMode;
                     const dailyTargetCount = typedLead.dailyTargetCount ?? 1;
                     const isCount = trackingMode === "COUNT";
@@ -316,12 +322,19 @@ export function WeeklyTable({
                           />
                         </td>
                         {weekDates.map((date) => {
-                          const logData = leadMeasure.logs?.[date] as import("@/api/generated/dowin.schemas").DailyLogCell | null | undefined;
+                          const logData = leadMeasure.logs?.[date] as
+                            | import("@/api/generated/dowin.schemas").DailyLogCell
+                            | null
+                            | undefined;
                           const isAchieved = logData?.achieved ?? false;
                           const count = logData?.count ?? null;
-                          const typedLeadDesktop = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                          const typedLeadDesktop = leadMeasure as {
+                            trackingMode?: string;
+                            dailyTargetCount?: number;
+                          };
                           const trackingMode = typedLeadDesktop.trackingMode;
-                          const dailyTargetCount = typedLeadDesktop.dailyTargetCount ?? 1;
+                          const dailyTargetCount =
+                            typedLeadDesktop.dailyTargetCount ?? 1;
                           const isCount = trackingMode === "COUNT";
 
                           return (
@@ -375,9 +388,7 @@ export function WeeklyTable({
                             </div>
                             <span
                               className={`font-mono text-[11px] font-black ${
-                                rate >= 100
-                                  ? "text-green-600"
-                                  : "text-zinc-500"
+                                rate >= 100 ? "text-green-600" : "text-zinc-500"
                               }`}
                             >
                               {achievedCount}/{weeklyTotal}

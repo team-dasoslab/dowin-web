@@ -217,10 +217,10 @@ export default function AccountRecoveryPageClient() {
               type="submit"
               disabled={isPending}
               className={`
-                h-[52px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-bold transition-colors
+                h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-bold transition-colors
                 ${isPending
                   ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-                  : "bg-primary text-white hover:bg-primary/90"
+                  : "bg-zinc-900 text-white hover:bg-zinc-800"
                 }
               `}
             >

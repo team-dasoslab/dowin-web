@@ -10,7 +10,10 @@ import { Logo } from "@/components/ui/Logo";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useToast } from "@/context/ToastContext";
 import { Link, useRouter } from "@/i18n/routing";
-import { getApiErrorMessage, getApiErrorStatus } from "@/lib/client/frontend-api";
+import {
+  getApiErrorMessage,
+  getApiErrorStatus,
+} from "@/lib/client/frontend-api";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { useTranslations } from "next-intl";
@@ -241,7 +244,7 @@ export default function LoginPageClient() {
               <Button
                 type="button"
                 onClick={handleCopyRecoveryCodes}
-                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors active:scale-[0.98]"
+                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors "
               >
                 {isCopied ? (
                   <span className="inline-flex items-center gap-2">
@@ -266,7 +269,7 @@ export default function LoginPageClient() {
               <Button
                 type="button"
                 onClick={handleDownloadRecoveryCodes}
-                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors active:scale-[0.98]"
+                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors "
               >
                 {t("recovery.saveTxt")}
               </Button>
@@ -276,7 +279,7 @@ export default function LoginPageClient() {
               onClick={() => {
                 router.push("/workspace/new");
               }}
-              className="w-full h-[56px] rounded-[24px] text-[17px] font-bold border-none bg-primary text-white transition-transform active:scale-[0.98]"
+              className="w-full h-[56px] rounded-[24px] text-[17px] font-bold border-none bg-zinc-900 text-white hover:bg-zinc-800 transition-transform "
             >
               {t("continue")}
             </Button>
@@ -354,12 +357,13 @@ export default function LoginPageClient() {
               type="submit"
               disabled={isPending}
               className={`
-                h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform active:scale-[0.98]
-                ${isPending
-                  ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-                  : "bg-primary text-white"
-                }
-              `}
+ h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform 
+ ${
+   isPending
+     ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+     : "bg-zinc-900 text-white hover:bg-zinc-800"
+ }
+ `}
             >
               {isPending ? (
                 <InlineSpinner />

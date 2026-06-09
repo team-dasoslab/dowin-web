@@ -5,8 +5,8 @@ import {
 import { Button } from "@/components/ui/Button";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
-import { Input } from "@/components/ui/Input";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Input } from "@/components/ui/Input";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
@@ -46,7 +46,9 @@ export function LeadMeasuresSection({
   restoreMeasureRow,
 }: LeadMeasuresSectionProps) {
   const t = useTranslations("Setup");
-  const activeMeasures = measures.filter((measure) => measure.status === "ACTIVE");
+  const activeMeasures = measures.filter(
+    (measure) => measure.status === "ACTIVE",
+  );
   const archivedMeasures = measures.filter(
     (measure) => measure.status === "ARCHIVED",
   );
@@ -55,7 +57,10 @@ export function LeadMeasuresSection({
   ).length;
 
   return (
-    <div className="bg-white rounded-[24px] overflow-hidden" data-coachmark="setup-lead">
+    <div
+      className="bg-white rounded-[24px] overflow-hidden"
+      data-coachmark="setup-lead"
+    >
       <div className="divide-y-2 divide-zinc-50">
         {activeMeasures.map((measure, index) => (
           <LeadMeasureRow
@@ -81,7 +86,7 @@ export function LeadMeasuresSection({
           type="button"
           disabled={isMutating}
           onClick={addMeasureRow}
-          className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#E8F3FF] py-4 text-[15px] font-bold text-primary transition-all active:scale-95"
+          className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#E8F3FF] py-4 text-[15px] font-bold text-primary transition-all "
         >
           <DowinIcon name="action-add" size="18px" />
           {t("addLeadMeasure")}
@@ -146,7 +151,7 @@ function LeadMeasureRow({
           type="button"
           disabled={isMutating}
           onClick={() => restoreMeasureRow(measure.id)}
-          className="w-full sm:w-auto rounded-[16px] border-none bg-zinc-200/50 px-5 py-3 text-[13px] font-black text-zinc-600 transition-all active:scale-95 shrink-0"
+          className="w-full sm:w-auto rounded-[16px] border-none bg-zinc-200/50 px-5 py-3 text-[13px] font-black text-zinc-600 transition-all shrink-0"
         >
           {t("cancelDelete")}
         </Button>
@@ -210,8 +215,8 @@ function LeadMeasureRow({
         <div className="relative flex w-full sm:w-auto">
           <SegmentedControl
             options={[
-              { value: "WEEKLY", label: "매주" },
-              { value: "MONTHLY", label: "매달" },
+              { value: "WEEKLY", label: t("modeWeekly") },
+              { value: "MONTHLY", label: t("modeMonthly") },
             ]}
             value={measure.period}
             onChange={(period) => {
@@ -223,7 +228,7 @@ function LeadMeasureRow({
               );
             }}
             disabled={isMutating}
-            size="lg"
+            size="md"
             className="w-full sm:w-auto"
           />
         </div>
@@ -235,9 +240,11 @@ function LeadMeasureRow({
               { value: "COUNT", label: t("trackingModeCount") },
             ]}
             value={measure.trackingMode}
-            onChange={(mode) => handleMeasureChange(measure.id, "trackingMode", mode)}
+            onChange={(mode) =>
+              handleMeasureChange(measure.id, "trackingMode", mode)
+            }
             disabled={isMutating}
-            size="lg"
+            size="md"
             className="w-full sm:w-auto"
           />
         </div>
@@ -246,7 +253,7 @@ function LeadMeasureRow({
       <div className="flex flex-col gap-3 rounded-[24px] bg-zinc-50/50 p-4 sm:flex-row sm:items-center sm:bg-transparent sm:p-0">
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="whitespace-nowrap text-sm font-medium text-zinc-600">
-            {measure.period === "WEEKLY" ? "매주" : "매달"}
+            {measure.period === "WEEKLY" ? t("modeWeekly") : t("modeMonthly")}
           </span>
           <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-zinc-100">
             <Button
@@ -259,12 +266,12 @@ function LeadMeasureRow({
                   measure.targetValue - 1,
                 )
               }
-              className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+              className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
               aria-label={t("decrement")}
             >
               <DowinIcon name="action-subtract" size="16px" />
             </Button>
-            <div className="flex h-12 min-w-12 items-center justify-center px-2 font-mono text-[17px] font-black text-zinc-900">
+            <div className="flex h-10 min-w-10 items-center justify-center px-2 font-mono text-[15px] font-black text-zinc-900">
               {measure.targetValue}
             </div>
             <Button
@@ -281,14 +288,14 @@ function LeadMeasureRow({
                   measure.targetValue + 1,
                 )
               }
-              className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+              className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
               aria-label={t("increment")}
             >
               <DowinIcon name="action-add" size="16px" />
             </Button>
           </div>
           <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
-            {measure.trackingMode === "COUNT" ? "일" : "회"}
+            {measure.trackingMode === "COUNT" ? t("unitDay") : t("unitTimes")}
           </span>
         </div>
 
@@ -297,7 +304,7 @@ function LeadMeasureRow({
             <span className="hidden text-zinc-300 sm:inline">·</span>
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
-                하루에
+                {t("perDay")}
               </span>
               <div className="flex shrink-0 items-center overflow-hidden rounded-[16px] bg-zinc-100">
                 <Button
@@ -310,11 +317,11 @@ function LeadMeasureRow({
                       measure.dailyTargetCount - 1,
                     )
                   }
-                  className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+                  className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
                 >
                   <DowinIcon name="action-subtract" size="16px" />
                 </Button>
-                <div className="flex h-12 min-w-12 items-center justify-center px-2 font-mono text-[17px] font-black text-zinc-900">
+                <div className="flex h-10 min-w-10 items-center justify-center px-2 font-mono text-[15px] font-black text-zinc-900">
                   {measure.dailyTargetCount}
                 </div>
                 <Button
@@ -327,254 +334,254 @@ function LeadMeasureRow({
                       measure.dailyTargetCount + 1,
                     )
                   }
-                  className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+                  className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
                 >
                   <DowinIcon name="action-add" size="16px" />
                 </Button>
               </div>
               <span className="whitespace-nowrap text-[15px] font-semibold text-zinc-600">
-                회
+                {t("unitTimes")}
               </span>
             </div>
           </>
         )}
       </div>
       {/* 
-      <div
-        className="rounded-[16px] bg-zinc-100"
-        data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
-      >
-        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
-          <div className="flex min-w-0 flex-1 items-start gap-3">
-            <DowinIcon
-              name="status-tag"
-              size="16px"
-              className="mt-0.5 shrink-0 text-primary"
-            />
-            <div className="min-w-0 flex-1 space-y-2">
-              <p className="text-[12px] font-bold text-zinc-500">
-                {t("tagLabel")}
-              </p>
-              {measure.tags.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {measure.tags.map((tag) => (
-                    <Button
-                      key={tag.id}
-                      type="button"
-                      disabled={isMutating}
-                      onClick={() => toggleMeasureTag(measure.id, tag)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-white transition-all active:scale-95 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
-                    >
-                      #{tag.name}
-                      <DowinIcon name="action-dismiss" size="12px" />
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-[14px] font-medium text-zinc-400">
-                  {t("noTags")}
-                </p>
-              )}
-            </div>
-          </div>
+ <div
+ className="rounded-[16px] bg-zinc-100"
+ data-coachmark={isTagCoachmarkTarget ? "setup-lead-tags" : undefined}
+ >
+ <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:px-5">
+ <div className="flex min-w-0 flex-1 items-start gap-3">
+ <DowinIcon
+ name="status-tag"
+ size="16px"
+ className="mt-0.5 shrink-0 text-primary"
+ />
+ <div className="min-w-0 flex-1 space-y-2">
+ <p className="text-[12px] font-bold text-zinc-500">
+ {t("tagLabel")}
+ </p>
+ {measure.tags.length > 0 ? (
+ <div className="flex flex-wrap gap-1.5">
+ {measure.tags.map((tag) => (
+ <Button
+ key={tag.id}
+ type="button"
+ disabled={isMutating}
+ onClick={() => toggleMeasureTag(measure.id, tag)}
+ className="inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-[12px] font-bold text-white transition-all shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+ >
+ #{tag.name}
+ <DowinIcon name="action-dismiss" size="12px" />
+ </Button>
+ ))}
+ </div>
+ ) : (
+ <p className="text-[14px] font-medium text-zinc-400">
+ {t("noTags")}
+ </p>
+ )}
+ </div>
+ </div>
 
-          <Button
-            type="button"
-            disabled={isMutating}
-            onClick={() => setIsTagEditorOpen((previous) => !previous)}
-            className={`w-full shrink-0 rounded-[12px] px-4 py-2.5 text-[13px] font-bold transition-all sm:w-auto ${
-              isTagEditorOpen
-                ? "bg-zinc-900 text-white"
-                : "bg-white text-zinc-700 shadow-sm"
-            }`}
-          >
-            {isTagEditorOpen ? t("done") : t("select")}
-          </Button>
-        </div>
+ <Button
+ type="button"
+ disabled={isMutating}
+ onClick={() => setIsTagEditorOpen((previous) => !previous)}
+ className={`w-full shrink-0 rounded-[12px] px-4 py-2.5 text-[13px] font-bold transition-all sm:w-auto ${
+ isTagEditorOpen
+ ? "bg-zinc-900 text-white"
+ : "bg-white text-zinc-700 shadow-sm"
+ }`}
+ >
+ {isTagEditorOpen ? t("done") : t("select")}
+ </Button>
+ </div>
 
-        {isTagEditorOpen ? (
-          <div className="space-y-4 border-t border-zinc-200/50 px-4 py-4 sm:px-5">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-[12px] font-medium text-zinc-500">
-                {t("tagLimit", { n: MAX_MEASURE_TAGS })}
-              </p>
-              <span className="text-[12px] font-bold text-zinc-500">
-                {measure.tags.length}/{MAX_MEASURE_TAGS}
-              </span>
-            </div>
+ {isTagEditorOpen ? (
+ <div className="space-y-4 border-t border-zinc-200/50 px-4 py-4 sm:px-5">
+ <div className="flex items-center justify-between gap-3">
+ <p className="text-[12px] font-medium text-zinc-500">
+ {t("tagLimit", { n: MAX_MEASURE_TAGS })}
+ </p>
+ <span className="text-[12px] font-bold text-zinc-500">
+ {measure.tags.length}/{MAX_MEASURE_TAGS}
+ </span>
+ </div>
 
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => {
-                const isSelected = measure.tags.some(
-                  (item) => item.id === tag.id,
-                );
+ <div className="flex flex-wrap gap-2">
+ {availableTags.map((tag) => {
+ const isSelected = measure.tags.some(
+ (item) => item.id === tag.id,
+ );
 
-                if (isSelected) {
-                  return null;
-                }
+ if (isSelected) {
+ return null;
+ }
 
-                return (
-                  <div
-                    key={tag.id}
-                    className="relative flex items-center gap-1 rounded-full bg-white px-1 py-0.5 shadow-sm"
-                  >
-                    {editingTagId === tag.id ? (
-                      <>
-                        <Input
-                          value={editingTagName}
-                          disabled={isMutating || isTagMutationPending}
-                          maxLength={MAX_TAG_NAME_LENGTH}
-                          onChange={(e) => setEditingTagName(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                              e.preventDefault();
-                              void renameTag(tag.id, editingTagName).then(
-                                (isRenamed) => {
-                                  if (isRenamed) {
-                                    setEditingTagId(null);
-                                    setEditingTagName("");
-                                  }
-                                },
-                              );
-                            }
+ return (
+ <div
+ key={tag.id}
+ className="relative flex items-center gap-1 rounded-full bg-white px-1 py-0.5 shadow-sm"
+ >
+ {editingTagId === tag.id ? (
+ <>
+ <Input
+ value={editingTagName}
+ disabled={isMutating || isTagMutationPending}
+ maxLength={MAX_TAG_NAME_LENGTH}
+ onChange={(e) => setEditingTagName(e.target.value)}
+ onKeyDown={(e) => {
+ if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+ e.preventDefault();
+ void renameTag(tag.id, editingTagName).then(
+ (isRenamed) => {
+ if (isRenamed) {
+ setEditingTagId(null);
+ setEditingTagName("");
+ }
+ },
+ );
+ }
 
-                            if (e.key === "Escape") {
-                              setEditingTagId(null);
-                              setEditingTagName("");
-                            }
-                          }}
-                          className="h-8 min-w-0 border-none bg-transparent px-3 py-0 text-[13px] font-semibold text-zinc-700 focus-visible:ring-0"
-                        />
-                        <Button
-                          type="button"
-                          disabled={isMutating || isTagMutationPending}
-                          onClick={() => {
-                            void renameTag(tag.id, editingTagName).then(
-                              (isRenamed) => {
-                                if (isRenamed) {
-                                  setEditingTagId(null);
-                                  setEditingTagName("");
-                                }
-                              },
-                            );
-                          }}
-                          className="rounded-full px-3 py-1 text-[12px] font-bold text-primary active:scale-95 transition-transform"
-                        >
-                          {t("save")}
-                        </Button>
-                        <Button
-                          type="button"
-                          disabled={isMutating || isTagMutationPending}
-                          onClick={() => {
-                            setEditingTagId(null);
-                            setEditingTagName("");
-                          }}
-                          className="rounded-full px-3 py-1 text-[12px] font-bold text-zinc-400 active:scale-95 transition-transform"
-                        >
-                          {t("cancel")}
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          type="button"
-                          disabled={isMutating}
-                          onClick={() => toggleMeasureTag(measure.id, tag)}
-                          className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-zinc-700 transition-colors hover:text-zinc-900 active:scale-95"
-                        >
-                          #{tag.name}
-                        </Button>
-                        <div className="relative">
-                          <Button
-                            type="button"
-                            disabled={isMutating || isTagMutationPending}
-                            onClick={() =>
-                              setOpenActionTagId((previous) =>
-                                previous === tag.id ? null : tag.id,
-                              )
-                            }
-                            className="rounded-full p-2 text-zinc-400 transition-colors hover:text-zinc-600 active:bg-zinc-100"
-                            aria-label={t("edit")}
-                          >
-                            <DowinIcon name="action-more" size="14px" />
-                          </Button>
-                          {openActionTagId === tag.id ? (
-                            <div className="absolute right-0 top-10 z-10 min-w-[120px] overflow-hidden rounded-[12px] border-none bg-white shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
-                              <Button
-                                type="button"
-                                disabled={isMutating || isTagMutationPending}
-                                onClick={() => {
-                                  setEditingTagId(tag.id);
-                                  setEditingTagName(tag.name);
-                                  setOpenActionTagId(null);
-                                }}
-                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
-                              >
-                                <DowinIcon name="action-edit" size="14px" />
-                                {t("edit")}
-                              </Button>
-                              <Button
-                                type="button"
-                                disabled={isMutating || isTagMutationPending}
-                                onClick={() => {
-                                  if (confirm(t("deleteTagConfirmExtended"))) {
-                                    void deleteTag(tag.id);
-                                  }
-                                  setOpenActionTagId(null);
-                                }}
-                                className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-red-500 transition-colors hover:bg-red-50"
-                              >
-                                <DowinIcon name="action-delete" size="14px" />
-                                {t("delete")}
-                              </Button>
-                            </div>
-                          ) : null}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+ if (e.key === "Escape") {
+ setEditingTagId(null);
+ setEditingTagName("");
+ }
+ }}
+ className="h-8 min-w-0 border-none bg-transparent px-3 py-0 text-[13px] font-semibold text-zinc-700 focus-visible:ring-0"
+ />
+ <Button
+ type="button"
+ disabled={isMutating || isTagMutationPending}
+ onClick={() => {
+ void renameTag(tag.id, editingTagName).then(
+ (isRenamed) => {
+ if (isRenamed) {
+ setEditingTagId(null);
+ setEditingTagName("");
+ }
+ },
+ );
+ }}
+ className="rounded-full px-3 py-1 text-[12px] font-bold text-primary transition-transform"
+ >
+ {t("save")}
+ </Button>
+ <Button
+ type="button"
+ disabled={isMutating || isTagMutationPending}
+ onClick={() => {
+ setEditingTagId(null);
+ setEditingTagName("");
+ }}
+ className="rounded-full px-3 py-1 text-[12px] font-bold text-zinc-400 transition-transform"
+ >
+ {t("cancel")}
+ </Button>
+ </>
+ ) : (
+ <>
+ <Button
+ type="button"
+ disabled={isMutating}
+ onClick={() => toggleMeasureTag(measure.id, tag)}
+ className="rounded-full px-3 py-1.5 text-[13px] font-semibold text-zinc-700 transition-colors hover:text-zinc-900 "
+ >
+ #{tag.name}
+ </Button>
+ <div className="relative">
+ <Button
+ type="button"
+ disabled={isMutating || isTagMutationPending}
+ onClick={() =>
+ setOpenActionTagId((previous) =>
+ previous === tag.id ? null : tag.id,
+ )
+ }
+ className="rounded-full p-2 text-zinc-400 transition-colors hover:text-zinc-600 active:bg-zinc-100"
+ aria-label={t("edit")}
+ >
+ <DowinIcon name="action-more" size="14px" />
+ </Button>
+ {openActionTagId === tag.id ? (
+ <div className="absolute right-0 top-10 z-10 min-w-[120px] overflow-hidden rounded-[12px] border-none bg-white shadow-[0_4px_16px_rgba(0,0,0,0.1)]">
+ <Button
+ type="button"
+ disabled={isMutating || isTagMutationPending}
+ onClick={() => {
+ setEditingTagId(tag.id);
+ setEditingTagName(tag.name);
+ setOpenActionTagId(null);
+ }}
+ className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+ >
+ <DowinIcon name="action-edit" size="14px" />
+ {t("edit")}
+ </Button>
+ <Button
+ type="button"
+ disabled={isMutating || isTagMutationPending}
+ onClick={() => {
+ if (confirm(t("deleteTagConfirmExtended"))) {
+ void deleteTag(tag.id);
+ }
+ setOpenActionTagId(null);
+ }}
+ className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-red-500 transition-colors hover:bg-red-50"
+ >
+ <DowinIcon name="action-delete" size="14px" />
+ {t("delete")}
+ </Button>
+ </div>
+ ) : null}
+ </div>
+ </>
+ )}
+ </div>
+ );
+ })}
+ </div>
 
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <Input
-                value={draftTagName}
-                disabled={isMutating || isTagMutationPending}
-                maxLength={MAX_TAG_NAME_LENGTH}
-                onChange={(e) => setDraftTagName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-                    e.preventDefault();
-                    void createTag(measure.id, draftTagName).then((isCreated) => {
-                      if (isCreated) {
-                        setDraftTagName("");
-                      }
-                    });
-                  }
-                }}
-                placeholder={t("newTagPlaceholder", { n: MAX_TAG_NAME_LENGTH })}
-                className="h-11 flex-1 rounded-[12px] border-none bg-white px-4 text-[14px] font-medium shadow-sm transition-colors placeholder:text-zinc-500 focus:ring-4 focus:ring-primary/5"
-              />
-              <Button
-                type="button"
-                disabled={isMutating || isTagMutationPending}
-                onClick={() => {
-                  void createTag(measure.id, draftTagName).then((isCreated) => {
-                    if (isCreated) {
-                      setDraftTagName("");
-                    }
-                  });
-                }}
-                className="rounded-[12px] bg-primary px-5 py-3 text-[14px] font-bold text-white transition-transform active:scale-95 sm:h-[48px]"
-              >
-                {t("addTag")}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-      </div>
-      */}
+ <div className="flex flex-col gap-2 sm:flex-row">
+ <Input
+ value={draftTagName}
+ disabled={isMutating || isTagMutationPending}
+ maxLength={MAX_TAG_NAME_LENGTH}
+ onChange={(e) => setDraftTagName(e.target.value)}
+ onKeyDown={(e) => {
+ if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+ e.preventDefault();
+ void createTag(measure.id, draftTagName).then((isCreated) => {
+ if (isCreated) {
+ setDraftTagName("");
+ }
+ });
+ }
+ }}
+ placeholder={t("newTagPlaceholder", { n: MAX_TAG_NAME_LENGTH })}
+ className="h-11 flex-1 rounded-[12px] border-none bg-white px-4 text-[14px] font-medium shadow-sm transition-colors placeholder:text-zinc-500 focus:ring-4 focus:ring-primary/5"
+ />
+ <Button
+ type="button"
+ disabled={isMutating || isTagMutationPending}
+ onClick={() => {
+ void createTag(measure.id, draftTagName).then((isCreated) => {
+ if (isCreated) {
+ setDraftTagName("");
+ }
+ });
+ }}
+ className="rounded-[12px] bg-primary px-5 py-3 text-[14px] font-bold text-white transition-transform sm:h-[48px]"
+ >
+ {t("addTag")}
+ </Button>
+ </div>
+ </div>
+ ) : null}
+ </div>
+ */}
     </div>
   );
 }
@@ -637,7 +644,7 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => restoreMeasureRow(measure.id)}
-                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-zinc-100 px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
+                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-zinc-100 px-4 text-[13px] font-bold text-zinc-600 transition-all disabled:opacity-55"
                   >
                     <span>{t("cancelDelete")}</span>
                   </Button>
@@ -691,7 +698,7 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => reactivateMeasureRow(measure.id)}
-                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-zinc-100 px-4 text-[13px] font-bold text-zinc-600 transition-all active:scale-95 disabled:opacity-55"
+                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-zinc-100 px-4 text-[13px] font-bold text-zinc-600 transition-all disabled:opacity-55"
                   >
                     <DowinIcon name="action-undo" size="14px" />
                     <span>{t("reactivateMeasure")}</span>
@@ -700,10 +707,16 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => removeMeasureRow(measure.id)}
-                    className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-red-50 text-red-500 transition-all active:scale-95 disabled:opacity-55 sm:w-auto sm:px-4 sm:bg-transparent"
+                    className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-red-50 text-red-500 transition-all disabled:opacity-55 sm:w-auto sm:px-4 sm:bg-transparent"
                   >
-                    <DowinIcon name="action-delete" size="14px" className="sm:mr-1.5" />
-                    <span className="hidden sm:inline font-bold text-[13px]">{t("delete")}</span>
+                    <DowinIcon
+                      name="action-delete"
+                      size="14px"
+                      className="sm:mr-1.5"
+                    />
+                    <span className="hidden sm:inline font-bold text-[13px]">
+                      {t("delete")}
+                    </span>
                   </Button>
                 </div>
               </div>

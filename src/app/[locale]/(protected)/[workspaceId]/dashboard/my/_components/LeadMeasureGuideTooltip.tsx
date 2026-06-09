@@ -1,6 +1,9 @@
 "use client";
 
-import { type WeeklyLogGuide, WeeklyLogGuideKind } from "@/api/generated/dowin.schemas";
+import {
+  type WeeklyLogGuide,
+  WeeklyLogGuideKind,
+} from "@/api/generated/dowin.schemas";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -33,9 +36,10 @@ export function LeadMeasureGuideTooltip({
 }: LeadMeasureGuideTooltipProps) {
   const style = guideStyles[guide.kind];
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const [position, setPosition] = useState<{ left: number; bottom: number } | null>(
-    null,
-  );
+  const [position, setPosition] = useState<{
+    left: number;
+    bottom: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!active) {
@@ -71,7 +75,10 @@ export function LeadMeasureGuideTooltip({
   const t = useTranslations("Dashboard.My.Guide");
 
   return (
-    <div className="relative inline-flex items-center" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="relative inline-flex items-center"
+      onClick={(e) => e.stopPropagation()}
+    >
       <button
         ref={triggerRef}
         type="button"
@@ -80,7 +87,7 @@ export function LeadMeasureGuideTooltip({
           e.stopPropagation();
           if (onToggle) onToggle();
         }}
-        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors active:scale-[0.95] ${
+        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors ${
           active ? style.activeClassName : style.buttonClassName
         }`}
         aria-label={t("ariaLabel")}
