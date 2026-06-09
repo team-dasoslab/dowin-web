@@ -256,7 +256,7 @@
     "onlyOneActiveDesc": "Only one scoreboard can be active at a time.",
     "archivedScoreboards": "Archived Scoreboards",
     "archivedScoreboardsDesc": "View your past scoreboards and reactivate them if needed.",
-    "totalCount": "Total: {count}",
+    "totalCount": "TOTAL {count}",
     "noArchived": "No archived scoreboards yet.",
     "noActive": "No active scoreboard",
     "noActiveDesc": "Reactivate an archived scoreboard or create a new one.",
