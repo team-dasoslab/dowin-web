@@ -276,7 +276,7 @@ export default function LoginPageClient() {
               onClick={() => {
                 router.push("/workspace/new");
               }}
-              className="w-full h-[56px] rounded-[24px] text-[17px] font-bold border-none bg-primary text-white transition-transform active:scale-[0.98]"
+              className="w-full h-[56px] rounded-[24px] text-[17px] font-bold border-none bg-zinc-900 text-white hover:bg-zinc-800 transition-transform active:scale-[0.98]"
             >
               {t("continue")}
             </Button>
@@ -357,7 +357,7 @@ export default function LoginPageClient() {
                 h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform active:scale-[0.98]
                 ${isPending
                   ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-                  : "bg-primary text-white"
+                  : "bg-zinc-900 text-white hover:bg-zinc-800"
                 }
               `}
             >
