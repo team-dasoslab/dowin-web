@@ -718,7 +718,7 @@
     "cancelMethodValue": "Cancel from the billing screen or customer portal",
     "businessInfo": "Seller information: Dasoslab, Representative Hanbee Seo, Business Registration No. 596-12-02628, 4F, 8, Dongtanjungsimsangga 2-gil, Hwaseong-si, Gyeonggi-do, Republic of Korea",
     "refundSummary": "Because Basic provides access to the workspace dashboard and operations features immediately after payment, already-paid periods are generally non-refundable. General cancellation stops future billing after the current period ends. Legal rights, duplicate payments, obvious mistaken charges, or technical failures right after payment are reviewed as exceptions.",
-    "supportSummary": "Questions about billing, cancellation, or refunds may be submitted to dowin.support@dasoslab.com or through the contact path.",
+    "supportSummary": "Questions about billing, cancellation, or refunds may be submitted to support@dowin.app or through the contact path.",
     "billingPolicyLink": "View Billing & Refund Policy",
     "termsLink": "View Terms of Service",
     "privacyLink": "View Privacy Policy",
@@ -1092,49 +1092,49 @@
       "start": "Get Started"
     },
     "Hero": {
-      "eyebrow": "For teams that need better results",
-      "headline": "Find why performance is stuck\nin your goals and execution",
-      "description": "Dowin connects your team's primary goal and weekly actions into one scoreboard, so you can see what needs to change.",
-      "primaryCta": "Create a team scoreboard",
-      "secondaryCta": "See the flow"
+      "eyebrow": "",
+      "headline": "Working hard\nbut results aren't following?",
+      "description": "",
+      "primaryCta": "Get started with Dowin",
+      "secondaryCta": "See how it works"
     },
     "Problem": {
-      "eyebrow": "Problem",
-      "title": "When performance is stuck,\nthe problem often starts before execution",
-      "body": "Your team may not be lazy. If the goal, criteria, actions, or check-in rhythm is unclear, hard work may not move the result.",
+      "eyebrow": "Why performance doesn't improve",
+      "title": "Setting goals alone\ndoesn't produce results",
+      "body": "",
       "item1Title": "Too many goals",
-      "item1Body": "Everything sounds important, so the one goal you need to win this week gets blurred.",
+      "item1Body": "Everything sounds important, so the one goal you must win this week gets blurred.",
       "item2Title": "Unclear success criteria",
-      "item2Body": "If success is not defined, the team can look at the same result and tell different stories.",
+      "item2Body": "The team looks at the same result and tells different stories—because what counts as success was never defined.",
       "item3Title": "Actions do not move the result",
-      "item3Body": "The team stays busy, but it is unclear whether those actions are pushing the goal forward.",
+      "item3Body": "The team stays busy, but it is not clear whether those actions are actually pushing the goal forward.",
       "item4Title": "Execution is not checked",
-      "item4Body": "You only find out what slipped when the meeting starts and everyone looks back from memory."
+      "item4Body": "The meeting starts, and everyone looks back from memory to figure out what slipped."
     },
     "Solution": {
-      "eyebrow": "Solution",
-      "title": "Dowin shows what can change performance\nweek by week",
-      "body": "It is not a place to write more goals. Dowin helps you narrow the primary goal, define success criteria, and check the action items that can move the result.",
+      "eyebrow": "How Dowin works",
+      "title": "Narrow the primary goal\nand review execution every week",
+      "body": "",
       "item1Title": "Narrow the primary goal",
-      "item1Body": "Start by deciding which result matters most right now.",
+      "item1Body": "Start by deciding which result you need to win right now.",
       "item2Title": "Define success with a number",
       "item2Body": "Judge progress by clear criteria, not by feeling.",
       "item3Title": "Connect action items to execution",
-      "item3Body": "Set the repeated actions that can move the result and track whether they happened this week.",
+      "item3Body": "Set the repeated actions that can move the result, and track whether they happened this week.",
       "item4Title": "Review on the scoreboard",
-      "item4Body": "See where the flow is blocked and adjust the next action."
+      "item4Body": "See where the flow is blocked and adjust the next action accordingly."
     },
     "Proof": {
-      "eyebrow": "Scoreboard",
-      "title": "Leaders do not need\nmore reports",
-      "body": "They need to see whether the goal is alive, whether actions are happening, and where to step in this week.",
-      "point1": "View goal progress and action execution together.",
+      "eyebrow": "Weekly scoreboard",
+      "title": "Can you see right now whether\nyour team is moving toward the goal this week?",
+      "body": "",
+      "point1": "View goal progress and action execution rate in one place.",
       "point2": "Do not miss delayed action items.",
       "point3": "See weekly execution flow by teammate.",
-      "point4": "Know what to adjust before the next meeting."
+      "point4": "Know what needs adjusting before the next meeting."
     },
     "Flow": {
-      "eyebrow": "Flow",
+      "eyebrow": "From start to review",
       "title": "Simple to start,\nsteady to review.",
       "step1": "Create a workspace and invite your team.",
       "step2": "Set the primary goal and success criteria for this period.",
@@ -1144,8 +1144,17 @@
     },
     "FinalCta": {
       "title": "If you want to change performance,\nstart with this week's execution",
-      "body": "Connect your primary goal, action items, and weekly check-in into one flow with Dowin.",
+      "body": "",
       "cta": "Create a team scoreboard"
+    },
+    "Footer": {
+      "headline": "Now it's time to focus\non what matters most",
+      "description": "Primary goal, success criteria, action items. Dowin connects your team's execution into a single flow.",
+      "cta": "Get Started",
+      "contact": "Contact Us",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "billingPolicy": "Billing & Refund Policy"
     }
   },
   "ContactPage": {
