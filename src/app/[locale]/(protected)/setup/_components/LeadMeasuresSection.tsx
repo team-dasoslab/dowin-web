@@ -223,7 +223,7 @@ function LeadMeasureRow({
               );
             }}
             disabled={isMutating}
-            size="lg"
+            size="md"
             className="w-full sm:w-auto"
           />
         </div>
@@ -237,7 +237,7 @@ function LeadMeasureRow({
             value={measure.trackingMode}
             onChange={(mode) => handleMeasureChange(measure.id, "trackingMode", mode)}
             disabled={isMutating}
-            size="lg"
+            size="md"
             className="w-full sm:w-auto"
           />
         </div>
@@ -259,12 +259,12 @@ function LeadMeasureRow({
                   measure.targetValue - 1,
                 )
               }
-              className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+              className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
               aria-label={t("decrement")}
             >
               <DowinIcon name="action-subtract" size="16px" />
             </Button>
-            <div className="flex h-12 min-w-12 items-center justify-center px-2 font-mono text-[17px] font-black text-zinc-900">
+            <div className="flex h-10 min-w-10 items-center justify-center px-2 font-mono text-[15px] font-black text-zinc-900">
               {measure.targetValue}
             </div>
             <Button
@@ -281,7 +281,7 @@ function LeadMeasureRow({
                   measure.targetValue + 1,
                 )
               }
-              className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+              className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
               aria-label={t("increment")}
             >
               <DowinIcon name="action-add" size="16px" />
@@ -310,11 +310,11 @@ function LeadMeasureRow({
                       measure.dailyTargetCount - 1,
                     )
                   }
-                  className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+                  className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
                 >
                   <DowinIcon name="action-subtract" size="16px" />
                 </Button>
-                <div className="flex h-12 min-w-12 items-center justify-center px-2 font-mono text-[17px] font-black text-zinc-900">
+                <div className="flex h-10 min-w-10 items-center justify-center px-2 font-mono text-[15px] font-black text-zinc-900">
                   {measure.dailyTargetCount}
                 </div>
                 <Button
@@ -327,7 +327,7 @@ function LeadMeasureRow({
                       measure.dailyTargetCount + 1,
                     )
                   }
-                  className="flex h-12 w-12 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+                  className="flex h-10 w-10 items-center justify-center text-zinc-500 transition-colors disabled:opacity-30 active:bg-zinc-200/50"
                 >
                   <DowinIcon name="action-add" size="16px" />
                 </Button>
