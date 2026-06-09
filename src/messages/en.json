@@ -701,6 +701,8 @@
     "entitlementSourceManualGrant": "Admin grant",
     "entitlementSourcePartner": "Partner grant",
     "entitlementSourceInternalTest": "Internal test",
+    "entitlementSourceBetaPromotionalGrant": "Marketing promotional grant (Beta Promotional Grant)",
+    "betaPromotionalGrantNotice": "Basic promotion benefits are currently applied.",
     "nonPolarEntitlementNotice": "You're currently using Basic features through {source}. If you need to change or cancel your subscription, please <contact>contact support</contact>.",
     "memberNotice": "Changing payment methods, canceling, and re-subscribing are currently limited to workspace admins.",
     "checkoutNoticeTitle": "Before you upgrade",

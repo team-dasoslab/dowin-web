@@ -214,7 +214,7 @@ export function ProfileBillingPageClient() {
                 size="14px"
                 className="mt-0.5 shrink-0"
               />
-              Basic 프로모션 혜택이 적용되어 있어요.
+              {t("betaPromotionalGrantNotice")}
             </div>
           ) : billing.entitlementSource && !isPolarEntitlement ? (
             <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
@@ -501,7 +501,7 @@ function getEntitlementSourceLabel(
     case "INTERNAL_TEST":
       return t("entitlementSourceInternalTest");
     case "BETA_PROMOTIONAL_GRANT":
-      return "마케팅 프로모션 혜택 (Beta Promotional Grant)";
+      return t("entitlementSourceBetaPromotionalGrant");
     default:
       return t("notAvailable");
   }

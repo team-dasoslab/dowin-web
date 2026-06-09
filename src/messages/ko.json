@@ -704,6 +704,8 @@
     "entitlementSourceManualGrant": "운영자 제공",
     "entitlementSourcePartner": "제휴 제공",
     "entitlementSourceInternalTest": "내부 테스트",
+    "entitlementSourceBetaPromotionalGrant": "마케팅 프로모션 혜택 (Beta Promotional Grant)",
+    "betaPromotionalGrantNotice": "Basic 프로모션 혜택이 적용되어 있어요.",
     "nonPolarEntitlementNotice": "현재 {source} 자격으로 Basic 기능을 이용하고 있어요. 구독 변경이나 해지가 필요하다면 <contact>고객지원으로 문의</contact>해 주세요.",
     "memberNotice": "결제 수단 변경, 해지, 재구독은 현재 워크스페이스 관리자만 진행할 수 있습니다.",
     "checkoutNoticeTitle": "결제 전 확인사항",
