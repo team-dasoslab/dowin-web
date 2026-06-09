@@ -52,7 +52,10 @@ function CountPopoverContent({
       className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
       onClick={(e) => e.stopPropagation()}
     >
-      <Button className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100" onClick={onClose}>
+      <Button
+        className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100"
+        onClick={onClose}
+      >
         <svg
           width="20"
           height="20"
@@ -104,7 +107,7 @@ function CountPopoverContent({
         </div>
 
         <Button
-          className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white active:scale-95 transition-all"
+          className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white transition-all"
           onClick={() => {
             onSave(localCount);
             onClose();
@@ -233,16 +236,23 @@ export function WeeklyBoardSection({
                       </td>
 
                       {weekDates.map((date) => {
-                        const currentValueObj: import("@/api/generated/dowin.schemas").DailyLogCell | null =
+                        const currentValueObj:
+                          | import("@/api/generated/dowin.schemas").DailyLogCell
+                          | null =
                           weekly?.logs?.[date] === undefined
                             ? null
                             : weekly.logs[date];
                         const currentValue = currentValueObj?.value ?? null;
                         const count = currentValueObj?.count ?? 0;
-                        const isAchievedDaily = currentValueObj?.achieved ?? false;
-                        const typedLead = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
+                        const isAchievedDaily =
+                          currentValueObj?.achieved ?? false;
+                        const typedLead = leadMeasure as {
+                          trackingMode?: string;
+                          dailyTargetCount?: number;
+                        };
                         const trackingMode = typedLead.trackingMode;
-                        const dailyTargetCount = typedLead.dailyTargetCount ?? 1;
+                        const dailyTargetCount =
+                          typedLead.dailyTargetCount ?? 1;
                         const isCount = trackingMode === "COUNT";
 
                         const isToday = date === today;
@@ -269,7 +279,7 @@ export function WeeklyBoardSection({
                                         : `${leadMeasure.id}-${date}`,
                                     )
                                   }
-                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
+                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
                                     isAchievedDaily
                                       ? "bg-primary text-white"
                                       : count > 0
@@ -336,7 +346,7 @@ export function WeeklyBoardSection({
                                     void toggleLog(leadMeasureId, date);
                                   }
                                 }}
-                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all active:scale-95 ${
+                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
                                   currentValue === true
                                     ? "bg-primary text-white"
                                     : isToday
@@ -378,9 +388,7 @@ export function WeeklyBoardSection({
                           </div>
                           <span
                             className={`font-mono text-[11px] font-black ${
-                              rate >= 100
-                                ? "text-green-600"
-                                : "text-zinc-500"
+                              rate >= 100 ? "text-green-600" : "text-zinc-500"
                             }`}
                           >
                             {achievedCount}/{weeklyTotal}

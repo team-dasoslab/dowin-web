@@ -221,7 +221,7 @@ function ContactInquiryComposer({
                         onClick={() =>
                           form.setField("category", category.value)
                         }
-                        className={`inline-flex items-center justify-center h-10 rounded-[12px] px-5 text-[13px] font-bold transition-all active:scale-[0.98] ${
+                        className={`inline-flex items-center justify-center h-10 rounded-[12px] px-5 text-[13px] font-bold transition-all ${
                           isSelected
                             ? "bg-primary border border-primary text-white"
                             : "bg-white border border-zinc-200 text-zinc-500"
@@ -435,10 +435,7 @@ function InquiryListSkeleton() {
   return (
     <div className="grid gap-3">
       {Array.from({ length: 3 }).map((_, index) => (
-        <div
-          key={index}
-          className="animate-pulse rounded-[24px] bg-white p-4"
-        >
+        <div key={index} className="animate-pulse rounded-[24px] bg-white p-4">
           <div className="space-y-3">
             <div className="flex gap-2">
               <div className="h-6 w-20 rounded-full bg-zinc-200" />
