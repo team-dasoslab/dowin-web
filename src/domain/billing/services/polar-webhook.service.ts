@@ -8,11 +8,7 @@ type BillingPort = Pick<
   | "findBillingEventByProviderEventId"
   | "findWorkspaceById"
   | "findWorkspaceByCustomerExternalRef"
-  | "appendBillingEvent"
-  | "appendBillingRetentionRecord"
-  | "upsertWorkspaceBillingState"
-  | "upsertWorkspaceSeatEntitlement"
-  | "updateWorkspaceBillingProjection"
+  | "recordPolarWebhookBillingEvent"
 >;
 
 const polarWebhookEnvelopeSchema = z.object({
@@ -251,7 +247,6 @@ function pickFirstString(
 }
 
 function createRetentionRecordInput(input: {
-  billingEventId: number;
   providerEventId: string;
   payload: WebhookEnvelope;
   projection: BillingProjection | null;
@@ -292,7 +287,6 @@ function createRetentionRecordInput(input: {
     asDate(subscription?.currentPeriodEnd);
 
   return {
-    billingEventId: input.billingEventId,
     providerEventId: input.providerEventId,
     eventType: input.payload.type,
     eventOccurredAt: input.occurredAt,
@@ -677,26 +671,30 @@ export class PolarWebhookService {
       null;
     const normalizedPayloadJson = stringifyNormalizedPolarPayload(payload);
 
-    const event = await this.billingStorage.appendBillingEvent({
-      workspaceId: workspace.id,
-      providerEventId: input.providerEventId,
-      eventType: payload.type,
-      customerKey,
-      subscriptionKey,
-      occurredAt,
-      payloadJson: normalizedPayloadJson,
-      status: getBillingEventStatus(payload.type, projection),
-      failureReason: getRiskReviewFailureReason({
-        eventType: payload.type,
-        currentPeriodEnd: projection?.currentPeriodEnd ?? null,
-        occurredAt,
-        projection,
-      }),
-    });
+    const nextPurchasedSeatCount =
+      projection?.purchasedSeatCount ??
+      (projection?.planCode === "FREE" && workspace.planCode === "BASIC"
+        ? 0
+        : null);
 
-    await this.billingStorage.appendBillingRetentionRecord(
-      createRetentionRecordInput({
-        billingEventId: event.id,
+    const event = await this.billingStorage.recordPolarWebhookBillingEvent({
+      event: {
+        workspaceId: workspace.id,
+        providerEventId: input.providerEventId,
+        eventType: payload.type,
+        customerKey,
+        subscriptionKey,
+        occurredAt,
+        payloadJson: normalizedPayloadJson,
+        status: getBillingEventStatus(payload.type, projection),
+        failureReason: getRiskReviewFailureReason({
+          eventType: payload.type,
+          currentPeriodEnd: projection?.currentPeriodEnd ?? null,
+          occurredAt,
+          projection,
+        }),
+      },
+      retention: createRetentionRecordInput({
         providerEventId: input.providerEventId,
         payload,
         projection,
@@ -704,51 +702,36 @@ export class PolarWebhookService {
         occurredAt,
         normalizedPayloadJson,
       }),
-    );
+      projection: projection
+        ? {
+            billingStatus: projection.billingStatus,
+            planCode: projection.planCode,
+            entitlementSource: projection.entitlementSource,
+            customerKey: projection.customerKey,
+            subscriptionKey: projection.subscriptionKey,
+            currentPeriodEnd: projection.currentPeriodEnd,
+            cancelAtPeriodEnd: projection.cancelAtPeriodEnd,
+            billingOwnerUserId:
+              projection.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+            lastEventOccurredAt: occurredAt,
+            workspaceBillingCustomerExternalRef:
+              projection.customerExternalRef ??
+              workspace.billingCustomerExternalRef ??
+              null,
+            workspaceBillingOwnerUserId:
+              projection.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
+            purchasedSeatCount: nextPurchasedSeatCount,
+          }
+        : undefined,
+    });
+
+    if (!event) {
+      return { status: "ignored" as const };
+    }
 
     if (!projection) {
       return { status: "accepted" as const };
     }
-
-    await this.billingStorage.upsertWorkspaceBillingState({
-      workspaceId: workspace.id,
-      billingStatus: projection.billingStatus,
-      planCode: projection.planCode,
-      entitlementSource: projection.entitlementSource,
-      customerKey: projection.customerKey,
-      subscriptionKey: projection.subscriptionKey,
-      currentPeriodEnd: projection.currentPeriodEnd,
-      cancelAtPeriodEnd: projection.cancelAtPeriodEnd,
-      billingOwnerUserId:
-        projection.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
-      lastEventId: event.id,
-      lastEventOccurredAt: occurredAt,
-    });
-
-    const nextPurchasedSeatCount =
-      projection.purchasedSeatCount ??
-      (projection.planCode === "FREE" && workspace.planCode === "BASIC"
-        ? 0
-        : null);
-
-    if (nextPurchasedSeatCount !== null) {
-      await this.billingStorage.upsertWorkspaceSeatEntitlement({
-        workspaceId: workspace.id,
-        purchasedSeatCount: nextPurchasedSeatCount,
-        seatSource: "POLAR",
-      });
-    }
-
-    await this.billingStorage.updateWorkspaceBillingProjection({
-      workspaceId: workspace.id,
-      planCode: projection.planCode,
-      billingCustomerExternalRef:
-        projection.customerExternalRef ??
-        workspace.billingCustomerExternalRef ??
-        null,
-      billingOwnerUserId:
-        projection.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
-    });
 
     return { status: "accepted" as const };
   }
