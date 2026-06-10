@@ -1099,17 +1099,17 @@
       "secondaryCta": "See how it works"
     },
     "Problem": {
-      "eyebrow": "Why performance doesn't improve",
-      "title": "Setting goals alone\ndoesn't produce results",
+      "eyebrow": "4 Reasons Why Performance Stalls",
+      "title": "Why does the team feel stuck\ndespite working so hard?",
       "body": "",
       "item1Title": "Too many goals",
-      "item1Body": "Everything sounds important, so the one goal you must win this week gets blurred.",
+      "item1Body": "Everything sounds important, dispersing the team's energy. The one real goal you must win this week gets blurred.",
       "item2Title": "Unclear success criteria",
-      "item2Body": "The team looks at the same result and tells different stories—because what counts as success was never defined.",
-      "item3Title": "Actions do not move the result",
-      "item3Body": "The team stays busy, but it is not clear whether those actions are actually pushing the goal forward.",
-      "item4Title": "Execution is not checked",
-      "item4Body": "The meeting starts, and everyone looks back from memory to figure out what slipped."
+      "item2Body": "Without a shared numerical definition of success, the team looks at the same result and evaluates it differently.",
+      "item3Title": "Goals disconnected from actions",
+      "item3Body": "The goal is ambitious, but it's unclear what to do today. You are missing the specific behaviors (lead measures) that control the outcome.",
+      "item4Title": "Busy but no visible progress",
+      "item4Body": "The team works hard every day, but it's hard to tell if you are moving forward. Execution isn't visualized, so you miss the timing to adjust."
     },
     "Solution": {
       "eyebrow": "How Dowin works",
@@ -1134,13 +1134,29 @@
       "point4": "Know what needs adjusting before the next meeting."
     },
     "Flow": {
-      "eyebrow": "From start to review",
-      "title": "Simple to start,\nsteady to review.",
-      "step1": "Create a workspace and invite your team.",
-      "step2": "Set the primary goal and success criteria for this period.",
-      "step3": "Define action items that can move the result.",
-      "step4": "Teammates record daily execution.",
-      "step5": "Leaders review this week's flow on the scoreboard."
+      "eyebrow": "Operating Rhythm",
+      "title": "Weekly operations loop\nfor endless growth",
+      "node1Title": "Set Goal",
+      "node1Desc": "One thing to win this period",
+      "node2Title": "Connect Actions",
+      "node2Desc": "Define outcome-driving behaviors",
+      "node3Title": "Log Daily",
+      "node3Desc": "With O/X or numbers",
+      "node4Title": "Weekly Check-in",
+      "node4Desc": "Check flow, adjust next actions"
+    },
+    "Pricing": {
+      "eyebrow": "Single Plan",
+      "title": "Pay only for what you need",
+      "body": "No complex plan comparisons. Paid workspaces have unlimited access to the entire weekly operations loop to boost team execution.",
+      "planName": "Basic Plan",
+      "price": "$1",
+      "unit": "per seat / month",
+      "feature1": "Unlimited core goals and lead measures",
+      "feature2": "Daily logs for individual tracking",
+      "feature3": "Weekly scoreboards and team dashboard",
+      "feature4": "Unlimited team invites (billed per seat)",
+      "cta": "Get started with Dowin"
     },
     "FinalCta": {
       "title": "If you want to change performance,\nstart with this week's execution",

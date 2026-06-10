@@ -1,301 +1,185 @@
 "use client";
+
 import { Footer } from "@/components/layout/Footer";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { Button } from "@/components/ui/Button";
-import { DowinIcon, type IconName } from "@/components/ui/DowinIcon";
-import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
-import Image from "next/image";
+import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
   const t = useTranslations("Landing");
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-white text-zinc-900 selection:bg-primary/20 selection:text-zinc-900">
-      {/* Background Grid Pattern & Ambient Glow */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:24px_24px]"></div>
-      <div className="pointer-events-none absolute left-0 top-0 h-[800px] w-full overflow-hidden -z-10">
-        <div className="absolute -left-1/4 -top-[100px] h-[700px] w-[700px] rounded-full bg-blue-100/30 blur-[120px]" />
-        <div className="absolute right-[-10%] top-[10%] h-[600px] w-[600px] rounded-full bg-primary/20 blur-[120px]" />
-      </div>
-
+    <main className="flex-1 w-full overflow-y-auto overflow-x-hidden bg-white text-zinc-950 selection:bg-primary/20 selection:text-zinc-950">
       <LandingHeader />
 
-      {/* 1. Hero Section - Extreme Typography & Bleed Dashboard UI */}
-      <section className="relative z-10 w-full pt-24 pb-0 md:pt-32 isolate overflow-hidden">
-        <div className="flex flex-col items-center text-center space-y-6 mx-auto px-4">
-          {/* Pill Badge
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-bold text-primary backdrop-blur-md ring-1 ring-inset ring-primary/20 animate-fade-in-up">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
-            </span>
-            {t("Hero.badge")}
-          </div>
-          */}
+      <section className="mx-auto flex min-h-[calc(100vh-80px)] max-w-[1120px] flex-col justify-center px-6 py-24 md:px-10 md:py-32">
+        <div className="max-w-[860px]">
+          {t("Hero.eyebrow") && (
+            <p className="mb-6 text-[15px] font-bold text-primary">
+              {t("Hero.eyebrow")}
+            </p>
+          )}
+          <h1 className="whitespace-pre-line break-keep text-[44px] font-black leading-[1.08] tracking-tight text-zinc-950 md:text-[76px]">
+            {t("Hero.headline")}
+          </h1>
+          {t("Hero.description") && (
+            <p className="mt-8 max-w-[680px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.7] text-zinc-600 md:text-[22px]">
+              {t("Hero.description")}
+            </p>
+          )}
 
-          {/* Headline - Editorial Tight typography */}
-          <div className="w-full max-w-[1040px]">
-            <h1 className="text-[42px] leading-[1.15] font-black tracking-tight text-zinc-900 md:text-[72px] md:tracking-[-0.03em] break-keep animate-fade-in-up [animation-delay:100ms] whitespace-pre-line">
-              {t("Hero.headline")}
-            </h1>
-          </div>
+        </div>
+      </section>
 
-          <p className="max-w-[700px] text-[17px] leading-[1.6] text-zinc-500 md:text-[20px] break-keep font-medium tracking-tight animate-fade-in-up [animation-delay:200ms] whitespace-pre-line">
-            {t("Hero.description")}
+      <TextSection
+        eyebrow={t("Problem.eyebrow")}
+        title={t("Problem.title")}
+        body={t("Problem.body")}
+        items={[
+          {
+            title: t("Problem.item1Title"),
+            body: t("Problem.item1Body"),
+          },
+          {
+            title: t("Problem.item2Title"),
+            body: t("Problem.item2Body"),
+          },
+          {
+            title: t("Problem.item3Title"),
+            body: t("Problem.item3Body"),
+          },
+          {
+            title: t("Problem.item4Title"),
+            body: t("Problem.item4Body"),
+          },
+        ]}
+      />
+
+      <TextSection
+        eyebrow={t("Solution.eyebrow")}
+        title={t("Solution.title")}
+        body={t("Solution.body")}
+        items={[
+          {
+            title: t("Solution.item1Title"),
+            body: t("Solution.item1Body"),
+          },
+          {
+            title: t("Solution.item2Title"),
+            body: t("Solution.item2Body"),
+          },
+          {
+            title: t("Solution.item3Title"),
+            body: t("Solution.item3Body"),
+          },
+          {
+            title: t("Solution.item4Title"),
+            body: t("Solution.item4Body"),
+          },
+        ]}
+      />
+
+      <section
+        id="flow"
+        className="border-y border-zinc-200 bg-zinc-950 px-6 py-24 text-white md:px-10 md:py-32"
+      >
+        <div className="mx-auto max-w-[1120px]">
+          <p className="mb-4 text-[14px] font-bold text-primary">
+            {t("Proof.eyebrow")}
           </p>
+          <h2 className="max-w-[780px] whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight md:text-[56px]">
+            {t("Proof.title")}
+          </h2>
+          {t("Proof.body") && (
+            <p className="mt-6 max-w-[680px] whitespace-pre-line break-keep text-[17px] font-medium leading-[1.7] text-zinc-300 md:text-[20px]">
+              {t("Proof.body")}
+            </p>
+          )}
 
-          <div className="pt-4 flex flex-col sm:flex-row gap-4 w-full sm:w-auto animate-fade-in-up [animation-delay:300ms]">
-            <Button
-              asChild
-              className="flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-[16px] font-bold text-white w-full sm:w-auto"
-            >
-              <Link href="/login" className="text-white">
-                {t("Hero.cta")}
-              </Link>
-            </Button>
-          </div>
-        </div>
-
-        {/* The "Bleed" Giant Dashboard Mockup */}
-        <div className="relative mt-16 md:mt-24 w-full max-w-[1200px] mx-auto px-4 sm:px-8 xl:px-0 h-[340px] md:h-[500px]">
-          {/* Main Dashboard Panel - bleeds down off the screen */}
-          <div className="absolute top-0 left-0 lg:left-[5%] w-full lg:w-[90%] h-[600px] rounded-t-[24px] md:rounded-t-[32px] bg-white border border-zinc-200/60 overflow-hidden flex flex-col">
-            {/* Fake Mac Header */}
-            <div className="h-12 w-full bg-zinc-50/80 backdrop-blur-md border-b border-zinc-200 flex items-center px-4 gap-2 shrink-0">
-              <div className="w-3 h-3 rounded-full bg-zinc-200" />
-              <div className="w-3 h-3 rounded-full bg-zinc-200" />
-              <div className="w-3 h-3 rounded-full bg-zinc-200" />
-              <div className="mx-auto h-7 w-64 rounded-md bg-white border border-zinc-200 text-[11px] font-mono text-zinc-400 flex items-center justify-center font-bold tracking-wider">
-                dowin
-              </div>
-            </div>
-
-            {/* Dashboard Layout */}
-            <div className="flex-1 flex bg-zinc-50/50">
-              {/* Sidebar */}
-              <div className="w-[80px] lg:w-[240px] border-r border-zinc-200 bg-white p-4 shrink-0 hidden md:block">
-                <div className="w-full h-10 rounded-xl bg-primary/10 mb-6 flex lg:px-4 items-center justify-center lg:justify-start gap-3">
-                  <Logo size="20px" className="text-primary" />
-                  <span className="hidden lg:block font-bold text-primary text-sm">
-                    {t("Mockup.workspace")}
-                  </span>
-                </div>
-                <div className="space-y-2">
-                  {[
-                    "domain-board",
-                    "action-align-left",
-                    "domain-trending",
-                    "domain-people-large",
-                  ].map((iconName, idx) => (
-                    <div
-                      key={idx}
-                      className={`w-full h-10 rounded-xl flex items-center px-4 gap-3 ${idx === 0 ? "bg-zinc-100 text-zinc-900" : "text-zinc-400"}`}
-                    >
-                      <DowinIcon
-                        name={iconName as IconName}
-                        size="20px"
-                        className="mx-auto lg:mx-0 shrink-0"
-                      />
-                      <div className="hidden lg:block h-3 w-16 bg-current rounded-full opacity-20" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Main Content Area */}
-              <div className="flex-1 p-6 lg:p-12 overflow-hidden flex flex-col gap-6">
-                {/* Top Stats */}
-                <div className="flex flex-wrap gap-4">
-                  <div className="w-full lg:w-1/3 bg-white border border-zinc-200 rounded-[24px] p-6">
-                    <p className="text-[13px] font-bold text-zinc-400 uppercase tracking-wider mb-2 gap-2 flex items-center">
-                      <DowinIcon name="domain-target-arrow-large" size="16px" />{" "}
-                      {t("Mockup.stats.dowinTitle")}
-                    </p>
-                    <h3 className="text-xl font-bold text-zinc-800 tracking-tight leading-snug mb-5 whitespace-pre-line">
-                      {t("Mockup.stats.dowinGoal")}
-                    </h3>
-                    <div className="flex items-end justify-between">
-                      <span className="text-[32px] font-black text-primary leading-none">
-                        68%
-                      </span>
-                      <div className="flex -space-x-2">
-                        <div className="w-8 h-8 rounded-full border-2 border-white bg-blue-100" />
-                        <div className="w-8 h-8 rounded-full border-2 border-white bg-rose-100" />
-                        <div className="w-8 h-8 rounded-full border-2 border-white bg-zinc-100 flex items-center justify-center text-[10px] font-bold text-zinc-500">
-                          +3
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 bg-white border border-zinc-200 rounded-[24px] p-6 min-w-[300px]">
-                    <div className="flex justify-between items-center mb-6">
-                      <p className="text-[13px] font-bold text-zinc-400 uppercase tracking-wider gap-2 flex items-center">
-                        <DowinIcon name="domain-pulse-large" size="16px" />{" "}
-                        {t("Mockup.stats.leadTitle")}
-                      </p>
-                      <span className="bg-zinc-100 text-zinc-500 px-3 py-1 rounded-full text-xs font-bold">
-                        {t("Mockup.stats.week")}
-                      </span>
-                    </div>
-                    <div className="space-y-3">
-                      {[
-                        { t: t("Mockup.stats.action1"), p: 4, out: 5 },
-                        { t: t("Mockup.stats.action2"), p: 1, out: 1 },
-                      ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-4">
-                          <div className="flex-1">
-                            <div className="flex justify-between mb-1.5">
-                              <span className="text-[14px] font-bold text-zinc-700">
-                                {item.t}
-                              </span>
-                              <span className="text-[12px] font-bold text-zinc-400">
-                                {item.p}/{item.out}
-                              </span>
-                            </div>
-                            <div className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${item.p === item.out ? "bg-emerald-500" : "bg-primary"}`}
-                                style={{
-                                  width: `${(item.p / item.out) * 100}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom Weekly List */}
-                <div className="flex-1 bg-white border border-zinc-200 rounded-[24px] p-6 overflow-hidden relative">
-                  <p className="text-[14px] font-bold text-zinc-800 mb-6">
-                    {t("Mockup.teamStatus")}
-                  </p>
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="h-16 w-full rounded-2xl bg-zinc-50 border border-zinc-100 flex items-center px-4 gap-4"
-                      >
-                        <div className="w-10 h-10 rounded-full bg-zinc-200" />
-                        <div className="flex-1 space-y-2">
-                          <div className="h-3 w-32 bg-zinc-200 rounded-full" />
-                          <div className="h-2 w-48 bg-zinc-100 rounded-full" />
-                        </div>
-                        <div className="w-20 h-8 rounded-full bg-primary/10" />
-                      </div>
-                    ))}
-                  </div>
-                  {/* Fade out bottom gradient */}
-                  <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                </div>
-              </div>
-            </div>
+          <div className="mt-14 grid gap-4 md:grid-cols-2">
+            {[
+              t("Proof.point1"),
+              t("Proof.point2"),
+              t("Proof.point3"),
+              t("Proof.point4"),
+            ].map((point) => (
+              <p
+                key={point}
+                className="border-t border-white/15 pt-5 text-[18px] font-bold leading-[1.55] text-white md:text-[22px]"
+              >
+                {point}
+              </p>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 2. Asymmetrical Metric Band - Focus on ONE */}
-      <section className="bg-zinc-50/80 py-16 md:py-32 border-b border-zinc-100 relative overflow-hidden">
-        <div className="mx-auto max-w-[1200px] px-6 md:px-12">
-          <div className="bg-white rounded-[32px] md:rounded-[48px] border border-zinc-200/60 p-8 md:p-16 overflow-hidden relative shadow-[0_32px_64px_-16px_rgba(0,0,0,0.03)]">
-            <div className="max-w-2xl mx-auto text-center space-y-8 relative z-10">
-              <div className="space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[14px] font-bold mx-auto">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-primary"></span>
-                  </span>
-                  {t("MetricBand.oneTitle")}
-                </div>
-                <h3 className="text-3xl md:text-5xl font-black text-zinc-900 tracking-tight leading-[1.1] whitespace-pre-line">
-                  {t("MetricBand.oneLabel")}
-                </h3>
-                <p className="text-lg md:text-xl text-zinc-500 font-medium leading-relaxed break-keep">
-                  {t("MetricBand.oneDesc")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Why Dowin? - Zigzag Deep Layering */}
-      <section className="py-24 md:py-32 bg-white overflow-hidden">
-        <div className="mx-auto max-w-[1200px] px-6 md:px-12">
-          <div className="text-center md:text-left mb-20 max-w-[700px]">
-            <h2 className="text-[32px] leading-[1.2] font-black tracking-[-0.03em] text-zinc-900 md:text-[48px] break-keep whitespace-pre-line">
-              {t("WhyDowin.header")}
+      <section className="px-6 py-24 md:px-10 md:py-32">
+        <div className="mx-auto grid max-w-[1120px] gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="mb-4 text-[14px] font-bold text-primary">
+              {t("Flow.eyebrow")}
+            </p>
+            <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight text-zinc-950 md:text-[56px]">
+              {t("Flow.title")}
             </h2>
           </div>
-
-          <div className="space-y-24">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-5 lg:pr-12">
-                <div className="inline-flex h-10 items-center px-4 rounded-[12px] bg-blue-50 text-blue-600 font-bold text-[13px]">
-                  {t("WhyDowin.item1Badge")}
+          <div className="relative mt-12 w-full max-w-[800px] mx-auto lg:mt-0">
+            {/* Background Circle Track */}
+            <div className="absolute inset-x-[15%] inset-y-[15%] md:inset-x-[20%] md:inset-y-[20%] rounded-full border-[3px] border-dashed border-zinc-200" />
+            
+            <div className="relative grid grid-cols-2 gap-8 md:gap-24">
+              {/* Node 01 - Top Left */}
+              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[18px] font-black text-white shadow-sm mb-4">
+                  01
                 </div>
-                <h3 className="text-[28px] font-black tracking-[-0.02em] text-zinc-900 leading-tight whitespace-pre-line">
-                  {t("WhyDowin.item1Title")}
+                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
+                  {t("Flow.node1Title")}
                 </h3>
-                <p className="text-[16px] leading-[1.7] text-zinc-500 font-medium break-keep">
-                  {t("WhyDowin.item1Desc")}
+                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
+                  {t("Flow.node1Desc")}
                 </p>
               </div>
-              <div className="relative">
-                <div className="absolute inset-0 bg-blue-100 rounded-full blur-[80px] opacity-50" />
-                <div className="relative bg-white rounded-[24px] p-6 border border-zinc-200">
-                  <div className="h-48 w-full bg-zinc-50 rounded-[20px] border border-zinc-100 flex flex-col items-center justify-center text-center px-6">
-                    <DowinIcon
-                      name="domain-target-arrow-large"
-                      size="40px"
-                      className="text-blue-500 mb-4"
-                    />
-                    <p className="text-[20px] font-bold text-zinc-800">
-                      {t("WhyDowin.item1VisualGoal")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="order-2 lg:order-1 relative">
-                <div className="absolute inset-0 bg-emerald-100 rounded-full blur-[80px] opacity-50" />
-                <div className="relative bg-white rounded-[24px] p-6 border border-zinc-200">
-                  <div className="h-40 w-full bg-zinc-50 rounded-[16px] border border-zinc-100 p-6 flex flex-col justify-center">
-                    <p className="font-bold text-zinc-600 mb-4 flex items-center gap-2 text-[14px]">
-                      <DowinIcon
-                        name="domain-pulse-large"
-                        size="20px"
-                        className="text-emerald-500"
-                      />
-                      {t("WhyDowin.item2VisualTitle")}
-                    </p>
-                    <div className="bg-white rounded-xl h-14 border border-zinc-200 flex items-center px-4 gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <DowinIcon name="status-checkmark-large" size="16px" />
-                      </div>
-                      <p className="font-bold text-zinc-800 text-[14px]">
-                        {t("WhyDowin.item2VisualAction")}
-                      </p>
-                    </div>
-                  </div>
+              {/* Node 02 - Top Right */}
+              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[18px] font-black text-white shadow-sm mb-4">
+                  02
                 </div>
-              </div>
-              <div className="order-1 lg:order-2 space-y-5 lg:pl-12">
-                <div className="inline-flex h-10 items-center px-4 rounded-[12px] bg-emerald-50 text-emerald-600 font-bold text-[13px]">
-                  {t("WhyDowin.item2Badge")}
-                </div>
-                <h3 className="text-[28px] font-black tracking-[-0.02em] text-zinc-900 leading-tight whitespace-pre-line">
-                  {t("WhyDowin.item2Title")}
+                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
+                  {t("Flow.node2Title")}
                 </h3>
-                <p className="text-[16px] leading-[1.7] text-zinc-500 font-medium break-keep">
-                  {t("WhyDowin.item2Desc")}
+                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
+                  {t("Flow.node2Desc")}
+                </p>
+              </div>
+
+              {/* Node 04 - Bottom Left */}
+              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 text-[18px] font-black text-white shadow-sm mb-4">
+                  04
+                </div>
+                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
+                  {t("Flow.node4Title")}
+                </h3>
+                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
+                  {t("Flow.node4Desc")}
+                </p>
+              </div>
+
+              {/* Node 03 - Bottom Right */}
+              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[18px] font-black text-white shadow-sm mb-4">
+                  03
+                </div>
+                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
+                  {t("Flow.node3Title")}
+                </h3>
+                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
+                  {t("Flow.node3Desc")}
                 </p>
               </div>
             </div>
@@ -303,259 +187,129 @@ export function RootLandingPage() {
         </div>
       </section>
 
-      {/* 4. Scoreboard Section (Dark Depth) */}
-      <section
-        id="how-it-works"
-        className="bg-zinc-900 py-24 md:py-32 text-white relative overflow-hidden"
-      >
-        {/* Deep perspective grids */}
-        <div className="absolute inset-0 bg-dowin-grid-pattern bg-[size:64px_64px]" />
-        <div className="absolute top-0 left-1/2 -tranzinc-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,rgba(79,70,229,0.2),transparent_60%)] pointer-events-none" />
-
-        <div className="mx-auto max-w-[1200px] px-6 text-center md:px-12 mb-20 md:mb-24 relative z-10">
-          <h2 className="text-[36px] leading-[1.2] font-black tracking-[-0.03em] md:text-[48px] mb-5 break-keep whitespace-pre-line">
-            {t("ExecutionLoop.title")}
-          </h2>
-          <p className="text-[17px] text-zinc-400 leading-[1.7] max-w-[600px] mx-auto break-keep font-medium whitespace-pre-line">
-            {t("ExecutionLoop.description")}
+      <section className="bg-white px-6 py-24 md:px-10 md:py-32">
+        <div className="mx-auto max-w-[1120px] text-center">
+          <p className="mb-4 text-[14px] font-bold text-primary">
+            {t("Pricing.eyebrow")}
           </p>
-        </div>
-
-        <div className="mx-auto max-w-[1000px] px-6 md:px-8 space-y-8 relative z-10">
-          {/* Layered Vertical Steps instead of huge blocks */}
-          <div className="relative pl-0 md:pl-24 space-y-12 md:space-y-16">
-            {/* Step 1 */}
-            <div className="relative flex flex-col md:flex-row gap-8 lg:gap-12 items-start md:items-center">
-              <div className="hidden md:flex absolute -left-16 top-1/2 -tranzinc-y-1/2 w-12 h-12 rounded-[16px] bg-primary items-center justify-center text-xl font-black border border-white/20 text-white z-10 transition-transform">
-                1
-              </div>
-              <div className="md:hidden flex h-12 w-12 rounded-xl bg-primary items-center justify-center text-xl font-black text-white">
-                1
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[24px] md:text-[32px] font-black tracking-tight text-white mb-3 break-keep">
-                  {t("ExecutionLoop.step1Title")}
-                </h3>
-                <p className="text-[16px] text-zinc-300 leading-[1.7] break-keep font-medium">
-                  {t("ExecutionLoop.step1Desc")}
-                </p>
-              </div>
-              <div className="flex-1 w-full bg-white/5 border border-white/10 rounded-[20px] p-6 backdrop-blur-md rotate-1 transition-transform">
-                <div className="h-2 w-16 bg-white/20 rounded-full mb-3" />
-                <div className="h-5 w-full max-w-[180px] bg-white/80 rounded-full mb-6" />
-                <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
-                  <div className="bg-primary h-full w-[45%]" />
-                </div>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="relative flex flex-col md:flex-row gap-8 lg:gap-12 items-start md:items-center">
-              <div className="hidden md:flex absolute -left-16 top-1/2 -tranzinc-y-1/2 w-12 h-12 rounded-[16px] bg-zinc-800 items-center justify-center text-xl font-black border border-white/10 text-zinc-300 z-10 transition-transform">
-                2
-              </div>
-              <div className="md:hidden flex h-12 w-12 rounded-xl bg-zinc-800 items-center justify-center text-xl font-black border border-white/10 text-white">
-                2
-              </div>
-              <div className="flex-1 md:order-2">
-                <h3 className="text-[24px] md:text-[32px] font-black tracking-tight text-white mb-3 break-keep">
-                  {t("ExecutionLoop.step2Title")}
-                </h3>
-                <p className="text-[16px] text-zinc-300 leading-[1.7] break-keep font-medium">
-                  {t("ExecutionLoop.step2Desc")}
-                </p>
-              </div>
-              <div className="flex-1 w-full md:order-1 bg-white/5 border border-white/10 rounded-[20px] p-6 backdrop-blur-md -rotate-1 transition-transform text-center">
-                <div className="inline-flex gap-3">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center border ${i < 3 ? "bg-primary border-primary" : "bg-transparent border-white/20 text-white/20"}`}
-                    >
-                      <DowinIcon name="status-checkmark-large" size="20px" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="relative flex flex-col md:flex-row gap-8 lg:gap-12 items-start md:items-center">
-              <div className="hidden md:flex absolute -left-16 top-1/2 -tranzinc-y-1/2 w-12 h-12 rounded-[16px] bg-zinc-800 items-center justify-center text-xl font-black border border-white/10 text-zinc-300 z-10 transition-transform">
-                3
-              </div>
-              <div className="md:hidden flex h-12 w-12 rounded-xl bg-zinc-800 items-center justify-center text-xl font-black border border-white/10 text-white">
-                3
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[24px] md:text-[32px] font-black tracking-tight text-white mb-3 break-keep">
-                  {t("ExecutionLoop.step3Title")}
-                </h3>
-                <p className="text-[16px] text-zinc-300 leading-[1.7] break-keep font-medium">
-                  {t("ExecutionLoop.step3Desc")}
-                </p>
-              </div>
-              <div className="flex-1 w-full bg-white/5 border border-white/10 rounded-[20px] p-6 backdrop-blur-md rotate-1 transition-transform">
-                <div className="flex items-end justify-between border-b border-white/10 pb-3 mb-3">
-                  <div className="h-2.5 w-14 bg-zinc-500 rounded" />
-                  <p className="text-[32px] font-black leading-none tracking-tighter">
-                    92<span className="text-[16px] opacity-50">%</span>
-                  </p>
-                </div>
-                <div className="h-3 w-24 bg-white/20 rounded" />
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Features Bento Grid
-      <section className="py-20 md:py-32 bg-zinc-50">
-        <div className="mx-auto max-w-[1200px] px-6 md:px-12">
-          <h3 className="text-[32px] md:text-[44px] font-black tracking-[-0.03em] text-zinc-900 mb-12 text-center lg:text-left leading-tight break-keep whitespace-pre-line">
-            {t("Features.title")}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 auto-rows-[220px]">
-            <div className="md:col-span-8 bg-white rounded-[24px] border border-zinc-200 p-8 transition-all overflow-hidden relative">
-              <div className="relative z-10 max-w-[300px]">
-                <h4 className="text-[20px] font-black text-zinc-900 mb-3 tracking-tight">
-                  {t("Features.item1Title")}
-                </h4>
-                <p className="text-[15px] text-zinc-500 leading-relaxed break-keep font-medium">
-                  {t("Features.item1Desc")}
-                </p>
-              </div>
-              <div className="absolute right-0 bottom-0 top-0 w-[50%] bg-gradient-to-l from-primary/5 to-transparent flex items-center justify-end pr-8">
-                <DowinIcon
-                  name="domain-trending"
-                  size="128px"
-                  className="text-primary/10 transition-transform"
-                />
-              </div>
-            </div>
-
-            <div className="md:col-span-4 bg-primary rounded-[24px] p-8 text-white relative overflow-hidden">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl transition-transform" />
-              <DowinIcon name="domain-board" size="32px" className="mb-6" />
-              <h4 className="text-[20px] font-black mb-2">
-                {t("Features.item2Title")}
-              </h4>
-              <p className="text-[14px] opacity-80 leading-relaxed font-medium break-keep">
-                {t("Features.item2Desc")}
-              </p>
-            </div>
-
-            <div className="md:col-span-5 bg-white rounded-[24px] border border-zinc-200 p-8 transition-all overflow-hidden relative">
-              <DowinIcon
-                name="domain-calendar-large"
-                size="32px"
-                className="text-zinc-300 transition-colors mb-6"
-              />
-              <h4 className="text-[20px] font-black text-zinc-900 mb-2 tracking-tight">
-                {t("Features.item3Title")}
-              </h4>
-              <p className="text-[15px] text-zinc-500 leading-relaxed font-medium break-keep">
-                {t("Features.item3Desc")}
-              </p>
-            </div>
-
-            <div className="md:col-span-7 bg-white rounded-[24px] border border-zinc-200 p-8 transition-all flex flex-col justify-end relative overflow-hidden">
-              <div className="absolute top-6 right-6">
-                <DowinIcon
-                  name="domain-target-arrow-large"
-                  size="64px"
-                  className="text-zinc-100 transition-all"
-                />
-              </div>
-              <h4 className="text-[20px] font-black text-zinc-900 mb-2 tracking-tight">
-                {t("Features.item4Title")}
-              </h4>
-              <p className="text-[15px] text-zinc-500 leading-relaxed font-medium max-w-[300px] break-keep">
-                {t("Features.item4Desc")}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      */}
-
-      {/* 7. Final CTA Section */}
-      <section className="relative w-full overflow-hidden border-t border-border bg-white py-24 md:py-40">
-        <div className="absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px] opacity-40" />
-        <div className="absolute left-1/2 top-1/2 -z-10 h-[400px] w-[400px] -tranzinc-x-1/2 -tranzinc-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
-
-        <div className="mx-auto flex max-w-[900px] flex-col items-center px-6 text-center">
-          <h2 className="whitespace-pre-line text-[40px] font-black leading-[1.1] tracking-tighter text-zinc-900 uppercase md:text-[64px]">
-            {t("Footer.headline")}
+          <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight text-zinc-950 md:text-[56px]">
+            {t("Pricing.title")}
           </h2>
-          <p className="mt-6 max-w-[600px] whitespace-pre-line text-[18px] font-medium leading-relaxed text-zinc-500 break-keep md:text-[20px]">
-            {t("Footer.description")}
+          <p className="mx-auto mt-6 max-w-[680px] whitespace-pre-line break-keep text-[17px] font-medium leading-[1.7] text-zinc-600 md:text-[20px]">
+            {t("Pricing.body")}
           </p>
-          <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row">
+          
+          <div className="mx-auto mt-16 max-w-[480px] rounded-3xl border border-zinc-200 bg-white p-8 text-left shadow-sm md:p-10">
+            <h3 className="text-[20px] font-bold text-zinc-950">
+              {t("Pricing.planName")}
+            </h3>
+            <div className="mt-4 flex items-end gap-2">
+              <span className="text-[44px] font-black leading-none tracking-tight text-zinc-950">
+                {t("Pricing.price")}
+              </span>
+              <span className="mb-1 text-[16px] font-medium text-zinc-500">
+                {t("Pricing.unit")}
+              </span>
+            </div>
+            
+            <ul className="mt-8 space-y-4">
+              {[
+                t("Pricing.feature1"),
+                t("Pricing.feature2"),
+                t("Pricing.feature3"),
+                t("Pricing.feature4"),
+              ].map((feature, i) => (
+                <li key={i} className="flex gap-3 text-zinc-600">
+                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                  <span className="text-[16px] font-medium leading-relaxed">
+                    {feature}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
             <Button
               asChild
-              className="flex h-[64px] min-w-[240px] items-center justify-center rounded-[16px] bg-zinc-900 px-10 text-[18px] font-black text-white"
+              className="mt-10 h-14 w-full rounded-xl text-[17px] font-bold"
             >
-              <Link href="/login" className="text-white">
-                {t("Footer.cta")}
-              </Link>
+              <Link href="/login">{t("Pricing.cta")}</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* 8. App Download Section */}
-      <section className="bg-zinc-950 py-20 md:py-32 text-white relative overflow-hidden border-t border-zinc-800">
-        <div className="absolute inset-0 bg-dowin-grid-pattern bg-[size:32px_32px] opacity-10 pointer-events-none" />
-        <div className="absolute left-1/2 top-1/2 -z-10 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-[140px] pointer-events-none" />
-
-        <div className="mx-auto max-w-[1100px] px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12 md:gap-16 relative z-10">
-          {/* Left Column: Text Content */}
-          <div className="max-w-xl text-center md:text-left space-y-4">
-            <h3 className="text-[28px] md:text-[40px] font-black tracking-tight text-white leading-[1.1] break-keep">
-              {t("Download.title")}
-            </h3>
-            <p className="text-[16px] md:text-[18px] text-zinc-400 font-medium leading-relaxed break-keep">
-              {t("Download.desc")}
+      <section className="bg-zinc-50 px-6 py-24 md:px-10 md:py-32">
+        <div className="mx-auto max-w-[900px] text-center">
+          <h2 className="whitespace-pre-line break-keep text-[38px] font-black leading-[1.12] tracking-tight text-zinc-950 md:text-[64px]">
+            {t("FinalCta.title")}
+          </h2>
+          {t("FinalCta.body") && (
+            <p className="mx-auto mt-6 max-w-[620px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.7] text-zinc-600 md:text-[20px]">
+              {t("FinalCta.body")}
             </p>
-          </div>
-
-          {/* Right Column: Stacked Store Buttons */}
-          <div className="flex flex-col items-center md:items-end gap-4 shrink-0">
-            <a
-              href="https://apps.apple.com/kr/app/dowin/id6764197512"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-transform duration-200"
+          )}
+          <div className="mt-10">
+            <Button
+              asChild
+              className="h-14 rounded-xl bg-zinc-950 px-8 text-[17px] font-bold text-white"
             >
-              <Image
-                src="/assets/store/appstore.png"
-                alt={t("Download.appStore")}
-                width={182}
-                height={54}
-                className="h-12 md:h-[54px] w-auto object-contain select-none"
-              />
-            </a>
-            <a
-              href="https://play.google.com/store/apps/details?id=com.dasoslab.dowin"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-transform duration-200"
-            >
-              <Image
-                src="/assets/store/playstore.png"
-                alt={t("Download.playStore")}
-                width={182}
-                height={54}
-                className="h-12 md:h-[54px] w-auto object-contain select-none"
-              />
-            </a>
+              <Link href="/login" className="text-white">
+                {t("FinalCta.cta")}
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
 
       <Footer className="border-t border-border" />
     </main>
+  );
+}
+
+type TextSectionItem = {
+  title: string;
+  body: string;
+};
+
+function TextSection({
+  eyebrow,
+  title,
+  body,
+  items,
+}: {
+  eyebrow: string;
+  title: string;
+  body: string;
+  items: TextSectionItem[];
+}) {
+  return (
+    <section className="border-t border-zinc-200 px-6 py-24 md:px-10 md:py-32">
+      <div className="mx-auto max-w-[1120px]">
+        <div className="max-w-[760px]">
+          <p className="mb-4 text-[14px] font-bold text-primary">{eyebrow}</p>
+          <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight text-zinc-950 md:text-[56px]">
+            {title}
+          </h2>
+          {body && (
+            <p className="mt-6 whitespace-pre-line break-keep text-[17px] font-medium leading-[1.7] text-zinc-600 md:text-[20px]">
+              {body}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-14 grid gap-x-10 gap-y-8 md:grid-cols-2">
+          {items.map((item) => (
+            <div key={item.title} className="border-t border-zinc-200 pt-6">
+              <h3 className="break-keep text-[24px] font-black leading-tight text-zinc-950">
+                {item.title}
+              </h3>
+              <p className="mt-3 break-keep text-[16px] font-medium leading-[1.65] text-zinc-600">
+                {item.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
