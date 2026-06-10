@@ -4,17 +4,103 @@ import { PolarWebhookService } from "./polar-webhook.service";
 function createBillingStorageMock(
   overrides: Record<string, unknown> = {},
 ): never {
-  return {
+  type AsyncMock<T = unknown> = (input: T) => Promise<unknown>;
+  type WebhookRecordInput = {
+    event: {
+      workspaceId: number;
+    };
+    retention: Record<string, unknown>;
+    projection?: {
+      billingStatus: string;
+      planCode: string;
+      entitlementSource: string | null;
+      customerKey: string | null;
+      subscriptionKey: string | null;
+      currentPeriodEnd: Date | null;
+      cancelAtPeriodEnd: boolean;
+      billingOwnerUserId: number | null;
+      lastEventOccurredAt: Date;
+      purchasedSeatCount?: number | null;
+      workspaceBillingCustomerExternalRef: string | null;
+      workspaceBillingOwnerUserId: number | null;
+    };
+  };
+  const appendBillingEvent =
+    (overrides.appendBillingEvent as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue({ id: 1 });
+  const appendBillingRetentionRecord =
+    (overrides.appendBillingRetentionRecord as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(null);
+  const upsertWorkspaceBillingState =
+    (overrides.upsertWorkspaceBillingState as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(undefined);
+  const upsertWorkspaceSeatEntitlement =
+    (overrides.upsertWorkspaceSeatEntitlement as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(undefined);
+  const updateWorkspaceBillingProjection =
+    (overrides.updateWorkspaceBillingProjection as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(undefined);
+
+  const recordPolarWebhookBillingEvent =
+    (overrides.recordPolarWebhookBillingEvent as
+      | AsyncMock<WebhookRecordInput>
+      | undefined) ??
+    vi.fn().mockImplementation(async (input: WebhookRecordInput) => {
+      const event = (await appendBillingEvent(input.event)) as { id: number };
+      await appendBillingRetentionRecord({
+        ...input.retention,
+        billingEventId: event.id,
+      });
+
+      if (input.projection) {
+        await upsertWorkspaceBillingState({
+          workspaceId: input.event.workspaceId,
+          billingStatus: input.projection.billingStatus,
+          planCode: input.projection.planCode,
+          entitlementSource: input.projection.entitlementSource,
+          customerKey: input.projection.customerKey,
+          subscriptionKey: input.projection.subscriptionKey,
+          currentPeriodEnd: input.projection.currentPeriodEnd,
+          cancelAtPeriodEnd: input.projection.cancelAtPeriodEnd,
+          billingOwnerUserId: input.projection.billingOwnerUserId,
+          lastEventId: event.id,
+          lastEventOccurredAt: input.projection.lastEventOccurredAt,
+        });
+
+        if (input.projection.purchasedSeatCount !== undefined) {
+          await upsertWorkspaceSeatEntitlement({
+            workspaceId: input.event.workspaceId,
+            purchasedSeatCount: input.projection.purchasedSeatCount ?? 0,
+            seatSource: "POLAR",
+          });
+        }
+
+        await updateWorkspaceBillingProjection({
+          workspaceId: input.event.workspaceId,
+          planCode: input.projection.planCode,
+          billingCustomerExternalRef:
+            input.projection.workspaceBillingCustomerExternalRef,
+          billingOwnerUserId: input.projection.workspaceBillingOwnerUserId,
+        });
+      }
+
+      return event;
+    });
+
+  const storage = {
     findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
     findWorkspaceById: vi.fn(),
     findWorkspaceByCustomerExternalRef: vi.fn(),
-    appendBillingEvent: vi.fn().mockResolvedValue({ id: 1 }),
-    appendBillingRetentionRecord: vi.fn().mockResolvedValue(null),
-    upsertWorkspaceBillingState: vi.fn().mockResolvedValue(undefined),
-    upsertWorkspaceSeatEntitlement: vi.fn().mockResolvedValue(undefined),
-    updateWorkspaceBillingProjection: vi.fn().mockResolvedValue(undefined),
+    appendBillingEvent,
+    appendBillingRetentionRecord,
+    upsertWorkspaceBillingState,
+    upsertWorkspaceSeatEntitlement,
+    updateWorkspaceBillingProjection,
+    recordPolarWebhookBillingEvent,
     ...overrides,
-  } as never;
+  };
+
+  return storage as never;
 }
 
 describe("PolarWebhookService", () => {
@@ -195,6 +281,43 @@ describe("PolarWebhookService", () => {
     });
 
     expect(result).toEqual({ status: "ignored" });
+  });
+
+  it("transaction 내부 중복으로 event가 생성되지 않으면 ignored로 처리한다", async () => {
+    const recordPolarWebhookBillingEvent = vi.fn().mockResolvedValue(null);
+    const upsertWorkspaceBillingState = vi.fn();
+    const service = new PolarWebhookService(createBillingStorageMock({
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 3,
+        planCode: "BASIC",
+        billingCustomerExternalRef: null,
+        billingOwnerUserId: 9,
+      }),
+      recordPolarWebhookBillingEvent,
+      upsertWorkspaceBillingState,
+    }));
+
+    const result = await service.handleWebhook({
+      providerEventId: "msg_race_duplicate",
+      payloadJson: JSON.stringify({
+        type: "subscription.active",
+        timestamp: "2026-06-09T00:00:00.000Z",
+        data: {
+          id: "sub_1",
+          customer_id: "cus_1",
+          current_period_end: "2026-07-09T00:00:00.000Z",
+          metadata: {
+            workspaceId: "3",
+            targetPlanCode: "BASIC",
+          },
+        },
+      }),
+      now: new Date("2026-06-09T00:00:00.000Z"),
+    });
+
+    expect(result).toEqual({ status: "ignored" });
+    expect(recordPolarWebhookBillingEvent).toHaveBeenCalledOnce();
+    expect(upsertWorkspaceBillingState).not.toHaveBeenCalled();
   });
 
   it("billing event에는 webhook 원문 대신 normalized payload만 저장한다", async () => {
