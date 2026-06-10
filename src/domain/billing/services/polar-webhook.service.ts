@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { stringifyNormalizedPolarPayload } from "@/domain/billing/polar-payload-normalizer";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { type EntitlementSource } from "@/domain/billing/types";
 
@@ -8,6 +9,7 @@ type BillingPort = Pick<
   | "findWorkspaceById"
   | "findWorkspaceByCustomerExternalRef"
   | "appendBillingEvent"
+  | "appendBillingRetentionRecord"
   | "upsertWorkspaceBillingState"
   | "upsertWorkspaceSeatEntitlement"
   | "updateWorkspaceBillingProjection"
@@ -109,6 +111,12 @@ function asPositiveInteger(value: unknown): number | null {
   return number !== null && Number.isInteger(number) && number > 0
     ? number
     : null;
+}
+
+function addYears(date: Date, years: number): Date {
+  const next = new Date(date);
+  next.setUTCFullYear(next.getUTCFullYear() + years);
+  return next;
 }
 
 function pickMetadataWithAny(
@@ -226,6 +234,143 @@ function pickPurchasedSeatCount(
     asPositiveInteger(metadata?.requestedSeatCount) ??
     null
   );
+}
+
+function pickFirstString(
+  source: Record<string, unknown>,
+  keys: string[],
+): string | null {
+  for (const key of keys) {
+    const value = asString(source[key]);
+    if (value) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function createRetentionRecordInput(input: {
+  billingEventId: number;
+  providerEventId: string;
+  payload: WebhookEnvelope;
+  projection: BillingProjection | null;
+  workspace: {
+    id: number;
+    uid?: string | null;
+    name?: string | null;
+    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingOwnerUserId?: number | null;
+  };
+  occurredAt: Date;
+  normalizedPayloadJson: string;
+}) {
+  const metadata = pickMetadataWithAny(
+    [
+      "termsVersion",
+      "privacyPolicyVersion",
+      "billingPolicyVersion",
+      "checkoutNoticeVersion",
+      "requestedSeatCount",
+      "targetPlanCode",
+    ],
+    input.payload.data.metadata,
+    getActiveSubscription(input.payload)?.metadata,
+  );
+  const customer = asRecord(input.payload.data.customer);
+  const subscription = asRecord(input.payload.data.subscription);
+  const currentPeriodStart =
+    asDate(input.payload.data.current_period_start) ??
+    asDate(input.payload.data.currentPeriodStart) ??
+    asDate(subscription?.current_period_start) ??
+    asDate(subscription?.currentPeriodStart);
+  const currentPeriodEnd =
+    input.projection?.currentPeriodEnd ??
+    asDate(input.payload.data.current_period_end) ??
+    asDate(input.payload.data.currentPeriodEnd) ??
+    asDate(subscription?.current_period_end) ??
+    asDate(subscription?.currentPeriodEnd);
+
+  return {
+    billingEventId: input.billingEventId,
+    providerEventId: input.providerEventId,
+    eventType: input.payload.type,
+    eventOccurredAt: input.occurredAt,
+    workspaceIdSnapshot: input.workspace.id,
+    workspaceUidSnapshot: input.workspace.uid ?? null,
+    workspaceNameSnapshot: input.workspace.name ?? null,
+    billingOwnerUserIdSnapshot:
+      input.projection?.billingOwnerUserId ??
+      input.workspace.billingOwnerUserId ??
+      null,
+    planCode:
+      input.projection?.planCode ?? pickPaidPlanCode(input.payload) ?? "BASIC",
+    seatCount:
+      input.projection?.purchasedSeatCount ??
+      pickPurchasedSeatCount(input.payload) ??
+      null,
+    currency: pickFirstString(input.payload.data, ["currency"]),
+    amount:
+      asNumber(input.payload.data.amount) ??
+      asNumber(input.payload.data.total_amount) ??
+      asNumber(input.payload.data.totalAmount),
+    taxAmount:
+      asNumber(input.payload.data.tax_amount) ??
+      asNumber(input.payload.data.taxAmount),
+    taxRate: pickFirstString(input.payload.data, ["tax_rate", "taxRate"]),
+    taxJurisdiction: pickFirstString(input.payload.data, [
+      "tax_jurisdiction",
+      "taxJurisdiction",
+    ]),
+    customerKey:
+      input.projection?.customerKey ??
+      asString(input.payload.data.customer_id) ??
+      asString(input.payload.data.customerId) ??
+      asString(customer?.id) ??
+      null,
+    subscriptionKey:
+      input.projection?.subscriptionKey ??
+      asString(input.payload.data.subscription_id) ??
+      asString(input.payload.data.subscriptionId) ??
+      asString(subscription?.id) ??
+      asString(input.payload.data.id) ??
+      null,
+    checkoutId: pickFirstString(input.payload.data, [
+      "checkout_id",
+      "checkoutId",
+    ]),
+    orderId: pickFirstString(input.payload.data, ["order_id", "orderId"]),
+    invoiceId: pickFirstString(input.payload.data, [
+      "invoice_id",
+      "invoiceId",
+    ]),
+    paymentId: pickFirstString(input.payload.data, [
+      "payment_id",
+      "paymentId",
+    ]),
+    receiptUrl: pickFirstString(input.payload.data, [
+      "receipt_url",
+      "receiptUrl",
+      "invoice_url",
+      "invoiceUrl",
+    ]),
+    currentPeriodStart,
+    currentPeriodEnd,
+    paidAt:
+      asDate(input.payload.data.paid_at) ?? asDate(input.payload.data.paidAt),
+    refundedAt:
+      asDate(input.payload.data.refunded_at) ??
+      asDate(input.payload.data.refundedAt),
+    canceledAt:
+      asDate(input.payload.data.canceled_at) ??
+      asDate(input.payload.data.canceledAt),
+    termsVersion: asString(metadata?.termsVersion),
+    privacyPolicyVersion: asString(metadata?.privacyPolicyVersion),
+    billingPolicyVersion: asString(metadata?.billingPolicyVersion),
+    checkoutNoticeVersion: asString(metadata?.checkoutNoticeVersion),
+    normalizedPayloadJson: input.normalizedPayloadJson,
+    legalRetentionUntil: addYears(input.occurredAt, 10),
+  };
 }
 
 function resolveProjection(
@@ -530,6 +675,7 @@ export class PolarWebhookService {
       asString(payload.data.subscription_id) ??
       asString(payload.data.id) ??
       null;
+    const normalizedPayloadJson = stringifyNormalizedPolarPayload(payload);
 
     const event = await this.billingStorage.appendBillingEvent({
       workspaceId: workspace.id,
@@ -538,7 +684,7 @@ export class PolarWebhookService {
       customerKey,
       subscriptionKey,
       occurredAt,
-      payloadJson: input.payloadJson,
+      payloadJson: normalizedPayloadJson,
       status: getBillingEventStatus(payload.type, projection),
       failureReason: getRiskReviewFailureReason({
         eventType: payload.type,
@@ -547,6 +693,18 @@ export class PolarWebhookService {
         projection,
       }),
     });
+
+    await this.billingStorage.appendBillingRetentionRecord(
+      createRetentionRecordInput({
+        billingEventId: event.id,
+        providerEventId: input.providerEventId,
+        payload,
+        projection,
+        workspace,
+        occurredAt,
+        normalizedPayloadJson,
+      }),
+    );
 
     if (!projection) {
       return { status: "accepted" as const };

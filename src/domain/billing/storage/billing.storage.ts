@@ -1,7 +1,9 @@
+import { nanoid } from "nanoid";
 import { getDb } from "@/db";
 import {
   billingEvents,
   billingProviderProducts,
+  billingRetentionRecords,
   workspaceBillingState,
   workspaceSeatEntitlements,
   workspaceMembers,
@@ -325,6 +327,97 @@ export class BillingStorage {
       .returning();
 
     return event;
+  }
+
+  async appendBillingRetentionRecord(input: {
+    billingEventId: number | null;
+    providerEventId: string | null;
+    eventType: string;
+    eventOccurredAt: Date;
+    workspaceIdSnapshot: number | null;
+    workspaceUidSnapshot?: string | null;
+    workspaceNameSnapshot?: string | null;
+    billingOwnerUserIdSnapshot?: number | null;
+    planCode: "BASIC" | "FREE" | "STANDARD";
+    seatCount?: number | null;
+    currency?: string | null;
+    amount?: number | null;
+    taxAmount?: number | null;
+    taxRate?: string | null;
+    taxJurisdiction?: string | null;
+    customerKey?: string | null;
+    subscriptionKey?: string | null;
+    checkoutId?: string | null;
+    orderId?: string | null;
+    invoiceId?: string | null;
+    paymentId?: string | null;
+    receiptUrl?: string | null;
+    currentPeriodStart?: Date | null;
+    currentPeriodEnd?: Date | null;
+    paidAt?: Date | null;
+    refundedAt?: Date | null;
+    canceledAt?: Date | null;
+    termsVersion?: string | null;
+    privacyPolicyVersion?: string | null;
+    billingPolicyVersion?: string | null;
+    checkoutNoticeVersion?: string | null;
+    autoRenewalNoticeAcceptedAt?: Date | null;
+    ipCountry?: string | null;
+    billingCountry?: string | null;
+    taxEvidenceSource?: string | null;
+    normalizedPayloadJson: string;
+    legalRetentionUntil: Date;
+    legalHold?: boolean;
+  }) {
+    const [record] = await this.db
+      .insert(billingRetentionRecords)
+      .values({
+        uid: nanoid(),
+        provider: "POLAR",
+        providerEventId: input.providerEventId,
+        billingEventId: input.billingEventId,
+        eventType: input.eventType,
+        eventOccurredAt: input.eventOccurredAt,
+        workspaceIdSnapshot: input.workspaceIdSnapshot,
+        workspaceUidSnapshot: input.workspaceUidSnapshot ?? null,
+        workspaceNameSnapshot: input.workspaceNameSnapshot ?? null,
+        billingOwnerUserIdSnapshot: input.billingOwnerUserIdSnapshot ?? null,
+        planCode: input.planCode,
+        seatCount: input.seatCount ?? null,
+        currency: input.currency ?? null,
+        amount: input.amount ?? null,
+        taxAmount: input.taxAmount ?? null,
+        taxRate: input.taxRate ?? null,
+        taxJurisdiction: input.taxJurisdiction ?? null,
+        customerKey: input.customerKey ?? null,
+        subscriptionKey: input.subscriptionKey ?? null,
+        checkoutId: input.checkoutId ?? null,
+        orderId: input.orderId ?? null,
+        invoiceId: input.invoiceId ?? null,
+        paymentId: input.paymentId ?? null,
+        receiptUrl: input.receiptUrl ?? null,
+        currentPeriodStart: input.currentPeriodStart ?? null,
+        currentPeriodEnd: input.currentPeriodEnd ?? null,
+        paidAt: input.paidAt ?? null,
+        refundedAt: input.refundedAt ?? null,
+        canceledAt: input.canceledAt ?? null,
+        termsVersion: input.termsVersion ?? null,
+        privacyPolicyVersion: input.privacyPolicyVersion ?? null,
+        billingPolicyVersion: input.billingPolicyVersion ?? null,
+        checkoutNoticeVersion: input.checkoutNoticeVersion ?? null,
+        autoRenewalNoticeAcceptedAt:
+          input.autoRenewalNoticeAcceptedAt ?? null,
+        ipCountry: input.ipCountry ?? null,
+        billingCountry: input.billingCountry ?? null,
+        taxEvidenceSource: input.taxEvidenceSource ?? null,
+        normalizedPayloadJson: input.normalizedPayloadJson,
+        legalRetentionUntil: input.legalRetentionUntil,
+        legalHold: input.legalHold ?? false,
+      })
+      .onConflictDoNothing()
+      .returning();
+
+    return record ?? null;
   }
 
   async upsertWorkspaceBillingState(input: {

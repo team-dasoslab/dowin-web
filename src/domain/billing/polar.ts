@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sanitizePolarLogBody } from "@/domain/billing/polar-payload-normalizer";
 
 const polarConfigSchema = z.object({
   POLAR_ENV: z.enum(["sandbox", "production"]),
@@ -238,7 +239,7 @@ export function getPolarApiErrorInfo(
 
   return {
     status: error.status,
-    body: error.body,
+    body: sanitizePolarLogBody(error.body),
   };
 }
 
