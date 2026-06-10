@@ -221,6 +221,7 @@ describe("PolarWebhookService", () => {
 
   it("BASIC 구독이 회수되면 seat entitlement를 0으로 낮춘다", async () => {
     const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
+    const appendBillingRetentionRecord = vi.fn().mockResolvedValue(null);
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 14,
@@ -229,6 +230,7 @@ describe("PolarWebhookService", () => {
         billingOwnerUserId: 22,
       }),
       appendBillingEvent: vi.fn().mockResolvedValue({ id: 52 }),
+      appendBillingRetentionRecord,
       upsertWorkspaceSeatEntitlement,
     }));
 
@@ -245,6 +247,7 @@ describe("PolarWebhookService", () => {
           metadata: {
             targetPlanCode: "BASIC",
             workspaceId: "14",
+            requestedSeatCount: "7",
           },
           customer: {
             external_id: "workspace-checkout:pending_14",
@@ -259,6 +262,13 @@ describe("PolarWebhookService", () => {
       purchasedSeatCount: 0,
       seatSource: "POLAR",
     });
+    expect(appendBillingRetentionRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "subscription.revoked",
+        planCode: "BASIC",
+        seatCount: 7,
+      }),
+    );
   });
 
   it("중복 webhook-id는 무시한다", async () => {

@@ -232,6 +232,12 @@ function pickPurchasedSeatCount(
   );
 }
 
+function asPlanCode(value: unknown): "BASIC" | "FREE" | "STANDARD" | null {
+  return value === "BASIC" || value === "FREE" || value === "STANDARD"
+    ? value
+    : null;
+}
+
 function pickFirstString(
   source: Record<string, unknown>,
   keys: string[],
@@ -272,6 +278,7 @@ function createRetentionRecordInput(input: {
     input.payload.data.metadata,
     getActiveSubscription(input.payload)?.metadata,
   );
+  const activeSubscription = getActiveSubscription(input.payload);
   const customer = asRecord(input.payload.data.customer);
   const subscription = asRecord(input.payload.data.subscription);
   const currentPeriodStart =
@@ -298,10 +305,17 @@ function createRetentionRecordInput(input: {
       input.workspace.billingOwnerUserId ??
       null,
     planCode:
-      input.projection?.planCode ?? pickPaidPlanCode(input.payload) ?? "BASIC",
+      asPlanCode(metadata?.targetPlanCode) ??
+      (input.workspace.planCode === "BASIC" || input.workspace.planCode === "STANDARD"
+        ? input.workspace.planCode
+        : input.projection?.planCode ?? "FREE"),
     seatCount:
-      input.projection?.purchasedSeatCount ??
+      pickPurchasedSeatCount(input.payload, activeSubscription) ??
       pickPurchasedSeatCount(input.payload) ??
+      (input.projection?.purchasedSeatCount &&
+      input.projection.purchasedSeatCount > 0
+        ? input.projection.purchasedSeatCount
+        : null) ??
       null,
     currency: pickFirstString(input.payload.data, ["currency"]),
     amount:
