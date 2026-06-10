@@ -213,6 +213,12 @@ yarn preview
 - 푸시 알림은 앱 WebView에서만 사용하며, 서버는 FCM 자격 증명과 활성 디바이스 토큰이 있어야 발송할 수 있다.
 - Push는 `send-daily` 내부 라우트를 사용한다.
 
+### Billing
+
+- 신규 결제 정책은 Basic-only seat 결제다. `FREE`와 `STANDARD`는 legacy 호환값으로만 본다.
+- Billing 구현은 Polar checkout, webhook, workspace billing state, seat entitlement, customer portal 흐름을 중심으로 동작한다.
+- 구매 기록 보존은 권한 projection과 분리해야 한다. 기준 문서는 [`docs/dev/billing/2026.06.09-billing-record-retention-design.md`](/docs/dev/billing/2026.06.09-billing-record-retention-design.md)다.
+
 ### Analytics / Updates
 
 - 현재 analytics는 별도 대시보드 제품이 아니라 export API 중심으로 구현돼 있다.
@@ -229,6 +235,7 @@ yarn preview
 - Daily Log: `/api/lead-measures/:id/logs/:date`, `/api/scoreboards/:id/logs/weekly`, `/api/scoreboards/:id/logs/monthly`
 - Dashboard: `/api/dashboard/team`, `/api/dashboard/team/memos`, `/api/dashboard/team/memos/:memoId/resolve`, `/api/dashboard/team/memos/:memoId`
 - Profile: `/api/users/me`
+- Billing: `/api/billing/me`, `/api/billing/checkout`, `/api/billing/portal`, `/api/webhooks/polar`
 - Analytics: `/api/analytics/export-data`
 - Push: `/api/notifications/devices`, `/api/push/send-daily`
 - OpenAPI: `/api/openapi`

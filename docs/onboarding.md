@@ -62,24 +62,25 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 요청 트리거 추가 완료
   - 정책: 앱(WebView) 환경에서만 동작하며, 로그인 흐름당 1회만 요청
 - WebView bridge / native-web handoff 전용 로컬 스킬 `frontend-webview` 추가 완료
-- 앱 클라이언트에서는 billing/export/`STANDARD` 중심 유료 노출을 숨기고 무료 핵심 흐름 중심으로 보이도록 앱 전용 UI 분기 적용 완료
+- 앱 클라이언트에서는 결제/구독/유료 기능 노출을 숨기고 무료 companion처럼 보이도록 앱 전용 UI 분기 적용 완료
 - 선행지표 상세 화면 제거 완료
 - API 라우트 dynamic slug는 `id` 기준으로 정리 완료
 - `getSession(db)`는 실제 Drizzle DB 타입 기준으로 동작하도록 정리 완료
 - 대시보드 주간 날짜 계산은 클라이언트 KST 기준으로 보정 완료
 - `dashboard/my` 기간 탐색(`view`, `date` query)과 축하 confetti 인터랙션 구현 완료
-- `dashboard` 팀 뷰 주간 히스토리 탐색 및 Free 6개월 / 유료 전체 기간 정책 연동 완료
+- `dashboard` 팀 뷰 주간 히스토리 탐색 구현 완료
 - Setup 선행지표 횟수 입력 제한 적용 완료 (`WEEKLY` 최대 7회, `MONTHLY`는 점수판 시작월 최대 일수 기준)
 - 선행지표 기록 방식은 `BOOLEAN`/`COUNT`를 지원하며, `COUNT`는 `dailyTargetCount` 이상인 날짜만 집계에 +1로 반영
 - Setup 점수판 생성 화면에 입력 품질 가이드용 코치마크 적용 완료
   - `react-joyride` 기반 3단계 안내
   - 로컬 스토리지(`dowin.setup.coachmark.v1.dismissed`) 기준 1회 노출
-- Free 플랜 기록 조회 6개월 제한 백엔드/프론트엔드 동시 적용 완료
+- 과거 Free 플랜 기록 조회 6개월 제한 백엔드/프론트엔드 동시 적용 완료
+  - 현재 Basic-only 정책에서는 신규 요금제 기준으로 사용하지 않는다
 - 히스토리 제한 구역(6개월 이전) 접근 시 블러 처리 및 '비공개' 오버레이 UI 구현 완료
 - 대시보드 네비게이션 `useTransition` 연동 및 데이터 조회 중 상호작용 비활성화(연타 방지) 완료
 - 주간 보기 시 6개월 제한 경계 주차(Overlap)에 대한 유연한 조회 허용 로직 적용 완료
 - Billing `GET /api/billing/me`, `POST /api/billing/checkout`, `GET /api/billing/portal`, `POST /api/webhooks/polar` 라우트 초안 구현 완료
-- Polar sandbox checkout과 webhook 반영 기준 `STANDARD` 플랜 전환 확인 완료
+- Polar sandbox checkout과 webhook 반영 기준 Basic entitlement 전환 확인 완료
 - 프로필 billing 화면에서 현재 플랜, billing 상태, 업그레이드 CTA, 결제 관리 CTA 노출 완료
 - 반복 `refund/revoked` 이력에 대한 최근 30일 위험 신호 집계와 `BILLING_REVIEW_REQUIRED` 차단 규칙 1차 적용 완료
 - billing 화면에 수동 검토 필요 배너 및 위험 신호 상태 표시 추가 완료
@@ -87,7 +88,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 
 ### 2.2. 아직 남은 것
 
-- 무료 가치 측정을 위한 이벤트 로그/지표 정의와 파일럿 관찰 체계 미구현
+- 파일럿 관찰을 위한 이벤트 로그/지표 정의 미구현
 - GA4 기반 일일 Discord 운영 리포트는 포맷 계약까지만 앱 저장소에 반영됐고, 실제 `GA4 Data API -> 집계 -> Discord 발송` 실행은 별도 스케줄러 워커에서 담당하도록 분리 예정이다
 - 대시보드 차트/시각화 고도화 미완료
 - 프로필 탈퇴 UX는 구현됐지만 닉네임/워크스페이스 이름 변경은 여전히 `prompt` 기반이다
@@ -101,12 +102,18 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 프로필 알림 토글은 앱 환경에서 현재 기기 FCM 토큰을 서버에 등록/비활성화한다
 - 유료 기능 후보는 `달성률 임계치 기반 자동 리마인드`보다 `리더 액션 어시스턴트` 중심으로 재정의했다. 핵심은 자동 꾸짖기가 아니라 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인`이며, 팀원 수용성/알림 피로 가드레일까지 포함해 `docs/planning/2026.04.14-leader-report-reminder-plan.md`를 본다
 - Polar customer portal 진입은 코드에서 `POLAR_ACCESS_TOKEN` fallback 지원까지 반영됐지만, 실제 sandbox 환경에는 `customer_sessions:write` scope가 있는 토큰 설정이 아직 필요하다
-- 환불 악용 방지 문서 기준의 `STANDARD` usage event 저장은 아직 미구현이며, 결제 운영을 계속할 거면 우선순위를 높여 반드시 구현해야 한다
+- 환불 악용 방지 문서 기준의 Basic usage event 저장은 아직 미구현이며, 결제 운영을 계속할 거면 우선순위를 높여 반드시 구현해야 한다
   - 이유:
     - 지금은 반복 환불/취소 이력 1차 차단까지만 가능하고, `결제 후 실제로 핵심 유료 기능을 얼마나 썼는지`를 코드로 판정할 수 없다
-    - 문서상 환불 예외 판단 기준을 실제 운영 로직으로 연결하려면 `STANDARD` usage ledger가 필요하다
+    - 문서상 환불 예외 판단 기준을 실제 운영 로직으로 연결하려면 Basic usage ledger가 필요하다
   - 함께 남은 후속:
     - 반복 환불 이력의 운영 알림/수동 검토 흐름 고도화
+- Basic seat 결제를 실제 판매 구조로 밀고 갈 때는 구매 기록 보존과 결제 데이터 최소화 기준을 함께 구현해야 한다
+  - 기준 문서: `docs/planning/2026.06.09-billing-record-retention-research.md`
+  - 핵심:
+    - 카드 원문/CVC/CVV는 Dowin DB, 로그, 에러 리포트에 저장하지 않는다
+    - 거래/구독/seat/환불/세금 증빙용 구매 기록은 법정 보존 아카이브로 분리한다
+    - 해외 판매 가능성을 고려해 결제 아카이브는 10년 보존을 기본 설계값으로 본다
 - `/profile/contact` 기준의 서비스 내부 문의 MVP는 구현 완료됐다
   - 포함 범위:
     - 문의 접수 폼
@@ -128,23 +135,24 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 
 ### 2.3. 현재 우선순위 (2026-04-30 기준)
 
-- 단기 우선순위는 무료 플랜 제한 조정보다 `가입 즉시 Basic seat 결제` 구조와 Basic에서 체감할 운영 가치를 맞추는 것이다.
+- 단기 우선순위는 Basic-only seat 결제 구조와 Basic에서 체감할 운영 가치를 맞추는 것이다.
 - 그 범용화에는 제품 전반의 내부 초기 용어를 독립적인 제품 언어로 재정리하고, 외부 방법론 의존 설명을 끊어내는 작업이 포함된다.
-- 공개 회원가입과 워크스페이스 셀프서브 진입은 현재 동작 중이며, 다음 우선순위는 운영 마감 기능과 무료 가치 측정 체계를 보강하는 것이다.
+- 공개 회원가입과 워크스페이스 셀프서브 진입은 현재 동작 중이며, 다음 우선순위는 Basic checkout 이후 운영 마감 기능과 파일럿 관찰 체계를 보강하는 것이다.
 - 목표 모델은 모든 워크스페이스가 Basic 플랜으로 시작하고, Basic이 seat 기반 유료 기본 플랜이 되는 구조다. 계정 가입과 복원코드 발급은 먼저 완료하지만, 워크스페이스 생성과 운영 접근은 Basic checkout 성공 검증 후에만 활성화된다.
 - 워크스페이스 접근은 `멤버십 접근권`과 `운영 접근권`을 분리한다. 결제 비활성 워크스페이스는 프로필, 결제, 문의, 멤버/초대 관리처럼 결제 문제 해결에 필요한 최소 표면만 허용하고, 대시보드/설정/점수판/리포트/export 같은 운영 화면은 `/{workspaceId}/subscription-required`로 유도한다.
 - 결제 비활성 워크스페이스의 복구 UX는 Polar portal과 새 Basic checkout을 분리한다. `ACTIVE`/`CANCELED`는 portal 중심, `NONE`/`EXPIRED`는 새 Basic checkout 중심, `REVOKED`는 문의/운영자 판단 중심으로 처리한다. `PAST_DUE`는 Polar상 복구 가능한 결제 실패 상태이므로 후속 enum 추가를 검토한다.
 - 그 핵심은 `리더 액션 어시스턴트` 계열 기능이며, 구체적으로는 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인` 흐름이다.
 - 무료 플랜 구조를 유지하는 방향은 폐기한다. 다음 유료화 작업의 중심은 Basic seat 결제 진입과 `자동 운영 체크인 + 체크인 결과 리포트` 같은 paid product value를 연결하는 것이다.
 - 팀 회의/회고 흐름은 별도 미팅 모드보다 팀 대시보드 메모 레일로 운영한다.
-- 무료 가치 측정 지표, 온보딩 카피 일관성, 계정 탈퇴 같은 잔여 운영 기능을 다음 제품 축으로 본다.
+- 파일럿 관찰 지표, 온보딩 카피 일관성, 계정 탈퇴 같은 잔여 운영 기능을 다음 제품 축으로 본다.
 - 용어 범용화는 내부 모델을 지우는 작업이 아니라, 사용자 노출 카피와 설명 레이어를 재설계하는 작업으로 본다.
 - 현재 확정된 사용자 노출 기본 용어는 `핵심 목표 / 성공 기준 / 액션 아이템 / 점수판`이다.
 - 랜딩은 단순 용어 치환만으로 끝내지 않고, `누가 봐도 어떤 제품인지 이해되는 카피`로 별도 다듬는 것을 다음 우선 작업으로 둔다.
 - 초대코드 만료 시간 정책과 다중 워크스페이스는 당장 우선순위에 올리지 않는다.
-- 결제/청구 구현은 별도 축이지만, `무엇을 사게 만들 것인가`에 대한 제품 가치는 `STANDARD` 기능 묶음 강화와 함께 먼저 선명해져야 한다.
-- 현재 구현 enum에는 아직 과거 `FREE | STANDARD` 명칭이 남아 있지만, 목표 모델에서는 `FREE` 무료 플랜 전제를 제거하고 `BASIC` paid seat entitlement를 기본값으로 만든다.
+- 결제/청구 구현은 별도 축이지만, `왜 Basic seat 구독을 사야 하는가`에 대한 제품 가치는 먼저 선명해져야 한다.
+- 현재 구현 enum에는 아직 과거 `FREE | STANDARD` 명칭이 남아 있지만, 신규 정책에서는 `BASIC` paid seat entitlement만 현재 요금제 기준값으로 본다. `FREE`/`STANDARD`는 legacy 호환값이다.
 - seat 기반 결제 전환은 워크스페이스 생성과 결제 비활성 복구 흐름부터 바뀐다. 현재 선행 작업은 `CapacityPolicy` 경계 확보와 운영 접근 gate이며, 다음 큰 배치는 기존 워크스페이스의 Basic checkout 재시작 API/UI와 `PAST_DUE` 상태 분리 검토다. 상세 순서는 `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`를 기준으로 본다.
+- 구매 기록 보존 기준은 Basic checkout/webhook/탈퇴 플로우를 구현할 때 함께 반영해야 하는 구현 제약이다. 단순 ledger 저장이 아니라 법정 보존용 billing archive, 삭제 요청 시 분리보관, 개인정보처리방침 보유기간 문구까지 연결해서 본다.
 - 운영 기본기 측면에서 외부 `Tally` 의존 문의 흐름은 내부 문의 저장 + Discord 운영 알림 + 사용자 문의 결과 조회 구조로 전환 완료됐다.
 - 다음 운영 후속은 운영자 처리 도구와 정책 문구 정렬이다.
 
@@ -249,10 +257,14 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
    - 초기 마케팅 방법론: `docs/planning/2026.04.19-marketing-methodology-plan.md`
    - 선행지표 태그 확장안: `docs/planning/2026.04.10-lead-measure-tag-plan.md`
    - 책 기준 정렬 점검 및 우선순위 재정의: `docs/planning/2026.04.13-book-alignment-priority-plan.md`
-   - Free 플랜 초기 제한안: `docs/planning/2026.04.14-free-plan-initial-limits-plan.md`
-     - 현재 우선순위상 출시 전 선행 적용 대상
-   - Polar 결제 MVP 설계안: `docs/planning/2026.04.18-polar-billing-mvp-plan.md`
-     - 로컬 sandbox checkout, tunnel URL, 테스트 카드 입력 예시, 환불/chargeback 방어 원칙 포함
+   - Basic-only seat 결제/권한: `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`
+     - Basic seat checkout, 운영 접근 gate, 환불/해지, legacy `FREE`/`STANDARD` 호환 원칙 포함
+   - Basic 결제 구매 기록 보존 리서치: `docs/planning/2026.06.09-billing-record-retention-research.md`
+     - 구매 기록 10년 보존, 카드 원문 미저장, 개인정보 분리보관 기준 포함
+   - 과거 Free 플랜 초기 제한안: `docs/planning/2026.04.14-free-plan-initial-limits-plan.md`
+     - 현재 정책이 아니라 히스토리로만 참고
+   - 과거 Polar `FREE -> STANDARD` 결제 MVP 설계안: `docs/planning/2026.04.18-polar-billing-mvp-plan.md`
+     - billing ledger, webhook, portal, 환불 리스크 맥락만 참고
    - 알림 스케줄 커스터마이즈: `docs/planning/2026.04.14-notification-schedule-customization-plan.md`
    - Slack/Discord 봇 연동 확장안: `docs/planning/2026.04.18-slack-discord-bot-integration-plan.md`
    - 범용화 + 무료 가치 우선 로드맵: `docs/planning/2026.03.24-monetization-generalization-roadmap.md`
