@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.5](https://github.com/team-dasoslab/dowin-web/compare/v1.2.4...v1.2.5) (2026-06-10)
+
+
+### Bug Fixes
+
+* billing retention archive 추가 및 webhook 저장 안정화 ([#119](https://github.com/team-dasoslab/dowin-web/issues/119)) ([ddb521a](https://github.com/team-dasoslab/dowin-web/commit/ddb521a33d1890e4bd956b16e4fc552a83a43d13))
+
 ## [1.2.4](https://github.com/team-dasoslab/dowin-web/compare/v1.2.3...v1.2.4) (2026-06-09)
 
 
