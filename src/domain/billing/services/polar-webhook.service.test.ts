@@ -1,6 +1,108 @@
 import { describe, expect, it, vi } from "vitest";
 import { PolarWebhookService } from "./polar-webhook.service";
 
+function createBillingStorageMock(
+  overrides: Record<string, unknown> = {},
+): never {
+  type AsyncMock<T = unknown> = (input: T) => Promise<unknown>;
+  type WebhookRecordInput = {
+    event: {
+      workspaceId: number;
+    };
+    retention: Record<string, unknown>;
+    projection?: {
+      billingStatus: string;
+      planCode: string;
+      entitlementSource: string | null;
+      customerKey: string | null;
+      subscriptionKey: string | null;
+      currentPeriodEnd: Date | null;
+      cancelAtPeriodEnd: boolean;
+      billingOwnerUserId: number | null;
+      lastEventOccurredAt: Date;
+      purchasedSeatCount?: number | null;
+      workspaceBillingCustomerExternalRef: string | null;
+      workspaceBillingOwnerUserId: number | null;
+    };
+  };
+  const appendBillingEvent =
+    (overrides.appendBillingEvent as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue({ id: 1 });
+  const appendBillingRetentionRecord =
+    (overrides.appendBillingRetentionRecord as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(null);
+  const upsertWorkspaceBillingState =
+    (overrides.upsertWorkspaceBillingState as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(undefined);
+  const upsertWorkspaceSeatEntitlement =
+    (overrides.upsertWorkspaceSeatEntitlement as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(undefined);
+  const updateWorkspaceBillingProjection =
+    (overrides.updateWorkspaceBillingProjection as AsyncMock | undefined) ??
+    vi.fn().mockResolvedValue(undefined);
+
+  const recordPolarWebhookBillingEvent =
+    (overrides.recordPolarWebhookBillingEvent as
+      | AsyncMock<WebhookRecordInput>
+      | undefined) ??
+    vi.fn().mockImplementation(async (input: WebhookRecordInput) => {
+      const event = (await appendBillingEvent(input.event)) as { id: number };
+      await appendBillingRetentionRecord({
+        ...input.retention,
+        billingEventId: event.id,
+      });
+
+      if (input.projection) {
+        await upsertWorkspaceBillingState({
+          workspaceId: input.event.workspaceId,
+          billingStatus: input.projection.billingStatus,
+          planCode: input.projection.planCode,
+          entitlementSource: input.projection.entitlementSource,
+          customerKey: input.projection.customerKey,
+          subscriptionKey: input.projection.subscriptionKey,
+          currentPeriodEnd: input.projection.currentPeriodEnd,
+          cancelAtPeriodEnd: input.projection.cancelAtPeriodEnd,
+          billingOwnerUserId: input.projection.billingOwnerUserId,
+          lastEventId: event.id,
+          lastEventOccurredAt: input.projection.lastEventOccurredAt,
+        });
+
+        if (input.projection.purchasedSeatCount !== undefined) {
+          await upsertWorkspaceSeatEntitlement({
+            workspaceId: input.event.workspaceId,
+            purchasedSeatCount: input.projection.purchasedSeatCount ?? 0,
+            seatSource: "POLAR",
+          });
+        }
+
+        await updateWorkspaceBillingProjection({
+          workspaceId: input.event.workspaceId,
+          planCode: input.projection.planCode,
+          billingCustomerExternalRef:
+            input.projection.workspaceBillingCustomerExternalRef,
+          billingOwnerUserId: input.projection.workspaceBillingOwnerUserId,
+        });
+      }
+
+      return event;
+    });
+
+  const storage = {
+    findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    findWorkspaceById: vi.fn(),
+    findWorkspaceByCustomerExternalRef: vi.fn(),
+    appendBillingEvent,
+    appendBillingRetentionRecord,
+    upsertWorkspaceBillingState,
+    upsertWorkspaceSeatEntitlement,
+    updateWorkspaceBillingProjection,
+    recordPolarWebhookBillingEvent,
+    ...overrides,
+  };
+
+  return storage as never;
+}
+
 describe("PolarWebhookService", () => {
   it("subscription.active를 STANDARD projection으로 반영한다", async () => {
     const findBillingEventByProviderEventId = vi.fn().mockResolvedValue(null);
@@ -14,14 +116,14 @@ describe("PolarWebhookService", () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 11 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
+    const service = new PolarWebhookService(createBillingStorageMock({
       findBillingEventByProviderEventId,
       findWorkspaceById,
       findWorkspaceByCustomerExternalRef,
       appendBillingEvent,
       upsertWorkspaceBillingState,
       updateWorkspaceBillingProjection,
-    } as never);
+    }));
 
     const result = await service.handleWebhook({
       providerEventId: "msg_1",
@@ -75,20 +177,16 @@ describe("PolarWebhookService", () => {
 
   it("subscription.active BASIC seats를 seat entitlement에 반영한다", async () => {
     const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 13,
         planCode: "BASIC",
         billingCustomerExternalRef: "workspace-checkout:pending_13",
         billingOwnerUserId: 21,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent: vi.fn().mockResolvedValue({ id: 51 }),
-      upsertWorkspaceBillingState: vi.fn().mockResolvedValue(undefined),
       upsertWorkspaceSeatEntitlement,
-      updateWorkspaceBillingProjection: vi.fn().mockResolvedValue(undefined),
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_basic_active",
@@ -123,20 +221,18 @@ describe("PolarWebhookService", () => {
 
   it("BASIC 구독이 회수되면 seat entitlement를 0으로 낮춘다", async () => {
     const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const appendBillingRetentionRecord = vi.fn().mockResolvedValue(null);
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 14,
         planCode: "BASIC",
         billingCustomerExternalRef: "workspace-checkout:pending_14",
         billingOwnerUserId: 22,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent: vi.fn().mockResolvedValue({ id: 52 }),
-      upsertWorkspaceBillingState: vi.fn().mockResolvedValue(undefined),
+      appendBillingRetentionRecord,
       upsertWorkspaceSeatEntitlement,
-      updateWorkspaceBillingProjection: vi.fn().mockResolvedValue(undefined),
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_basic_revoked",
@@ -151,6 +247,7 @@ describe("PolarWebhookService", () => {
           metadata: {
             targetPlanCode: "BASIC",
             workspaceId: "14",
+            requestedSeatCount: "7",
           },
           customer: {
             external_id: "workspace-checkout:pending_14",
@@ -165,17 +262,24 @@ describe("PolarWebhookService", () => {
       purchasedSeatCount: 0,
       seatSource: "POLAR",
     });
+    expect(appendBillingRetentionRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: "subscription.revoked",
+        planCode: "BASIC",
+        seatCount: 7,
+      }),
+    );
   });
 
   it("중복 webhook-id는 무시한다", async () => {
-    const service = new PolarWebhookService({
+    const service = new PolarWebhookService(createBillingStorageMock({
       findBillingEventByProviderEventId: vi.fn().mockResolvedValue({ id: 1 }),
       findWorkspaceById: vi.fn(),
       findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent: vi.fn(),
       upsertWorkspaceBillingState: vi.fn(),
       updateWorkspaceBillingProjection: vi.fn(),
-    } as never);
+    }));
 
     const result = await service.handleWebhook({
       providerEventId: "msg_dup",
@@ -189,23 +293,148 @@ describe("PolarWebhookService", () => {
     expect(result).toEqual({ status: "ignored" });
   });
 
+  it("transaction 내부 중복으로 event가 생성되지 않으면 ignored로 처리한다", async () => {
+    const recordPolarWebhookBillingEvent = vi.fn().mockResolvedValue(null);
+    const upsertWorkspaceBillingState = vi.fn();
+    const service = new PolarWebhookService(createBillingStorageMock({
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 3,
+        planCode: "BASIC",
+        billingCustomerExternalRef: null,
+        billingOwnerUserId: 9,
+      }),
+      recordPolarWebhookBillingEvent,
+      upsertWorkspaceBillingState,
+    }));
+
+    const result = await service.handleWebhook({
+      providerEventId: "msg_race_duplicate",
+      payloadJson: JSON.stringify({
+        type: "subscription.active",
+        timestamp: "2026-06-09T00:00:00.000Z",
+        data: {
+          id: "sub_1",
+          customer_id: "cus_1",
+          current_period_end: "2026-07-09T00:00:00.000Z",
+          metadata: {
+            workspaceId: "3",
+            targetPlanCode: "BASIC",
+          },
+        },
+      }),
+      now: new Date("2026-06-09T00:00:00.000Z"),
+    });
+
+    expect(result).toEqual({ status: "ignored" });
+    expect(recordPolarWebhookBillingEvent).toHaveBeenCalledOnce();
+    expect(upsertWorkspaceBillingState).not.toHaveBeenCalled();
+  });
+
+  it("billing event에는 webhook 원문 대신 normalized payload만 저장한다", async () => {
+    const appendBillingEvent = vi.fn().mockResolvedValue({ id: 12 });
+    const appendBillingRetentionRecord = vi.fn().mockResolvedValue(null);
+    const service = new PolarWebhookService(createBillingStorageMock({
+      findWorkspaceById: vi.fn().mockResolvedValue({
+        id: 3,
+        uid: "ws_3",
+        name: "Ops",
+        planCode: "BASIC",
+        billingCustomerExternalRef: null,
+        billingOwnerUserId: 9,
+      }),
+      appendBillingEvent,
+      appendBillingRetentionRecord,
+    }));
+
+    await service.handleWebhook({
+      providerEventId: "msg_sanitized",
+      payloadJson: JSON.stringify({
+        type: "subscription.active",
+        timestamp: "2026-06-09T00:00:00.000Z",
+        data: {
+          id: "sub_1",
+          customer_id: "cus_1",
+          current_period_end: "2026-07-09T00:00:00.000Z",
+          seats: 5,
+          metadata: {
+            workspaceId: "3",
+            targetPlanCode: "BASIC",
+            requestedSeatCount: "5",
+            internalNote: "drop me",
+          },
+          customer: {
+            external_id: "workspace:3",
+            email: "buyer@example.com",
+          },
+          payment_method_details: {
+            card: {
+              number: "4242424242424242",
+              cvc: "123",
+            },
+          },
+        },
+      }),
+      now: new Date("2026-06-09T00:00:00.000Z"),
+    });
+
+    const payloadJson = appendBillingEvent.mock.calls[0]?.[0]?.payloadJson;
+    expect(JSON.parse(payloadJson)).toEqual({
+      type: "subscription.active",
+      timestamp: "2026-06-09T00:00:00.000Z",
+      data: {
+        id: "sub_1",
+        customer_id: "cus_1",
+        current_period_end: "2026-07-09T00:00:00.000Z",
+        seats: 5,
+        metadata: {
+          workspaceId: "3",
+          targetPlanCode: "BASIC",
+          requestedSeatCount: "5",
+        },
+        customer: {
+          external_id: "workspace:3",
+        },
+      },
+    });
+    expect(payloadJson).not.toContain("4242424242424242");
+    expect(payloadJson).not.toContain("cvc");
+    expect(payloadJson).not.toContain("buyer@example.com");
+    expect(payloadJson).not.toContain("internalNote");
+    expect(appendBillingRetentionRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        billingEventId: 12,
+        providerEventId: "msg_sanitized",
+        eventType: "subscription.active",
+        eventOccurredAt: new Date("2026-06-09T00:00:00.000Z"),
+        workspaceIdSnapshot: 3,
+        workspaceUidSnapshot: "ws_3",
+        workspaceNameSnapshot: "Ops",
+        billingOwnerUserIdSnapshot: 9,
+        planCode: "BASIC",
+        seatCount: 5,
+        customerKey: "cus_1",
+        subscriptionKey: "sub_1",
+        normalizedPayloadJson: payloadJson,
+        legalRetentionUntil: new Date("2036-06-09T00:00:00.000Z"),
+      }),
+    );
+  });
+
   it("customer.state_changed에 활성 구독이 없으면 FREE로 회수한다", async () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 21 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 5,
         planCode: "STANDARD",
         billingCustomerExternalRef: "workspace:5",
         billingOwnerUserId: 8,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState,
       updateWorkspaceBillingProjection,
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_state",
@@ -253,8 +482,7 @@ describe("PolarWebhookService", () => {
     const upsertWorkspaceSeatEntitlement = vi.fn().mockResolvedValue(undefined);
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 13,
         planCode: "BASIC",
@@ -266,7 +494,7 @@ describe("PolarWebhookService", () => {
       upsertWorkspaceBillingState,
       upsertWorkspaceSeatEntitlement,
       updateWorkspaceBillingProjection,
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_state_basic",
@@ -323,19 +551,17 @@ describe("PolarWebhookService", () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 22 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 6,
         planCode: "STANDARD",
         billingCustomerExternalRef: "workspace:6",
         billingOwnerUserId: 10,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState,
       updateWorkspaceBillingProjection,
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_state_expired",
@@ -377,19 +603,17 @@ describe("PolarWebhookService", () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 31 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 7,
         planCode: "STANDARD",
         billingCustomerExternalRef: "workspace:7",
         billingOwnerUserId: 4,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState,
       updateWorkspaceBillingProjection,
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_ended",
@@ -432,19 +656,17 @@ describe("PolarWebhookService", () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 41 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 8,
         planCode: "FREE",
         billingCustomerExternalRef: "workspace:8",
         billingOwnerUserId: 12,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState,
       updateWorkspaceBillingProjection,
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_uncanceled",
@@ -483,19 +705,17 @@ describe("PolarWebhookService", () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 42 });
     const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
     const updateWorkspaceBillingProjection = vi.fn().mockResolvedValue(undefined);
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 9,
         planCode: "STANDARD",
         billingCustomerExternalRef: "workspace:9",
         billingOwnerUserId: 13,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState,
       updateWorkspaceBillingProjection,
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_past_due",
@@ -532,19 +752,17 @@ describe("PolarWebhookService", () => {
 
   it("기간말 만료로 온 subscription.revoked는 위험 신호로 집계하지 않는다", async () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 43 });
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 10,
         planCode: "STANDARD",
         billingCustomerExternalRef: "workspace:10",
         billingOwnerUserId: 14,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState: vi.fn().mockResolvedValue(undefined),
       updateWorkspaceBillingProjection: vi.fn().mockResolvedValue(undefined),
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_revoked_period_end",
@@ -578,19 +796,17 @@ describe("PolarWebhookService", () => {
 
   it("즉시 효력 상실 subscription.revoked는 위험 신호로 표시한다", async () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 44 });
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 11,
         planCode: "STANDARD",
         billingCustomerExternalRef: "workspace:11",
         billingOwnerUserId: 15,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState: vi.fn().mockResolvedValue(undefined),
       updateWorkspaceBillingProjection: vi.fn().mockResolvedValue(undefined),
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_revoked_immediate",
@@ -625,19 +841,17 @@ describe("PolarWebhookService", () => {
   it("부분 환불 order.refunded도 권한 회수 없이 위험 이벤트로 저장한다", async () => {
     const appendBillingEvent = vi.fn().mockResolvedValue({ id: 45 });
     const upsertWorkspaceBillingState = vi.fn();
-    const service = new PolarWebhookService({
-      findBillingEventByProviderEventId: vi.fn().mockResolvedValue(null),
+    const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 12,
         planCode: "BASIC",
         billingCustomerExternalRef: "workspace:12",
         billingOwnerUserId: 16,
       }),
-      findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent,
       upsertWorkspaceBillingState,
       updateWorkspaceBillingProjection: vi.fn(),
-    } as never);
+    }));
 
     await service.handleWebhook({
       providerEventId: "msg_partial_refund",
@@ -672,14 +886,14 @@ describe("PolarWebhookService", () => {
   });
 
   it("signed payload가 JSON이 아니면 무시한다", async () => {
-    const service = new PolarWebhookService({
+    const service = new PolarWebhookService(createBillingStorageMock({
       findBillingEventByProviderEventId: vi.fn(),
       findWorkspaceById: vi.fn(),
       findWorkspaceByCustomerExternalRef: vi.fn(),
       appendBillingEvent: vi.fn(),
       upsertWorkspaceBillingState: vi.fn(),
       updateWorkspaceBillingProjection: vi.fn(),
-    } as never);
+    }));
 
     const result = await service.handleWebhook({
       providerEventId: "msg_bad_json",
