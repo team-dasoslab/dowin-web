@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.6](https://github.com/team-dasoslab/dowin-web/compare/v1.2.5...v1.2.6) (2026-06-11)
+
+
+### Bug Fixes
+
+* 랜딩페이지 개선 ([#121](https://github.com/team-dasoslab/dowin-web/issues/121)) ([50dd38f](https://github.com/team-dasoslab/dowin-web/commit/50dd38fac39e2e70cb2cef2678133723a07b3e56))
+
 ## [1.2.5](https://github.com/team-dasoslab/dowin-web/compare/v1.2.4...v1.2.5) (2026-06-10)
 
 
