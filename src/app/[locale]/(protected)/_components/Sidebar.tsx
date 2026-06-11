@@ -71,8 +71,8 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="fixed inset-x-0 top-0 z-[110] hidden h-[64px] border-b border-zinc-200 bg-white/95 backdrop-blur-sm lg:flex items-center">
-        <div className="flex items-center justify-between w-full max-w-[1200px] mx-auto px-4 md:px-10 lg:px-12 gap-8">
+      <aside className="fixed inset-x-0 top-4 z-[110] hidden lg:flex justify-center px-4 md:px-6 pointer-events-none">
+        <div className="flex h-[64px] items-center justify-between w-full max-w-[1200px] rounded-full bg-white/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-zinc-200/80 px-4 md:px-6 gap-8 pointer-events-auto">
           <div className="flex-shrink-0 w-[200px]">
             {/* Workspace Pill */}
             {isProfileLoading ? (
@@ -93,26 +93,28 @@ export function Sidebar() {
           </div>
 
           {/* Navigation Links */}
-          <nav className="flex-1 flex items-center justify-center gap-2 overflow-x-auto scrollbar-none h-[64px]">
-            {filteredLinks.map(({ href, translationKey }) => {
-              const isActive = getIsActive(href);
+          <div className="flex-1 flex items-center justify-center overflow-x-auto scrollbar-none h-full">
+            <nav className="flex items-center justify-center gap-1 p-1">
+              {filteredLinks.map(({ href, translationKey }) => {
+                const isActive = getIsActive(href);
 
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  className={cn(
-                    "flex items-center justify-center px-4 min-w-fit whitespace-nowrap h-full border-b-[3px] transition-all text-[15px]",
-                    isActive
-                      ? "border-primary text-primary font-bold"
-                      : "border-transparent text-zinc-500 font-semibold",
-                  )}
-                >
-                  <span>{t(translationKey)}</span>
-                </Link>
-              );
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={cn(
+                      "flex items-center justify-center px-5 py-2 min-w-fit whitespace-nowrap rounded-[12px] transition-all text-[14px] font-bold",
+                      isActive
+                        ? "bg-zinc-100 text-zinc-900"
+                        : "text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50",
+                    )}
+                  >
+                    <span>{t(translationKey)}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
 
           <div className="w-[200px] flex-shrink-0" />
         </div>

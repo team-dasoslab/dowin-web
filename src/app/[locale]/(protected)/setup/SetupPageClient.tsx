@@ -237,7 +237,7 @@ export default function SetupPage() {
               </section>
             )}
 
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 p-4 pb-safe shadow-[0_-8px_16px_rgba(0,0,0,0.02)] backdrop-blur-md lg:static lg:bg-transparent lg:p-0 lg:pt-8 lg:shadow-none">
+            <div className="pt-8 pb-safe lg:p-0 lg:pt-8">
               <div className="mx-auto max-w-[800px]">
                 <SetupSubmitButton
                   isEditMode={isEditMode}
