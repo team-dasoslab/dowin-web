@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.2.7](https://github.com/team-dasoslab/dowin-web/compare/v1.2.6...v1.2.7) (2026-06-11)
+
+
+### Bug Fixes
+
+* QA ([#123](https://github.com/team-dasoslab/dowin-web/issues/123)) ([fcb84c7](https://github.com/team-dasoslab/dowin-web/commit/fcb84c791d0c236402141fbf2ae162ad9aabe876))
+
+## [1.2.6](https://github.com/team-dasoslab/dowin-web/compare/v1.2.5...v1.2.6) (2026-06-11)
+
+
+### Bug Fixes
+
+* 랜딩페이지 개선 ([#121](https://github.com/team-dasoslab/dowin-web/issues/121)) ([50dd38f](https://github.com/team-dasoslab/dowin-web/commit/50dd38fac39e2e70cb2cef2678133723a07b3e56))
+
+## [1.2.5](https://github.com/team-dasoslab/dowin-web/compare/v1.2.4...v1.2.5) (2026-06-10)
+
+
+### Bug Fixes
+
+* billing retention archive 추가 및 webhook 저장 안정화 ([#119](https://github.com/team-dasoslab/dowin-web/issues/119)) ([ddb521a](https://github.com/team-dasoslab/dowin-web/commit/ddb521a33d1890e4bd956b16e4fc552a83a43d13))
+
 ## [1.2.4](https://github.com/team-dasoslab/dowin-web/compare/v1.2.3...v1.2.4) (2026-06-09)
 
 

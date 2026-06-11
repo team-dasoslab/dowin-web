@@ -37,7 +37,7 @@ const privacyByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "개인정보 보호에 대한 문의 사항은 아래 연락처로 문의하실 수 있습니다.",
           "책임자명: Dowin 개인정보보호 담당자",
-          "이메일: dowin.support@dasoslab.com",
+          "이메일: support@dowin.app",
         ],
       },
       {
@@ -112,7 +112,7 @@ const privacyByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "10. 이용자의 권리와 행사 방법",
         body: [
           "이용자는 자신의 개인정보에 대해 열람, 정정, 삭제, 처리정지 요청을 할 수 있습니다.",
-          "프로필 수정, 언어 변경, 워크스페이스 탈퇴, 계정 탈퇴 등 일부 권리는 서비스 내 기능으로 직접 행사할 수 있으며, 추가 요청은 서비스 내 문의하기 링크 또는 이메일(dowin.support@dasoslab.com)로 접수할 수 있습니다.",
+          "프로필 수정, 언어 변경, 워크스페이스 탈퇴, 계정 탈퇴 등 일부 권리는 서비스 내 기능으로 직접 행사할 수 있으며, 추가 요청은 서비스 내 문의하기 링크 또는 이메일(support@dowin.app)로 접수할 수 있습니다.",
           "서비스 내 문의하기는 현재 외부 문의 폼(Tally, https://tally.so/r/2ExbKb)으로 연결될 수 있으므로, 이용자는 주민등록번호, 계좌번호, 비밀번호, 건강정보 등 민감한 개인정보 입력을 피하고 필요한 범위의 정보만 기재해 주시기 바랍니다.",
           "탈퇴 시 현재 비밀번호 확인이 요구될 수 있으며, 워크스페이스의 유일한 관리자인 경우 권한 이전 또는 워크스페이스 삭제가 먼저 필요할 수 있습니다.",
         ],
@@ -170,7 +170,7 @@ const privacyByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "You can contact us about privacy matters through the following channel.",
           "Privacy contact: Dowin Privacy Manager",
-          "Email: dowin.support@dasoslab.com",
+          "Email: support@dowin.app",
         ],
       },
       {
@@ -245,7 +245,7 @@ const privacyByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "10. User rights and how to exercise them",
         body: [
           "Users may request access, correction, deletion, or restriction of processing regarding their personal information.",
-          "Some rights can be exercised directly through product features such as profile updates, locale changes, workspace leave, or account deletion. Additional requests can be sent through the in-product contact link or by email at dowin.support@dasoslab.com.",
+          "Some rights can be exercised directly through product features such as profile updates, locale changes, workspace leave, or account deletion. Additional requests can be sent through the in-product contact link or by email at support@dowin.app.",
           "The in-product contact path currently links to an external support form on Tally (https://tally.so/r/2ExbKb), so users should avoid entering unnecessary sensitive personal information such as resident registration numbers, bank-account details, passwords, or health information there.",
           "Account deletion may require current-password verification, and a sole workspace admin may need to transfer admin rights or delete the workspace first.",
         ],
@@ -298,7 +298,7 @@ const termsByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "Dowin 서비스의 운영 주체는 Dasoslab이며, 대표자는 서한비입니다.",
           "사업자등록번호는 596-12-02628이고, 사업장 주소는 경기 화성시 동탄중심상가2길 8 4층입니다.",
-          "서비스 관련 문의는 dowin.support@dasoslab.com으로 접수할 수 있습니다.",
+          "서비스 관련 문의는 support@dowin.app으로 접수할 수 있습니다.",
         ],
       },
       {
@@ -350,7 +350,7 @@ const termsByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "유료 플랜이 제공되는 경우 요금, 제공 범위, 결제 수단, 결제 주기 등 구체 조건은 결제 화면과 플랜 안내 화면에 고지된 내용을 따릅니다.",
           "정기결제 해지 또는 결제 관리가 필요한 경우 서비스 내 플랜 및 결제 화면 또는 결제 사업자 고객 포털을 통해 진행할 수 있습니다.",
-          "환불 또는 취소 요청은 dowin.support@dasoslab.com 또는 서비스 내 '문의하기' 경로로 접수할 수 있으며, 회사는 결제 이력, 사용 상태, 외부 결제 사업자 처리 결과를 확인한 뒤 관련 법령과 '결제 및 환불 정책'에 따라 처리합니다.",
+          "환불 또는 취소 요청은 support@dowin.app 또는 서비스 내 '문의하기' 경로로 접수할 수 있으며, 회사는 결제 이력, 사용 상태, 외부 결제 사업자 처리 결과를 확인한 뒤 관련 법령과 '결제 및 환불 정책'에 따라 처리합니다.",
           "결제 완료 직후 실제 플랜 상태 반영에는 외부 결제 사업자의 webhook 처리 시간이 일부 소요될 수 있습니다.",
           "반복 환불 또는 취소 이력이 있는 경우 신규 결제가 제한되거나 수동 검토가 요구될 수 있습니다.",
         ],
@@ -367,7 +367,7 @@ const termsByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "10. 준거 및 문의",
         body: [
           "본 약관의 해석과 서비스 이용에 관한 분쟁은 대한민국 법령을 기준으로 해석합니다.",
-          "서비스 이용 중 문의나 불편 사항은 dowin.support@dasoslab.com 또는 서비스 내 '문의하기' 경로를 통해 접수할 수 있습니다.",
+          "서비스 이용 중 문의나 불편 사항은 support@dowin.app 또는 서비스 내 '문의하기' 경로를 통해 접수할 수 있습니다.",
         ],
       },
     ],
@@ -386,7 +386,7 @@ const termsByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "Dowin is operated by Dasoslab, whose representative is Hanbee Seo.",
           "The business registration number is 596-12-02628, and the business address is 4F, 8, Dongtanjungsimsangga 2-gil, Hwaseong-si, Gyeonggi-do, Republic of Korea.",
-          "Service-related questions may be sent to dowin.support@dasoslab.com.",
+          "Service-related questions may be sent to support@dowin.app.",
         ],
       },
       {
@@ -438,7 +438,7 @@ const termsByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "Where paid plans are offered, the applicable pricing, scope, payment methods, and billing cycle are those disclosed in the billing flow and plan screen at the time of purchase.",
           "Users may manage recurring billing, cancellation, or billing settings through the in-product billing screen or the payment provider's customer portal where available.",
-          "Refund or cancellation requests may be submitted to dowin.support@dasoslab.com or through the in-product contact path. The company reviews billing history, usage state, and the payment provider's processing result before handling the request under applicable law and the Billing and Refund Policy.",
+          "Refund or cancellation requests may be submitted to support@dowin.app or through the in-product contact path. The company reviews billing history, usage state, and the payment provider's processing result before handling the request under applicable law and the Billing and Refund Policy.",
           "Billing-state updates may not be reflected immediately because they can depend on external webhook processing by the payment provider.",
           "Repeated refund or cancellation history may result in checkout restrictions, temporary holds, or manual review.",
         ],
@@ -455,7 +455,7 @@ const termsByLocale: Record<Locale, LegalDocumentContent> = {
         heading: "10. Governing law and contact",
         body: [
           "These terms are governed by and interpreted in accordance with the laws of the Republic of Korea.",
-          "Questions, complaints, or billing-related requests about the service may be submitted to dowin.support@dasoslab.com or through the in-product Contact path.",
+          "Questions, complaints, or billing-related requests about the service may be submitted to support@dowin.app or through the in-product Contact path.",
         ],
       },
     ],
@@ -477,7 +477,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "본 유료 기능의 운영 주체는 Dasoslab이며, 대표자는 서한비입니다.",
           "사업자등록번호는 596-12-02628이고, 사업장 주소는 경기 화성시 동탄중심상가2길 8 4층입니다.",
-          "결제, 해지, 환불 관련 문의는 dowin.support@dasoslab.com으로 접수할 수 있습니다.",
+          "결제, 해지, 환불 관련 문의는 support@dowin.app으로 접수할 수 있습니다.",
         ],
       },
       {
@@ -518,7 +518,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
       {
         heading: "6. 환불 및 취소 요청 방법",
         body: [
-          "환불 또는 취소 요청은 dowin.support@dasoslab.com 또는 서비스 내 '문의하기' 경로로 접수할 수 있습니다.",
+          "환불 또는 취소 요청은 support@dowin.app 또는 서비스 내 '문의하기' 경로로 접수할 수 있습니다.",
           "회사는 결제 이력, 사용 상태, 외부 결제 사업자 처리 결과를 확인한 뒤 관련 법령, 결제 사업자 정책, 본 정책에 따라 처리 여부와 처리 방식을 검토합니다.",
           "환불 요청 시 결제 일시, 결제 수단, 문제가 된 주문 또는 워크스페이스, 요청 사유 등 확인에 필요한 정보를 요청할 수 있습니다.",
           "이용자가 관련 자료 제출 또는 사실 확인에 협조하지 않는 경우, 회사는 확인 가능한 범위 내에서만 요청을 검토할 수 있습니다.",
@@ -549,7 +549,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
         body: [
           "The paid features described in this policy are operated by Dasoslab, whose representative is Hanbee Seo.",
           "The business registration number is 596-12-02628, and the business address is 4F, 8, Dongtanjungsimsangga 2-gil, Hwaseong-si, Gyeonggi-do, Republic of Korea.",
-          "Questions about billing, cancellation, or refunds may be sent to dowin.support@dasoslab.com.",
+          "Questions about billing, cancellation, or refunds may be sent to support@dowin.app.",
         ],
       },
       {
@@ -590,7 +590,7 @@ const billingPolicyByLocale: Record<Locale, LegalDocumentContent> = {
       {
         heading: "6. How to request a refund or cancellation",
         body: [
-          "Refund or cancellation requests may be submitted to dowin.support@dasoslab.com or through the in-product contact path.",
+          "Refund or cancellation requests may be submitted to support@dowin.app or through the in-product contact path.",
           "The company reviews billing history, usage state, the payment provider's processing result, applicable law, and this policy before determining how the request should be handled.",
           "When needed, the company may ask for information such as the payment date, payment method, affected order or workspace, and the reason for the request.",
           "If the user does not cooperate with reasonable information requests or fact verification, the company may review the request only within the scope it can verify.",

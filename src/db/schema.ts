@@ -449,6 +449,84 @@ export const billingEventsRelations = relations(billingEvents, ({ one }) => ({
   }),
 }));
 
+export const billingRetentionRecords = sqliteTable(
+  "billing_retention_records",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    uid: text("uid").notNull().unique(),
+    provider: text("provider", { enum: ["POLAR"] }).notNull(),
+    providerEventId: text("provider_event_id"),
+    billingEventId: integer("billing_event_id").references(() => billingEvents.id, {
+      onDelete: "set null",
+    }),
+    eventType: text("event_type").notNull(),
+    eventOccurredAt: integer("event_occurred_at", {
+      mode: "timestamp",
+    }).notNull(),
+    workspaceIdSnapshot: integer("workspace_id_snapshot"),
+    workspaceUidSnapshot: text("workspace_uid_snapshot"),
+    workspaceNameSnapshot: text("workspace_name_snapshot"),
+    billingOwnerUserIdSnapshot: integer("billing_owner_user_id_snapshot"),
+    planCode: text("plan_code", { enum: ["BASIC", "FREE", "STANDARD"] })
+      .notNull()
+      .default("BASIC"),
+    productCode: text("product_code"),
+    billingInterval: text("billing_interval"),
+    seatCount: integer("seat_count"),
+    unitPrice: integer("unit_price"),
+    currency: text("currency"),
+    amount: integer("amount"),
+    taxAmount: integer("tax_amount"),
+    taxRate: text("tax_rate"),
+    taxJurisdiction: text("tax_jurisdiction"),
+    customerKey: text("customer_key"),
+    subscriptionKey: text("subscription_key"),
+    checkoutId: text("checkout_id"),
+    orderId: text("order_id"),
+    invoiceId: text("invoice_id"),
+    paymentId: text("payment_id"),
+    receiptUrl: text("receipt_url"),
+    currentPeriodStart: integer("current_period_start", { mode: "timestamp" }),
+    currentPeriodEnd: integer("current_period_end", { mode: "timestamp" }),
+    paidAt: integer("paid_at", { mode: "timestamp" }),
+    refundedAt: integer("refunded_at", { mode: "timestamp" }),
+    canceledAt: integer("canceled_at", { mode: "timestamp" }),
+    termsVersion: text("terms_version"),
+    privacyPolicyVersion: text("privacy_policy_version"),
+    billingPolicyVersion: text("billing_policy_version"),
+    checkoutNoticeVersion: text("checkout_notice_version"),
+    autoRenewalNoticeAcceptedAt: integer("auto_renewal_notice_accepted_at", {
+      mode: "timestamp",
+    }),
+    ipCountry: text("ip_country"),
+    billingCountry: text("billing_country"),
+    taxEvidenceSource: text("tax_evidence_source"),
+    normalizedPayloadJson: text("normalized_payload_json").notNull(),
+    legalRetentionUntil: integer("legal_retention_until", {
+      mode: "timestamp",
+    }).notNull(),
+    legalHold: integer("legal_hold", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("billing_retention_records_provider_event_unique").on(
+      table.provider,
+      table.providerEventId,
+      table.eventType,
+    ),
+    index("billing_retention_records_workspace_idx").on(
+      table.workspaceIdSnapshot,
+    ),
+    index("billing_retention_records_retention_until_idx").on(
+      table.legalRetentionUntil,
+    ),
+  ],
+);
+
 export const billingCheckoutEvents = sqliteTable(
   "billing_checkout_events",
   {

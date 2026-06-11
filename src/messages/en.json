@@ -718,7 +718,7 @@
     "cancelMethodValue": "Cancel from the billing screen or customer portal",
     "businessInfo": "Seller information: Dasoslab, Representative Hanbee Seo, Business Registration No. 596-12-02628, 4F, 8, Dongtanjungsimsangga 2-gil, Hwaseong-si, Gyeonggi-do, Republic of Korea",
     "refundSummary": "Because Basic provides access to the workspace dashboard and operations features immediately after payment, already-paid periods are generally non-refundable. General cancellation stops future billing after the current period ends. Legal rights, duplicate payments, obvious mistaken charges, or technical failures right after payment are reviewed as exceptions.",
-    "supportSummary": "Questions about billing, cancellation, or refunds may be submitted to dowin.support@dasoslab.com or through the contact path.",
+    "supportSummary": "Questions about billing, cancellation, or refunds may be submitted to support@dowin.app or through the contact path.",
     "billingPolicyLink": "View Billing & Refund Policy",
     "termsLink": "View Terms of Service",
     "privacyLink": "View Privacy Policy",
@@ -1092,111 +1092,66 @@
       "start": "Get Started"
     },
     "Hero": {
-      "badge": "Keep the important goal in view",
-      "headline": "Are you really focused on\nthe goal that matters most?",
-      "description": "For teams that stay busy but struggle to see their progress clearly.\nDowin aligns your team from the primary goal down to weekly execution, so everyone moves in the same direction.",
-      "cta": "Get Started Now"
-    },
-    "Mockup": {
-      "workspace": "Our Workspace",
-      "stats": {
-        "dowinTitle": "Primary Goal",
-        "dowinGoal": "Grow signups for\nthe new service",
-        "leadTitle": "Action Items: This Week",
-        "week": "Week 4",
-        "action1": "Review pre-signup drop-off points",
-        "action2": "Prepare customer support responses"
-      },
-      "teamStatus": "This week's execution by teammate"
-    },
-    "MetricBand": {
-      "title": "Do not spread the team across many goals.\nFocus on the one that matters most.",
-      "oneTitle": "Primary Goal",
-      "oneLabel": "The single goal\nthat must be achieved",
-      "oneDesc": "When a team chases everything at once, nothing gets done. Defining the one goal that must be achieved is where execution begins.",
-      "stat1Value": "80",
-      "stat1Desc": "Execution rate of action items\nbeing recorded this week",
-      "stat2Value": "10",
-      "stat2Desc": "Weekly check-ins that stay\nshort and finish quickly"
-    },
-    "WhyDowin": {
-      "header": "A different way to set goals",
+      "eyebrow": "",
+      "headline": "Are you really focusing on\nwhat matters most right now?",
       "description": "",
-      "item1Badge": "Success Criteria",
-      "item1Title": "Define success criteria\nwith a clear number",
-      "item1Desc": "Without a finish line, teams can look at the same result and draw different conclusions. Define exactly how far you need to go for it to count as success, and keep everyone pointed the same way.",
-      "item1VisualGoal": "Grow monthly signups\nfrom 300 to 1,000",
-      "item2Badge": "Action Items",
-      "item2Title": "Execute the actions\nthat move the result",
-      "item2Desc": "Results cannot be moved directly today. But the behaviors that drive those results can be defined and acted on right now. Lead measures are what make goals move.",
-      "item2VisualTitle": "This week's action items",
-      "item2VisualAction": "Review signup conversion metrics"
+      "primaryCta": "Get started with Dowin",
+      "secondaryCta": "See how it works"
     },
-    "ExecutionLoop": {
-      "title": "Manage execution\non the scoreboard",
-      "description": "When the primary goal, success criteria, and action items come together in one place, the team's position becomes unmistakably clear. No more pre-meeting prep.",
-      "step1Title": "Daily action item recording",
-      "step1Desc": "As each person's daily records build up, the team's overall execution flow forms automatically.",
-      "step2Title": "Full team status at a glance",
-      "step2Desc": "The scoreboard shows who is executing and where things are stalling — no separate report, no need to ask.",
-      "step3Title": "Weekly direction alignment",
-      "step3Desc": "Review this week's results on the scoreboard and adjust next steps quickly. No long meeting required."
+    "Problem": {
+      "eyebrow": "",
+      "title": "Working hard,\nbut why aren't there results?",
+      "body": "",
+      "item1Title": "Too many goals",
+      "item1Body": "Everything is important. We worked busily, but it feels like we missed the most important thing.",
+      "item2Title": "Working hard, but drifting from the goal",
+      "item2Body": "Working frantically, sometimes we end up doing things far from the actual goal.",
+      "item3Title": "Know the direction, but stuck on where to start",
+      "item3Body": "We have the big picture. But when breaking it down into today's tasks, we get stuck on where to start.",
+      "item4Title": "Not sure if we're doing well",
+      "item4Body": "We know the team is working hard. But it's hard to judge whether things are actually going well."
     },
-    "Features": {
-      "title": "Designed less for storing records,\nand more for keeping execution moving.",
-      "item1Title": "Teamwide Scoreboard",
-      "item1Desc": "Everyone in the workspace checks the same scoreboard to see this week's execution flow together.",
-      "item2Title": "Personal Dashboard",
-      "item2Desc": "Each person quickly checks the action items they need to record today and keeps their execution moving inside the team flow.",
-      "item3Title": "Weekly Check-in",
-      "item3Desc": "Without stretching meetings out, quickly align on this week's status and what needs follow-up.",
-      "item4Title": "Records that build up naturally",
-      "item4Desc": "Without writing separate reports, daily records naturally build into a visible execution flow for the team."
+    "Solution": {
+      "eyebrow": "",
+      "title": "Focus on one most important goal\nand make real results every week",
+      "body": "",
+      "item1Title": "Keep only one most important goal",
+      "item1Body": "Decide the one thing to do first right now. Narrowing the goal clearly shows the current progress and problems to solve.",
+      "item2Title": "Define success criteria clearly",
+      "item2Body": "Agree on what 'well done' means with numbers. Discussing with numbers, not feelings, makes feedback fast and clear.",
+      "item3Title": "Break the goal into executable actions for today",
+      "item3Body": "Teammates clearly divide what to do this week.",
+      "item4Title": "Check the scoreboard every week",
+      "item4Body": "See overall goal progress and individual action execution rates on one screen. You can spot delayed items even before the meeting."
+    },
+    "Loop": {
+      "eyebrow": "",
+      "title": "Execution loop that drives results",
+      "node1Title": "Set Goal",
+      "node1Desc": "The most important goal the team must achieve",
+      "node2Title": "Execute",
+      "node2Desc": "Specific action items to achieve the goal",
+      "node3Title": "Log Daily",
+      "node3Desc": "Log daily action execution",
+      "node4Title": "Weekly Check-in",
+      "node4Desc": "Feedback and improvement via scoreboard"
     },
     "Pricing": {
-      "header": "Choose a workspace and seats,\nthen start right away.",
-      "description": "Basic is the default team subscription. Choose the seats you need during workspace setup, complete checkout, and start operating.",
-      "eyebrow": "Base subscription",
-      "price": "Basic",
-      "cadence": "seat-based",
-      "planDescription": "Billing is managed per workspace, and members can join up to the number of purchased seats.",
-      "cta": "Get started",
-      "ctaFree": "Get Started",
-      "ctaStandard": "Get Notified",
-      "standardOnly": "STANDARD Only",
-      "features": [
-        "Workspace and member seat-based operations",
-        "Personal records and team scoreboard together",
-        "Primary goals, action items, and weekly check-ins",
-        "Team invites and member management by seat count",
-        "Basic subscription status and billing management"
-      ],
-      "plans": {
-        "FREE": {
-          "eyebrow": "Available Now",
-          "description": "A good place for a small team to start using primary goals and weekly check-ins right away.",
-          "price": "$0",
-          "features": [
-            "Start right away with up to 10 members",
-            "View the last 6 months of records",
-            "Check reports for the last 4 weeks",
-            "Primary goals, records, and weekly check-ins included",
-            "See personal records and the team scoreboard together"
-          ]
-        },
-        "STANDARD": {
-          "eyebrow": "Coming Soon",
-          "description": "For teams that want tighter operating follow-up, direct support, and more context around execution.",
-          "price": "Coming Soon",
-          "features": [
-            "Direct reminders to teammates",
-            "CSV export for sharing and meetings",
-            "Longer record and report history",
-            "Extended analysis for operating decisions",
-            "Additional features for team execution management"
-          ]
-        }
-      }
+      "eyebrow": "",
+      "title": "Just one plan",
+      "body": "Start by paying only for the number of your team members.",
+      "planName": "Basic",
+      "price": "$1",
+      "unit": "per seat / month",
+      "feature1": "Unlimited goal and action item management",
+      "feature2": "Personalized daily action tracking and reminders",
+      "feature3": "Real-time team execution scoreboard and dashboard",
+      "cta": "Get started right now"
+    },
+    "FinalCta": {
+      "title": "Shall we focus on\nwhat matters most?",
+      "body": "Start the most reliable execution loop that drives results right now.",
+      "cta": "Get started right now"
     },
     "Footer": {
       "headline": "Now it's time to focus\non what matters most",
@@ -1206,12 +1161,6 @@
       "privacy": "Privacy Policy",
       "terms": "Terms of Service",
       "billingPolicy": "Billing & Refund Policy"
-    },
-    "Download": {
-      "title": "Download the app",
-      "desc": "Check and log your team's primary goal and action items in real time from the app.",
-      "appStore": "App Store",
-      "playStore": "Google Play"
     }
   },
   "ContactPage": {
