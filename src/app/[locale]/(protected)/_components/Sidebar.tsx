@@ -55,19 +55,30 @@ export function Sidebar() {
   };
 
   const mainTabPaths = [
-    "/dashboard",
     "/dashboard/my",
-    "/workspace/report",
-    "/setup",
-    "/scoreboards",
+    "/dashboard",
     "/workspace/settings",
     "/profile",
   ];
 
+  const normalizedPathname =
+    pathname.endsWith("/") && pathname !== "/"
+      ? pathname.slice(0, -1)
+      : pathname;
+
   const isMainTab =
-    pathname === "/" ||
-    pathname === `/${workspaceId}` ||
-    mainTabPaths.some((p) => pathname.includes(p));
+    normalizedPathname === "/" ||
+    normalizedPathname === `/${workspaceId}` ||
+    mainTabPaths.some((p) => {
+      return (
+        normalizedPathname === p ||
+        (workspaceId ? normalizedPathname === `/${workspaceId}${p}` : false)
+      );
+    });
+
+  if (!isMainTab) {
+    return null;
+  }
 
   return (
     <>
