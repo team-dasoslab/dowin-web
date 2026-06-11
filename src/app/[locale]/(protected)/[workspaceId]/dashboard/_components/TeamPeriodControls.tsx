@@ -28,7 +28,7 @@ export function TeamPeriodControls({
   return (
     <div className="flex flex-col gap-2 py-2 select-none">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-4">
           <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-white transition-all focus-within:ring-2 focus-within:ring-primary/20 hover:bg-zinc-50 shrink-0">
             <DowinIcon
               name="domain-calendar"

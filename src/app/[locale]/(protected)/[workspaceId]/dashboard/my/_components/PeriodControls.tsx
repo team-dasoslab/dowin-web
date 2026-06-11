@@ -41,7 +41,7 @@ export function PeriodControls({
     <>
       {/* ─── 모바일 레이아웃 (sm 미만) ─── */}
       <div className="flex flex-col gap-3 py-2 sm:hidden select-none">
-        <div className="flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
+        <div className="flex items-center justify-between gap-4 overflow-x-auto scrollbar-none">
           <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-white transition-all focus-within:ring-2 focus-within:ring-primary/20 shrink-0">
             <DowinIcon
               name="domain-calendar"
@@ -91,12 +91,12 @@ export function PeriodControls({
                 disabled={isPeriodLoading}
                 className="flex h-8 shrink-0 items-center gap-1 rounded-[12px] px-3 text-[11px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"
               >
-                <span className="hidden min-[360px]:inline">{t("backToToday")}</span>
+                <span className="hidden min-[360px]:inline">
+                  {t("backToToday")}
+                </span>
               </Button>
             ) : null}
           </div>
-
-
         </div>
       </div>
 
@@ -104,7 +104,7 @@ export function PeriodControls({
       <div className="hidden sm:flex flex-col gap-4 py-2 select-none">
         {/* Row 2: Navigation & Settings */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             {/* Utility: Calendar Picker */}
             <div className="relative flex h-10 w-10 items-center justify-center rounded-[16px] bg-white transition-all hover:bg-zinc-50">
               <DowinIcon
@@ -163,7 +163,6 @@ export function PeriodControls({
           </div>
 
           {/* Secondary Group: View Toggle (At the very end) */}
-
         </div>
       </div>
     </>
