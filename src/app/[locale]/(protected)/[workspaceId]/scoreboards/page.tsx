@@ -1,17 +1,17 @@
 "use client";
 
+import { ActiveScoreboardSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ActiveScoreboardSection";
+import { ArchivedScoreboardsSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ArchivedScoreboardsSection";
+import { useScoreboardArchive } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_hooks/useScoreboardArchive";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { PageSidebarNav } from "@/components/PageSidebarNav";
-import { ActiveScoreboardSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ActiveScoreboardSection";
-import { ArchivedScoreboardsSection } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_components/ArchivedScoreboardsSection";
-import { useScoreboardArchive } from "@/app/[locale]/(protected)/[workspaceId]/scoreboards/_hooks/useScoreboardArchive";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { SectionHeader } from "@/components/ui/SectionHeader";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Logo } from "@/components/ui/Logo";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
@@ -83,7 +83,10 @@ export default function ScoreboardsPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           <PageSidebarNav
-            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            items={menuGroups.map((group) => ({
+              id: group.id,
+              label: group.label,
+            }))}
             activeId={activeSection}
           />
 
@@ -126,7 +129,6 @@ export default function ScoreboardsPage() {
         </div>
       </ProtectedPageContainer>
     </div>
-
   );
 }
 
@@ -134,7 +136,7 @@ function ScoreboardsSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-[24px] bg-zinc-200" />
+        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
         <div className="h-44 rounded-[24px] bg-zinc-200" />
         <div className="h-72 rounded-[24px] bg-zinc-200" />
       </div>

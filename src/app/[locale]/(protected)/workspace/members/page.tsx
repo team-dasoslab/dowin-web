@@ -15,13 +15,13 @@ import { MemberListItem } from "@/app/[locale]/(protected)/workspace/members/_co
 import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/workspace/members/_hooks/useRemoveWorkspaceMember";
 import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/workspace/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
+import { DowinIcon } from "@/components/ui/DowinIcon";
+import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Logo } from "@/components/ui/Logo";
-import { useMemo } from "react";
 import { useParams } from "next/navigation";
+import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -102,7 +102,7 @@ export default function ProfileMembersPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="max-w-[640px]">
+      <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5">
@@ -124,7 +124,9 @@ export default function ProfileMembersPage() {
               asChild
               className="h-9 rounded-[12px] bg-zinc-100 px-3.5 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
             >
-              <Link href={getWorkspacePath(workspaceParamId, "/workspace/invites")}>
+              <Link
+                href={getWorkspacePath(workspaceParamId, "/workspace/invites")}
+              >
                 {t("invitesCardButton")}
               </Link>
             </Button>
@@ -154,7 +156,11 @@ export default function ProfileMembersPage() {
               }`}
             >
               <span>{members.length}</span>
-              <span className={isAtOrOverMemberLimit ? "text-red-400" : "text-zinc-400"}>
+              <span
+                className={
+                  isAtOrOverMemberLimit ? "text-red-400" : "text-zinc-400"
+                }
+              >
                 / {memberLimit}
               </span>
             </div>
@@ -197,10 +203,13 @@ export default function ProfileMembersPage() {
 function MembersPageSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading className="max-w-[640px]">
-        <div className="h-10 rounded-content bg-zinc-200" />
-        <div className="h-24 rounded-content bg-zinc-200" />
-        <div className="h-72 rounded-content bg-zinc-200" />
+      <ProtectedPageContainer
+        isLoading
+        className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
+      >
+        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
+        <div className="h-24 rounded-[24px] bg-zinc-200" />
+        <div className="h-72 rounded-[24px] bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );
@@ -250,7 +259,9 @@ function NoAccessState() {
             asChild
             className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
           >
-            <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
+            <Link href={getWorkspacePath(workspaceId, "/profile")}>
+              {t("backToSettings")}
+            </Link>
           </Button>
         </div>
       </div>

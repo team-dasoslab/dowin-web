@@ -55,19 +55,30 @@ export function Sidebar() {
   };
 
   const mainTabPaths = [
-    "/dashboard",
     "/dashboard/my",
-    "/workspace/report",
-    "/setup",
-    "/scoreboards",
+    "/dashboard",
     "/workspace/settings",
     "/profile",
   ];
 
+  const normalizedPathname =
+    pathname.endsWith("/") && pathname !== "/"
+      ? pathname.slice(0, -1)
+      : pathname;
+
   const isMainTab =
-    pathname === "/" ||
-    pathname === `/${workspaceId}` ||
-    mainTabPaths.some((p) => pathname.includes(p));
+    normalizedPathname === "/" ||
+    normalizedPathname === `/${workspaceId}` ||
+    mainTabPaths.some((p) => {
+      return (
+        normalizedPathname === p ||
+        (workspaceId ? normalizedPathname === `/${workspaceId}${p}` : false)
+      );
+    });
+
+  if (!isMainTab) {
+    return null;
+  }
 
   return (
     <>
@@ -76,7 +87,7 @@ export function Sidebar() {
           <div className="flex-shrink-0 w-[200px]">
             {/* Workspace Pill */}
             {isProfileLoading ? (
-              <div className="flex h-10 w-full animate-pulse items-center rounded-content bg-zinc-200 transition-all px-4" />
+              <div className="flex h-10 w-full animate-pulse items-center rounded-[12px] bg-zinc-200 transition-all px-4" />
             ) : workspaceName ? (
               <WorkspaceSwitcher isCollapsed={false} />
             ) : (
