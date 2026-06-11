@@ -1,193 +1,247 @@
 "use client";
 
+import Image from "next/image";
+
 import { Footer } from "@/components/layout/Footer";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/routing";
-import { Check } from "lucide-react";
+import { 
+  Check, 
+  ArrowRight,
+  ListChecks,
+  Target,
+  ClipboardCheck,
+  MessageSquareWarning,
+  Flag,
+  BarChart3
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function RootLandingPage() {
   const t = useTranslations("Landing");
 
   return (
-    <main className="flex-1 w-full overflow-y-auto overflow-x-hidden bg-white text-zinc-950 selection:bg-primary/20 selection:text-zinc-950">
-      <LandingHeader />
+    <main className="flex-1 w-full overflow-y-auto overflow-x-hidden relative bg-zinc-50 text-zinc-900 selection:bg-primary/20 selection:text-primary font-sans">
+      <div className="absolute top-0 w-full z-50">
+        <LandingHeader />
+      </div>
 
-      <section className="mx-auto flex min-h-[calc(100vh-80px)] max-w-[1120px] flex-col justify-center px-6 py-24 md:px-10 md:py-32">
-        <div className="max-w-[860px]">
-          {t("Hero.eyebrow") && (
-            <p className="mb-6 text-[15px] font-bold text-primary">
-              {t("Hero.eyebrow")}
-            </p>
-          )}
-          <h1 className="whitespace-pre-line break-keep text-[44px] font-black leading-[1.08] tracking-tight text-zinc-950 md:text-[76px]">
-            {t("Hero.headline")}
-          </h1>
-          {t("Hero.description") && (
-            <p className="mt-8 max-w-[680px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.7] text-zinc-600 md:text-[22px]">
-              {t("Hero.description")}
-            </p>
-          )}
-
+      {/* Hero Section */}
+      <section className="relative mx-auto flex min-h-[calc(100vh-80px)] max-w-[1200px] flex-col justify-center px-6 py-32 md:px-10 md:py-48 text-center items-center">
+        <div className="absolute top-0 w-[800px] h-[600px] bg-primary/10 rounded-full blur-[150px] opacity-60 -z-10 pointer-events-none" />
+        
+        {t("Hero.eyebrow") && (
+          <p className="mb-6 text-[15px] font-bold tracking-widest text-primary bg-primary/10 px-5 py-2 rounded-button inline-block">
+            {t("Hero.eyebrow")}
+          </p>
+        )}
+        <h1 className="whitespace-pre-line break-keep text-[52px] font-bold leading-[1.3] tracking-tight text-zinc-900 md:text-[80px] max-w-[900px]">
+          {t("Hero.headline")}
+        </h1>
+        {t("Hero.description") && (
+          <p className="mt-8 max-w-[640px] whitespace-pre-line break-keep text-[20px] font-medium leading-[1.6] text-zinc-600 md:text-[24px]">
+            {t("Hero.description")}
+          </p>
+        )}
+        <div className="mt-14 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <Button
+            asChild
+            className="h-14 rounded-button bg-primary px-10 text-[17px] font-bold text-white"
+          >
+            <Link href="/login">{t("Hero.primaryCta")}</Link>
+          </Button>
         </div>
       </section>
 
-      <TextSection
-        eyebrow={t("Problem.eyebrow")}
-        title={t("Problem.title")}
-        body={t("Problem.body")}
-        items={[1, 2, 3, 4].map((i) => ({
-          title: t(`Problem.item${i}Title` as any),
-          body: t(`Problem.item${i}Body` as any),
-        }))}
-      />
-
-      <TextSection
-        eyebrow={t("Solution.eyebrow")}
-        title={t("Solution.title")}
-        body={t("Solution.body")}
-        items={[1, 2, 3, 4].map((i) => ({
-          title: t(`Solution.item${i}Title` as any),
-          body: t(`Solution.item${i}Body` as any),
-        }))}
-      />
-
-      <section id="loop" className="px-6 py-24 md:px-10 md:py-32">
-        <div className="mx-auto grid max-w-[1120px] gap-12 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <p className="mb-4 text-[14px] font-bold text-primary">
-              {t("Loop.eyebrow")}
-            </p>
-            <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight text-zinc-950 md:text-[56px]">
-              {t("Loop.title")}
+      {/* Problem Section: Sticky Scroll */}
+      <section className="bg-white px-6 py-32 md:px-10 md:py-48">
+        <div className="mx-auto max-w-[1200px] grid lg:grid-cols-[1fr_1.2fr] gap-20 items-start">
+          {/* Sticky Sidebar */}
+          <div className="lg:sticky lg:top-40 max-w-[600px]">
+            <h2 className="whitespace-pre-line break-keep text-[40px] font-bold leading-[1.3] tracking-tight text-zinc-900 md:text-[56px]">
+              {t("Problem.title")}
             </h2>
+            {t("Problem.body") && (
+              <p className="mt-6 whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-600 md:text-[22px]">
+                {t("Problem.body")}
+              </p>
+            )}
           </div>
-          <div className="relative mt-16 w-full max-w-[900px] mx-auto lg:mt-0 flex items-center justify-center">
-            {/* The Central Circular Arrows SVG */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-              <div className="w-[240px] h-[240px] md:w-[460px] md:h-[460px] opacity-70 md:opacity-100">
-                <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-md -rotate-45">
-                  <defs>
-                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#3b82f6" />
-                    </marker>
-                    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
-                    </marker>
-                    <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
-                    </marker>
-                    <marker id="arrow-violet" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#8b5cf6" />
-                    </marker>
-                  </defs>
-                  <g transform="translate(100, 100)">
-                    {/* Node 1 to 2 (Top quadrant) */}
-                    <g transform="rotate(-90)">
-                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#3b82f6" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-blue)" />
-                    </g>
-                    {/* Node 2 to 3 (Right quadrant) */}
-                    <g transform="rotate(0)">
-                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#10b981" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-emerald)" />
-                    </g>
-                    {/* Node 3 to 4 (Bottom quadrant) */}
-                    <g transform="rotate(90)">
-                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#f59e0b" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-amber)" />
-                    </g>
-                    {/* Node 4 to 1 (Left quadrant) */}
-                    <g transform="rotate(180)">
-                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#8b5cf6" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-violet)" />
-                    </g>
-                  </g>
-                </svg>
-              </div>
+
+          {/* Scrolling Cards */}
+          <div className="flex flex-col gap-6 md:gap-8">
+            {[
+              {
+                icon: ListChecks,
+                title: t("Problem.item1Title"),
+                body: t("Problem.item1Body"),
+              },
+              {
+                icon: Target,
+                title: t("Problem.item2Title"),
+                body: t("Problem.item2Body"),
+              },
+              {
+                icon: ClipboardCheck,
+                title: t("Problem.item3Title"),
+                body: t("Problem.item3Body"),
+              },
+              {
+                icon: MessageSquareWarning,
+                title: t("Problem.item4Title"),
+                body: t("Problem.item4Body"),
+              },
+            ].map((item: any, i: number) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="bg-zinc-50 rounded-2xl p-8 md:p-10 flex flex-col justify-between">
+                  <div>
+                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-white text-zinc-900">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="break-keep text-[24px] font-bold leading-[1.4] tracking-tight text-zinc-900 mb-4">{item.title}</h3>
+                  </div>
+                  <p className="break-keep text-[17px] font-medium leading-[1.6] text-zinc-600">{item.body}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Solution Section: 2x2 Grid */}
+      <section className="bg-zinc-50 px-6 py-32 md:px-10 md:py-48">
+        <div className="mx-auto max-w-[1000px]">
+          <div className="text-center mb-24">
+            <h2 className="whitespace-pre-line break-keep text-[40px] font-bold leading-[1.3] tracking-tight text-zinc-900 md:text-[56px]">
+              {t("Solution.title")}
+            </h2>
+            {t("Solution.body") && (
+              <p className="mt-6 whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-600 md:text-[22px]">
+                {t("Solution.body")}
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {[
+              { icon: Target, title: t("Solution.item1Title"), body: t("Solution.item1Body") },
+              { icon: Flag, title: t("Solution.item2Title"), body: t("Solution.item2Body") },
+              { icon: ClipboardCheck, title: t("Solution.item3Title"), body: t("Solution.item3Body") },
+              { icon: BarChart3, title: t("Solution.item4Title"), body: t("Solution.item4Body") },
+            ].map((item: any, i: number) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="bg-white rounded-2xl p-8 md:p-10 flex flex-col justify-between">
+                  <div>
+                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="h-7 w-7" />
+                    </div>
+                    <h3 className="break-keep text-[24px] font-bold leading-[1.4] tracking-tight text-zinc-900 mb-4">{item.title}</h3>
+                  </div>
+                  <p className="break-keep text-[17px] font-medium leading-[1.6] text-zinc-600">{item.body}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Loop Section */}
+      <section id="loop" className="bg-white px-6 py-32 md:px-10 md:py-48 text-center">
+        <div className="mx-auto max-w-[1000px]">
+          {t("Loop.eyebrow") && <p className="mb-4 text-[15px] font-bold tracking-widest text-primary uppercase">{t("Loop.eyebrow")}</p>}
+          <h2 className="whitespace-pre-line break-keep text-[40px] font-bold leading-[1.3] tracking-tight text-zinc-900 md:text-[56px] mb-24">
+            {t("Loop.title")}
+          </h2>
+          
+          <div className="relative mx-auto w-[280px] h-[280px] md:w-[500px] md:h-[500px] mt-24 mb-32">
+            {/* Continuous SVG Circle */}
+            <div className="absolute inset-0 pointer-events-none z-0">
+              <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
+                <circle cx="100" cy="100" r="100" fill="none" stroke="currentColor" className="text-zinc-200" strokeWidth="2" strokeDasharray="4 6" />
+              </svg>
             </div>
 
-            <div className="relative z-10 grid grid-cols-2 gap-x-6 gap-y-20 md:gap-x-40 md:gap-y-32">
-              {[
-                { num: "01", node: 1, colorCls: "bg-blue-50 text-blue-500 group-hover:bg-blue-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(59,130,246,0.15)]" },
-                { num: "02", node: 2, colorCls: "bg-emerald-50 text-emerald-500 group-hover:bg-emerald-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)]" },
-                { num: "04", node: 4, colorCls: "bg-violet-50 text-violet-500 group-hover:bg-violet-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(139,92,246,0.15)]" },
-                { num: "03", node: 3, colorCls: "bg-amber-50 text-amber-500 group-hover:bg-amber-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)]" },
-              ].map((item, i) => (
-                <div key={i} className={`group relative flex flex-col items-center text-center bg-white/90 backdrop-blur-sm p-5 md:p-8 rounded-3xl border border-zinc-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 ${item.shadowCls}`}>
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-[20px] font-black mb-4 md:mb-5 group-hover:scale-110 group-hover:text-white transition-all duration-300 ${item.colorCls}`}>
+            {/* Nodes on the circle (14.6% is 1 - 1/sqrt(2) to lie on the circle) */}
+            {[
+              { num: "1", node: 1, pos: "left-[14.6%] top-[14.6%]" },
+              { num: "2", node: 2, pos: "left-[85.4%] top-[14.6%]" },
+              { num: "3", node: 3, pos: "left-[85.4%] top-[85.4%]" },
+              { num: "4", node: 4, pos: "left-[14.6%] top-[85.4%]" },
+            ].map((item, i) => (
+              <div key={i} className={`absolute ${item.pos} z-10`}>
+                {/* Offset container so the center of the 56x56 icon sits exactly at the anchor point */}
+                <div className="absolute -left-[80px] md:-left-[140px] -top-[28px] w-[160px] md:w-[280px] flex flex-col items-center text-center">
+                  <div className="text-[20px] font-bold text-white mb-4 md:mb-6 bg-zinc-900 w-14 h-14 flex items-center justify-center rounded-full ring-[10px] ring-white">
                     {item.num}
                   </div>
-                  <h3 className="text-[17px] md:text-[22px] font-bold text-zinc-900 mb-2">
+                  <h3 className="text-[18px] md:text-[24px] font-bold text-zinc-900 mb-2 md:mb-3 tracking-tight">
                     {t(`Loop.node${item.node}Title` as any)}
                   </h3>
-                  <p className="text-[13px] md:text-[16px] font-medium text-zinc-500 break-keep">
+                  <p className="text-[14px] md:text-[15px] font-medium text-zinc-600 break-keep leading-relaxed max-w-[240px]">
                     {t(`Loop.node${item.node}Desc` as any)}
                   </p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-white px-6 py-24 md:px-10 md:py-32">
-        <div className="mx-auto max-w-[1120px] text-center">
-          <p className="mb-4 text-[14px] font-bold text-primary">
-            {t("Pricing.eyebrow")}
-          </p>
-          <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight text-zinc-950 md:text-[56px]">
+      {/* Pricing Section */}
+      <section className="bg-zinc-50 px-6 py-32 md:px-10 md:py-48">
+        <div className="mx-auto max-w-[1000px] text-center">
+          <h2 className="whitespace-pre-line break-keep text-[40px] font-bold leading-[1.3] tracking-tight text-zinc-900 md:text-[56px]">
             {t("Pricing.title")}
           </h2>
-          <p className="mx-auto mt-6 max-w-[680px] whitespace-pre-line break-keep text-[17px] font-medium leading-[1.7] text-zinc-600 md:text-[20px]">
-            {t("Pricing.body")}
-          </p>
+          {t("Pricing.body") && (
+            <p className="mx-auto mt-6 max-w-[720px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-600 md:text-[22px]">
+              {t("Pricing.body")}
+            </p>
+          )}
           
-          <div className="mx-auto mt-16 max-w-[480px] rounded-3xl border border-zinc-200 bg-white p-8 text-left shadow-sm md:p-10">
-            <h3 className="text-[20px] font-bold text-zinc-950">
+          <div className="mx-auto mt-20 max-w-[480px] bg-white p-10 md:p-12 rounded-2xl text-center">
+            <h3 className="text-[18px] font-bold text-primary tracking-tight bg-primary/10 inline-block px-4 py-1.5 rounded-button mb-6">
               {t("Pricing.planName")}
             </h3>
-            <div className="mt-4 flex items-end gap-2">
-              <span className="text-[44px] font-black leading-none tracking-tight text-zinc-950">
-                {t("Pricing.price")}
-              </span>
-              <span className="mb-1 text-[16px] font-medium text-zinc-500">
-                {t("Pricing.unit")}
-              </span>
+            <div className="flex justify-center items-baseline gap-2">
+              <span className="text-[56px] font-bold leading-none tracking-tight text-zinc-900">{t("Pricing.price")}</span>
+              <span className="text-[18px] font-medium text-zinc-500">{t("Pricing.unit")}</span>
             </div>
-            
-            <ul className="mt-8 space-y-4">
+            <ul className="mt-10 space-y-5 text-left inline-block w-full px-4">
               {[1, 2, 3].map((i) => (
-                <li key={i} className="flex gap-3 text-zinc-600">
-                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <span className="text-[16px] font-medium leading-relaxed">
-                    {t(`Pricing.feature${i}` as any)}
-                  </span>
+                <li key={i} className="flex items-center gap-4 text-zinc-700">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+                    <Check className="h-4 w-4" strokeWidth={3} />
+                  </div>
+                  <span className="text-[17px] font-medium leading-relaxed">{t(`Pricing.feature${i}` as any)}</span>
                 </li>
               ))}
             </ul>
-
-            <Button
-              asChild
-              className="mt-10 h-14 w-full rounded-xl text-[17px] font-bold"
-            >
+            <Button asChild className="mt-12 h-14 w-full rounded-button bg-primary text-[17px] font-bold text-white">
               <Link href="/login">{t("Pricing.cta")}</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      <section className="bg-zinc-50 px-6 py-24 md:px-10 md:py-32">
-        <div className="mx-auto max-w-[900px] text-center">
-          <h2 className="whitespace-pre-line break-keep text-[38px] font-black leading-[1.12] tracking-tight text-zinc-950 md:text-[64px]">
+      {/* Final CTA */}
+      <section className="bg-white px-6 py-40 md:px-10 md:py-56">
+        <div className="mx-auto max-w-[1000px] text-center">
+          <h2 className="whitespace-pre-line break-keep text-[44px] font-bold leading-[1.3] tracking-tight text-zinc-900 md:text-[64px]">
             {t("FinalCta.title")}
           </h2>
           {t("FinalCta.body") && (
-            <p className="mx-auto mt-6 max-w-[620px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.7] text-zinc-600 md:text-[20px]">
+            <p className="mx-auto mt-6 max-w-[720px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-600 md:text-[24px]">
               {t("FinalCta.body")}
             </p>
           )}
-          <div className="mt-10">
+          <div className="mt-14">
             <Button
               asChild
-              className="h-14 rounded-xl bg-zinc-950 px-8 text-[17px] font-bold text-white"
+              className="h-14 w-full sm:w-auto min-w-[240px] rounded-button bg-primary px-8 text-[17px] font-bold text-white shadow-sm"
             >
               <Link href="/login" className="text-white">
                 {t("FinalCta.cta")}
@@ -197,55 +251,7 @@ export function RootLandingPage() {
         </div>
       </section>
 
-      <Footer className="border-t border-border" />
+      <Footer className="bg-zinc-50" />
     </main>
-  );
-}
-
-type TextSectionItem = {
-  title: string;
-  body: string;
-};
-
-function TextSection({
-  eyebrow,
-  title,
-  body,
-  items,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  items: TextSectionItem[];
-}) {
-  return (
-    <section className="border-t border-zinc-200 px-6 py-24 md:px-10 md:py-32">
-      <div className="mx-auto max-w-[1120px]">
-        <div className="max-w-[760px]">
-          <p className="mb-4 text-[14px] font-bold text-primary">{eyebrow}</p>
-          <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight text-zinc-950 md:text-[56px]">
-            {title}
-          </h2>
-          {body && (
-            <p className="mt-6 whitespace-pre-line break-keep text-[17px] font-medium leading-[1.7] text-zinc-600 md:text-[20px]">
-              {body}
-            </p>
-          )}
-        </div>
-
-        <div className="mt-14 grid gap-x-10 gap-y-8 md:grid-cols-2">
-          {items.map((item) => (
-            <div key={item.title} className="border-t border-zinc-200 pt-6">
-              <h3 className="break-keep text-[24px] font-black leading-tight text-zinc-950">
-                {item.title}
-              </h3>
-              <p className="mt-3 break-keep text-[16px] font-medium leading-[1.65] text-zinc-600">
-                {item.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }
