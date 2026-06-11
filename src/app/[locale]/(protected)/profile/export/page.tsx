@@ -11,8 +11,8 @@ import { useProfileExportData } from "@/app/[locale]/(protected)/profile/export/
 import { useProfileExportForm } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportForm";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
-import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -71,7 +71,7 @@ export default function ProfileExportPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="max-w-[640px]">
+      <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title="데이터 내보내기" />
 
         <div className="rounded-[24px] bg-white px-6 py-5 flex items-center gap-4">
@@ -228,7 +228,9 @@ function ExportUnavailableInAppState() {
               asChild
               className="w-fit rounded-[16px] bg-zinc-100 px-5 py-3 text-sm font-black text-zinc-900 transition-colors hover:bg-zinc-200"
             >
-              <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("appUnavailableAction")}</Link>
+              <Link href={getWorkspacePath(workspaceId, "/profile")}>
+                {t("appUnavailableAction")}
+              </Link>
             </Button>
           }
         />
@@ -250,7 +252,10 @@ function ProfileExportHeader() {
 function ExportSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading className="max-w-[640px]">
+      <ProtectedPageContainer
+        isLoading
+        className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
+      >
         <div className="h-10 rounded-[16px] bg-zinc-200" />
         <div className="h-24 rounded-[24px] bg-zinc-200" />
         <div className="h-[420px] rounded-[24px] bg-zinc-200" />
@@ -300,7 +305,9 @@ function NoScoreboardState() {
               asChild
               className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
-              <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>새 점수판 만들기</Link>
+              <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>
+                새 점수판 만들기
+              </Link>
             </Button>
           }
         />

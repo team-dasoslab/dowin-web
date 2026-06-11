@@ -1,14 +1,14 @@
 "use client";
 
-import { usePasswordChangeAction } from "@/app/[locale]/(protected)/profile/password/_hooks/usePasswordChangeAction";
-import { usePasswordChangeForm } from "@/app/[locale]/(protected)/profile/password/_hooks/usePasswordChangeForm";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { usePasswordChangeAction } from "@/app/[locale]/(protected)/profile/password/_hooks/usePasswordChangeAction";
+import { usePasswordChangeForm } from "@/app/[locale]/(protected)/profile/password/_hooks/usePasswordChangeForm";
 import { Button } from "@/components/ui/Button";
-import { PasswordInput } from "@/components/ui/PasswordInput";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useTranslations } from "next-intl";
 
 export default function ProfilePasswordPage() {
@@ -30,7 +30,7 @@ export default function ProfilePasswordPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="max-w-[640px]">
+      <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
@@ -41,7 +41,9 @@ export default function ProfilePasswordPage() {
             <h1 className="text-[17px] font-bold tracking-tight text-zinc-900">
               {t("cardTitle")}
             </h1>
-            <p className="mt-1 text-[13px] font-medium text-zinc-500 leading-relaxed">{t("cardDesc")}</p>
+            <p className="mt-1 text-[13px] font-medium text-zinc-500 leading-relaxed">
+              {t("cardDesc")}
+            </p>
           </div>
         </div>
 

@@ -1,15 +1,15 @@
 "use client";
 
-import { useDeleteAccountAction } from "@/app/[locale]/(protected)/profile/delete-account/_hooks/useDeleteAccountAction";
-import { useDeleteAccountForm } from "@/app/[locale]/(protected)/profile/delete-account/_hooks/useDeleteAccountForm";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { useDeleteAccountAction } from "@/app/[locale]/(protected)/profile/delete-account/_hooks/useDeleteAccountAction";
+import { useDeleteAccountForm } from "@/app/[locale]/(protected)/profile/delete-account/_hooks/useDeleteAccountForm";
 import { Button } from "@/components/ui/Button";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
 export default function ProfileDeleteAccountPage() {
@@ -28,7 +28,7 @@ export default function ProfileDeleteAccountPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="max-w-[640px]">
+      <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
@@ -39,7 +39,9 @@ export default function ProfileDeleteAccountPage() {
             <h1 className="text-[17px] font-bold tracking-tight text-zinc-900">
               {t("cardTitle")}
             </h1>
-            <p className="mt-1 text-[13px] font-medium text-zinc-600 leading-relaxed">{t("cardDesc")}</p>
+            <p className="mt-1 text-[13px] font-medium text-zinc-600 leading-relaxed">
+              {t("cardDesc")}
+            </p>
           </div>
         </div>
 

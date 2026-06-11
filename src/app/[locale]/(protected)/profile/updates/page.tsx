@@ -27,8 +27,9 @@ export default function UpdatesPage() {
   }
 
   return (
-    <ProtectedPageContainer className="max-w-[640px]">
+    <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
       <ProtectedPageHeader
+        className="flex-row items-center justify-between"
         title={t("header")}
         rightElement={
           <div className="flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1.5 text-xs font-bold tracking-tight text-primary">

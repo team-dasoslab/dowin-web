@@ -29,14 +29,19 @@ export function PricingPageClient() {
   const { data: workspaceResponse } = useGetWorkspacesMe();
   const workspaceId =
     (params.workspaceId as string | undefined) ??
-    (workspaceResponse?.status === 200 ? (workspaceResponse.data.id ?? "") : "");
-  const { data: billingResponse, error, isLoading } =
-    useGetWorkspacesWorkspaceIdBillingMe(workspaceId, {
-      query: {
-        retry: false,
-        enabled: Boolean(workspaceId),
-      },
-    });
+    (workspaceResponse?.status === 200
+      ? (workspaceResponse.data.id ?? "")
+      : "");
+  const {
+    data: billingResponse,
+    error,
+    isLoading,
+  } = useGetWorkspacesWorkspaceIdBillingMe(workspaceId, {
+    query: {
+      retry: false,
+      enabled: Boolean(workspaceId),
+    },
+  });
   const { openPortal, isPortalPending } = useProfileBillingActions(workspaceId);
 
   const hasNoWorkspace = getApiErrorStatus(error) === 404;
@@ -44,7 +49,8 @@ export function PricingPageClient() {
   const canManageViaPolar =
     Boolean(billing?.canManageBilling) &&
     billing?.entitlementSource === "POLAR" &&
-    (billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED");
+    (billing.billingStatus === "ACTIVE" ||
+      billing.billingStatus === "CANCELED");
 
   if (isLoading) {
     return <PricingSkeleton />;
@@ -64,7 +70,7 @@ export function PricingPageClient() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="space-y-8 lg:space-y-12">
+      <ProtectedPageContainer className="space-y-8 lg:space-y-12 pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader
           title={t("header")}
           description={t("description")}
@@ -107,7 +113,8 @@ export function PricingPageClient() {
             </div>
           ) : null}
 
-          {billing.entitlementSource && billing.entitlementSource !== "POLAR" ? (
+          {billing.entitlementSource &&
+          billing.entitlementSource !== "POLAR" ? (
             <div className="rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
               <span>
                 {t.rich("nonPolarEntitlementNotice", {
@@ -115,7 +122,9 @@ export function PricingPageClient() {
                     <Link
                       href={getWorkspacePath(workspaceId, "/profile/contact")}
                       className="underline underline-offset-2 hover:text-amber-900"
-                    >{chunks}</Link>
+                    >
+                      {chunks}
+                    </Link>
                   ),
                 })}
               </span>
@@ -140,9 +149,18 @@ export function PricingPageClient() {
             description={t("cancelGuideDesc")}
           />
           <div className="grid gap-4 md:grid-cols-3">
-            <GuideCard title={t("cancelStep1Title")} desc={t("cancelStep1Desc")} />
-            <GuideCard title={t("cancelStep2Title")} desc={t("cancelStep2Desc")} />
-            <GuideCard title={t("cancelStep3Title")} desc={t("cancelStep3Desc")} />
+            <GuideCard
+              title={t("cancelStep1Title")}
+              desc={t("cancelStep1Desc")}
+            />
+            <GuideCard
+              title={t("cancelStep2Title")}
+              desc={t("cancelStep2Desc")}
+            />
+            <GuideCard
+              title={t("cancelStep3Title")}
+              desc={t("cancelStep3Desc")}
+            />
           </div>
         </section>
 
@@ -211,7 +229,11 @@ function PricingUnavailableInAppState() {
             </Button>
           }
           icon={
-            <DowinIcon name="domain-wallet" size="24px" className="text-primary" />
+            <DowinIcon
+              name="domain-wallet"
+              size="24px"
+              className="text-primary"
+            />
           }
         />
       </div>
@@ -273,7 +295,7 @@ function PricingErrorState() {
 function PricingSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading>
+      <ProtectedPageContainer isLoading className="pb-24 md:pb-10 lg:pb-12">
         <div className="h-10 w-48 rounded-content bg-zinc-200" />
         <div className="h-56 rounded-content bg-zinc-200" />
         <div className="grid gap-4 md:grid-cols-3">
