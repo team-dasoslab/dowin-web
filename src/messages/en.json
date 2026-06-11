@@ -1093,59 +1093,65 @@
     },
     "Hero": {
       "eyebrow": "",
-      "headline": "Working hard\nbut results aren't following?",
+      "headline": "Are you really focusing on\nwhat matters most right now?",
       "description": "",
       "primaryCta": "Get started with Dowin",
       "secondaryCta": "See how it works"
     },
     "Problem": {
-      "eyebrow": "Why performance doesn't improve",
-      "title": "Setting goals alone\ndoesn't produce results",
+      "eyebrow": "",
+      "title": "Working hard,\nbut why aren't there results?",
       "body": "",
       "item1Title": "Too many goals",
-      "item1Body": "Everything sounds important, so the one goal you must win this week gets blurred.",
-      "item2Title": "Unclear success criteria",
-      "item2Body": "The team looks at the same result and tells different stories—because what counts as success was never defined.",
-      "item3Title": "Actions do not move the result",
-      "item3Body": "The team stays busy, but it is not clear whether those actions are actually pushing the goal forward.",
-      "item4Title": "Execution is not checked",
-      "item4Body": "The meeting starts, and everyone looks back from memory to figure out what slipped."
+      "item1Body": "Everything is important. We worked busily, but it feels like we missed the most important thing.",
+      "item2Title": "Working hard, but drifting from the goal",
+      "item2Body": "Working frantically, sometimes we end up doing things far from the actual goal.",
+      "item3Title": "Know the direction, but stuck on where to start",
+      "item3Body": "We have the big picture. But when breaking it down into today's tasks, we get stuck on where to start.",
+      "item4Title": "Not sure if we're doing well",
+      "item4Body": "We know the team is working hard. But it's hard to judge whether things are actually going well."
     },
     "Solution": {
-      "eyebrow": "How Dowin works",
-      "title": "Narrow the primary goal\nand review execution every week",
+      "eyebrow": "",
+      "title": "Focus on one most important goal\nand make real results every week",
       "body": "",
-      "item1Title": "Narrow the primary goal",
-      "item1Body": "Start by deciding which result you need to win right now.",
-      "item2Title": "Define success with a number",
-      "item2Body": "Judge progress by clear criteria, not by feeling.",
-      "item3Title": "Connect action items to execution",
-      "item3Body": "Set the repeated actions that can move the result, and track whether they happened this week.",
-      "item4Title": "Review on the scoreboard",
-      "item4Body": "See where the flow is blocked and adjust the next action accordingly."
+      "item1Title": "Keep only one most important goal",
+      "item1Body": "Decide the one thing to do first right now. Narrowing the goal clearly shows the current progress and problems to solve.",
+      "item2Title": "Define success criteria clearly",
+      "item2Body": "Agree on what 'well done' means with numbers. Discussing with numbers, not feelings, makes feedback fast and clear.",
+      "item3Title": "Break the goal into executable actions for today",
+      "item3Body": "Teammates clearly divide what to do this week.",
+      "item4Title": "Check the scoreboard every week",
+      "item4Body": "See overall goal progress and individual action execution rates on one screen. You can spot delayed items even before the meeting."
     },
-    "Proof": {
-      "eyebrow": "Weekly scoreboard",
-      "title": "Can you see right now whether\nyour team is moving toward the goal this week?",
-      "body": "",
-      "point1": "View goal progress and action execution rate in one place.",
-      "point2": "Do not miss delayed action items.",
-      "point3": "See weekly execution flow by teammate.",
-      "point4": "Know what needs adjusting before the next meeting."
+    "Loop": {
+      "eyebrow": "",
+      "title": "Execution loop that drives results",
+      "node1Title": "Set Goal",
+      "node1Desc": "The most important goal the team must achieve",
+      "node2Title": "Execute",
+      "node2Desc": "Specific action items to achieve the goal",
+      "node3Title": "Log Daily",
+      "node3Desc": "Log daily action execution",
+      "node4Title": "Weekly Check-in",
+      "node4Desc": "Feedback and improvement via scoreboard"
     },
-    "Flow": {
-      "eyebrow": "From start to review",
-      "title": "Simple to start,\nsteady to review.",
-      "step1": "Create a workspace and invite your team.",
-      "step2": "Set the primary goal and success criteria for this period.",
-      "step3": "Define action items that can move the result.",
-      "step4": "Teammates record daily execution.",
-      "step5": "Leaders review this week's flow on the scoreboard."
+    "Pricing": {
+      "eyebrow": "",
+      "title": "Just one plan",
+      "body": "Start by paying only for the number of your team members.",
+      "planName": "Basic",
+      "price": "$1",
+      "unit": "per seat / month",
+      "feature1": "Unlimited goal and action item management",
+      "feature2": "Personalized daily action tracking and reminders",
+      "feature3": "Real-time team execution scoreboard and dashboard",
+      "cta": "Get started right now"
     },
     "FinalCta": {
-      "title": "If you want to change performance,\nstart with this week's execution",
-      "body": "",
-      "cta": "Create a team scoreboard"
+      "title": "Shall we focus on\nwhat matters most?",
+      "body": "Start the most reliable execution loop that drives results right now.",
+      "cta": "Get started right now"
     },
     "Footer": {
       "headline": "Now it's time to focus\non what matters most",
