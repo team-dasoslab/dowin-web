@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { Logo } from "@/components/ui/Logo";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -21,6 +23,16 @@ export function Footer({ className }: FooterProps) {
           <span className="text-[18px] font-black tracking-tighter text-text-primary uppercase">
             {tCommon("serviceName")}
           </span>
+        </div>
+
+        {/* App Download Links */}
+        <div className="flex flex-row items-center justify-center gap-4 mt-2">
+          <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+            <Image src="/assets/store/appstore.png" alt="App Store" width={140} height={42} className="h-auto w-[120px] opacity-80 hover:opacity-100 transition-opacity" unoptimized />
+          </a>
+          <a href="#" className="transition-transform hover:scale-105 active:scale-95">
+            <Image src="/assets/store/playstore.png" alt="Google Play" width={140} height={42} className="h-auto w-[120px] opacity-80 hover:opacity-100 transition-opacity" unoptimized />
+          </a>
         </div>
 
         {/* Legal Links */}

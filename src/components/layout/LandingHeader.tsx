@@ -10,7 +10,7 @@ export function LandingHeader() {
   const tCommon = useTranslations("Common");
 
   return (
-    <header className="fixed top-0 z-50 h-16 w-full bg-white/70 backdrop-blur-xl border-b border-zinc-200/50">
+    <header className="fixed top-0 z-50 h-16 w-full bg-white/80 backdrop-blur-xl">
       <div className="mx-auto flex h-full max-w-[1200px] items-center justify-between px-6 md:px-12">
         <Link href="/" className="flex items-center gap-2.5">
           <Logo />
@@ -21,7 +21,7 @@ export function LandingHeader() {
         <div className="flex items-center gap-6">
           <Button
             asChild
-            className="flex h-10 items-center justify-center rounded-full bg-primary px-6 text-[15px] font-bold text-white leading-none"
+            className="flex h-10 items-center justify-center rounded-button bg-primary px-6 text-[15px] font-bold text-white leading-none"
           >
             <Link href="/login">
               {t("Navigation.login")}
