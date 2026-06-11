@@ -37,151 +37,92 @@ export function RootLandingPage() {
         eyebrow={t("Problem.eyebrow")}
         title={t("Problem.title")}
         body={t("Problem.body")}
-        items={[
-          {
-            title: t("Problem.item1Title"),
-            body: t("Problem.item1Body"),
-          },
-          {
-            title: t("Problem.item2Title"),
-            body: t("Problem.item2Body"),
-          },
-          {
-            title: t("Problem.item3Title"),
-            body: t("Problem.item3Body"),
-          },
-          {
-            title: t("Problem.item4Title"),
-            body: t("Problem.item4Body"),
-          },
-        ]}
+        items={[1, 2, 3, 4].map((i) => ({
+          title: t(`Problem.item${i}Title` as any),
+          body: t(`Problem.item${i}Body` as any),
+        }))}
       />
 
       <TextSection
         eyebrow={t("Solution.eyebrow")}
         title={t("Solution.title")}
         body={t("Solution.body")}
-        items={[
-          {
-            title: t("Solution.item1Title"),
-            body: t("Solution.item1Body"),
-          },
-          {
-            title: t("Solution.item2Title"),
-            body: t("Solution.item2Body"),
-          },
-          {
-            title: t("Solution.item3Title"),
-            body: t("Solution.item3Body"),
-          },
-          {
-            title: t("Solution.item4Title"),
-            body: t("Solution.item4Body"),
-          },
-        ]}
+        items={[1, 2, 3, 4].map((i) => ({
+          title: t(`Solution.item${i}Title` as any),
+          body: t(`Solution.item${i}Body` as any),
+        }))}
       />
 
-      <section
-        id="flow"
-        className="border-y border-zinc-200 bg-zinc-950 px-6 py-24 text-white md:px-10 md:py-32"
-      >
-        <div className="mx-auto max-w-[1120px]">
-          <p className="mb-4 text-[14px] font-bold text-primary">
-            {t("Proof.eyebrow")}
-          </p>
-          <h2 className="max-w-[780px] whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight md:text-[56px]">
-            {t("Proof.title")}
-          </h2>
-          {t("Proof.body") && (
-            <p className="mt-6 max-w-[680px] whitespace-pre-line break-keep text-[17px] font-medium leading-[1.7] text-zinc-300 md:text-[20px]">
-              {t("Proof.body")}
-            </p>
-          )}
-
-          <div className="mt-14 grid gap-4 md:grid-cols-2">
-            {[
-              t("Proof.point1"),
-              t("Proof.point2"),
-              t("Proof.point3"),
-              t("Proof.point4"),
-            ].map((point) => (
-              <p
-                key={point}
-                className="border-t border-white/15 pt-5 text-[18px] font-bold leading-[1.55] text-white md:text-[22px]"
-              >
-                {point}
-              </p>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="px-6 py-24 md:px-10 md:py-32">
+      <section id="loop" className="px-6 py-24 md:px-10 md:py-32">
         <div className="mx-auto grid max-w-[1120px] gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p className="mb-4 text-[14px] font-bold text-primary">
-              {t("Flow.eyebrow")}
+              {t("Loop.eyebrow")}
             </p>
             <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.16] tracking-tight text-zinc-950 md:text-[56px]">
-              {t("Flow.title")}
+              {t("Loop.title")}
             </h2>
           </div>
-          <div className="relative mt-12 w-full max-w-[800px] mx-auto lg:mt-0">
-            {/* Background Circle Track */}
-            <div className="absolute inset-x-[15%] inset-y-[15%] md:inset-x-[20%] md:inset-y-[20%] rounded-full border-[3px] border-dashed border-zinc-200" />
-            
-            <div className="relative grid grid-cols-2 gap-8 md:gap-24">
-              {/* Node 01 - Top Left */}
-              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[18px] font-black text-white shadow-sm mb-4">
-                  01
-                </div>
-                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
-                  {t("Flow.node1Title")}
-                </h3>
-                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
-                  {t("Flow.node1Desc")}
-                </p>
+          <div className="relative mt-16 w-full max-w-[900px] mx-auto lg:mt-0 flex items-center justify-center">
+            {/* The Central Circular Arrows SVG */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+              <div className="w-[240px] h-[240px] md:w-[460px] md:h-[460px] opacity-70 md:opacity-100">
+                <svg viewBox="0 0 200 200" className="w-full h-full drop-shadow-md -rotate-45">
+                  <defs>
+                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#3b82f6" />
+                    </marker>
+                    <marker id="arrow-emerald" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981" />
+                    </marker>
+                    <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+                    </marker>
+                    <marker id="arrow-violet" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                      <path d="M 0 1 L 10 5 L 0 9 z" fill="#8b5cf6" />
+                    </marker>
+                  </defs>
+                  <g transform="translate(100, 100)">
+                    {/* Node 1 to 2 (Top quadrant) */}
+                    <g transform="rotate(-90)">
+                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#3b82f6" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-blue)" />
+                    </g>
+                    {/* Node 2 to 3 (Right quadrant) */}
+                    <g transform="rotate(0)">
+                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#10b981" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-emerald)" />
+                    </g>
+                    {/* Node 3 to 4 (Bottom quadrant) */}
+                    <g transform="rotate(90)">
+                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#f59e0b" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-amber)" />
+                    </g>
+                    {/* Node 4 to 1 (Left quadrant) */}
+                    <g transform="rotate(180)">
+                      <path d="M 68.9 12.1 A 70 70 0 0 1 12.1 68.9" fill="none" stroke="#8b5cf6" strokeWidth="12" strokeLinecap="round" markerEnd="url(#arrow-violet)" />
+                    </g>
+                  </g>
+                </svg>
               </div>
+            </div>
 
-              {/* Node 02 - Top Right */}
-              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[18px] font-black text-white shadow-sm mb-4">
-                  02
+            <div className="relative z-10 grid grid-cols-2 gap-x-6 gap-y-20 md:gap-x-40 md:gap-y-32">
+              {[
+                { num: "01", node: 1, colorCls: "bg-blue-50 text-blue-500 group-hover:bg-blue-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(59,130,246,0.15)]" },
+                { num: "02", node: 2, colorCls: "bg-emerald-50 text-emerald-500 group-hover:bg-emerald-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)]" },
+                { num: "04", node: 4, colorCls: "bg-violet-50 text-violet-500 group-hover:bg-violet-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(139,92,246,0.15)]" },
+                { num: "03", node: 3, colorCls: "bg-amber-50 text-amber-500 group-hover:bg-amber-500", shadowCls: "hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)]" },
+              ].map((item, i) => (
+                <div key={i} className={`group relative flex flex-col items-center text-center bg-white/90 backdrop-blur-sm p-5 md:p-8 rounded-3xl border border-zinc-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 ${item.shadowCls}`}>
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl text-[20px] font-black mb-4 md:mb-5 group-hover:scale-110 group-hover:text-white transition-all duration-300 ${item.colorCls}`}>
+                    {item.num}
+                  </div>
+                  <h3 className="text-[17px] md:text-[22px] font-bold text-zinc-900 mb-2">
+                    {t(`Loop.node${item.node}Title` as any)}
+                  </h3>
+                  <p className="text-[13px] md:text-[16px] font-medium text-zinc-500 break-keep">
+                    {t(`Loop.node${item.node}Desc` as any)}
+                  </p>
                 </div>
-                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
-                  {t("Flow.node2Title")}
-                </h3>
-                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
-                  {t("Flow.node2Desc")}
-                </p>
-              </div>
-
-              {/* Node 04 - Bottom Left */}
-              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-900 text-[18px] font-black text-white shadow-sm mb-4">
-                  04
-                </div>
-                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
-                  {t("Flow.node4Title")}
-                </h3>
-                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
-                  {t("Flow.node4Desc")}
-                </p>
-              </div>
-
-              {/* Node 03 - Bottom Right */}
-              <div className="flex flex-col items-center text-center bg-white p-4 rounded-2xl">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-[18px] font-black text-white shadow-sm mb-4">
-                  03
-                </div>
-                <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2">
-                  {t("Flow.node3Title")}
-                </h3>
-                <p className="text-[14px] md:text-[16px] font-medium text-zinc-500 break-keep">
-                  {t("Flow.node3Desc")}
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -213,16 +154,11 @@ export function RootLandingPage() {
             </div>
             
             <ul className="mt-8 space-y-4">
-              {[
-                t("Pricing.feature1"),
-                t("Pricing.feature2"),
-                t("Pricing.feature3"),
-                t("Pricing.feature4"),
-              ].map((feature, i) => (
+              {[1, 2, 3].map((i) => (
                 <li key={i} className="flex gap-3 text-zinc-600">
                   <Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <span className="text-[16px] font-medium leading-relaxed">
-                    {feature}
+                    {t(`Pricing.feature${i}` as any)}
                   </span>
                 </li>
               ))}
