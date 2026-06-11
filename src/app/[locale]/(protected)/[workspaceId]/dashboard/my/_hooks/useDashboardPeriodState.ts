@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  DashboardView,
+  isDashboardView,
+} from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-scoreboard";
+import {
   addDays,
   addMonths,
   getMonthStart,
@@ -8,11 +12,7 @@ import {
   getWeekDates,
   isValidDateString,
 } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
-import {
-  DashboardView,
-  isDashboardView,
-} from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-scoreboard";
-import { usePathname, useRouter } from "@/i18n/routing"
+import { usePathname, useRouter } from "@/i18n/routing";
 import { useSearchParams } from "next/navigation";
 
 export const useDashboardPeriodState = () => {

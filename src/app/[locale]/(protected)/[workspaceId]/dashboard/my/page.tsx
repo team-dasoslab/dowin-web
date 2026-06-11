@@ -243,8 +243,8 @@ export default function MyDashboardPage() {
             ) : null}
 
             <section id="scoreboard" className="space-y-4 scroll-mt-28">
-              <SectionHeader 
-                title={t("executionBoard")} 
+              <SectionHeader
+                title={t("executionBoard")}
                 rightElement={
                   <SegmentedControl
                     options={[
