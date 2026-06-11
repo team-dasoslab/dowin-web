@@ -1,7 +1,6 @@
 import { getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useTranslations } from "next-intl";
 
 interface PeriodControlsProps {
@@ -97,16 +96,7 @@ export function PeriodControls({
             ) : null}
           </div>
 
-          <SegmentedControl
-            options={[
-              { value: "week", label: t("weekView") },
-              { value: "month", label: t("monthView") },
-            ]}
-            value={selectedView}
-            onChange={setSelectedView}
-            disabled={isPeriodLoading}
-            size="sm"
-          />
+
         </div>
       </div>
 
@@ -173,17 +163,7 @@ export function PeriodControls({
           </div>
 
           {/* Secondary Group: View Toggle (At the very end) */}
-          <SegmentedControl
-            options={[
-              { value: "week", label: t("weekView") },
-              { value: "month", label: t("monthView") },
-            ]}
-            value={selectedView}
-            onChange={setSelectedView}
-            disabled={isPeriodLoading}
-            size="md"
-            className="lg:ml-auto w-fit"
-          />
+
         </div>
       </div>
     </>

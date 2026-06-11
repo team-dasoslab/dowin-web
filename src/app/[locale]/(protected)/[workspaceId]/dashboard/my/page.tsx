@@ -22,6 +22,7 @@ import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
@@ -242,7 +243,21 @@ export default function MyDashboardPage() {
             ) : null}
 
             <section id="scoreboard" className="space-y-4 scroll-mt-28">
-              <SectionHeader title={t("executionBoard")} />
+              <SectionHeader 
+                title={t("executionBoard")} 
+                rightElement={
+                  <SegmentedControl
+                    options={[
+                      { value: "week", label: t("weekView") },
+                      { value: "month", label: t("monthView") },
+                    ]}
+                    value={selectedView}
+                    onChange={setSelectedView}
+                    disabled={isPeriodLoading}
+                    size="sm"
+                  />
+                }
+              />
               <PeriodControls
                 monthLabel={monthLabel}
                 movePeriod={movePeriod}
