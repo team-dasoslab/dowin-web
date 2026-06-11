@@ -4,14 +4,14 @@ import {
   TeamDashboardMember,
   TeamWeeklyReportTrend,
 } from "@/api/generated/dowin.schemas";
+import { formatWeekLabel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
+import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/[workspaceId]/workspace/report/_hooks/useTeamWeeklyReport";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
-import { formatWeekLabel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
-import { useTeamWeeklyReport } from "@/app/[locale]/(protected)/[workspaceId]/workspace/report/_hooks/useTeamWeeklyReport";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -114,8 +114,7 @@ const buildReportSummary = (
       status: copy.losingStartedStatus,
       score: formatScore(m, copy.unsetScore),
       nextAction: copy.losingStartedAction,
-      badgeTone:
-        "border-primary/30 bg-primary/6 text-primary",
+      badgeTone: "border-primary/30 bg-primary/6 text-primary",
     })),
   ].slice(0, 3);
 
@@ -209,7 +208,8 @@ export default function ReportPage() {
   if (isLoading) return <ReportLoadingState />;
   if (hasNoWorkspace) return <ReportNoWorkspaceState />;
   if (isForbidden) return <ReportForbiddenState workspaceId={workspaceId} />;
-  if (isError || !report) return <ReportErrorState onRetry={refetch} workspaceId={workspaceId} />;
+  if (isError || !report)
+    return <ReportErrorState onRetry={refetch} workspaceId={workspaceId} />;
 
   const members = report.members ?? [];
   const summary = buildReportSummary(members, {
@@ -243,7 +243,10 @@ export default function ReportPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           <PageSidebarNav
-            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            items={menuGroups.map((group) => ({
+              id: group.id,
+              label: group.label,
+            }))}
             activeId={activeSection}
           />
 
@@ -348,7 +351,11 @@ function ChartLegendTooltip({
           style={{ backgroundColor: color }}
         />
         {label}
-        <DowinIcon name="status-info" size={10} className="text-zinc-300 ml-0.5" />
+        <DowinIcon
+          name="status-info"
+          size={10}
+          className="text-zinc-300 ml-0.5"
+        />
       </Button>
       {active && (
         <>
@@ -432,7 +439,13 @@ function TeamTrendChart({
 
       <div className="flex-1 min-h-[200px]">
         {hasTrendData ? (
-          <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} initialDimension={{ width: 10, height: 10 }}>
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={1}
+            minHeight={1}
+            initialDimension={{ width: 10, height: 10 }}
+          >
             <AreaChart
               data={data}
               margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
@@ -510,7 +523,12 @@ function TeamTrendChart({
                 strokeWidth={2.5}
                 fill="url(#winGrad)"
                 dot={{ r: 3, fill: "#fff", stroke: "#3a64c7", strokeWidth: 2 }}
-                activeDot={{ r: 5, fill: "#3a64c7", stroke: "#fff", strokeWidth: 2 }}
+                activeDot={{
+                  r: 5,
+                  fill: "#3a64c7",
+                  stroke: "#fff",
+                  strokeWidth: 2,
+                }}
                 animationDuration={1000}
               />
               <Area
@@ -521,7 +539,12 @@ function TeamTrendChart({
                 fill="url(#execGrad)"
                 strokeDasharray="4 4"
                 dot={false}
-                activeDot={{ r: 4, fill: "#84cc16", stroke: "#fff", strokeWidth: 2 }}
+                activeDot={{
+                  r: 4,
+                  fill: "#84cc16",
+                  stroke: "#fff",
+                  strokeWidth: 2,
+                }}
                 animationDuration={1000}
               />
             </AreaChart>
@@ -665,7 +688,9 @@ function WinRateOverview({
                   <span className="font-mono text-4xl font-bold tracking-tight text-text-primary">
                     {totalCount}
                   </span>
-                  <span className="text-xs font-bold text-text-muted">{t("common.memberCount", { count: "" })}</span>
+                  <span className="text-xs font-bold text-text-muted">
+                    {t("common.memberCount", { count: "" })}
+                  </span>
                 </div>
               </div>
 
@@ -697,10 +722,16 @@ function WinRateOverview({
                   </div>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className={cn(
-                    "font-mono text-4xl font-bold tracking-tight",
-                    winRate >= 80 ? "text-primary" : winRate >= 50 ? "text-amber-500" : "text-zinc-400"
-                  )}>
+                  <span
+                    className={cn(
+                      "font-mono text-4xl font-bold tracking-tight",
+                      winRate >= 80
+                        ? "text-primary"
+                        : winRate >= 50
+                          ? "text-amber-500"
+                          : "text-zinc-400",
+                    )}
+                  >
                     {winRate}%
                   </span>
                 </div>
@@ -724,8 +755,6 @@ function WinRateOverview({
     </div>
   );
 }
-
-
 
 function StatusBoardCard({
   label,
@@ -845,7 +874,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
               <span
                 className={cn(
                   "rounded px-2 py-0.5 text-[10px] font-bold tracking-tight md:text-[11px] border",
-                  member.badgeTone
+                  member.badgeTone,
                 )}
               >
                 {member.status}
@@ -874,19 +903,19 @@ function ReportLoadingState() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <ProtectedPageContainer spacing="compact">
-        <div className="h-16 w-48 animate-pulse rounded-content bg-zinc-200" />
+        <div className="h-12 w-48 animate-pulse rounded-[12px] bg-zinc-200" />
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
           <div className="hidden w-[240px] space-y-2 lg:block">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-10 rounded-button bg-zinc-200 animate-pulse"
+                className="h-10 rounded-[12px] bg-zinc-200 animate-pulse"
               />
             ))}
           </div>
           <div className="flex-1 space-y-10">
-            <div className="h-64 rounded-content bg-zinc-200 animate-pulse" />
-            <div className="h-48 rounded-content bg-zinc-200 animate-pulse" />
+            <div className="h-72 rounded-[24px] bg-zinc-200 animate-pulse" />
+            <div className="h-[340px] rounded-[24px] bg-zinc-200 animate-pulse" />
           </div>
         </div>
       </ProtectedPageContainer>
@@ -937,7 +966,9 @@ function ReportForbiddenState({ workspaceId }: { workspaceId: string }) {
           </p>
           <div className="flex justify-center">
             <Button asChild className="rounded-content">
-              <Link href={`/${workspaceId}/dashboard`}>{t("states.backToDashboard")}</Link>
+              <Link href={`/${workspaceId}/dashboard`}>
+                {t("states.backToDashboard")}
+              </Link>
             </Button>
           </div>
         </Card>
@@ -946,7 +977,13 @@ function ReportForbiddenState({ workspaceId }: { workspaceId: string }) {
   );
 }
 
-function ReportErrorState({ onRetry, workspaceId }: { onRetry: () => void, workspaceId: string }) {
+function ReportErrorState({
+  onRetry,
+  workspaceId,
+}: {
+  onRetry: () => void;
+  workspaceId: string;
+}) {
   const t = useTranslations("Report");
 
   return (
@@ -968,7 +1005,9 @@ function ReportErrorState({ onRetry, workspaceId }: { onRetry: () => void, works
               asChild
               className="rounded-content border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors"
             >
-              <Link href={`/${workspaceId}/dashboard`}>{t("states.backToDashboard")}</Link>
+              <Link href={`/${workspaceId}/dashboard`}>
+                {t("states.backToDashboard")}
+              </Link>
             </Button>
           </div>
         </Card>
