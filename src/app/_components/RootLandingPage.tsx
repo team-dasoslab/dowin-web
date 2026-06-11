@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 import { Footer } from "@/components/layout/Footer";
 import { LandingHeader } from "@/components/layout/LandingHeader";
 import { Button } from "@/components/ui/Button";
@@ -9,7 +7,6 @@ import { FadeIn } from "@/components/ui/FadeIn";
 import { Link } from "@/i18n/routing";
 import { 
   Check, 
-  ArrowRight,
   ListChecks,
   Target,
   ClipboardCheck,
@@ -105,7 +102,7 @@ export function RootLandingPage() {
                 title: t("Problem.item4Title"),
                 body: t("Problem.item4Body"),
               },
-            ].map((item: any, i: number) => {
+            ].map((item, i) => {
               const Icon = item.icon;
               return (
                 <FadeIn key={item.title} delay={0.1 * i} distance={60}>
@@ -149,7 +146,7 @@ export function RootLandingPage() {
               { icon: Flag, title: t("Solution.item2Title"), body: t("Solution.item2Body") },
               { icon: ClipboardCheck, title: t("Solution.item3Title"), body: t("Solution.item3Body") },
               { icon: BarChart3, title: t("Solution.item4Title"), body: t("Solution.item4Body") },
-            ].map((item: any, i: number) => {
+            ].map((item, i) => {
               const Icon = item.icon;
               return (
                 <FadeIn key={item.title} delay={0.1 * i} distance={40}>
@@ -206,10 +203,10 @@ export function RootLandingPage() {
                       {item.num}
                     </div>
                     <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2 md:mb-3 tracking-tight">
-                      {t(`Loop.node${item.node}Title` as any)}
+                      {t(`Loop.node${item.node}Title` as Parameters<typeof t>[0])}
                     </h3>
                     <p className="text-[14px] md:text-[16px] font-medium text-zinc-600 break-keep leading-relaxed max-w-[240px]">
-                      {t(`Loop.node${item.node}Desc` as any)}
+                      {t(`Loop.node${item.node}Desc` as Parameters<typeof t>[0])}
                     </p>
                   </div>
                 </div>
@@ -250,7 +247,7 @@ export function RootLandingPage() {
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
                       <Check className="h-4 w-4" strokeWidth={3} />
                     </div>
-                    <span className="text-[17px] font-medium leading-relaxed">{t(`Pricing.feature${i}` as any)}</span>
+                    <span className="text-[17px] font-medium leading-relaxed">{t(`Pricing.feature${i}` as Parameters<typeof t>[0])}</span>
                   </li>
                 ))}
               </ul>
