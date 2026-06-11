@@ -102,7 +102,7 @@ export default function ProfileMembersPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="max-w-[640px]">
+      <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5">
@@ -203,7 +203,10 @@ export default function ProfileMembersPage() {
 function MembersPageSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading className="max-w-[640px]">
+      <ProtectedPageContainer
+        isLoading
+        className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
+      >
         <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
         <div className="h-24 rounded-[24px] bg-zinc-200" />
         <div className="h-72 rounded-[24px] bg-zinc-200" />

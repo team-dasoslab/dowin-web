@@ -27,7 +27,7 @@ export default function UpdatesPage() {
   }
 
   return (
-    <ProtectedPageContainer className="max-w-[640px]">
+    <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
       <ProtectedPageHeader
         title={t("header")}
         rightElement={
