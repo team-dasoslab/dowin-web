@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/team-dasoslab/dowin-web/compare/v1.2.8...v1.3.0) (2026-06-12)
+
+
+### Features
+
+* SEO 최적화 및 다국어 메타데이터 적용 ([e0c60da](https://github.com/team-dasoslab/dowin-web/commit/e0c60da3f0d357ff7984e62e77bbbc777b3523d2))
+
 ## [1.2.8](https://github.com/team-dasoslab/dowin-web/compare/v1.2.7...v1.2.8) (2026-06-11)
 
 
