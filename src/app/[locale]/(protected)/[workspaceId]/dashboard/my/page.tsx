@@ -265,7 +265,6 @@ export default function MyDashboardPage() {
                 selectedDate={selectedDate}
                 selectedView={selectedView}
                 setSelectedDate={setSelectedDate}
-                setSelectedView={setSelectedView}
                 weekLabel={weekLabel}
                 today={today}
                 isPreviousDisabled={isPreviousDisabled}
