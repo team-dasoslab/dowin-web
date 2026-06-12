@@ -545,7 +545,7 @@ yarn dev
 yarn storybook
 yarn test --run
 yarn test:frontend
-yarn test:server
+yarn test:backend
 yarn gen:api
 yarn mig:local
 ```
@@ -569,7 +569,7 @@ yarn test --run <changed-test-file>
 주의:
 
 - `yarn test --run`은 전체 콘솔 테스트 1회 실행이다
-- 프론트엔드/서버만 넓게 확인할 때는 `yarn test:frontend`, `yarn test:server`를 사용한다
+- 프론트엔드/백엔드만 넓게 확인할 때는 `yarn test:frontend`, `yarn test:backend`를 사용한다
 - Storybook browser 테스트가 필요하면 `yarn test:storybook --run`을 별도로 사용한다
 
 ### 9.4. 머지 전 보안 점검

@@ -103,7 +103,7 @@ yarn dev
 yarn storybook
 yarn test --run
 yarn test:frontend
-yarn test:server
+yarn test:backend
 yarn lint
 yarn tsc --noEmit
 ```
@@ -195,7 +195,7 @@ Codex는 작업 종류에 따라 아래를 가능한 한 기본 검증 세트로
 
 백엔드:
 
-- `yarn test:server`
+- `yarn test:backend`
 - 변경한 도메인 테스트 우선 실행
 - 인증/인가, 소유권, 미래 날짜 금지, 상태 전이 같은 비즈니스 규칙 확인
 

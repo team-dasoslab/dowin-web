@@ -141,7 +141,7 @@ After backend/API/domain changes, run:
 ```bash
 yarn lint
 yarn tsc --noEmit
-yarn test:server
+yarn test:backend
 ```
 
 For API contract changes, also run:

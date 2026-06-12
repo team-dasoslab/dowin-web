@@ -86,7 +86,7 @@ yarn dev
 yarn gen:api
 yarn test --run
 yarn test:frontend
-yarn test:server
+yarn test:backend
 yarn storybook
 yarn mig:local
 yarn preview

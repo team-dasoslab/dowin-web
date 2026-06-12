@@ -119,7 +119,7 @@ Use the smallest useful verification set first, then broaden:
 
 ```bash
 yarn test --run <changed-test-file>
-yarn test:server
+yarn test:backend
 yarn tsc --noEmit
 yarn lint
 yarn eslint <changed-files>
@@ -186,7 +186,7 @@ The rule here is about how to split and order commits so review stays clear.
 - Is storage logic isolated from route code?
 - Are prepared statements or Drizzle-safe bindings used?
 - If the changed path is aggregation-heavy or query-heavy, was a performance review done?
-- Did `yarn test --run <changed-test-file>` or `yarn test:server`, `yarn tsc --noEmit`, and `yarn lint` run for the backend change?
+- Did `yarn test --run <changed-test-file>` or `yarn test:backend`, `yarn tsc --noEmit`, and `yarn lint` run for the backend change?
 
 ## Output Contract
 
