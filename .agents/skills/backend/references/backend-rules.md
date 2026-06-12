@@ -31,11 +31,13 @@
 
 ```bash
 yarn test --run <changed-test-file>
-yarn test
+yarn test:server
 yarn tsc --noEmit
 yarn lint
 yarn eslint <changed-files>
 ```
+
+Use focused `yarn test --run <changed-test-file>` while developing. Before handoff for backend/API/domain implementation changes, run `yarn test:server` unless a narrower run is explicitly accepted for a small documentation-adjacent change.
 
 If API contracts changed:
 
