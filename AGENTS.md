@@ -128,16 +128,31 @@ Trigger examples:
 
 ## Verification Defaults
 
-Run the smallest useful verification set for the task. Common commands:
+After frontend implementation changes that affect app logic, UI behavior, routing, hooks, generated API usage, shared UI components, or user-visible state, run these commands before final handoff:
 
 ```bash
-yarn tsc --noEmit
 yarn lint
-yarn test
+yarn tsc --noEmit
+yarn test:frontend
+```
+
+After backend/API/domain changes, run:
+
+```bash
+yarn lint
+yarn tsc --noEmit
+yarn test:server
+```
+
+For API contract changes, also run:
+
+```bash
 yarn gen:api
 ```
 
-Only run the commands relevant to the change.
+During development, it is fine to run smaller focused commands first, such as `yarn test --run <changed-test-files>` or `yarn eslint <changed-files>`, but the final handoff after frontend implementation changes must include `yarn lint`, `yarn tsc --noEmit`, and `yarn test:frontend`. For broad cross-cutting changes, use `yarn test --run` instead of the split suites.
+
+Documentation-only, planning-only, prompt/skill instruction-only, and other non-frontend-code changes do not require the frontend verification gate unless they also modify app logic.
 
 When the change touches the AI operating layer, add a harness security pass before completion.
 
