@@ -24,11 +24,13 @@ vi.mock("next/navigation", () => ({
   useParams: () => useParams(),
 }));
 
-function mockBilling(overrides: {
-  billingStatus?: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-  planCode?: "BASIC" | "FREE" | "STANDARD";
-  requiresManualReview?: boolean;
-} = {}) {
+function mockBilling(
+  overrides: {
+    billingStatus?: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    planCode?: "BASIC" | "FREE" | "STANDARD";
+    requiresManualReview?: boolean;
+  } = {},
+) {
   vi.mocked(useGetWorkspacesWorkspaceIdBillingMe).mockReturnValue({
     data: {
       data: {
