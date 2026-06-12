@@ -327,17 +327,15 @@ export default function WorkspaceSettingsPage() {
                       </div>
                     </div>
                   ))}
-                  <div className="rounded-[24px] overflow-hidden bg-white">
-                    <Link
-                      href="/workspace/new"
-                      className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
-                    >
-                      <div className="w-9 h-9 rounded-[12px] border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
-                        <DowinIcon name="action-add-active" size="16px" className="text-primary" />
-                      </div>
-                      {commonT("createWorkspace")}
-                    </Link>
-                  </div>
+                  <Link
+                    href="/workspace/new"
+                    className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
+                  >
+                    <div className="w-9 h-9 rounded-[12px] border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                      <DowinIcon name="action-add-active" size="16px" className="text-primary" />
+                    </div>
+                    {commonT("createWorkspace")}
+                  </Link>
                 </div>
               </section>
             </div>
