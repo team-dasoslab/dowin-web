@@ -19,8 +19,69 @@ import { useTranslations } from "next-intl";
 export function RootLandingPage() {
   const t = useTranslations("Landing");
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Dowin",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web Application",
+    description: t("Hero.description") || "가장 중요한 목표에 집중하세요.",
+    url: "https://dowin.app",
+    author: {
+      "@type": "Organization",
+      name: "Dasoslab",
+    },
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: t("Problem.item1Title"),
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: t("Problem.item1Body"),
+        },
+      },
+      {
+        "@type": "Question",
+        name: t("Problem.item2Title"),
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: t("Problem.item2Body"),
+        },
+      },
+      {
+        "@type": "Question",
+        name: t("Problem.item3Title"),
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: t("Problem.item3Body"),
+        },
+      },
+      {
+        "@type": "Question",
+        name: t("Solution.item1Title"),
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: t("Solution.item1Body"),
+        },
+      },
+    ],
+  };
+
   return (
     <main className="flex-1 w-full overflow-y-auto overflow-x-hidden relative bg-white text-zinc-900 selection:bg-primary/20 selection:text-primary font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="absolute top-0 w-full z-50">
         <LandingHeader />
       </div>
