@@ -183,6 +183,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - `yarn test --run` 통과
 - Storybook browser 테스트는 기본 `yarn test`에 포함되지 않고 `yarn test:storybook --run`으로 분리되어 있다
 - `AGENTS.md`, `codex.md`, `.agents/skills/**` 같은 하네스 파일이 바뀌면 머지 전 `dowin-harness-security-check`를 추가로 수행한다
+- 프론트엔드 화면/훅 테스트 작성 기준은 `docs/dev/common/2026.06.12-frontend-test-strategy.md`를 따른다
 
 ## 3. 기술 스택
 

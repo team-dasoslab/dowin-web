@@ -55,6 +55,7 @@ DOWIN는 팀의 목표 실행과 주간 운영을 관리하는 서비스다. 핵
    - [`docs/dev/common/2026.03.12-api-conventions.md`](/docs/dev/common/2026.03.12-api-conventions.md)
    - [`docs/dev/common/2026.03.14-common-utilities.md`](/docs/dev/common/2026.03.14-common-utilities.md)
    - [`docs/dev/common/2026.03.12-security.md`](/docs/dev/common/2026.03.12-security.md)
+   - [`docs/dev/common/2026.06.12-frontend-test-strategy.md`](/docs/dev/common/2026.06.12-frontend-test-strategy.md)
    - [`docs/dev/common/2026.03.09-database-schema.md`](/docs/dev/common/2026.03.09-database-schema.md)
 6. 운영 문서
    - [`docs/dev/operations/README.md`](/docs/dev/operations/README.md)
