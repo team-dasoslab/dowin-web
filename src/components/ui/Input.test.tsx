@@ -23,7 +23,7 @@ describe("Input", () => {
       />,
     );
 
-    expect(screen.getByText("Password")).toBeInTheDocument();
+    expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(screen.getByTestId("right-element")).toHaveTextContent("Show");
     expect(screen.getByText("Password").parentElement).toHaveClass("space-y-4");
   });
