@@ -8,6 +8,7 @@ import { Link, usePathname } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { useNativeApp } from "@/context/NativeAppContext";
 
 export function Sidebar() {
   const t = useTranslations("Dashboard");
@@ -15,6 +16,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const params = useParams();
   const workspaceId = params.workspaceId as string | undefined;
+  const isNativeApp = useNativeApp();
 
   const { data: profileResponse, isLoading: isProfileLoading } =
     useGetUsersMe();
@@ -91,15 +93,31 @@ export function Sidebar() {
             ) : workspaceName ? (
               <WorkspaceSwitcher isCollapsed={false} />
             ) : (
-              <Link
-                href="/workspace/new"
-                className="flex h-10 w-full items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4"
-              >
-                <DowinIcon name="action-add-active" size="16px" />
-                <span className="truncate text-[13px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
-                  {commonT("createWorkspace")}
-                </span>
-              </Link>
+              <div className="flex gap-2 w-full">
+                {!isNativeApp && (
+                  <Link
+                    href="/workspace/new"
+                    className="flex h-10 flex-1 items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4"
+                  >
+                    <DowinIcon name="action-add-active" size="16px" />
+                    <span className="truncate text-[13px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
+                      {commonT("createWorkspace")}
+                    </span>
+                  </Link>
+                )}
+                <Link
+                  href="/workspace/join"
+                  className={cn("flex h-10 items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4", isNativeApp ? "w-full" : "w-10 px-0 justify-center flex-shrink-0")}
+                  title={commonT("joinWorkspace")}
+                >
+                  <DowinIcon name="action-enter" size="16px" />
+                  {isNativeApp && (
+                    <span className="truncate text-[13px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
+                      {commonT("joinWorkspace")}
+                    </span>
+                  )}
+                </Link>
+              </div>
             )}
           </div>
 

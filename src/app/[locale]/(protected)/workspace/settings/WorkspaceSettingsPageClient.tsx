@@ -310,8 +310,7 @@ export default function WorkspaceSettingsPage() {
 
                       <div className="flex-shrink-0">
                         {ws.id === workspaceId ? (
-                            <div className="flex h-8 items-center gap-1.5 rounded-[16px] bg-primary/10 px-3 text-[12px] font-bold text-primary">
-                              <DowinIcon name="status-checkmark" size="14px" />
+                            <div className="flex h-10 items-center justify-center rounded-[12px] bg-primary/10 px-5 text-sm font-bold text-primary">
                               {commonT("current")}
                             </div>
                           ) : (
@@ -319,7 +318,7 @@ export default function WorkspaceSettingsPage() {
                               type="button"
                               disabled={isActionPending}
                               onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              className="flex h-8 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 transition-colors hover:bg-zinc-200 min-h-0"
+                              className="flex h-10 items-center justify-center rounded-[12px] bg-zinc-100 px-5 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-200 min-h-0"
                             >
                             {commonT("switchWorkspace")}
                           </Button>
@@ -327,17 +326,26 @@ export default function WorkspaceSettingsPage() {
                       </div>
                     </div>
                   ))}
-                  <div className="rounded-[24px] overflow-hidden bg-white">
+                  {!isNativeApp && (
                     <Link
                       href="/workspace/new"
                       className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
                     >
-                      <div className="w-9 h-9 rounded-[12px] border border-primary/20 bg-primary/5 flex items-center justify-center flex-shrink-0">
+                      <div className="w-9 h-9 rounded-[12px] bg-primary/5 flex items-center justify-center flex-shrink-0">
                         <DowinIcon name="action-add-active" size="16px" className="text-primary" />
                       </div>
                       {commonT("createWorkspace")}
                     </Link>
-                  </div>
+                  )}
+                  <Link
+                    href="/workspace/join"
+                    className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
+                  >
+                    <div className="w-9 h-9 rounded-[12px] bg-primary/5 flex items-center justify-center flex-shrink-0">
+                      <DowinIcon name="action-enter" size="16px" className="text-primary" />
+                    </div>
+                    {commonT("joinWorkspace")}
+                  </Link>
                 </div>
               </section>
             </div>

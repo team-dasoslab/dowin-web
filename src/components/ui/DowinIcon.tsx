@@ -58,6 +58,7 @@ import {
   Wallet,
   X,
   Zap,
+  Plus,
 } from "lucide-react";
 import React from "react";
 
@@ -143,8 +144,9 @@ export const ICON_MAP = {
   "domain-key": Key,
 
   // Actions
-  "action-add": CirclePlus,
-  "action-add-active": CirclePlus,
+  "action-add": Plus,
+  "action-add-active": Plus,
+  "action-add-circle": CirclePlus,
   "action-add-square": SquarePlus,
   "action-edit": Pencil,
   "action-edit-active": Pencil,

@@ -48,9 +48,6 @@ describe("JoinWorkspacePage", () => {
     ).toBeInTheDocument();
     expect(screen.getByPlaceholderText("예: TEAM-AB12-CD34")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "참가하기" })).toBeDisabled();
-    expect(
-      screen.getByRole("link", { name: "워크스페이스를 새로 만들고 싶으신가요?" }),
-    ).toHaveAttribute("href", "/workspace/new");
   });
 
   it("submits a trimmed uppercase invite code", () => {

@@ -176,7 +176,7 @@ export default function ProfileInvitesPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-12 min-w-0 items-center gap-2 rounded-[16px] bg-zinc-50 px-4 text-xs font-bold text-zinc-600 transition-colors focus-within:bg-zinc-100">
+              <label className="flex h-10 min-w-0 items-center gap-2 rounded-[12px] bg-zinc-50 px-4 text-xs font-bold text-zinc-600 transition-colors focus-within:bg-zinc-100">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -201,7 +201,7 @@ export default function ProfileInvitesPage() {
                 type="button"
                 onClick={() => void handleCreateInvite()}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
-                className={`h-12 rounded-[16px] px-5 text-[14px] font-black transition-colors ${
+                className={`h-10 rounded-[12px] px-5 text-sm font-bold transition-colors ${
                   isCreatingInvite || isOverFreeMemberLimit
                     ? "cursor-not-allowed bg-zinc-100 text-zinc-400"
                     : "bg-primary/10 text-primary hover:bg-primary/20"
