@@ -310,8 +310,7 @@ export default function WorkspaceSettingsPage() {
 
                       <div className="flex-shrink-0">
                         {ws.id === workspaceId ? (
-                            <div className="flex h-8 items-center gap-1.5 rounded-[16px] bg-primary/10 px-3 text-[12px] font-bold text-primary">
-                              <DowinIcon name="status-checkmark" size="14px" />
+                            <div className="flex h-10 items-center justify-center rounded-[12px] bg-primary/10 px-5 text-sm font-bold text-primary">
                               {commonT("current")}
                             </div>
                           ) : (
@@ -319,7 +318,7 @@ export default function WorkspaceSettingsPage() {
                               type="button"
                               disabled={isActionPending}
                               onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              className="flex h-8 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 transition-colors hover:bg-zinc-200 min-h-0"
+                              className="flex h-10 items-center justify-center rounded-[12px] bg-zinc-100 px-5 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-200 min-h-0"
                             >
                             {commonT("switchWorkspace")}
                           </Button>
