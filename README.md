@@ -110,7 +110,9 @@ yarn dev
 yarn dev               # 개발 서버
 yarn build             # 프로덕션 빌드
 yarn start             # 빌드 결과 실행
-yarn test              # Vitest
+yarn test --run        # 전체 Vitest 1회 실행
+yarn test:frontend     # 프론트엔드 테스트 묶음
+yarn test:backend      # 백엔드/API/domain 테스트 묶음
 yarn gen:api           # OpenAPI 기반 Orval 생성
 yarn mig:local         # 로컬 D1 마이그레이션 적용
 yarn mig:remote        # 원격 D1 마이그레이션 적용
