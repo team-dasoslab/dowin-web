@@ -169,7 +169,7 @@ export function ProfileBillingPageClient() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="max-w-[640px] space-y-6">
+      <ProtectedPageContainer className="max-w-[640px] space-y-6 pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="space-y-4">
@@ -225,12 +225,17 @@ export function ProfileBillingPageClient() {
               />
               <span>
                 {t.rich("nonPolarEntitlementNotice", {
-                  source: getEntitlementSourceLabel(billing.entitlementSource, t),
+                  source: getEntitlementSourceLabel(
+                    billing.entitlementSource,
+                    t,
+                  ),
                   contact: (chunks) => (
                     <Link
                       href={getWorkspacePath(workspaceId, "/profile/contact")}
                       className="underline underline-offset-2 hover:text-amber-900"
-                    >{chunks}</Link>
+                    >
+                      {chunks}
+                    </Link>
                   ),
                 })}
               </span>
@@ -239,7 +244,9 @@ export function ProfileBillingPageClient() {
         </div>
 
         <section className="space-y-4">
-          <h2 className="px-1 text-lg font-bold tracking-tight text-zinc-900">{t("currentPlanTitle")}</h2>
+          <h2 className="px-1 text-lg font-bold tracking-tight text-zinc-900">
+            {t("currentPlanTitle")}
+          </h2>
           <div className="rounded-[24px] bg-white py-2">
             <div className="flex items-center justify-between px-6 py-4">
               <span className="text-[15px] font-medium text-zinc-600">
@@ -510,7 +517,10 @@ function getEntitlementSourceLabel(
 function ProfileBillingSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading className="max-w-[640px] space-y-6">
+      <ProtectedPageContainer
+        isLoading
+        className="max-w-[640px] space-y-6 pb-24 md:pb-10 lg:pb-12"
+      >
         <div className="h-10 w-48 rounded-[24px] bg-zinc-200" />
         <div className="h-32 rounded-[24px] bg-zinc-200" />
         <div className="space-y-3">

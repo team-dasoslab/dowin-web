@@ -14,16 +14,16 @@ import {
 } from "@/app/[locale]/(protected)/setup/_lib/setup-coachmark";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 
-import { useRouter } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 export default function SetupPage() {
   const t = useTranslations("Setup");
@@ -167,7 +167,10 @@ export default function SetupPage() {
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           <PageSidebarNav
-            items={menuGroups.map((group) => ({ id: group.id, label: group.label }))}
+            items={menuGroups.map((group) => ({
+              id: group.id,
+              label: group.label,
+            }))}
             activeId={activeSection}
             bottomContent={<SetupGuideCard />}
           />
@@ -250,20 +253,32 @@ export default function SetupPage() {
         </div>
       </ProtectedPageContainer>
     </div>
-
   );
 }
 
 function SetupSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-10 rounded-content bg-zinc-200" />
-        <div className="h-12 rounded-content bg-zinc-200" />
-        <div className="h-44 rounded-content bg-zinc-200" />
-        <div className="h-44 rounded-content bg-zinc-200" />
-        <div className="h-64 rounded-content bg-zinc-200" />
-      </div>
+      <ProtectedPageContainer isLoading className="space-y-6 lg:space-y-12">
+        <div className="space-y-4">
+          <div className="h-10 w-48 rounded-[12px] bg-zinc-200" />
+          <div className="h-5 w-2/3 max-w-[400px] rounded-[12px] bg-zinc-200" />
+        </div>
+
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
+          <div className="hidden w-[240px] space-y-2 lg:block">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-10 rounded-[12px] bg-zinc-200" />
+            ))}
+          </div>
+
+          <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
+            <div className="h-32 rounded-[24px] bg-zinc-200" />
+            <div className="h-32 rounded-[24px] bg-zinc-200" />
+            <div className="h-64 rounded-[24px] bg-zinc-200" />
+          </div>
+        </div>
+      </ProtectedPageContainer>
     </div>
   );
 }

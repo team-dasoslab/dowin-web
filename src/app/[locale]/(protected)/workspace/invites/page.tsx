@@ -15,16 +15,16 @@ import { useInviteActions } from "@/app/[locale]/(protected)/workspace/invites/_
 import { useInviteForm } from "@/app/[locale]/(protected)/workspace/invites/_hooks/useInviteForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { useNativeApp } from "@/context/NativeAppContext";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
+import { Logo } from "@/components/ui/Logo";
 import { Switch } from "@/components/ui/Switch";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Logo } from "@/components/ui/Logo";
-import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import { useMemo, useState } from "react";
 
 import { useTranslations } from "next-intl";
 
@@ -130,7 +130,7 @@ export default function ProfileInvitesPage() {
 
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer className="max-w-[640px]">
+      <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
@@ -170,7 +170,9 @@ export default function ProfileInvitesPage() {
               <p className="text-[12px] font-bold text-zinc-600">
                 {t("maxUsesLabel")}
               </p>
-              <p className="text-[11px] font-medium text-zinc-400">{t("maxUsesLimit")}</p>
+              <p className="text-[11px] font-medium text-zinc-400">
+                {t("maxUsesLimit")}
+              </p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
@@ -302,8 +304,7 @@ export default function ProfileInvitesPage() {
                 const isPendingToggle = pendingToggleInviteId === inviteId;
                 const isCopied = copiedInviteId === inviteId;
                 const usageLabel = `${invite.usedCount ?? 0} / ${invite.maxUses ?? 0}`;
-                const isActivationBlocked =
-                  isOverFreeMemberLimit && !isActive;
+                const isActivationBlocked = isOverFreeMemberLimit && !isActive;
 
                 return (
                   <div
@@ -339,7 +340,8 @@ export default function ProfileInvitesPage() {
                             </span>
                           ) : (
                             <span className="flex items-center gap-1.5">
-                              <DowinIcon name="action-copy" size="14px" /> {t("copyCode")}
+                              <DowinIcon name="action-copy" size="14px" />{" "}
+                              {t("copyCode")}
                             </span>
                           )}
                         </Button>
@@ -367,11 +369,11 @@ export default function ProfileInvitesPage() {
                         {t("usageLabel", { usage: usageLabel })}
                       </span>
                     </div>
-                      {isActive && isOverFreeMemberLimit ? (
-                        <span className="text-[10px] font-semibold text-danger">
-                          {t("activeInviteOverLimit")}
-                        </span>
-                      ) : null}
+                    {isActive && isOverFreeMemberLimit ? (
+                      <span className="text-[10px] font-semibold text-danger">
+                        {t("activeInviteOverLimit")}
+                      </span>
+                    ) : null}
                   </div>
                 );
               })
@@ -386,11 +388,14 @@ export default function ProfileInvitesPage() {
 function InvitePageSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
-      <ProtectedPageContainer isLoading className="max-w-[640px]">
-        <div className="h-10 rounded-content bg-zinc-200" />
-        <div className="h-24 rounded-content bg-zinc-200" />
-        <div className="h-44 rounded-content bg-zinc-200" />
-        <div className="h-72 rounded-content bg-zinc-200" />
+      <ProtectedPageContainer
+        isLoading
+        className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
+      >
+        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
+        <div className="h-24 rounded-[24px] bg-zinc-200" />
+        <div className="h-44 rounded-[24px] bg-zinc-200" />
+        <div className="h-72 rounded-[24px] bg-zinc-200" />
       </ProtectedPageContainer>
     </div>
   );
@@ -440,7 +445,9 @@ function NoAccessState() {
             asChild
             className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
           >
-            <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
+            <Link href={getWorkspacePath(workspaceId, "/profile")}>
+              {t("backToSettings")}
+            </Link>
           </Button>
         </div>
       </div>

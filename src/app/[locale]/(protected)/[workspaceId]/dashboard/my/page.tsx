@@ -22,6 +22,7 @@ import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
@@ -175,7 +176,7 @@ export default function MyDashboardPage() {
         <ProtectedPageHeader
           title={
             isProfileLoading ? (
-              <div className="h-8 w-48 animate-pulse rounded-content bg-zinc-200" />
+              <div className="h-8 w-48 animate-pulse rounded-[12px] bg-zinc-200" />
             ) : nickname ? (
               t("userScoreboard", { nickname })
             ) : (
@@ -242,7 +243,21 @@ export default function MyDashboardPage() {
             ) : null}
 
             <section id="scoreboard" className="space-y-4 scroll-mt-28">
-              <SectionHeader title={t("executionBoard")} />
+              <SectionHeader 
+                title={t("executionBoard")} 
+                rightElement={
+                  <SegmentedControl
+                    options={[
+                      { value: "week", label: t("weekView") },
+                      { value: "month", label: t("monthView") },
+                    ]}
+                    value={selectedView}
+                    onChange={setSelectedView}
+                    disabled={isPeriodLoading}
+                    size="sm"
+                  />
+                }
+              />
               <PeriodControls
                 monthLabel={monthLabel}
                 movePeriod={movePeriod}
@@ -258,7 +273,7 @@ export default function MyDashboardPage() {
               />
 
               {isLoading ? (
-                <div className="h-[400px] w-full animate-pulse rounded-content bg-zinc-200" />
+                <div className="h-[400px] w-full animate-pulse rounded-[24px] bg-zinc-200" />
               ) : activeLeadMeasures.length === 0 ? (
                 <div className="rounded-[24px] bg-white py-12 text-center text-zinc-500 font-medium text-[15px]">
                   {t("noActiveMeasures")}
@@ -309,13 +324,13 @@ function MyDashboardSkeleton() {
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-16 rounded-content bg-zinc-200" />
-        <div className="h-24 rounded-content bg-zinc-200" />
+        <div className="h-12 w-1/3 rounded-[12px] bg-zinc-200" />
+        <div className="h-[140px] rounded-[24px] bg-zinc-200" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-content bg-zinc-200" />
-          <div className="h-48 rounded-content bg-zinc-200" />
+          <div className="h-48 rounded-[24px] bg-zinc-200" />
+          <div className="h-48 rounded-[24px] bg-zinc-200" />
         </div>
-        <div className="h-72 rounded-content bg-zinc-200" />
+        <div className="h-[400px] rounded-[24px] bg-zinc-200" />
       </div>
     </div>
   );
