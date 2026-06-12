@@ -176,11 +176,62 @@ function mockNoActiveScoreboard() {
   } as ReturnType<typeof useGetWorkspacesWorkspaceIdScoreboardsActive>);
 }
 
+function mockActiveScoreboard() {
+  vi.mocked(useGetWorkspacesWorkspaceIdScoreboardsActive).mockReturnValue({
+    data: {
+      data: {
+        goalName: "기존 목표",
+        id: 101,
+        lagMeasure: "기존 성공 기준",
+        startDate: "2026-02-01",
+      },
+      status: 200,
+    },
+    error: undefined,
+    isLoading: false,
+  } as ReturnType<typeof useGetWorkspacesWorkspaceIdScoreboardsActive>);
+}
+
 function mockLeadMeasures() {
   vi.mocked(
     useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
   ).mockReturnValue({
     data: undefined,
+    isLoading: false,
+  } as ReturnType<
+    typeof useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures
+  >);
+}
+
+function mockExistingLeadMeasures() {
+  vi.mocked(
+    useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
+  ).mockReturnValue({
+    data: {
+      data: [
+        {
+          dailyTargetCount: 1,
+          id: 11,
+          name: "기존 활성 액션",
+          period: "WEEKLY",
+          status: "ACTIVE",
+          tags: [{ id: 1, name: "영업" }],
+          targetValue: 3,
+          trackingMode: "BOOLEAN",
+        },
+        {
+          dailyTargetCount: 2,
+          id: 12,
+          name: "기존 보관 액션",
+          period: "MONTHLY",
+          status: "ARCHIVED",
+          tags: [],
+          targetValue: 99,
+          trackingMode: "COUNT",
+        },
+      ],
+      status: 200,
+    },
     isLoading: false,
   } as ReturnType<
     typeof useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures
@@ -438,6 +489,204 @@ describe("useScoreboardSetup create mode", () => {
       "success",
       "새 점수판을 만들었습니다.",
     );
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: ["active-scoreboard", "workspace-1"],
+      });
+    });
+  });
+});
+
+describe("useScoreboardSetup update mode", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    searchParamsGet.mockReturnValue("update");
+    vi.mocked(useToast).mockReturnValue({ showToast });
+    mockWorkspace();
+    mockWorkspaceTags();
+    mockActiveScoreboard();
+    mockExistingLeadMeasures();
+    mockMutations();
+    createLeadMeasureMutateAsync.mockResolvedValue({
+      data: {
+        id: 301,
+      },
+      status: 201,
+    });
+    updateScoreboardMutateAsync.mockResolvedValue({
+      data: {
+        id: 101,
+      },
+      status: 200,
+    });
+    updateLeadMeasureMutateAsync.mockResolvedValue({
+      status: 200,
+    });
+    archiveLeadMeasureMutateAsync.mockResolvedValue({
+      status: 200,
+    });
+    reactivateLeadMeasureMutateAsync.mockResolvedValue({
+      status: 200,
+    });
+  });
+
+  it("initializes edit-mode state from the active scoreboard and lead measures", async () => {
+    const { result } = renderScoreboardSetup();
+
+    await waitFor(() => {
+      expect(result.current.goalName).toBe("기존 목표");
+    });
+
+    expect(result.current.isEditMode).toBe(true);
+    expect(result.current.lagMeasure).toBe("기존 성공 기준");
+    expect(result.current.monthlyTargetMax).toBe(28);
+    expect(result.current.measures).toEqual([
+      expect.objectContaining({
+        existingId: 11,
+        initialStatus: "ACTIVE",
+        name: "기존 활성 액션",
+        period: "WEEKLY",
+        status: "ACTIVE",
+        targetValue: 3,
+        trackingMode: "BOOLEAN",
+      }),
+      expect.objectContaining({
+        dailyTargetCount: 2,
+        existingId: 12,
+        initialStatus: "ARCHIVED",
+        name: "기존 보관 액션",
+        period: "MONTHLY",
+        status: "ARCHIVED",
+        targetValue: 28,
+        trackingMode: "COUNT",
+      }),
+    ]);
+    expect(
+      useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
+    ).toHaveBeenCalledWith(
+      "workspace-1",
+      101,
+      { status: "all" },
+      expect.objectContaining({
+        query: expect.objectContaining({
+          enabled: true,
+        }),
+      }),
+    );
+  });
+
+  it("marks existing rows for archive, reactivation, delete, and restore locally", async () => {
+    const { result } = renderScoreboardSetup();
+
+    await waitFor(() => {
+      expect(result.current.measures).toHaveLength(2);
+    });
+
+    act(() => {
+      result.current.archiveMeasureRow("11");
+      result.current.reactivateMeasureRow("12");
+      result.current.removeMeasureRow("11");
+    });
+
+    expect(result.current.measures).toEqual([
+      expect.objectContaining({
+        existingId: 11,
+        isDeleted: true,
+        status: "ARCHIVED",
+      }),
+      expect.objectContaining({
+        existingId: 12,
+        status: "ACTIVE",
+      }),
+    ]);
+
+    act(() => {
+      result.current.restoreMeasureRow("11");
+    });
+
+    expect(result.current.measures[0]).toEqual(
+      expect.objectContaining({
+        existingId: 11,
+        isDeleted: false,
+      }),
+    );
+  });
+
+  it("updates scoreboard and reconciles existing, new, and archived lead measures", async () => {
+    const queryClient = createTestQueryClient();
+    const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+    const { result } = renderScoreboardSetup(queryClient);
+    let submitResult = false;
+
+    await waitFor(() => {
+      expect(result.current.measures).toHaveLength(2);
+    });
+
+    act(() => {
+      result.current.setGoalName("수정 목표");
+      result.current.setLagMeasure("수정 성공 기준");
+      result.current.archiveMeasureRow("11");
+      result.current.reactivateMeasureRow("12");
+      result.current.handleMeasureChange("12", "name", "재활성화 액션");
+      result.current.addMeasureRow();
+    });
+
+    const newMeasureId =
+      result.current.measures.find((measure) => measure.existingId === null)
+        ?.id ?? "";
+
+    act(() => {
+      result.current.handleMeasureChange(newMeasureId, "name", "신규 액션");
+      result.current.handleMeasureChange(newMeasureId, "period", "MONTHLY");
+      result.current.handleMeasureChange(newMeasureId, "targetValue", 4);
+    });
+
+    await act(async () => {
+      submitResult = await result.current.submit();
+    });
+
+    expect(submitResult).toBe(true);
+    expect(updateScoreboardMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      id: 101,
+      data: {
+        goalName: "수정 목표",
+        lagMeasure: "수정 성공 기준",
+      },
+    });
+    expect(reactivateLeadMeasureMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      id: 12,
+    });
+    expect(updateLeadMeasureMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      id: 12,
+      data: {
+        dailyTargetCount: 2,
+        name: "재활성화 액션",
+        period: "MONTHLY",
+        tagIds: [],
+        targetValue: 28,
+        trackingMode: "COUNT",
+      },
+    });
+    expect(createLeadMeasureMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      scoreboardId: 101,
+      data: {
+        dailyTargetCount: 1,
+        name: "신규 액션",
+        period: "MONTHLY",
+        tagIds: [],
+        targetValue: 4,
+        trackingMode: "BOOLEAN",
+      },
+    });
+    expect(archiveLeadMeasureMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      id: 11,
+    });
+    expect(showToast).toHaveBeenCalledWith("success", "점수판을 저장했습니다.");
     await waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({
         queryKey: ["active-scoreboard", "workspace-1"],
