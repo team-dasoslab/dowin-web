@@ -1,0 +1,447 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { NextIntlClientProvider } from "next-intl";
+import type { ReactNode } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import {
+  useDeleteWorkspacesWorkspaceIdLeadMeasuresId,
+  useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
+  usePostWorkspacesWorkspaceIdLeadMeasuresIdArchive,
+  usePostWorkspacesWorkspaceIdLeadMeasuresIdReactivate,
+  usePostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
+  usePutWorkspacesWorkspaceIdLeadMeasuresId,
+} from "@/api/generated/lead-measure/lead-measure";
+import {
+  useGetWorkspacesWorkspaceIdScoreboardsActive,
+  usePostWorkspacesWorkspaceIdScoreboards,
+  usePostWorkspacesWorkspaceIdScoreboardsIdArchive,
+  usePutWorkspacesWorkspaceIdScoreboardsId,
+} from "@/api/generated/scoreboard/scoreboard";
+import {
+  useDeleteWorkspacesIdTagsTagId,
+  useGetWorkspacesIdTags,
+  useGetWorkspacesMe,
+  usePostWorkspacesIdTags,
+  usePutWorkspacesIdTagsTagId,
+} from "@/api/generated/workspace/workspace";
+import { useToast } from "@/context/ToastContext";
+import { trackEvent } from "@/lib/client/gtag";
+import koMessages from "@/messages/ko.json";
+import { createTestQueryClient } from "@/test/render";
+
+import { useScoreboardSetup } from "./useScoreboardSetup";
+
+vi.mock("@/api/generated/lead-measure/lead-measure", () => ({
+  getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasuresQueryKey: vi.fn(
+    (workspaceId, scoreboardId, params) => [
+      "lead-measures",
+      workspaceId,
+      scoreboardId,
+      params,
+    ],
+  ),
+  useDeleteWorkspacesWorkspaceIdLeadMeasuresId: vi.fn(),
+  useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures: vi.fn(),
+  usePostWorkspacesWorkspaceIdLeadMeasuresIdArchive: vi.fn(),
+  usePostWorkspacesWorkspaceIdLeadMeasuresIdReactivate: vi.fn(),
+  usePostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures: vi.fn(),
+  usePutWorkspacesWorkspaceIdLeadMeasuresId: vi.fn(),
+}));
+
+vi.mock("@/api/generated/scoreboard/scoreboard", () => ({
+  getGetWorkspacesWorkspaceIdScoreboardsActiveQueryKey: vi.fn((workspaceId) => [
+    "active-scoreboard",
+    workspaceId,
+  ]),
+  getGetWorkspacesWorkspaceIdScoreboardsQueryKey: vi.fn((workspaceId) => [
+    "scoreboards",
+    workspaceId,
+  ]),
+  useGetWorkspacesWorkspaceIdScoreboardsActive: vi.fn(),
+  usePostWorkspacesWorkspaceIdScoreboards: vi.fn(),
+  usePostWorkspacesWorkspaceIdScoreboardsIdArchive: vi.fn(),
+  usePutWorkspacesWorkspaceIdScoreboardsId: vi.fn(),
+}));
+
+vi.mock("@/api/generated/workspace/workspace", () => ({
+  getGetWorkspacesIdTagsQueryKey: vi.fn((workspaceId) => [
+    "workspace-tags",
+    workspaceId,
+  ]),
+  useDeleteWorkspacesIdTagsTagId: vi.fn(),
+  useGetWorkspacesIdTags: vi.fn(),
+  useGetWorkspacesMe: vi.fn(),
+  usePostWorkspacesIdTags: vi.fn(),
+  usePutWorkspacesIdTagsTagId: vi.fn(),
+}));
+
+const refresh = vi.fn();
+const replace = vi.fn();
+const searchParamsGet = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: vi.fn(() => ({
+    refresh,
+    replace,
+  })),
+  useSearchParams: vi.fn(() => ({
+    get: searchParamsGet,
+  })),
+}));
+
+vi.mock("@/context/ToastContext", () => ({
+  useToast: vi.fn(),
+}));
+
+vi.mock("@/lib/client/gtag", () => ({
+  trackEvent: vi.fn(),
+}));
+
+vi.mock("@/lib/client/id-hash", () => ({
+  hashId: vi.fn((value: number | null | undefined) => `hash-${value}`),
+}));
+
+const showToast = vi.fn();
+const createScoreboardMutateAsync = vi.fn();
+const createLeadMeasureMutateAsync = vi.fn();
+const updateScoreboardMutateAsync = vi.fn();
+const archiveScoreboardMutateAsync = vi.fn();
+const updateLeadMeasureMutateAsync = vi.fn();
+const archiveLeadMeasureMutateAsync = vi.fn();
+const reactivateLeadMeasureMutateAsync = vi.fn();
+const deleteLeadMeasureMutateAsync = vi.fn();
+const createTagMutateAsync = vi.fn();
+const updateTagMutateAsync = vi.fn();
+const deleteTagMutateAsync = vi.fn();
+
+function createWrapper(queryClient: QueryClient) {
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <NextIntlClientProvider
+        locale="ko"
+        messages={koMessages}
+        timeZone="Asia/Seoul"
+      >
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </NextIntlClientProvider>
+    );
+  };
+}
+
+function mockMutation<T extends (...args: never[]) => unknown>(
+  hook: T,
+  mutateAsync: ReturnType<typeof vi.fn>,
+  overrides: Record<string, unknown> = {},
+) {
+  vi.mocked(hook).mockReturnValue({
+    isPending: false,
+    mutateAsync,
+    ...overrides,
+  } as unknown as ReturnType<T>);
+}
+
+function mockWorkspace() {
+  vi.mocked(useGetWorkspacesMe).mockReturnValue({
+    data: {
+      data: {
+        id: "workspace-1",
+        name: "Dowin Team",
+      },
+      status: 200,
+    },
+    isLoading: false,
+  } as ReturnType<typeof useGetWorkspacesMe>);
+}
+
+function mockWorkspaceTags() {
+  vi.mocked(useGetWorkspacesIdTags).mockReturnValue({
+    data: {
+      data: [{ id: 1, name: "영업" }],
+      status: 200,
+    },
+    isLoading: false,
+  } as ReturnType<typeof useGetWorkspacesIdTags>);
+}
+
+function mockNoActiveScoreboard() {
+  vi.mocked(useGetWorkspacesWorkspaceIdScoreboardsActive).mockReturnValue({
+    data: undefined,
+    error: {
+      response: {
+        status: 404,
+      },
+    },
+    isLoading: false,
+  } as ReturnType<typeof useGetWorkspacesWorkspaceIdScoreboardsActive>);
+}
+
+function mockLeadMeasures() {
+  vi.mocked(
+    useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
+  ).mockReturnValue({
+    data: undefined,
+    isLoading: false,
+  } as ReturnType<
+    typeof useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures
+  >);
+}
+
+function mockMutations() {
+  mockMutation(
+    usePostWorkspacesWorkspaceIdScoreboards,
+    createScoreboardMutateAsync,
+  );
+  mockMutation(
+    usePutWorkspacesWorkspaceIdScoreboardsId,
+    updateScoreboardMutateAsync,
+  );
+  mockMutation(
+    usePostWorkspacesWorkspaceIdScoreboardsIdArchive,
+    archiveScoreboardMutateAsync,
+  );
+  mockMutation(
+    usePostWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
+    createLeadMeasureMutateAsync,
+  );
+  mockMutation(
+    usePutWorkspacesWorkspaceIdLeadMeasuresId,
+    updateLeadMeasureMutateAsync,
+  );
+  mockMutation(
+    usePostWorkspacesWorkspaceIdLeadMeasuresIdArchive,
+    archiveLeadMeasureMutateAsync,
+  );
+  mockMutation(
+    usePostWorkspacesWorkspaceIdLeadMeasuresIdReactivate,
+    reactivateLeadMeasureMutateAsync,
+  );
+  mockMutation(
+    useDeleteWorkspacesWorkspaceIdLeadMeasuresId,
+    deleteLeadMeasureMutateAsync,
+  );
+  mockMutation(usePostWorkspacesIdTags, createTagMutateAsync);
+  mockMutation(usePutWorkspacesIdTagsTagId, updateTagMutateAsync);
+  mockMutation(useDeleteWorkspacesIdTagsTagId, deleteTagMutateAsync);
+}
+
+function renderScoreboardSetup(queryClient = createTestQueryClient()) {
+  return {
+    queryClient,
+    ...renderHook(() => useScoreboardSetup(), {
+      wrapper: createWrapper(queryClient),
+    }),
+  };
+}
+
+describe("useScoreboardSetup create mode", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    searchParamsGet.mockReturnValue("create");
+    vi.mocked(useToast).mockReturnValue({ showToast });
+    mockWorkspace();
+    mockWorkspaceTags();
+    mockNoActiveScoreboard();
+    mockLeadMeasures();
+    mockMutations();
+    createScoreboardMutateAsync.mockResolvedValue({
+      data: {
+        id: 101,
+      },
+      status: 201,
+    });
+    createLeadMeasureMutateAsync.mockResolvedValue({
+      data: {
+        id: 201,
+      },
+      status: 201,
+    });
+  });
+
+  it("initializes empty create-mode form state", () => {
+    const { result } = renderScoreboardSetup();
+
+    expect(result.current.isEditMode).toBe(false);
+    expect(result.current.isInitializing).toBe(false);
+    expect(result.current.goalName).toBe("");
+    expect(result.current.lagMeasure).toBe("");
+    expect(result.current.availableTags).toEqual([{ id: 1, name: "영업" }]);
+    expect(result.current.measures).toEqual([
+      expect.objectContaining({
+        dailyTargetCount: 1,
+        existingId: null,
+        id: expect.any(String),
+        name: "",
+        period: "WEEKLY",
+        status: "ACTIVE",
+        targetValue: 3,
+        trackingMode: "BOOLEAN",
+      }),
+    ]);
+    expect(
+      useGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLeadMeasures,
+    ).toHaveBeenCalledWith(
+      "workspace-1",
+      0,
+      undefined,
+      expect.objectContaining({
+        query: expect.objectContaining({
+          enabled: false,
+        }),
+      }),
+    );
+  });
+
+  it("updates local goal, success criteria, and measure fields with clamped targets", () => {
+    const { result } = renderScoreboardSetup();
+    const measureId = result.current.measures[0]?.id ?? "";
+
+    act(() => {
+      result.current.setGoalName("신규 목표");
+      result.current.setLagMeasure("신규 성공 기준");
+      result.current.handleMeasureChange(
+        measureId,
+        "name",
+        "신규 액션 아이템",
+      );
+      result.current.handleMeasureChange(measureId, "targetValue", 9);
+      result.current.handleMeasureChange(measureId, "period", "MONTHLY");
+      result.current.handleMeasureChange(measureId, "targetValue", 99);
+      result.current.handleMeasureChange(
+        measureId,
+        "trackingMode",
+        "COUNT",
+      );
+      result.current.handleMeasureChange(
+        measureId,
+        "dailyTargetCount",
+        4,
+      );
+    });
+
+    expect(result.current.goalName).toBe("신규 목표");
+    expect(result.current.lagMeasure).toBe("신규 성공 기준");
+    expect(result.current.measures[0]).toEqual(
+      expect.objectContaining({
+        dailyTargetCount: 4,
+        name: "신규 액션 아이템",
+        period: "MONTHLY",
+        targetValue: 30,
+        trackingMode: "COUNT",
+      }),
+    );
+  });
+
+  it("adds and removes unsaved measure rows without removing the last active row", () => {
+    const { result } = renderScoreboardSetup();
+    const firstMeasureId = result.current.measures[0]?.id ?? "";
+
+    act(() => {
+      result.current.removeMeasureRow(firstMeasureId);
+    });
+    expect(result.current.measures).toHaveLength(1);
+
+    act(() => {
+      result.current.addMeasureRow();
+    });
+    expect(result.current.measures).toHaveLength(2);
+
+    act(() => {
+      result.current.removeMeasureRow(firstMeasureId);
+    });
+
+    expect(result.current.measures).toHaveLength(1);
+  });
+
+  it("validates required fields before submitting", async () => {
+    const { result } = renderScoreboardSetup();
+    let submitResult = true;
+
+    await act(async () => {
+      submitResult = await result.current.submit();
+    });
+
+    expect(submitResult).toBe(false);
+    expect(createScoreboardMutateAsync).not.toHaveBeenCalled();
+    expect(showToast).toHaveBeenCalledWith(
+      "error",
+      "핵심 목표, 성공 기준, 그리고 최소 하나의 액션 아이템을 입력해주세요.",
+    );
+  });
+
+  it("creates a scoreboard, creates active lead measures, tracks events, and shows a success toast", async () => {
+    const queryClient = createTestQueryClient();
+    const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+    const { result } = renderScoreboardSetup(queryClient);
+    const measureId = result.current.measures[0]?.id ?? "";
+    let submitResult = false;
+
+    act(() => {
+      result.current.setGoalName("분기 매출 1억원 만들기");
+      result.current.setLagMeasure("월 매출 3천만원에서 1억원으로");
+      result.current.handleMeasureChange(
+        measureId,
+        "name",
+        "잠재고객 10명에게 연락하기",
+      );
+      result.current.handleMeasureChange(measureId, "targetValue", 3);
+      result.current.handleMeasureChange(
+        measureId,
+        "trackingMode",
+        "COUNT",
+      );
+      result.current.handleMeasureChange(
+        measureId,
+        "dailyTargetCount",
+        2,
+      );
+      result.current.toggleMeasureTag(measureId, {
+        id: 1,
+        name: "영업",
+      });
+    });
+
+    await act(async () => {
+      submitResult = await result.current.submit();
+    });
+
+    expect(submitResult).toBe(true);
+    expect(createScoreboardMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      data: expect.objectContaining({
+        goalName: "분기 매출 1억원 만들기",
+        lagMeasure: "월 매출 3천만원에서 1억원으로",
+      }),
+    });
+    expect(createLeadMeasureMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      scoreboardId: 101,
+      data: {
+        dailyTargetCount: 2,
+        name: "잠재고객 10명에게 연락하기",
+        period: "WEEKLY",
+        tagIds: [1],
+        targetValue: 3,
+        trackingMode: "COUNT",
+      },
+    });
+    expect(trackEvent).toHaveBeenCalledWith("scoreboard_created", {
+      lead_measure_count: 1,
+      workspace_id_hash: "workspace-1",
+    });
+    expect(trackEvent).toHaveBeenCalledWith("lead_measure_created", {
+      lead_measure_id_hash: "hash-201",
+      period_type: "WEEKLY",
+      scoreboard_id_hash: "hash-101",
+    });
+    expect(showToast).toHaveBeenCalledWith(
+      "success",
+      "새 점수판을 만들었습니다.",
+    );
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: ["active-scoreboard", "workspace-1"],
+      });
+    });
+  });
+});
