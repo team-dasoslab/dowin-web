@@ -1,6 +1,6 @@
 {
   "name": "dowin",
-  "version": "1.2.8",
+  "version": "1.3.1",
   "private": true,
   "packageManager": "yarn@4.10.0",
   "scripts": {
@@ -13,6 +13,8 @@
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
     "test": "vitest",
+    "test:frontend": "vitest --run src/app/_components 'src/app/[locale]' src/components src/context src/hooks src/lib/client",
+    "test:backend": "vitest --run src/app/api src/domain src/lib/server",
     "test:ui": "vitest --ui",
     "test:storybook": "vitest --config vitest.storybook.config.mts",
     "gen:api": "orval",

@@ -159,14 +159,11 @@ export default function NewWorkspacePage() {
  <Button
  type="submit"
  disabled={isPending || !name.trim() || !seatCount.trim()}
- className={`
- h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors 
- ${
+ className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
  isPending || !name.trim() || !seatCount.trim()
  ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
  : "bg-zinc-900 text-white hover:bg-zinc-800"
- }
- `}
+ }`}
  >
  {isPending ? (
  <InlineSpinner size="sm" />

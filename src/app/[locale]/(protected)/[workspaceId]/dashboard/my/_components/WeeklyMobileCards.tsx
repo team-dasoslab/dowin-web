@@ -116,6 +116,7 @@ function WeeklyMobileCard({
             date={date}
             dayLabel={localizedDays[index]}
             leadMeasureId={leadMeasureId}
+            leadMeasureName={leadMeasure.name}
             onBeforeToggle={onBeforeToggle}
             pendingLogKeys={pendingLogKeys}
             today={today}
@@ -141,6 +142,7 @@ type WeeklyMobileCardDayProps = {
   date: string;
   dayLabel: string;
   leadMeasureId: number | null;
+  leadMeasureName: string | null | undefined;
   onBeforeToggle: WeeklyMobileCardsProps["onBeforeToggle"];
   pendingLogKeys: WeeklyMobileCardsProps["pendingLogKeys"];
   today: string;
@@ -154,6 +156,7 @@ function WeeklyMobileCardDay({
   date,
   dayLabel,
   leadMeasureId,
+  leadMeasureName,
   onBeforeToggle,
   pendingLogKeys,
   today,
@@ -169,6 +172,7 @@ function WeeklyMobileCardDay({
   const isPending = currentLogKey !== null && pendingLogKeys.has(currentLogKey);
   const isCount = trackingMode === "COUNT";
   const t = useTranslations("Dashboard");
+  const measureName = leadMeasureName ?? t("leadMeasureHead");
 
   const count = value?.count ?? null;
   const isAchieved = value?.achieved ?? false;
@@ -194,6 +198,10 @@ function WeeklyMobileCardDay({
       {isCount ? (
         <>
           <Button
+            aria-label={t("editDailyCount", {
+              date,
+              measureName,
+            })}
             disabled={isPending || !isEditable || leadMeasureId === null}
             onClick={() => {
               if (leadMeasureId !== null && isEditable) {
@@ -231,6 +239,7 @@ function WeeklyMobileCardDay({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Button
+                    aria-label={t("closeDailyCount")}
                     className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100"
                     onClick={() => setOpenPopover(false)}
                   >
@@ -290,6 +299,7 @@ function WeeklyMobileCardDay({
                       </Button>
                     </div>
                     <Button
+                      aria-label={t("saveDailyCount")}
                       className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white transition-all"
                       onClick={() => {
                         handleCountSave(localCount);
@@ -306,6 +316,10 @@ function WeeklyMobileCardDay({
         </>
       ) : (
         <Button
+          aria-label={t("toggleDailyLog", {
+            date,
+            measureName,
+          })}
           disabled={isPending || !isEditable || leadMeasureId === null}
           onClick={() => {
             if (leadMeasureId !== null && isEditable) {

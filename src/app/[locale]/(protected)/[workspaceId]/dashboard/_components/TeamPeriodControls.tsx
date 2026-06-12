@@ -36,6 +36,7 @@ export function TeamPeriodControls({
               className="text-zinc-400"
             />
             <input
+              aria-label={t("selectDate")}
               type="date"
               value={selectedDate}
               disabled={isPeriodLoading}
@@ -46,6 +47,7 @@ export function TeamPeriodControls({
 
           <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-white p-1.5 h-10 sm:justify-start lg:flex-none">
             <Button
+              aria-label={t("previousPeriod")}
               type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
@@ -59,6 +61,7 @@ export function TeamPeriodControls({
             </div>
 
             <Button
+              aria-label={t("nextPeriod")}
               type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
@@ -73,6 +76,7 @@ export function TeamPeriodControls({
 
             {isResetVisible ? (
               <Button
+                aria-label={t("backToToday")}
                 type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}

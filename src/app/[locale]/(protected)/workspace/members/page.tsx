@@ -122,7 +122,7 @@ export default function ProfileMembersPage() {
           <div className="flex shrink-0 items-center">
             <Button
               asChild
-              className="h-9 rounded-[12px] bg-zinc-100 px-3.5 text-xs font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
+              className="h-10 rounded-[12px] bg-zinc-100 px-5 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
             >
               <Link
                 href={getWorkspacePath(workspaceParamId, "/workspace/invites")}

@@ -32,7 +32,7 @@ export default function ProfileDeleteAccountPage() {
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-red-100 text-red-600">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-red-100 text-red-600">
             <DowinIcon name="status-warning" size="24px" />
           </div>
           <div className="min-w-0">
@@ -69,7 +69,11 @@ export default function ProfileDeleteAccountPage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => void submit()}
-            className="h-11 w-full rounded-[12px] bg-red-600 text-sm font-bold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
+              isSubmitting
+                ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                : "bg-zinc-900 text-white hover:bg-zinc-800"
+            }`}
           >
             {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>

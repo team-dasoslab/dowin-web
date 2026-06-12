@@ -1,6 +1,7 @@
 import { publicRuntimeConfig } from "@/config/public-runtime-config";
+import { serverRuntimeConfig } from "@/config/server-runtime-config";
 import { resolveLocale } from "@/i18n/detect-locale";
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { cookies, headers } from "next/headers";
 import Script from "next/script";
 import { ReactNode } from "react";
@@ -11,6 +12,82 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#EFF0FA",
+};
+
+export const metadata: Metadata = {
+  metadataBase: new URL(serverRuntimeConfig.appOrigin),
+  applicationName: "Dowin",
+  authors: [{ name: "Dasoslab", url: serverRuntimeConfig.appOrigin }],
+  generator: "Next.js",
+  keywords: [
+    "목표 관리",
+    "목표 실행",
+    "할 일",
+    "생산성",
+    "플래너",
+    "주간 계획",
+    "주간 운영",
+    "핵심 목표",
+    "성공 기준",
+    "액션 아이템",
+    "점수판",
+    "주간 점검",
+    "팀 대시보드",
+    "워크스페이스",
+  ],
+  creator: "Dasoslab",
+  publisher: "Dasoslab",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Dowin",
+  },
+  title: {
+    template: "%s | Dowin",
+    default: "Dowin",
+  },
+  description: "가장 중요한 목표에 집중하세요.",
+  openGraph: {
+    title: "Dowin",
+    description: "가장 중요한 목표에 집중하세요.",
+    url: "/",
+    siteName: "Dowin",
+    images: [
+      {
+        url: "/cover.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Dowin",
+    description: "가장 중요한 목표에 집중하세요.",
+    images: ["/cover.png"],
+  },
+  icons: {
+    icon: "/favicon.svg",
+  },
+  alternates: {
+    canonical: "/",
+    languages: {
+      ko: "/ko",
+      en: "/en",
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default async function RootLayout({
@@ -32,27 +109,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <head>
-        <title>Dowin</title>
-        {/* ... existing meta tags ... */}
-        <meta name="description" content="가장 중요한 목표에 집중하세요." />
-        <meta property="og:title" content="Dowin" />
-        <meta
-          property="og:description"
-          content="가장 중요한 목표에 집중하세요."
-        />
-        <meta property="og:image" content="/cover.png" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Dowin" />
-        <meta
-          name="twitter:description"
-          content="가장 중요한 목표에 집중하세요."
-        />
-        <meta name="twitter:image" content="/cover.png" />
-        <meta name="theme-color" content="#EFF0FA" />
-        <link rel="icon" href="/favicon.svg" />
-      </head>
+      <head></head>
       <body>
         {gaId ? (
           <>
