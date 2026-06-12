@@ -1088,9 +1088,7 @@
       "createButton": "Create New",
       "loading": "Joining workspace...",
       "joinSuccess": "Joined workspace successfully.",
-      "joinFailed": "An error occurred while joining the workspace.",
-      "goToCreateText": "Want to create a new workspace?",
-      "goToCreateButton": "Create New"
+      "joinFailed": "An error occurred while joining the workspace."
     }
   },
   "Landing": {

@@ -78,15 +78,6 @@ export default function JoinWorkspacePage() {
           </div>
         </form>
 
-        {/* 하단 링크 */}
-        <div className="pt-4 flex items-center justify-center">
-          <Link
-            href="/workspace/new"
-            className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
-          >
-            {t("goToCreateText")}
-          </Link>
-        </div>
       </div>
     </div>
   );
