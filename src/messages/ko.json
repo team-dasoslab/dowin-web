@@ -115,6 +115,10 @@
     "dismissUpdate": "이 업데이트 잠시 숨기기",
     "newFeatureNotice": "새로운 기능 안내",
     "dailyCountTitle": "하루 목표 설정",
+    "toggleDailyLog": "{measureName} {date} 기록 토글",
+    "editDailyCount": "{measureName} {date} 횟수 입력",
+    "closeDailyCount": "횟수 입력 닫기",
+    "saveDailyCount": "횟수 저장",
     "My": {
       "logSaveFailed": "기록 저장에 실패했습니다.",
       "Celebration": {

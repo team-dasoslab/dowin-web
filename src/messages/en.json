@@ -115,6 +115,10 @@
     "dismissUpdate": "Dismiss this update",
     "newFeatureNotice": "What's New",
     "dailyCountTitle": "Set Daily Target",
+    "toggleDailyLog": "Toggle {measureName} log for {date}",
+    "editDailyCount": "Edit {measureName} count for {date}",
+    "closeDailyCount": "Close count input",
+    "saveDailyCount": "Save count",
     "My": {
       "logSaveFailed": "Failed to save log.",
       "Celebration": {
