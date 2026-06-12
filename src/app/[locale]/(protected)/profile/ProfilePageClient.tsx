@@ -18,6 +18,7 @@ import {
   useNotificationSettings,
 } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
+import { useNativeApp } from "@/context/NativeAppContext";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useToast } from "@/context/ToastContext";
@@ -34,7 +35,7 @@ import { useEffect, useRef, useState } from "react";
 interface MenuItem {
   id: string;
   icon: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
   description?: string;
   danger?: boolean;
   href?: string;
@@ -69,6 +70,7 @@ export default function ProfilePage() {
   const nickname = user?.nickname ?? t("defaultNickname");
   const customId = user?.customId ?? "";
   const avatarKey = user?.avatarKey ?? null;
+  const isNativeApp = useNativeApp();
   const [isPushSubscribed, setIsPushSubscribed] = useState(false);
   const {
     dailySettings,
@@ -168,7 +170,16 @@ export default function ProfilePage() {
         {
           id: "push-notification",
           icon: <DowinIcon name="status-bell" className="w-4 h-4" />,
-          title: t("pushReminder"),
+          title: (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span>{t("pushReminder")}</span>
+              {!isNativeApp && (
+                <span className="text-[11px] font-medium text-zinc-500">
+                  ({t("NotificationControl.appOnly")})
+                </span>
+              )}
+            </div>
+          ),
           rightElement: (
             <NotificationSettingControl
               disabled={isDailyLoading || isUpdatingDaily}
@@ -410,13 +421,13 @@ function MenuItemRow({
           {item.icon}
         </div>
         <div className="text-left min-w-0">
-          <p
+          <div
             className={`text-[14px] font-bold ${
               item.danger ? "text-danger" : "text-text-primary"
             }`}
           >
             {item.title}
-          </p>
+          </div>
         </div>
       </div>
       <div className="flex-shrink-0">

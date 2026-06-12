@@ -217,11 +217,6 @@ export function NotificationSettingControl({
         }}
         aria-label={isRegistered ? t("toggleOff") : t("toggleOn")}
       />
-      {!isNativeApp ? (
-        <span className="text-[11px] font-medium text-zinc-500">
-          {t("appOnly")}
-        </span>
-      ) : null}
     </div>
   );
 }
