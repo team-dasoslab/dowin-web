@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/team-dasoslab/dowin-web/compare/v1.3.0...v1.3.1) (2026-06-12)
+
+
+### Bug Fixes
+
+* QA ([#133](https://github.com/team-dasoslab/dowin-web/issues/133)) ([f41ae73](https://github.com/team-dasoslab/dowin-web/commit/f41ae73a7dfe74155f7bb7f6ad8c9b6ac5afe8c9))
+
 ## [1.3.0](https://github.com/team-dasoslab/dowin-web/compare/v1.2.8...v1.3.0) (2026-06-12)
 
 
