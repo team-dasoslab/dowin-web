@@ -8,6 +8,7 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
+import { useNativeApp } from "@/context/NativeAppContext";
 
 interface WorkspaceSwitcherProps {
   isCollapsed: boolean;
@@ -16,7 +17,9 @@ interface WorkspaceSwitcherProps {
 export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
   const commonT = useTranslations("Common");
   const [isOpen, setIsOpen] = useState(false);
+  const [optimisticWorkspaceId, setOptimisticWorkspaceId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isNativeApp = useNativeApp();
 
   const params = useParams();
   const locale = useLocale();
@@ -40,6 +43,9 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
   const me = meResponse?.status === 200 ? meResponse.data : null;
   const workspaces = workspacesResponse?.status === 200 ? workspacesResponse.data : [];
 
+  const displayWorkspaceId = optimisticWorkspaceId || currentWorkspaceId || me?.id;
+  const activeWorkspace = workspaces.find((ws) => ws.id === displayWorkspaceId) || me;
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -50,7 +56,7 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (isMeLoading) {
+  if (isMeLoading && !activeWorkspace) {
     return (
       <div
         className={cn(
@@ -61,7 +67,7 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
     );
   }
 
-  if (!me) {
+  if (!activeWorkspace) {
     return null; // Handle empty state outside or let Sidebar render empty
   }
 
@@ -76,7 +82,7 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
         )}
       >
         <span className="truncate text-[16px] font-bold text-zinc-900 whitespace-nowrap transition-all duration-300 pt-[2px]">
-          {me.name}
+          {activeWorkspace.name}
         </span>
         <DowinIcon 
           name="nav-chevron-down" 
@@ -92,26 +98,37 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
               key={ws.id}
               onClick={() => {
                 setIsOpen(false);
-                if (ws.id !== me.id && ws.id) {
+                if (ws.id !== activeWorkspace.id && ws.id) {
+                  setOptimisticWorkspaceId(ws.id);
                   switchWorkspace({ data: { workspaceId: ws.id } });
                 }
               }}
               className={cn(
                 "flex w-full items-center rounded-[12px] px-3 py-3 text-[15px] transition-colors hover:bg-zinc-100",
-                ws.id === me.id ? "font-bold text-zinc-900 bg-zinc-50/50" : "font-medium text-zinc-600"
+                ws.id === activeWorkspace.id ? "font-bold text-zinc-900 bg-zinc-50/50" : "font-medium text-zinc-600"
               )}
             >
               <span className="truncate">{ws.name}</span>
             </button>
           ))}
           <div className="border-t border-zinc-100 my-2 mx-1" />
+          {!isNativeApp && (
+            <Link
+              href="/workspace/new"
+              onClick={() => setIsOpen(false)}
+              className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-zinc-100 text-zinc-600 font-bold gap-2"
+            >
+              <DowinIcon name="action-add-active" size="14px" />
+              <span>{commonT("createWorkspace")}</span>
+            </Link>
+          )}
           <Link
-            href="/workspace/new"
+            href="/workspace/join"
             onClick={() => setIsOpen(false)}
             className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-zinc-100 text-zinc-600 font-bold gap-2"
           >
-            <DowinIcon name="action-add-active" size="14px" />
-            <span>{commonT("createWorkspace")}</span>
+            <DowinIcon name="action-enter" size="14px" />
+            <span>{commonT("joinWorkspace")}</span>
           </Link>
         </div>
       )}

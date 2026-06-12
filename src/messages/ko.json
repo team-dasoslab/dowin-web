@@ -1091,9 +1091,7 @@
       "createButton": "새로 만들기",
       "loading": "워크스페이스에 참가하는 중입니다.",
       "joinSuccess": "워크스페이스에 참가했습니다.",
-      "joinFailed": "워크스페이스 참가 중 오류가 발생했습니다.",
-      "goToCreateText": "워크스페이스를 새로 만들고 싶으신가요?",
-      "goToCreateButton": "생성하기"
+      "joinFailed": "워크스페이스 참가 중 오류가 발생했습니다."
     }
   },
   "Landing": {

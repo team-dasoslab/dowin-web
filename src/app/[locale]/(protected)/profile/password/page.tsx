@@ -34,7 +34,7 @@ export default function ProfilePasswordPage() {
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="domain-key" size="24px" />
           </div>
           <div className="min-w-0">
@@ -74,7 +74,11 @@ export default function ProfilePasswordPage() {
             type="button"
             disabled={isSubmitting}
             onClick={() => void submit()}
-            className="btn-dowin-primary h-11 w-full rounded-[12px] text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
+            className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
+              isSubmitting
+                ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                : "bg-zinc-900 text-white hover:bg-zinc-800"
+            }`}
           >
             {isSubmitting ? t("submittingButton") : t("submitButton")}
           </Button>
