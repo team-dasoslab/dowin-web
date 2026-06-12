@@ -22,10 +22,10 @@ export function SetupSubmitButton({
       type="submit"
       form={formId}
       disabled={isMutating}
-      className={`flex w-full items-center justify-center gap-2 rounded-[16px] py-4 text-[17px] font-bold transition-all ${
+      className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
         isMutating
-          ? "cursor-not-allowed bg-primary/50 text-white"
-          : "bg-primary text-white hover:bg-primary/90"
+          ? "cursor-not-allowed bg-zinc-100 text-zinc-400"
+          : "bg-zinc-900 text-white hover:bg-zinc-800"
       }`}
     >
       {isSubmitPending ? (
