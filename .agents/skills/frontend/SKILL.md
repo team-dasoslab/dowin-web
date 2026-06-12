@@ -42,6 +42,7 @@ If current code and docs differ, verify the implementation and preserve establis
 - When creating commits, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `feat|fix|docs|chore|refactor|style` with the format `<type>: <변경 요약>`.
 
 For detailed file paths and doc priorities, read `references/frontend-rules.md`.
+For frontend testing scope, prioritization, mocks, and verification patterns, read `docs/dev/common/2026.06.12-frontend-test-strategy.md`.
 
 ## Workflow
 
@@ -82,9 +83,10 @@ If a shared UI component is added or materially changed, add or update a story i
 
 ### 5. Verify
 
-Run the smallest useful set first:
+Run the smallest useful set first. Frontend implementation changes must include the relevant frontend test run; do not finish frontend app logic, UI behavior, routing, hook, generated API usage, or shared UI component work without running the changed or affected frontend tests.
 
 ```bash
+yarn test --run <changed-or-affected-test-files>
 yarn tsc --noEmit
 yarn lint
 yarn eslint <changed-files>
@@ -93,8 +95,9 @@ yarn eslint <changed-files>
 Then run broader checks when the change is substantial:
 
 ```bash
+yarn test:frontend
 yarn storybook
-yarn test
+yarn test --run
 yarn test:storybook --run
 ```
 
@@ -120,6 +123,7 @@ Apply `gen:api` only when the API contract actually changed. If there is no cont
 - If server state changed, were related queries invalidated?
 - If query-string state is needed, did you choose between server `searchParams` props and client `useSearchParams()` intentionally, and add `Suspense` when using the client hook?
 - Are new or changed visible UI strings covered in both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded?
+- Were the changed or affected frontend tests run with `yarn test --run <files>` or `yarn test:frontend`?
 - If API contracts changed, was `yarn gen:api` run?
 - If shared UI changed, was Storybook updated?
 - Was mobile layout considered?

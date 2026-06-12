@@ -30,6 +30,8 @@ function CountPopoverContent({
   dailyTargetCount,
   onSave,
   onClose,
+  closeLabel,
+  saveLabel,
   title,
   subtitle,
 }: {
@@ -37,6 +39,8 @@ function CountPopoverContent({
   dailyTargetCount: number;
   onSave: (count: number) => void;
   onClose: () => void;
+  closeLabel: string;
+  saveLabel: string;
   title: string;
   subtitle: string;
 }) {
@@ -53,6 +57,7 @@ function CountPopoverContent({
       onClick={(e) => e.stopPropagation()}
     >
       <Button
+        aria-label={closeLabel}
         className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100"
         onClick={onClose}
       >
@@ -107,6 +112,7 @@ function CountPopoverContent({
         </div>
 
         <Button
+          aria-label={saveLabel}
           className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white transition-all"
           onClick={() => {
             onSave(localCount);
@@ -264,21 +270,37 @@ export function WeeklyBoardSection({
                         const isPending =
                           currentLogKey !== null &&
                           pendingLogKeys.has(currentLogKey);
+                        const measureName =
+                          leadMeasure.name ?? t("leadMeasureHead");
 
                         return (
                           <td key={date} className="py-3 text-center">
                             {isCount ? (
                               <div className="flex flex-col items-center justify-center relative">
                                 <Button
-                                  disabled={!isEditable}
-                                  onClick={() =>
-                                    setOpenPopoverKey(
-                                      openPopoverKey ===
-                                        `${leadMeasure.id}-${date}`
-                                        ? null
-                                        : `${leadMeasure.id}-${date}`,
-                                    )
+                                  aria-label={t("editDailyCount", {
+                                    date,
+                                    measureName,
+                                  })}
+                                  disabled={
+                                    isPending ||
+                                    !isEditable ||
+                                    leadMeasureId === null
                                   }
+                                  onClick={() => {
+                                    if (
+                                      leadMeasureId !== null &&
+                                      isEditable &&
+                                      !isPending
+                                    ) {
+                                      setOpenPopoverKey(
+                                        openPopoverKey ===
+                                          `${leadMeasure.id}-${date}`
+                                          ? null
+                                          : `${leadMeasure.id}-${date}`,
+                                      );
+                                    }
+                                  }}
                                   className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
                                     isAchievedDaily
                                       ? "bg-primary text-white"
@@ -288,7 +310,7 @@ export function WeeklyBoardSection({
                                           ? "bg-primary/5 text-primary"
                                           : "bg-zinc-100 text-zinc-500 hover:bg-zinc-100"
                                   } ${
-                                    !isEditable
+                                    isPending || !isEditable
                                       ? "cursor-not-allowed opacity-50"
                                       : "cursor-pointer"
                                   }`}
@@ -315,6 +337,8 @@ export function WeeklyBoardSection({
                                       <CountPopoverContent
                                         initialCount={count}
                                         dailyTargetCount={dailyTargetCount}
+                                        closeLabel={t("closeDailyCount")}
+                                        saveLabel={t("saveDailyCount")}
                                         title={
                                           leadMeasure.name ??
                                           t("dailyCountTitle")
@@ -335,6 +359,10 @@ export function WeeklyBoardSection({
                               </div>
                             ) : (
                               <Button
+                                aria-label={t("toggleDailyLog", {
+                                  date,
+                                  measureName,
+                                })}
                                 disabled={
                                   isPending ||
                                   !isEditable ||

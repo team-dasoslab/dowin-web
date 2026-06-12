@@ -94,7 +94,7 @@ Add broader checks when the change affects real UI behavior or routing:
 
 ```bash
 yarn lint
-yarn test
+yarn test:frontend
 ```
 
 ## Output Contract

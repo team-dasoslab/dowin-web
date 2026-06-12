@@ -72,6 +72,9 @@
     "weekView": "주간",
     "monthView": "월간",
     "backToToday": "오늘로 돌아가기",
+    "selectDate": "날짜 선택",
+    "previousPeriod": "이전 기간",
+    "nextPeriod": "다음 기간",
     "weekViewDesc": "선택한 날짜가 포함된 한 주(월~일)를 보여줍니다.",
     "monthViewDesc": "선택한 날짜가 포함된 한 달 전체를 집계합니다.",
     "weeklyLeadMeasures": "주간 액션 아이템",
@@ -112,6 +115,10 @@
     "dismissUpdate": "이 업데이트 잠시 숨기기",
     "newFeatureNotice": "새로운 기능 안내",
     "dailyCountTitle": "하루 목표 설정",
+    "toggleDailyLog": "{measureName} {date} 기록 토글",
+    "editDailyCount": "{measureName} {date} 횟수 입력",
+    "closeDailyCount": "횟수 입력 닫기",
+    "saveDailyCount": "횟수 저장",
     "My": {
       "logSaveFailed": "기록 저장에 실패했습니다.",
       "Celebration": {

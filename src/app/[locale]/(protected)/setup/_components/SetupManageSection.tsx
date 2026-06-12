@@ -25,7 +25,7 @@ export function SetupManageSection({
             type="button"
             disabled={isArchivePending}
             onClick={() => {
-              if (confirm(t("archiveConfirm"))) {
+              if (confirm(t("confirmArchive"))) {
                 archive();
               }
             }}

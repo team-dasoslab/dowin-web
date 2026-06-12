@@ -55,6 +55,7 @@ DOWIN는 팀의 목표 실행과 주간 운영을 관리하는 서비스다. 핵
    - [`docs/dev/common/2026.03.12-api-conventions.md`](/docs/dev/common/2026.03.12-api-conventions.md)
    - [`docs/dev/common/2026.03.14-common-utilities.md`](/docs/dev/common/2026.03.14-common-utilities.md)
    - [`docs/dev/common/2026.03.12-security.md`](/docs/dev/common/2026.03.12-security.md)
+   - [`docs/dev/common/2026.06.12-frontend-test-strategy.md`](/docs/dev/common/2026.06.12-frontend-test-strategy.md)
    - [`docs/dev/common/2026.03.09-database-schema.md`](/docs/dev/common/2026.03.09-database-schema.md)
 6. 운영 문서
    - [`docs/dev/operations/README.md`](/docs/dev/operations/README.md)
@@ -83,7 +84,9 @@ yarn dev
 
 ```bash
 yarn gen:api
-yarn test
+yarn test --run
+yarn test:frontend
+yarn test:backend
 yarn storybook
 yarn mig:local
 yarn preview
@@ -330,6 +333,6 @@ Drizzle 스키마 기준 핵심 테이블은 아래와 같다.
 
 - 기존 문서 일부는 계획 상태를 아직 포함하고 있어 실제 구현보다 넓거나 다를 수 있다.
 - 특히 Dashboard는 문서상 별도 `/api/dashboard/me`가 보이지만, 현재 개인 뷰는 활성 점수판과 로그 API 조합으로 동작한다.
-- Storybook browser 테스트는 기본 `yarn test`에 포함되지 않는다. 브라우저 기반 검증이 필요하면 별도 명령으로 실행한다.
+- Storybook browser 테스트는 기본 콘솔 테스트에 포함되지 않는다. 브라우저 기반 검증이 필요하면 별도 명령으로 실행한다.
 
 이 문서로 시작한 뒤, 실제 변경은 항상 현재 코드와 테스트를 기준으로 판단하면 된다.

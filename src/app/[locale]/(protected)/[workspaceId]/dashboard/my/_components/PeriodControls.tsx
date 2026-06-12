@@ -9,7 +9,6 @@ interface PeriodControlsProps {
   selectedDate: string;
   selectedView: "week" | "month";
   setSelectedDate: (value: string) => void;
-  setSelectedView: (value: "week" | "month") => void;
   movePeriod: (direction: -1 | 1) => void;
   weekLabel: string;
   today: string;
@@ -24,7 +23,6 @@ export function PeriodControls({
   selectedDate,
   selectedView,
   setSelectedDate,
-  setSelectedView,
   weekLabel,
   today,
   isPreviousDisabled,
@@ -50,6 +48,7 @@ export function PeriodControls({
             />
             <input
               type="date"
+              aria-label={t("selectDate")}
               value={selectedDate}
               disabled={isPeriodLoading}
               onChange={(event) => setSelectedDate(event.target.value)}
@@ -60,6 +59,7 @@ export function PeriodControls({
           <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-white p-1.5 h-10">
             <Button
               type="button"
+              aria-label={t("previousPeriod")}
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
@@ -73,6 +73,7 @@ export function PeriodControls({
 
             <Button
               type="button"
+              aria-label={t("nextPeriod")}
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
@@ -87,6 +88,7 @@ export function PeriodControls({
             {isResetVisible ? (
               <Button
                 type="button"
+                aria-label={t("backToToday")}
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
                 className="flex h-8 shrink-0 items-center gap-1 rounded-[12px] px-3 text-[11px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"
@@ -114,6 +116,7 @@ export function PeriodControls({
               />
               <input
                 type="date"
+                aria-label={t("selectDate")}
                 value={selectedDate}
                 disabled={isPeriodLoading}
                 onChange={(event) => setSelectedDate(event.target.value)}
@@ -125,6 +128,7 @@ export function PeriodControls({
             <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-white p-1.5 h-10 sm:justify-start lg:flex-none">
               <Button
                 type="button"
+                aria-label={t("previousPeriod")}
                 onClick={() => movePeriod(-1)}
                 disabled={isPreviousDisabled || isPeriodLoading}
                 className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
@@ -138,6 +142,7 @@ export function PeriodControls({
 
               <Button
                 type="button"
+                aria-label={t("nextPeriod")}
                 onClick={() => movePeriod(1)}
                 disabled={isPeriodLoading}
                 className="flex h-8 w-8 items-center justify-center rounded-[12px] text-zinc-500 hover:bg-zinc-100 transition-colors disabled:opacity-30"
@@ -152,6 +157,7 @@ export function PeriodControls({
               {isResetVisible && (
                 <Button
                   type="button"
+                  aria-label={t("backToToday")}
                   onClick={resetToToday}
                   disabled={isPeriodLoading}
                   className="flex h-8 items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-bold text-zinc-500 hover:bg-zinc-100 transition-colors"

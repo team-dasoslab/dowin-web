@@ -31,16 +31,20 @@
 ## Verification Defaults
 
 ```bash
+yarn test --run <changed-or-affected-test-files>
 yarn tsc --noEmit
 yarn lint
 yarn eslint <changed-files>
 ```
 
+Frontend implementation changes must run the relevant frontend test target before completion. Use `docs/dev/common/2026.06.12-frontend-test-strategy.md` to decide the affected page, hook, and component tests. Prefer focused `yarn test --run <changed-or-affected-test-files>` during development and `yarn test:frontend` for broader frontend verification. Documentation-only and prompt/skill instruction-only changes do not require the frontend verification gate unless they also modify app logic.
+
 If the change is substantial:
 
 ```bash
+yarn test:frontend
 yarn storybook
-yarn test
+yarn test --run
 yarn test:storybook --run
 ```
 
