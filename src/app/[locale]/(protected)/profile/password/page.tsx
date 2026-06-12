@@ -34,7 +34,7 @@ export default function ProfilePasswordPage() {
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="domain-key" size="24px" />
           </div>
           <div className="min-w-0">
