@@ -25,7 +25,8 @@ Common commands:
 
 ```bash
 yarn test --run <changed-test-file>
-yarn test
+yarn test:frontend
+yarn test:server
 yarn tsc --noEmit
 yarn lint
 yarn eslint <changed-files>
@@ -46,7 +47,7 @@ Common commands:
 yarn tsc --noEmit
 yarn lint
 yarn eslint <changed-files>
-yarn test
+yarn test:frontend
 ```
 
 Manual checks when relevant:
@@ -82,7 +83,8 @@ Apply the broader gates:
 
 Current repo caveat:
 
-- `yarn test` is the console test path.
+- `yarn test --run` is the full console test path.
+- Use `yarn test:frontend` and `yarn test:server` for split frontend/server verification.
 - Browser-backed Storybook verification is separate via `yarn test:storybook --run`.
 
 ## Domain-Specific Checks

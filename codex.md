@@ -101,7 +101,9 @@ Codex는 아래 순서로 사실상 Source of Truth를 판단한다.
 yarn install
 yarn dev
 yarn storybook
-yarn test
+yarn test --run
+yarn test:frontend
+yarn test:server
 yarn lint
 yarn tsc --noEmit
 ```
@@ -193,7 +195,7 @@ Codex는 작업 종류에 따라 아래를 가능한 한 기본 검증 세트로
 
 백엔드:
 
-- `yarn test`
+- `yarn test:server`
 - 변경한 도메인 테스트 우선 실행
 - 인증/인가, 소유권, 미래 날짜 금지, 상태 전이 같은 비즈니스 규칙 확인
 
@@ -201,6 +203,7 @@ Codex는 작업 종류에 따라 아래를 가능한 한 기본 검증 세트로
 
 - `yarn tsc --noEmit`
 - `yarn lint`
+- `yarn test:frontend`
 - 필요한 경우 `yarn storybook`
 - 모바일 레이아웃, 빈 상태, 로딩 상태, 실패 롤백 확인
 
