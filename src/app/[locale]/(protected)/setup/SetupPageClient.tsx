@@ -262,7 +262,6 @@ function SetupSkeleton() {
       <ProtectedPageContainer isLoading className="space-y-6 lg:space-y-12">
         <div className="space-y-4">
           <div className="h-10 w-48 rounded-[12px] bg-zinc-200" />
-          <div className="h-5 w-2/3 max-w-[400px] rounded-[12px] bg-zinc-200" />
         </div>
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
