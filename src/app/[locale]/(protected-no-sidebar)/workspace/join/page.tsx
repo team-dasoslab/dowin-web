@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Logo } from "@/components/ui/Logo";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
-import { Link } from "@/i18n/routing";
+
 import { useTranslations } from "next-intl";
 
 export default function JoinWorkspacePage() {
