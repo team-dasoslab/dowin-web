@@ -70,7 +70,7 @@ export default function ProfileExportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title="데이터 내보내기" />
 
@@ -217,7 +217,7 @@ function ExportUnavailableInAppState() {
   const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
@@ -251,7 +251,7 @@ function ProfileExportHeader() {
 
 function ExportSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
@@ -266,7 +266,7 @@ function ExportSkeleton() {
 
 function NoWorkspaceState() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
@@ -288,7 +288,7 @@ function NoWorkspaceState() {
 function NoScoreboardState() {
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel

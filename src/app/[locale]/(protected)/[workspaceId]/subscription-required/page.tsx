@@ -52,7 +52,7 @@ export default function SubscriptionRequiredPage() {
   }, [billing, router, workspaceId]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-100 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-[480px] space-y-4 animate-dowin-in">
 
         {/* Main card */}

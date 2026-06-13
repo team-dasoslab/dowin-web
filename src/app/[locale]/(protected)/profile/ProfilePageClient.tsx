@@ -308,7 +308,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProfileCoachmark
         isRunning={isCoachmarkRunning}
         setIsRunning={setIsCoachmarkRunning}
@@ -471,7 +471,7 @@ function MenuItemRow({
 
 function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer isLoading>
         <div className="h-10 rounded-content bg-zinc-200" />
         <div className="h-24 rounded-content bg-zinc-200" />

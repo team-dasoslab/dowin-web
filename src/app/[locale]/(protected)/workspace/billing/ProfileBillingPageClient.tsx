@@ -168,7 +168,7 @@ export function ProfileBillingPageClient() {
       billing.billingStatus === "CANCELED");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer className="max-w-[640px] space-y-6 pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
@@ -445,7 +445,7 @@ function BillingUnavailableInAppState() {
   const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <EmptyStatePanel
           title={t("appUnavailableTitle")}
@@ -516,7 +516,7 @@ function getEntitlementSourceLabel(
 
 function ProfileBillingSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer
         isLoading
         className="max-w-[640px] space-y-6 pb-24 md:pb-10 lg:pb-12"
@@ -540,7 +540,7 @@ function NoWorkspaceState() {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <div className="w-full space-y-6 rounded-[24px] bg-white p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -567,7 +567,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
   const t = useTranslations("ProfileBilling");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <div className="w-full space-y-6 rounded-[24px] bg-white p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">

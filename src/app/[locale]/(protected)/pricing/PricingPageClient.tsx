@@ -69,7 +69,7 @@ export function PricingPageClient() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer className="space-y-8 lg:space-y-12 pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader
           title={t("header")}
@@ -213,7 +213,7 @@ function PricingUnavailableInAppState() {
   const workspaceId = useParams().workspaceId as string | undefined;
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <EmptyStatePanel
           title={t("appUnavailableTitle")}
@@ -245,7 +245,7 @@ function NoWorkspaceState() {
   const t = useTranslations("Pricing");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -272,7 +272,7 @@ function PricingErrorState() {
   const t = useTranslations("Pricing");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -294,7 +294,7 @@ function PricingErrorState() {
 
 function PricingSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer isLoading className="pb-24 md:pb-10 lg:pb-12">
         <div className="h-10 w-48 rounded-content bg-zinc-200" />
         <div className="h-56 rounded-content bg-zinc-200" />

@@ -205,7 +205,7 @@ export default function LoginPageClient() {
 
   if (recoveryCodes) {
     return (
-      <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+      <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
         <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
@@ -294,7 +294,7 @@ export default function LoginPageClient() {
   }
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
       <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">

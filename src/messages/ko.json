@@ -659,8 +659,8 @@
       "standardRequired": "CSV 다운로드는 Basic 구독이 활성화되어야 사용할 수 있어요."
     },
     "Notification": {
-      "timeChanged": "일일 리마인드 시간이 변경되었습니다.",
-      "timeChangeFailed": "일일 리마인드 시간 변경에 실패했습니다."
+      "timeChanged": "리마인드 시간이 변경되었습니다.",
+      "timeChangeFailed": "리마인드 시간 변경에 실패했습니다."
     },
     "NotificationControl": {
       "appOnly": "앱에서만 지원",

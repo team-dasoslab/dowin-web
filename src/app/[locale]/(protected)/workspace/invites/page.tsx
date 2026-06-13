@@ -129,7 +129,7 @@ export default function ProfileInvitesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
@@ -387,7 +387,7 @@ export default function ProfileInvitesPage() {
 
 function InvitePageSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
@@ -404,7 +404,7 @@ function InvitePageSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("ProfileInvites");
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
@@ -429,7 +429,7 @@ function NoAccessState() {
   const t = useTranslations("ProfileInvites");
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">

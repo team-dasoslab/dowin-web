@@ -40,7 +40,7 @@ export function PeriodControls({
       {/* ─── 모바일 레이아웃 (sm 미만) ─── */}
       <div className="flex flex-col gap-3 py-2 sm:hidden select-none">
         <div className="flex items-center justify-between gap-4 overflow-x-auto scrollbar-none">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-[14px] bg-white transition-all focus-within:ring-2 focus-within:ring-primary/20 shrink-0">
+          <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-[14px] bg-white transition-all focus-within:ring-2 focus-within:ring-primary/20 shrink-0">
             <DowinIcon
               name="domain-calendar"
               size="16px"
@@ -108,7 +108,7 @@ export function PeriodControls({
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:justify-start lg:gap-3">
           <div className="flex items-center gap-4">
             {/* Utility: Calendar Picker */}
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-[16px] bg-white transition-all hover:bg-zinc-50">
+            <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-[16px] bg-white transition-all hover:bg-zinc-50">
               <DowinIcon
                 name="domain-calendar"
                 size="16px"
