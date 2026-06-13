@@ -36,7 +36,7 @@ export function SegmentedControl<T extends string>({
 
   return (
     <div
-      className={`inline-flex shrink-0 bg-zinc-200/50 ${containerClasses[size]} ${className}`}
+      className={`inline-flex shrink-0 bg-border/50 ${containerClasses[size]} ${className}`}
     >
       {options.map((option) => {
         const isActive = value === option.value;
@@ -48,7 +48,7 @@ export function SegmentedControl<T extends string>({
             disabled={disabled}
             className={`flex-1 font-black whitespace-nowrap transition-all ${buttonClasses[size]} ${
               isActive
-                ? "bg-surface text-text-primary "
+                ? "bg-zinc-950 dark:bg-black text-white shadow-sm"
                 : "text-text-muted hover:text-text-secondary"
             }`}
           >
