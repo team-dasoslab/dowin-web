@@ -8,6 +8,7 @@ import {
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
 import {
   PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
@@ -113,6 +114,13 @@ export default function ProfilePage() {
           title: t("languageTitle"),
           description: t("languageDesc"),
           rightElement: <LocaleSwitcher />,
+        },
+        {
+          id: "theme",
+          icon: <DowinIcon name="action-theme" className="w-4 h-4" />,
+          title: t("themeTitle"),
+          description: t("themeDesc"),
+          rightElement: <ThemeToggle />,
         },
       ],
     },
