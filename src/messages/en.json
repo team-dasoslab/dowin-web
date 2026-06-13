@@ -656,8 +656,8 @@
       "standardRequired": "CSV download requires an active Basic subscription."
     },
     "Notification": {
-      "timeChanged": "Daily reminder time has been changed.",
-      "timeChangeFailed": "Failed to change daily reminder time."
+      "timeChanged": "Reminder time has been changed.",
+      "timeChangeFailed": "Failed to change reminder time."
     },
     "NotificationControl": {
       "appOnly": "App only",
