@@ -122,19 +122,17 @@ export default function AccountRecoveryPageClient() {
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
       <Card className="w-full max-w-[480px] bg-surface border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
-        <div className="flex flex-col items-center text-center space-y-5 mb-10">
-          <div className="w-16 h-16 bg-surface dark:bg-surface-elevated ring-1 ring-black/5 dark:ring-white/10 rounded-[16px] flex items-center justify-center">
-            <DowinIcon
-              name="auth-key-large"
-              size="32px"
-              className="text-text-primary"
-            />
-          </div>
+        <div className="flex flex-col items-start text-left space-y-5 mb-10">
+          <DowinIcon
+            name="auth-key-large"
+            size="32px"
+            className="text-text-primary"
+          />
           <div className="space-y-1.5">
             <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
               {t("recoveryPage.title")}
             </h1>
-            <p className="text-[14px] text-text-muted font-medium tracking-tight break-keep px-4">
+            <p className="text-[14px] text-text-muted font-medium tracking-tight break-keep">
               {t("recoveryPage.description")}
             </p>
           </div>

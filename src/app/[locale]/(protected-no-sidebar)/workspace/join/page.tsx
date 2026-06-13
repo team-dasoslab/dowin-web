@@ -33,9 +33,7 @@ export default function JoinWorkspacePage() {
         </div>
 
         <div className="space-y-5">
-          <div className="w-16 h-16 bg-surface dark:bg-surface-elevated ring-1 ring-black/5 dark:ring-white/10 rounded-[16px] flex items-center justify-center shadow-sm">
-            <Logo size="32px" className="text-text-primary" />
-          </div>
+          <Logo size="32px" className="text-text-primary" />
           <div>
             <h1 className="text-2xl font-black text-text-primary tracking-tight">
               {t("title")}

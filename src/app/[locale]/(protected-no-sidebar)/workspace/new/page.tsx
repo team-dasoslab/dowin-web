@@ -67,9 +67,7 @@ export default function NewWorkspacePage() {
 
  {/* 헤더 */}
  <div className="space-y-5">
- <div className="w-16 h-16 bg-surface dark:bg-surface-elevated ring-1 ring-black/5 dark:ring-white/10 rounded-[16px] flex items-center justify-center shadow-sm">
  <Logo size="32px" className="text-text-primary" />
- </div>
  <div className="space-y-2">
  <InfoTooltip
  label={
