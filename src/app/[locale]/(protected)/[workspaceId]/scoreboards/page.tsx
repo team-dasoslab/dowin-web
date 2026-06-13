@@ -154,10 +154,10 @@ function ScoreboardsNoWorkspaceState() {
           <Logo className="text-primary" size="28px" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
+          <h1 className="text-2xl font-black text-text-primary tracking-tight">
             {td("noWorkspaceTitle")}
           </h1>
-          <p className="text-[14px] font-medium text-zinc-500 leading-relaxed">
+          <p className="text-[14px] font-medium text-text-muted leading-relaxed">
             {t("noWorkspaceArchiveDesc")}
           </p>
         </div>

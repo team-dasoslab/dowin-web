@@ -35,8 +35,8 @@ export function InfoTooltip({
   className,
   align = "left",
   side = "bottom",
-  triggerClassName = "text-zinc-400 hover:text-zinc-600 transition-colors",
-  activeTriggerClassName = "text-zinc-800 bg-zinc-100",
+  triggerClassName = "text-text-muted hover:text-text-secondary transition-colors",
+  activeTriggerClassName = "text-text-primary bg-sub-background",
   triggerIcon = <DowinIcon name="status-info" size="18px" />,
 }: InfoTooltipProps) {
   const [open, setOpen] = useState(false);

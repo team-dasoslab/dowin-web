@@ -37,13 +37,13 @@ export function ScoreboardOverviewSection({
   return (
     <div className="flex flex-col gap-3">
       {/* ── Goal Section ── */}
-      <div className="flex flex-col rounded-[24px] bg-white p-6 sm:p-8 space-y-7">
+      <div className="flex flex-col rounded-[24px] bg-surface p-6 sm:p-8 space-y-7">
         <div className="space-y-2">
-          <p className="text-[14px] font-bold text-zinc-500">
+          <p className="text-[14px] font-bold text-text-muted">
             {t("dowinLabel")}
           </p>
           {activeScoreboard ? (
-            <h2 className="text-[26px] font-black tracking-tight text-zinc-900 sm:text-[32px] break-words leading-tight">
+            <h2 className="text-[26px] font-black tracking-tight text-text-primary sm:text-[32px] break-words leading-tight">
               {activeScoreboard.goalName}
             </h2>
           ) : (
@@ -52,11 +52,11 @@ export function ScoreboardOverviewSection({
         </div>
 
         <div className="space-y-2">
-          <p className="text-[14px] font-bold text-zinc-500">
+          <p className="text-[14px] font-bold text-text-muted">
             {t("lagMeasureLabel")}
           </p>
           {activeScoreboard ? (
-            <p className="text-[17px] font-bold text-zinc-800 leading-snug break-words">
+            <p className="text-[17px] font-bold text-text-primary leading-snug break-words">
               {activeScoreboard.lagMeasure}
             </p>
           ) : (
@@ -68,8 +68,8 @@ export function ScoreboardOverviewSection({
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-5">
         <div className="flex flex-row gap-3 lg:flex-col lg:gap-3 lg:col-span-1">
           {/* Weekly Section */}
-          <div className="flex flex-1 flex-col justify-between p-5 rounded-[24px] bg-white">
-            <p className="text-[13px] font-bold text-zinc-500">
+          <div className="flex flex-1 flex-col justify-between p-5 rounded-[24px] bg-surface">
+            <p className="text-[13px] font-bold text-text-muted">
               {t("weeklyAchievementRate")}
             </p>
             <div className="mt-3 flex flex-col gap-3">
@@ -77,9 +77,9 @@ export function ScoreboardOverviewSection({
                 <span className={cn("text-[32px] font-black tracking-tighter leading-none", getRateColor(weeklyOverallRate))}>
                   {weeklyOverallRate}
                 </span>
-                <span className="text-[18px] font-bold text-zinc-400 leading-none">%</span>
+                <span className="text-[18px] font-bold text-text-muted leading-none">%</span>
               </div>
-              <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-sub-background rounded-full overflow-hidden">
                 <div
                   className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(weeklyOverallRate))}
                   style={{ width: `${Math.min(weeklyOverallRate, 100)}%` }}
@@ -89,8 +89,8 @@ export function ScoreboardOverviewSection({
           </div>
 
           {/* Monthly Section */}
-          <div className="flex flex-1 flex-col justify-between p-5 rounded-[24px] bg-white">
-            <p className="text-[13px] font-bold text-zinc-500">
+          <div className="flex flex-1 flex-col justify-between p-5 rounded-[24px] bg-surface">
+            <p className="text-[13px] font-bold text-text-muted">
               {t("monthlyAchievementRate")}
             </p>
             <div className="mt-3 flex flex-col gap-3">
@@ -98,9 +98,9 @@ export function ScoreboardOverviewSection({
                 <span className={cn("text-[32px] font-black tracking-tighter leading-none", getRateColor(monthlyOverallRate))}>
                   {monthlyOverallRate}
                 </span>
-                <span className="text-[18px] font-bold text-zinc-400 leading-none">%</span>
+                <span className="text-[18px] font-bold text-text-muted leading-none">%</span>
               </div>
-              <div className="h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-sub-background rounded-full overflow-hidden">
                 <div
                   className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(monthlyOverallRate))}
                   style={{ width: `${Math.min(monthlyOverallRate, 100)}%` }}
@@ -124,7 +124,7 @@ export function ScoreboardOverviewSection({
 function getRateColor(v: number) {
   if (v >= 80) return "text-success";
   if (v >= 50) return "text-primary";
-  return "text-zinc-800";
+  return "text-text-primary";
 }
 
 function getRateBgColor(v: number) {
@@ -146,9 +146,9 @@ function DashboardWeeklyTrendSection({
   const t = useTranslations("Dashboard");
 
   return (
-    <div className={cn("flex flex-col p-5 rounded-[24px] bg-white", className)}>
+    <div className={cn("flex flex-col p-5 rounded-[24px] bg-surface", className)}>
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[15px] font-bold text-zinc-800">
+        <p className="text-[15px] font-bold text-text-primary">
           {t("recentTrend")}
         </p>
       </div>

@@ -34,7 +34,7 @@ export function MemberListItem({
 
   return (
     <div
-      className="flex flex-col justify-between gap-3 bg-white px-4 py-4 sm:flex-row sm:items-center sm:gap-4 transition-colors hover:bg-zinc-50 rounded-[16px] -mx-4"
+      className="flex flex-col justify-between gap-3 bg-surface px-4 py-4 sm:flex-row sm:items-center sm:gap-4 transition-colors hover:bg-sub-background rounded-[16px] -mx-4"
     >
       <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto">
         <UserAvatar
@@ -45,20 +45,20 @@ export function MemberListItem({
         />
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <p className="truncate text-sm font-semibold text-zinc-900">
+            <p className="truncate text-sm font-semibold text-text-primary">
               {nickname}
             </p>
             <Badge
               className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                 member.role === "ADMIN"
                   ? "bg-primary/10 text-primary"
-                  : "bg-zinc-100 text-zinc-500"
+                  : "bg-sub-background text-text-muted"
               }`}
             >
               {member.role === "ADMIN" ? "ADMIN" : "MEMBER"}
             </Badge>
             {isSelf ? (
-              <Badge className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold text-zinc-500">
+              <Badge className="rounded-full bg-sub-background px-2 py-0.5 text-[10px] font-bold text-text-muted">
                 {t("me")}
               </Badge>
             ) : null}
@@ -86,7 +86,7 @@ export function MemberListItem({
           className={`flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] px-3 py-2 text-xs font-bold transition-colors ${
             canRemove
               ? "bg-red-50 text-red-600 hover:bg-red-100"
-              : "cursor-not-allowed bg-zinc-100 text-zinc-400"
+              : "cursor-not-allowed bg-sub-background text-text-muted"
           }`}
         >
           <DowinIcon name="action-member-remove" size="14px" />

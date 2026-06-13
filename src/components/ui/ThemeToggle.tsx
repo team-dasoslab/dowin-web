@@ -16,7 +16,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="h-9 w-[100px] rounded-[12px] bg-zinc-100 animate-pulse" />
+      <div className="h-9 w-[100px] rounded-[12px] bg-sub-background animate-pulse" />
     );
   }
 
@@ -25,7 +25,7 @@ export function ThemeToggle() {
       <select
         value={theme}
         onChange={(e) => setTheme(e.target.value)}
-        className="h-9 min-w-[100px] cursor-pointer rounded-[12px] border-none bg-zinc-100 px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-zinc-200"
+        className="h-9 min-w-[100px] cursor-pointer rounded-[12px] border-none bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-zinc-200"
       >
         <option value="light">{t("themeLight")}</option>
         <option value="dark">{t("themeDark")}</option>

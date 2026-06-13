@@ -53,12 +53,12 @@ function CountPopoverContent({
 
   return (
     <div
-      className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
+      className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
       onClick={(e) => e.stopPropagation()}
     >
       <Button
         aria-label={closeLabel}
-        className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100"
+        className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-sub-background"
         onClick={onClose}
       >
         <svg
@@ -70,7 +70,7 @@ function CountPopoverContent({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-zinc-400"
+          className="text-text-muted"
         >
           <path d="M18 6 6 18" />
           <path d="m6 6 12 12" />
@@ -88,7 +88,7 @@ function CountPopoverContent({
             min="0"
             value={localCount}
             onChange={(e) => setLocalCount(parseInt(e.target.value, 10) || 0)}
-            className="w-32 text-5xl font-black text-primary text-center bg-zinc-100 rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
+            className="w-32 text-5xl font-black text-primary text-center bg-sub-background rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
             placeholder="0"
           />
           <span className="text-2xl text-text-muted/40 font-bold mb-2">
@@ -98,13 +98,13 @@ function CountPopoverContent({
 
         <div className="flex w-full gap-2 mt-3">
           <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-zinc-100 text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-zinc-100"
+            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-zinc-200/50 hover:bg-sub-background"
             onClick={() => setLocalCount(Math.max(0, localCount - 1))}
           >
             -
           </Button>
           <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-zinc-100 text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-zinc-100"
+            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-zinc-200/50 hover:bg-sub-background"
             onClick={() => setLocalCount(localCount + 1)}
           >
             +
@@ -163,10 +163,10 @@ export function WeeklyBoardSection({
         weeklyById={weeklyById}
       />
 
-      <div className="relative hidden overflow-hidden rounded-[24px] bg-white md:block">
+      <div className="relative hidden overflow-hidden rounded-[24px] bg-surface md:block">
         <div className="overflow-x-auto">
           <div className="min-w-[600px]">
-            <div className="border-b-2 border-zinc-50 bg-white">
+            <div className="border-b-2 border-zinc-50 bg-surface">
               <table className="w-full table-fixed text-xs">
                 <colgroup>
                   <col className="w-[38%]" />
@@ -177,7 +177,7 @@ export function WeeklyBoardSection({
                 </colgroup>
                 <thead>
                   <tr>
-                    <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+                    <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-text-muted">
                       {t("leadMeasureHead")}
                     </th>
                     {localizedDays.map((day, index) => (
@@ -186,13 +186,13 @@ export function WeeklyBoardSection({
                         className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
                           weekDates[index] === today
                             ? "text-primary"
-                            : "text-zinc-500"
+                            : "text-text-muted"
                         }`}
                       >
                         {day}
                       </th>
                     ))}
-                    <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-zinc-500">
+                    <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
                       {t("achievement")}
                     </th>
                   </tr>
@@ -222,13 +222,13 @@ export function WeeklyBoardSection({
                       : 0;
 
                   return (
-                    <tr key={leadMeasure.id} className="bg-white">
+                    <tr key={leadMeasure.id} className="bg-surface">
                       <td className="px-5 py-4">
                         <LeadMeasureSummary
                           guide={guide}
                           guideActive={activeGuideId === leadMeasureId}
                           name={leadMeasure.name}
-                          nameClassName="block text-sm font-semibold text-zinc-900"
+                          nameClassName="block text-sm font-semibold text-text-primary"
                           onGuideClose={() => setActiveGuideId(null)}
                           onGuideToggle={() =>
                             setActiveGuideId((currentId) =>
@@ -308,7 +308,7 @@ export function WeeklyBoardSection({
                                         ? "bg-[#E8F3FF] text-primary"
                                         : date === today
                                           ? "bg-primary/5 text-primary"
-                                          : "bg-zinc-100 text-zinc-500 hover:bg-zinc-100"
+                                          : "bg-sub-background text-text-muted hover:bg-sub-background"
                                   } ${
                                     isPending || !isEditable
                                       ? "cursor-not-allowed opacity-50"
@@ -379,7 +379,7 @@ export function WeeklyBoardSection({
                                     ? "bg-primary text-white"
                                     : isToday
                                       ? "bg-[#E8F3FF] text-primary"
-                                      : "bg-zinc-100 text-zinc-400 hover:bg-zinc-100"
+                                      : "bg-sub-background text-text-muted hover:bg-sub-background"
                                 } ${
                                   isPending || !isEditable
                                     ? "cursor-not-allowed opacity-50"
@@ -401,12 +401,12 @@ export function WeeklyBoardSection({
 
                       <td className="px-3 py-4 text-center">
                         <div className="flex flex-col items-center gap-1.5">
-                          <span className="text-[11px] font-medium text-zinc-500">
+                          <span className="text-[11px] font-medium text-text-muted">
                             {leadMeasure.period === "MONTHLY"
                               ? t("monthlyLabel")
                               : t("weeklyLabel")}
                           </span>
-                          <div className="h-1.5 w-12 overflow-hidden rounded-full bg-zinc-100">
+                          <div className="h-1.5 w-12 overflow-hidden rounded-full bg-sub-background">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
                                 rate >= 100 ? "bg-green-500" : "bg-primary"
@@ -416,7 +416,7 @@ export function WeeklyBoardSection({
                           </div>
                           <span
                             className={`font-mono text-[11px] font-black ${
-                              rate >= 100 ? "text-green-600" : "text-zinc-500"
+                              rate >= 100 ? "text-green-600" : "text-text-muted"
                             }`}
                           >
                             {achievedCount}/{weeklyTotal}

@@ -187,7 +187,7 @@ export default function MyDashboardPage() {
             <div className="flex flex-wrap gap-2">
               <Button
                 asChild
-                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all "
+                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all "
               >
                 <Link href={`/${workspaceId}/scoreboards`}>
                   {t("scoreboardArchive")}
@@ -195,7 +195,7 @@ export default function MyDashboardPage() {
               </Button>
               <Button
                 asChild
-                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all "
+                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all "
               >
                 <Link href={`/${workspaceId}/setup?mode=update`}>
                   {t("manageScoreboard")}
@@ -274,7 +274,7 @@ export default function MyDashboardPage() {
               {isLoading ? (
                 <div className="h-[400px] w-full animate-pulse rounded-[24px] bg-zinc-200" />
               ) : activeLeadMeasures.length === 0 ? (
-                <div className="rounded-[24px] bg-white py-12 text-center text-zinc-500 font-medium text-[15px]">
+                <div className="rounded-[24px] bg-surface py-12 text-center text-text-muted font-medium text-[15px]">
                   {t("noActiveMeasures")}
                 </div>
               ) : selectedView === "month" ? (

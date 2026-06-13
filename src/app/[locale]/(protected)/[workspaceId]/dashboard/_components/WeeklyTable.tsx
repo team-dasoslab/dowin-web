@@ -118,7 +118,7 @@ export function WeeklyTable({
                 alt={`${member.nickname ?? "사용자"} 아바타`}
                 size={20}
               />
-              <span className="truncate text-[13px] font-black text-zinc-900">
+              <span className="truncate text-[13px] font-black text-text-primary">
                 {member.nickname}
               </span>
               {isMe ? (
@@ -126,7 +126,7 @@ export function WeeklyTable({
                   {tc("me")}
                 </span>
               ) : null}
-              <span className="hidden truncate text-[12px] font-medium text-zinc-500 sm:inline">
+              <span className="hidden truncate text-[12px] font-medium text-text-muted sm:inline">
                 — {member.goalName}
               </span>
             </div>
@@ -138,7 +138,7 @@ export function WeeklyTable({
                   className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all ${
                     memoMode === "view"
                       ? "bg-primary/10 text-primary hover:bg-primary/20"
-                      : "bg-white text-zinc-900 hover:bg-zinc-50"
+                      : "bg-surface text-text-primary hover:bg-sub-background"
                   }`}
                 >
                   {t("viewMemos")}
@@ -150,7 +150,7 @@ export function WeeklyTable({
                 className={`h-10 px-4 text-[13px] font-black !rounded-2xl transition-all ${
                   memoMode === "compose"
                     ? "bg-primary/10 text-primary hover:bg-primary/20"
-                    : "bg-white text-zinc-900 hover:bg-zinc-50"
+                    : "bg-surface text-text-primary hover:bg-sub-background"
                 }`}
               >
                 {t("memoButton")}
@@ -158,7 +158,7 @@ export function WeeklyTable({
             </div>
           </div>
           <div className="sm:hidden">
-            <p className="text-[12px] font-medium leading-relaxed text-zinc-500">
+            <p className="text-[12px] font-medium leading-relaxed text-text-muted">
               {member.goalName}
             </p>
           </div>
@@ -174,7 +174,7 @@ export function WeeklyTable({
             return (
               <div
                 key={`${member.userId}-${leadMeasure.id}-mobile`}
-                className="rounded-[24px] bg-white p-5"
+                className="rounded-[24px] bg-surface p-5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <LeadMeasureSummary name={leadMeasure.name} />
@@ -255,10 +255,10 @@ export function WeeklyTable({
           })}
         </div>
 
-        <div className="hidden overflow-hidden rounded-[24px] bg-white md:block">
+        <div className="hidden overflow-hidden rounded-[24px] bg-surface md:block">
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
-              <div className="border-b-2 border-zinc-50 bg-white">
+              <div className="border-b-2 border-zinc-50 bg-surface">
                 <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[38%]" />
@@ -269,7 +269,7 @@ export function WeeklyTable({
                   </colgroup>
                   <thead>
                     <tr>
-                      <th className="py-3 px-5 text-left text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
+                      <th className="py-3 px-5 text-left text-[11px] font-bold text-text-muted uppercase tracking-widest">
                         {t("leadMeasureHead")}
                       </th>
                       {DAY_KEYS.map((dayKey, index) => (
@@ -279,14 +279,14 @@ export function WeeklyTable({
                             weekDates[index] === today
                               ? "text-primary"
                               : weekDates[index] > today
-                                ? "text-zinc-500/50"
-                                : "text-zinc-500"
+                                ? "text-text-muted/50"
+                                : "text-text-muted"
                           }`}
                         >
                           {t(dayKey)}
                         </th>
                       ))}
-                      <th className="py-3 px-3 text-center text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
+                      <th className="py-3 px-3 text-center text-[11px] font-bold text-text-muted uppercase tracking-widest">
                         {t("achievementTab")}
                       </th>
                     </tr>
@@ -314,11 +314,11 @@ export function WeeklyTable({
                         : 0;
 
                     return (
-                      <tr key={leadMeasure.id} className="bg-white">
+                      <tr key={leadMeasure.id} className="bg-surface">
                         <td className="py-4 px-5">
                           <LeadMeasureSummary
                             name={leadMeasure.name}
-                            nameClassName="block text-sm font-semibold text-zinc-900"
+                            nameClassName="block text-sm font-semibold text-text-primary"
                           />
                         </td>
                         {weekDates.map((date) => {
@@ -345,7 +345,7 @@ export function WeeklyTable({
                                     isAchieved
                                       ? "text-green-600"
                                       : count != null && count > 0
-                                        ? "text-zinc-900"
+                                        ? "text-text-primary"
                                         : date === today
                                           ? "text-primary/50"
                                           : "text-text-muted"
@@ -373,12 +373,12 @@ export function WeeklyTable({
                         })}
                         <td className="py-4 px-3 text-center">
                           <div className="flex flex-col items-center gap-1.5">
-                            <span className="text-[11px] font-medium text-zinc-500">
+                            <span className="text-[11px] font-medium text-text-muted">
                               {leadMeasure.period === "MONTHLY"
                                 ? t("monthView")
                                 : t("weekView")}
                             </span>
-                            <div className="h-1.5 w-12 overflow-hidden rounded-full bg-zinc-100">
+                            <div className="h-1.5 w-12 overflow-hidden rounded-full bg-sub-background">
                               <div
                                 className={`h-full rounded-full transition-all duration-500 ${
                                   rate >= 100 ? "bg-green-500" : "bg-primary"
@@ -388,7 +388,7 @@ export function WeeklyTable({
                             </div>
                             <span
                               className={`font-mono text-[11px] font-black ${
-                                rate >= 100 ? "text-green-600" : "text-zinc-500"
+                                rate >= 100 ? "text-green-600" : "text-text-muted"
                               }`}
                             >
                               {achievedCount}/{weeklyTotal}

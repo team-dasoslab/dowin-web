@@ -85,7 +85,7 @@ export function Sidebar() {
   return (
     <>
       <aside className="fixed inset-x-0 top-4 z-[110] hidden lg:flex justify-center px-4 md:px-6 pointer-events-none">
-        <div className="flex h-[64px] items-center justify-between w-full max-w-[1200px] rounded-full bg-white/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-zinc-200/80 px-4 md:px-6 gap-8 pointer-events-auto">
+        <div className="flex h-[64px] items-center justify-between w-full max-w-[1200px] rounded-full bg-surface/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-border/80 px-4 md:px-6 gap-8 pointer-events-auto">
           <div className="flex-shrink-0 w-[200px]">
             {/* Workspace Pill */}
             {isProfileLoading ? (
@@ -134,8 +134,8 @@ export function Sidebar() {
                     className={cn(
                       "flex items-center justify-center px-5 py-2 min-w-fit whitespace-nowrap rounded-[12px] transition-all text-[14px] font-bold",
                       isActive
-                        ? "bg-zinc-100 text-zinc-900"
-                        : "text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50",
+                        ? "bg-sub-background text-text-primary"
+                        : "text-text-muted hover:text-text-primary hover:bg-sub-background",
                     )}
                   >
                     <span>{t(translationKey)}</span>
@@ -150,7 +150,7 @@ export function Sidebar() {
       </aside>
 
       {isMainTab && (
-        <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-zinc-200 bg-white px-1 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 lg:hidden">
+        <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-border bg-surface px-1 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 lg:hidden">
           <div className="mx-auto grid max-w-[520px] grid-cols-4 gap-1">
             {filteredLinks.map(
               ({ href, iconName, iconNameActive, translationKey }) => {
@@ -163,7 +163,7 @@ export function Sidebar() {
                     href={href}
                     className={cn(
                       "flex min-w-0 flex-col items-center justify-center gap-1 rounded-button px-1 py-2 transition-colors",
-                      isActive ? "text-zinc-950" : "text-zinc-400",
+                      isActive ? "text-zinc-950" : "text-text-muted",
                     )}
                   >
                     <DowinIcon

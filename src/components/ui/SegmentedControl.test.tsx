@@ -21,10 +21,10 @@ describe("SegmentedControl", () => {
     );
 
     expect(screen.getByRole("button", { name: "Week" })).toHaveClass(
-      "bg-white",
+      "bg-surface",
     );
     expect(screen.getByRole("button", { name: "Month" })).toHaveClass(
-      "text-zinc-500",
+      "text-text-muted",
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Month" }));

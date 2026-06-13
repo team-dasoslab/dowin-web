@@ -16,11 +16,11 @@ import { useTranslations } from "next-intl";
 export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
   const t = useTranslations("ProductUpdates");
   return (
-    <div className="rounded-[24px] bg-white p-5">
+    <div className="rounded-[24px] bg-surface p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="rounded-[8px] bg-zinc-100 px-2 py-1 text-[10px] font-bold text-zinc-600">
+            <Badge className="rounded-[8px] bg-sub-background px-2 py-1 text-[10px] font-bold text-text-secondary">
               {t(`tags.${item.tag}`)}
             </Badge>
             {item.isNew ? (
@@ -31,21 +31,21 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
 
           </div>
           <div className="space-y-1">
-            <h3 className="text-sm font-bold text-zinc-900">
+            <h3 className="text-sm font-bold text-text-primary">
               {t(`updates.${item.id}.title`)}
             </h3>
-            <p className="text-[13px] leading-6 text-zinc-600">
+            <p className="text-[13px] leading-6 text-text-secondary">
               {t(`updates.${item.id}.summary`)}
             </p>
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] leading-none text-zinc-500">
+          <div className="flex items-center gap-1.5 text-[11px] leading-none text-text-muted">
             {item.publishedAt}
           </div>
         </div>
 
         <Button
           asChild
-          className="shrink-0 self-start rounded-[12px] bg-zinc-100 px-3 py-2 text-xs font-bold text-zinc-600 sm:self-auto hover:bg-zinc-200 transition-colors"
+          className="shrink-0 self-start rounded-[12px] bg-sub-background px-3 py-2 text-xs font-bold text-text-secondary sm:self-auto hover:bg-zinc-200 transition-colors"
         >
           <Link
             href={item.ctaHref}

@@ -58,8 +58,8 @@ export function PageSidebarNav({
               className={cn(
                 "flex w-full items-center rounded-[14px] px-4 py-3 text-left text-[15px] font-bold transition-all",
                 isActive
-                  ? "bg-white text-zinc-900"
-                  : "text-zinc-500 hover:bg-white/50",
+                  ? "bg-surface text-text-primary"
+                  : "text-text-muted hover:bg-surface/50",
               )}
             >
               <div className="flex items-center gap-3">

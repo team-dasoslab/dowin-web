@@ -48,7 +48,7 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-4 text-[13px] font-black text-zinc-900 transition-colors hover:bg-zinc-200 whitespace-nowrap flex-shrink-0"
+              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-sub-background px-4 text-[13px] font-black text-text-primary transition-colors hover:bg-zinc-200 whitespace-nowrap flex-shrink-0"
             >
               {pendingActionId === activeScoreboardId && (
                 <InlineSpinner
@@ -74,15 +74,15 @@ function EmptyActiveScoreboardCard() {
   const td = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <div className="rounded-[24px] bg-white p-8 text-center space-y-4">
+    <div className="rounded-[24px] bg-surface p-8 text-center space-y-4">
       <div className="w-12 h-12 bg-primary/5 rounded-[16px] shadow-sm mx-auto flex items-center justify-center">
          <Logo size="24px" className="text-primary" />
       </div>
       <div className="space-y-1">
-        <p className="text-[15px] font-black text-zinc-900">
+        <p className="text-[15px] font-black text-text-primary">
           {t("noActive")}
         </p>
-        <p className="text-[13px] font-medium text-zinc-500">{t("noActiveDesc")}</p>
+        <p className="text-[13px] font-medium text-text-muted">{t("noActiveDesc")}</p>
       </div>
       <div className="flex justify-center">
         <Button

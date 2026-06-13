@@ -30,7 +30,7 @@ export function WorkspaceOverLimitBanner({
   return (
     <section className="rounded-lg border border-red-200 bg-red-50 px-4 py-4 text-red-800">
       <div className="flex gap-3">
-        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-red-600">
+        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface text-red-600">
           <DowinIcon name="status-warning" size="16px" />
         </div>
         <div className="min-w-0 flex-1 space-y-3">
@@ -51,7 +51,7 @@ export function WorkspaceOverLimitBanner({
             <div className="flex flex-wrap gap-2">
               <Button
                 asChild
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 text-[11px] font-bold text-red-700"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-red-200 bg-surface px-3 text-[11px] font-bold text-red-700"
               >
                 <Link href={getWorkspacePath(workspaceId, "/workspace/members")}>
                   <DowinIcon name="domain-people" size="14px" />

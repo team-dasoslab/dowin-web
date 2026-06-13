@@ -200,7 +200,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={saveImage}
                     disabled={isExporting}
-                    className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all w-full sm:w-auto"
+                    className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all w-full sm:w-auto"
                   >
                     {isShareSupported
                       ? t("shareScoreboard")
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                   ))}
                 </div>
               ) : members.length === 0 ? (
-                <div className="bg-white rounded-[24px] p-8 text-center text-text-muted text-sm">
+                <div className="bg-surface rounded-[24px] p-8 text-center text-text-muted text-sm">
                   {t("noMembers")}
                 </div>
               ) : (

@@ -27,7 +27,7 @@ export const PasswordInput = ({
             type="button"
             onClick={() => setIsVisible((previous) => !previous)}
             className={cn(
-              "flex items-center text-zinc-400 hover:text-zinc-600 transition-colors",
+              "flex items-center text-text-muted hover:text-text-secondary transition-colors",
               toggleClassName
             )}
           >
