@@ -405,11 +405,7 @@ export function ProfileBillingPageClient() {
         <section>
           <div className="rounded-[24px] bg-surface p-5">
             <h3 className="flex items-center gap-2 text-[14px] font-black text-text-primary">
-              <DowinIcon
-                name="status-info"
-                size="16px"
-                className="text-text-muted"
-              />
+
               {t("downgradePolicyTitle")}
             </h3>
             <p className="mt-2 text-[12px] font-medium leading-relaxed text-text-muted">
