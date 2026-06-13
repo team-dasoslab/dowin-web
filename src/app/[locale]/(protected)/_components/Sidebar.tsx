@@ -163,7 +163,7 @@ export function Sidebar() {
                     href={href}
                     className={cn(
                       "flex min-w-0 flex-col items-center justify-center gap-1 rounded-button px-1 py-2 transition-colors",
-                      isActive ? "text-zinc-950" : "text-text-muted",
+                      isActive ? "text-text-primary" : "text-text-muted",
                     )}
                   >
                     <DowinIcon
