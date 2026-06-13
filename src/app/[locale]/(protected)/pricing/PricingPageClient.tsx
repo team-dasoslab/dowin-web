@@ -76,22 +76,22 @@ export function PricingPageClient() {
           description={t("description")}
         />
 
-        <Card className="space-y-5 border-zinc-200 bg-white p-5 md:p-6">
+        <Card className="space-y-5 border-border bg-surface p-5 md:p-6">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
-              <p className="text-xs font-bold text-zinc-400">
+              <p className="text-xs font-bold text-text-muted">
                 {billing.workspaceName}
               </p>
-              <h2 className="text-xl font-black tracking-tight text-zinc-900">
+              <h2 className="text-xl font-black tracking-tight text-text-primary">
                 {t("heroTitle")}
               </h2>
             </div>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-zinc-50 text-primary">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-content bg-sub-background text-primary">
               <DowinIcon name="domain-wallet" size="24px" />
             </div>
           </div>
 
-          <div className="grid gap-3 rounded-content border border-zinc-100 bg-zinc-50/60 p-4 sm:grid-cols-3">
+          <div className="grid gap-3 rounded-content border border-border bg-sub-background/60 p-4 sm:grid-cols-3">
             <InfoItem label={t("planLabel")} value={t("basicPlanName")} />
             <InfoItem
               label={t("statusLabel")}
@@ -108,14 +108,14 @@ export function PricingPageClient() {
           </div>
 
           {!billing.canManageBilling ? (
-            <div className="rounded-content border border-zinc-200 bg-zinc-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-zinc-500">
+            <div className="rounded-content border border-border bg-sub-background px-4 py-3 text-[12px] font-medium leading-relaxed text-text-muted">
               {t("memberNotice")}
             </div>
           ) : null}
 
           {billing.entitlementSource &&
           billing.entitlementSource !== "POLAR" ? (
-            <div className="rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+            <div className="rounded-content border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-500">
               <span>
                 {t.rich("nonPolarEntitlementNotice", {
                   contact: (chunks) => (
@@ -164,7 +164,7 @@ export function PricingPageClient() {
           </div>
         </section>
 
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-zinc-400">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 px-1 text-[12px] font-bold text-text-muted">
           <Link href="/billing-policy" className="transition-colors">
             {t("billingPolicyLink")}
           </Link>
@@ -189,19 +189,19 @@ export function PricingPageClient() {
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1">
-      <p className="text-[11px] font-black uppercase tracking-[0.12em] text-zinc-400">
+      <p className="text-[11px] font-black uppercase tracking-[0.12em] text-text-muted">
         {label}
       </p>
-      <p className="text-sm font-black text-zinc-900">{value}</p>
+      <p className="text-sm font-black text-text-primary">{value}</p>
     </div>
   );
 }
 
 function GuideCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <Card className="space-y-2 border-zinc-200 bg-white p-5">
-      <h3 className="text-[14px] font-black text-zinc-900">{title}</h3>
-      <p className="text-[12px] font-medium leading-relaxed text-zinc-500">
+    <Card className="space-y-2 border-border bg-surface p-5">
+      <h3 className="text-[14px] font-black text-text-primary">{title}</h3>
+      <p className="text-[12px] font-medium leading-relaxed text-text-muted">
         {desc}
       </p>
     </Card>
@@ -221,7 +221,7 @@ function PricingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-button border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-900 transition-colors"
+              className="rounded-button border border-border bg-surface px-5 py-3 text-sm font-black text-text-primary transition-colors"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -247,15 +247,15 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+        <Card className="w-full space-y-6 rounded-content border-border bg-surface p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Logo size="32px" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-xl font-black tracking-tight text-zinc-900">
+            <h1 className="text-xl font-black tracking-tight text-text-primary">
               {t("noWorkspaceTitle")}
             </h1>
-            <p className="text-sm font-medium leading-relaxed text-zinc-500">
+            <p className="text-sm font-medium leading-relaxed text-text-muted">
               {t("noWorkspaceDesc")}
             </p>
           </div>
@@ -274,15 +274,15 @@ function PricingErrorState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-zinc-200 bg-white p-8 text-center shadow-xl shadow-zinc-200/50">
+        <Card className="w-full space-y-6 rounded-content border-border bg-surface p-8 text-center shadow-xl shadow-zinc-200/50">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <DowinIcon name="status-warning" size="24px" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-xl font-black tracking-tight text-zinc-900">
+            <h1 className="text-xl font-black tracking-tight text-text-primary">
               {t("loadFailedTitle")}
             </h1>
-            <p className="text-sm font-medium leading-relaxed text-zinc-500">
+            <p className="text-sm font-medium leading-relaxed text-text-muted">
               {t("loadFailedDesc")}
             </p>
           </div>
@@ -296,12 +296,12 @@ function PricingSkeleton() {
   return (
     <div className="min-h-screen">
       <ProtectedPageContainer isLoading className="pb-24 md:pb-10 lg:pb-12">
-        <div className="h-10 w-48 rounded-content bg-zinc-200" />
-        <div className="h-56 rounded-content bg-zinc-200" />
+        <div className="h-10 w-48 rounded-content bg-border" />
+        <div className="h-56 rounded-content bg-border" />
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="h-32 rounded-content bg-zinc-200" />
-          <div className="h-32 rounded-content bg-zinc-200" />
-          <div className="h-32 rounded-content bg-zinc-200" />
+          <div className="h-32 rounded-content bg-border" />
+          <div className="h-32 rounded-content bg-border" />
+          <div className="h-32 rounded-content bg-border" />
         </div>
       </ProtectedPageContainer>
     </div>

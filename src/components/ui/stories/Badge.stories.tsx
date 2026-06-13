@@ -14,7 +14,7 @@ export const Default: Story = {
   args: {
     children: "80%",
     className:
-      "px-2 py-0.5 rounded border border-border text-xs font-bold bg-white text-text-primary",
+      "px-2 py-0.5 rounded border border-border text-xs font-bold bg-surface text-text-primary",
   },
 };
 
@@ -22,7 +22,7 @@ export const Success: Story = {
   args: {
     children: "Success",
     className:
-      "px-2 py-0.5 rounded border border-green-200 text-xs font-bold bg-green-50 text-green-700",
+      "px-2 py-0.5 rounded border border-success/20 text-xs font-bold bg-success/10 text-success",
   },
 };
 

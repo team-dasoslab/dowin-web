@@ -27,16 +27,16 @@ export function ScoreboardImageCard({
 
   return (
     <div 
-      className="w-[1080px] min-w-[1080px] bg-zinc-100 p-12 text-zinc-950"
+      className="w-[1080px] min-w-[1080px] bg-sub-background p-12 text-zinc-950"
       style={{ width: "1080px" }}
     >
-      <div className="rounded-[24px] bg-white p-10 shadow-sm">
+      <div className="rounded-[24px] bg-surface p-10 shadow-sm">
         {/* Header */}
         <div className="flex items-center justify-between pb-2">
-          <div className="flex items-center gap-2 text-[15px] font-bold text-zinc-500 tracking-tight">
+          <div className="flex items-center gap-2 text-[15px] font-bold text-text-muted tracking-tight">
             <span>{workspaceName}</span>
             <span className="text-zinc-300">•</span>
-            <span className="text-zinc-900">{weekLabel}</span>
+            <span className="text-text-primary">{weekLabel}</span>
           </div>
           <Logo className="h-5 w-auto text-zinc-300 grayscale" />
         </div>
@@ -51,32 +51,32 @@ export function ScoreboardImageCard({
               size={64}
             />
             <div className="flex-1 min-w-0 flex flex-col justify-center">
-              <span className="text-xl font-black text-zinc-900 truncate mb-1.5">
+              <span className="text-xl font-black text-text-primary truncate mb-1.5">
                 {member.nickname}
               </span>
-              <p className="text-[15px] font-bold text-zinc-800 break-words line-clamp-2 leading-snug">
+              <p className="text-[15px] font-bold text-text-primary break-words line-clamp-2 leading-snug">
                 {member.goalName || "-"}
               </p>
-              <p className="text-[13px] font-medium text-zinc-500 break-words line-clamp-2 mt-0.5">
+              <p className="text-[13px] font-medium text-text-muted break-words line-clamp-2 mt-0.5">
                 {member.lagMeasure || "-"}
               </p>
             </div>
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
-            <div className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-zinc-50 px-6 py-4 min-w-[130px]">
-              <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
+            <div className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-sub-background px-6 py-4 min-w-[130px]">
+              <span className="text-[11px] font-bold text-text-muted uppercase tracking-widest">
                 {t("weeklyAchievement", { fallback: "주간 달성률" })}
               </span>
               <span className="text-2xl font-black text-primary">
                 {member.weeklyAchievementRate ?? 0}%
               </span>
             </div>
-            <div className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-zinc-50 px-6 py-4 min-w-[130px]">
-              <span className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest">
+            <div className="flex flex-col items-center justify-center gap-1.5 rounded-2xl bg-sub-background px-6 py-4 min-w-[130px]">
+              <span className="text-[11px] font-bold text-text-muted uppercase tracking-widest">
                 {t("monthlyAchievement", { fallback: "월간 달성률" })}
               </span>
-              <span className="text-2xl font-black text-zinc-700">
+              <span className="text-2xl font-black text-text-secondary">
                 {member.monthlyAchievementRate ?? 0}%
               </span>
             </div>
@@ -84,7 +84,7 @@ export function ScoreboardImageCard({
         </div>
 
         {/* Table Area */}
-        <div className="mt-8 rounded-2xl border border-zinc-100 overflow-hidden">
+        <div className="mt-8 rounded-2xl border border-border overflow-hidden">
           <table className="w-full table-fixed text-sm">
             <colgroup>
               <col className="w-[35%]" />
@@ -93,9 +93,9 @@ export function ScoreboardImageCard({
               ))}
               <col className="w-[12.5%]" />
             </colgroup>
-            <thead className="bg-zinc-50">
+            <thead className="bg-sub-background">
               <tr>
-                <th className="py-4 px-6 text-left text-[12px] font-bold text-zinc-500 uppercase tracking-widest">
+                <th className="py-4 px-6 text-left text-[12px] font-bold text-text-muted uppercase tracking-widest">
                   {t("leadMeasureHead")}
                 </th>
                 {DAY_KEYS.map((dayKey, index) => (
@@ -105,14 +105,14 @@ export function ScoreboardImageCard({
                       weekDates[index] === today
                         ? "text-primary"
                         : weekDates[index] > today
-                          ? "text-zinc-500/50"
-                          : "text-zinc-500"
+                          ? "text-text-muted/50"
+                          : "text-text-muted"
                     }`}
                   >
                     {t(dayKey)}
                   </th>
                 ))}
-                <th className="py-4 px-4 text-center text-[12px] font-bold text-zinc-500 uppercase tracking-widest">
+                <th className="py-4 px-4 text-center text-[12px] font-bold text-text-muted uppercase tracking-widest">
                   {t("achievementTab")}
                 </th>
               </tr>
@@ -126,9 +126,9 @@ export function ScoreboardImageCard({
                 const isCount = trackingMode === "COUNT";
 
                 return (
-                  <tr key={leadMeasure.id} className="bg-white">
+                  <tr key={leadMeasure.id} className="bg-surface">
                     <td className="py-5 px-6">
-                      <p className="text-[14px] font-semibold text-zinc-900 break-words line-clamp-2 leading-relaxed">
+                      <p className="text-[14px] font-semibold text-text-primary break-words line-clamp-2 leading-relaxed">
                         {leadMeasure.name}
                       </p>
                     </td>
@@ -145,7 +145,7 @@ export function ScoreboardImageCard({
                                 isAchieved
                                   ? "text-green-600"
                                   : count != null && count > 0
-                                    ? "text-zinc-900"
+                                    ? "text-text-primary"
                                     : date === today
                                       ? "text-primary/50"
                                       : "text-zinc-300"
@@ -173,12 +173,12 @@ export function ScoreboardImageCard({
                     })}
                     <td className="py-5 px-4 text-center align-middle">
                       <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-[12px] font-medium text-zinc-500">
+                        <span className="text-[12px] font-medium text-text-muted">
                           {leadMeasure.period === "MONTHLY"
                             ? t("monthView")
                             : t("weekView")}
                         </span>
-                        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-zinc-100">
+                        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-sub-background">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${
                               rate >= 100 ? "bg-green-500" : "bg-primary"
@@ -188,7 +188,7 @@ export function ScoreboardImageCard({
                         </div>
                         <span
                           className={`font-mono text-[13px] font-black tracking-tight ${
-                            rate >= 100 ? "text-green-600" : "text-zinc-600"
+                            rate >= 100 ? "text-green-600" : "text-text-secondary"
                           }`}
                         >
                           {achieved}/{total}

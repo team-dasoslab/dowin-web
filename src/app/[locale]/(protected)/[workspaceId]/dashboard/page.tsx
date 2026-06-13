@@ -163,7 +163,7 @@ export default function DashboardPage() {
           rightElement={
             <div className="flex items-center gap-2">
               {isLoading ? (
-                <div className="h-10 w-[200px] animate-pulse rounded-[16px] bg-zinc-200" />
+                <div className="h-10 w-[200px] animate-pulse rounded-[16px] bg-border" />
               ) : null}
             </div>
           }
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                     type="button"
                     onClick={saveImage}
                     disabled={isExporting}
-                    className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all w-full sm:w-auto"
+                    className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all w-full sm:w-auto"
                   >
                     {isShareSupported
                       ? t("shareScoreboard")
@@ -214,12 +214,12 @@ export default function DashboardPage() {
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="h-40 w-full animate-pulse rounded-[24px] bg-zinc-200"
+                      className="h-40 w-full animate-pulse rounded-[24px] bg-border"
                     />
                   ))}
                 </div>
               ) : members.length === 0 ? (
-                <div className="bg-white rounded-[24px] p-8 text-center text-text-muted text-sm">
+                <div className="bg-surface rounded-[24px] p-8 text-center text-text-muted text-sm">
                   {t("noMembers")}
                 </div>
               ) : (
@@ -264,7 +264,7 @@ export default function DashboardPage() {
                   {[1, 2].map((i) => (
                     <div
                       key={i}
-                      className="h-[400px] w-full animate-pulse rounded-[24px] bg-zinc-200"
+                      className="h-[400px] w-full animate-pulse rounded-[24px] bg-border"
                     />
                   ))}
                 </div>
@@ -323,12 +323,12 @@ function DashboardLoadingState() {
   return (
     <div className="min-h-screen">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
+        <div className="h-12 w-48 rounded-[12px] bg-border" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-40 rounded-[24px] bg-zinc-200" />
-          <div className="h-40 rounded-[24px] bg-zinc-200" />
+          <div className="h-40 rounded-[24px] bg-border" />
+          <div className="h-40 rounded-[24px] bg-border" />
         </div>
-        <div className="h-[400px] rounded-[24px] bg-zinc-200" />
+        <div className="h-[400px] rounded-[24px] bg-border" />
       </div>
     </div>
   );
@@ -362,7 +362,9 @@ function DashboardNoScoreboardState() {
           actions={
             <Button
               asChild
-              className="h-[56px] w-full flex items-center justify-center px-8 text-[16px] font-black rounded-[24px] bg-zinc-900 text-white hover:bg-zinc-800 transition-colors "
+              variant="hero"
+              size="hero"
+              className="w-full"
             >
               <Link href={`/${workspaceId}/setup?mode=create`}>
                 {t("createScoreboard")}

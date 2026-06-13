@@ -106,7 +106,7 @@ const buildReportSummary = (
       status: copy.notStartedStatus,
       score: formatScore(m, copy.unsetScore),
       nextAction: copy.notStartedAction,
-      badgeTone: "border-amber-200 bg-amber-50 text-amber-700",
+      badgeTone: "border-amber-500/20 bg-amber-500/10 text-amber-500",
     })),
     ...losingStartedMembers.map((m) => ({
       key: `losing-${m.userId ?? getMemberName(m, copy.unnamedMember)}`,
@@ -289,7 +289,7 @@ export default function ReportPage() {
                 title={t("trend.title")}
                 description={t("trend.desc")}
               />
-              <Card className="overflow-visible p-6 sm:p-8 border border-zinc-200 bg-white">
+              <Card className="overflow-visible p-6 sm:p-8 border border-border bg-surface">
                 <div className="h-[300px] w-full">
                   <TeamTrendChart trends={report.trends ?? []} />
                 </div>
@@ -360,7 +360,7 @@ function ChartLegendTooltip({
       {active && (
         <>
           <div className="fixed inset-0 z-10 sm:hidden" onClick={onClose} />
-          <div className="absolute left-0 top-full z-20 mt-2 w-56 rounded-content border border-border bg-white p-4 shadow-xl animate-dowin-in">
+          <div className="absolute left-0 top-full z-20 mt-2 w-56 rounded-content border border-border bg-surface p-4 shadow-xl animate-dowin-in">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-primary">
               {label}
             </p>
@@ -485,7 +485,7 @@ function TeamTrendChart({
                 content={({ active, payload, label }) => {
                   if (!active || !payload?.length) return null;
                   return (
-                    <div className="rounded-lg border border-zinc-200 bg-white/95 p-3 shadow-lg backdrop-blur-sm">
+                    <div className="rounded-lg border border-border bg-surface/95 p-3 shadow-lg backdrop-blur-sm">
                       <p className="mb-2 text-[11px] font-bold text-text-primary">
                         {label}
                       </p>
@@ -650,15 +650,15 @@ function WinRateOverview({
       label: t("statusCards.noScoreboard.label"),
       count: noScoreboardCount,
       names: noScoreboardNames,
-      color: "bg-zinc-200",
-      indicator: "bg-zinc-200",
+      color: "bg-border",
+      indicator: "bg-border",
     },
   ];
 
   return (
     <div className="space-y-4">
       {/* Main Status Card */}
-      <Card className="relative overflow-visible border border-zinc-200 bg-white">
+      <Card className="relative overflow-visible border border-border bg-surface">
         {/* Clipped background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-content">
           <div className="absolute top-0 right-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
@@ -679,7 +679,7 @@ function WinRateOverview({
               </div>
             </div>
 
-            <div className="flex items-center gap-8 md:gap-12 shrink-0 border-t border-zinc-100 pt-6 md:border-t-0 md:pt-0">
+            <div className="flex items-center gap-8 md:gap-12 shrink-0 border-t border-border pt-6 md:border-t-0 md:pt-0">
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
                   {t("winOverview.totalMembers")}
@@ -705,12 +705,12 @@ function WinRateOverview({
                       onClick={() => setShowInfo(!showInfo)}
                       onMouseEnter={() => setShowInfo(true)}
                       onMouseLeave={() => setShowInfo(false)}
-                      className="text-zinc-400 transition-colors outline-none p-0 min-h-0 bg-transparent hover:bg-transparent"
+                      className="text-text-muted transition-colors outline-none p-0 min-h-0 bg-transparent hover:bg-transparent"
                     >
                       <DowinIcon name="status-info" size={12} />
                     </Button>
                     {showInfo && (
-                      <div className="absolute top-full right-0 mt-2 w-64 rounded-content border border-zinc-200 bg-white p-4 shadow-xl z-[60] animate-dowin-in">
+                      <div className="absolute top-full right-0 mt-2 w-64 rounded-content border border-border bg-surface p-4 shadow-xl z-[60] animate-dowin-in">
                         <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-text-primary">
                           {t("winOverview.activeWinRate")}
                         </p>
@@ -729,7 +729,7 @@ function WinRateOverview({
                         ? "text-primary"
                         : winRate >= 50
                           ? "text-amber-500"
-                          : "text-zinc-400",
+                          : "text-text-muted",
                     )}
                   >
                     {winRate}%
@@ -774,7 +774,7 @@ function StatusBoardCard({
   const shownNames = expanded ? names : names.slice(0, COLLAPSED_MAX);
 
   return (
-    <Card className="flex flex-col border border-zinc-200 bg-white">
+    <Card className="flex flex-col border border-border bg-surface">
       <div className="flex flex-col flex-1 p-4 sm:p-5 gap-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -794,7 +794,7 @@ function StatusBoardCard({
               {shownNames.map((name) => (
                 <span
                   key={`${label}-${name}`}
-                  className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-bold text-text-secondary"
+                  className="rounded bg-sub-background px-1.5 py-0.5 text-[11px] font-bold text-text-secondary"
                 >
                   {name}
                 </span>
@@ -803,7 +803,7 @@ function StatusBoardCard({
                 <Button
                   type="button"
                   onClick={() => setExpanded(true)}
-                  className="rounded bg-zinc-50 px-1.5 py-0.5 text-[11px] font-bold text-text-muted p-0 min-h-0 hover:bg-zinc-100"
+                  className="rounded bg-sub-background px-1.5 py-0.5 text-[11px] font-bold text-text-muted p-0 min-h-0 hover:bg-sub-background"
                 >
                   +{names.length - COLLAPSED_MAX}
                 </Button>
@@ -837,7 +837,7 @@ function InlineEmptyState({
   description: string;
 }) {
   return (
-    <Card className="border border-dashed border-border rounded-content p-8 bg-white text-center">
+    <Card className="border border-dashed border-border rounded-content p-8 bg-surface text-center">
       <p className="text-sm font-semibold text-text-primary">{title}</p>
       <p className="mt-1 text-xs leading-5 text-text-muted">{description}</p>
     </Card>
@@ -850,8 +850,8 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
   const t = useTranslations("Report");
 
   return (
-    <Card className="overflow-hidden border border-zinc-200 bg-white">
-      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-zinc-100 bg-zinc-100 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-text-muted md:grid">
+    <Card className="overflow-hidden border border-border bg-surface">
+      <div className="hidden grid-cols-[minmax(0,1fr)_auto_auto_minmax(0,1.2fr)] gap-4 border-b border-border bg-sub-background px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-text-muted md:grid">
         <span>{t("focus.table.member")}</span>
         <span className="text-center">{t("focus.table.status")}</span>
         <span className="text-center">{t("focus.table.score")}</span>
@@ -903,19 +903,19 @@ function ReportLoadingState() {
   return (
     <div className="min-h-screen">
       <ProtectedPageContainer spacing="compact">
-        <div className="h-12 w-48 animate-pulse rounded-[12px] bg-zinc-200" />
+        <div className="h-12 w-48 animate-pulse rounded-[12px] bg-border" />
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
           <div className="hidden w-[240px] space-y-2 lg:block">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-10 rounded-[12px] bg-zinc-200 animate-pulse"
+                className="h-10 rounded-[12px] bg-border animate-pulse"
               />
             ))}
           </div>
           <div className="flex-1 space-y-10">
-            <div className="h-72 rounded-[24px] bg-zinc-200 animate-pulse" />
-            <div className="h-[340px] rounded-[24px] bg-zinc-200 animate-pulse" />
+            <div className="h-72 rounded-[24px] bg-border animate-pulse" />
+            <div className="h-[340px] rounded-[24px] bg-border animate-pulse" />
           </div>
         </div>
       </ProtectedPageContainer>
@@ -1003,7 +1003,7 @@ function ReportErrorState({
             </Button>
             <Button
               asChild
-              className="rounded-content border border-border bg-white px-4 py-2 text-sm font-bold text-text-primary transition-colors"
+              className="rounded-content border border-border bg-surface px-4 py-2 text-sm font-bold text-text-primary transition-colors"
             >
               <Link href={`/${workspaceId}/dashboard`}>
                 {t("states.backToDashboard")}

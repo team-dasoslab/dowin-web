@@ -136,9 +136,9 @@ function ScoreboardsSkeleton() {
   return (
     <div className="min-h-screen">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
-        <div className="h-44 rounded-[24px] bg-zinc-200" />
-        <div className="h-72 rounded-[24px] bg-zinc-200" />
+        <div className="h-12 w-48 rounded-[12px] bg-border" />
+        <div className="h-44 rounded-[24px] bg-border" />
+        <div className="h-72 rounded-[24px] bg-border" />
       </div>
     </div>
   );
@@ -154,10 +154,10 @@ function ScoreboardsNoWorkspaceState() {
           <Logo className="text-primary" size="28px" />
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
+          <h1 className="text-2xl font-black text-text-primary tracking-tight">
             {td("noWorkspaceTitle")}
           </h1>
-          <p className="text-[14px] font-medium text-zinc-500 leading-relaxed">
+          <p className="text-[14px] font-medium text-text-muted leading-relaxed">
             {t("noWorkspaceArchiveDesc")}
           </p>
         </div>

@@ -52,9 +52,9 @@ export function DocumentOutlineClient({
               className={cn(
                 "block rounded-lg px-3 py-1.5 text-[13.5px] transition-colors",
                 activeId === heading.id
-                  ? "bg-zinc-100 text-zinc-900 font-bold"
+                  ? "bg-zinc-100 text-text-primary font-bold"
                   : "text-zinc-600",
-                heading.depth === 1 && "font-bold text-zinc-900",
+                heading.depth === 1 && "font-bold text-text-primary",
                 heading.depth === 2 && "pl-5 text-[13px]",
                 heading.depth === 3 && "pl-8 text-[13px]",
                 heading.depth >= 4 && "pl-11 text-[13px]"

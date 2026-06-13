@@ -86,7 +86,7 @@ function WeeklyMobileCard({
   const guide = weeklyGuideById.get(leadMeasureId);
 
   return (
-    <div className="rounded-[24px] bg-white p-5">
+    <div className="rounded-[24px] bg-surface p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <LeadMeasureSummary
@@ -190,7 +190,7 @@ function WeeklyMobileCardDay({
     <div className="text-center relative">
       <p
         className={`mb-1.5 text-[11px] font-bold ${
-          isToday ? "text-primary" : "text-zinc-400"
+          isToday ? "text-primary" : "text-text-muted"
         }`}
       >
         {dayLabel}
@@ -212,10 +212,10 @@ function WeeklyMobileCardDay({
               isAchieved
                 ? "bg-primary text-white"
                 : (count ?? 0) > 0
-                  ? "bg-[#E8F3FF] text-primary"
+                  ? "bg-primary/15 text-primary"
                   : isToday
                     ? "bg-primary/5 text-primary"
-                    : "bg-zinc-100 text-zinc-500"
+                    : "bg-sub-background text-text-muted"
             } ${isPending || !isEditable ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
           >
             <span className="text-[12px] font-bold tracking-tighter leading-none">
@@ -235,12 +235,12 @@ function WeeklyMobileCardDay({
                   }}
                 />
                 <div
-                  className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
+                  className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Button
                     aria-label={t("closeDailyCount")}
-                    className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-zinc-100"
+                    className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-sub-background"
                     onClick={() => setOpenPopover(false)}
                   >
                     <svg
@@ -252,7 +252,7 @@ function WeeklyMobileCardDay({
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="text-zinc-400"
+                      className="text-text-muted"
                     >
                       <path d="M18 6 6 18" />
                       <path d="m6 6 12 12" />
@@ -274,7 +274,7 @@ function WeeklyMobileCardDay({
                         onChange={(e) =>
                           setLocalCount(parseInt(e.target.value, 10) || 0)
                         }
-                        className="w-32 text-5xl font-black text-primary text-center bg-zinc-100 rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
+                        className="w-32 text-5xl font-black text-primary text-center bg-sub-background rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
                         placeholder="0"
                       />
                       <span className="text-2xl text-text-muted/40 font-bold mb-2">
@@ -284,7 +284,7 @@ function WeeklyMobileCardDay({
 
                     <div className="flex w-full gap-2 mt-3">
                       <Button
-                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-zinc-100 text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-zinc-100"
+                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
                         onClick={() =>
                           setLocalCount(Math.max(0, localCount - 1))
                         }
@@ -292,7 +292,7 @@ function WeeklyMobileCardDay({
                         -
                       </Button>
                       <Button
-                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-zinc-100 text-zinc-600 transition-colors active:bg-zinc-200/50 hover:bg-zinc-100"
+                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
                         onClick={() => setLocalCount(localCount + 1)}
                       >
                         +
@@ -331,8 +331,8 @@ function WeeklyMobileCardDay({
             isAchieved
               ? "bg-primary text-white"
               : isToday
-                ? "bg-[#E8F3FF] text-primary"
-                : "bg-zinc-100 text-zinc-400"
+                ? "bg-primary/15 text-primary"
+                : "bg-sub-background text-text-muted"
           } ${
             isPending || !isEditable
               ? "cursor-not-allowed opacity-50"

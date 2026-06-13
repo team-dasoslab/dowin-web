@@ -8,12 +8,12 @@ export const formatWeekLabel = (weekStart?: string, weekEnd?: string) => {
 
 export const getRateTone = (rate: number) => {
   if (rate >= 80) {
-    return "text-green-700 bg-green-50";
+    return "text-success bg-success/10";
   }
 
   if (rate >= 50) {
-    return "text-amber-700 bg-amber-50";
+    return "text-amber-500 bg-amber-500/10";
   }
 
-  return "text-red-700 bg-red-50";
+  return "text-danger bg-danger/10";
 };

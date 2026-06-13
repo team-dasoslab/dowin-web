@@ -38,7 +38,7 @@ export function Logo({ size = 24, className, ...props }: LogoProps) {
           width="795"
           height="40"
           transform="rotate(90 481 -140)"
-          fill="white"
+          fill="var(--color-background)"
         />
         <rect
           x="401"
@@ -46,7 +46,7 @@ export function Logo({ size = 24, className, ...props }: LogoProps) {
           width="795"
           height="40"
           transform="rotate(90 401 -140)"
-          fill="white"
+          fill="var(--color-background)"
         />
         <rect
           x="321"
@@ -54,7 +54,7 @@ export function Logo({ size = 24, className, ...props }: LogoProps) {
           width="795"
           height="40"
           transform="rotate(90 321 -140)"
-          fill="white"
+          fill="var(--color-background)"
         />
       </g>
     </svg>

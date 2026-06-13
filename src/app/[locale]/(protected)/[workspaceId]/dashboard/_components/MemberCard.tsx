@@ -21,7 +21,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
 
   return (
     <div
-      className={`bg-white rounded-[24px] p-6 space-y-4 transition-colors ${
+      className={`bg-surface rounded-[24px] p-6 space-y-4 transition-colors ${
         isMe
           ? "ring-1 ring-primary/20"
           : ""
@@ -38,7 +38,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
           />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="text-sm font-bold text-zinc-900 truncate">
+              <p className="text-sm font-bold text-text-primary truncate">
                 {member.nickname}
               </p>
               {isMe ? (
@@ -47,22 +47,22 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
                 </Badge>
               ) : null}
             </div>
-            <p className="text-xs text-zinc-500 truncate">
+            <p className="text-xs text-text-muted truncate">
               {hasScoreboard ? member.goalName : t("noScoreboardTitle")}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-zinc-500 bg-zinc-100 rounded-[16px] px-4 py-3">
-        <DowinIcon name="domain-target-arrow" size="12px" className="text-zinc-400 flex-shrink-0" />
+      <div className="flex items-center gap-2 text-xs text-text-muted bg-sub-background rounded-[16px] px-4 py-3">
+        <DowinIcon name="domain-target-arrow" size="12px" className="text-text-muted flex-shrink-0" />
         <span className="truncate">
           {hasScoreboard ? member.lagMeasure : t("noScoreboardDesc")}
         </span>
       </div>
 
       <div className="space-y-1.5">
-        <div className="flex justify-between items-center text-[11px] text-zinc-900">
+        <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("weeklyAchievement")}</span>
           <Badge
             className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-[8px] border-none ${getRateTone(weeklyAchievementRate)}`}
@@ -70,7 +70,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
             {hasScoreboard ? `${weeklyAchievementRate}%` : tc("unsetTitle")}
           </Badge>
         </div>
-        <div className="flex justify-between items-center text-[11px] text-zinc-900">
+        <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("monthlyAchievement")}</span>
           <Badge
             className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-[8px] border-none ${getRateTone(monthlyAchievementRate)}`}

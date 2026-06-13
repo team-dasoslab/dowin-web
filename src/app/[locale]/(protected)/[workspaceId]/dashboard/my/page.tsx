@@ -176,7 +176,7 @@ export default function MyDashboardPage() {
         <ProtectedPageHeader
           title={
             isProfileLoading ? (
-              <div className="h-8 w-48 animate-pulse rounded-[12px] bg-zinc-200" />
+              <div className="h-8 w-48 animate-pulse rounded-[12px] bg-border" />
             ) : nickname ? (
               t("userScoreboard", { nickname })
             ) : (
@@ -187,7 +187,7 @@ export default function MyDashboardPage() {
             <div className="flex flex-wrap gap-2">
               <Button
                 asChild
-                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all "
+                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all "
               >
                 <Link href={`/${workspaceId}/scoreboards`}>
                   {t("scoreboardArchive")}
@@ -195,7 +195,7 @@ export default function MyDashboardPage() {
               </Button>
               <Button
                 asChild
-                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-white text-zinc-900 hover:bg-zinc-50 transition-all "
+                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all "
               >
                 <Link href={`/${workspaceId}/setup?mode=update`}>
                   {t("manageScoreboard")}
@@ -272,9 +272,9 @@ export default function MyDashboardPage() {
               />
 
               {isLoading ? (
-                <div className="h-[400px] w-full animate-pulse rounded-[24px] bg-zinc-200" />
+                <div className="h-[400px] w-full animate-pulse rounded-[24px] bg-border" />
               ) : activeLeadMeasures.length === 0 ? (
-                <div className="rounded-[24px] bg-white py-12 text-center text-zinc-500 font-medium text-[15px]">
+                <div className="rounded-[24px] bg-surface py-12 text-center text-text-muted font-medium text-[15px]">
                   {t("noActiveMeasures")}
                 </div>
               ) : selectedView === "month" ? (
@@ -323,13 +323,13 @@ function MyDashboardSkeleton() {
   return (
     <div className="min-h-screen">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
-        <div className="h-12 w-1/3 rounded-[12px] bg-zinc-200" />
-        <div className="h-[140px] rounded-[24px] bg-zinc-200" />
+        <div className="h-12 w-1/3 rounded-[12px] bg-border" />
+        <div className="h-[140px] rounded-[24px] bg-border" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="h-48 rounded-[24px] bg-zinc-200" />
-          <div className="h-48 rounded-[24px] bg-zinc-200" />
+          <div className="h-48 rounded-[24px] bg-border" />
+          <div className="h-48 rounded-[24px] bg-border" />
         </div>
-        <div className="h-[400px] rounded-[24px] bg-zinc-200" />
+        <div className="h-[400px] rounded-[24px] bg-border" />
       </div>
     </div>
   );
@@ -361,13 +361,13 @@ function NoScoreboardState() {
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           title={t("noScoreboardTitle")}
-          description={
-            <div className="whitespace-pre-line">{t("noScoreboardDesc")}</div>
-          }
+          description={t("noScoreboardDesc")}
           actions={
             <Button
               asChild
-              className="h-[56px] w-full flex items-center justify-center px-8 text-[16px] font-black rounded-[24px] bg-zinc-900 text-white hover:bg-zinc-800 transition-colors "
+              variant="hero"
+              size="hero"
+              className="w-full"
             >
               <Link href={`/${workspaceId}/setup?mode=create`}>
                 {t("createScoreboard")}

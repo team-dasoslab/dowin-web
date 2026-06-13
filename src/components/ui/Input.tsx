@@ -26,7 +26,7 @@ export const Input = ({
       <input
         id={inputId}
         className={cn(
-          "h-[52px] w-full rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5 disabled:opacity-50 disabled:cursor-not-allowed",
+          "h-[52px] w-full rounded-[16px] border-none bg-sub-background px-5 text-[15px] font-semibold text-text-primary outline-none transition-colors placeholder:text-text-muted focus:bg-surface focus:ring-4 focus:ring-primary/5 disabled:opacity-50 disabled:cursor-not-allowed",
           rightElement ? "pr-14" : "",
           className
         )}
@@ -49,7 +49,7 @@ export const Input = ({
     <div className={cn("space-y-2", containerClassName)}>
       <label
         htmlFor={inputId}
-        className="text-sm block font-semibold text-zinc-900 ml-1"
+        className="text-sm block font-semibold text-text-primary ml-1"
       >
         {label}
       </label>

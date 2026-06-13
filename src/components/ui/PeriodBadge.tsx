@@ -20,7 +20,7 @@ export function PeriodBadge({
   return (
     <div
       className={cn(
-        "flex items-center rounded-[16px] bg-zinc-100 transition-all",
+        "flex items-center rounded-[16px] bg-sub-background transition-all",
         isMd ? "gap-2 px-3 py-1.5" : "gap-1.5 px-2.5 py-1",
         className,
       )}
@@ -28,11 +28,11 @@ export function PeriodBadge({
       <DowinIcon
         name={iconName}
         size={isMd ? 16 : 14}
-        className="text-zinc-400"
+        className="text-text-muted"
       />
       <span
         className={cn(
-          "font-bold tracking-tight text-zinc-600 tabular-nums",
+          "font-bold tracking-tight text-text-secondary tabular-nums",
           isMd ? "text-[12px]" : "text-[11px]",
         )}
       >
