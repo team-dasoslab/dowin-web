@@ -258,7 +258,7 @@ export function WeeklyTable({
         <div className="hidden overflow-hidden rounded-[24px] bg-surface md:block">
           <div className="overflow-x-auto">
             <div className="min-w-[600px]">
-              <div className="border-b-2 border-zinc-50 bg-surface">
+              <div className="border-b border-border bg-surface">
                 <table className="w-full table-fixed text-xs">
                   <colgroup>
                     <col className="w-[38%]" />
@@ -302,7 +302,7 @@ export function WeeklyTable({
                   ))}
                   <col className="w-[14%]" />
                 </colgroup>
-                <tbody className="divide-y-2 divide-zinc-50">
+                <tbody className="divide-y divide-border">
                   {member.leadMeasures?.map((leadMeasure) => {
                     const achievedCount = leadMeasure.achieved ?? 0;
                     const targetValue = leadMeasure.targetValue ?? 0;
@@ -378,7 +378,7 @@ export function WeeklyTable({
                                 ? t("monthView")
                                 : t("weekView")}
                             </span>
-                            <div className="h-1.5 w-12 overflow-hidden rounded-full bg-sub-background">
+                            <div className="h-1.5 w-12 overflow-hidden rounded-full bg-border">
                               <div
                                 className={`h-full rounded-full transition-all duration-500 ${
                                   rate >= 100 ? "bg-green-500" : "bg-primary"

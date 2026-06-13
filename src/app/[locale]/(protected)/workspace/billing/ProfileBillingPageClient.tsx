@@ -188,7 +188,7 @@ export function ProfileBillingPageClient() {
                   type="button"
                   onClick={() => void openPortal()}
                   disabled={isPortalPending}
-                  className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary hover:bg-zinc-200 transition-colors"
+                  className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary hover:bg-border transition-colors"
                 >
                   {isPortalPending ? t("portalLoading") : t("portalButton")}
                 </Button>
@@ -217,7 +217,7 @@ export function ProfileBillingPageClient() {
               {t("betaPromotionalGrantNotice")}
             </div>
           ) : billing.entitlementSource && !isPolarEntitlement ? (
-            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+            <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-amber-500/10 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-500">
               <DowinIcon
                 name="status-info"
                 size="14px"
@@ -310,7 +310,7 @@ export function ProfileBillingPageClient() {
                             type="button"
                             onClick={handleSeatChangeClick}
                             disabled={isUpdatingSeats}
-                            className="whitespace-nowrap h-8 rounded-[12px] bg-sub-background px-3 text-xs font-bold text-text-secondary hover:bg-zinc-200 transition-colors"
+                            className="whitespace-nowrap h-8 rounded-[12px] bg-sub-background px-3 text-xs font-bold text-text-secondary hover:bg-border transition-colors"
                           >
                             {isUpdatingSeats
                               ? t("seatChangeDialogSubmitting")
@@ -384,14 +384,14 @@ export function ProfileBillingPageClient() {
             ) : null}
 
             {requiresManualReview ? (
-              <div className="space-y-3 rounded-[24px] bg-red-50 p-5">
-                <div className="flex items-center gap-2 text-red-600">
+              <div className="space-y-3 rounded-[24px] bg-danger/10 p-5">
+                <div className="flex items-center gap-2 text-danger">
                   <DowinIcon name="status-locked" size="18px" />
                   <p className="text-[14px] font-black">
                     {t("riskReviewTitle")}
                   </p>
                 </div>
-                <p className="text-[12px] leading-relaxed text-red-700/80">
+                <p className="text-[12px] leading-relaxed text-danger/80">
                   {t("riskReviewDesc", {
                     refundCount: billing.recentRefundCount,
                     revokedCount: billing.recentRevokedCount,
@@ -453,7 +453,7 @@ function BillingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-[12px] bg-sub-background px-5 py-3 text-sm font-bold text-text-primary hover:bg-zinc-200 transition-colors"
+              className="rounded-[12px] bg-sub-background px-5 py-3 text-sm font-bold text-text-primary hover:bg-border transition-colors"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -521,16 +521,16 @@ function ProfileBillingSkeleton() {
         isLoading
         className="max-w-[640px] space-y-6 pb-24 md:pb-10 lg:pb-12"
       >
-        <div className="h-10 w-48 rounded-[24px] bg-zinc-200" />
-        <div className="h-32 rounded-[24px] bg-zinc-200" />
+        <div className="h-10 w-48 rounded-[24px] bg-border" />
+        <div className="h-32 rounded-[24px] bg-border" />
         <div className="space-y-3">
-          <div className="h-6 w-32 rounded-[16px] bg-zinc-200" />
+          <div className="h-6 w-32 rounded-[16px] bg-border" />
           <div className="space-y-2">
-            <div className="h-24 rounded-[16px] bg-zinc-200" />
-            <div className="h-24 rounded-[16px] bg-zinc-200" />
+            <div className="h-24 rounded-[16px] bg-border" />
+            <div className="h-24 rounded-[16px] bg-border" />
           </div>
         </div>
-        <div className="h-48 rounded-[24px] bg-zinc-200" />
+        <div className="h-48 rounded-[24px] bg-border" />
       </ProtectedPageContainer>
     </div>
   );
@@ -570,7 +570,7 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
         <div className="w-full space-y-6 rounded-[24px] bg-surface p-8 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-danger/10 text-danger">
             <DowinIcon name="status-locked" size="32px" />
           </div>
           <div className="space-y-2">

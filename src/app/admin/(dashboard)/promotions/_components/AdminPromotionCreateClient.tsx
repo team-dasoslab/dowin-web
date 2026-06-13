@@ -69,7 +69,7 @@ export default function AdminPromotionCreateClient() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
-              코드 <span className="text-red-500">*</span>
+              코드 <span className="text-danger">*</span>
             </label>
             <div className="flex gap-2">
               <Input
@@ -77,7 +77,7 @@ export default function AdminPromotionCreateClient() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="예: DOWIN2026BETA"
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                 required
               />
               <Button
@@ -92,14 +92,14 @@ export default function AdminPromotionCreateClient() {
 
           <div className="space-y-2">
             <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
-              캠페인 이름 <span className="text-red-500">*</span>
+              캠페인 이름 <span className="text-danger">*</span>
             </label>
             <Input
               type="text"
               value={campaignName}
               onChange={(e) => setCampaignName(e.target.value)}
               placeholder="예: 초기 클로즈드 베타 피드백 모집"
-              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
               required
             />
           </div>
@@ -113,28 +113,28 @@ export default function AdminPromotionCreateClient() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="캠페인에 대한 운영자 메모를 남겨주세요."
               rows={3}
-              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900 resize-none placeholder:text-zinc-400 min-h-[auto]"
+              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary resize-none placeholder:text-zinc-400 min-h-[auto]"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
-                최대 사용 횟수 <span className="text-red-500">*</span>
+                최대 사용 횟수 <span className="text-danger">*</span>
               </label>
               <Input
                 type="number"
                 value={maxUses}
                 min={1}
                 onChange={(e) => setMaxUses(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                 required
               />
             </div>
 
             <div className="space-y-2">
               <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
-                부여 좌석(Seat) 수 <span className="text-red-500">*</span>
+                부여 좌석(Seat) 수 <span className="text-danger">*</span>
               </label>
               <Input
                 type="number"
@@ -142,7 +142,7 @@ export default function AdminPromotionCreateClient() {
                 min={1}
                 max={10}
                 onChange={(e) => setGrantedSeatCount(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                 required
               />
             </div>

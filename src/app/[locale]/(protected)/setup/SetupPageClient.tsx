@@ -261,20 +261,20 @@ function SetupSkeleton() {
     <div className="min-h-screen">
       <ProtectedPageContainer isLoading className="space-y-6 lg:space-y-12">
         <div className="space-y-4">
-          <div className="h-10 w-48 rounded-[12px] bg-zinc-200" />
+          <div className="h-10 w-48 rounded-[12px] bg-border" />
         </div>
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           <div className="hidden w-[240px] space-y-2 lg:block">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-10 rounded-[12px] bg-zinc-200" />
+              <div key={i} className="h-10 rounded-[12px] bg-border" />
             ))}
           </div>
 
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12 pb-24 lg:pb-[60vh]">
-            <div className="h-32 rounded-[24px] bg-zinc-200" />
-            <div className="h-32 rounded-[24px] bg-zinc-200" />
-            <div className="h-64 rounded-[24px] bg-zinc-200" />
+            <div className="h-32 rounded-[24px] bg-border" />
+            <div className="h-32 rounded-[24px] bg-border" />
+            <div className="h-64 rounded-[24px] bg-border" />
           </div>
         </div>
       </ProtectedPageContainer>

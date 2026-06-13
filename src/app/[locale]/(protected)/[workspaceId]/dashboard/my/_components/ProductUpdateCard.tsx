@@ -34,7 +34,7 @@ export function ProductUpdateCard({
 
         <div className="space-y-2.5 pr-10 sm:max-w-[84%] sm:pr-0">
           <div>
-            <span className="inline-flex w-fit rounded-[8px] bg-[#E8F3FF] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+            <span className="inline-flex w-fit rounded-[8px] bg-primary/15 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
               {t("newFeatureNotice")}
             </span>
           </div>
@@ -64,7 +64,7 @@ export function ProductUpdateCard({
             </Button>
             <Button
               asChild
-              className="justify-center rounded-[14px] bg-sub-background h-10 px-5 text-[13px] font-bold text-text-secondary transition-all border-none shadow-none hover:bg-zinc-200/50"
+              className="justify-center rounded-[14px] bg-sub-background h-10 px-5 text-[13px] font-bold text-text-secondary transition-all border-none shadow-none hover:bg-border/50"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile/updates")}>
                 {t("viewAllUpdates")}

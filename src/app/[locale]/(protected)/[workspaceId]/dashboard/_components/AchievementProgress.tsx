@@ -12,7 +12,7 @@ export function AchievementProgress({
   achievedCount,
   periodLabel,
   targetValue,
-  trackBackgroundClassName = "bg-sub-background",
+  trackBackgroundClassName = "bg-border",
   valueTextSizeClassName = "text-[12px]",
 }: AchievementProgressProps) {
   const t = useTranslations("Dashboard");

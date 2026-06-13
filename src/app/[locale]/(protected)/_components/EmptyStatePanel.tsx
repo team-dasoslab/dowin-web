@@ -21,7 +21,7 @@ export function EmptyStatePanel({
     <div className="flex justify-center w-full">
       <Card className="max-w-[480px] w-full bg-surface border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in text-left">
         <div className="space-y-5">
-          <div className="w-16 h-16 bg-surface border-none rounded-[16px] flex items-center justify-center shadow-sm">
+          <div className="w-16 h-16 bg-surface dark:bg-surface-elevated ring-1 ring-black/5 dark:ring-white/10 rounded-[16px] flex items-center justify-center shadow-sm">
             {icon || <Logo size="32px" className="text-text-primary" />}
           </div>
 

@@ -213,7 +213,7 @@ export default function ProfilePage() {
                     onChange={(event) => {
                       void updateDailySettings(event.target.value);
                     }}
-                    className="h-9 cursor-pointer rounded-[12px] border-none bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-9 cursor-pointer rounded-[12px] border-none bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-border disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {TIME_OPTIONS.map((time) => (
                       <option key={time} value={time}>
@@ -481,12 +481,12 @@ function ProfileSkeleton() {
   return (
     <div className="min-h-screen">
       <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-zinc-200" />
-        <div className="h-24 rounded-content bg-zinc-200" />
+        <div className="h-10 rounded-content bg-border" />
+        <div className="h-24 rounded-content bg-border" />
         <div className="space-y-4">
-          <div className="h-44 rounded-content bg-zinc-200" />
-          <div className="h-36 rounded-content bg-zinc-200" />
-          <div className="h-28 rounded-content bg-zinc-200" />
+          <div className="h-44 rounded-content bg-border" />
+          <div className="h-36 rounded-content bg-border" />
+          <div className="h-28 rounded-content bg-border" />
         </div>
       </ProtectedPageContainer>
     </div>

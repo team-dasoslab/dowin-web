@@ -106,7 +106,7 @@ const buildReportSummary = (
       status: copy.notStartedStatus,
       score: formatScore(m, copy.unsetScore),
       nextAction: copy.notStartedAction,
-      badgeTone: "border-amber-200 bg-amber-50 text-amber-700",
+      badgeTone: "border-amber-500/20 bg-amber-500/10 text-amber-500",
     })),
     ...losingStartedMembers.map((m) => ({
       key: `losing-${m.userId ?? getMemberName(m, copy.unnamedMember)}`,
@@ -650,8 +650,8 @@ function WinRateOverview({
       label: t("statusCards.noScoreboard.label"),
       count: noScoreboardCount,
       names: noScoreboardNames,
-      color: "bg-zinc-200",
-      indicator: "bg-zinc-200",
+      color: "bg-border",
+      indicator: "bg-border",
     },
   ];
 
@@ -903,19 +903,19 @@ function ReportLoadingState() {
   return (
     <div className="min-h-screen">
       <ProtectedPageContainer spacing="compact">
-        <div className="h-12 w-48 animate-pulse rounded-[12px] bg-zinc-200" />
+        <div className="h-12 w-48 animate-pulse rounded-[12px] bg-border" />
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
           <div className="hidden w-[240px] space-y-2 lg:block">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-10 rounded-[12px] bg-zinc-200 animate-pulse"
+                className="h-10 rounded-[12px] bg-border animate-pulse"
               />
             ))}
           </div>
           <div className="flex-1 space-y-10">
-            <div className="h-72 rounded-[24px] bg-zinc-200 animate-pulse" />
-            <div className="h-[340px] rounded-[24px] bg-zinc-200 animate-pulse" />
+            <div className="h-72 rounded-[24px] bg-border animate-pulse" />
+            <div className="h-[340px] rounded-[24px] bg-border animate-pulse" />
           </div>
         </div>
       </ProtectedPageContainer>

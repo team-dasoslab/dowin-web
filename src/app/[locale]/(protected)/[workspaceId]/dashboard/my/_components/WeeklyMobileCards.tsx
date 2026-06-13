@@ -212,7 +212,7 @@ function WeeklyMobileCardDay({
               isAchieved
                 ? "bg-primary text-white"
                 : (count ?? 0) > 0
-                  ? "bg-[#E8F3FF] text-primary"
+                  ? "bg-primary/15 text-primary"
                   : isToday
                     ? "bg-primary/5 text-primary"
                     : "bg-sub-background text-text-muted"
@@ -284,7 +284,7 @@ function WeeklyMobileCardDay({
 
                     <div className="flex w-full gap-2 mt-3">
                       <Button
-                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-zinc-200/50 hover:bg-sub-background"
+                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
                         onClick={() =>
                           setLocalCount(Math.max(0, localCount - 1))
                         }
@@ -292,7 +292,7 @@ function WeeklyMobileCardDay({
                         -
                       </Button>
                       <Button
-                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-zinc-200/50 hover:bg-sub-background"
+                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
                         onClick={() => setLocalCount(localCount + 1)}
                       >
                         +
@@ -331,7 +331,7 @@ function WeeklyMobileCardDay({
             isAchieved
               ? "bg-primary text-white"
               : isToday
-                ? "bg-[#E8F3FF] text-primary"
+                ? "bg-primary/15 text-primary"
                 : "bg-sub-background text-text-muted"
           } ${
             isPending || !isEditable

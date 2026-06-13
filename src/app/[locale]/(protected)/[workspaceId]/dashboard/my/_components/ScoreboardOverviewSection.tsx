@@ -47,7 +47,7 @@ export function ScoreboardOverviewSection({
               {activeScoreboard.goalName}
             </h2>
           ) : (
-            <div className="h-9 w-3/4 animate-pulse rounded-[12px] bg-zinc-200" />
+            <div className="h-9 w-3/4 animate-pulse rounded-[12px] bg-border" />
           )}
         </div>
 
@@ -60,7 +60,7 @@ export function ScoreboardOverviewSection({
               {activeScoreboard.lagMeasure}
             </p>
           ) : (
-            <div className="h-6 w-1/2 animate-pulse rounded-[12px] bg-zinc-200" />
+            <div className="h-6 w-1/2 animate-pulse rounded-[12px] bg-border" />
           )}
         </div>
       </div>
@@ -79,7 +79,7 @@ export function ScoreboardOverviewSection({
                 </span>
                 <span className="text-[18px] font-bold text-text-muted leading-none">%</span>
               </div>
-              <div className="h-1.5 w-full bg-sub-background rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
                 <div
                   className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(weeklyOverallRate))}
                   style={{ width: `${Math.min(weeklyOverallRate, 100)}%` }}
@@ -100,7 +100,7 @@ export function ScoreboardOverviewSection({
                 </span>
                 <span className="text-[18px] font-bold text-text-muted leading-none">%</span>
               </div>
-              <div className="h-1.5 w-full bg-sub-background rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
                 <div
                   className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(monthlyOverallRate))}
                   style={{ width: `${Math.min(monthlyOverallRate, 100)}%` }}
@@ -154,7 +154,7 @@ function DashboardWeeklyTrendSection({
       </div>
 
       {isLoading ? (
-        <div className="flex-1 animate-pulse rounded-lg bg-zinc-200" />
+        <div className="flex-1 animate-pulse rounded-lg bg-border" />
       ) : (
         <div className="h-[140px] lg:h-auto lg:flex-1 w-full min-h-[140px]">
           <WeeklyRateTrendChart points={weeklyTrendPoints} />

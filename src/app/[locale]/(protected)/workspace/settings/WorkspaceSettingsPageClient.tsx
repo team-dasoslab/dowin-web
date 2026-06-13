@@ -195,8 +195,8 @@ export default function WorkspaceSettingsPage() {
     return (
       <div className="min-h-screen">
         <ProtectedPageContainer isLoading>
-          <div className="h-10 rounded-[24px] bg-zinc-200" />
-          <div className="h-24 rounded-[24px] bg-zinc-200" />
+          <div className="h-10 rounded-[24px] bg-border" />
+          <div className="h-24 rounded-[24px] bg-border" />
         </ProtectedPageContainer>
       </div>
     );
@@ -318,7 +318,7 @@ export default function WorkspaceSettingsPage() {
                               type="button"
                               disabled={isActionPending}
                               onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              className="flex h-10 items-center justify-center rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-zinc-200 min-h-0"
+                              className="flex h-10 items-center justify-center rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-border min-h-0"
                             >
                             {commonT("switchWorkspace")}
                           </Button>

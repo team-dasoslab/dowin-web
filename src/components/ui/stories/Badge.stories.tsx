@@ -22,7 +22,7 @@ export const Success: Story = {
   args: {
     children: "Success",
     className:
-      "px-2 py-0.5 rounded border border-green-200 text-xs font-bold bg-green-50 text-green-700",
+      "px-2 py-0.5 rounded border border-success/20 text-xs font-bold bg-success/10 text-success",
   },
 };
 

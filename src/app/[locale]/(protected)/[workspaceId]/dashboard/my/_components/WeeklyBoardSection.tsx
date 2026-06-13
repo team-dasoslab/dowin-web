@@ -98,13 +98,13 @@ function CountPopoverContent({
 
         <div className="flex w-full gap-2 mt-3">
           <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-zinc-200/50 hover:bg-sub-background"
+            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
             onClick={() => setLocalCount(Math.max(0, localCount - 1))}
           >
             -
           </Button>
           <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-zinc-200/50 hover:bg-sub-background"
+            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
             onClick={() => setLocalCount(localCount + 1)}
           >
             +
@@ -166,7 +166,7 @@ export function WeeklyBoardSection({
       <div className="relative hidden overflow-hidden rounded-[24px] bg-surface md:block">
         <div className="overflow-x-auto">
           <div className="min-w-[600px]">
-            <div className="border-b-2 border-zinc-50 bg-surface">
+            <div className="border-b border-border bg-surface">
               <table className="w-full table-fixed text-xs">
                 <colgroup>
                   <col className="w-[38%]" />
@@ -208,7 +208,7 @@ export function WeeklyBoardSection({
                 ))}
                 <col className="w-[14%]" />
               </colgroup>
-              <tbody className="divide-y-2 divide-zinc-50">
+              <tbody className="divide-y divide-border">
                 {activeLeadMeasures.map((leadMeasure) => {
                   const leadMeasureId = toNumberId(leadMeasure.id);
                   const weekly = weeklyById.get(leadMeasureId);
@@ -305,7 +305,7 @@ export function WeeklyBoardSection({
                                     isAchievedDaily
                                       ? "bg-primary text-white"
                                       : count > 0
-                                        ? "bg-[#E8F3FF] text-primary"
+                                        ? "bg-primary/15 text-primary"
                                         : date === today
                                           ? "bg-primary/5 text-primary"
                                           : "bg-sub-background text-text-muted hover:bg-sub-background"
@@ -378,7 +378,7 @@ export function WeeklyBoardSection({
                                   currentValue === true
                                     ? "bg-primary text-white"
                                     : isToday
-                                      ? "bg-[#E8F3FF] text-primary"
+                                      ? "bg-primary/5 text-primary"
                                       : "bg-sub-background text-text-muted hover:bg-sub-background"
                                 } ${
                                   isPending || !isEditable
@@ -406,7 +406,7 @@ export function WeeklyBoardSection({
                               ? t("monthlyLabel")
                               : t("weeklyLabel")}
                           </span>
-                          <div className="h-1.5 w-12 overflow-hidden rounded-full bg-sub-background">
+                          <div className="h-1.5 w-12 overflow-hidden rounded-full bg-border">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
                                 rate >= 100 ? "bg-green-500" : "bg-primary"

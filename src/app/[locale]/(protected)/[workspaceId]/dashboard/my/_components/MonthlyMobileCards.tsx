@@ -216,7 +216,7 @@ function MonthlyMobileMeasureDay({
             value?.achieved
               ? "bg-primary text-white"
               : count > 0
-                ? "bg-[#E8F3FF] text-primary"
+                ? "bg-primary/15 text-primary"
                 : date === null
                   ? "bg-transparent text-transparent"
                   : isToday
@@ -236,7 +236,7 @@ function MonthlyMobileMeasureDay({
               : date === null
                 ? "bg-transparent text-transparent"
                 : isToday
-                  ? "bg-[#E8F3FF] text-primary"
+                  ? "bg-primary/5 text-primary"
                   : "bg-sub-background text-text-muted"
           }`}
         >

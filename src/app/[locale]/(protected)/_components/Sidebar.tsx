@@ -89,7 +89,7 @@ export function Sidebar() {
           <div className="flex-shrink-0 w-[200px]">
             {/* Workspace Pill */}
             {isProfileLoading ? (
-              <div className="flex h-10 w-full animate-pulse items-center rounded-[12px] bg-zinc-200 transition-all px-4" />
+              <div className="flex h-10 w-full animate-pulse items-center rounded-[12px] bg-border transition-all px-4" />
             ) : workspaceName ? (
               <WorkspaceSwitcher isCollapsed={false} />
             ) : (

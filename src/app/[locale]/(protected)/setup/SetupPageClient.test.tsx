@@ -140,7 +140,7 @@ describe("SetupPage", () => {
     expect(
       screen.queryByRole("heading", { name: "새 점수판 생성하기" }),
     ).not.toBeInTheDocument();
-    expect(container.querySelectorAll(".bg-zinc-200").length).toBeGreaterThan(
+    expect(container.querySelectorAll(".bg-border").length).toBeGreaterThan(
       0,
     );
   });

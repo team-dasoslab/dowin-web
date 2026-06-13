@@ -85,7 +85,7 @@ export function MemberListItem({
           onClick={() => onRemove(memberId, nickname)}
           className={`flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] px-3 py-2 text-xs font-bold transition-colors ${
             canRemove
-              ? "bg-red-50 text-red-600 hover:bg-red-100"
+              ? "bg-danger/10 text-danger hover:bg-danger/20"
               : "cursor-not-allowed bg-sub-background text-text-muted"
           }`}
         >

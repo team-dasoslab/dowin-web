@@ -338,7 +338,7 @@ function ContactInquiryComposer({
                   !form.values.message ||
                   !form.values.privacyConsent
                 }
-                className="inline-flex h-14 flex-1 items-center justify-center bg-primary text-[16px] font-black tracking-tight text-white disabled:cursor-not-allowed disabled:bg-zinc-200"
+                className="inline-flex h-14 flex-1 items-center justify-center bg-primary text-[16px] font-black tracking-tight text-white disabled:cursor-not-allowed disabled:bg-border disabled:text-text-muted"
               >
                 {isSubmitting ? t("submittingButton") : t("submitButton")}
               </Button>
@@ -439,11 +439,11 @@ function InquiryListSkeleton() {
         <div key={index} className="animate-pulse rounded-[24px] bg-surface p-4">
           <div className="space-y-3">
             <div className="flex gap-2">
-              <div className="h-6 w-20 rounded-full bg-zinc-200" />
-              <div className="h-6 w-24 rounded-full bg-zinc-200" />
+              <div className="h-6 w-20 rounded-full bg-border" />
+              <div className="h-6 w-24 rounded-full bg-border" />
             </div>
-            <div className="h-5 w-3/5 rounded bg-zinc-200" />
-            <div className="h-4 w-4/5 rounded bg-zinc-200" />
+            <div className="h-5 w-3/5 rounded bg-border" />
+            <div className="h-4 w-4/5 rounded bg-border" />
           </div>
         </div>
       ))}

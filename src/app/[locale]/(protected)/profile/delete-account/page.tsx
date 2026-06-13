@@ -32,7 +32,7 @@ export default function ProfileDeleteAccountPage() {
         <ProtectedPageHeader title={t("header")} />
 
         <div className="flex items-center gap-4 rounded-[24px] bg-surface px-6 py-5">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-red-100 text-red-600">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-danger/10 text-danger">
             <DowinIcon name="status-warning" size="24px" />
           </div>
           <div className="min-w-0">
@@ -46,7 +46,7 @@ export default function ProfileDeleteAccountPage() {
         </div>
 
         <div className="space-y-5 rounded-[24px] bg-surface p-5">
-          <div className="rounded-[16px] bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-[16px] bg-danger/10 px-4 py-3 text-sm text-danger">
             {t("warningText")}
           </div>
 

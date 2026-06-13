@@ -82,7 +82,7 @@ export function PeriodControls({
             </Button>
 
             {isResetVisible ? (
-              <div className="mx-1 h-4 w-px shrink-0 bg-zinc-200" />
+              <div className="mx-1 h-4 w-px shrink-0 bg-border" />
             ) : null}
 
             {isResetVisible ? (
@@ -151,7 +151,7 @@ export function PeriodControls({
               </Button>
 
               {isResetVisible && (
-                <div className="mx-1 h-4 w-px bg-zinc-200 sm:block" />
+                <div className="mx-1 h-4 w-px bg-border sm:block" />
               )}
 
               {isResetVisible && (

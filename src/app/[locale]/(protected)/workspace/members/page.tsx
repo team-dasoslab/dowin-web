@@ -122,7 +122,7 @@ export default function ProfileMembersPage() {
           <div className="flex shrink-0 items-center">
             <Button
               asChild
-              className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-zinc-200"
+              className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-border"
             >
               <Link
                 href={getWorkspacePath(workspaceParamId, "/workspace/invites")}
@@ -151,7 +151,7 @@ export default function ProfileMembersPage() {
             <div
               className={`flex shrink-0 items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-bold tracking-tight ${
                 isAtOrOverMemberLimit
-                  ? "bg-red-50 text-red-600"
+                  ? "bg-danger/10 text-danger"
                   : "bg-sub-background text-text-secondary"
               }`}
             >
@@ -207,9 +207,9 @@ function MembersPageSkeleton() {
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
       >
-        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
-        <div className="h-24 rounded-[24px] bg-zinc-200" />
-        <div className="h-72 rounded-[24px] bg-zinc-200" />
+        <div className="h-12 w-48 rounded-[12px] bg-border" />
+        <div className="h-24 rounded-[24px] bg-border" />
+        <div className="h-72 rounded-[24px] bg-border" />
       </ProtectedPageContainer>
     </div>
   );

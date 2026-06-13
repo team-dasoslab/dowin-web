@@ -73,7 +73,7 @@ export function RootLandingPage() {
   };
 
   return (
-    <main className="flex-1 w-full overflow-y-auto overflow-x-hidden relative bg-white text-zinc-900 selection:bg-primary/20 selection:text-primary font-sans">
+    <main className="flex-1 w-full overflow-y-auto overflow-x-hidden relative bg-white text-text-primary selection:bg-primary/20 selection:text-primary font-sans">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -98,13 +98,13 @@ export function RootLandingPage() {
           </FadeIn>
         )}
         <FadeIn delay={0.2}>
-          <h1 className="whitespace-pre-line break-keep text-[48px] font-black leading-[1.25] tracking-tighter text-zinc-900 md:text-[72px] max-w-[1000px]">
+          <h1 className="whitespace-pre-line break-keep text-[48px] font-black leading-[1.25] tracking-tighter text-text-primary md:text-[72px] max-w-[1000px]">
             {t("Hero.headline")}
           </h1>
         </FadeIn>
         {t("Hero.description") && (
           <FadeIn delay={0.3}>
-            <p className="mt-8 mx-auto max-w-[640px] whitespace-pre-line break-keep text-[20px] font-medium leading-[1.6] text-zinc-500 md:text-[24px]">
+            <p className="mt-8 mx-auto max-w-[640px] whitespace-pre-line break-keep text-[20px] font-medium leading-[1.6] text-text-muted md:text-[24px]">
               {t("Hero.description")}
             </p>
           </FadeIn>
@@ -127,13 +127,13 @@ export function RootLandingPage() {
           {/* Sticky Sidebar */}
           <div className="lg:sticky lg:top-40 max-w-[600px]">
             <FadeIn>
-              <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-zinc-900 md:text-[52px]">
+              <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-text-primary md:text-[52px]">
                 {t("Problem.title")}
               </h2>
             </FadeIn>
             {t("Problem.body") && (
               <FadeIn delay={0.1}>
-                <p className="mt-8 whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-500 md:text-[22px]">
+                <p className="mt-8 whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-text-muted md:text-[22px]">
                   {t("Problem.body")}
                 </p>
               </FadeIn>
@@ -169,12 +169,12 @@ export function RootLandingPage() {
                 <FadeIn key={item.title} delay={0.1 * i} distance={60}>
                   <div className="bg-white rounded-3xl p-8 md:p-12 flex flex-col justify-between">
                     <div>
-                      <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-50 text-zinc-900">
+                      <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-50 text-text-primary">
                         <Icon className="h-7 w-7" />
                       </div>
-                      <h3 className="break-keep text-[24px] font-bold leading-[1.3] tracking-tight text-zinc-900 mb-6">{item.title}</h3>
+                      <h3 className="break-keep text-[24px] font-bold leading-[1.3] tracking-tight text-text-primary mb-6">{item.title}</h3>
                     </div>
-                    <p className="break-keep text-[17px] font-medium leading-[1.6] text-zinc-500">{item.body}</p>
+                    <p className="break-keep text-[17px] font-medium leading-[1.6] text-text-muted">{item.body}</p>
                   </div>
                 </FadeIn>
               );
@@ -188,13 +188,13 @@ export function RootLandingPage() {
         <div className="mx-auto max-w-[1200px]">
           <div className="text-center mb-24 md:mb-32">
             <FadeIn>
-              <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-zinc-900 md:text-[52px]">
+              <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-text-primary md:text-[52px]">
                 {t("Solution.title")}
               </h2>
             </FadeIn>
             {t("Solution.body") && (
               <FadeIn delay={0.1}>
-                <p className="mt-8 whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-500 md:text-[22px]">
+                <p className="mt-8 whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-text-muted md:text-[22px]">
                   {t("Solution.body")}
                 </p>
               </FadeIn>
@@ -216,9 +216,9 @@ export function RootLandingPage() {
                       <div className="mb-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                         <Icon className="h-7 w-7" />
                       </div>
-                      <h3 className="break-keep text-[24px] font-bold leading-[1.3] tracking-tight text-zinc-900 mb-6">{item.title}</h3>
+                      <h3 className="break-keep text-[24px] font-bold leading-[1.3] tracking-tight text-text-primary mb-6">{item.title}</h3>
                     </div>
-                    <p className="break-keep text-[17px] font-medium leading-[1.6] text-zinc-500">{item.body}</p>
+                    <p className="break-keep text-[17px] font-medium leading-[1.6] text-text-muted">{item.body}</p>
                   </div>
                 </FadeIn>
               );
@@ -236,7 +236,7 @@ export function RootLandingPage() {
             </FadeIn>
           )}
           <FadeIn delay={0.1}>
-            <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-zinc-900 md:text-[52px] mb-24">
+            <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-text-primary md:text-[52px] mb-24">
               {t("Loop.title")}
             </h2>
           </FadeIn>
@@ -263,7 +263,7 @@ export function RootLandingPage() {
                     <div className="text-[20px] font-bold text-white mb-4 md:mb-6 bg-zinc-900 w-14 h-14 flex items-center justify-center rounded-full ring-[10px] ring-white/50">
                       {item.num}
                     </div>
-                    <h3 className="text-[18px] md:text-[22px] font-bold text-zinc-900 mb-2 md:mb-3 tracking-tight">
+                    <h3 className="text-[18px] md:text-[22px] font-bold text-text-primary mb-2 md:mb-3 tracking-tight">
                       {t(`Loop.node${item.node}Title` as Parameters<typeof t>[0])}
                     </h3>
                     <p className="text-[14px] md:text-[16px] font-medium text-zinc-600 break-keep leading-relaxed max-w-[240px]">
@@ -281,13 +281,13 @@ export function RootLandingPage() {
       <section className="bg-zinc-50 px-6 py-40 md:px-10 md:py-56">
         <div className="mx-auto max-w-[1000px] text-center">
           <FadeIn>
-            <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-zinc-900 md:text-[52px]">
+            <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.25] tracking-tighter text-text-primary md:text-[52px]">
               {t("Pricing.title")}
             </h2>
           </FadeIn>
           {t("Pricing.body") && (
             <FadeIn delay={0.1}>
-              <p className="mx-auto mt-8 max-w-[720px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-500 md:text-[22px]">
+              <p className="mx-auto mt-8 max-w-[720px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-text-muted md:text-[22px]">
                 {t("Pricing.body")}
               </p>
             </FadeIn>
@@ -299,8 +299,8 @@ export function RootLandingPage() {
                 {t("Pricing.planName")}
               </h3>
               <div className="flex justify-center items-baseline gap-2">
-                <span className="text-[56px] font-black leading-none tracking-tighter text-zinc-900">{t("Pricing.price")}</span>
-                <span className="text-[18px] font-medium text-zinc-500">{t("Pricing.unit")}</span>
+                <span className="text-[56px] font-black leading-none tracking-tighter text-text-primary">{t("Pricing.price")}</span>
+                <span className="text-[18px] font-medium text-text-muted">{t("Pricing.unit")}</span>
               </div>
               <ul className="mt-12 space-y-6 text-left inline-block w-full px-4">
                 {[1, 2, 3].map((i) => (
@@ -324,13 +324,13 @@ export function RootLandingPage() {
       <section className="bg-white px-6 py-40 md:px-10 md:py-56">
         <div className="mx-auto max-w-[1000px] text-center">
           <FadeIn>
-            <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.2] tracking-tighter text-zinc-900 md:text-[64px]">
+            <h2 className="whitespace-pre-line break-keep text-[40px] font-black leading-[1.2] tracking-tighter text-text-primary md:text-[64px]">
               {t("FinalCta.title")}
             </h2>
           </FadeIn>
           {t("FinalCta.body") && (
             <FadeIn delay={0.1}>
-              <p className="mx-auto mt-8 max-w-[720px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-zinc-500 md:text-[24px]">
+              <p className="mx-auto mt-8 max-w-[720px] whitespace-pre-line break-keep text-[18px] font-medium leading-[1.6] text-text-muted md:text-[24px]">
                 {t("FinalCta.body")}
               </p>
             </FadeIn>

@@ -9,7 +9,7 @@ export function SetupGuideCard() {
   return (
     <div className="p-6 bg-surface border-none rounded-[24px] space-y-5 animate-dowin-in">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-[#E8F3FF] rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-primary/15 rounded-full flex items-center justify-center">
           <DowinIcon name="status-info" size="18px" className="text-primary" />
         </div>
         <h4 className="text-[14px] font-bold text-text-primary tracking-tight">

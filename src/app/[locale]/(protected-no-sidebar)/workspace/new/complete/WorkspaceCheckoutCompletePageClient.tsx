@@ -78,8 +78,8 @@ export default function WorkspaceCheckoutCompletePageClient({
           </div>
         ) : (
           <div className="space-y-5">
-            <div className="rounded-content border border-red-100 bg-red-50 p-4">
-              <p className="text-center text-xs font-bold text-red-600">
+            <div className="rounded-content border border-danger/20 bg-danger/10 p-4">
+              <p className="text-center text-xs font-bold text-danger">
                 {error}
               </p>
             </div>

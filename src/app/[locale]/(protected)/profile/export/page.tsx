@@ -151,7 +151,7 @@ export default function ProfileExportPage() {
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                className="h-8 rounded-[12px] bg-sub-background px-3 text-[11px] font-black text-text-secondary transition-colors hover:bg-zinc-200"
+                className="h-8 rounded-[12px] bg-sub-background px-3 text-[11px] font-black text-text-secondary transition-colors hover:bg-border"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -226,7 +226,7 @@ function ExportUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="w-fit rounded-[16px] bg-sub-background px-5 py-3 text-sm font-black text-text-primary transition-colors hover:bg-zinc-200"
+              className="w-fit rounded-[16px] bg-sub-background px-5 py-3 text-sm font-black text-text-primary transition-colors hover:bg-border"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -242,7 +242,7 @@ function ExportUnavailableInAppState() {
 function ProfileExportHeader() {
   return (
     <header className="flex items-center justify-between">
-      <SmartBackButton className="w-9 h-9 rounded-[16px] bg-sub-background flex items-center justify-center text-text-muted transition-colors hover:bg-zinc-200" />
+      <SmartBackButton className="w-9 h-9 rounded-[16px] bg-sub-background flex items-center justify-center text-text-muted transition-colors hover:bg-border" />
       <p className="text-[13px] font-bold text-text-muted">데이터 내보내기</p>
       <div className="w-8" />
     </header>
@@ -256,9 +256,9 @@ function ExportSkeleton() {
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
       >
-        <div className="h-10 rounded-[16px] bg-zinc-200" />
-        <div className="h-24 rounded-[24px] bg-zinc-200" />
-        <div className="h-[420px] rounded-[24px] bg-zinc-200" />
+        <div className="h-10 rounded-[16px] bg-border" />
+        <div className="h-24 rounded-[24px] bg-border" />
+        <div className="h-[420px] rounded-[24px] bg-border" />
       </ProtectedPageContainer>
     </div>
   );

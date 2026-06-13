@@ -60,7 +60,7 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
     return (
       <div
         className={cn(
-          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-zinc-200 transition-all",
+          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-border transition-all",
           "px-4",
         )}
       />

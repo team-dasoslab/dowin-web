@@ -63,7 +63,7 @@ export function MonthlyBoardSection({
                 key={`${monthLabel}-week-${weekIndex + 1}`}
                 className="overflow-hidden rounded-[24px] bg-surface"
               >
-                <div className="border-b-2 border-zinc-50 bg-surface px-6 py-4">
+                <div className="border-b border-border bg-surface px-6 py-4">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-[14px] font-black text-text-primary">
                       {t("weekNumber", { n: weekIndex + 1 })}
@@ -82,7 +82,7 @@ export function MonthlyBoardSection({
 
                 <div className="overflow-x-auto">
                   <div className="min-w-[600px]">
-                    <div className="border-b-2 border-zinc-50 bg-surface">
+                    <div className="border-b border-border bg-surface">
                       <table className="w-full table-fixed text-xs">
                         <colgroup>
                           <col className="w-[34%]" />
@@ -135,7 +135,7 @@ export function MonthlyBoardSection({
                         <col className="w-[10%]" />
                         <col className="w-[16%]" />
                       </colgroup>
-                      <tbody className="divide-y-2 divide-zinc-50">
+                      <tbody className="divide-y divide-border">
                         {monthlyLeadMeasures.map((leadMeasure) => {
                           const targetValue = leadMeasure.targetValue ?? 0;
                           const tags =
@@ -196,7 +196,7 @@ export function MonthlyBoardSection({
                                             value?.achieved
                                               ? "bg-primary text-white"
                                               : count > 0
-                                                ? "bg-[#E8F3FF] text-primary"
+                                                ? "bg-primary/15 text-primary"
                                                 : date === null
                                                   ? "bg-transparent text-transparent"
                                                   : isToday
@@ -219,7 +219,7 @@ export function MonthlyBoardSection({
                                             : date === null
                                               ? "bg-transparent text-transparent"
                                               : isToday
-                                                ? "bg-[#E8F3FF] text-primary"
+                                                ? "bg-primary/5 text-primary"
                                                 : "bg-sub-background text-text-muted"
                                         }`}
                                       >
@@ -240,7 +240,7 @@ export function MonthlyBoardSection({
                               </td>
                               <td className="px-3 py-4 text-center">
                                 <div className="flex flex-col items-center gap-1.5">
-                                  <div className="h-1.5 w-12 overflow-hidden rounded-full bg-sub-background">
+                                  <div className="h-1.5 w-12 overflow-hidden rounded-full bg-border">
                                     <div
                                       className={`h-full rounded-full transition-all duration-500 ${
                                         rate >= 100

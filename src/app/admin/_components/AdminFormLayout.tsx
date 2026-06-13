@@ -20,7 +20,7 @@ export default function AdminFormLayout({
       <div className="space-y-4">
         <Link
           href={backHref}
-          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-600 transition-colors"
+          className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-zinc-100 hover:bg-border text-zinc-600 transition-colors"
         >
           <DowinIcon name="nav-back" size="16px" />
         </Link>

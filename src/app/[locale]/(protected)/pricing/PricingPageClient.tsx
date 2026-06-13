@@ -115,7 +115,7 @@ export function PricingPageClient() {
 
           {billing.entitlementSource &&
           billing.entitlementSource !== "POLAR" ? (
-            <div className="rounded-content border border-amber-200 bg-amber-50 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-800">
+            <div className="rounded-content border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-500">
               <span>
                 {t.rich("nonPolarEntitlementNotice", {
                   contact: (chunks) => (
@@ -296,12 +296,12 @@ function PricingSkeleton() {
   return (
     <div className="min-h-screen">
       <ProtectedPageContainer isLoading className="pb-24 md:pb-10 lg:pb-12">
-        <div className="h-10 w-48 rounded-content bg-zinc-200" />
-        <div className="h-56 rounded-content bg-zinc-200" />
+        <div className="h-10 w-48 rounded-content bg-border" />
+        <div className="h-56 rounded-content bg-border" />
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="h-32 rounded-content bg-zinc-200" />
-          <div className="h-32 rounded-content bg-zinc-200" />
-          <div className="h-32 rounded-content bg-zinc-200" />
+          <div className="h-32 rounded-content bg-border" />
+          <div className="h-32 rounded-content bg-border" />
+          <div className="h-32 rounded-content bg-border" />
         </div>
       </ProtectedPageContainer>
     </div>

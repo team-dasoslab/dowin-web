@@ -220,7 +220,7 @@ export default function ProfileInvitesPage() {
                   className={`h-8 rounded-full px-3 text-[12px] font-bold transition-colors ${
                     Number(maxUsesInput) === value
                       ? "bg-primary/10 text-primary"
-                      : "bg-sub-background text-text-muted hover:bg-zinc-200"
+                      : "bg-sub-background text-text-muted hover:bg-border"
                   }`}
                 >
                   {t("presetUnit", { count: value })}
@@ -260,7 +260,7 @@ export default function ProfileInvitesPage() {
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "ALL"
                   ? "bg-zinc-900 text-white"
-                  : "bg-sub-background text-text-muted hover:bg-zinc-200"
+                  : "bg-sub-background text-text-muted hover:bg-border"
               }`}
             >
               {t("filterAll")}
@@ -270,7 +270,7 @@ export default function ProfileInvitesPage() {
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "ACTIVE"
                   ? "bg-zinc-900 text-white"
-                  : "bg-sub-background text-text-muted hover:bg-zinc-200"
+                  : "bg-sub-background text-text-muted hover:bg-border"
               }`}
             >
               {t("filterActive")}
@@ -280,7 +280,7 @@ export default function ProfileInvitesPage() {
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "INACTIVE"
                   ? "bg-zinc-900 text-white"
-                  : "bg-sub-background text-text-muted hover:bg-zinc-200"
+                  : "bg-sub-background text-text-muted hover:bg-border"
               }`}
             >
               {t("filterInactive")}
@@ -331,7 +331,7 @@ export default function ProfileInvitesPage() {
                         <Button
                           type="button"
                           onClick={() => void copyInviteCode(inviteId, code)}
-                          className="h-8 rounded-[12px] bg-sub-background px-3 text-[12px] font-bold text-text-secondary hover:bg-zinc-200"
+                          className="h-8 rounded-[12px] bg-sub-background px-3 text-[12px] font-bold text-text-secondary hover:bg-border"
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
@@ -392,10 +392,10 @@ function InvitePageSkeleton() {
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
       >
-        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
-        <div className="h-24 rounded-[24px] bg-zinc-200" />
-        <div className="h-44 rounded-[24px] bg-zinc-200" />
-        <div className="h-72 rounded-[24px] bg-zinc-200" />
+        <div className="h-12 w-48 rounded-[12px] bg-border" />
+        <div className="h-24 rounded-[24px] bg-border" />
+        <div className="h-44 rounded-[24px] bg-border" />
+        <div className="h-72 rounded-[24px] bg-border" />
       </ProtectedPageContainer>
     </div>
   );
