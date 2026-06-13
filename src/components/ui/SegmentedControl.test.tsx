@@ -21,7 +21,7 @@ describe("SegmentedControl", () => {
     );
 
     expect(screen.getByRole("button", { name: "Week" })).toHaveClass(
-      "bg-surface",
+      "bg-zinc-950",
     );
     expect(screen.getByRole("button", { name: "Month" })).toHaveClass(
       "text-text-muted",
