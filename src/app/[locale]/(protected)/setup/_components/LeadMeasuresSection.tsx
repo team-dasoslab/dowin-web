@@ -61,7 +61,7 @@ export function LeadMeasuresSection({
       className="bg-surface rounded-[24px] overflow-hidden"
       data-coachmark="setup-lead"
     >
-      <div className="divide-y-2 divide-zinc-50">
+      <div className="divide-y divide-border/50">
         {activeMeasures.map((measure, index) => (
           <LeadMeasureRow
             key={measure.id}
@@ -86,7 +86,7 @@ export function LeadMeasuresSection({
           type="button"
           disabled={isMutating}
           onClick={addMeasureRow}
-          className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-[#E8F3FF] py-4 text-[15px] font-bold text-primary transition-all "
+          className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-primary/15 py-4 text-[15px] font-bold text-primary transition-all "
         >
           <DowinIcon name="action-add" size="18px" />
           {t("addLeadMeasure")}
@@ -140,7 +140,7 @@ function LeadMeasureRow({
     return (
       <div className="flex flex-col gap-4 p-4 sm:p-8 bg-sub-background sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-[11px] font-bold text-red-500 bg-red-50 border-none px-2 py-0.5 rounded-full shrink-0">
+          <span className="text-[11px] font-bold text-danger bg-danger/10 border-none px-2 py-0.5 rounded-full shrink-0">
             {t("deletedBadge")}
           </span>
           <span className="text-sm font-semibold text-text-muted truncate max-w-[200px] sm:max-w-[400px]">
@@ -151,7 +151,7 @@ function LeadMeasureRow({
           type="button"
           disabled={isMutating}
           onClick={() => restoreMeasureRow(measure.id)}
-          className="w-full sm:w-auto rounded-[16px] border-none bg-zinc-200/50 px-5 py-3 text-[13px] font-black text-text-secondary transition-all shrink-0"
+          className="w-full sm:w-auto rounded-[16px] border-none bg-border/50 px-5 py-3 text-[13px] font-black text-text-secondary transition-all shrink-0"
         >
           {t("cancelDelete")}
         </Button>
@@ -174,7 +174,7 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating || measuresCount <= 1}
                 onClick={() => archiveMeasureRow(measure.id)}
-                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-sub-background px-4 text-[13px] font-black text-text-primary transition-colors disabled:opacity-40 hover:bg-zinc-200"
+                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-sub-background px-4 text-[13px] font-black text-text-primary transition-colors disabled:opacity-40 hover:bg-border"
               >
                 {t("archiveMeasure")}
               </Button>
@@ -182,7 +182,7 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating}
                 onClick={() => removeMeasureRow(measure.id)}
-                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-red-50 px-4 text-[13px] font-black text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
+                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-danger/10 px-4 text-[13px] font-black text-danger transition-colors disabled:opacity-40 hover:bg-danger/20"
               >
                 {t("delete")}
               </Button>
@@ -192,7 +192,7 @@ function LeadMeasureRow({
               type="button"
               disabled={isMutating}
               onClick={() => removeMeasureRow(measure.id)}
-              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-red-50 px-4 text-[13px] font-black text-red-500 transition-colors disabled:opacity-40 hover:bg-red-100"
+              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-danger/10 px-4 text-[13px] font-black text-danger transition-colors disabled:opacity-40 hover:bg-danger/20"
             >
               {t("delete")}
             </Button>
@@ -266,7 +266,7 @@ function LeadMeasureRow({
                   measure.targetValue - 1,
                 )
               }
-              className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+              className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-border/50"
               aria-label={t("decrement")}
             >
               <DowinIcon name="action-subtract" size="16px" />
@@ -288,7 +288,7 @@ function LeadMeasureRow({
                   measure.targetValue + 1,
                 )
               }
-              className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+              className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-border/50"
               aria-label={t("increment")}
             >
               <DowinIcon name="action-add" size="16px" />
@@ -317,7 +317,7 @@ function LeadMeasureRow({
                       measure.dailyTargetCount - 1,
                     )
                   }
-                  className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+                  className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-border/50"
                 >
                   <DowinIcon name="action-subtract" size="16px" />
                 </Button>
@@ -334,7 +334,7 @@ function LeadMeasureRow({
                       measure.dailyTargetCount + 1,
                     )
                   }
-                  className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-zinc-200/50"
+                  className="flex h-10 w-10 items-center justify-center text-text-muted transition-colors disabled:opacity-30 active:bg-border/50"
                 >
                   <DowinIcon name="action-add" size="16px" />
                 </Button>
@@ -529,7 +529,7 @@ function LeadMeasureRow({
  }
  setOpenActionTagId(null);
  }}
- className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-red-500 transition-colors hover:bg-red-50"
+ className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-danger transition-colors hover:bg-danger/10"
  >
  <DowinIcon name="action-delete" size="14px" />
  {t("delete")}
@@ -633,7 +633,7 @@ function ArchivedMeasuresSection({
                   className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 bg-sub-background"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-[11px] font-bold text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-[11px] font-bold text-danger bg-danger/10 border border-danger/20 px-2 py-0.5 rounded-full shrink-0">
                       {t("deletedBadge")}
                     </span>
                     <span className="text-sm font-semibold text-text-muted truncate max-w-[200px] sm:max-w-[400px]">
@@ -707,7 +707,7 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => removeMeasureRow(measure.id)}
-                    className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-red-50 text-red-500 transition-all disabled:opacity-55 sm:w-auto sm:px-4 sm:bg-transparent"
+                    className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-danger/10 text-danger transition-all disabled:opacity-55 sm:w-auto sm:px-4 sm:bg-transparent"
                   >
                     <DowinIcon
                       name="action-delete"
