@@ -193,7 +193,7 @@ export default function WorkspaceSettingsPage() {
 
   if (isProfileLoading || isWorkspaceLoading) {
     return (
-      <div className="min-h-screen bg-zinc-100">
+      <div className="min-h-screen">
         <ProtectedPageContainer isLoading>
           <div className="h-10 rounded-[24px] bg-zinc-200" />
           <div className="h-24 rounded-[24px] bg-zinc-200" />
@@ -205,7 +205,7 @@ export default function WorkspaceSettingsPage() {
   if (!user || !hasWorkspace) return null;
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       {isActionPending && (
         <LoadingOverlay
           message={

@@ -142,7 +142,7 @@ export default function SetupPage() {
   const isMutating = isSubmitPending || isArchivePending;
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <SetupCoachmark
         isRunning={isCoachmarkRunning}
         mode={coachmarkMode}
@@ -258,7 +258,7 @@ export default function SetupPage() {
 
 function SetupSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer isLoading className="space-y-6 lg:space-y-12">
         <div className="space-y-4">
           <div className="h-10 w-48 rounded-[12px] bg-zinc-200" />

@@ -168,7 +168,7 @@ export default function MyDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       {celebrationLevel ? (
         <DashboardCelebrationOverlay level={celebrationLevel} />
       ) : null}
@@ -321,7 +321,7 @@ function DashboardCelebrationOverlay({ level }: { level: CelebrationLevel }) {
 
 function MyDashboardSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="max-w-[1200px] mx-auto p-4 md:p-10 lg:p-12 space-y-10 animate-pulse">
         <div className="h-12 w-1/3 rounded-[12px] bg-zinc-200" />
         <div className="h-[140px] rounded-[24px] bg-zinc-200" />
@@ -338,7 +338,7 @@ function MyDashboardSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("Dashboard");
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           icon={<Logo size="20px" className="text-primary" />}
@@ -357,7 +357,7 @@ function NoScoreboardState() {
   const t = useTranslations("Dashboard");
   const workspaceId = useParams().workspaceId as string;
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="max-w-[1200px] mx-auto flex min-h-screen items-center p-4 md:p-10 lg:p-12">
         <EmptyStatePanel
           title={t("noScoreboardTitle")}
