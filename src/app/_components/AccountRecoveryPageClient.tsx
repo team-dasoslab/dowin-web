@@ -121,20 +121,20 @@ export default function AccountRecoveryPageClient() {
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
+      <Card className="w-full max-w-[480px] bg-surface border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
         <div className="flex flex-col items-center text-center space-y-5 mb-10">
-          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center">
+          <div className="w-16 h-16 bg-surface dark:bg-surface-elevated ring-1 ring-black/5 dark:ring-white/10 rounded-[16px] flex items-center justify-center">
             <DowinIcon
               name="auth-key-large"
               size="32px"
-              className="text-zinc-900"
+              className="text-text-primary"
             />
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 uppercase leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
               {t("recoveryPage.title")}
             </h1>
-            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep px-4">
+            <p className="text-[14px] text-text-muted font-medium tracking-tight break-keep px-4">
               {t("recoveryPage.description")}
             </p>
           </div>
@@ -160,24 +160,24 @@ export default function AccountRecoveryPageClient() {
 
             {recoveryAccount && (
               <div className="space-y-6 animate-fade-in-up">
-                <div className="rounded-[24px] border-none bg-zinc-100/50 p-5 space-y-4">
-                  <p className="text-xs font-bold text-zinc-500">
+                <div className="rounded-[24px] border-none bg-sub-background/50 p-5 space-y-4">
+                  <p className="text-xs font-bold text-text-muted">
                     {t("recoveryPage.accountFound")}
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                      <p className="text-[11px] font-semibold text-zinc-500">
+                      <p className="text-[11px] font-semibold text-text-muted">
                         {t("nickname")}
                       </p>
-                      <p className="text-[15px] font-bold text-zinc-900 truncate">
+                      <p className="text-[15px] font-bold text-text-primary truncate">
                         {recoveryAccount.nickname}
                       </p>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[11px] font-semibold text-zinc-500">
+                      <p className="text-[11px] font-semibold text-text-muted">
                         {t("id")}
                       </p>
-                      <p className="text-[15px] font-bold text-zinc-900 truncate">
+                      <p className="text-[15px] font-bold text-text-primary truncate">
                         {recoveryAccount.customId}
                       </p>
                     </div>
@@ -205,8 +205,8 @@ export default function AccountRecoveryPageClient() {
           )}
 
           {error && (
-            <div className="p-4 bg-red-50 rounded-[24px] animate-shake">
-              <p className="text-red-500 text-[13px] font-bold text-center leading-tight">
+            <div className="p-4 bg-danger/10 rounded-[24px] animate-shake">
+              <p className="text-danger text-[13px] font-bold text-center leading-tight">
                 {error}
               </p>
             </div>
@@ -216,13 +216,9 @@ export default function AccountRecoveryPageClient() {
             <Button
               type="submit"
               disabled={isPending}
-              className={`
-                h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-bold transition-colors
-                ${isPending
-                  ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-                  : "bg-zinc-900 text-white hover:bg-zinc-800"
-                }
-              `}
+              variant="hero"
+              size="hero"
+              className="w-full"
             >
               {isPending ? (
                 <InlineSpinner />
@@ -240,7 +236,7 @@ export default function AccountRecoveryPageClient() {
             <div className="text-center">
               <Link
                 href="/login"
-                className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
+                className="text-[14px] font-semibold text-text-muted transition-colors active:text-text-primary"
               >
                 {t("recoveryPage.backToLogin")}
               </Link>

@@ -67,7 +67,7 @@ export default function NewWorkspacePage() {
 
  {/* 헤더 */}
  <div className="space-y-5">
- <div className="w-16 h-16 bg-surface border-none rounded-[16px] flex items-center justify-center shadow-sm">
+ <div className="w-16 h-16 bg-surface dark:bg-surface-elevated ring-1 ring-black/5 dark:ring-white/10 rounded-[16px] flex items-center justify-center shadow-sm">
  <Logo size="32px" className="text-text-primary" />
  </div>
  <div className="space-y-2">
@@ -159,11 +159,9 @@ export default function NewWorkspacePage() {
  <Button
  type="submit"
  disabled={isPending || !name.trim() || !seatCount.trim()}
- className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
- isPending || !name.trim() || !seatCount.trim()
- ? "bg-sub-background text-text-muted cursor-not-allowed"
- : "bg-zinc-900 text-white hover:bg-zinc-800"
- }`}
+ variant="hero"
+ size="hero"
+ className="w-full"
  >
  {isPending ? (
  <InlineSpinner size="sm" />
