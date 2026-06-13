@@ -12,6 +12,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 import { Suspense, useEffect, useState } from "react";
 
+import { ThemeProvider } from "@/providers/ThemeProvider";
+
 export function Providers({
   children,
   locale,
@@ -43,22 +45,24 @@ export function Providers({
 
   return (
     <NativeAppProvider isNative={isNative}>
-      <NextIntlClientProvider
-        locale={locale}
-        messages={messages}
-        timeZone={DEFAULT_TIME_ZONE}
-      >
-        <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <BridgeInitializer isNative={isNative} />
-            <Suspense fallback={null}>
-              <NavigationHistoryTracker />
-              <CampaignAttribution />
-            </Suspense>
-            {children}
-          </ToastProvider>
-        </QueryClientProvider>
-      </NextIntlClientProvider>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <NextIntlClientProvider
+          locale={locale}
+          messages={messages}
+          timeZone={DEFAULT_TIME_ZONE}
+        >
+          <QueryClientProvider client={queryClient}>
+            <ToastProvider>
+              <BridgeInitializer isNative={isNative} />
+              <Suspense fallback={null}>
+                <NavigationHistoryTracker />
+                <CampaignAttribution />
+              </Suspense>
+              {children}
+            </ToastProvider>
+          </QueryClientProvider>
+        </NextIntlClientProvider>
+      </ThemeProvider>
     </NativeAppProvider>
   );
 }

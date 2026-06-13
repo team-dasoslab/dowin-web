@@ -208,22 +208,22 @@ export default function LoginPageClient() {
       <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-        <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
+        <Card className="w-full max-w-[480px] bg-surface border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
           <div className="space-y-4 text-center mb-8">
-            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 uppercase leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary uppercase leading-none">
               {t("recovery.title")}
             </h1>
-            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep">
+            <p className="text-[14px] text-text-muted font-medium tracking-tight break-keep">
               {t("recovery.description")}
             </p>
           </div>
 
-          <div className="mt-8 rounded-[24px] border-none bg-zinc-50 p-4 sm:p-6">
+          <div className="mt-8 rounded-[24px] border-none bg-sub-background p-4 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               {recoveryCodes.map((code) => (
                 <div
                   key={code}
-                  className="rounded-[12px] border-none bg-white px-3 py-4 text-center text-[15px] sm:text-[16px] font-mono font-bold tracking-widest text-zinc-900 truncate"
+                  className="rounded-[12px] border-none bg-surface dark:bg-surface-elevated px-3 py-4 text-center text-[15px] sm:text-[16px] font-mono font-bold tracking-widest text-text-primary truncate"
                 >
                   {code}
                 </div>
@@ -244,7 +244,7 @@ export default function LoginPageClient() {
               <Button
                 type="button"
                 onClick={handleCopyRecoveryCodes}
-                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors "
+                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-sub-background hover:bg-zinc-200 dark:hover:bg-zinc-800 text-text-secondary transition-colors "
               >
                 {isCopied ? (
                   <span className="inline-flex items-center gap-2">
@@ -269,7 +269,7 @@ export default function LoginPageClient() {
               <Button
                 type="button"
                 onClick={handleDownloadRecoveryCodes}
-                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-zinc-100 text-zinc-700 transition-colors "
+                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-sub-background hover:bg-zinc-200 dark:hover:bg-zinc-800 text-text-secondary transition-colors "
               >
                 {t("recovery.saveTxt")}
               </Button>
@@ -297,16 +297,14 @@ export default function LoginPageClient() {
     <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
-        <div className="flex flex-col items-center text-center space-y-5 mb-12">
-          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center">
-            <Logo size="32px" className="text-zinc-900" />
-          </div>
+        <Card className="w-full max-w-[480px] bg-surface border-none rounded-[24px] p-8 md:p-12 animate-dowin-in relative z-10">
+          <div className="flex flex-col items-start text-left space-y-5 mb-12">
+            <Logo size="32px" className="text-text-primary" />
           <div className="space-y-1.5">
-            <h1 className="text-[24px] font-black tracking-tighter text-zinc-900 leading-none">
+            <h1 className="text-[24px] font-black tracking-tighter text-text-primary leading-none">
               {mode === "login" ? t("login") : t("signup")}
             </h1>
-            <p className="text-[14px] text-zinc-500 font-medium tracking-tight break-keep">
+            <p className="text-[14px] text-text-muted font-medium tracking-tight break-keep">
               {mode === "login" ? t("subtitle") : t("signupSubtitle")}
             </p>
           </div>
@@ -356,14 +354,9 @@ export default function LoginPageClient() {
             <Button
               type="submit"
               disabled={isPending}
-              className={`
- h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform 
- ${
-   isPending
-     ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-     : "bg-zinc-900 text-white hover:bg-zinc-800"
- }
- `}
+              variant="hero"
+              size="hero"
+              className="w-full"
             >
               {isPending ? (
                 <InlineSpinner />
@@ -383,14 +376,14 @@ export default function LoginPageClient() {
                 <Button
                   type="button"
                   onClick={() => resetErrorAndSwitchMode("signup")}
-                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800 min-h-0 p-0"
+                  className="text-[14px] font-semibold text-text-muted transition-colors active:text-text-primary min-h-0 p-0"
                 >
                   {t("signup")}
                 </Button>
                 <span className="h-3 w-[1px] bg-zinc-300" />
                 <Link
                   href="/account-recovery"
-                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
+                  className="text-[14px] font-semibold text-text-muted transition-colors active:text-text-primary"
                 >
                   {t("recoveryPage.title")}
                 </Link>
@@ -400,7 +393,7 @@ export default function LoginPageClient() {
                 <Button
                   type="button"
                   onClick={() => resetErrorAndSwitchMode("login")}
-                  className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800 min-h-0 p-0"
+                  className="text-[14px] font-semibold text-text-muted transition-colors active:text-text-primary min-h-0 p-0"
                 >
                   {t("login")}
                 </Button>

@@ -95,7 +95,7 @@ export default function AdminPromotionDetailClient({ promotionId }: { promotionI
             <InlineSpinner />
           </div>
         ) : !detailData ? (
-          <div className="py-12 text-center text-sm font-bold text-zinc-500">
+          <div className="py-12 text-center text-sm font-bold text-text-muted">
             데이터를 불러오지 못했습니다.
           </div>
         ) : (
@@ -181,7 +181,7 @@ export default function AdminPromotionDetailClient({ promotionId }: { promotionI
                     handleUpdateStatus(newStatus);
                   }}
                   className={`relative inline-flex h-[26px] w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-full border-none transition-colors duration-200 ease-in-out focus:outline-none ${
-                    editStatus === "ACTIVE" ? "bg-primary" : "bg-zinc-200"
+                    editStatus === "ACTIVE" ? "bg-primary" : "bg-border"
                   } ${patchCodeMutation.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   <span
@@ -252,7 +252,7 @@ export default function AdminPromotionDetailClient({ promotionId }: { promotionI
                               onChange={(e) =>
                                 handleUpdateFeedback(r.id, e.target.value as MarketingInviteFeedbackStatus)
                               }
-                              className="w-full px-3 py-2 bg-zinc-100 border-none rounded-[12px] text-[12px] focus:ring-2 focus:ring-primary/20 outline-none font-bold text-zinc-900"
+                              className="w-full px-3 py-2 bg-zinc-100 border-none rounded-[12px] text-[12px] focus:ring-2 focus:ring-primary/20 outline-none font-bold text-text-primary"
                               disabled={patchFeedbackMutation.isPending}
                             >
                               <option value="NOT_REQUESTED">미요청</option>
@@ -265,7 +265,7 @@ export default function AdminPromotionDetailClient({ promotionId }: { promotionI
                               value={operatorNote}
                               onChange={(e) => setOperatorNote(e.target.value)}
                               placeholder="노트 작성..."
-                              className="w-full px-3 py-2 bg-zinc-100 border-none rounded-[12px] text-[12px] focus:ring-2 focus:ring-primary/20 outline-none font-medium text-zinc-900"
+                              className="w-full px-3 py-2 bg-zinc-100 border-none rounded-[12px] text-[12px] focus:ring-2 focus:ring-primary/20 outline-none font-medium text-text-primary"
                               onBlur={(e) => {
                                 if (e.target.value) {
                                   setOperatorNote(e.target.value);

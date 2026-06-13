@@ -134,7 +134,7 @@ export default function AdminProductCreateClient() {
             </div>
             
             <div className="space-y-2 md:col-span-2">
-              <label className="flex items-center gap-2 px-4 py-3 border-none bg-zinc-100 rounded-[16px] cursor-pointer hover:bg-zinc-200 transition-colors w-fit shrink-0">
+              <label className="flex items-center gap-2 px-4 py-3 border-none bg-zinc-100 rounded-[16px] cursor-pointer hover:bg-border transition-colors w-fit shrink-0">
                 <input
                   type="checkbox"
                   checked={isActive}

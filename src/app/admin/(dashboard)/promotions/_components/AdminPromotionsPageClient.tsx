@@ -158,7 +158,7 @@ export default function AdminPromotionsPageClient() {
                           </span>
                           <button
                             onClick={(e) => handleCopyCode(e, code.code)}
-                            className="flex items-center gap-1 px-3 py-2 text-zinc-500 hover:text-zinc-900 transition-colors bg-zinc-50 rounded-[12px] border-none hover:bg-zinc-100 shadow-none"
+                            className="flex items-center gap-1 px-3 py-2 text-text-muted hover:text-text-primary transition-colors bg-zinc-50 rounded-[12px] border-none hover:bg-zinc-100 shadow-none"
                             title="코드 복사"
                           >
                             <Copy size={14} strokeWidth={2.5} />
@@ -180,7 +180,7 @@ export default function AdminPromotionsPageClient() {
                             disabled={patchCodeMutation.isPending}
                             onClick={(e) => handleUpdateListStatus(e, code.id, code.status as MarketingInviteCodeStatus)}
                             className={`relative inline-flex h-[20px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full border-none transition-colors duration-200 ease-in-out focus:outline-none ${
-                              code.status === "ACTIVE" ? "bg-primary" : "bg-zinc-200"
+                              code.status === "ACTIVE" ? "bg-primary" : "bg-border"
                             } ${patchCodeMutation.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                             <span

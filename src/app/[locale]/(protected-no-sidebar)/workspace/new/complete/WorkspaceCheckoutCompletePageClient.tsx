@@ -57,16 +57,16 @@ export default function WorkspaceCheckoutCompletePageClient({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-[420px] bg-white border border-zinc-200 rounded-content p-8 md:p-10 space-y-8 animate-dowin-in">
+      <Card className="w-full max-w-[420px] bg-surface border border-border rounded-content p-8 md:p-10 space-y-8 animate-dowin-in">
         <div className="space-y-5 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10">
             <Logo size="24px" className="text-primary" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-2xl font-black tracking-tight text-zinc-900">
+            <h1 className="text-2xl font-black tracking-tight text-text-primary">
               {t("checkoutCompleteTitle")}
             </h1>
-            <p className="whitespace-pre-line text-sm font-medium leading-relaxed text-zinc-500">
+            <p className="whitespace-pre-line text-sm font-medium leading-relaxed text-text-muted">
               {t("checkoutCompleteDescription")}
             </p>
           </div>
@@ -78,8 +78,8 @@ export default function WorkspaceCheckoutCompletePageClient({
           </div>
         ) : (
           <div className="space-y-5">
-            <div className="rounded-content border border-red-100 bg-red-50 p-4">
-              <p className="text-center text-xs font-bold text-red-600">
+            <div className="rounded-content border border-danger/20 bg-danger/10 p-4">
+              <p className="text-center text-xs font-bold text-danger">
                 {error}
               </p>
             </div>

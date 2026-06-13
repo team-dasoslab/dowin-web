@@ -13,7 +13,7 @@ export function DashboardHeader({
     <header className="flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
       <div className="flex items-center gap-3">
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-black text-zinc-900 tracking-tight">
+          <h1 className="truncate text-xl font-black text-text-primary tracking-tight">
             {nickname ? t("userScoreboard", { nickname }) : t("myScoreboard")}
           </h1>
         </div>

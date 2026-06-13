@@ -49,7 +49,7 @@ export default function AdminHeaderClient() {
               <Logo size="20px" className="text-primary" />
             </div>
             <div>
-              <span className="text-[14px] font-black tracking-tight text-zinc-900 leading-none block">
+              <span className="text-[14px] font-black tracking-tight text-text-primary leading-none block">
                 Dowin Admin
               </span>
             </div>
@@ -66,7 +66,7 @@ export default function AdminHeaderClient() {
                   className={`px-4 py-2 text-[14px] font-bold rounded-full transition-colors ${
                     isActive
                       ? "bg-primary/10 text-primary"
-                      : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
+                      : "text-text-muted hover:bg-zinc-100 hover:text-text-primary"
                   }`}
                 >
                   {item.label}
@@ -79,7 +79,7 @@ export default function AdminHeaderClient() {
         <div className="flex items-center">
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-zinc-100 text-zinc-500 hover:bg-zinc-200 hover:text-zinc-800 rounded-full transition-colors text-[13px] font-bold"
+            className="px-4 py-2 bg-zinc-100 text-text-muted hover:bg-border hover:text-text-primary rounded-full transition-colors text-[13px] font-bold"
           >
             로그아웃
           </button>
@@ -99,7 +99,7 @@ export default function AdminHeaderClient() {
                 className={`whitespace-nowrap px-4 py-2 text-[13px] font-bold rounded-full transition-colors ${
                   isActive
                     ? "bg-primary/10 text-primary"
-                    : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800"
+                    : "text-text-muted hover:bg-zinc-100 hover:text-text-primary"
                 }`}
               >
                 {item.label}

@@ -18,12 +18,12 @@ export function LagMeasureSection({
 
   return (
     <div
-      className="bg-white p-6 md:p-8 space-y-6 rounded-[24px]"
+      className="bg-surface p-6 md:p-8 space-y-6 rounded-[24px]"
       data-coachmark="setup-lag"
     >
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <label className="block text-lg font-bold text-zinc-900 tracking-tight">
+          <label className="block text-lg font-bold text-text-primary tracking-tight">
             {t("lagMeasureQuestion")}
           </label>
         </div>
@@ -32,7 +32,7 @@ export function LagMeasureSection({
           disabled={isMutating}
           onChange={(e) => setLagMeasure(e.target.value)}
           placeholder={t("lagMeasurePlaceholder")}
-          className="h-11 w-full rounded-[12px] border-none bg-zinc-100 px-4 text-[15px] font-semibold text-zinc-900 outline-none transition-colors placeholder:text-zinc-500 focus:bg-white focus:ring-4 focus:ring-primary/5"
+          className="h-11 w-full rounded-[12px] border-none bg-sub-background px-4 text-[15px] font-semibold text-text-primary outline-none transition-colors placeholder:text-text-muted focus:bg-surface focus:ring-4 focus:ring-primary/5"
           required
         />
       </div>

@@ -20,7 +20,7 @@ export const Default: Story = {
         </p>
       </div>
     ),
-    className: "p-6 border border-border rounded-lg shadow-sm bg-white",
+    className: "p-6 border border-border rounded-lg shadow-sm bg-surface",
   },
 };
 
@@ -40,6 +40,6 @@ export const Complex: Story = {
         <div className="p-4 text-xs text-text-muted text-right">Footer</div>
       </div>
     ),
-    className: "border border-border rounded-lg overflow-hidden bg-white",
+    className: "border border-border rounded-lg overflow-hidden bg-surface",
   },
 };

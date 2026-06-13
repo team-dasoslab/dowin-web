@@ -33,21 +33,21 @@ export default function ProfilePasswordPage() {
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
-        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
+        <div className="flex items-center gap-4 rounded-[24px] bg-surface px-6 py-5">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="domain-key" size="24px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-[17px] font-bold tracking-tight text-zinc-900">
+            <h1 className="text-[17px] font-bold tracking-tight text-text-primary">
               {t("cardTitle")}
             </h1>
-            <p className="mt-1 text-[13px] font-medium text-zinc-500 leading-relaxed">
+            <p className="mt-1 text-[13px] font-medium text-text-muted leading-relaxed">
               {t("cardDesc")}
             </p>
           </div>
         </div>
 
-        <div className="space-y-5 rounded-[24px] bg-white p-5">
+        <div className="space-y-5 rounded-[24px] bg-surface p-5">
           <PasswordField
             label={t("currentPasswordLabel")}
             value={currentPassword}
@@ -76,7 +76,7 @@ export default function ProfilePasswordPage() {
             onClick={() => void submit()}
             className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
               isSubmitting
-                ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                ? "bg-sub-background text-text-muted cursor-not-allowed"
                 : "bg-zinc-900 text-white hover:bg-zinc-800"
             }`}
           >
@@ -111,7 +111,7 @@ function PasswordField({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
       />
-      {hint ? <p className="text-[11px] text-zinc-500 pl-1">{hint}</p> : null}
+      {hint ? <p className="text-[11px] text-text-muted pl-1">{hint}</p> : null}
     </div>
   );
 }

@@ -59,21 +59,19 @@ export default function NewWorkspacePage() {
  {isPending && (
  <LoadingOverlay message={promotionCode ? t("loadingPromo") : t("loading")} />
  )}
- <div className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
+ <div className="w-full max-w-[480px] bg-surface border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
  {/* 상단 내비게이션 */}
  <div className="flex items-center">
- <SmartBackButton className="w-9 h-9 rounded-full bg-zinc-100 border-none flex items-center justify-center text-zinc-600 transition-transform shrink-0" />
+ <SmartBackButton />
  </div>
 
  {/* 헤더 */}
  <div className="space-y-5">
- <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
  <Logo size="32px" className="text-text-primary" />
- </div>
  <div className="space-y-2">
  <InfoTooltip
  label={
- <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
+ <h1 className="text-2xl font-black text-text-primary tracking-tight">
  {t("title")}
  </h1>
  }
@@ -96,11 +94,11 @@ export default function NewWorkspacePage() {
  />
 
  <div className="space-y-2">
- <label className="text-sm block font-semibold text-zinc-900 ml-1">
+ <label className="text-sm block font-semibold text-text-primary ml-1">
  {t("seatLabel")}
  </label>
  {promotionCode ? (
- <div className="flex h-[52px] w-full items-center rounded-[16px] border-none bg-zinc-100 px-5 text-[15px] font-semibold text-zinc-500 cursor-not-allowed">
+ <div className="flex h-[52px] w-full items-center rounded-[16px] border-none bg-sub-background px-5 text-[15px] font-semibold text-text-muted cursor-not-allowed">
  {t("seatAutoApplied") || "프로모션 혜택 최대 좌석 수로 자동 적용됩니다."}
  </div>
  ) : (
@@ -135,12 +133,12 @@ export default function NewWorkspacePage() {
  <div className="flex items-center justify-between p-4 bg-primary/5 border border-primary/10 rounded-[16px]">
  <div className="space-y-0.5">
  <span className="text-[11px] font-black text-primary block">{t("appliedPromotionCode")}</span>
- <span className="text-sm font-bold text-zinc-900">{promotionCode}</span>
+ <span className="text-sm font-bold text-text-primary">{promotionCode}</span>
  </div>
  <Button
  type="button"
  onClick={() => handlePromotionCodeChange("")}
- className="text-[12px] font-bold text-zinc-400 hover:text-zinc-600 px-2 py-1 min-h-0"
+ className="text-[12px] font-bold text-text-muted hover:text-text-secondary px-2 py-1 min-h-0"
  >
  {t("cancelPromotionCode")}
  </Button>
@@ -159,11 +157,9 @@ export default function NewWorkspacePage() {
  <Button
  type="submit"
  disabled={isPending || !name.trim() || !seatCount.trim()}
- className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
- isPending || !name.trim() || !seatCount.trim()
- ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
- : "bg-zinc-900 text-white hover:bg-zinc-800"
- }`}
+ variant="hero"
+ size="hero"
+ className="w-full"
  >
  {isPending ? (
  <InlineSpinner size="sm" />
@@ -177,7 +173,7 @@ export default function NewWorkspacePage() {
  <div className="pt-4 flex items-center justify-center">
  <Link
  href="/workspace/join"
- className="text-[14px] font-semibold text-zinc-500 transition-colors active:text-zinc-800"
+ className="text-[14px] font-semibold text-text-muted transition-colors active:text-text-primary"
  >
  {t("goToJoinText")}
  </Link>

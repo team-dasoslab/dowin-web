@@ -105,16 +105,16 @@ export default function ProfileMembersPage() {
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
-        <div className="flex items-center justify-between gap-4 rounded-[24px] bg-white p-5">
+        <div className="flex items-center justify-between gap-4 rounded-[24px] bg-surface p-5">
           <div className="flex min-w-0 items-center gap-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
               <DowinIcon name="domain-people" size="20px" />
             </div>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold tracking-tight text-zinc-900">
+              <h1 className="truncate text-lg font-bold tracking-tight text-text-primary">
                 {workspace.name}
               </h1>
-              <p className="mt-0.5 truncate text-xs text-zinc-500">
+              <p className="mt-0.5 truncate text-xs text-text-muted">
                 {t("membersCountDesc", { count: members.length })}
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function ProfileMembersPage() {
           <div className="flex shrink-0 items-center">
             <Button
               asChild
-              className="h-10 rounded-[12px] bg-zinc-100 px-5 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-200"
+              className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-border"
             >
               <Link
                 href={getWorkspacePath(workspaceParamId, "/workspace/invites")}
@@ -141,24 +141,24 @@ export default function ProfileMembersPage() {
           />
         ) : null}
 
-        <div className="space-y-4 rounded-[24px] bg-white p-5">
+        <div className="space-y-4 rounded-[24px] bg-surface p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="space-y-1">
-              <h2 className="text-sm font-bold text-zinc-900">
+              <h2 className="text-sm font-bold text-text-primary">
                 {t("currentMembersTitle")}
               </h2>
             </div>
             <div
               className={`flex shrink-0 items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-bold tracking-tight ${
                 isAtOrOverMemberLimit
-                  ? "bg-red-50 text-red-600"
-                  : "bg-zinc-100 text-zinc-600"
+                  ? "bg-danger/10 text-danger"
+                  : "bg-sub-background text-text-secondary"
               }`}
             >
               <span>{members.length}</span>
               <span
                 className={
-                  isAtOrOverMemberLimit ? "text-red-400" : "text-zinc-400"
+                  isAtOrOverMemberLimit ? "text-red-400" : "text-text-muted"
                 }
               >
                 / {memberLimit}
@@ -168,7 +168,7 @@ export default function ProfileMembersPage() {
 
           <div className="flex flex-col gap-2">
             {members.length === 0 ? (
-              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
+              <div className="bg-surface px-4 py-10 text-center text-sm text-text-muted">
                 {t("noMembers")}
               </div>
             ) : (
@@ -207,9 +207,9 @@ function MembersPageSkeleton() {
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
       >
-        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
-        <div className="h-24 rounded-[24px] bg-zinc-200" />
-        <div className="h-72 rounded-[24px] bg-zinc-200" />
+        <div className="h-12 w-48 rounded-[12px] bg-border" />
+        <div className="h-24 rounded-[24px] bg-border" />
+        <div className="h-72 rounded-[24px] bg-border" />
       </ProtectedPageContainer>
     </div>
   );
@@ -220,7 +220,7 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+        <div className="w-full space-y-4 rounded-[24px] bg-surface p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <Logo size="24px" />
           </div>
@@ -245,7 +245,7 @@ function NoAccessState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+        <div className="w-full space-y-4 rounded-[24px] bg-surface p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10 text-primary">
             <DowinIcon name="status-locked" size="20px" />
           </div>
@@ -257,7 +257,7 @@ function NoAccessState() {
           </div>
           <Button
             asChild
-            className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
+            className="w-full rounded-content border border-border bg-surface py-3 text-sm font-semibold text-text-primary"
           >
             <Link href={getWorkspacePath(workspaceId, "/profile")}>
               {t("backToSettings")}

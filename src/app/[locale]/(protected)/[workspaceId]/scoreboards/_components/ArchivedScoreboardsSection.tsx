@@ -31,7 +31,7 @@ export function ArchivedScoreboardsSection({
     <section className="space-y-3">
 
       {archivedScoreboards.length === 0 ? (
-        <div className="rounded-[24px] bg-white p-8 text-center text-[13px] font-medium text-zinc-500">
+        <div className="rounded-[24px] bg-surface p-8 text-center text-[13px] font-medium text-text-muted">
           {t("noArchived")}
         </div>
       ) : (
@@ -57,7 +57,7 @@ export function ArchivedScoreboardsSection({
 
                       onReactivate(scoreboardId);
                     }}
-                    className="flex h-10 items-center gap-1.5 rounded-[16px] bg-zinc-100 px-4 text-[13px] font-black text-zinc-900 transition-colors hover:bg-zinc-200 whitespace-nowrap flex-shrink-0"
+                    className="flex h-10 items-center gap-1.5 rounded-[16px] bg-sub-background px-4 text-[13px] font-black text-text-primary transition-colors hover:bg-border whitespace-nowrap flex-shrink-0"
                   >
                     {pendingActionId === scoreboardId && (
                       <InlineSpinner

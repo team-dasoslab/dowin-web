@@ -50,7 +50,7 @@ export default function AdminModal({
       >
         <div className="flex items-center justify-between">
           {title ? (
-            <h3 className="text-[18px] font-black tracking-tight text-zinc-900">
+            <h3 className="text-[18px] font-black tracking-tight text-text-primary">
               {title}
             </h3>
           ) : (

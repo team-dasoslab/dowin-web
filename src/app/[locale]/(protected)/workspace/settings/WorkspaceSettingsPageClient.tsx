@@ -195,8 +195,8 @@ export default function WorkspaceSettingsPage() {
     return (
       <div className="min-h-screen">
         <ProtectedPageContainer isLoading>
-          <div className="h-10 rounded-[24px] bg-zinc-200" />
-          <div className="h-24 rounded-[24px] bg-zinc-200" />
+          <div className="h-10 rounded-[24px] bg-border" />
+          <div className="h-24 rounded-[24px] bg-border" />
         </ProtectedPageContainer>
       </div>
     );
@@ -243,12 +243,12 @@ export default function WorkspaceSettingsPage() {
                 />
               )}
 
-              <div className="rounded-[24px] bg-white px-4 py-4 flex items-center justify-between gap-4 sm:px-8 sm:py-8 sm:gap-6">
+              <div className="rounded-[24px] bg-surface px-4 py-4 flex items-center justify-between gap-4 sm:px-8 sm:py-8 sm:gap-6">
                 <div className="flex flex-col min-w-0 text-left">
-                  <h2 className="text-xl font-black text-zinc-900 truncate tracking-tight">
+                  <h2 className="text-xl font-black text-text-primary truncate tracking-tight">
                     {workspace.name}
                   </h2>
-                  <p className="text-sm font-medium text-zinc-500 mt-1">
+                  <p className="text-sm font-medium text-text-muted mt-1">
                     {isWorkspaceAdmin ? t("workspaceAdmin") : t("workspaceMember")}
                   </p>
                 </div>
@@ -272,7 +272,7 @@ export default function WorkspaceSettingsPage() {
                   }}
                 >
                   <SectionHeader title={group.label} />
-                  <div className="rounded-[24px] overflow-hidden bg-white">
+                  <div className="rounded-[24px] overflow-hidden bg-surface">
                     {group.items.map((item) => (
                       <MenuItemRow
                         key={item.id}
@@ -293,17 +293,17 @@ export default function WorkspaceSettingsPage() {
                 }}
               >
                 <SectionHeader title={t("workspaceList")} />
-                <div className="rounded-[24px] overflow-hidden bg-white">
+                <div className="rounded-[24px] overflow-hidden bg-surface">
                   {workspaces.map((ws) => (
                     <div
                       key={ws.id}
-                      className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors hover:bg-zinc-50 sm:px-6 sm:py-5"
+                      className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors hover:bg-sub-background sm:px-6 sm:py-5"
                     >
                       <div className="flex min-w-0 flex-col text-left">
-                        <span className="truncate text-[14px] font-black text-zinc-900">
+                        <span className="truncate text-[14px] font-black text-text-primary">
                           {ws.name}
                         </span>
-                        <span className="mt-0.5 truncate text-[12px] font-medium text-zinc-500">
+                        <span className="mt-0.5 truncate text-[12px] font-medium text-text-muted">
                           {ws.role === "ADMIN" ? t("workspaceAdmin") : t("workspaceMember")}
                         </span>
                       </div>
@@ -318,7 +318,7 @@ export default function WorkspaceSettingsPage() {
                               type="button"
                               disabled={isActionPending}
                               onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              className="flex h-10 items-center justify-center rounded-[12px] bg-zinc-100 px-5 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-200 min-h-0"
+                              className="flex h-10 items-center justify-center rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-border min-h-0"
                             >
                             {commonT("switchWorkspace")}
                           </Button>
@@ -329,7 +329,7 @@ export default function WorkspaceSettingsPage() {
                   {!isNativeApp && (
                     <Link
                       href="/workspace/new"
-                      className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
+                      className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-sub-background text-primary font-bold gap-3"
                     >
                       <div className="w-9 h-9 rounded-[12px] bg-primary/5 flex items-center justify-center flex-shrink-0">
                         <DowinIcon name="action-add-active" size="16px" className="text-primary" />
@@ -339,7 +339,7 @@ export default function WorkspaceSettingsPage() {
                   )}
                   <Link
                     href="/workspace/join"
-                    className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-zinc-50 text-primary font-bold gap-3"
+                    className="flex w-full items-center px-4 py-4 sm:px-6 sm:py-5 text-sm transition-colors hover:bg-sub-background text-primary font-bold gap-3"
                   >
                     <div className="w-9 h-9 rounded-[12px] bg-primary/5 flex items-center justify-center flex-shrink-0">
                       <DowinIcon name="action-enter" size="16px" className="text-primary" />
@@ -369,20 +369,20 @@ function MenuItemRow({
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${item.danger
             ? "bg-danger/5 text-danger"
-            : "bg-zinc-100 text-zinc-500"
+            : "bg-sub-background text-text-muted"
           }`}
         >
           {item.icon}
         </div>
         <div className="text-left min-w-0">
-          <p className={`text-[14px] font-black ${item.danger ? "text-danger" : "text-zinc-900"}`}>
+          <p className={`text-[14px] font-black ${item.danger ? "text-danger" : "text-text-primary"}`}>
             {item.title}
           </p>
-          {item.description && <p className="text-[12px] text-zinc-500 mt-0.5">{item.description}</p>}
+          {item.description && <p className="text-[12px] text-text-muted mt-0.5">{item.description}</p>}
         </div>
       </div>
       <div className="flex-shrink-0">
-        {item.rightElement ? item.rightElement : <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-zinc-400/50" />}
+        {item.rightElement ? item.rightElement : <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />}
       </div>
     </div>
   );
@@ -390,7 +390,7 @@ function MenuItemRow({
   if (item.onClick) {
     return (
       <div className={itemWrapperClassName}>
-        <Button disabled={isActionPending} onClick={item.onClick} className="block w-full text-left transition-colors hover:bg-zinc-50 justify-start items-stretch rounded-none h-auto p-0 font-normal">
+        <Button disabled={isActionPending} onClick={item.onClick} className="block w-full text-left transition-colors hover:bg-sub-background justify-start items-stretch rounded-none h-auto p-0 font-normal">
           {Content}
         </Button>
       </div>
@@ -400,12 +400,12 @@ function MenuItemRow({
   if (item.href) {
     return (
       <div className={itemWrapperClassName}>
-        <Link href={item.href} className="block w-full transition-colors hover:bg-zinc-50">
+        <Link href={item.href} className="block w-full transition-colors hover:bg-sub-background">
           {Content}
         </Link>
       </div>
     );
   }
 
-  return <div className={`w-full bg-white ${itemWrapperClassName}`}>{Content}</div>;
+  return <div className={`w-full bg-surface ${itemWrapperClassName}`}>{Content}</div>;
 }

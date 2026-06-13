@@ -56,13 +56,13 @@ export default function SubscriptionRequiredPage() {
       <div className="w-full max-w-[480px] space-y-4 animate-dowin-in">
 
         {/* Main card */}
-        <Card className="divide-y divide-zinc-100 border-zinc-200 bg-white">
+        <Card className="divide-y divide-zinc-100 border-border bg-surface">
           {/* Title + description */}
           <div className="px-6 py-6 text-center">
-            <h1 className="text-lg font-black tracking-tight text-zinc-900">
+            <h1 className="text-lg font-black tracking-tight text-text-primary">
               {canManageBilling ? t("adminTitle") : t("memberTitle")}
             </h1>
-            <p className="mt-2 text-sm leading-6 text-zinc-500">
+            <p className="mt-2 text-sm leading-6 text-text-muted">
               {canManageBilling ? t("adminDescription") : t("memberDescription")}
             </p>
           </div>
@@ -102,7 +102,7 @@ export default function SubscriptionRequiredPage() {
             )}
             {canOpenPortal ? (
               <Button
-                className="w-full justify-center gap-2 rounded-button border border-zinc-200 bg-white py-3 text-sm font-black text-zinc-700 transition-all"
+                className="w-full justify-center gap-2 rounded-button border border-border bg-surface py-3 text-sm font-black text-text-secondary transition-all"
                 disabled={isPortalPending}
                 onClick={() => {
                   void openPortal();
@@ -118,7 +118,7 @@ export default function SubscriptionRequiredPage() {
             ) : (
               <Button
                 asChild
-                className="w-full justify-center gap-2 rounded-button border border-zinc-200 bg-white py-3 text-sm font-black text-zinc-700 transition-all"
+                className="w-full justify-center gap-2 rounded-button border border-border bg-surface py-3 text-sm font-black text-text-secondary transition-all"
               >
                 <Link href={getWorkspacePath(workspaceId, "/profile/contact")}>
                   {t("contactAction")}
@@ -129,13 +129,13 @@ export default function SubscriptionRequiredPage() {
 
           {/* Allowed access notice */}
           <div className="px-6 py-4">
-            <div className="flex items-start gap-3 rounded-content bg-zinc-50 p-4">
-              <Users className="mt-0.5 size-4 shrink-0 text-zinc-400" />
+            <div className="flex items-start gap-3 rounded-content bg-sub-background p-4">
+              <Users className="mt-0.5 size-4 shrink-0 text-text-muted" />
               <div>
-                <p className="text-sm font-bold text-zinc-800">
+                <p className="text-sm font-bold text-text-primary">
                   {t("allowedTitle")}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-zinc-500">
+                <p className="mt-1 text-xs leading-5 text-text-muted">
                   {t("allowedDescription")}
                 </p>
               </div>

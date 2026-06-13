@@ -16,7 +16,7 @@ export function ActionRow({
   className,
 }: ActionRowProps) {
   return (
-    <Card className={cn("bg-white px-5 py-4", className)}>
+    <Card className={cn("bg-surface px-5 py-4", className)}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-text-primary">{title}</p>

@@ -89,10 +89,10 @@ function MonthlyMobileWeekCard({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2 px-1 pt-2">
-        <p className="text-[14px] font-black text-zinc-900">
+        <p className="text-[14px] font-black text-text-primary">
           {t("weekNumber", { n: weekIndex + 1 })}
         </p>
-        <p className="text-[12px] font-mono font-medium text-zinc-500">
+        <p className="text-[12px] font-mono font-medium text-text-muted">
           {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
           {" – "}
           {weekDatesInMonth
@@ -145,7 +145,7 @@ function MonthlyMobileMeasureCard({
   }, 0);
 
   return (
-    <div className="rounded-[24px] bg-white p-5">
+    <div className="rounded-[24px] bg-surface p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
@@ -205,7 +205,7 @@ function MonthlyMobileMeasureDay({
     <div className="space-y-1 text-center">
       <p
         className={`text-[11px] font-bold ${
-          isToday ? "text-primary" : "text-zinc-400"
+          isToday ? "text-primary" : "text-text-muted"
         }`}
       >
         {dayLabel}
@@ -216,12 +216,12 @@ function MonthlyMobileMeasureDay({
             value?.achieved
               ? "bg-primary text-white"
               : count > 0
-                ? "bg-[#E8F3FF] text-primary"
+                ? "bg-primary/15 text-primary"
                 : date === null
                   ? "bg-transparent text-transparent"
                   : isToday
                     ? "bg-primary/5 text-primary"
-                    : "bg-zinc-100 text-zinc-500"
+                    : "bg-sub-background text-text-muted"
           }`}
         >
           <span className="text-[12px] font-bold tracking-tighter leading-none">
@@ -236,8 +236,8 @@ function MonthlyMobileMeasureDay({
               : date === null
                 ? "bg-transparent text-transparent"
                 : isToday
-                  ? "bg-[#E8F3FF] text-primary"
-                  : "bg-zinc-100 text-zinc-400"
+                  ? "bg-primary/5 text-primary"
+                  : "bg-sub-background text-text-muted"
           }`}
         >
           {value?.achieved ? (

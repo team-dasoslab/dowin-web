@@ -19,17 +19,15 @@ export function EmptyStatePanel({
 }: EmptyStatePanelProps) {
   return (
     <div className="flex justify-center w-full">
-      <Card className="max-w-[480px] w-full bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in text-left">
+      <Card className="max-w-[480px] w-full bg-surface border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in text-left">
         <div className="space-y-5">
-          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
-            {icon || <Logo size="32px" className="text-zinc-900" />}
-          </div>
+          {icon || <Logo size="32px" className="text-text-primary" />}
 
           <div className="space-y-2">
-            <h1 className="text-[24px] font-black tracking-tight text-zinc-900 leading-none">
+            <h1 className="text-[24px] font-black tracking-tight text-text-primary leading-none">
               {title}
             </h1>
-            <div className="text-[15px] font-medium text-zinc-500 tracking-tight break-keep pt-1">
+            <div className="text-[15px] font-medium text-text-muted tracking-tight break-keep pt-1">
               {description}
             </div>
           </div>

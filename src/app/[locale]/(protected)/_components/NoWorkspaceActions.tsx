@@ -11,7 +11,9 @@ export function NoWorkspaceActions() {
       {!isNativeApp && (
         <Button
           asChild
-          className="btn-dowin-primary flex items-center gap-2 rounded-button px-5 py-3 text-sm font-bold"
+          variant="hero"
+          size="hero"
+          className="w-full"
         >
           <Link href="/workspace/new">
             {t("createWorkspace")}
@@ -21,7 +23,7 @@ export function NoWorkspaceActions() {
 
       <Button
         asChild
-        className="flex items-center gap-2 rounded-button bg-white border border-border px-5 py-3 text-sm font-bold text-text-primary"
+        className="flex items-center gap-2 rounded-button bg-surface border border-border px-5 py-3 text-sm font-bold text-text-primary"
       >
         <Link href="/workspace/join">
           {t("joinWorkspace")}

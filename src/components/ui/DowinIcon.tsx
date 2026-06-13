@@ -59,6 +59,7 @@ import {
   X,
   Zap,
   Plus,
+  Palette,
 } from "lucide-react";
 import React from "react";
 
@@ -173,6 +174,7 @@ export const ICON_MAP = {
   "action-checkmark": Check,
   "action-align-left": AlignLeft,
   "action-arrow-right": ChevronRight,
+  "action-theme": Palette,
 } as const;
 
 export type IconName = keyof typeof ICON_MAP;

@@ -128,8 +128,8 @@ export default function AdminProductsPageClient() {
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black tracking-widest uppercase ${
                             product.isActive
-                              ? "bg-green-100 text-green-700"
-                              : "bg-zinc-100 text-zinc-500"
+                              ? "bg-green-100 text-success"
+                              : "bg-zinc-100 text-text-muted"
                           }`}
                         >
                           {product.isActive ? "ACTIVE" : "INACTIVE"}

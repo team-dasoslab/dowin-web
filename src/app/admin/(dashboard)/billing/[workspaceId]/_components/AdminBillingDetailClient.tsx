@@ -135,25 +135,25 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
             <InlineSpinner />
           </div>
         ) : !detail ? (
-          <div className="py-12 text-center text-sm font-bold text-zinc-500">
+          <div className="py-12 text-center text-sm font-bold text-text-muted">
             데이터를 불러오지 못했습니다.
           </div>
         ) : (
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none">
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   워크스페이스 명
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.workspaceName}
                 </span>
               </div>
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   요금제 코드
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.planCode}
                 </span>
               </div>
@@ -161,44 +161,44 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
 
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none">
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   제공업체 (PG)
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.provider || "없음 (None)"}
                 </span>
               </div>
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   권한 출처
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.entitlementSource || "없음 (None)"}
                 </span>
               </div>
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   결제 상태
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.billingStatus}
                 </span>
               </div>
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   이용 종료일
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.currentPeriodEnd
                     ? new Date(detail.currentPeriodEnd).toLocaleString()
                     : "없음 (None)"}
                 </span>
               </div>
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   멤버 한도 (Seats)
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.purchasedSeatCount !== null && detail.purchasedSeatCount !== undefined
                     ? `${detail.purchasedSeatCount}명`
                     : "자동 (Auto)"}
@@ -223,7 +223,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                         e.target.value as AdminBillingManualOverrideRequestPlanCode
                       )
                     }
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
                     <option value="FREE">FREE</option>
                     <option value="BASIC">BASIC</option>
@@ -242,7 +242,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                         e.target.value as AdminBillingManualOverrideRequestBillingStatus
                       )
                     }
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
                     {availableStatuses.map((status) => (
                       <option key={status} value={status}>
@@ -262,7 +262,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                         e.target.value as EditableEntitlementSource
                       )
                     }
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
                     {availableEntitlementSources.map((source) => (
                       <option key={source || "none"} value={source}>
@@ -270,7 +270,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                       </option>
                     ))}
                   </select>
-                  <p className="px-1 text-[11px] font-medium leading-relaxed text-zinc-500">
+                  <p className="px-1 text-[11px] font-medium leading-relaxed text-text-muted">
                     {editPlanCode === "BASIC" || editPlanCode === "STANDARD"
                       ? "수동 권한 지급은 기본적으로 MANUAL_GRANT를 사용하세요. POLAR는 실제 결제 정합성 보정에만 사용합니다."
                       : "FREE 상태에서는 source를 비우거나 POLAR만 유지하세요."}
@@ -287,7 +287,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     type="date"
                     value={editPeriodEnd}
                     onChange={(e) => setEditPeriodEnd(e.target.value)}
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   />
                 </div>
 
@@ -302,9 +302,9 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     onChange={(e) => setEditSeatCount(e.target.value)}
                     disabled={editPlanCode === "FREE"}
                     placeholder="지정 안 함 (자동 설정)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900 disabled:bg-zinc-200 disabled:text-zinc-500 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
                   />
-                  <p className="px-1 text-[11px] font-medium leading-relaxed text-zinc-500 mt-1">
+                  <p className="px-1 text-[11px] font-medium leading-relaxed text-text-muted mt-1">
                     빈 값이면 기존 값 유지 또는 현재 멤버 수 기준으로 자동 설정
                   </p>
                 </div>
@@ -341,7 +341,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     value={editCustomerKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-zinc-500 cursor-not-allowed select-all"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-text-muted cursor-not-allowed select-all"
                   />
                 </div>
 
@@ -354,21 +354,21 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     value={editSubscriptionKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-zinc-500 cursor-not-allowed select-all"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-text-muted cursor-not-allowed select-all"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-zinc-600 ml-1">
-                  변경 사유 <span className="text-red-500 font-black">*</span>
+                  변경 사유 <span className="text-danger font-black">*</span>
                 </label>
                 <Input
                   type="text"
                   value={changeReason}
                   onChange={(e) => setChangeReason(e.target.value)}
                   placeholder="수동 보정 사유를 적어주세요..."
-                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   required
                 />
               </div>

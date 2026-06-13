@@ -39,7 +39,7 @@ export default function UpdatesPage() {
       />
 
       {/* 
-      <div className="rounded-[24px] bg-white px-6 py-6">
+      <div className="rounded-[24px] bg-surface px-6 py-6">
         <div className="max-w-[720px] space-y-3">
           <div>
             <Badge className="w-fit rounded-[8px] bg-primary/5 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
@@ -48,14 +48,14 @@ export default function UpdatesPage() {
 
           </div>
           <div className="space-y-1.5">
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900">
+            <h1 className="text-xl font-bold tracking-tight text-text-primary">
               {t(`updates.${latestMajorUpdate.id}.title`)}
             </h1>
-            <p className="max-w-[520px] text-sm leading-6 text-zinc-600">
+            <p className="max-w-[520px] text-sm leading-6 text-text-secondary">
               {t(`updates.${latestMajorUpdate.id}.summary`)}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none text-zinc-500">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] leading-none text-text-muted">
             <span>{latestMajorUpdate.publishedAt}</span>
             <span className="text-border">•</span>
             <span>{t(`tags.${latestMajorUpdate.tag}`)}</span>

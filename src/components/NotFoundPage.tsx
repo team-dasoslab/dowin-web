@@ -48,7 +48,7 @@ export function NotFoundPage({
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
-              <Logo size="32px" className="text-zinc-900" />
+              <Logo size="32px" className="text-text-primary" />
             </div>
             <div className="text-[11px] font-black tracking-widest uppercase text-zinc-400 bg-zinc-100 px-3 py-1.5 rounded-full">
               {copy.badge}
@@ -56,10 +56,10 @@ export function NotFoundPage({
           </div>
 
           <div className="space-y-2">
-            <h1 className="text-[24px] font-black tracking-tight text-zinc-900 leading-none">
+            <h1 className="text-[24px] font-black tracking-tight text-text-primary leading-none">
               {copy.title}
             </h1>
-            <div className="text-[15px] font-medium text-zinc-500 tracking-tight break-keep pt-1 leading-relaxed">
+            <div className="text-[15px] font-medium text-text-muted tracking-tight break-keep pt-1 leading-relaxed">
               {copy.description}
             </div>
           </div>

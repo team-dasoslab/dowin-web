@@ -74,7 +74,7 @@ export default function ProfileExportPage() {
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title="데이터 내보내기" />
 
-        <div className="rounded-[24px] bg-white px-6 py-5 flex items-center gap-4">
+        <div className="rounded-[24px] bg-surface px-6 py-5 flex items-center gap-4">
           <UserAvatar
             avatarKey={user?.avatarKey}
             avatarSeed={user?.nickname}
@@ -83,16 +83,16 @@ export default function ProfileExportPage() {
             className="flex-shrink-0"
           />
           <div className="min-w-0">
-            <h1 className="text-lg font-black text-zinc-900 tracking-tight">
+            <h1 className="text-lg font-black text-text-primary tracking-tight">
               {user?.nickname ?? "사용자"}님의 CSV 다운로드
             </h1>
-            <div className="mt-0.5 flex items-center gap-2 text-xs font-medium text-zinc-500">
+            <div className="mt-0.5 flex items-center gap-2 text-xs font-medium text-text-muted">
               <span className="truncate">{workspace?.name}</span>
               <span
                 className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-bold ${
                   isExportAvailable
                     ? "bg-primary/10 text-primary"
-                    : "bg-zinc-100 text-zinc-500"
+                    : "bg-sub-background text-text-muted"
                 }`}
               >
                 Basic
@@ -102,56 +102,56 @@ export default function ProfileExportPage() {
         </div>
 
         {!isExportAvailable ? (
-          <div className="rounded-[24px] p-4 space-y-2 bg-zinc-100">
-            <p className="text-sm font-black text-zinc-900">
+          <div className="rounded-[24px] p-4 space-y-2 bg-sub-background">
+            <p className="text-sm font-black text-text-primary">
               CSV 다운로드는 현재 제공되지 않습니다.
             </p>
-            <p className="text-[11px] leading-relaxed text-zinc-500">
+            <p className="text-[11px] leading-relaxed text-text-muted">
               현재는 앱 안에서 기록과 조회를 계속 사용할 수 있습니다.
             </p>
           </div>
         ) : null}
 
-        <div className="rounded-[24px] bg-white p-6 space-y-5">
+        <div className="rounded-[24px] bg-surface p-6 space-y-5">
           <div className="space-y-1">
-            <h2 className="text-[15px] font-black text-zinc-900">
+            <h2 className="text-[15px] font-black text-text-primary">
               내보내기 조건
             </h2>
-            <p className="text-[12px] font-medium text-zinc-500">
+            <p className="text-[12px] font-medium text-text-muted">
               기간(최대 92일)과 선행지표를 선택해 CSV 파일로 내려받습니다.
             </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-zinc-50 px-4 text-xs text-zinc-600">
+            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-sub-background px-4 text-xs text-text-secondary">
               <span className="shrink-0 text-[12px] font-bold">시작일</span>
               <input
                 type="date"
                 value={exportFrom}
                 onChange={(event) => handleExportFromChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-zinc-900 outline-none"
+                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-text-primary outline-none"
               />
             </label>
-            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-zinc-50 px-4 text-xs text-zinc-600">
+            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-sub-background px-4 text-xs text-text-secondary">
               <span className="shrink-0 text-[12px] font-bold">종료일</span>
               <input
                 type="date"
                 value={exportTo}
                 onChange={(event) => handleExportToChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-zinc-900 outline-none"
+                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-text-primary outline-none"
               />
             </label>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[12px] font-bold text-zinc-500">
+              <p className="text-[12px] font-bold text-text-muted">
                 선행지표 선택
               </p>
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                className="h-8 rounded-[12px] bg-zinc-100 px-3 text-[11px] font-black text-zinc-600 transition-colors hover:bg-zinc-200"
+                className="h-8 rounded-[12px] bg-sub-background px-3 text-[11px] font-black text-text-secondary transition-colors hover:bg-border"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -163,7 +163,7 @@ export default function ProfileExportPage() {
                 return (
                   <label
                     key={measure.id}
-                    className="flex items-center gap-2 rounded-[12px] bg-zinc-50 px-3 py-2 text-[13px] font-bold text-zinc-900"
+                    className="flex items-center gap-2 rounded-[12px] bg-sub-background px-3 py-2 text-[13px] font-bold text-text-primary"
                   >
                     <input
                       type="checkbox"
@@ -178,7 +178,7 @@ export default function ProfileExportPage() {
             </div>
           </div>
 
-          <label className="flex items-center gap-2 rounded-[12px] border-none bg-zinc-100 px-3 py-2 text-xs text-zinc-600">
+          <label className="flex items-center gap-2 rounded-[12px] border-none bg-sub-background px-3 py-2 text-xs text-text-secondary">
             <input
               type="checkbox"
               checked={splitByWeek}
@@ -189,7 +189,7 @@ export default function ProfileExportPage() {
           </label>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
-            <p className="text-[12px] font-medium text-zinc-500">
+            <p className="text-[12px] font-medium text-text-muted">
               선택 지표 {selectedExportMeasureIds.length}개
             </p>
             <Button
@@ -226,7 +226,7 @@ function ExportUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="w-fit rounded-[16px] bg-zinc-100 px-5 py-3 text-sm font-black text-zinc-900 transition-colors hover:bg-zinc-200"
+              className="w-fit rounded-[16px] bg-sub-background px-5 py-3 text-sm font-black text-text-primary transition-colors hover:bg-border"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -242,8 +242,8 @@ function ExportUnavailableInAppState() {
 function ProfileExportHeader() {
   return (
     <header className="flex items-center justify-between">
-      <SmartBackButton className="w-9 h-9 rounded-[16px] bg-zinc-100 flex items-center justify-center text-zinc-500 transition-colors hover:bg-zinc-200" />
-      <p className="text-[13px] font-bold text-zinc-500">데이터 내보내기</p>
+      <SmartBackButton />
+      <p className="text-[13px] font-bold text-text-muted">데이터 내보내기</p>
       <div className="w-8" />
     </header>
   );
@@ -256,9 +256,9 @@ function ExportSkeleton() {
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
       >
-        <div className="h-10 rounded-[16px] bg-zinc-200" />
-        <div className="h-24 rounded-[24px] bg-zinc-200" />
-        <div className="h-[420px] rounded-[24px] bg-zinc-200" />
+        <div className="h-10 rounded-[16px] bg-border" />
+        <div className="h-24 rounded-[24px] bg-border" />
+        <div className="h-[420px] rounded-[24px] bg-border" />
       </ProtectedPageContainer>
     </div>
   );
