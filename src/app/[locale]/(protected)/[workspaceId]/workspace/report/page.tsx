@@ -230,7 +230,7 @@ export default function ReportPage() {
   const hasMembers = summary.totalCount > 0;
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={tDashboard("weeklyReport")}
@@ -901,7 +901,7 @@ function FocusMemberList({ members }: { members: FocusMember[] }) {
 
 function ReportLoadingState() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer spacing="compact">
         <div className="h-12 w-48 animate-pulse rounded-[12px] bg-zinc-200" />
         <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
@@ -927,7 +927,7 @@ function ReportNoWorkspaceState() {
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
@@ -952,7 +952,7 @@ function ReportForbiddenState({ workspaceId }: { workspaceId: string }) {
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">
@@ -987,7 +987,7 @@ function ReportErrorState({
   const t = useTranslations("Report");
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-[720px] p-4 md:p-8">
         <Card className="space-y-4 p-8 text-center rounded-content">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-content bg-primary/10">

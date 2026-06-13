@@ -13,7 +13,7 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div
-      className="flex h-[100dvh] w-full flex-col overflow-hidden bg-zinc-100"
+      className="flex h-[100dvh] w-full flex-col overflow-hidden"
       style={{
         paddingTop: "var(--safe-area-inset-top, 0px)",
         paddingBottom: "var(--safe-area-inset-bottom, 0px)",
