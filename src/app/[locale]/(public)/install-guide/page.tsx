@@ -63,7 +63,7 @@ export default function InstallGuidePage() {
     <div className="min-h-screen">
       <div className="mx-auto flex max-w-[560px] flex-col gap-6 p-4 pb-10 animate-dowin-in md:p-8">
         <header className="flex items-center justify-between">
-          <SmartBackButton className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-muted transition-colors" />
+          <SmartBackButton />
           <p className="text-xs text-text-muted">iPhone 설치 가이드</p>
           <div className="w-8" />
         </header>

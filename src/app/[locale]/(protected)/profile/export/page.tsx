@@ -242,7 +242,7 @@ function ExportUnavailableInAppState() {
 function ProfileExportHeader() {
   return (
     <header className="flex items-center justify-between">
-      <SmartBackButton className="w-9 h-9 rounded-[16px] bg-sub-background flex items-center justify-center text-text-muted transition-colors hover:bg-border" />
+      <SmartBackButton />
       <p className="text-[13px] font-bold text-text-muted">데이터 내보내기</p>
       <div className="w-8" />
     </header>

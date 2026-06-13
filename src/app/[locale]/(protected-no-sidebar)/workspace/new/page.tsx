@@ -62,7 +62,7 @@ export default function NewWorkspacePage() {
  <div className="w-full max-w-[480px] bg-surface border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
  {/* 상단 내비게이션 */}
  <div className="flex items-center">
- <SmartBackButton className="w-9 h-9 rounded-full bg-sub-background border-none flex items-center justify-center text-text-secondary transition-transform shrink-0" />
+ <SmartBackButton />
  </div>
 
  {/* 헤더 */}
