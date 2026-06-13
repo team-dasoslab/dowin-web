@@ -24,13 +24,13 @@ export function ScoreboardCard({
   const fallbackDate = t("noDateFallback");
 
   return (
-    <div className="rounded-[24px] bg-white p-6 space-y-5">
+    <div className="rounded-[24px] bg-surface p-6 space-y-5">
       <div className="space-y-2">
-        <h2 className="text-[18px] font-black text-zinc-900 leading-tight">
+        <h2 className="text-[18px] font-black text-text-primary leading-tight">
           {goalName || t("unnamedScoreboard")}
         </h2>
-        <div className="flex items-center gap-2 text-[14px] font-medium text-zinc-500">
-          <DowinIcon name="domain-target-arrow" size="16px" className="text-zinc-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 text-[14px] font-medium text-text-muted">
+          <DowinIcon name="domain-target-arrow" size="16px" className="text-text-muted flex-shrink-0" />
           <span className="leading-relaxed">
             {lagMeasure || t("noLagMeasure")}
           </span>

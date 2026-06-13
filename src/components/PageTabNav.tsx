@@ -24,7 +24,7 @@ export function PageTabNav({
   return (
     <div
       className={cn(
-        "sticky top-0 z-20 w-full bg-white/95 backdrop-blur-sm border-b border-zinc-200",
+        "sticky top-0 z-20 w-full bg-surface/95 backdrop-blur-sm border-b border-border",
         containerClassName,
       )}
     >
@@ -44,7 +44,7 @@ export function PageTabNav({
                 "whitespace-nowrap py-4 px-1 border-b-2 transition-all font-semibold text-[15px]",
                 isActive
                   ? "border-primary text-primary font-bold"
-                  : "border-transparent text-zinc-500 hover:text-zinc-800 hover:border-zinc-300",
+                  : "border-transparent text-text-muted hover:text-text-primary hover:border-border-hover",
               )}
             >
               {item.label}

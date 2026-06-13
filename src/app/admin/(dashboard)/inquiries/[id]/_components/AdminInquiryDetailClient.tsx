@@ -84,53 +84,53 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
             <InlineSpinner />
           </div>
         ) : !detail ? (
-          <div className="py-12 text-center text-sm font-bold text-zinc-500">
+          <div className="py-12 text-center text-sm font-bold text-text-muted">
             데이터를 불러오지 못했습니다.
           </div>
         ) : (
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none">
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   사용자 ID
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.userId}
                 </span>
               </div>
               <div>
-                <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+                <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   워크스페이스 ID
                 </span>
-                <span className="text-sm font-bold text-zinc-900">
+                <span className="text-sm font-bold text-text-primary">
                   {detail.workspaceId || "없음"}
                 </span>
               </div>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+              <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                 제목
               </span>
-              <span className="text-base font-extrabold text-zinc-900 leading-normal break-words">
+              <span className="text-base font-extrabold text-text-primary leading-normal break-words">
                 {detail.subject}
               </span>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+              <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                 문의 내용
               </span>
-              <div className="text-sm font-medium text-zinc-800 bg-zinc-50 p-5 rounded-[24px] border-none leading-relaxed break-words whitespace-pre-wrap">
+              <div className="text-sm font-medium text-text-primary bg-zinc-50 p-5 rounded-[24px] border-none leading-relaxed break-words whitespace-pre-wrap">
                 {detail.message}
               </div>
             </div>
 
             <div className="space-y-1">
-              <span className="text-xs font-bold tracking-tight text-zinc-500 block mb-1">
+              <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                 답변 받을 이메일
               </span>
-              <span className="text-sm font-bold text-zinc-900 break-all">
+              <span className="text-sm font-bold text-text-primary break-all">
                 {detail.replyEmail}
               </span>
             </div>
@@ -144,7 +144,7 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value as AdminContactInquiryUpdateRequestStatus)}
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
                     <option value="RECEIVED">접수됨 (Received)</option>
                     <option value="IN_PROGRESS">처리 중 (In Progress)</option>
@@ -154,14 +154,14 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-zinc-600 ml-1">
-                    변경 사유 <span className="text-red-500 font-black">*</span>
+                    변경 사유 <span className="text-danger font-black">*</span>
                   </label>
                   <Input
                     type="text"
                     value={changeReason}
                     onChange={(e) => setChangeReason(e.target.value)}
                     placeholder="상태 변경의 이유를 적어주세요..."
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900"
+                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                     required
                   />
                 </div>
@@ -176,7 +176,7 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                   onChange={(e) => setEditAnswer(e.target.value)}
                   placeholder="문의 처리에 대한 요약을 적어주세요..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-zinc-900 resize-none placeholder:text-zinc-400 min-h-[auto]"
+                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary resize-none placeholder:text-zinc-400 min-h-[auto]"
                 />
               </div>
 

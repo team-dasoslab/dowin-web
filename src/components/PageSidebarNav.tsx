@@ -44,11 +44,11 @@ export function PageSidebarNav({
   return (
     <aside
       className={cn(
-        "scrollbar-none sticky top-0 z-20 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto bg-zinc-100/95 px-4 py-2 backdrop-blur lg:top-12 lg:z-auto lg:mx-0 lg:block lg:w-[240px] lg:space-y-8 lg:overflow-visible lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-none",
+        "hidden lg:sticky lg:top-12 lg:block lg:w-[240px] lg:space-y-8",
         containerClassName,
       )}
     >
-      <nav className={cn("flex gap-2 lg:block lg:space-y-2", className)}>
+      <nav className={cn("space-y-2", className)}>
         {items.map((item) => {
           const isActive = item.id === activeId;
           return (
@@ -56,10 +56,10 @@ export function PageSidebarNav({
               key={item.id}
               onClick={() => handleSelect(item.id)}
               className={cn(
-                "flex shrink-0 items-center rounded-[14px] px-4 py-3 text-left text-[15px] font-bold transition-all lg:w-full",
+                "flex w-full items-center rounded-[14px] px-4 py-3 text-left text-[15px] font-bold transition-all",
                 isActive
-                  ? "bg-white text-zinc-900"
-                  : "text-zinc-500 hover:bg-white/50",
+                  ? "bg-surface text-text-primary"
+                  : "text-text-muted hover:bg-surface/50",
               )}
             >
               <div className="flex items-center gap-3">

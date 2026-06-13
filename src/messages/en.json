@@ -541,6 +541,11 @@
     "passwordChangeDesc": "Reset password for account security.",
     "languageTitle": "Language Settings",
     "languageDesc": "Change the display language of the app.",
+    "themeTitle": "Display Theme",
+    "themeDesc": "Match your device settings or manually select dark mode.",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System Default",
     "languageKo": "한국어",
     "languageEn": "English",
     "languageChangeFailed": "Failed to change language.",
@@ -656,8 +661,8 @@
       "standardRequired": "CSV download requires an active Basic subscription."
     },
     "Notification": {
-      "timeChanged": "Daily reminder time has been changed.",
-      "timeChangeFailed": "Failed to change daily reminder time."
+      "timeChanged": "Reminder time has been changed.",
+      "timeChangeFailed": "Failed to change reminder time."
     },
     "NotificationControl": {
       "appOnly": "App only",

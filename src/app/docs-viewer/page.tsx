@@ -463,7 +463,7 @@ export default async function DocsViewerPage({
                   {locale === "ko" ? "← 앱으로 돌아가기" : "← Back to app"}
                 </NextLink>
               </Button>
-              <h1 className="text-xl font-black text-zinc-900 tracking-tight">
+              <h1 className="text-xl font-black text-text-primary tracking-tight">
                 Dowin Docs
               </h1>
               <Badge className="rounded-lg border border-primary/20 bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
@@ -517,7 +517,7 @@ export default async function DocsViewerPage({
 
                 <div className="mt-4 grid gap-6 sm:grid-cols-3">
                   <div>
-                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-text-muted">
                       Folder
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -552,7 +552,7 @@ export default async function DocsViewerPage({
                     </div>
                   </div>
                   <div>
-                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-text-muted">
                       {t("sidebar.topicTitle")}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -588,7 +588,7 @@ export default async function DocsViewerPage({
                   </div>
 
                   <div>
-                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-text-muted">
                       {t("sidebar.lensTitle")}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -674,8 +674,8 @@ export default async function DocsViewerPage({
                 className={cn(
                   "px-4 py-2 text-sm font-bold transition-colors border-b-2",
                   tab === "doc"
-                    ? "border-zinc-900 text-zinc-900"
-                    : "border-transparent text-zinc-500",
+                    ? "border-zinc-900 text-text-primary"
+                    : "border-transparent text-text-muted",
                 )}
               >
                 Current Document
@@ -692,8 +692,8 @@ export default async function DocsViewerPage({
                 className={cn(
                   "px-4 py-2 text-sm font-bold transition-colors border-b-2",
                   tab === "feed"
-                    ? "border-zinc-900 text-zinc-900"
-                    : "border-transparent text-zinc-500",
+                    ? "border-zinc-900 text-text-primary"
+                    : "border-transparent text-text-muted",
                 )}
               >
                 Document Feed{" "}
@@ -713,8 +713,8 @@ export default async function DocsViewerPage({
                 className={cn(
                   "px-4 py-2 text-sm font-bold transition-colors border-b-2",
                   tab === "todos"
-                    ? "border-zinc-900 text-zinc-900"
-                    : "border-transparent text-zinc-500",
+                    ? "border-zinc-900 text-text-primary"
+                    : "border-transparent text-text-muted",
                 )}
               >
                 Open Todos{" "}
@@ -810,7 +810,7 @@ function DocumentCard({
           : "border-zinc-200 bg-white",
       )}
     >
-      <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
+      <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-text-muted">
         <span>{t(`sections.${doc.section}`)}</span>
         <span className="text-zinc-300">|</span>
         <span className="text-zinc-700">{t(`topics.${doc.topic}`)}</span>
@@ -835,7 +835,7 @@ function DocumentCard({
               doc: doc.relativePath,
               tab: "doc",
             })}
-            className="text-lg font-black text-zinc-900"
+            className="text-lg font-black text-text-primary"
           >
             {doc.title}
           </NextLink>
@@ -855,7 +855,7 @@ function DocumentCard({
                 <div className="flex max-h-48 flex-col gap-3 overflow-y-auto pr-1">
                   {doc.links.length > 0 && (
                     <div>
-                      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-text-muted">
                         Outbound Links ({doc.links.length})
                       </p>
                       <div className="flex flex-col gap-1">
@@ -881,7 +881,7 @@ function DocumentCard({
                   )}
                   {doc.inboundLinks.length > 0 && (
                     <div>
-                      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                      <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-text-muted">
                         Inbound Links ({doc.inboundLinks.length})
                       </p>
                       <div className="flex flex-col gap-1">
@@ -918,7 +918,7 @@ function DocumentCard({
 
       <div className="mt-1 flex items-center justify-between text-xs text-zinc-400">
         <div className="flex items-center gap-2">
-          <span className="font-mono bg-zinc-100 px-1.5 py-0.5 rounded text-[10px] text-zinc-500">
+          <span className="font-mono bg-zinc-100 px-1.5 py-0.5 rounded text-[10px] text-text-muted">
             {doc.relativePath}
           </span>
           <span>{doc.dateLabel ?? t("card.noDate")}</span>
@@ -941,7 +941,7 @@ function FormattedText({ text }: { text: string }) {
           return (
             <code
               key={i}
-              className="rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-mono text-[13px] text-zinc-800 break-words"
+              className="rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-mono text-[13px] text-text-primary break-words"
             >
               {part.slice(1, -1)}
             </code>
@@ -950,7 +950,7 @@ function FormattedText({ text }: { text: string }) {
 
         if (part.startsWith("**") && part.endsWith("**")) {
           return (
-            <strong key={i} className="font-bold text-zinc-900">
+            <strong key={i} className="font-bold text-text-primary">
               {part.slice(2, -2)}
             </strong>
           );
@@ -1030,26 +1030,26 @@ function DocumentPanel({
         </p>
         <div className="space-y-3">
           <div className="flex items-center gap-4 text-sm">
-            <span className="w-12 font-bold text-zinc-500">
+            <span className="w-12 font-bold text-text-muted">
               {t("detail.date")}
             </span>
-            <span className="font-semibold text-zinc-900">
+            <span className="font-semibold text-text-primary">
               {activeDoc.dateLabel ?? "-"}
             </span>
           </div>
           {activeDoc.summary && (
             <div className="flex items-start gap-4 text-sm">
-              <span className="w-12 pt-0.5 font-bold text-zinc-500">목적</span>
-              <span className="flex-1 font-medium leading-relaxed text-zinc-900">
+              <span className="w-12 pt-0.5 font-bold text-text-muted">목적</span>
+              <span className="flex-1 font-medium leading-relaxed text-text-primary">
                 {activeDoc.summary}
               </span>
             </div>
           )}
           <div className="flex items-start gap-4 text-sm">
-            <span className="w-12 pt-0.5 font-bold text-zinc-500">
+            <span className="w-12 pt-0.5 font-bold text-text-muted">
               {t("detail.path")}
             </span>
-            <span className="flex-1 break-all font-mono text-[13px] font-bold text-zinc-800 pt-0.5">
+            <span className="flex-1 break-all font-mono text-[13px] font-bold text-text-primary pt-0.5">
               {activeDoc.relativePath}
             </span>
           </div>
@@ -1074,12 +1074,12 @@ function DocumentPanel({
                 key={`${block.id}-${index}`}
                 id={block.id}
                 className={cn(
-                  "font-bold tracking-tight text-zinc-900 mt-8 mb-4",
+                  "font-bold tracking-tight text-text-primary mt-8 mb-4",
                   block.depth === 1 && "text-2xl font-black mt-10",
                   block.depth === 2 && "text-xl",
                   block.depth === 3 && "text-lg mt-6",
                   block.depth === 4 && "text-base mt-4",
-                  block.depth >= 5 && "text-[15px] mt-4 text-zinc-800",
+                  block.depth >= 5 && "text-[15px] mt-4 text-text-primary",
                 )}
               >
                 {block.text}
@@ -1122,7 +1122,7 @@ function DocumentPanel({
             return (
               <pre
                 key={`${block.text.slice(0, 20)}-${index}`}
-                className="overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-4 text-[13.5px] leading-relaxed text-zinc-800 font-mono"
+                className="overflow-x-auto rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-4 text-[13.5px] leading-relaxed text-text-primary font-mono"
               >
                 <code>{block.text}</code>
               </pre>

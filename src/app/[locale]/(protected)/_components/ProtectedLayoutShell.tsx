@@ -12,7 +12,7 @@ export function ProtectedLayoutShell({
   sidebar,
 }: ProtectedLayoutShellProps) {
   return (
-    <div className="flex h-full flex-col bg-zinc-100">
+    <div className="flex h-full flex-col">
       {sidebar}
       <main
         id="main-scroll-container"

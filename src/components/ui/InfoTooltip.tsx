@@ -35,8 +35,8 @@ export function InfoTooltip({
   className,
   align = "left",
   side = "bottom",
-  triggerClassName = "text-zinc-400 hover:text-zinc-600 transition-colors",
-  activeTriggerClassName = "text-zinc-800 bg-zinc-100",
+  triggerClassName = "text-text-muted hover:text-text-secondary transition-colors",
+  activeTriggerClassName = "text-text-primary bg-sub-background",
   triggerIcon = <DowinIcon name="status-info" size="18px" />,
 }: InfoTooltipProps) {
   const [open, setOpen] = useState(false);
@@ -91,12 +91,12 @@ export function InfoTooltip({
           <div
             role="tooltip"
             className={cn(
-              "absolute z-50 w-72 max-w-[calc(100vw-4rem)] rounded-[16px] border-none bg-zinc-900 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-dowin-in",
+              "absolute z-50 w-72 max-w-[calc(100vw-4rem)] rounded-[16px] border border-transparent dark:border-border bg-zinc-800 dark:bg-zinc-700 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-dowin-in",
               tooltipAlignClass,
               tooltipSideClass,
             )}
           >
-            <div className="text-[14px] font-semibold leading-relaxed text-white whitespace-pre-line">
+            <div className="text-[14px] font-semibold leading-relaxed text-zinc-50 dark:text-text-primary whitespace-pre-line">
               {content}
             </div>
           </div>
@@ -116,12 +116,12 @@ export function InfoTooltip({
         <div
           role="tooltip"
           className={cn(
-            "absolute z-50 w-72 max-w-[calc(100vw-2rem)] sm:max-w-none rounded-[16px] border-none bg-zinc-900 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-dowin-in",
+            "absolute z-50 w-72 max-w-[calc(100vw-2rem)] sm:max-w-none rounded-[16px] border border-transparent dark:border-border bg-zinc-800 dark:bg-zinc-700 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] animate-dowin-in",
             tooltipAlignClass,
             tooltipSideClass,
           )}
         >
-          <div className="text-[14px] font-semibold leading-relaxed text-white whitespace-pre-line">
+          <div className="text-[14px] font-semibold leading-relaxed text-zinc-50 dark:text-text-primary whitespace-pre-line">
             {content}
           </div>
         </div>

@@ -8,6 +8,7 @@ import {
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
 import {
   PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
@@ -114,6 +115,13 @@ export default function ProfilePage() {
           description: t("languageDesc"),
           rightElement: <LocaleSwitcher />,
         },
+        {
+          id: "theme",
+          icon: <DowinIcon name="action-theme" className="w-4 h-4" />,
+          title: t("themeTitle"),
+          description: t("themeDesc"),
+          rightElement: <ThemeToggle />,
+        },
       ],
     },
     {
@@ -174,7 +182,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-1.5 flex-wrap">
               <span>{t("pushReminder")}</span>
               {!isNativeApp && (
-                <span className="text-[11px] font-medium text-zinc-500">
+                <span className="text-[11px] font-medium text-text-muted">
                   ({t("NotificationControl.appOnly")})
                 </span>
               )}
@@ -205,7 +213,7 @@ export default function ProfilePage() {
                     onChange={(event) => {
                       void updateDailySettings(event.target.value);
                     }}
-                    className="h-9 cursor-pointer rounded-[12px] border-none bg-zinc-100 px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-9 cursor-pointer rounded-[12px] border-none bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-border disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {TIME_OPTIONS.map((time) => (
                       <option key={time} value={time}>
@@ -308,7 +316,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProfileCoachmark
         isRunning={isCoachmarkRunning}
         setIsRunning={setIsCoachmarkRunning}
@@ -342,7 +350,7 @@ export default function ProfilePage() {
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
             {/* 프로필 요약 카드 */}
             <div className="space-y-4">
-              <div className="rounded-[24px] bg-white px-4 py-4 flex items-center gap-4 sm:px-8 sm:py-8 sm:gap-6">
+              <div className="rounded-[24px] bg-surface px-4 py-4 flex items-center gap-4 sm:px-8 sm:py-8 sm:gap-6">
                 <UserAvatar
                   avatarKey={avatarKey}
                   avatarSeed={nickname}
@@ -380,7 +388,7 @@ export default function ProfilePage() {
 
 
 
-                    <div className="rounded-[24px] overflow-hidden bg-white">
+                    <div className="rounded-[24px] overflow-hidden bg-surface">
                       {group.items.map((item) => (
                         <MenuItemRow
                           key={item.id}
@@ -415,7 +423,7 @@ function MenuItemRow({
           className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${
             item.danger
               ? "bg-danger/5 text-danger"
-              : "bg-zinc-100 text-zinc-500"
+              : "bg-sub-background text-text-muted"
           }`}
         >
           {item.icon}
@@ -446,7 +454,7 @@ function MenuItemRow({
         <Button
           disabled={isActionPending}
           onClick={item.onClick}
-          className="block w-full text-left transition-colors hover:bg-zinc-50 justify-start items-stretch rounded-none h-auto p-0 font-normal"
+          className="block w-full text-left transition-colors hover:bg-sub-background justify-start items-stretch rounded-none h-auto p-0 font-normal"
         >
           {Content}
         </Button>
@@ -457,7 +465,7 @@ function MenuItemRow({
   if (item.href) {
     return (
       <div className={itemWrapperClassName}>
-        <Link href={item.href} className="block w-full transition-colors hover:bg-zinc-50">
+        <Link href={item.href} className="block w-full transition-colors hover:bg-sub-background">
           {Content}
         </Link>
       </div>
@@ -465,20 +473,20 @@ function MenuItemRow({
   }
 
   return (
-    <div className={`w-full bg-white ${itemWrapperClassName}`}>{Content}</div>
+    <div className={`w-full bg-surface ${itemWrapperClassName}`}>{Content}</div>
   );
 }
 
 function ProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer isLoading>
-        <div className="h-10 rounded-content bg-zinc-200" />
-        <div className="h-24 rounded-content bg-zinc-200" />
+        <div className="h-10 rounded-content bg-border" />
+        <div className="h-24 rounded-content bg-border" />
         <div className="space-y-4">
-          <div className="h-44 rounded-content bg-zinc-200" />
-          <div className="h-36 rounded-content bg-zinc-200" />
-          <div className="h-28 rounded-content bg-zinc-200" />
+          <div className="h-44 rounded-content bg-border" />
+          <div className="h-36 rounded-content bg-border" />
+          <div className="h-28 rounded-content bg-border" />
         </div>
       </ProtectedPageContainer>
     </div>

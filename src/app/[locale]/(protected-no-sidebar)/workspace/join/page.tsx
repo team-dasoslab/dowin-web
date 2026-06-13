@@ -24,20 +24,18 @@ export default function JoinWorkspacePage() {
     });
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-zinc-100 px-4 py-12 overflow-y-auto selection:bg-primary/20">
+    <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
       {isPending && <LoadingOverlay message={t("loading")} />}
-      <div className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
+      <div className="w-full max-w-[480px] bg-surface border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10">
         <div className="flex items-center">
-          <SmartBackButton className="w-9 h-9 rounded-full bg-zinc-100 border-none flex items-center justify-center text-zinc-600 transition-transform shrink-0" />
+          <SmartBackButton />
         </div>
 
         <div className="space-y-5">
-          <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">
-            <Logo size="32px" className="text-text-primary" />
-          </div>
+          <Logo size="32px" className="text-text-primary" />
           <div>
-            <h1 className="text-2xl font-black text-zinc-900 tracking-tight">
+            <h1 className="text-2xl font-black text-text-primary tracking-tight">
               {t("title")}
             </h1>
           </div>
@@ -67,11 +65,9 @@ export default function JoinWorkspacePage() {
             <Button
               type="submit"
               disabled={isPending || inviteCode.trim().length === 0}
-              className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-black transition-colors ${
-                isPending || inviteCode.trim().length === 0
-                  ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-                  : "bg-zinc-900 text-white hover:bg-zinc-800"
-              }`}
+              variant="hero"
+              size="hero"
+              className="w-full"
             >
               {isPending ? <InlineSpinner size="sm" /> : t("button")}
             </Button>

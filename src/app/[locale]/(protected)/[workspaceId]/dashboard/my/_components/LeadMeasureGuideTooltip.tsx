@@ -23,7 +23,7 @@ const guideStyles = {
   },
   [WeeklyLogGuideKind.adjust]: {
     popupIconClassName: "text-amber-500",
-    buttonClassName: "text-amber-400 hover:text-amber-600 hover:bg-amber-50",
+    buttonClassName: "text-amber-400 hover:text-amber-600 hover:bg-amber-500/10",
     activeClassName: "text-amber-600 bg-amber-100",
   },
 } as const;

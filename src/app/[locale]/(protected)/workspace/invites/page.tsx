@@ -129,19 +129,19 @@ export default function ProfileInvitesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
-        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
+        <div className="flex items-center gap-4 rounded-[24px] bg-surface px-6 py-5">
           <div className="flex h-14 w-14 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="domain-ticket-diagonal" size="20px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-[18px] font-black tracking-tight text-zinc-900">
+            <h1 className="text-[18px] font-black tracking-tight text-text-primary">
               {workspace.name}
             </h1>
-            <p className="mt-0.5 text-[13px] font-medium text-zinc-500">
+            <p className="mt-0.5 text-[13px] font-medium text-text-muted">
               {t("invitesCountDesc", {
                 total: invites.length,
                 active: activeInviteCount,
@@ -158,25 +158,25 @@ export default function ProfileInvitesPage() {
           />
         ) : null}
 
-        <div className="space-y-5 rounded-[24px] bg-white p-6">
+        <div className="space-y-5 rounded-[24px] bg-surface p-6">
           <div>
-            <h2 className="text-[15px] font-black text-zinc-900">
+            <h2 className="text-[15px] font-black text-text-primary">
               {t("newInviteTitle")}
             </h2>
           </div>
 
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[12px] font-bold text-zinc-600">
+              <p className="text-[12px] font-bold text-text-secondary">
                 {t("maxUsesLabel")}
               </p>
-              <p className="text-[11px] font-medium text-zinc-400">
+              <p className="text-[11px] font-medium text-text-muted">
                 {t("maxUsesLimit")}
               </p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
-              <label className="flex h-10 min-w-0 items-center gap-2 rounded-[12px] bg-zinc-50 px-4 text-xs font-bold text-zinc-600 transition-colors focus-within:bg-zinc-100">
+              <label className="flex h-10 min-w-0 items-center gap-2 rounded-[12px] bg-sub-background px-4 text-xs font-bold text-text-secondary transition-colors focus-within:bg-sub-background">
                 <span className="shrink-0 text-[11px]">
                   {t("maxUsesInputLabel")}
                 </span>
@@ -190,9 +190,9 @@ export default function ProfileInvitesPage() {
                     handleMaxUsesInputChange(event.target.value)
                   }
                   placeholder={t("maxUsesPlaceholder")}
-                  className="h-full min-w-0 border-0 bg-transparent p-0 text-right text-sm font-semibold text-zinc-900 outline-none focus-visible:ring-0"
+                  className="h-full min-w-0 border-0 bg-transparent p-0 text-right text-sm font-semibold text-text-primary outline-none focus-visible:ring-0"
                 />
-                <span className="shrink-0 text-[11px] text-zinc-500">
+                <span className="shrink-0 text-[11px] text-text-muted">
                   {t("maxUsesUnit")}
                 </span>
               </label>
@@ -203,7 +203,7 @@ export default function ProfileInvitesPage() {
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
                 className={`h-10 rounded-[12px] px-5 text-sm font-bold transition-colors ${
                   isCreatingInvite || isOverFreeMemberLimit
-                    ? "cursor-not-allowed bg-zinc-100 text-zinc-400"
+                    ? "cursor-not-allowed bg-sub-background text-text-muted"
                     : "bg-primary/10 text-primary hover:bg-primary/20"
                 }`}
               >
@@ -220,7 +220,7 @@ export default function ProfileInvitesPage() {
                   className={`h-8 rounded-full px-3 text-[12px] font-bold transition-colors ${
                     Number(maxUsesInput) === value
                       ? "bg-primary/10 text-primary"
-                      : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                      : "bg-sub-background text-text-muted hover:bg-border"
                   }`}
                 >
                   {t("presetUnit", { count: value })}
@@ -241,16 +241,16 @@ export default function ProfileInvitesPage() {
           </div>
         </div>
 
-        <div className="space-y-5 rounded-[24px] bg-white p-6">
+        <div className="space-y-5 rounded-[24px] bg-surface p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-[15px] font-black text-zinc-900">
+              <h2 className="text-[15px] font-black text-text-primary">
                 {t("inviteListTitle")}
               </h2>
             </div>
-            <div className="flex shrink-0 items-center gap-1 rounded-full bg-zinc-100 px-3.5 py-1.5 text-[13px] font-bold tracking-tight text-zinc-600">
+            <div className="flex shrink-0 items-center gap-1 rounded-full bg-sub-background px-3.5 py-1.5 text-[13px] font-bold tracking-tight text-text-secondary">
               <span>{activeInviteCount}</span>
-              <span className="text-zinc-400">/ {invites.length}</span>
+              <span className="text-text-muted">/ {invites.length}</span>
             </div>
           </div>
 
@@ -260,7 +260,7 @@ export default function ProfileInvitesPage() {
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "ALL"
                   ? "bg-zinc-900 text-white"
-                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                  : "bg-sub-background text-text-muted hover:bg-border"
               }`}
             >
               {t("filterAll")}
@@ -270,7 +270,7 @@ export default function ProfileInvitesPage() {
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "ACTIVE"
                   ? "bg-zinc-900 text-white"
-                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                  : "bg-sub-background text-text-muted hover:bg-border"
               }`}
             >
               {t("filterActive")}
@@ -280,7 +280,7 @@ export default function ProfileInvitesPage() {
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold transition-colors min-h-0 ${
                 filter === "INACTIVE"
                   ? "bg-zinc-900 text-white"
-                  : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                  : "bg-sub-background text-text-muted hover:bg-border"
               }`}
             >
               {t("filterInactive")}
@@ -289,11 +289,11 @@ export default function ProfileInvitesPage() {
 
           <div className="flex flex-col gap-2">
             {invites.length === 0 ? (
-              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
+              <div className="bg-surface px-4 py-10 text-center text-sm text-text-muted">
                 {t("noInvites")}
               </div>
             ) : filteredInvites.length === 0 ? (
-              <div className="bg-white px-4 py-10 text-center text-sm text-zinc-500">
+              <div className="bg-surface px-4 py-10 text-center text-sm text-text-muted">
                 선택한 필터에 해당하는 초대코드가 없습니다.
               </div>
             ) : (
@@ -309,18 +309,18 @@ export default function ProfileInvitesPage() {
                 return (
                   <div
                     key={inviteId > 0 ? inviteId : `${code}-${index}`}
-                    className="flex flex-col gap-2 rounded-[16px] px-4 py-4 transition-colors hover:bg-zinc-50 -mx-4"
+                    className="flex flex-col gap-2 rounded-[16px] px-4 py-4 transition-colors hover:bg-sub-background -mx-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
-                        <p className="truncate font-mono text-sm font-bold tracking-wide text-zinc-900">
+                        <p className="truncate font-mono text-sm font-bold tracking-wide text-text-primary">
                           {code || t("noCode")}
                         </p>
                         <Badge
                           className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                             isActive
                               ? "bg-primary/10 text-primary"
-                              : "bg-zinc-100 text-zinc-600"
+                              : "bg-sub-background text-text-secondary"
                           }`}
                         >
                           {isActive ? t("active") : t("inactive")}
@@ -331,7 +331,7 @@ export default function ProfileInvitesPage() {
                         <Button
                           type="button"
                           onClick={() => void copyInviteCode(inviteId, code)}
-                          className="h-8 rounded-[12px] bg-zinc-100 px-3 text-[12px] font-bold text-zinc-700 hover:bg-zinc-200"
+                          className="h-8 rounded-[12px] bg-sub-background px-3 text-[12px] font-bold text-text-secondary hover:bg-border"
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
@@ -365,7 +365,7 @@ export default function ProfileInvitesPage() {
                     </div>
 
                     <div className="flex items-center">
-                      <span className="text-[12px] font-medium text-zinc-500">
+                      <span className="text-[12px] font-medium text-text-muted">
                         {t("usageLabel", { usage: usageLabel })}
                       </span>
                     </div>
@@ -387,15 +387,15 @@ export default function ProfileInvitesPage() {
 
 function InvitePageSkeleton() {
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer
         isLoading
         className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
       >
-        <div className="h-12 w-48 rounded-[12px] bg-zinc-200" />
-        <div className="h-24 rounded-[24px] bg-zinc-200" />
-        <div className="h-44 rounded-[24px] bg-zinc-200" />
-        <div className="h-72 rounded-[24px] bg-zinc-200" />
+        <div className="h-12 w-48 rounded-[12px] bg-border" />
+        <div className="h-24 rounded-[24px] bg-border" />
+        <div className="h-44 rounded-[24px] bg-border" />
+        <div className="h-72 rounded-[24px] bg-border" />
       </ProtectedPageContainer>
     </div>
   );
@@ -404,9 +404,9 @@ function InvitePageSkeleton() {
 function NoWorkspaceState() {
   const t = useTranslations("ProfileInvites");
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+        <div className="w-full space-y-4 rounded-[24px] bg-surface p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <Logo size="24px" />
           </div>
@@ -429,9 +429,9 @@ function NoAccessState() {
   const t = useTranslations("ProfileInvites");
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <div className="w-full space-y-4 rounded-[24px] bg-white p-6 text-center">
+        <div className="w-full space-y-4 rounded-[24px] bg-surface p-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
             <DowinIcon name="status-locked" size="20px" />
           </div>
@@ -443,7 +443,7 @@ function NoAccessState() {
           </div>
           <Button
             asChild
-            className="w-full rounded-content border border-border bg-white py-3 text-sm font-semibold text-text-primary"
+            className="w-full rounded-content border border-border bg-surface py-3 text-sm font-semibold text-text-primary"
           >
             <Link href={getWorkspacePath(workspaceId, "/profile")}>
               {t("backToSettings")}

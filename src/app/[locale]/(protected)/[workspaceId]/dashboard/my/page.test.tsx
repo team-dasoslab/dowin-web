@@ -280,7 +280,7 @@ describe("MyDashboardPage", () => {
 
     const { container } = renderWithProviders(<MyDashboardPage />);
 
-    expect(container.querySelectorAll(".bg-zinc-200").length).toBeGreaterThan(
+    expect(container.querySelectorAll(".bg-border").length).toBeGreaterThan(
       0,
     );
     expect(screen.queryByTestId("weekly-board")).not.toBeInTheDocument();

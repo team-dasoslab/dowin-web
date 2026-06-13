@@ -24,7 +24,7 @@ describe("SegmentedControl", () => {
       "bg-white",
     );
     expect(screen.getByRole("button", { name: "Month" })).toHaveClass(
-      "text-zinc-500",
+      "text-text-muted",
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Month" }));

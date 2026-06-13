@@ -60,7 +60,7 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
     return (
       <div
         className={cn(
-          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-zinc-200 transition-all",
+          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-border transition-all",
           "px-4",
         )}
       />
@@ -78,21 +78,21 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
         disabled={isPending}
         className={cn(
           "flex h-10 w-fit items-center gap-1.5 rounded-[12px] transition-all px-3",
-          isOpen ? "bg-zinc-100" : "bg-transparent hover:bg-zinc-100/80",
+          isOpen ? "bg-sub-background" : "bg-transparent hover:bg-sub-background/80",
         )}
       >
-        <span className="truncate text-[16px] font-bold text-zinc-900 whitespace-nowrap transition-all duration-300 pt-[2px]">
+        <span className="truncate text-[16px] font-bold text-text-primary whitespace-nowrap transition-all duration-300 pt-[2px]">
           {activeWorkspace.name}
         </span>
         <DowinIcon 
           name="nav-chevron-down" 
           size="16px" 
-          className={cn("text-zinc-400 shrink-0 transition-transform duration-200", isOpen && "rotate-180")} 
+          className={cn("text-text-muted shrink-0 transition-transform duration-200", isOpen && "rotate-180")} 
         />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-full rounded-[20px] border border-zinc-200 bg-white p-2 z-50">
+        <div className="absolute top-full left-0 mt-2 w-full rounded-[20px] border border-border bg-surface p-2 z-50">
           {workspaces.map((ws) => (
             <button
               key={ws.id}
@@ -104,19 +104,19 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
                 }
               }}
               className={cn(
-                "flex w-full items-center rounded-[12px] px-3 py-3 text-[15px] transition-colors hover:bg-zinc-100",
-                ws.id === activeWorkspace.id ? "font-bold text-zinc-900 bg-zinc-50/50" : "font-medium text-zinc-600"
+                "flex w-full items-center rounded-[12px] px-3 py-3 text-[15px] transition-colors hover:bg-sub-background",
+                ws.id === activeWorkspace.id ? "font-bold text-text-primary bg-sub-background/50" : "font-medium text-text-secondary"
               )}
             >
               <span className="truncate">{ws.name}</span>
             </button>
           ))}
-          <div className="border-t border-zinc-100 my-2 mx-1" />
+          <div className="border-t border-border my-2 mx-1" />
           {!isNativeApp && (
             <Link
               href="/workspace/new"
               onClick={() => setIsOpen(false)}
-              className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-zinc-100 text-zinc-600 font-bold gap-2"
+              className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-sub-background text-text-secondary font-bold gap-2"
             >
               <DowinIcon name="action-add-active" size="14px" />
               <span>{commonT("createWorkspace")}</span>
@@ -125,7 +125,7 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
           <Link
             href="/workspace/join"
             onClick={() => setIsOpen(false)}
-            className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-zinc-100 text-zinc-600 font-bold gap-2"
+            className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-sub-background text-text-secondary font-bold gap-2"
           >
             <DowinIcon name="action-enter" size="14px" />
             <span>{commonT("joinWorkspace")}</span>

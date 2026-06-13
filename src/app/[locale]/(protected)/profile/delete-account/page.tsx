@@ -27,26 +27,26 @@ export default function ProfileDeleteAccountPage() {
   });
 
   return (
-    <div className="min-h-screen bg-zinc-100">
+    <div className="min-h-screen">
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title={t("header")} />
 
-        <div className="flex items-center gap-4 rounded-[24px] bg-white px-6 py-5">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-red-100 text-red-600">
+        <div className="flex items-center gap-4 rounded-[24px] bg-surface px-6 py-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px] bg-danger/10 text-danger">
             <DowinIcon name="status-warning" size="24px" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-[17px] font-bold tracking-tight text-zinc-900">
+            <h1 className="text-[17px] font-bold tracking-tight text-text-primary">
               {t("cardTitle")}
             </h1>
-            <p className="mt-1 text-[13px] font-medium text-zinc-600 leading-relaxed">
+            <p className="mt-1 text-[13px] font-medium text-text-secondary leading-relaxed">
               {t("cardDesc")}
             </p>
           </div>
         </div>
 
-        <div className="space-y-5 rounded-[24px] bg-white p-5">
-          <div className="rounded-[16px] bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="space-y-5 rounded-[24px] bg-surface p-5">
+          <div className="rounded-[16px] bg-danger/10 px-4 py-3 text-sm text-danger">
             {t("warningText")}
           </div>
 
@@ -71,7 +71,7 @@ export default function ProfileDeleteAccountPage() {
             onClick={() => void submit()}
             className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
               isSubmitting
-                ? "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                ? "bg-sub-background text-text-muted cursor-not-allowed"
                 : "bg-zinc-900 text-white hover:bg-zinc-800"
             }`}
           >
@@ -131,7 +131,7 @@ function TextField({
         placeholder={placeholder}
         className="focus:ring-red-500/10"
       />
-      {hint ? <p className="text-[11px] text-zinc-500 pl-1">{hint}</p> : null}
+      {hint ? <p className="text-[11px] text-text-muted pl-1">{hint}</p> : null}
     </div>
   );
 }
