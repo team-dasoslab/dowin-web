@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/team-dasoslab/dowin-web/compare/v1.4.1...v1.4.2) (2026-06-15)
+
+
+### Bug Fixes
+
+* OG 이미지 용량 최적화 및 Cloudflare 배포 에러 해결 ([81dfa97](https://github.com/team-dasoslab/dowin-web/commit/81dfa9725226f9f52374c49dd9af249455c41e30))
+
 ## [1.4.1](https://github.com/team-dasoslab/dowin-web/compare/v1.4.0...v1.4.1) (2026-06-15)
 
 
