@@ -58,13 +58,6 @@ export const metadata: Metadata = {
     description: "가장 중요한 목표에 집중하세요.",
     url: "/",
     siteName: "Dowin",
-    images: [
-      {
-        url: "/cover.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
     locale: "ko_KR",
     type: "website",
   },
@@ -72,7 +65,6 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Dowin",
     description: "가장 중요한 목표에 집중하세요.",
-    images: ["/cover.png"],
   },
   icons: {
     icon: "/favicon.svg",

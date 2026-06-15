@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/team-dasoslab/dowin-web/compare/v1.4.0...v1.4.1) (2026-06-15)
+
+
+### Bug Fixes
+
+* OG 이미지 인식 오류 해결을 위한 파일 기반 메타데이터 적용 ([92b7d91](https://github.com/team-dasoslab/dowin-web/commit/92b7d91adc5479ccc3f457d99c663d2ba0d7567f))
+
 ## [1.4.0](https://github.com/team-dasoslab/dowin-web/compare/v1.3.2...v1.4.0) (2026-06-13)
 
 
