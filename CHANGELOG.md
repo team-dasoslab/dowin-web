@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/team-dasoslab/dowin-web/compare/v1.4.2...v1.4.3) (2026-06-16)
+
+
+### Bug Fixes
+
+* 랜딩 피드백 반영해서 개선 ([#146](https://github.com/team-dasoslab/dowin-web/issues/146)) ([f97d2df](https://github.com/team-dasoslab/dowin-web/commit/f97d2df19036531a6a1ee0bbca1a369e1ad27fc7))
+
 ## [1.4.2](https://github.com/team-dasoslab/dowin-web/compare/v1.4.1...v1.4.2) (2026-06-15)
 
 
