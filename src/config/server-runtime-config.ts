@@ -1,15 +1,14 @@
 const nodeEnv = process.env.NODE_ENV ?? "development";
-const hostname = process.env.HOSTNAME ?? "localhost";
 const port = process.env.PORT ?? "4000";
-const protocol = process.env.APP_PROTOCOL ?? "http";
-const appOrigin = process.env.APP_ORIGIN ?? `${protocol}://${hostname}:${port}`;
+const appOrigin = (process.env.APP_BASE_URL ?? `http://localhost:${port}`).replace(
+  /\/+$/,
+  "",
+);
 
 export const serverRuntimeConfig = Object.freeze({
   nodeEnv,
   isDevelopment: nodeEnv === "development",
-  hostname,
   port,
-  protocol,
   appOrigin,
   apiDocsUrl: new URL("/api-docs", appOrigin).toString(),
   contactDiscordWebhookUrl: process.env.CONTACT_DISCORD_WEBHOOK_URL ?? "",
