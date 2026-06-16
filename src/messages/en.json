@@ -1138,13 +1138,13 @@
       "eyebrow": "",
       "title": "Execution loop that drives results",
       "node1Title": "Set Goal",
-      "node1Desc": "The most important goal the team must achieve",
+      "node1Desc": "The most important goal\nthe team must achieve",
       "node2Title": "Execute",
-      "node2Desc": "Specific action items to achieve the goal",
+      "node2Desc": "Specific action items\nto achieve the goal",
       "node3Title": "Log Daily",
-      "node3Desc": "Log daily action execution",
+      "node3Desc": "Log daily\naction execution",
       "node4Title": "Weekly Check-in",
-      "node4Desc": "Feedback and improvement via scoreboard"
+      "node4Desc": "Feedback and improvement\nvia scoreboard"
     },
     "Pricing": {
       "eyebrow": "",

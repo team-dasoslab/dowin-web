@@ -1142,13 +1142,13 @@
       "eyebrow": "",
       "title": "성과를 만드는 실행 루프",
       "node1Title": "목표 설정",
-      "node1Desc": "팀이 달성해야 할 가장 중요한 목표",
+      "node1Desc": "팀이 달성해야 할\n가장 중요한 목표",
       "node2Title": "실행",
-      "node2Desc": "목표 달성을 위한 구체적인 액션 아이템",
+      "node2Desc": "목표 달성을 위한\n구체적인 액션 아이템",
       "node3Title": "매일 기록",
-      "node3Desc": "매일 액션 실행 여부 기록",
+      "node3Desc": "매일 액션\n실행 여부 기록",
       "node4Title": "주간 점검",
-      "node4Desc": "점수판을 통한 피드백 및 개선"
+      "node4Desc": "점수판을 통한\n피드백 및 개선"
     },
     "Pricing": {
       "eyebrow": "",
