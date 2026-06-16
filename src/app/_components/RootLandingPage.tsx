@@ -242,33 +242,56 @@ export function RootLandingPage() {
           </FadeIn>
           
           <FadeIn delay={0.2} distance={80}>
-            <div className="relative mx-auto w-[280px] h-[280px] md:w-[500px] md:h-[500px] mt-24 mb-32">
+            <div className="relative mx-auto w-[280px] h-[280px] md:w-[500px] md:h-[500px] mt-40 md:mt-48 mb-32">
               {/* Continuous SVG Circle */}
               <div className="absolute inset-0 pointer-events-none z-0">
                 <svg viewBox="0 0 200 200" className="w-full h-full overflow-visible">
-                  <circle cx="100" cy="100" r="100" fill="none" stroke="currentColor" className="text-primary/20" strokeWidth="2" strokeDasharray="4 6" />
+                  {/* Continuous SVG Circle with mathematically calculated dash array to leave 16px gaps at exactly 0, 90, 180, and 270 degrees (compensating for round linecaps) */}
+                  <circle cx="100" cy="100" r="100" fill="none" stroke="currentColor" className="text-zinc-900/20" strokeWidth="2" strokeLinecap="round" strokeDashoffset="-8" strokeDasharray="3 9.55 3 9.55 3 9.55 3 9.55 3 9.55 3 9.55 3 9.55 3 9.55 3 9.55 3 9.55 3 9.55 3 16" />
+                  
+                  {/* Arrows indicating clockwise direction, perfectly rotated around center */}
+                  <path d="M 96 -6 L 104 0 L 96 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-900/20" />
+                  <path d="M 96 -6 L 104 0 L 96 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-900/20" transform="rotate(90 100 100)" />
+                  <path d="M 96 -6 L 104 0 L 96 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-900/20" transform="rotate(180 100 100)" />
+                  <path d="M 96 -6 L 104 0 L 96 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-900/20" transform="rotate(270 100 100)" />
                 </svg>
               </div>
 
               {/* Nodes on the circle (14.6% is 1 - 1/sqrt(2) to lie on the circle) */}
               {[
-                { num: "1", node: 1, pos: "left-[14.6%] top-[14.6%]" },
-                { num: "2", node: 2, pos: "left-[85.4%] top-[14.6%]" },
-                { num: "3", node: 3, pos: "left-[85.4%] top-[85.4%]" },
-                { num: "4", node: 4, pos: "left-[14.6%] top-[85.4%]" },
+                { num: "1", node: 1, pos: "left-[14.6%] top-[14.6%]", textTop: true },
+                { num: "2", node: 2, pos: "left-[85.4%] top-[14.6%]", textTop: true },
+                { num: "3", node: 3, pos: "left-[85.4%] top-[85.4%]", textTop: false },
+                { num: "4", node: 4, pos: "left-[14.6%] top-[85.4%]", textTop: false },
               ].map((item, i) => (
                 <div key={i} className={`absolute ${item.pos} z-10`}>
                   {/* Offset container so the center of the 56x56 icon sits exactly at the anchor point */}
-                  <div className="absolute -left-[80px] md:-left-[140px] -top-[28px] w-[160px] md:w-[280px] flex flex-col items-center text-center">
-                    <div className="text-[20px] font-bold text-white mb-4 md:mb-6 bg-zinc-900 w-14 h-14 flex items-center justify-center rounded-full ring-[10px] ring-white/50">
-                      {item.num}
-                    </div>
-                    <h3 className="text-[18px] md:text-[22px] font-bold text-text-primary mb-2 md:mb-3 tracking-tight">
-                      {t(`Loop.node${item.node}Title` as Parameters<typeof t>[0])}
-                    </h3>
-                    <p className="text-[14px] md:text-[16px] font-medium text-zinc-600 break-keep leading-relaxed max-w-[240px]">
-                      {t(`Loop.node${item.node}Desc` as Parameters<typeof t>[0])}
-                    </p>
+                  <div className={`absolute -left-[80px] md:-left-[140px] w-[160px] md:w-[280px] flex flex-col items-center text-center ${item.textTop ? '-bottom-[28px]' : '-top-[28px]'}`}>
+                    {item.textTop ? (
+                      <>
+                        <h3 className="text-[18px] md:text-[22px] font-bold text-text-primary mb-3 md:mb-4 tracking-tight">
+                          {t(`Loop.node${item.node}Title` as Parameters<typeof t>[0])}
+                        </h3>
+                        <p className="whitespace-pre-line text-[14px] md:text-[16px] font-medium text-zinc-600 break-keep leading-relaxed max-w-[240px] mb-4 md:mb-6">
+                          {t(`Loop.node${item.node}Desc` as Parameters<typeof t>[0])}
+                        </p>
+                        <div className="text-[20px] font-bold text-white bg-zinc-900 w-14 h-14 shrink-0 flex items-center justify-center rounded-full ring-[10px] ring-white/50">
+                          {item.num}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-[20px] font-bold text-white mb-4 md:mb-6 bg-zinc-900 w-14 h-14 shrink-0 flex items-center justify-center rounded-full ring-[10px] ring-white/50">
+                          {item.num}
+                        </div>
+                        <h3 className="text-[18px] md:text-[22px] font-bold text-text-primary mb-3 md:mb-4 tracking-tight">
+                          {t(`Loop.node${item.node}Title` as Parameters<typeof t>[0])}
+                        </h3>
+                        <p className="whitespace-pre-line text-[14px] md:text-[16px] font-medium text-zinc-600 break-keep leading-relaxed max-w-[240px]">
+                          {t(`Loop.node${item.node}Desc` as Parameters<typeof t>[0])}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
