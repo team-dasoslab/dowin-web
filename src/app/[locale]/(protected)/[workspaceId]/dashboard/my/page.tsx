@@ -6,6 +6,7 @@ import { PeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboa
 import { ProductUpdateCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ProductUpdateCard";
 import { ScoreboardOverviewSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ScoreboardOverviewSection";
 import { WeeklyBoardSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/WeeklyBoardSection";
+import { TeamMemberCheckIn } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberCheckIn";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { useLoginPushPrompt } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useLoginPushPrompt";
 import { useMyDashboardPageState } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useMyDashboardPageState";
@@ -169,6 +170,7 @@ export default function MyDashboardPage() {
 
   return (
     <div className="min-h-screen">
+      <TeamMemberCheckIn />
       {celebrationLevel ? (
         <DashboardCelebrationOverlay level={celebrationLevel} />
       ) : null}

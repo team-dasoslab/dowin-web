@@ -32,6 +32,8 @@ type ActiveMemoState = {
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
+  const params = useParams();
+  const workspaceId = params.workspaceId as string;
   const {
     dashboard,
     hasNoWorkspace,
@@ -45,7 +47,7 @@ export default function DashboardPage() {
     setSelectedDate,
     weekDates,
     weekLabel,
-  } = useTeamDashboard(useParams().workspaceId as string);
+  } = useTeamDashboard(workspaceId);
   const { data: profileResponse } = useGetUsersMe();
   const [activeMemoState, setActiveMemoState] = useState<ActiveMemoState>(null);
   const myUserId =
@@ -161,11 +163,9 @@ export default function DashboardPage() {
         <ProtectedPageHeader
           title={t("teamStatus")}
           rightElement={
-            <div className="flex items-center gap-2">
-              {isLoading ? (
-                <div className="h-10 w-[200px] animate-pulse rounded-[16px] bg-border" />
-              ) : null}
-            </div>
+            isLoading ? (
+              <div className="h-10 w-[200px] animate-pulse rounded-[16px] bg-border" />
+            ) : null
           }
         />
 
