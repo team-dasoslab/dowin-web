@@ -777,7 +777,6 @@ function getReasonCode(
   logsByMeasure: Map<number, Array<{ value: boolean; count: number }>>,
   now: Date,
   settings: {
-    triggerNoWeeklyLogEnabled: boolean;
     triggerSlowStartEnabled: boolean;
   },
 ) {
@@ -800,10 +799,6 @@ function getReasonCode(
     if (candidate.targetValue >= 3 && kstDay >= 3 && kstHour >= 10 && achievedCount <= 1) {
       return "SLOW_WEEKLY_START" as const;
     }
-  }
-
-  if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
-    return "NO_WEEKLY_LOG" as const;
   }
 
   return null;

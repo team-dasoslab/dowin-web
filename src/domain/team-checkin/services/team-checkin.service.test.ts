@@ -90,4 +90,58 @@ describe("TeamCheckinService", () => {
       }),
     ).rejects.toThrow("TEAM_CHECKIN_ALREADY_RESPONDED");
   });
+
+  it("does not send a weekly target 2 checkin on Monday before slow-start threshold", async () => {
+    const createDelivery = vi.fn();
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: true,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-15T01:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 0,
+      createdDeliveryCount: 0,
+    });
+    expect(createDelivery).not.toHaveBeenCalled();
+  });
 });
