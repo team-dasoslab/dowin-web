@@ -202,30 +202,31 @@ export function LeaderReport() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
         {/* Recent Activity Log */}
         <div className="flex flex-col h-full">
-          <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">체크인 기록</h3>
+          <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
           
           <div className="bg-surface rounded-[28px] p-6 h-full">
-            <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[31px] before:-translate-x-px before:h-full before:w-0.5 before:bg-border/40">
-              {(report?.activity || []).map((activity, i) => (
-                <div key={activity.checkinId! + i} className="relative flex items-start">
-                  <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
-                    {activity.type === 'CHECKIN_SENT' ? <Bot className="w-5 h-5 text-white" /> : <CheckCircle2 className="w-5 h-5 text-white" />}
+            {(!report?.activity || report.activity.length === 0) ? (
+              <div className="text-text-muted text-[15px] font-medium py-4">{t("noRecentActivity")}</div>
+            ) : (
+              <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[31px] before:-translate-x-px before:h-full before:w-0.5 before:bg-border/40">
+                {report.activity.map((activity, i) => (
+                  <div key={activity.checkinId! + i} className="relative flex items-start">
+                    <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
+                      {activity.type === 'CHECKIN_SENT' ? <Bot className="w-5 h-5 text-white" /> : <CheckCircle2 className="w-5 h-5 text-white" />}
+                    </div>
+                    
+                    <div className="ml-10 pt-1">
+                      <p className="text-[15px] text-text-primary font-bold leading-snug tracking-tight mb-1">
+                        {t("historyDesc", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" })}
+                      </p>
+                      <p className="text-[13px] text-text-muted">
+                        {formatDateRelative(activity.createdAt)}
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div className="ml-10 pt-1">
-                    <p className="text-[15px] text-text-primary font-bold leading-snug tracking-tight mb-1">
-                      {activity.memberNickname}님에게 &apos;{activity.leadMeasureName}&apos; 체크인 {activity.type === 'CHECKIN_SENT' ? '발송' : '응답'}
-                    </p>
-                    <p className="text-[13px] text-text-muted">
-                      {formatDateRelative(activity.createdAt)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              {(report?.activity || []).length === 0 && (
-                <div className="text-text-muted text-sm py-4">최근 활동 내역이 없습니다.</div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
