@@ -6,6 +6,14 @@ import { Bot, HelpCircle, CheckCircle2, X, FileEdit } from "lucide-react";
 import { Area, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGetWorkspacesWorkspaceIdReportsTeamWeekly } from "@/api/generated/reports/reports";
+import {
+  addDays,
+  getTodayInKst,
+  getWeekDates,
+  isValidDateString,
+} from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
+import { TeamPeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamPeriodControls";
 import {
   useGetWorkspacesWorkspaceIdTeamCheckinsReport,
   usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposals,
@@ -17,14 +25,6 @@ import {
 
 export function LeaderReport() {
   const t = useTranslations("TeamCheckin");
-
-  const MOCK_TREND_POINTS = [
-    { label: "5/18주", rate: 60, executionRate: 75 },
-    { label: "5/25주", rate: 45, executionRate: 50 },
-    { label: "6/1주", rate: 30, executionRate: 80 },
-    { label: "6/8주", rate: 45, executionRate: 85 },
-    { label: t("thisWeek"), rate: 70, executionRate: 83 },
-  ];
 
   function formatDateRelative(dateString?: string | null) {
     if (!dateString) return t("justNow");
@@ -51,10 +51,48 @@ export function LeaderReport() {
   const { workspaceId } = useParams() as { workspaceId: string };
   const queryClient = useQueryClient();
   
-  const { data: reportResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsReport(workspaceId, { weekStart: "2026-06-15" });
+  const today = getTodayInKst();
+  const [selectedDate, setSelectedDateState] = useState(today);
+  const selectedWeekStart = getWeekDates(selectedDate)[0] ?? today;
+  const currentWeekStart = getWeekDates(today)[0] ?? today;
+
+  const movePeriod = (direction: -1 | 1) => {
+    const nextWeekStart = addDays(selectedWeekStart, direction * 7);
+    setSelectedDateState(nextWeekStart);
+  };
+  
+  const setSelectedDate = (value: string) => {
+    if (!isValidDateString(value)) return;
+    const nextWeekStart = getWeekDates(value)[0] ?? value;
+    setSelectedDateState(nextWeekStart);
+  };
+  
+  const resetToToday = () => {
+    setSelectedDateState(today);
+  };
+
+  const getWeekDatesFromStart = (weekStart?: string) => {
+    if (!weekStart) return [];
+    const [year, month, day] = weekStart.split("-").map(Number);
+    const base = new Date(Date.UTC(year, month - 1, day));
+    return Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(base);
+      date.setUTCDate(base.getUTCDate() + index);
+      return date.toISOString().slice(0, 10);
+    });
+  };
+
+  const { data: reportResponse, isFetching: isPeriodLoading } = useGetWorkspacesWorkspaceIdTeamCheckinsReport(workspaceId, { weekStart: selectedWeekStart });
+  const { data: weeklyReportResponse, isFetching: isWeeklyLoading } = useGetWorkspacesWorkspaceIdReportsTeamWeekly(workspaceId, { weekStart: selectedWeekStart, weeks: 5 });
   const submitProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposals();
 
   const report = reportResponse?.status === 200 ? reportResponse.data : null;
+  const weeklyReport = weeklyReportResponse?.status === 200 ? weeklyReportResponse.data : null;
+
+  const weekDates = getWeekDatesFromStart(report?.weekStart ?? selectedWeekStart);
+  const weekLabel = weekDates.length === 7 
+    ? `${weekDates[0].slice(5).replace("-", ".")} - ${weekDates[6].slice(5).replace("-", ".")}`
+    : "";
 
   const [activeSignalModal, setActiveSignalModal] = useState<string | null>(null); // responseId
   const [commentText, setCommentText] = useState("");
@@ -75,6 +113,22 @@ export function LeaderReport() {
 
   const attentionItems = (report?.attentionItems || []).filter(item => item.responseId && !item.openProposalId && !resolvedIds.includes(item.responseId));
   const pendingCount = attentionItems.length;
+
+  const trendPoints = [...(weeklyReport?.trends || [])]
+    .sort((a, b) => (a.weekStart || "").localeCompare(b.weekStart || ""))
+    .map(trend => {
+      const s = new Date(trend.weekStart!);
+      const isSelected = trend.weekStart === selectedWeekStart;
+      return {
+        label: isSelected ? t("thisWeek") : `${s.getMonth() + 1}.${s.getDate()}`,
+        rate: trend.winRate || 0,
+        executionRate: trend.executionRate || 0,
+      };
+    });
+
+  const currentTrend = weeklyReport?.trends?.find(t => t.weekStart === selectedWeekStart);
+  const currentWinRate = currentTrend?.winRate || 0;
+  const currentExecutionRate = currentTrend?.executionRate || 0;
 
   const handleResolveSignal = async (signal: TeamCheckinReportResponseAttentionItemsItem) => {
     if (!signal.responseId) return;
@@ -119,15 +173,17 @@ export function LeaderReport() {
     <div className="space-y-8 animate-dowin-in max-w-5xl mx-auto pb-20 pt-4">
       
       {/* Week Selector Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-2">
-        
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 rounded-[16px] bg-surface p-1.5 h-10">
-            <div className="px-4 text-center text-[13px] font-black text-text-primary tabular-nums">
-              {formatDateRange(report?.weekStart, report?.weekEnd) || t("thisWeek")}
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
+        <TeamPeriodControls
+          isPeriodLoading={isPeriodLoading || isWeeklyLoading}
+          isPreviousDisabled={false}
+          isResetVisible={selectedWeekStart !== currentWeekStart}
+          movePeriod={movePeriod}
+          resetToToday={resetToToday}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          weekLabel={weekLabel}
+        />
       </div>
 
       {/* Summary Stats */}
@@ -172,7 +228,7 @@ export function LeaderReport() {
 
       {/* Team Win Rate Trend Chart */}
       <div className="flex flex-col h-full px-2">
-        <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">주간 달성률</h3>
+        <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">최근 {trendPoints.length || 5}주 달성률</h3>
         <div className="bg-surface rounded-[28px] p-6 w-full">
           <div className="flex items-center gap-8 mb-6 px-2">
             <div>
@@ -180,7 +236,7 @@ export function LeaderReport() {
                 <span className="text-[13px] font-bold text-text-muted">달성률</span>
                 <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
               </div>
-              <div className="text-[28px] font-black tracking-tight text-text-primary">70<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
+              <div className="text-[28px] font-black tracking-tight text-text-primary">{currentWinRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
             </div>
             
             <div>
@@ -188,12 +244,12 @@ export function LeaderReport() {
                 <span className="text-[13px] font-bold text-text-muted">실행률</span>
                 <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
               </div>
-              <div className="text-[28px] font-black tracking-tight text-text-primary">83<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
+              <div className="text-[28px] font-black tracking-tight text-text-primary">{currentExecutionRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
             </div>
           </div>
 
           <div className="h-[240px] w-full">
-            <WeeklyRateTrendChart points={MOCK_TREND_POINTS} />
+            <WeeklyRateTrendChart points={trendPoints} />
           </div>
         </div>
       </div>
