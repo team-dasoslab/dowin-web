@@ -259,9 +259,11 @@ export function LeaderReport() {
         <section id="history" className="flex flex-col h-full scroll-mt-28">
           <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
           
-          <div className="bg-surface rounded-[28px] p-6 h-full">
+          <div className="bg-surface rounded-[28px] p-6 flex flex-col h-full">
             {(!report?.activity || report.activity.length === 0) ? (
-              <div className="text-text-muted text-[15px] font-medium py-4">{t("noRecentActivity")}</div>
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
+                {t("noRecentActivity")}
+              </div>
             ) : (
               <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[31px] before:-translate-x-px before:h-full before:w-0.5 before:bg-border/40">
                 {report.activity.map((activity, i) => (
@@ -297,12 +299,13 @@ export function LeaderReport() {
           </div>
           
           <div className="bg-surface rounded-[28px] p-4 flex flex-col gap-2 h-full">
+            {attentionItems.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
+                {t("noAttentionItems")}
+              </div>
+            ) : (
             <div className="space-y-1">
-              {attentionItems.length === 0 ? (
-                <div className="text-text-muted text-[15px] font-medium py-4">
-                  {t("noAttentionItems")}
-                </div>
-              ) : attentionItems.map((signal) => (
+              {attentionItems.map((signal) => (
                 <div
                   key={signal.responseId!}
                   className={`w-full text-left py-3 px-2 rounded-[20px] transition-colors flex flex-col hover:bg-surface/40 cursor-pointer`}
@@ -337,6 +340,7 @@ export function LeaderReport() {
                 </div>
               ))}
             </div>
+            )}
           </div>
         </section>
 
