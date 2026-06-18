@@ -134,42 +134,44 @@ export function LeaderReport() {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-2">
-        <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-          <span className="text-[14px] text-text-secondary font-medium mb-4">발송된 체크인</span>
-          <div>
-            <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.sentCount || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">건</span></div>
-            <p className="text-[13px] text-text-muted mt-1">대상 {report?.summary?.recipientCount || 0}명</p>
+      <section id="achievement" className="scroll-mt-28">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-2">
+          <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
+            <span className="text-[14px] text-text-secondary font-medium mb-4">발송된 체크인</span>
+            <div>
+              <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.sentCount || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">건</span></div>
+              <p className="text-[13px] text-text-muted mt-1">대상 {report?.summary?.recipientCount || 0}명</p>
+            </div>
+          </div>
+          
+          <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
+            <span className="text-[14px] text-text-secondary font-medium mb-4">1탭 반응률</span>
+            <div>
+              <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.oneTapResponseRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
+              <p className="text-[13px] text-text-muted mt-1">{report?.summary?.respondedCount || 0}명 응답</p>
+            </div>
+          </div>
+          
+          <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
+            <span className="text-[14px] text-text-secondary font-medium mb-4">기록 재개율</span>
+            <div>
+              <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.resumedWithin24hRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
+              <p className="text-[13px] text-text-muted mt-1">24시간 내 기록</p>
+            </div>
+          </div>
+          
+          <div className="bg-danger/5 rounded-[24px] p-6 flex flex-col justify-between">
+            <span className="text-[14px] text-danger font-bold mb-4 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-danger animate-pulse"></span>
+              확인 필요
+            </span>
+            <div>
+              <div className="text-[32px] font-bold text-danger tracking-tight">{report?.summary?.adjustmentSignalCount || 0}<span className="text-[18px] text-danger/60 ml-1 font-medium">건</span></div>
+              <p className="text-[13px] text-danger/70 mt-1">도움이 필요해요</p>
+            </div>
           </div>
         </div>
-        
-        <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-          <span className="text-[14px] text-text-secondary font-medium mb-4">1탭 반응률</span>
-          <div>
-            <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.oneTapResponseRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
-            <p className="text-[13px] text-text-muted mt-1">{report?.summary?.respondedCount || 0}명 응답</p>
-          </div>
-        </div>
-        
-        <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-          <span className="text-[14px] text-text-secondary font-medium mb-4">기록 재개율</span>
-          <div>
-            <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.resumedWithin24hRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
-            <p className="text-[13px] text-text-muted mt-1">24시간 내 기록</p>
-          </div>
-        </div>
-        
-        <div className="bg-danger/5 rounded-[24px] p-6 flex flex-col justify-between">
-          <span className="text-[14px] text-danger font-bold mb-4 flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-danger animate-pulse"></span>
-            확인 필요
-          </span>
-          <div>
-            <div className="text-[32px] font-bold text-danger tracking-tight">{report?.summary?.adjustmentSignalCount || 0}<span className="text-[18px] text-danger/60 ml-1 font-medium">건</span></div>
-            <p className="text-[13px] text-danger/70 mt-1">도움이 필요해요</p>
-          </div>
-        </div>
-      </div>
+      </section>
 
       {/* Team Win Rate Trend Chart */}
       <div className="flex flex-col h-full px-2">
@@ -201,7 +203,7 @@ export function LeaderReport() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
         {/* Recent Activity Log */}
-        <div className="flex flex-col h-full">
+        <section id="history" className="flex flex-col h-full scroll-mt-28">
           <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
           
           <div className="bg-surface rounded-[28px] p-6 h-full">
@@ -228,26 +230,24 @@ export function LeaderReport() {
               </div>
             )}
           </div>
-        </div>
+        </section>
 
         {/* Attention Needed */}
-        <div className="flex flex-col h-full">
+        <section id="attention" className="flex flex-col h-full scroll-mt-28">
           <div className="flex items-center justify-between mb-5 px-2">
-            <h3 className="text-[20px] font-bold text-text-primary">조율 및 지원 요청</h3>
-            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center transition-all">
-              <span className="text-red-500 font-bold text-[16px]">{pendingCount}</span>
-            </div>
+            <h3 className="text-[20px] font-bold text-text-primary">{t("attentionItems")}</h3>
+            {pendingCount > 0 && (
+              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center transition-all">
+                <span className="text-red-500 font-bold text-[16px]">{pendingCount}</span>
+              </div>
+            )}
           </div>
           
           <div className="bg-surface rounded-[28px] p-4 flex flex-col gap-2 h-full">
             <div className="space-y-1">
               {attentionItems.length === 0 ? (
-                <div className="py-12 text-center flex flex-col items-center justify-center animate-in fade-in duration-300">
-                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                    <CheckCircle2 className="w-8 h-8 text-primary" />
-                  </div>
-                  <p className="text-[16px] font-bold text-text-primary mb-1">모든 지원 요청을 확인했습니다</p>
-                  <p className="text-[14px] text-text-secondary">팀원들의 업무가 원활하게 진행되고 있습니다.</p>
+                <div className="text-text-muted text-[15px] font-medium py-4">
+                  {t("noAttentionItems")}
                 </div>
               ) : attentionItems.map((signal) => (
                 <div
@@ -285,7 +285,7 @@ export function LeaderReport() {
               ))}
             </div>
           </div>
-        </div>
+        </section>
 
       </div>
 
