@@ -17,6 +17,7 @@
     "test:backend": "vitest --run src/app/api src/domain src/lib/server",
     "test:ui": "vitest --ui",
     "test:storybook": "vitest --config vitest.storybook.config.mts",
+    "test:checkin": "node --env-file=.env scripts/test-team-checkin.mjs",
     "gen:api": "orval",
     "mig:local": "npx drizzle-kit generate && npx wrangler d1 migrations apply wig-db --local",
     "mig:remote": "drizzle-kit generate && wrangler d1 migrations apply wig-db --remote",
