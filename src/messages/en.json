@@ -1002,7 +1002,17 @@
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "Logs from before last week cannot be modified. Please update current week data only.",
     "BILLING_NOT_READY": "Billing integration is not ready yet.",
     "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "The limit cannot be lower than the members still in the workspace. Remove members first, then try again.",
-    "BILLING_REVIEW_REQUIRED": "This workspace has repeated refund or cancellation history, so a new checkout cannot be started right now. Please contact support."
+    "BILLING_REVIEW_REQUIRED": "This workspace has repeated refund or cancellation history, so a new checkout cannot be started right now. Please contact support.",
+    "TEAM_CHECKIN_DISABLED": "Team check-ins are disabled for this workspace.",
+    "TEAM_CHECKIN_NOT_FOUND": "The requested team check-in was not found.",
+    "TEAM_CHECKIN_ALREADY_RESPONDED": "This team check-in has already been answered.",
+    "TEAM_CHECKIN_RESPONSE_REQUIRED": "A member response is required to create an adjustment proposal.",
+    "TEAM_CHECKIN_RESPONSE_NOT_ACTIONABLE": "This response cannot be used for an adjustment proposal.",
+    "TEAM_CHECKIN_PROPOSAL_NOT_FOUND": "The requested adjustment proposal was not found.",
+    "TEAM_CHECKIN_PROPOSAL_ALREADY_OPEN": "An open adjustment proposal already exists.",
+    "TEAM_CHECKIN_PROPOSAL_NOT_OPEN": "This adjustment proposal is already closed.",
+    "TEAM_CHECKIN_PROPOSAL_EXPIRED": "This adjustment proposal has expired.",
+    "TEAM_CHECKIN_PROPOSAL_APPLY_FAILED": "Failed to apply the adjustment proposal. Review the current action item state."
   },
   "Auth": {
     "login": "Login",
