@@ -120,9 +120,6 @@ export function LeaderReport() {
       
       {/* Week Selector Header */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 px-2">
-        <h2 className="text-[20px] font-bold text-text-primary tracking-tight mr-1">
-          주간 리포트
-        </h2>
         
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1 rounded-[16px] bg-surface p-1.5 h-10">

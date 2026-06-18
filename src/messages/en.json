@@ -1443,7 +1443,6 @@
   },
   "TeamCheckin": {
     "settingsTitle": "Service-Led Team Check-in",
-    "settingsDesc": "Dowin notification-based execution rate improvement feature",
     "enabledToast": "Team check-in has been enabled.",
     "disabledToast": "Team check-in has been disabled.",
     "updateFailedToast": "Failed to update settings.",

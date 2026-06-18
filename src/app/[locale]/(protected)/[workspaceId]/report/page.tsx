@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LeaderReport } from "./_components/LeaderReport";
 import { ProtectedPageContainer, ProtectedPageHeader } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { SubPageLayout } from "@/app/[locale]/(protected)/_components/SubPageLayout";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 
 import { useTranslations } from "next-intl";
@@ -45,7 +46,7 @@ export default function ReportPage() {
   }, [activeSection, menuGroups]);
 
   return (
-    <div className="min-h-screen">
+    <SubPageLayout>
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={t("reportPageTitle")}
@@ -62,6 +63,6 @@ export default function ReportPage() {
           </div>
         </div>
       </ProtectedPageContainer>
-    </div>
+    </SubPageLayout>
   );
 }

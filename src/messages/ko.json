@@ -1447,8 +1447,7 @@
   },
   "TeamCheckin": {
     "settingsTitle": "서비스 주도 팀 체크인",
-    "settingsDesc": "Dowin 알림 기반의 실행률 향상 기능",
-    "enabledToast": "팀 체크인이 켜졌습니다.",
+    "enabledToast": "팀 체크인이 활성화되었습니다.",
     "disabledToast": "팀 체크인이 꺼졌습니다.",
     "updateFailedToast": "설정 변경에 실패했습니다.",
     "reportPageTitle": "팀 체크인 리포트",

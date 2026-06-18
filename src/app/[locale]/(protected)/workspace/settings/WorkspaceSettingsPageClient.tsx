@@ -183,7 +183,6 @@ export default function WorkspaceSettingsPage() {
               id: "checkin-settings",
               icon: <DowinIcon name="nav-dashboard" className="w-4 h-4" />,
               title: checkinT("settingsTitle"),
-              description: checkinT("settingsDesc"),
               rightElement: checkinSettings ? (
                 <div onClick={(e) => e.stopPropagation()}>
                   <Switch 
