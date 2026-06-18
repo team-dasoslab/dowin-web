@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/team-dasoslab/dowin-web/compare/v1.4.3...v1.5.0) (2026-06-18)
+
+
+### Features
+
+* 체크인 기능 API ([#149](https://github.com/team-dasoslab/dowin-web/issues/149)) ([6c48809](https://github.com/team-dasoslab/dowin-web/commit/6c4880981fa1003d97d4b64d1bd4d732d2ef6dbb))
+
 ## [1.4.3](https://github.com/team-dasoslab/dowin-web/compare/v1.4.2...v1.4.3) (2026-06-16)
 
 
