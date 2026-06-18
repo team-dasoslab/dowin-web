@@ -1,0 +1,93 @@
+import { describe, expect, it, vi } from "vitest";
+import { TeamCheckinService } from "@/domain/team-checkin/services/team-checkin.service";
+import { TeamCheckinStorage } from "@/domain/team-checkin/storage/team-checkin.storage";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+
+const adminContext: WorkspaceAccessContext = {
+  workspaceId: 1,
+  workspacePublicId: "ws_uid",
+  workspaceName: "Team",
+  userId: 10,
+  role: "ADMIN",
+  membershipId: 100,
+  entitlement: {
+    canAccessBasicSubscription: true,
+    entitlementSource: "POLAR",
+    billingStatus: "ACTIVE",
+    planCode: "BASIC",
+  },
+};
+
+const memberContext: WorkspaceAccessContext = {
+  ...adminContext,
+  userId: 11,
+  role: "MEMBER",
+};
+
+const createStorage = (overrides: Partial<TeamCheckinStorage>) =>
+  overrides as TeamCheckinStorage;
+
+describe("TeamCheckinService", () => {
+  it("blocks MEMBER from updating settings", async () => {
+    const service = new TeamCheckinService(createStorage({}));
+
+    await expect(
+      service.updateSettings(memberContext, {
+        enabled: true,
+        includeAdminAsMember: false,
+        triggerNoWeeklyLogEnabled: true,
+        triggerSlowStartEnabled: true,
+        dailyMemberLimit: 2,
+        dailyWorkspaceLimit: 30,
+      }),
+    ).rejects.toThrow("FORBIDDEN");
+  });
+
+  it("returns default disabled settings when no settings row exists", async () => {
+    const service = new TeamCheckinService(
+      createStorage({
+        findSettings: vi.fn().mockResolvedValue(null),
+      }),
+    );
+
+    await expect(service.getSettings(adminContext)).resolves.toEqual({
+      enabled: false,
+      includeAdminAsMember: false,
+      triggerNoWeeklyLogEnabled: true,
+      triggerSlowStartEnabled: true,
+      dailyMemberLimit: 2,
+      dailyWorkspaceLimit: 30,
+    });
+  });
+
+  it("prevents duplicate checkin responses", async () => {
+    const now = new Date("2026-06-18T01:00:00.000Z");
+    const service = new TeamCheckinService(
+      createStorage({
+        findDeliveryByUid: vi.fn().mockResolvedValue({
+          id: 1,
+          uid: "chk_1",
+          workspaceId: 1,
+          memberUserId: 11,
+          leadMeasureId: 20,
+        }),
+        findResponseByDeliveryId: vi.fn().mockResolvedValue({
+          id: 2,
+          uid: "res_1",
+          deliveryId: 1,
+          workspaceId: 1,
+          memberUserId: 11,
+          responseType: "SNOOZE_TODAY",
+          note: null,
+          createdAt: now,
+        }),
+      }),
+    );
+
+    await expect(
+      service.respondToCheckin(memberContext, "chk_1", {
+        responseType: "LOG_NOW",
+      }),
+    ).rejects.toThrow("TEAM_CHECKIN_ALREADY_RESPONDED");
+  });
+});

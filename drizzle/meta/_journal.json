@@ -253,6 +253,13 @@
       "when": 1781077088788,
       "tag": "0035_mean_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "6",
+      "when": 1781769701920,
+      "tag": "0036_handy_catseye",
+      "breakpoints": true
     }
   ]
 }

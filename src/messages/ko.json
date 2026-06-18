@@ -1005,7 +1005,17 @@
     "PAST_WEEK_LOG_EDIT_NOT_ALLOWED": "지난주부터의 기록은 수정할 수 없습니다. 이번 주 기록만 변경해주세요.",
     "BILLING_NOT_READY": "결제 연동 준비가 아직 끝나지 않았습니다.",
     "BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT": "남아 있는 멤버 수보다 낮은 한도는 설정할 수 없습니다. 먼저 멤버를 내보낸 뒤 다시 시도해주세요.",
-    "BILLING_REVIEW_REQUIRED": "반복 환불 또는 취소 이력이 있어 결제를 바로 다시 시작할 수 없습니다. 고객지원으로 문의해주세요."
+    "BILLING_REVIEW_REQUIRED": "반복 환불 또는 취소 이력이 있어 결제를 바로 다시 시작할 수 없습니다. 고객지원으로 문의해주세요.",
+    "TEAM_CHECKIN_DISABLED": "이 워크스페이스의 팀 체크인이 꺼져 있습니다.",
+    "TEAM_CHECKIN_NOT_FOUND": "요청한 팀 체크인을 찾을 수 없습니다.",
+    "TEAM_CHECKIN_ALREADY_RESPONDED": "이미 응답한 팀 체크인입니다.",
+    "TEAM_CHECKIN_RESPONSE_REQUIRED": "조정 제안을 만들려면 팀원 응답이 필요합니다.",
+    "TEAM_CHECKIN_RESPONSE_NOT_ACTIONABLE": "이 응답에는 조정 제안을 만들 수 없습니다.",
+    "TEAM_CHECKIN_PROPOSAL_NOT_FOUND": "요청한 조정 제안을 찾을 수 없습니다.",
+    "TEAM_CHECKIN_PROPOSAL_ALREADY_OPEN": "이미 응답 대기 중인 조정 제안이 있습니다.",
+    "TEAM_CHECKIN_PROPOSAL_NOT_OPEN": "이미 종료된 조정 제안입니다.",
+    "TEAM_CHECKIN_PROPOSAL_EXPIRED": "조정 제안 응답 기한이 지났습니다.",
+    "TEAM_CHECKIN_PROPOSAL_APPLY_FAILED": "조정 제안을 적용하지 못했습니다. 현재 액션 아이템 상태를 확인해주세요."
   },
   "Auth": {
     "login": "로그인",
