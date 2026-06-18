@@ -23,6 +23,10 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetWorkspacesWorkspaceIdTeamCheckinsSettings, usePutWorkspacesWorkspaceIdTeamCheckinsSettings, getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey } from "@/api/generated/team-checkins/team-checkins";
+import { TeamCheckinSettings } from "@/api/generated/dowin.schemas";
+import { Switch } from "@/components/ui/Switch";
 
 interface MenuItem {
   id: string;
@@ -39,6 +43,7 @@ export default function WorkspaceSettingsPage() {
   const t = useTranslations("Profile");
   const commonT = useTranslations("Common");
   const dashboardT = useTranslations("Dashboard");
+  const checkinT = useTranslations("TeamCheckin");
   const isNativeApp = useNativeApp();
   const router = useRouter();
   const workspaceId = useParams().workspaceId as string | undefined;
@@ -62,6 +67,28 @@ export default function WorkspaceSettingsPage() {
       },
     },
   });
+
+  const queryClient = useQueryClient();
+  const { data: checkinSettingsRes } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId || "", { query: { enabled: !!workspaceId } });
+  const checkinSettings = checkinSettingsRes?.status === 200 ? (checkinSettingsRes.data as TeamCheckinSettings) : null;
+  const updateSettings = usePutWorkspacesWorkspaceIdTeamCheckinsSettings();
+
+  const handleToggleCheckin = async (checked: boolean) => {
+    if (!workspaceId || !checkinSettings) return;
+    try {
+      await updateSettings.mutateAsync({
+        workspaceId,
+        data: {
+          ...checkinSettings,
+          enabled: checked
+        }
+      });
+      queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey(workspaceId) });
+      showToast("success", checked ? checkinT("enabledToast") : checkinT("disabledToast"));
+    } catch {
+      showToast("error", checkinT("updateFailedToast"));
+    }
+  };
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
@@ -152,6 +179,27 @@ export default function WorkspaceSettingsPage() {
                 },
               ]
               : []),
+            {
+              id: "checkin-settings",
+              icon: <DowinIcon name="nav-dashboard" className="w-4 h-4" />,
+              title: checkinT("settingsTitle"),
+              description: checkinT("settingsDesc"),
+              rightElement: checkinSettings ? (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Switch 
+                    checked={checkinSettings.enabled} 
+                    onCheckedChange={handleToggleCheckin} 
+                    disabled={updateSettings.isPending}
+                  />
+                </div>
+              ) : undefined,
+            },
+            {
+              id: "checkin-report",
+              icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+              title: dashboardT("checkinReport"),
+              href: getWorkspacePath(workspaceId, "/report"),
+            },
             {
               id: "workspace-name",
               icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
