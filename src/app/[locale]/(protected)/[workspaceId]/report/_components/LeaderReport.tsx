@@ -238,104 +238,100 @@ export function LeaderReport() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
-        {/* Recent Activity Log */}
-        <section id="history" className="flex flex-col h-full scroll-mt-28">
-          <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
-          
-          <div className="bg-surface rounded-[28px] p-6 flex flex-col h-full">
-            {(!report?.activity || report.activity.length === 0) ? (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
-                {t("noRecentActivity")}
-              </div>
-            ) : (
-              <div className="relative pl-6 space-y-8">
-                {report.activity.map((activity, i) => {
-                  const isLast = i === report.activity!.length - 1;
-                  return (
-                  <div key={activity.checkinId! + i} className="relative flex items-start">
-                    <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
-                      {activity.type === 'CHECKIN_SENT' ? <Bot className="w-5 h-5 text-white" /> : <CheckCircle2 className="w-5 h-5 text-white" />}
-                    </div>
-
-                    {!isLast && (
-                      <div className="absolute -left-6 top-10 -bottom-8 w-10 flex justify-center">
-                        <div className="w-0.5 h-full bg-border/40" />
-                      </div>
-                    )}
-                    
-                    <div className="ml-10 pt-1">
-                      <p className="text-[15px] text-text-primary font-bold leading-snug tracking-tight mb-1">
-                        {activity.type === 'CHECKIN_SENT' ? t("historySent", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" }) : t("historyResponded", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" })}
-                      </p>
-                      <p className="text-[13px] text-text-muted">
-                        {formatDateRelative(activity.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                )})}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Attention Needed */}
-        <section id="attention" className="flex flex-col h-full scroll-mt-28">
-          <div className="flex items-center justify-between mb-5 px-2">
-            <h3 className="text-[20px] font-bold text-text-primary">{t("attentionItems")}</h3>
-          </div>
-          
-          <div className="bg-surface rounded-[28px] p-4 flex flex-col gap-2 h-full">
-            {attentionItems.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
-                {t("noAttentionItems")}
-              </div>
-            ) : (
-            <div className="space-y-1">
-              {attentionItems.map((signal) => (
-                <div
-                  key={signal.responseId!}
-                  className={`w-full text-left py-3 px-2 rounded-[20px] transition-colors flex flex-col hover:bg-surface/40 cursor-pointer`}
-                  onClick={() => setActiveSignalModal(signal.responseId!)}
-                >
-                  <div className="flex gap-4 items-center">
-                    <div className="relative shrink-0">
-                      <UserAvatar
-                        avatarSeed={signal.memberNickname || "Member"}
-                        alt={signal.memberNickname || "Member"}
-                        size={46}
-                      />
-                      {!signal.isResolved && (
-                        <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
-                      )}
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 py-0.5">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className={`text-[13px] font-bold text-[#4E5968]`}>
-                          {signal.memberNickname}
-                        </span>
-                        <div className="w-1 h-1 rounded-full bg-[#D1D6DB]" />
-                        <span className={`text-[13px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-blue-500'}`}>
-                          {signal.isResolved ? '조율 중' : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
-                        </span>
-                        <div className="w-1 h-1 rounded-full bg-[#D1D6DB]" />
-                        <span className="text-[13px] font-bold text-[#8B95A1]">{formatDateRelative(signal.createdAt)}</span>
-                      </div>
-                      
-                      <p className={`text-[16px] truncate tracking-tight font-bold text-[#191F28] leading-snug`}>
-                        {signal.leadMeasureName}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+      {/* Attention Needed */}
+      <section id="attention" className="flex flex-col scroll-mt-28 px-2">
+            <div className="flex items-center justify-between mb-5 px-2">
+              <h3 className="text-[20px] font-bold text-text-primary">{t("attentionItems")}</h3>
             </div>
-            )}
-          </div>
-        </section>
+            
+            <div className="bg-surface rounded-[28px] p-6 flex flex-col">
+              {attentionItems.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
+                  {t("noAttentionItems")}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {attentionItems.map((signal) => (
+                    <div
+                      key={signal.responseId!}
+                      className={`w-full text-left p-4 rounded-[20px] transition-colors flex flex-col hover:bg-surface/40 cursor-pointer border border-border/40 bg-white`}
+                      onClick={() => setActiveSignalModal(signal.responseId!)}
+                    >
+                      <div className="flex gap-4 items-center">
+                        <div className="relative shrink-0">
+                          <UserAvatar
+                            avatarSeed={signal.memberNickname || "Member"}
+                            alt={signal.memberNickname || "Member"}
+                            size={40}
+                          />
+                          {!signal.isResolved && (
+                            <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0 py-0.5">
+                          <div className="flex justify-between items-start w-full mb-0.5">
+                            <span className={`text-[14px] font-medium truncate pr-2 ${!signal.isResolved ? 'text-primary' : 'text-[#8B95A1]'}`}>
+                              {signal.leadMeasureName}
+                            </span>
+                            <span className="text-[12px] text-[#8B95A1] shrink-0 mt-0.5">{formatDateRelative(signal.createdAt)}</span>
+                          </div>
+                          
+                          <div className={`flex items-center gap-1.5 text-[15px] leading-snug tracking-tight truncate ${!signal.isResolved ? 'font-bold text-[#191F28]' : 'font-medium text-[#4E5968]'}`}>
+                            <span className="truncate">{signal.memberNickname}</span>
+                            <span className="text-[#B0B8C1] text-[12px] font-bold">•</span>
+                            <span className={`text-[14px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-primary'}`}>
+                              {signal.isResolved ? '조율 중' : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+      </section>
 
-      </div>
+      {/* Recent Activity Log */}
+      <section id="history" className="flex flex-col scroll-mt-28 px-2">
+            <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
+            
+            <div className="bg-surface rounded-[28px] p-6 flex flex-col">
+              {(!report?.activity || report.activity.length === 0) ? (
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
+                  {t("noRecentActivity")}
+                </div>
+              ) : (
+                <div className="relative pl-6 space-y-8">
+                  {report.activity.map((activity, i) => {
+                    const isLast = i === report.activity!.length - 1;
+                    return (
+                    <div key={activity.checkinId! + i} className="relative flex items-start">
+                      <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
+                        {activity.type === 'CHECKIN_SENT' ? <Bot className="w-5 h-5 text-white" /> : <CheckCircle2 className="w-5 h-5 text-white" />}
+                      </div>
+
+                      {!isLast && (
+                        <div className="absolute -left-6 top-10 -bottom-8 w-10 flex justify-center">
+                          <div className="w-0.5 h-full bg-border/40" />
+                        </div>
+                      )}
+                      
+                      <div className="ml-10 pt-1">
+                        <p className="text-[15px] text-text-primary font-bold leading-snug tracking-tight mb-1">
+                          {activity.type === 'CHECKIN_SENT' ? t("historySent", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" }) : t("historyResponded", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" })}
+                        </p>
+                        <p className="text-[13px] text-text-muted">
+                          {formatDateRelative(activity.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                  )})}
+                </div>
+              )}
+        </div>
+      </section>
 
       {/* Leader's Action Item Detail Modal */}
       {activeSignalModal && (() => {

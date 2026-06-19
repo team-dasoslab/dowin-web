@@ -15,8 +15,8 @@ export default function ReportPage() {
   const menuGroups = useMemo(
     () => [
       { id: "achievement", label: t("weeklyAchievement") },
-      { id: "history", label: t("checkinHistory") },
       { id: "attention", label: t("attentionItems") },
+      { id: "history", label: t("checkinHistory") },
     ],
     [t]
   );
