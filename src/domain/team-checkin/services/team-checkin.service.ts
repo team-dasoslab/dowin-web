@@ -1,4 +1,10 @@
 import { customAlphabet } from "nanoid";
+import { serverRuntimeConfig } from "@/config/server-runtime-config";
+import {
+  DEFAULT_LOCALE,
+  isSupportedLocale,
+  type Locale,
+} from "@/i18n/detect-locale";
 import {
   ConflictError,
   ForbiddenError,
@@ -17,6 +23,10 @@ import {
   TeamCheckinStorage,
 } from "@/domain/team-checkin/storage/team-checkin.storage";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import en from "@/messages/en.json";
+import ko from "@/messages/ko.json";
+
+const messages = { ko, en } as const;
 
 const createUid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -31,6 +41,11 @@ const DEFAULT_SETTINGS = {
   dailyMemberLimit: 2,
   dailyWorkspaceLimit: 30,
 };
+const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
+
+type TeamCheckinServiceOptions = {
+  leadMeasureAgeGateEnabled?: boolean;
+};
 
 type FcmSender = (
   messages: Array<{
@@ -44,10 +59,17 @@ type FcmSender = (
 ) => Promise<{ success: number; failed: number; disabledTokens: string[] }>;
 
 export class TeamCheckinService {
+  private leadMeasureAgeGateEnabled: boolean;
+
   constructor(
     private storage: TeamCheckinStorage,
     private sendFcmMessages?: FcmSender,
-  ) {}
+    options: TeamCheckinServiceOptions = {},
+  ) {
+    this.leadMeasureAgeGateEnabled =
+      options.leadMeasureAgeGateEnabled ??
+      serverRuntimeConfig.teamCheckinLeadMeasureAgeGateEnabled;
+  }
 
   async getSettings(context: WorkspaceAccessContext) {
     await this.assertBasic(context);
@@ -103,7 +125,7 @@ export class TeamCheckinService {
             reasonCode: item.delivery.reasonCode,
             periodStart: item.delivery.periodStart,
             periodEnd: item.delivery.periodEnd,
-            sentAt: item.delivery.sentAt?.toISOString() ?? null,
+            sentAt: item.delivery.sentAt?.toISOString() ?? item.delivery.createdAt.toISOString(),
             response: item.response
               ? {
                   id: item.response.uid,
@@ -188,13 +210,14 @@ export class TeamCheckinService {
         resumedWithin24h: await this.hasResumedWithin24h(row),
       })),
     );
-    const sentRows = rows.filter((row) => row.sendStatus === "SENT");
+    const sentRows = rows;
     const respondedRows = rows.filter((row) => row.response);
     const adjustmentRows = rows.filter(
       (row) =>
         row.response?.responseType === "BLOCKED" ||
         row.response?.responseType === "ADJUSTMENT_REQUESTED",
     );
+    const attentionRows = adjustmentRows.filter((row) => !row.proposal);
     const proposalRows = rows.filter((row) => row.proposal);
     const acceptedProposalRows = proposalRows.filter(
       (row) => row.proposal?.status === "ACCEPTED",
@@ -224,14 +247,13 @@ export class TeamCheckinService {
           rowsWithFollowup.filter((item) => item.resumedWithin24h).length,
           respondedRows.length,
         ),
-        adjustmentSignalCount: adjustmentRows.length,
+        adjustmentSignalCount: attentionRows.length,
         proposalAcceptanceRate: getRate(
           acceptedProposalRows.length,
           proposalRows.length,
         ),
       },
       attentionItems: adjustmentRows
-        .filter((row) => !row.proposal || row.proposal.status === "PROPOSED")
         .map((row) => ({
           responseId: row.response?.uid ?? null,
           checkinId: row.uid,
@@ -244,6 +266,17 @@ export class TeamCheckinService {
           createdAt: row.response?.createdAt.toISOString() ?? row.createdAt.toISOString(),
           openProposalId:
             row.proposal?.status === "PROPOSED" ? row.proposal.uid : null,
+          isResolved: !!row.proposal,
+          resolvedAt: row.proposal?.createdAt.toISOString() ?? null,
+          resolvedProposal: row.proposal
+            ? {
+                actionType: row.proposal.actionType,
+                leaderNote: row.proposal.leaderNote,
+                payloadJson: row.proposal.payloadJson,
+                status: row.proposal.status,
+                createdAt: row.proposal.createdAt.toISOString(),
+              }
+            : null,
         })),
       activity: rows.slice(0, 20).map((row) => ({
         type: row.response ? "CHECKIN_RESPONDED" : "CHECKIN_SENT",
@@ -467,9 +500,11 @@ export class TeamCheckinService {
         (candidate) =>
           settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
       );
-      const weeklyCandidates = candidates.filter(
-        (candidate) => candidate.period === "WEEKLY",
-      );
+      const weeklyCandidates = candidates.filter((candidate) => {
+        if (candidate.period !== "WEEKLY") return false;
+        if (!this.leadMeasureAgeGateEnabled) return true;
+        return isOldEnoughForCheckin(candidate.leadMeasureCreatedAt, now);
+      });
       const logs = await this.storage.findLogsForCandidates(
         weeklyCandidates.map((candidate) => candidate.leadMeasureId),
         weekStart,
@@ -527,8 +562,7 @@ export class TeamCheckinService {
           continue;
         }
 
-        const title = "Dowin 팀 체크인";
-        const body = buildMessageBody(candidate, reasonCode);
+        const { title, body } = buildPushMessage(candidate);
         const delivery = await this.storage.createDelivery({
           uid: `chk_${createUid()}`,
           workspaceId: workspace.id,
@@ -772,6 +806,10 @@ function groupLogs(
   return map;
 }
 
+function isOldEnoughForCheckin(createdAt: Date, now: Date) {
+  return now.getTime() - createdAt.getTime() >= MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS;
+}
+
 function getReasonCode(
   candidate: TeamCheckinCandidate,
   logsByMeasure: Map<number, Array<{ value: boolean; count: number }>>,
@@ -790,6 +828,10 @@ function getReasonCode(
   const kstDay = getKstDay(now);
   const kstHour = getKstHour(now);
 
+  if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
+    return "NO_WEEKLY_LOG" as const;
+  }
+
   if (settings.triggerSlowStartEnabled) {
     if (candidate.targetValue === 1 && kstDay >= 5 && kstHour >= 10 && achievedCount === 0) {
       return "SLOW_WEEKLY_START" as const;
@@ -802,21 +844,24 @@ function getReasonCode(
     }
   }
 
-  if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
-    return "NO_WEEKLY_LOG" as const;
-  }
-
   return null;
 }
 
-function buildMessageBody(
-  candidate: TeamCheckinCandidate,
-  reasonCode: "NO_WEEKLY_LOG" | "SLOW_WEEKLY_START",
-) {
-  if (reasonCode === "SLOW_WEEKLY_START") {
-    return `${candidate.leadMeasureName} 실행 리듬이 이번 주 목표보다 늦습니다. 가능한 작은 단위로 먼저 재개해 주세요.`;
-  }
-  return `이번 주 ${candidate.leadMeasureName} 기록이 아직 없어요. 오늘 가능한 가장 작은 실행을 하나만 업데이트해 주세요.`;
+function buildPushMessage(candidate: TeamCheckinCandidate) {
+  const locale = resolvePushLocale(candidate.userLocale);
+  const t = messages[locale].Notification;
+
+  return {
+    title: t.teamCheckinTitle,
+    body: t.teamCheckinBody.replace(
+      "{actionItemName}",
+      candidate.leadMeasureName,
+    ),
+  };
+}
+
+function resolvePushLocale(locale?: string | null): Locale {
+  return isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
 }
 
 function getKstWeekRange(now: Date) {

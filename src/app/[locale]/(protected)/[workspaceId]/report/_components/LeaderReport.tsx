@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Bot, HelpCircle, CheckCircle2, X, FileEdit } from "lucide-react";
+import { Bot, HelpCircle, CheckCircle2, X } from "lucide-react";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Area, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ import {
 import {
   TeamCheckinReportResponseAttentionItemsItem
 } from "@/api/generated/dowin.schemas";
+import { buildAdjustmentProposalDraft } from "../_lib/team-checkin-proposal";
 
 export function LeaderReport() {
   const t = useTranslations("TeamCheckin");
@@ -42,12 +44,6 @@ export function LeaderReport() {
     return t("justNow");
   }
 
-  function formatDateRange(start?: string, end?: string) {
-    if (!start || !end) return "";
-    const s = new Date(start);
-    const e = new Date(end);
-    return `${s.getMonth() + 1}.${s.getDate()} - ${e.getMonth() + 1}.${e.getDate()}`;
-  }
   const { workspaceId } = useParams() as { workspaceId: string };
   const queryClient = useQueryClient();
   
@@ -112,7 +108,6 @@ export function LeaderReport() {
   };
 
   const attentionItems = (report?.attentionItems || []).filter(item => item.responseId && !item.openProposalId && !resolvedIds.includes(item.responseId));
-  const pendingCount = attentionItems.length;
 
   const trendPoints = [...(weeklyReport?.trends || [])]
     .sort((a, b) => (a.weekStart || "").localeCompare(b.weekStart || ""))
@@ -133,31 +128,20 @@ export function LeaderReport() {
   const handleResolveSignal = async (signal: TeamCheckinReportResponseAttentionItemsItem) => {
     if (!signal.responseId) return;
     
-    let actionType: "CHANGE_TARGET_COUNT" | "ARCHIVE_ACTION_ITEM" | "REPLACE_ACTION_ITEM" | undefined;
-    let payload: Record<string, unknown> = {};
-
-    if (proposalType === 'archive') {
-      actionType = "ARCHIVE_ACTION_ITEM";
-      payload = { reason: commentText || "액션 아이템 보관 처리" };
-    } else if (proposalType === 'update_metric' && proposalNumber !== "") {
-      actionType = "CHANGE_TARGET_COUNT";
-      payload = { newTargetValue: Number(proposalNumber) };
-    } else if (proposalType === 'replace_action_item' && proposalReplacementText.trim() !== "") {
-      actionType = "REPLACE_ACTION_ITEM";
-      payload = { replacementName: proposalReplacementText };
-    } else {
-      // Just a comment, mapped as ARCHIVE for now or maybe we just don't allow comment-only in API
-      // Since MVP requires an actionType, we will require at least one proposal type
-      return;
-    }
+    const proposalDraft = buildAdjustmentProposalDraft({
+      proposalType,
+      proposalNumber,
+      proposalReplacementText,
+    });
+    if (!proposalDraft) return;
 
     try {
       await submitProposal.mutateAsync({
         workspaceId,
         data: {
           sourceResponseId: signal.responseId,
-          actionType: actionType,
-          payload: payload,
+          actionType: proposalDraft.actionType,
+          payload: proposalDraft.payload,
           leaderNote: commentText || null
         }
       });
@@ -190,37 +174,37 @@ export function LeaderReport() {
       <section id="achievement" className="scroll-mt-28">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-2">
           <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-            <span className="text-[14px] text-text-secondary font-medium mb-4">발송된 체크인</span>
+            <span className="text-[14px] text-text-secondary font-medium mb-4">{t("sentCount")}</span>
             <div>
-              <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.sentCount || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">건</span></div>
-              <p className="text-[13px] text-text-muted mt-1">대상 {report?.summary?.recipientCount || 0}명</p>
+              <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.sentCount || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">{t("countUnit")}</span></div>
+              <p className="text-[13px] text-text-muted mt-1">{t("targetCount", { n: report?.summary?.recipientCount || 0 })}</p>
             </div>
           </div>
           
           <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-            <span className="text-[14px] text-text-secondary font-medium mb-4">1탭 반응률</span>
+            <span className="text-[14px] text-text-secondary font-medium mb-4">{t("oneTapResponseRate")}</span>
             <div>
               <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.oneTapResponseRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
-              <p className="text-[13px] text-text-muted mt-1">{report?.summary?.respondedCount || 0}명 응답</p>
+              <p className="text-[13px] text-text-muted mt-1">{t("respondedCount", { n: report?.summary?.respondedCount || 0 })}</p>
             </div>
           </div>
           
           <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-            <span className="text-[14px] text-text-secondary font-medium mb-4">기록 재개율</span>
+            <span className="text-[14px] text-text-secondary font-medium mb-4">{t("resumedRate")}</span>
             <div>
               <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.resumedWithin24hRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
-              <p className="text-[13px] text-text-muted mt-1">24시간 내 기록</p>
+              <p className="text-[13px] text-text-muted mt-1">{t("resumedWithin24h")}</p>
             </div>
           </div>
           
           <div className="bg-danger/5 rounded-[24px] p-6 flex flex-col justify-between">
             <span className="text-[14px] text-danger font-bold mb-4 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-danger animate-pulse"></span>
-              확인 필요
+              {t("needsCheck")}
             </span>
             <div>
-              <div className="text-[32px] font-bold text-danger tracking-tight">{report?.summary?.adjustmentSignalCount || 0}<span className="text-[18px] text-danger/60 ml-1 font-medium">건</span></div>
-              <p className="text-[13px] text-danger/70 mt-1">도움이 필요해요</p>
+              <div className="text-[32px] font-bold text-danger tracking-tight">{report?.summary?.adjustmentSignalCount || 0}<span className="text-[18px] text-danger/60 ml-1 font-medium">{t("countUnit")}</span></div>
+              <p className="text-[13px] text-danger/70 mt-1">{t("needsHelp")}</p>
             </div>
           </div>
         </div>
@@ -254,106 +238,111 @@ export function LeaderReport() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-2">
-        {/* Recent Activity Log */}
-        <section id="history" className="flex flex-col h-full scroll-mt-28">
-          <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
-          
-          <div className="bg-surface rounded-[28px] p-6 flex flex-col h-full">
-            {(!report?.activity || report.activity.length === 0) ? (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
-                {t("noRecentActivity")}
-              </div>
-            ) : (
-              <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[31px] before:-translate-x-px before:h-full before:w-0.5 before:bg-border/40">
-                {report.activity.map((activity, i) => (
-                  <div key={activity.checkinId! + i} className="relative flex items-start">
-                    <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
-                      {activity.type === 'CHECKIN_SENT' ? <Bot className="w-5 h-5 text-white" /> : <CheckCircle2 className="w-5 h-5 text-white" />}
-                    </div>
-                    
-                    <div className="ml-10 pt-1">
-                      <p className="text-[15px] text-text-primary font-bold leading-snug tracking-tight mb-1">
-                        {t("historyDesc", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" })}
-                      </p>
-                      <p className="text-[13px] text-text-muted">
-                        {formatDateRelative(activity.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Attention Needed */}
-        <section id="attention" className="flex flex-col h-full scroll-mt-28">
-          <div className="flex items-center justify-between mb-5 px-2">
-            <h3 className="text-[20px] font-bold text-text-primary">{t("attentionItems")}</h3>
-            {pendingCount > 0 && (
-              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center transition-all">
-                <span className="text-red-500 font-bold text-[16px]">{pendingCount}</span>
-              </div>
-            )}
-          </div>
-          
-          <div className="bg-surface rounded-[28px] p-4 flex flex-col gap-2 h-full">
-            {attentionItems.length === 0 ? (
-              <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
-                {t("noAttentionItems")}
-              </div>
-            ) : (
-            <div className="space-y-1">
-              {attentionItems.map((signal) => (
-                <div
-                  key={signal.responseId!}
-                  className={`w-full text-left py-3 px-2 rounded-[20px] transition-colors flex flex-col hover:bg-surface/40 cursor-pointer`}
-                  onClick={() => setActiveSignalModal(signal.responseId!)}
-                >
-                  <div className="flex gap-4 items-center">
-                    <div className="relative shrink-0">
-                      <div className={`w-[46px] h-[46px] rounded-full flex items-center justify-center text-[22px] bg-[#F2F4F6]`}>
-                        {signal.signalType === 'BLOCKED' ? '🚨' : '🤔'}
-                      </div>
-                      <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 py-0.5">
-                      <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className={`text-[13px] font-bold text-[#4E5968]`}>
-                          {signal.memberNickname}
-                        </span>
-                        <div className="w-1 h-1 rounded-full bg-[#D1D6DB]" />
-                        <span className={`text-[13px] font-bold ${signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-blue-500'}`}>
-                          {signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
-                        </span>
-                        <div className="w-1 h-1 rounded-full bg-[#D1D6DB]" />
-                        <span className="text-[13px] font-bold text-[#8B95A1]">{formatDateRelative(signal.createdAt)}</span>
-                      </div>
-                      
-                      <p className={`text-[16px] truncate tracking-tight font-bold text-[#191F28] leading-snug`}>
-                        {signal.leadMeasureName}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+      {/* Attention Needed */}
+      <section id="attention" className="flex flex-col scroll-mt-28 px-2">
+            <div className="flex items-center justify-between mb-5 px-2">
+              <h3 className="text-[20px] font-bold text-text-primary">{t("attentionItems")}</h3>
             </div>
-            )}
-          </div>
-        </section>
+            
+            <div className="bg-surface rounded-[28px] p-6 flex flex-col">
+              {attentionItems.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
+                  {t("noAttentionItems")}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {attentionItems.map((signal) => (
+                    <div
+                      key={signal.responseId!}
+                      className={`w-full text-left p-4 rounded-[20px] transition-colors flex flex-col hover:bg-surface/40 cursor-pointer border border-border/40 bg-white`}
+                      onClick={() => setActiveSignalModal(signal.responseId!)}
+                    >
+                      <div className="flex gap-4 items-center">
+                        <div className="relative shrink-0">
+                          <UserAvatar
+                            avatarSeed={signal.memberNickname || "Member"}
+                            alt={signal.memberNickname || "Member"}
+                            size={40}
+                          />
+                          {!signal.isResolved && (
+                            <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0 py-0.5">
+                          <div className="flex justify-between items-start w-full mb-0.5">
+                            <span className={`text-[14px] font-medium truncate pr-2 ${!signal.isResolved ? 'text-primary' : 'text-[#8B95A1]'}`}>
+                              {signal.leadMeasureName}
+                            </span>
+                            <span className="text-[12px] text-[#8B95A1] shrink-0 mt-0.5">{formatDateRelative(signal.createdAt)}</span>
+                          </div>
+                          
+                          <div className={`flex items-center gap-1.5 text-[15px] leading-snug tracking-tight truncate ${!signal.isResolved ? 'font-bold text-[#191F28]' : 'font-medium text-[#4E5968]'}`}>
+                            <span className="truncate">{signal.memberNickname}</span>
+                            <span className="text-[#B0B8C1] text-[12px] font-bold">•</span>
+                            <span className={`text-[14px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-primary'}`}>
+                              {signal.isResolved ? '조율 중' : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+      </section>
 
-      </div>
+      {/* Recent Activity Log */}
+      <section id="history" className="flex flex-col scroll-mt-28 px-2">
+            <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
+            
+            <div className="bg-surface rounded-[28px] p-6 flex flex-col">
+              {(!report?.activity || report.activity.length === 0) ? (
+                <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
+                  {t("noRecentActivity")}
+                </div>
+              ) : (
+                <div className="relative pl-6 space-y-8">
+                  {report.activity.map((activity, i) => {
+                    const isLast = i === report.activity!.length - 1;
+                    return (
+                    <div key={activity.checkinId! + i} className="relative flex items-start">
+                      <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
+                        {activity.type === 'CHECKIN_SENT' ? <Bot className="w-5 h-5 text-white" /> : <CheckCircle2 className="w-5 h-5 text-white" />}
+                      </div>
+
+                      {!isLast && (
+                        <div className="absolute -left-6 top-10 -bottom-8 w-10 flex justify-center">
+                          <div className="w-0.5 h-full bg-border/40" />
+                        </div>
+                      )}
+                      
+                      <div className="ml-10 pt-1">
+                        <p className="text-[15px] text-text-primary font-bold leading-snug tracking-tight mb-1">
+                          {activity.type === 'CHECKIN_SENT' ? t("historySent", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" }) : t("historyResponded", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" })}
+                        </p>
+                        <p className="text-[13px] text-text-muted">
+                          {formatDateRelative(activity.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                  )})}
+                </div>
+              )}
+        </div>
+      </section>
 
       {/* Leader's Action Item Detail Modal */}
       {activeSignalModal && (() => {
         const signal = attentionItems.find(s => s.responseId === activeSignalModal);
         if (!signal) return null;
         
-        const canSubmit = (proposalType === 'archive') || 
-                          (proposalType === 'update_metric' && proposalNumber !== "") || 
-                          (proposalType === 'replace_action_item' && proposalReplacementText.trim() !== "");
+        const canSubmit = buildAdjustmentProposalDraft({
+          proposalType,
+          proposalNumber,
+          proposalReplacementText,
+        }) !== null;
 
         return (
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 animate-in fade-in duration-200" onClick={closeModal}>
@@ -362,10 +351,14 @@ export function LeaderReport() {
               <div className="px-6 py-5 flex items-start shrink-0 bg-white z-10 rounded-t-[32px] border-b border-[#F2F4F6] relative">
                 <div className="flex gap-4 items-center w-full pr-8">
                   <div className="relative shrink-0">
-                    <div className={`w-[46px] h-[46px] rounded-full flex items-center justify-center text-[22px] bg-[#F2F4F6]`}>
-                      {signal.signalType === 'BLOCKED' ? '🚨' : '🤔'}
-                    </div>
-                    <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                    <UserAvatar
+                      avatarSeed={signal.memberNickname || "Member"}
+                      alt={signal.memberNickname || "Member"}
+                      size={46}
+                    />
+                    {!signal.isResolved && (
+                      <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                    )}
                   </div>
                   
                   <div className="flex-1 min-w-0">
@@ -393,26 +386,51 @@ export function LeaderReport() {
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col gap-6">
-                <div className="px-2 space-y-6">
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col gap-6 bg-white">
+                <div className="px-1 space-y-7 mb-8">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-[14px] font-bold text-[#4E5968]">{signal.memberNickname} 팀원의 요청</span>
+                      <span className="text-[13px] font-bold text-[#4E5968]">{signal.memberNickname} 팀원의 요청</span>
+                      <span className="text-[13px] font-medium text-[#8B95A1]">{formatDateRelative(signal.createdAt)}</span>
                     </div>
-                    <div className="bg-white rounded-[24px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FileEdit className="w-4 h-4 text-[#8B95A1]" />
-                        <span className="text-[14px] font-bold text-[#8B95A1]">{signal.signalType === 'BLOCKED' ? '막힘 발생 보고' : '목표 조율 요청'}</span>
+                    <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[14px] font-bold text-[#8B95A1]">
+                          {signal.signalType === 'BLOCKED' ? '막힘 발생 보고' : '목표 조율 요청'}
+                        </span>
+                        <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
+                          {signal.note || "도움이 필요합니다."}
+                        </p>
                       </div>
-                      <p className="text-[16px] text-[#333D4B] leading-relaxed">
-                        {signal.note || "도움이 필요합니다."}
-                      </p>
                     </div>
                   </div>
+
+                  {signal.isResolved && signal.resolvedProposal && (
+                    <div className="flex flex-col gap-2 mt-4">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[13px] font-bold text-primary">리더님의 응답</span>
+                        <span className="text-[13px] font-medium text-primary">{formatDateRelative(signal.resolvedProposal.createdAt)}</span>
+                      </div>
+                      <div className="bg-primary/10 rounded-[16px] p-5">
+                        {signal.resolvedProposal.leaderNote && (
+                          <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium mb-4 whitespace-pre-wrap`}>
+                            {signal.resolvedProposal.leaderNote}
+                          </p>
+                        )}
+                        <div className={signal.resolvedProposal.leaderNote ? 'pt-4 border-t border-primary/15' : ''}>
+                          <p className="text-[16px] text-[#191F28] leading-relaxed font-bold">
+                            {signal.resolvedProposal.actionType === 'CHANGE_TARGET_COUNT' ? '실행 횟수 조정 제안' : 
+                             signal.resolvedProposal.actionType === 'ARCHIVE_ACTION_ITEM' ? '아이템 보관 제안' : '대체 목표 제안'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="p-5 bg-white shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] rounded-b-[32px]">
+              {!signal.isResolved && (
+                <div className="p-5 bg-white shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] rounded-b-[32px]">
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2">
                     <input
@@ -480,6 +498,7 @@ export function LeaderReport() {
                           placeholder={t("proposeTargetLabel2")}
                           className="w-20 bg-white border border-primary/30 shadow-sm rounded-[10px] px-3 py-2 text-center text-[15px] font-bold text-primary outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                           min={1}
+                          max={7}
                           autoFocus
                         />
                         <span className="text-[14px] text-[#333D4B] font-medium">회로 조정 제안</span>
@@ -501,6 +520,7 @@ export function LeaderReport() {
                   </div>
                 </div>
               </div>
+              )}
 
             </div>
           </div>

@@ -90,4 +90,267 @@ describe("TeamCheckinService", () => {
       }),
     ).rejects.toThrow("TEAM_CHECKIN_ALREADY_RESPONDED");
   });
+
+  it("does not send a weekly target 2 checkin on Monday before slow-start threshold when no-log trigger is disabled", async () => {
+    const createDelivery = vi.fn();
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: false,
+              triggerSlowStartEnabled: true,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-01T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-15T01:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 0,
+      createdDeliveryCount: 0,
+    });
+    expect(createDelivery).not.toHaveBeenCalled();
+  });
+
+  it("creates localized no-weekly-log checkins when no-log trigger is enabled", async () => {
+    const createDelivery = vi.fn().mockResolvedValue({
+      id: 1,
+      uid: "chk_1",
+      deeplinkPath: "/ko/ws_uid/dashboard/my",
+    });
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: false,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-19T00:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 12,
+            memberRole: "MEMBER",
+            userLocale: "en",
+            scoreboardId: 31,
+            leadMeasureId: 21,
+            leadMeasureName: "Customer interviews",
+            leadMeasureCreatedAt: new Date("2026-06-19T00:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        findActiveDeviceTokens: vi.fn().mockResolvedValue([]),
+        markDeliverySkipped: vi.fn(),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-19T00:48:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 2,
+      createdDeliveryCount: 2,
+      skippedCount: 2,
+    });
+    expect(createDelivery).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        messageTitle: "Dowin",
+        messageBody:
+          "이번 주 고객 인터뷰 기록이 아직 없어요. 오늘 할 수 있는 가장 작은 한 걸음부터 남겨주세요.",
+        reasonCode: "NO_WEEKLY_LOG",
+      }),
+    );
+    expect(createDelivery).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        messageTitle: "Dowin",
+        messageBody:
+          "You haven't logged Customer interviews this week. Start with one small step you can do today.",
+        reasonCode: "NO_WEEKLY_LOG",
+      }),
+    );
+  });
+
+  it("evaluates a recent lead measure while the age gate is disabled", async () => {
+    const createDelivery = vi.fn();
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: true,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-12T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        createDelivery,
+      }),
+      undefined,
+      { leadMeasureAgeGateEnabled: false },
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-17T01:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 1,
+      createdDeliveryCount: 0,
+    });
+    expect(createDelivery).toHaveBeenCalledOnce();
+  });
+
+  it("skips a recent lead measure while the age gate is enabled", async () => {
+    const createDelivery = vi.fn();
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: true,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-12T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        createDelivery,
+      }),
+      undefined,
+      { leadMeasureAgeGateEnabled: true },
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-17T01:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 0,
+      createdDeliveryCount: 0,
+    });
+    expect(createDelivery).not.toHaveBeenCalled();
+  });
 });
