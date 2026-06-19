@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/team-dasoslab/dowin-web/compare/v1.6.0...v1.6.1) (2026-06-19)
+
+
+### Bug Fixes
+
+* 체크인 기능 QA 및 개선 ([#153](https://github.com/team-dasoslab/dowin-web/issues/153)) ([77269d4](https://github.com/team-dasoslab/dowin-web/commit/77269d40e700f549cbbdd09366119e3c7729c4e1))
+
 ## [1.6.0](https://github.com/team-dasoslab/dowin-web/compare/v1.5.0...v1.6.0) (2026-06-18)
 
 
