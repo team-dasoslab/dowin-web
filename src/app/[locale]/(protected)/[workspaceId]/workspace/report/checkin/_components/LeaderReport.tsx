@@ -78,7 +78,9 @@ export function LeaderReport() {
     });
   };
 
-  const { data: reportResponse, isFetching: isPeriodLoading } = useGetWorkspacesWorkspaceIdTeamCheckinsReport(workspaceId, { weekStart: selectedWeekStart });
+  const [showActiveOnly, setShowActiveOnly] = useState(true);
+
+  const { data: reportResponse, isFetching: isPeriodLoading } = useGetWorkspacesWorkspaceIdTeamCheckinsReport(workspaceId, { weekStart: selectedWeekStart, activeOnly: showActiveOnly });
   const { data: weeklyReportResponse, isFetching: isWeeklyLoading } = useGetWorkspacesWorkspaceIdReportsTeamWeekly(workspaceId, { weekStart: selectedWeekStart, weeks: 5 });
   const submitProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposals();
 
@@ -89,6 +91,8 @@ export function LeaderReport() {
   const weekLabel = weekDates.length === 7 
     ? `${weekDates[0].slice(5).replace("-", ".")} - ${weekDates[6].slice(5).replace("-", ".")}`
     : "";
+
+
 
   const [activeSignalModal, setActiveSignalModal] = useState<string | null>(null); // responseId
   const [commentText, setCommentText] = useState("");
@@ -107,7 +111,10 @@ export function LeaderReport() {
     setCommentText("");
   };
 
-  const attentionItems = (report?.attentionItems || []).filter(item => item.responseId && !item.openProposalId && !resolvedIds.includes(item.responseId));
+  const attentionItems = (report?.attentionItems || [])
+    .filter(item => item.responseId && !item.openProposalId && !resolvedIds.includes(item.responseId));
+
+  const activityLog = (report?.activity || []);
 
   const trendPoints = [...(weeklyReport?.trends || [])]
     .sort((a, b) => (a.weekStart || "").localeCompare(b.weekStart || ""))
@@ -168,6 +175,15 @@ export function LeaderReport() {
           setSelectedDate={setSelectedDate}
           weekLabel={weekLabel}
         />
+        <label className="flex items-center gap-2 cursor-pointer bg-surface px-3 py-2 rounded-[14px] shrink-0 border border-border/40 hover:bg-surface/80 transition-colors">
+          <input 
+            type="checkbox" 
+            checked={showActiveOnly} 
+            onChange={e => setShowActiveOnly(e.target.checked)}
+            className="w-4 h-4 rounded-[4px] border-border/60 text-primary focus:ring-primary/20 transition-all cursor-pointer"
+          />
+          <span className="text-[13px] font-bold text-text-secondary select-none">{t("activeMembersOnly")}</span>
+        </label>
       </div>
 
       {/* Summary Stats */}
@@ -281,7 +297,11 @@ export function LeaderReport() {
                             <span className="truncate">{signal.memberNickname}</span>
                             <span className="text-[#B0B8C1] text-[12px] font-bold">•</span>
                             <span className={`text-[14px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-primary'}`}>
-                              {signal.isResolved ? '조율 중' : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                              {signal.isResolved 
+                                ? (signal.resolvedProposal?.status === 'ACCEPTED' ? t("statusAdjustDone") 
+                                 : signal.resolvedProposal?.status === 'DECLINED' ? t("statusDeclined") 
+                                 : t("statusAdjusting")) 
+                                : signal.signalType === 'BLOCKED' ? t("signalBlocked") : t("signalAdjust")}
                             </span>
                           </div>
                         </div>
@@ -298,14 +318,14 @@ export function LeaderReport() {
             <h3 className="text-[20px] font-bold text-text-primary mb-5 px-2">{t("checkinHistory")}</h3>
             
             <div className="bg-surface rounded-[28px] p-6 flex flex-col">
-              {(!report?.activity || report.activity.length === 0) ? (
+              {activityLog.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center min-h-[160px] text-text-muted text-[15px] font-medium text-center">
                   {t("noRecentActivity")}
                 </div>
               ) : (
                 <div className="relative pl-6 space-y-8">
-                  {report.activity.map((activity, i) => {
-                    const isLast = i === report.activity!.length - 1;
+                  {activityLog.map((activity, i) => {
+                    const isLast = i === activityLog.length - 1;
                     return (
                     <div key={activity.checkinId! + i} className="relative flex items-start">
                       <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
@@ -368,11 +388,14 @@ export function LeaderReport() {
                           {signal.memberNickname}
                         </span>
                         <span className="text-[#B0B8C1] text-[12px] font-bold">•</span>
-                        <span className={`text-[15px] font-bold ${signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-blue-500'}`}>
-                          {signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                        <span className={`text-[15px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-primary'}`}>
+                          {signal.isResolved 
+                            ? (signal.resolvedProposal?.status === 'ACCEPTED' ? t("statusAdjustDone") 
+                             : signal.resolvedProposal?.status === 'DECLINED' ? t("statusDeclined") 
+                             : t("statusAdjusting")) 
+                            : signal.signalType === 'BLOCKED' ? t("signalBlocked") : t("signalAdjust")}
                         </span>
                       </div>
-                      <span className="text-[14px] text-[#8B95A1] font-medium shrink-0">{formatDateRelative(signal.createdAt)}</span>
                     </div>
                     
                     <p className="text-[16px] text-[#4E5968] font-bold truncate leading-snug">
@@ -390,13 +413,13 @@ export function LeaderReport() {
                 <div className="px-1 space-y-7 mb-8">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-[13px] font-bold text-[#4E5968]">{signal.memberNickname} 팀원의 요청</span>
+                      <span className="text-[13px] font-bold text-[#4E5968]">{t("teamMember")}</span>
                       <span className="text-[13px] font-medium text-[#8B95A1]">{formatDateRelative(signal.createdAt)}</span>
                     </div>
                     <div className="bg-[#F2F4F6] rounded-[16px] p-5">
                       <div className="flex flex-col gap-1">
                         <span className="text-[14px] font-bold text-[#8B95A1]">
-                          {signal.signalType === 'BLOCKED' ? '막힘 발생 보고' : '목표 조율 요청'}
+                          {signal.signalType === 'BLOCKED' ? t("typeBlocked") : t("typeAdjust")}
                         </span>
                         <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
                           {signal.note || "도움이 필요합니다."}
@@ -408,7 +431,7 @@ export function LeaderReport() {
                   {signal.isResolved && signal.resolvedProposal && (
                     <div className="flex flex-col gap-2 mt-4">
                       <div className="flex items-center justify-between px-1">
-                        <span className="text-[13px] font-bold text-primary">리더님의 응답</span>
+                        <span className="text-[13px] font-bold text-primary">{t("myResponse")}</span>
                         <span className="text-[13px] font-medium text-primary">{formatDateRelative(signal.resolvedProposal.createdAt)}</span>
                       </div>
                       <div className="bg-primary/10 rounded-[16px] p-5">
@@ -423,6 +446,20 @@ export function LeaderReport() {
                              signal.resolvedProposal.actionType === 'ARCHIVE_ACTION_ITEM' ? '아이템 보관 제안' : '대체 목표 제안'}
                           </p>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {signal.isResolved && signal.resolvedProposal && (signal.resolvedProposal.status === 'ACCEPTED' || signal.resolvedProposal.status === 'DECLINED') && (
+                    <div className="flex flex-col gap-2 mt-4">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[13px] font-bold text-[#4E5968]">{t("teamMember")}</span>
+                        <span className="text-[13px] font-medium text-[#8B95A1]">{formatDateRelative(signal.resolvedAt || signal.resolvedProposal.createdAt)}</span>
+                      </div>
+                      <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                        <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium">
+                          {signal.resolvedProposal.status === 'ACCEPTED' ? t("proposalAcceptedMsg") : t("proposalDeclinedMsg")}
+                        </p>
                       </div>
                     </div>
                   )}

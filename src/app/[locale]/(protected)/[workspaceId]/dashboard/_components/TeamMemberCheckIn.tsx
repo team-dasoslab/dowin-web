@@ -68,8 +68,6 @@ export function TeamMemberCheckIn() {
   
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [pendingAction, setPendingAction] = useState<"blocked" | "adjust" | null>(null);
-  const [actionReason, setActionReason] = useState("");
   
   const { data: inboxResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsInbox(
     workspaceId,
@@ -86,6 +84,14 @@ export function TeamMemberCheckIn() {
   const isWorkspaceAdmin = workspaceResponse?.status === 200 && workspaceResponse.data.role === "ADMIN";
   const checkinSettings = checkinSettingsResponse?.status === 200 && 'enabled' in checkinSettingsResponse.data ? checkinSettingsResponse.data : null;
   
+  if (!workspaceResponse || !checkinSettingsResponse) {
+    return null;
+  }
+
+  if (checkinSettingsResponse?.status === 200 && checkinSettings?.enabled === false) {
+    return null;
+  }
+
   if (isWorkspaceAdmin && !checkinSettings?.includeAdminAsMember) {
     return null;
   }
@@ -256,12 +262,12 @@ export function TeamMemberCheckIn() {
 
   const getStatusUI = (status: CheckInStatus) => {
     switch (status) {
-      case "done": return { icon: <CheckCircle2 className="w-8 h-8 text-primary" />, text: t("statusDone"), desc: t("statusDoneDesc"), color: "text-primary" };
-      case "later": return { icon: <Clock className="w-8 h-8 text-text-primary" />, text: t("statusLater"), desc: t("statusLaterDesc"), color: "text-text-primary" };
-      case "blocked": return { icon: <AlertCircle className="w-8 h-8 text-danger" />, text: t("statusBlocked"), desc: t("statusBlockedDesc"), color: "text-danger" };
-      case "adjust": return { icon: <FileEdit className="w-8 h-8 text-text-secondary" />, text: t("statusAdjust"), desc: t("statusAdjustDesc"), color: "text-text-secondary" };
-      case "adjusted": return { icon: <CheckCircle2 className="w-8 h-8 text-primary" />, text: t("statusAdjusted"), desc: t("statusAdjustedDesc"), color: "text-primary" };
-      case "declined": return { icon: <X className="w-8 h-8 text-text-secondary" />, text: t("statusDeclined"), desc: t("statusDeclinedDesc"), color: "text-text-secondary" };
+      case "done": return { icon: <CheckCircle2 className="w-8 h-8 text-primary" />, text: t("statusDone"), color: "text-primary" };
+      case "later": return { icon: <Clock className="w-8 h-8 text-text-primary" />, text: t("statusLater"), color: "text-text-primary" };
+      case "blocked": return { icon: <AlertCircle className="w-8 h-8 text-danger" />, text: t("statusBlocked"), color: "text-danger" };
+      case "adjust": return { icon: <FileEdit className="w-8 h-8 text-text-secondary" />, text: t("statusAdjust"), color: "text-text-secondary" };
+      case "adjusted": return { icon: <CheckCircle2 className="w-8 h-8 text-primary" />, text: t("statusAdjusted"), color: "text-primary" };
+      case "declined": return { icon: <X className="w-8 h-8 text-text-secondary" />, text: t("statusDeclined"), color: "text-text-secondary" };
       case "leader_comment": return null;
       default: return null;
     }
@@ -288,7 +294,7 @@ export function TeamMemberCheckIn() {
           
           {!selectedId ? (
             <>
-              <div className="bg-surface px-6 pt-12 lg:pt-8 pb-4 shrink-0 flex items-center justify-between">
+              <div className="bg-surface px-5 pt-12 lg:pt-8 pb-4 shrink-0 flex items-center justify-between">
                 <h1 className="text-[24px] font-bold text-text-primary tracking-tight flex items-center gap-2">
                   Inbox
                   {unreadCount > 0 && (
@@ -303,7 +309,7 @@ export function TeamMemberCheckIn() {
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto px-2 pb-4">
+              <div className="flex-1 overflow-y-auto px-5 pb-4">
                 {notifications.length === 0 ? (
                   <div className="py-12 text-center text-text-muted">
                     {t("inboxEmpty")}
@@ -314,20 +320,20 @@ export function TeamMemberCheckIn() {
                     onClick={() => {
                       setSelectedId(n.id);
                     }}
-                    className={`w-full flex gap-3 text-left p-4 rounded-[20px] transition-all duration-200 relative ${n.isUnread ? 'bg-primary/5 hover:bg-primary/10' : 'bg-transparent hover:bg-sub-background'}`}
+                    className="w-full flex gap-3 text-left p-4 rounded-[20px] transition-all duration-200 relative bg-transparent hover:bg-sub-background"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start w-full mb-0.5">
-                        <span className={`text-[14px] font-medium truncate pr-2 ${n.isUnread ? 'text-primary' : 'text-[#8B95A1]'}`}>
+                        <span className={`text-[14px] font-medium truncate pr-2 ${n.isUnread ? 'text-primary' : 'text-text-muted'}`}>
                           {n.actionItemName}
                           {n.isUnread && (
                             <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full ml-1.5 mb-0.5 align-middle" />
                           )}
                         </span>
-                        <span className="text-[12px] text-[#8B95A1] shrink-0 mt-0.5">{n.date}</span>
+                        <span className="text-[12px] text-text-muted shrink-0 mt-0.5">{n.date}</span>
                       </div>
                       
-                      <p className={`text-[15px] leading-snug tracking-tight line-clamp-2 ${n.isUnread ? 'font-bold text-[#191F28]' : 'font-medium text-[#4E5968]'}`}>
+                      <p className={`text-[15px] leading-snug tracking-tight line-clamp-2 ${n.isUnread ? 'font-bold text-text-primary' : 'font-medium text-text-secondary'}`}>
                         {n.content.split('\n')[0]}
                       </p>
                     </div>
@@ -337,21 +343,19 @@ export function TeamMemberCheckIn() {
             </>
           ) : (
             <div className="flex flex-col h-full bg-surface">
-              <div className="px-4 py-4 pt-12 lg:pt-4 flex items-center shrink-0">
+              <div className="px-5 py-4 pt-12 lg:pt-4 flex items-center shrink-0">
                 <button
                   onClick={() => {
                     setSelectedId(null);
-                    setPendingAction(null);
-                    setActionReason("");
                   }}
-                  className="p-2 hover:bg-sub-background rounded-full transition-colors text-text-primary shrink-0"
+                  className="-ml-2 p-2 hover:bg-sub-background rounded-full transition-colors text-text-primary shrink-0"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 {selectedItem && (
                   <div className="flex flex-col justify-center ml-2 mr-4 min-w-0">
-                    <span className="text-[16px] font-bold text-[#191F28] truncate">{selectedItem.actionItemName}</span>
-                    <span className={`text-[13px] font-bold ${selectedItem.status === 'adjusted' ? 'text-[#8B95A1]' : 'text-primary'}`}>
+                    <span className="text-[16px] font-bold text-text-primary truncate">{selectedItem.actionItemName}</span>
+                    <span className={`text-[13px] font-bold ${selectedItem.status === 'adjusted' ? 'text-text-muted' : 'text-primary'}`}>
                       {selectedItem.status === 'pending' ? t("statusPending") :
                        selectedItem.status === 'leader_comment' ? t("statusAdjusting") : 
                        selectedItem.status === 'adjusted' ? t("statusAdjustDone") : 
@@ -361,18 +365,18 @@ export function TeamMemberCheckIn() {
                 )}
               </div>
 
-              <div className="flex-1 px-6 pb-6 overflow-y-auto flex flex-col animate-dowin-in">
+              <div className="flex-1 px-5 pb-6 overflow-y-auto flex flex-col animate-dowin-in">
                 {/* Initial System Request (Always Visible) */}
                 <div className="flex flex-col gap-2 mt-2 mb-8 shrink-0">
-                  <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center justify-between px-4">
                     <span className="text-[13px] font-bold text-primary">{t("system")}</span>
                     <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem?.sentAt)}</span>
                   </div>
-                  <div className="bg-primary/10 rounded-[16px] p-5">
-                    <h2 className="text-[16px] font-bold text-[#191F28] leading-[1.4] tracking-tight mb-2">
+                  <div className="bg-primary/10 rounded-[20px] p-4">
+                    <h2 className="text-[16px] font-bold text-text-primary leading-[1.4] tracking-tight mb-2">
                       {t.rich("msgNoLogRich", { measureName: selectedItem?.actionItemName || '', highlight: (chunks) => <span className="text-primary">{chunks}</span> })}
                     </h2>
-                    <p className="text-[15px] text-[#191F28] leading-relaxed font-medium">
+                    <p className="text-[15px] text-text-primary leading-relaxed font-medium">
                       {t("msgNoLogSub")}
                     </p>
                   </div>
@@ -382,66 +386,39 @@ export function TeamMemberCheckIn() {
                   <div className="flex flex-col h-full animate-dowin-in">
                     <div className="mt-auto flex flex-col gap-3">
                       <button
-                        onClick={() => handleResponse(selectedItem.id, "LOG_NOW")}
+                        onClick={() => { if (window.confirm(t("confirmLogNow"))) handleResponse(selectedItem.id, "LOG_NOW"); }}
                         disabled={submitResponse.isPending}
-                        className="w-full py-[18px] rounded-[16px] bg-primary text-white text-[16px] font-bold transition-transform active:scale-[0.98] shadow-sm hover:bg-primary/90 disabled:opacity-50"
+                        className="w-full py-[18px] rounded-[20px] bg-primary text-white text-[16px] font-bold transition-colors shadow-[0_4px_12px_rgba(49,130,246,0.15)] hover:bg-primary/90 disabled:opacity-50"
                       >
-                        방금 완료했어요
+                        {t("actionLogNow")}
                       </button>
                       <button
-                        onClick={() => handleResponse(selectedItem.id, "SNOOZE_TODAY")}
+                        onClick={() => { if (window.confirm(t("confirmSnooze"))) handleResponse(selectedItem.id, "SNOOZE_TODAY"); }}
                         disabled={submitResponse.isPending}
-                        className="w-full py-[18px] rounded-[16px] bg-[#F2F4F6] text-[#4E5968] text-[16px] font-bold transition-transform active:scale-[0.98] hover:bg-[#E5E8EB] disabled:opacity-50"
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors hover:bg-border disabled:opacity-50"
                       >
-                        오늘 나중에 할게요
+                        {t("actionSnooze")}
                       </button>
-                      
-                      <div className="flex justify-center items-center gap-4 mt-3 mb-1">
-                        <button
-                          onClick={() => setPendingAction(pendingAction === "blocked" ? null : "blocked")}
-                          className={`text-[14px] font-bold transition-colors underline-offset-4 hover:underline ${pendingAction === 'blocked' ? 'text-[#F04438]' : 'text-[#8B95A1]'}`}
-                        >
-                          막힘 있어요
-                        </button>
-                        <div className="w-[3px] h-[3px] rounded-full bg-[#D1D6DB]" />
-                        <button
-                          onClick={() => setPendingAction(pendingAction === "adjust" ? null : "adjust")}
-                          className={`text-[14px] font-bold transition-colors underline-offset-4 hover:underline ${pendingAction === 'adjust' ? 'text-primary' : 'text-[#8B95A1]'}`}
-                        >
-                          목표를 조정할래요
-                        </button>
-                      </div>
-
-                      {(pendingAction === "blocked" || pendingAction === "adjust") && (
-                        <div className="mt-3 flex gap-2 animate-in fade-in slide-in-from-top-2 p-1">
-                          <input
-                            autoFocus
-                            type="text"
-                            value={actionReason}
-                            onChange={(e) => setActionReason(e.target.value)}
-                            placeholder={pendingAction === "blocked" ? t("blockedPlaceholder") : t("adjustPlaceholder")}
-                            className="flex-1 bg-[#F2F4F6] border-none rounded-[16px] px-5 py-[16px] text-[15px] font-medium text-[#191F28] placeholder:text-[#8B95A1] outline-none focus:ring-2 focus:ring-[#3182F6]/30 transition-all"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && actionReason.trim() && !submitResponse.isPending) {
-                                handleResponse(selectedItem.id, pendingAction === "blocked" ? "BLOCKED" : "ADJUSTMENT_REQUESTED", actionReason.trim());
-                                setPendingAction(null);
-                                setActionReason("");
-                              }
-                            }}
-                          />
-                          <button
-                            disabled={!actionReason.trim() || submitResponse.isPending}
-                            onClick={() => {
-                              handleResponse(selectedItem.id, pendingAction === "blocked" ? "BLOCKED" : "ADJUSTMENT_REQUESTED", actionReason.trim());
-                              setPendingAction(null);
-                              setActionReason("");
-                            }}
-                            className={`shrink-0 px-6 text-white text-[15px] font-bold rounded-[16px] transition-all disabled:opacity-50 disabled:bg-[#D1D6DB] ${pendingAction === 'blocked' ? 'bg-[#F04438] hover:bg-[#D92D20]' : 'bg-primary hover:bg-primary/90'}`}
-                          >
-                            전송
-                          </button>
-                        </div>
-                      )}
+                      <button
+                        onClick={() => {
+                          const note = window.prompt(t("blockedPlaceholder"));
+                          if (note !== null) handleResponse(selectedItem.id, "BLOCKED", note.trim() || undefined);
+                        }}
+                        disabled={submitResponse.isPending}
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors disabled:opacity-50 hover:bg-border"
+                      >
+                        {t("actionBlocked")}
+                      </button>
+                      <button
+                        onClick={() => {
+                          const note = window.prompt(t("adjustPlaceholder"));
+                          if (note !== null) handleResponse(selectedItem.id, "ADJUSTMENT_REQUESTED", note.trim() || undefined);
+                        }}
+                        disabled={submitResponse.isPending}
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors disabled:opacity-50 hover:bg-border"
+                      >
+                        {t("actionAdjust")}
+                      </button>
                     </div>
                   </div>
                 ) : selectedItem?.status === "leader_comment" || selectedItem?.status === "adjusted" || selectedItem?.status === "declined" ? (
@@ -451,17 +428,17 @@ export function TeamMemberCheckIn() {
                       <div className="px-1 space-y-7 mb-8">
                         {selectedItem.myRequest && (
                           <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between px-1">
-                              <span className="text-[13px] font-bold text-[#4E5968]">{t("myRequest")}</span>
-                              <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem.respondedAt)}</span>
+                            <div className="flex items-center justify-between px-4">
+                              <span className="text-[13px] font-bold text-text-secondary">{t("myRequest")}</span>
+                              <span className="text-[13px] font-medium text-text-muted">{formatDate(selectedItem.respondedAt)}</span>
                             </div>
-                            <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                            <div className="bg-sub-background rounded-[20px] p-4">
                               <div className="flex flex-col gap-1">
-                                <span className="text-[14px] font-bold text-[#8B95A1]">
+                                <span className="text-[14px] font-bold text-text-muted">
                                   {t("statusAdjust")}
                                 </span>
                                 {selectedItem.myRequest && (
-                                  <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium">
+                                  <p className="text-[15px] text-text-secondary leading-relaxed font-medium">
                                     {selectedItem.myRequest}
                                   </p>
                                 )}
@@ -472,21 +449,21 @@ export function TeamMemberCheckIn() {
 
                         {(selectedItem.leaderComment || selectedItem.proposal) && (
                           <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between px-1">
+                            <div className="flex items-center justify-between px-4">
                               <span className="text-[13px] font-bold text-primary">
                                 {t("leaderComment")}
                               </span>
                               <span className="text-[13px] font-medium text-primary">{selectedItem.date}</span>
                             </div>
-                            <div className="bg-primary/10 rounded-[16px] p-5">
+                            <div className="bg-primary/10 rounded-[20px] p-4">
                               {selectedItem.leaderComment && (
-                                <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
+                                <p className={`text-[15px] text-text-primary leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
                                   {selectedItem.leaderComment}
                                 </p>
                               )}
                               {selectedItem.proposal && (
                                 <div className={selectedItem.leaderComment ? 'pt-4 border-t border-primary/15' : ''}>
-                                  <p className="text-[16px] text-[#191F28] leading-relaxed font-bold">
+                                  <p className="text-[16px] text-text-primary leading-relaxed font-bold">
                                     {selectedItem.proposal.description}
                                   </p>
                                 </div>
@@ -498,12 +475,12 @@ export function TeamMemberCheckIn() {
                           <>
                             {selectedItem.status === 'declined' && (
                               <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between px-1">
-                                  <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
-                                  <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem.respondedAt)}</span>
+                                <div className="flex items-center justify-between px-4">
+                                  <span className="text-[13px] font-bold text-text-secondary">{t("myResponse")}</span>
+                                  <span className="text-[13px] font-medium text-text-muted">{formatDate(selectedItem.respondedAt)}</span>
                                 </div>
-                                <div className="bg-[#F2F4F6] rounded-[16px] p-5">
-                                  <span className="text-[14px] font-bold text-[#8B95A1]">
+                                <div className="bg-sub-background rounded-[20px] p-4">
+                                  <span className="text-[14px] font-bold text-text-muted">
                                     {getStatusUI(selectedItem.status)?.text}
                                   </span>
                                 </div>
@@ -512,12 +489,12 @@ export function TeamMemberCheckIn() {
 
                             {selectedItem.status === 'adjusted' && selectedItem.proposal && (
                               <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between px-1">
+                                <div className="flex items-center justify-between px-4">
                                   <span className="text-[13px] font-bold text-primary">{t("system")}</span>
                                   <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem.respondedAt)}</span>
                                 </div>
-                                <div className="bg-primary/10 rounded-[16px] p-5">
-                                  <p className="text-[15px] text-[#191F28] leading-relaxed font-bold">
+                                <div className="bg-primary/10 rounded-[20px] p-4">
+                                  <p className="text-[15px] text-text-primary leading-relaxed font-bold">
                                     {selectedItem.proposal.rawActionType === "CHANGE_TARGET_COUNT" 
                                       ? t("sysTargetCountChanged", { count: (selectedItem.proposal.rawPayload as { newTargetValue?: number })?.newTargetValue || 0 })
                                       : selectedItem.proposal.rawActionType === "ARCHIVE_ACTION_ITEM"
@@ -538,17 +515,17 @@ export function TeamMemberCheckIn() {
                       <div className="mt-auto flex gap-3 pt-8 pb-2">
                         <button 
                           disabled={acceptProposal.isPending || declineProposal.isPending}
-                          onClick={() => handleProposalDecision(selectedItem.proposalId!, "decline")}
-                          className="flex-1 py-4 bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#4E5968] text-[16px] font-bold rounded-[16px] transition-colors disabled:opacity-50"
+                          onClick={() => { if (window.confirm(t("confirmSave"))) handleProposalDecision(selectedItem.proposalId!, "decline"); }}
+                          className="flex-1 py-4 bg-sub-background hover:bg-border text-text-secondary text-[16px] font-bold rounded-[16px] transition-colors disabled:opacity-50"
                         >
-                          기존 목표 유지
+                          {t("keepCurrentGoal")}
                         </button>
                         <button 
                           disabled={acceptProposal.isPending || declineProposal.isPending}
-                          onClick={() => handleProposalDecision(selectedItem.proposalId!, "accept")}
+                          onClick={() => { if (window.confirm(t("confirmSave"))) handleProposalDecision(selectedItem.proposalId!, "accept"); }}
                           className="flex-1 py-4 bg-primary hover:bg-primary/90 text-white text-[16px] font-bold rounded-[16px] transition-colors shadow-sm disabled:opacity-50"
                         >
-                          수정사항 반영
+                          {t("acceptProposal")}
                         </button>
                       </div>
                     )}
@@ -560,16 +537,16 @@ export function TeamMemberCheckIn() {
                     <div className="flex flex-col gap-6">
                       <div className="px-1 space-y-7 mb-8">
                         <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between px-1">
-                            <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
-                            <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem!.respondedAt)}</span>
+                          <div className="flex items-center justify-between px-4">
+                            <span className="text-[13px] font-bold text-text-secondary">{t("myResponse")}</span>
+                            <span className="text-[13px] font-medium text-text-muted">{formatDate(selectedItem!.respondedAt)}</span>
                           </div>
-                          <div className="bg-[#F2F4F6] rounded-[16px] p-5">
-                            <span className="text-[14px] font-bold text-[#8B95A1]">
+                          <div className="bg-sub-background rounded-[20px] p-4">
+                            <span className="text-[14px] font-bold text-text-muted">
                               {getStatusUI(selectedItem!.status)?.text}
                             </span>
                             {selectedItem!.myRequest && (
-                              <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
+                              <p className="text-[15px] text-text-secondary leading-relaxed font-medium mt-1">
                                 {selectedItem!.myRequest}
                               </p>
                             )}

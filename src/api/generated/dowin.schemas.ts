@@ -2210,6 +2210,7 @@ export const GetWorkspacesWorkspaceIdTeamCheckinsInboxStatus = {
 
 export type GetWorkspacesWorkspaceIdTeamCheckinsReportParams = {
 weekStart: string;
+activeOnly?: boolean;
 };
 
 export type PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status = typeof PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status[keyof typeof PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status];

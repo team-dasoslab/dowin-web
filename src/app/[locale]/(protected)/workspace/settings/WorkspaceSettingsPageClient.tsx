@@ -27,6 +27,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useGetWorkspacesWorkspaceIdTeamCheckinsSettings, usePutWorkspacesWorkspaceIdTeamCheckinsSettings, getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey } from "@/api/generated/team-checkins/team-checkins";
 import { TeamCheckinSettings } from "@/api/generated/dowin.schemas";
 import { Switch } from "@/components/ui/Switch";
+import { Bot } from "lucide-react";
 
 interface MenuItem {
   id: string;
@@ -119,7 +120,7 @@ export default function WorkspaceSettingsPage() {
       if (!container) return;
       const scrollPosition = container.scrollTop + 150;
       let currentSectionId = activeSection;
-      const sections = ["general", "workspaces"];
+      const sections = ["general", "checkin", "workspaces"];
       for (const id of sections) {
         const el = sectionRefs.current[id];
         if (el && el.offsetTop <= scrollPosition) {
@@ -180,26 +181,6 @@ export default function WorkspaceSettingsPage() {
               ]
               : []),
             {
-              id: "checkin-settings",
-              icon: <DowinIcon name="nav-dashboard" className="w-4 h-4" />,
-              title: checkinT("settingsTitle"),
-              rightElement: checkinSettings ? (
-                <div onClick={(e) => e.stopPropagation()}>
-                  <Switch 
-                    checked={checkinSettings.enabled} 
-                    onCheckedChange={handleToggleCheckin} 
-                    disabled={updateSettings.isPending}
-                  />
-                </div>
-              ) : undefined,
-            },
-            {
-              id: "checkin-report",
-              icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
-              title: dashboardT("checkinReport"),
-              href: getWorkspacePath(workspaceId, "/report"),
-            },
-            {
               id: "workspace-name",
               icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
               title: t("changeWorkspaceName"),
@@ -233,6 +214,38 @@ export default function WorkspaceSettingsPage() {
               danger: true,
               onClick: () => void leaveWorkspace(),
             },
+          ]
+        : [],
+    },
+    {
+      id: "checkin",
+      label: checkinT("settingsTitle"),
+      items: hasWorkspace && isWorkspaceAdmin
+        ? [
+            {
+              id: "checkin-settings-master",
+              icon: <Bot className="w-4 h-4" />,
+              title: checkinT("enableServiceLedCheckin"),
+              rightElement: checkinSettings ? (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Switch 
+                    checked={checkinSettings.enabled} 
+                    onCheckedChange={handleToggleCheckin} 
+                    disabled={updateSettings.isPending}
+                  />
+                </div>
+              ) : undefined,
+            },
+            ...(checkinSettings?.enabled
+              ? [
+                  {
+                    id: "checkin-report",
+                    icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+                    title: dashboardT("checkinReport"),
+                    href: getWorkspacePath(workspaceId, "/workspace/report/checkin"),
+                  },
+                ]
+              : []),
           ]
         : [],
     },
@@ -273,6 +286,7 @@ export default function WorkspaceSettingsPage() {
           <PageSidebarNav
             items={[
               { id: "general", label: t("workspaceManagement") },
+              { id: "checkin", label: checkinT("settingsTitle") },
               { id: "workspaces", label: t("workspaceList") },
             ]}
             activeId={activeSection}

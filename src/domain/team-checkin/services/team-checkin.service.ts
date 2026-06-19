@@ -201,10 +201,10 @@ export class TeamCheckinService {
     };
   }
 
-  async getReport(context: WorkspaceAccessContext, weekStart: string) {
+  async getReport(context: WorkspaceAccessContext, weekStart: string, activeOnly: boolean = false) {
     await this.assertAdmin(context);
     await this.assertBasic(context);
-    const rows = await this.storage.findReportRows(context.workspaceId, weekStart);
+    const rows = await this.storage.findReportRows(context.workspaceId, weekStart, activeOnly);
     const rowsWithFollowup = await Promise.all(
       rows.map(async (row) => ({
         row,
