@@ -210,13 +210,14 @@ export class TeamCheckinService {
         resumedWithin24h: await this.hasResumedWithin24h(row),
       })),
     );
-    const sentRows = rows.filter((row) => row.sendStatus === "SENT");
+    const sentRows = rows;
     const respondedRows = rows.filter((row) => row.response);
     const adjustmentRows = rows.filter(
       (row) =>
         row.response?.responseType === "BLOCKED" ||
         row.response?.responseType === "ADJUSTMENT_REQUESTED",
     );
+    const attentionRows = adjustmentRows.filter((row) => !row.proposal);
     const proposalRows = rows.filter((row) => row.proposal);
     const acceptedProposalRows = proposalRows.filter(
       (row) => row.proposal?.status === "ACCEPTED",
@@ -246,14 +247,13 @@ export class TeamCheckinService {
           rowsWithFollowup.filter((item) => item.resumedWithin24h).length,
           respondedRows.length,
         ),
-        adjustmentSignalCount: adjustmentRows.length,
+        adjustmentSignalCount: attentionRows.length,
         proposalAcceptanceRate: getRate(
           acceptedProposalRows.length,
           proposalRows.length,
         ),
       },
-      attentionItems: adjustmentRows
-        .filter((row) => !row.proposal || row.proposal.status === "PROPOSED")
+      attentionItems: attentionRows
         .map((row) => ({
           responseId: row.response?.uid ?? null,
           checkinId: row.uid,
