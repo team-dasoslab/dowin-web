@@ -146,7 +146,7 @@ describe("TeamCheckinService", () => {
     expect(createDelivery).not.toHaveBeenCalled();
   });
 
-  it("creates a no-weekly-log checkin when no-log trigger is enabled", async () => {
+  it("creates localized no-weekly-log checkins when no-log trigger is enabled", async () => {
     const createDelivery = vi.fn().mockResolvedValue({
       id: 1,
       uid: "chk_1",
@@ -185,6 +185,21 @@ describe("TeamCheckinService", () => {
             trackingMode: "BOOLEAN",
             dailyTargetCount: 1,
           },
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 12,
+            memberRole: "MEMBER",
+            userLocale: "en",
+            scoreboardId: 31,
+            leadMeasureId: 21,
+            leadMeasureName: "Customer interviews",
+            leadMeasureCreatedAt: new Date("2026-06-19T00:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
         ]),
         findLogsForCandidates: vi.fn().mockResolvedValue([]),
         findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
@@ -201,12 +216,27 @@ describe("TeamCheckinService", () => {
       }),
     ).resolves.toMatchObject({
       evaluatedWorkspaceCount: 1,
-      candidateCount: 1,
-      createdDeliveryCount: 1,
-      skippedCount: 1,
+      candidateCount: 2,
+      createdDeliveryCount: 2,
+      skippedCount: 2,
     });
-    expect(createDelivery).toHaveBeenCalledWith(
-      expect.objectContaining({ reasonCode: "NO_WEEKLY_LOG" }),
+    expect(createDelivery).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        messageTitle: "Dowin",
+        messageBody:
+          "이번 주 고객 인터뷰 기록이 아직 없어요. 오늘 할 수 있는 가장 작은 한 걸음부터 남겨주세요.",
+        reasonCode: "NO_WEEKLY_LOG",
+      }),
+    );
+    expect(createDelivery).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        messageTitle: "Dowin",
+        messageBody:
+          "You haven't logged Customer interviews this week. Start with one small step you can do today.",
+        reasonCode: "NO_WEEKLY_LOG",
+      }),
     );
   });
 

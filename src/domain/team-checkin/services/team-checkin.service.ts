@@ -1,6 +1,11 @@
 import { customAlphabet } from "nanoid";
 import { serverRuntimeConfig } from "@/config/server-runtime-config";
 import {
+  DEFAULT_LOCALE,
+  isSupportedLocale,
+  type Locale,
+} from "@/i18n/detect-locale";
+import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
@@ -18,6 +23,10 @@ import {
   TeamCheckinStorage,
 } from "@/domain/team-checkin/storage/team-checkin.storage";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import en from "@/messages/en.json";
+import ko from "@/messages/ko.json";
+
+const messages = { ko, en } as const;
 
 const createUid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -542,8 +551,7 @@ export class TeamCheckinService {
           continue;
         }
 
-        const title = "Dowin 팀 체크인";
-        const body = buildMessageBody(candidate, reasonCode);
+        const { title, body } = buildPushMessage(candidate);
         const delivery = await this.storage.createDelivery({
           uid: `chk_${createUid()}`,
           workspaceId: workspace.id,
@@ -828,14 +836,21 @@ function getReasonCode(
   return null;
 }
 
-function buildMessageBody(
-  candidate: TeamCheckinCandidate,
-  reasonCode: "NO_WEEKLY_LOG" | "SLOW_WEEKLY_START",
-) {
-  if (reasonCode === "SLOW_WEEKLY_START") {
-    return `${candidate.leadMeasureName} 실행 리듬이 이번 주 목표보다 늦습니다. 가능한 작은 단위로 먼저 재개해 주세요.`;
-  }
-  return `이번 주 ${candidate.leadMeasureName} 기록이 아직 없어요. 오늘 가능한 가장 작은 실행을 하나만 업데이트해 주세요.`;
+function buildPushMessage(candidate: TeamCheckinCandidate) {
+  const locale = resolvePushLocale(candidate.userLocale);
+  const t = messages[locale].Notification;
+
+  return {
+    title: t.teamCheckinTitle,
+    body: t.teamCheckinBody.replace(
+      "{actionItemName}",
+      candidate.leadMeasureName,
+    ),
+  };
+}
+
+function resolvePushLocale(locale?: string | null): Locale {
+  return isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
 }
 
 function getKstWeekRange(now: Date) {

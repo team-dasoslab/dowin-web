@@ -1274,7 +1274,9 @@
   },
   "Notification": {
     "dailyReminderTitle": "Dowin",
-    "dailyReminderBody": "오늘의 액션 아이템을 기록했나요? 지금 바로 체크해보세요!"
+    "dailyReminderBody": "오늘의 액션 아이템을 기록했나요? 지금 바로 체크해보세요!",
+    "teamCheckinTitle": "Dowin",
+    "teamCheckinBody": "이번 주 {actionItemName} 기록이 아직 없어요. 오늘 할 수 있는 가장 작은 한 걸음부터 남겨주세요."
   },
   "PushNotification": {
     "unsupportedIos": "iOS 16.4 이상에서만 알림을 지원합니다.",
