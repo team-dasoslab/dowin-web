@@ -63,6 +63,7 @@ describe("GET /api/workspaces/me", () => {
       memberCount: 11,
       freeMemberLimit: 10,
       isOverFreeMemberLimit: true,
+      role: "MEMBER",
       createdAt: new Date("2026-04-01T00:00:00.000Z"),
     });
 
@@ -77,6 +78,7 @@ describe("GET /api/workspaces/me", () => {
         memberCount: 11,
         freeMemberLimit: 10,
         isOverFreeMemberLimit: true,
+        role: "MEMBER",
       }),
     );
     expect(mockGetMyWorkspace).toHaveBeenCalledWith(7, undefined);

@@ -1039,10 +1039,19 @@ export const WorkspacePlanCode = {
   STANDARD: 'STANDARD',
 } as const;
 
+export type WorkspaceRole = typeof WorkspaceRole[keyof typeof WorkspaceRole];
+
+
+export const WorkspaceRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
 export interface Workspace {
   id?: string;
   name?: string;
   planCode?: WorkspacePlanCode;
+  role?: WorkspaceRole;
   /** @minimum 0 */
   memberCount?: number;
   /** @minimum 1 */

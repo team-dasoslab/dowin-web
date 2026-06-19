@@ -78,8 +78,7 @@ export default function MyDashboardPage() {
     profileResponse?.status === 200
       ? (profileResponse.data.nickname ?? null)
       : null;
-  const isWorkspaceAdmin =
-    profileResponse?.status === 200 && profileResponse.data.role === "ADMIN";
+  const isWorkspaceAdmin = workspace?.role === "ADMIN";
   const {
     celebrationLevel,
     handleDismissProductUpdate,

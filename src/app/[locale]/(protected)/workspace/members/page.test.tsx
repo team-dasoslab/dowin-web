@@ -81,8 +81,8 @@ function mockWorkspace(
         id: "workspace-1",
         isOverFreeMemberLimit: false,
         memberCount: 3,
-        myRole: "ADMIN",
         name: "Dowin Team",
+        role: "ADMIN",
       },
       status: 200,
     },
@@ -188,11 +188,14 @@ describe("ProfileMembersPage", () => {
   });
 
   it("blocks non-admin users from member management", () => {
-    mockProfile({
+    mockWorkspace({
       data: {
         data: {
-          id: 2,
-          nickname: "일반 멤버",
+          freeMemberLimit: 10,
+          id: "workspace-1",
+          isOverFreeMemberLimit: false,
+          memberCount: 3,
+          name: "Dowin Team",
           role: "MEMBER",
         },
         status: 200,

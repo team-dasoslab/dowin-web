@@ -45,7 +45,7 @@ export default function ProfileMembersPage() {
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaceId = workspace?.id ?? "";
-  const isWorkspaceAdmin = user?.role === "ADMIN";
+  const isWorkspaceAdmin = workspace?.role === "ADMIN";
 
   const { data: membersResponse, isLoading: isMembersLoading } =
     useGetWorkspacesIdMembers(workspaceId, {
