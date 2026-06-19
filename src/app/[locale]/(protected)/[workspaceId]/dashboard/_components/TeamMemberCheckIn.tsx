@@ -33,6 +33,8 @@ interface NotificationItem {
   proposalId?: string;
   actionItemName: string;
   date: string;
+  sentAt?: string | null;
+  respondedAt?: string | null;
   isUnread: boolean;
   content: string;
   status: CheckInStatus;
@@ -65,7 +67,7 @@ export function TeamMemberCheckIn() {
   
   const { data: inboxResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsInbox(
     workspaceId,
-    { status: "open" }
+    { status: "all" }
   );
   
   const { data: userResponse } = useGetUsersMe();
@@ -84,8 +86,11 @@ export function TeamMemberCheckIn() {
 
   const inboxItems = inboxResponse?.status === 200 ? inboxResponse.data.items || [] : [];
   
-  // Map API items to NotificationItem
-  const notifications: NotificationItem[] = inboxItems.map((item) => {
+  // Map API items to NotificationItem and group by conversation
+  const checkinMap = new Map<string, NotificationItem>();
+
+  // 1. Create base CHECKIN items
+  inboxItems.forEach((item) => {
     if (item.type === "CHECKIN") {
       const chk = item as TeamCheckinInboxCheckinItem;
       let status: CheckInStatus = "pending";
@@ -102,16 +107,24 @@ export function TeamMemberCheckIn() {
         if (chk.response.responseType === "ADJUSTMENT_REQUESTED") status = "adjust";
       }
 
-      return {
+      checkinMap.set(chk.id!, {
         id: chk.id!,
         actionItemName: chk.leadMeasureName || "",
-        date: formatDate(chk.sentAt),
+        date: formatDate(chk.response?.createdAt || chk.sentAt),
+        sentAt: chk.sentAt,
+        respondedAt: chk.response?.createdAt,
         isUnread: !chk.response,
         content,
         status,
+        myRequest: chk.response?.note || undefined,
         type: "system_alert"
-      };
-    } else {
+      });
+    }
+  });
+
+  // 2. Merge PROPOSAL items into their source check-ins
+  inboxItems.forEach((item) => {
+    if (item.type === "ADJUSTMENT_PROPOSAL") {
       const prop = item as TeamCheckinInboxProposalItem;
       let status: CheckInStatus = "leader_comment";
       if (prop.status === "ACCEPTED") status = "adjusted";
@@ -121,33 +134,57 @@ export function TeamMemberCheckIn() {
       let pType: ProposalAction["type"] = "update_metric";
       if (prop.actionType === "CHANGE_TARGET_COUNT") {
         const payload = prop.payload as { newTargetValue?: number };
-        description = `목표 횟수 변경 (${payload.newTargetValue}건으로)`;
+        description = t("actionTargetCount") + ` (${payload.newTargetValue}건으로)`;
       } else if (prop.actionType === "ARCHIVE_ACTION_ITEM") {
         pType = "archive";
-        description = "현재 액션 아이템 보관하기";
+        description = t("actionArchive");
       } else if (prop.actionType === "REPLACE_ACTION_ITEM") {
         pType = "create_new";
         const payload = prop.payload as { replacementName?: string };
-        description = `새 액션 아이템으로 변경: ${payload.replacementName}`;
+        description = t("actionReplace") + `: ${payload.replacementName}`;
       }
 
-      return {
-        id: prop.id!,
-        proposalId: prop.id,
-        sourceCheckinId: prop.sourceCheckinId,
-        actionItemName: prop.leadMeasureName || "",
-        date: formatDate(prop.expiresAt),
-        isUnread: prop.status === "PROPOSED",
-        content: "리더님이 목표 조정을 제안했습니다.",
-        status,
-        leaderComment: prop.leaderNote || "조정 제안을 보냈습니다.",
-        myRequest: t("requestAdjustDesc"),
-        proposal: {
-          type: pType,
-          description
-        },
-        type: "human"
-      };
+      const existing = checkinMap.get(prop.sourceCheckinId!);
+      if (existing) {
+        existing.proposalId = prop.id;
+        existing.leaderComment = prop.leaderNote || t("statusAdjust");
+        existing.proposal = { type: pType, description };
+        existing.status = status;
+        if (prop.status === "PROPOSED") existing.isUnread = true;
+        existing.date = formatDate(prop.expiresAt); // update date to proposal's date
+        existing.content = t("actionProposalTitle");
+        // Keep original myRequest or undefined
+        existing.type = "human";
+      } else {
+        // Fallback for standalone proposal (should be rare)
+        checkinMap.set(prop.id!, {
+          id: prop.id!,
+          proposalId: prop.id,
+          sourceCheckinId: prop.sourceCheckinId,
+          actionItemName: prop.leadMeasureName || "",
+          date: formatDate(prop.expiresAt),
+          isUnread: prop.status === "PROPOSED",
+          content: t("actionProposalTitle"),
+          status,
+          leaderComment: prop.leaderNote || t("statusAdjust"),
+          myRequest: t("requestAdjustDesc"),
+          proposal: { type: pType, description },
+          type: "human"
+        });
+      }
+    }
+  });
+
+  // 3. Preserve sort order based on the API response
+  const notifications: NotificationItem[] = [];
+  const added = new Set<string>();
+  
+  inboxItems.forEach(item => {
+    const targetId = item.type === "CHECKIN" ? item.id! : (item as TeamCheckinInboxProposalItem).sourceCheckinId!;
+    const finalId = checkinMap.has(targetId) ? targetId : item.id!;
+    if (!added.has(finalId)) {
+      added.add(finalId);
+      notifications.push(checkinMap.get(finalId)!);
     }
   });
 
@@ -165,7 +202,6 @@ export function TeamMemberCheckIn() {
         }
       });
       queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsInboxQueryKey(workspaceId) });
-      setSelectedId(null);
     } catch (e) {
       console.error(e);
     }
@@ -179,7 +215,6 @@ export function TeamMemberCheckIn() {
         await declineProposal.mutateAsync({ workspaceId, proposalId, data: { reason: "KEEP_CURRENT_GOAL" } });
       }
       queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsInboxQueryKey(workspaceId) });
-      setSelectedId(null);
     } catch (e) {
       console.error(e);
     }
@@ -307,7 +342,7 @@ export function TeamMemberCheckIn() {
                 <div className="flex flex-col gap-2 mt-2 mb-8 shrink-0">
                   <div className="flex items-center justify-between px-1">
                     <span className="text-[13px] font-bold text-primary">{t("system")}</span>
-                    <span className="text-[13px] font-medium text-primary">{selectedItem?.date}</span>
+                    <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem?.sentAt)}</span>
                   </div>
                   <div className="bg-primary/10 rounded-[24px] rounded-tl-[8px] p-5">
                     <h2 className="text-[16px] font-bold text-[#191F28] leading-[1.4] tracking-tight mb-2">
@@ -397,9 +432,15 @@ export function TeamMemberCheckIn() {
                               <span className="text-[13px] font-medium text-[#8B95A1]">{t("previous")}</span>
                             </div>
                             <div className="bg-[#F2F4F6] rounded-[24px] rounded-tl-[8px] p-5">
-                              <div className="flex items-center gap-2 mb-2">
-                                <FileEdit className="w-4 h-4 text-[#8B95A1]" />
-                                <span className="text-[13px] font-bold text-[#8B95A1]">{t("requestAdjustDesc")}</span>
+                              <div className="flex flex-col gap-1">
+                                <span className="text-[14px] font-bold text-[#8B95A1]">
+                                  {t("statusAdjust")}
+                                </span>
+                                {selectedItem.myRequest && (
+                                  <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium">
+                                    {selectedItem.myRequest}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -456,32 +497,20 @@ export function TeamMemberCheckIn() {
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center justify-between px-1">
                             <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
-                            <span className="text-[13px] font-medium text-[#8B95A1]">{selectedItem!.date}</span>
+                            <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem!.respondedAt)}</span>
                           </div>
                           <div className="bg-[#F2F4F6] rounded-[24px] rounded-tl-[8px] p-5">
                             <span className="text-[14px] font-bold text-[#8B95A1]">
                               {getStatusUI(selectedItem!.status)?.text}
                             </span>
-                            <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
-                              {selectedItem!.status === 'done' && '{t("statusDoneDesc")}'}
-                              {selectedItem!.status === 'later' && '{t("statusLaterDesc")}'}
-                              {selectedItem!.status === 'blocked' && '{t("statusBlockedDesc")}'}
-                              {selectedItem!.status === 'adjust' && '상황에 맞게 목표 조율을 요청했어요.'}
-                            </p>
+                            {selectedItem!.myRequest && (
+                              <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
+                                {selectedItem!.myRequest}
+                              </p>
+                            )}
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between px-1">
-                            <span className="text-[13px] font-bold text-primary">{t("system")}</span>
-                            <span className="text-[13px] font-medium text-primary">{t("justNow")}</span>
-                          </div>
-                          <div className="bg-primary/10 rounded-[24px] rounded-tr-[8px] p-5">
-                            <p className="text-[15px] text-[#191F28] leading-relaxed font-medium">
-                              {getStatusUI(selectedItem!.status)?.desc}
-                            </p>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
