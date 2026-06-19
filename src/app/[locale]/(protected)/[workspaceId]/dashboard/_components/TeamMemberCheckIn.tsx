@@ -292,7 +292,7 @@ export function TeamMemberCheckIn() {
                 {selectedItem && (
                   <div className="flex flex-col justify-center ml-2 mr-4 min-w-0">
                     <span className="text-[16px] font-bold text-[#191F28] truncate">{selectedItem.actionItemName}</span>
-                    <span className={`text-[13px] font-bold ${selectedItem.status === 'adjusted' ? 'text-[#8B95A1]' : 'text-[#3182F6]'}`}>
+                    <span className={`text-[13px] font-bold ${selectedItem.status === 'adjusted' ? 'text-[#8B95A1]' : 'text-primary'}`}>
                       {selectedItem.status === 'pending' ? '답변 대기 중' :
                        selectedItem.status === 'leader_comment' ? '조율 진행 중' : 
                        selectedItem.status === 'adjusted' ? '조율 완료됨' : 
@@ -306,12 +306,12 @@ export function TeamMemberCheckIn() {
                 {/* Initial System Request (Always Visible) */}
                 <div className="flex flex-col gap-2 mt-2 mb-8 shrink-0">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[13px] font-bold text-[#3182F6]">시스템</span>
-                    <span className="text-[13px] font-medium text-[#3182F6]">{selectedItem?.date}</span>
+                    <span className="text-[13px] font-bold text-primary">시스템</span>
+                    <span className="text-[13px] font-medium text-primary">{selectedItem?.date}</span>
                   </div>
-                  <div className="bg-[#E8F3FF] rounded-[24px] rounded-tl-[8px] p-5">
+                  <div className="bg-primary/10 rounded-[24px] rounded-tl-[8px] p-5">
                     <h2 className="text-[16px] font-bold text-[#191F28] leading-[1.4] tracking-tight mb-2">
-                      이번 주 <span className="text-[#3182F6]">{selectedItem?.actionItemName}</span> 기록이 아직 없어요.
+                      이번 주 <span className="text-primary">{selectedItem?.actionItemName}</span> 기록이 아직 없어요.
                     </h2>
                     <p className="text-[15px] text-[#191F28] leading-relaxed font-medium">
                       오늘 가능한 가장 작은 실행을 하나만 업데이트해 주세요. 작은 시작이 중요해요!
@@ -325,7 +325,7 @@ export function TeamMemberCheckIn() {
                       <button
                         onClick={() => handleResponse(selectedItem.id, "LOG_NOW")}
                         disabled={submitResponse.isPending}
-                        className="w-full py-[18px] rounded-[16px] bg-[#3182F6] text-white text-[16px] font-bold transition-transform active:scale-[0.98] shadow-sm hover:bg-[#1B64DA] disabled:opacity-50"
+                        className="w-full py-[18px] rounded-[16px] bg-primary text-white text-[16px] font-bold transition-transform active:scale-[0.98] shadow-sm hover:bg-primary/90 disabled:opacity-50"
                       >
                         방금 완료했어요
                       </button>
@@ -347,7 +347,7 @@ export function TeamMemberCheckIn() {
                         <div className="w-[3px] h-[3px] rounded-full bg-[#D1D6DB]" />
                         <button
                           onClick={() => setPendingAction(pendingAction === "adjust" ? null : "adjust")}
-                          className={`text-[14px] font-bold transition-colors underline-offset-4 hover:underline ${pendingAction === 'adjust' ? 'text-[#3182F6]' : 'text-[#8B95A1]'}`}
+                          className={`text-[14px] font-bold transition-colors underline-offset-4 hover:underline ${pendingAction === 'adjust' ? 'text-primary' : 'text-[#8B95A1]'}`}
                         >
                           목표를 조정할래요
                         </button>
@@ -377,7 +377,7 @@ export function TeamMemberCheckIn() {
                               setPendingAction(null);
                               setActionReason("");
                             }}
-                            className={`shrink-0 px-6 text-white text-[15px] font-bold rounded-[16px] transition-all disabled:opacity-50 disabled:bg-[#D1D6DB] ${pendingAction === 'blocked' ? 'bg-[#F04438] hover:bg-[#D92D20]' : 'bg-[#3182F6] hover:bg-[#1B64DA]'}`}
+                            className={`shrink-0 px-6 text-white text-[15px] font-bold rounded-[16px] transition-all disabled:opacity-50 disabled:bg-[#D1D6DB] ${pendingAction === 'blocked' ? 'bg-[#F04438] hover:bg-[#D92D20]' : 'bg-primary hover:bg-primary/90'}`}
                           >
                             전송
                           </button>
@@ -408,18 +408,18 @@ export function TeamMemberCheckIn() {
                         {selectedItem.leaderComment && (
                           <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
-                              <span className="text-[13px] font-bold text-[#3182F6]">리더 코멘트</span>
-                              <span className="text-[13px] font-medium text-[#3182F6]">{selectedItem.date}</span>
+                              <span className="text-[13px] font-bold text-primary">리더 코멘트</span>
+                              <span className="text-[13px] font-medium text-primary">{selectedItem.date}</span>
                             </div>
-                            <div className="bg-[#E8F3FF] rounded-[24px] rounded-tr-[8px] p-5">
+                            <div className="bg-primary/10 rounded-[24px] rounded-tr-[8px] p-5">
                               <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
                                 {selectedItem.leaderComment}
                               </p>
                               
                               {selectedItem.proposal && (
-                                <div className="bg-white rounded-[16px] p-4 border border-[#3182F6]/10 shadow-[0_2px_10px_rgba(49,130,246,0.05)]">
+                                <div className="bg-white rounded-[16px] p-4 border border-primary/10 shadow-[0_2px_10px_rgba(49,130,246,0.05)]">
                                   <div className="flex flex-col gap-1">
-                                    <span className="text-[12px] font-bold text-[#3182F6]">리더의 제안</span>
+                                    <span className="text-[12px] font-bold text-primary">리더의 제안</span>
                                     <span className="text-[16px] font-bold text-[#191F28]">{selectedItem.proposal.description}</span>
                                   </div>
                                 </div>
@@ -442,7 +442,7 @@ export function TeamMemberCheckIn() {
                         <button 
                           disabled={acceptProposal.isPending || declineProposal.isPending}
                           onClick={() => handleProposalDecision(selectedItem.proposalId!, "accept")}
-                          className="flex-1 py-4 bg-[#3182F6] hover:bg-[#1B64DA] text-white text-[16px] font-bold rounded-[16px] transition-colors shadow-sm disabled:opacity-50"
+                          className="flex-1 py-4 bg-primary hover:bg-primary/90 text-white text-[16px] font-bold rounded-[16px] transition-colors shadow-sm disabled:opacity-50"
                         >
                           수정사항 반영
                         </button>
@@ -473,10 +473,10 @@ export function TeamMemberCheckIn() {
 
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center justify-between px-1">
-                            <span className="text-[13px] font-bold text-[#3182F6]">시스템</span>
-                            <span className="text-[13px] font-medium text-[#3182F6]">방금 전</span>
+                            <span className="text-[13px] font-bold text-primary">시스템</span>
+                            <span className="text-[13px] font-medium text-primary">방금 전</span>
                           </div>
-                          <div className="bg-[#E8F3FF] rounded-[24px] rounded-tr-[8px] p-5">
+                          <div className="bg-primary/10 rounded-[24px] rounded-tr-[8px] p-5">
                             <p className="text-[15px] text-[#191F28] leading-relaxed font-medium">
                               {getStatusUI(selectedItem!.status)?.desc}
                             </p>
