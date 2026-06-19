@@ -1289,6 +1289,10 @@ export interface UserNotificationSettingsUpdateRequest {
   dailyReminderTime: string;
 }
 
+export interface UserNotificationTimezoneUpdateRequest {
+  timezone: string;
+}
+
 export type DevicePushTokenRegisterRequestProvider = typeof DevicePushTokenRegisterRequestProvider[keyof typeof DevicePushTokenRegisterRequestProvider];
 
 
