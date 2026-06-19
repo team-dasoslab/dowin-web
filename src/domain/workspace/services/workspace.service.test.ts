@@ -41,6 +41,7 @@ describe("WorkspaceService", () => {
     vi.clearAllMocks();
     mockStorage.countMembers.mockResolvedValue(1);
     mockStorage.findPlanLimit.mockResolvedValue({ memberLimit: 10 });
+    mockStorage.findMembership.mockResolvedValue({ role: "ADMIN" });
     mockStorage.findBillingState.mockResolvedValue({
       planCode: "BASIC",
       billingStatus: "ACTIVE",
@@ -63,6 +64,7 @@ describe("WorkspaceService", () => {
         freeMemberLimit: 10,
         isOverFreeMemberLimit: false,
         memberCount: 1,
+        role: "ADMIN",
       });
     });
 
@@ -80,6 +82,7 @@ describe("WorkspaceService", () => {
         freeMemberLimit: 10,
         isOverFreeMemberLimit: true,
         memberCount: 11,
+        role: "ADMIN",
       });
     });
 
@@ -100,7 +103,24 @@ describe("WorkspaceService", () => {
         freeMemberLimit: 5,
         isOverFreeMemberLimit: true,
         memberCount: 6,
+        role: "ADMIN",
       });
+    });
+
+    it("현재 워크스페이스의 membership role을 함께 반환한다", async () => {
+      const mockWorkspace = {
+        id: 1,
+        uid: "ws_1",
+        name: "Workspace",
+        planCode: "FREE",
+      };
+      mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
+      mockStorage.findMembership.mockResolvedValue({ role: "MEMBER" });
+
+      const result = await service.getMyWorkspace(123);
+
+      expect(result.role).toBe("MEMBER");
+      expect(mockStorage.findMembership).toHaveBeenCalledWith(1, 123);
     });
 
     it("사용자가 속한 워크스페이스가 없으면 404 에러를 던진다", async () => {

@@ -97,7 +97,7 @@ export default function WorkspaceSettingsPage() {
 
   const showBillingSurface = !isNativeApp;
   const hasWorkspace = workspace !== null;
-  const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
+  const isWorkspaceAdmin = hasWorkspace && workspace.role === "ADMIN";
 
   const {
     changeWorkspaceName,

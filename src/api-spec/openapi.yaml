@@ -3951,6 +3951,9 @@ components:
         planCode:
           type: string
           enum: [BASIC, FREE, STANDARD]
+        role:
+          type: string
+          enum: [ADMIN, MEMBER]
         memberCount:
           type: integer
           minimum: 0

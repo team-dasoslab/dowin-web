@@ -48,7 +48,7 @@ export default function ProfileInvitesPage() {
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaceId = workspace?.id ?? "";
-  const isWorkspaceAdmin = user?.role === "ADMIN";
+  const isWorkspaceAdmin = workspace?.role === "ADMIN";
 
   const { data: invitesResponse, isLoading: isInvitesLoading } =
     useGetWorkspacesIdInvites(workspaceId, {

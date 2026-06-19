@@ -11,7 +11,7 @@ import {
   usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline,
   useGetWorkspacesWorkspaceIdTeamCheckinsSettings
 } from "@/api/generated/team-checkins/team-checkins";
-import { useGetUsersMe } from "@/api/generated/profile/profile";
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { useTranslations } from "next-intl";
 import {
   TeamCheckinInboxCheckinItem,
@@ -76,14 +76,14 @@ export function TeamMemberCheckIn() {
     { status: "all" }
   );
   
-  const { data: userResponse } = useGetUsersMe();
+  const { data: workspaceResponse } = useGetWorkspacesMe();
   const { data: checkinSettingsResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId);
 
   const submitResponse = usePostWorkspacesWorkspaceIdTeamCheckinsCheckinIdResponse();
   const acceptProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdAccept();
   const declineProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline();
 
-  const isWorkspaceAdmin = userResponse?.status === 200 && userResponse.data.role === "ADMIN";
+  const isWorkspaceAdmin = workspaceResponse?.status === 200 && workspaceResponse.data.role === "ADMIN";
   const checkinSettings = checkinSettingsResponse?.status === 200 && 'enabled' in checkinSettingsResponse.data ? checkinSettingsResponse.data : null;
   
   if (isWorkspaceAdmin && !checkinSettings?.includeAdminAsMember) {
