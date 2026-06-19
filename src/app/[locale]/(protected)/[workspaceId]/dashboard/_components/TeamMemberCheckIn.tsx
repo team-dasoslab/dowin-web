@@ -380,14 +380,14 @@ export function TeamMemberCheckIn() {
                       <button
                         onClick={() => { if (window.confirm(t("confirmLogNow"))) handleResponse(selectedItem.id, "LOG_NOW"); }}
                         disabled={submitResponse.isPending}
-                        className="w-full py-[18px] rounded-[20px] bg-primary text-white text-[16px] font-bold transition-transform active:scale-[0.98] shadow-[0_4px_12px_rgba(49,130,246,0.15)] hover:bg-primary/90 disabled:opacity-50"
+                        className="w-full py-[18px] rounded-[20px] bg-primary text-white text-[16px] font-bold transition-colors shadow-[0_4px_12px_rgba(49,130,246,0.15)] hover:bg-primary/90 disabled:opacity-50"
                       >
                         {t("actionLogNow")}
                       </button>
                       <button
                         onClick={() => { if (window.confirm(t("confirmSnooze"))) handleResponse(selectedItem.id, "SNOOZE_TODAY"); }}
                         disabled={submitResponse.isPending}
-                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-transform active:scale-[0.98] hover:bg-border disabled:opacity-50"
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors hover:bg-border disabled:opacity-50"
                       >
                         {t("actionSnooze")}
                       </button>
@@ -397,7 +397,7 @@ export function TeamMemberCheckIn() {
                           if (note !== null) handleResponse(selectedItem.id, "BLOCKED", note.trim() || undefined);
                         }}
                         disabled={submitResponse.isPending}
-                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-all active:scale-[0.98] disabled:opacity-50 hover:bg-border"
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors disabled:opacity-50 hover:bg-border"
                       >
                         {t("actionBlocked")}
                       </button>
@@ -407,7 +407,7 @@ export function TeamMemberCheckIn() {
                           if (note !== null) handleResponse(selectedItem.id, "ADJUSTMENT_REQUESTED", note.trim() || undefined);
                         }}
                         disabled={submitResponse.isPending}
-                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-all active:scale-[0.98] disabled:opacity-50 hover:bg-border"
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors disabled:opacity-50 hover:bg-border"
                       >
                         {t("actionAdjust")}
                       </button>
