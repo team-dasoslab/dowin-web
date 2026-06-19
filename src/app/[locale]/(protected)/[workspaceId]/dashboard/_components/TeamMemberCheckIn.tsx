@@ -146,14 +146,14 @@ export function TeamMemberCheckIn() {
       } else if (prop.actionType === "REPLACE_ACTION_ITEM") {
         pType = "create_new";
         const payload = prop.payload as { replacementName?: string };
-        description = t("actionReplace") + `: ${payload.replacementName}`;
+        description = t("actionReplace") + ` (${payload.replacementName})`;
       }
 
       const existing = checkinMap.get(prop.sourceCheckinId!);
       if (existing) {
         const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
         existing.proposalId = prop.id;
-        existing.leaderComment = prop.leaderNote || t("statusAdjust");
+        existing.leaderComment = prop.leaderNote || undefined;
         existing.proposal = { type: pType, description };
         existing.status = status;
         if (prop.status === "PROPOSED") existing.isUnread = true;
@@ -173,7 +173,7 @@ export function TeamMemberCheckIn() {
           isUnread: prop.status === "PROPOSED",
           content: t("actionProposalTitle"),
           status,
-          leaderComment: prop.leaderNote || t("statusAdjust"),
+          leaderComment: prop.leaderNote || undefined,
           myRequest: t("requestAdjustDesc"),
           proposal: { type: pType, description },
           type: "human"
@@ -472,16 +472,18 @@ export function TeamMemberCheckIn() {
                           </div>
                         )}
 
-                        {selectedItem.leaderComment && (
+                        {(selectedItem.leaderComment || selectedItem.proposal) && (
                           <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
                               <span className="text-[13px] font-bold text-primary">{t("leaderComment")}</span>
                               <span className="text-[13px] font-medium text-primary">{selectedItem.date}</span>
                             </div>
                             <div className="bg-primary/10 rounded-[24px] rounded-tr-[8px] p-5">
-                              <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
-                                {selectedItem.leaderComment}
-                              </p>
+                              {selectedItem.leaderComment && (
+                                <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
+                                  {selectedItem.leaderComment}
+                                </p>
+                              )}
                               
                               {selectedItem.proposal && (
                                 <div className="bg-white rounded-[16px] p-4 border border-primary/10 shadow-[0_2px_10px_rgba(49,130,246,0.05)]">
