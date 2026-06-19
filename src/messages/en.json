@@ -1272,7 +1272,7 @@
     "dailyReminderTitle": "Dowin",
     "dailyReminderBody": "Did you record your lead measures today? Check them now!",
     "teamCheckinTitle": "Dowin",
-    "teamCheckinBody": "You haven't logged {actionItemName} this week. Start with one small step you can do today."
+    "teamCheckinBody": "No log for {actionItemName} this week. Give it a go today?"
   },
   "PushNotification": {
     "unsupportedIos": "Push notifications are only supported on iOS 16.4 or later.",
@@ -1511,7 +1511,7 @@
     "statusDeclinedDesc": "Proceeding with the current goal.",
     "blockedPlaceholder": "What difficulties are you facing?",
     "adjustPlaceholder": "How would you like to adjust it?",
-    "msgNoLog": "You haven't logged [{measureName}] this week yet.\nPlease update with just one smallest execution possible today.",
+    "msgNoLog": "You haven't logged [{measureName}] this week yet.",
     "msgSlowStart": "There's still time until this week's goal, but the start is getting delayed.\nPlease update with just one small execution.",
     "btnLogNow": "Done",
     "btnLater": "I'll do it later today",
@@ -1523,6 +1523,6 @@
     "statusAdjusting": "Adjustment in progress",
     "statusAdjustDone": "Adjustment completed",
     "msgNoLogRich": "You haven't logged <highlight>{measureName}</highlight> this week yet.",
-    "msgNoLogSub": "Please update with just one small execution today. A small start is important!"
+    "msgNoLogSub": "Give it a go today?"
   }
 }

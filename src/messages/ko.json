@@ -1276,7 +1276,7 @@
     "dailyReminderTitle": "Dowin",
     "dailyReminderBody": "오늘의 액션 아이템을 기록했나요? 지금 바로 체크해보세요!",
     "teamCheckinTitle": "Dowin",
-    "teamCheckinBody": "이번 주 {actionItemName} 기록이 아직 없어요. 오늘 할 수 있는 가장 작은 한 걸음부터 남겨주세요."
+    "teamCheckinBody": "이번 주 {actionItemName} 기록이 아직 없어요. 오늘 해볼까요?"
   },
   "PushNotification": {
     "unsupportedIos": "iOS 16.4 이상에서만 알림을 지원합니다.",
@@ -1515,7 +1515,7 @@
     "statusDeclinedDesc": "현재 목표로 계속 진행합니다.",
     "blockedPlaceholder": "어떤 어려움이 있나요?",
     "adjustPlaceholder": "어떻게 조율하고 싶으신가요?",
-    "msgNoLog": "이번 주 [{measureName}] 기록이 아직 없어요.\n오늘 가능한 가장 작은 실행을 하나만 업데이트해 주세요.",
+    "msgNoLog": "이번 주 [{measureName}] 기록이 아직 없어요.",
     "msgSlowStart": "이번 주 목표까지 아직 여유가 있지만, 시작이 늦어지고 있어요.\n작은 실행을 하나만 업데이트해 주세요.",
     "btnLogNow": "완료",
     "btnLater": "오늘 나중에 할게요",
@@ -1527,6 +1527,6 @@
     "statusAdjusting": "조율 진행 중",
     "statusAdjustDone": "조율 완료됨",
     "msgNoLogRich": "이번 주 <highlight>{measureName}</highlight> 기록이 아직 없어요.",
-    "msgNoLogSub": "오늘 가능한 가장 작은 실행을 하나만 업데이트해 주세요. 작은 시작이 중요해요!"
+    "msgNoLogSub": "오늘 해볼까요?"
   }
 }
