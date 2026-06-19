@@ -202,8 +202,8 @@ export function TeamMemberCheckIn() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-[90px] lg:bottom-6 right-4 sm:right-6 z-[9990] w-14 h-14 rounded-[20px] shadow-lg flex items-center justify-center transition-colors duration-300 ${
-          isOpen ? "hidden sm:flex bg-surface border border-border/40 text-text-primary" : "bg-primary text-white"
+        className={`fixed bottom-[90px] lg:bottom-6 right-4 lg:right-6 z-[9990] w-14 h-14 rounded-[20px] shadow-lg flex items-center justify-center transition-colors duration-300 ${
+          isOpen ? "hidden lg:flex bg-surface border border-border/40 text-text-primary" : "bg-primary text-white"
         }`}
       >
         {isOpen ? <X className="w-6 h-6" /> : <Inbox className="w-6 h-6" />}
@@ -215,11 +215,11 @@ export function TeamMemberCheckIn() {
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] sm:inset-auto sm:bottom-[100px] lg:bottom-24 right-0 sm:right-6 sm:w-[380px] h-[100dvh] sm:h-[640px] sm:max-h-[85vh] bg-surface sm:rounded-[28px] sm:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-dowin-in sm:origin-bottom-right">
+        <div className="fixed inset-0 z-[9999] lg:inset-auto lg:bottom-24 right-0 lg:right-6 lg:w-[380px] h-[100dvh] lg:h-[640px] lg:max-h-[85vh] bg-surface lg:rounded-[28px] lg:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-dowin-in lg:origin-bottom-right">
           
           {!selectedId ? (
             <>
-              <div className="bg-surface px-6 pt-12 sm:pt-8 pb-4 shrink-0 flex items-center justify-between">
+              <div className="bg-surface px-6 pt-12 lg:pt-8 pb-4 shrink-0 flex items-center justify-between">
                 <h1 className="text-[24px] font-bold text-text-primary tracking-tight flex items-center gap-2">
                   Inbox
                   {unreadCount > 0 && (
@@ -228,7 +228,7 @@ export function TeamMemberCheckIn() {
                 </h1>
                 <button 
                   onClick={() => setIsOpen(false)}
-                  className="sm:hidden p-2 -mr-2 text-text-muted hover:bg-sub-background rounded-full"
+                  className="lg:hidden p-2 -mr-2 text-text-muted hover:bg-sub-background rounded-full"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -278,7 +278,7 @@ export function TeamMemberCheckIn() {
             </>
           ) : (
             <div className="flex flex-col h-full bg-surface">
-              <div className="px-4 py-4 pt-12 sm:pt-4 flex items-center shrink-0">
+              <div className="px-4 py-4 pt-12 lg:pt-4 flex items-center shrink-0">
                 <button
                   onClick={() => {
                     setSelectedId(null);
