@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Inbox, ChevronLeft, CheckCircle2, Clock, AlertCircle, FileEdit, X, Bot } from "lucide-react";
-import { UserAvatar } from "@/components/UserAvatar";
+import { Inbox, ChevronLeft, CheckCircle2, Clock, AlertCircle, FileEdit, X } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -25,6 +24,8 @@ type CheckInStatus = "pending" | "done" | "later" | "blocked" | "adjust" | "lead
 interface ProposalAction {
   type: "update_metric" | "archive" | "create_new";
   description: string;
+  rawActionType?: string;
+  rawPayload?: Record<string, unknown>;
 }
 
 interface NotificationItem {
@@ -131,40 +132,46 @@ export function TeamMemberCheckIn() {
   inboxItems.forEach((item) => {
     if (item.type === "ADJUSTMENT_PROPOSAL") {
       const prop = item as TeamCheckinInboxProposalItem;
-      let status: CheckInStatus = "leader_comment";
-      if (prop.status === "ACCEPTED") status = "adjusted";
-      if (prop.status === "DECLINED") status = "declined";
       
       let description = t("leaderProposal");
       let pType: ProposalAction["type"] = "update_metric";
       if (prop.actionType === "CHANGE_TARGET_COUNT") {
         const payload = prop.payload as { newTargetValue?: number };
-        description = t("actionTargetCount") + ` (${payload.newTargetValue}건으로)`;
+        description = t("actionTargetCount", { count: payload.newTargetValue || 0 });
       } else if (prop.actionType === "ARCHIVE_ACTION_ITEM") {
         pType = "archive";
         description = t("actionArchive");
       } else if (prop.actionType === "REPLACE_ACTION_ITEM") {
         pType = "create_new";
         const payload = prop.payload as { replacementName?: string };
-        description = t("actionReplace") + ` (${payload.replacementName})`;
+        description = t("actionReplace", { name: payload.replacementName || "" });
       }
 
       const existing = checkinMap.get(prop.sourceCheckinId!);
       if (existing) {
         const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const status = prop.status === "ACCEPTED" ? "adjusted" : 
+                          prop.status === "DECLINED" ? "declined" : "leader_comment";
         const proposalContent = status === "adjusted" ? t("statusAdjusted") : status === "declined" ? t("statusDeclined") : t("actionProposalTitle");
-        existing.proposalId = prop.id;
-        existing.leaderComment = prop.leaderNote || undefined;
-        existing.proposal = { type: pType, description };
+        
         existing.status = status;
+        existing.leaderComment = prop.leaderNote || undefined;
+        existing.proposalId = prop.id;
+        existing.proposal = { 
+          type: pType, 
+          description,
+          rawActionType: prop.actionType,
+          rawPayload: prop.payload,
+        };
         if (prop.status === "PROPOSED") existing.isUnread = true;
-        existing.date = formatDate(proposalCreatedAt); // update date to proposal's date
+        existing.date = formatDate(proposalCreatedAt);
         existing.content = proposalContent;
-        // Keep original myRequest or undefined
         existing.type = "human";
       } else {
         // Fallback for standalone proposal (should be rare)
         const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const status = prop.status === "ACCEPTED" ? "adjusted" : 
+                          prop.status === "DECLINED" ? "declined" : "leader_comment";
         checkinMap.set(prop.id!, {
           id: prop.id!,
           proposalId: prop.id,
@@ -309,23 +316,13 @@ export function TeamMemberCheckIn() {
                     }}
                     className={`w-full flex gap-3 text-left p-4 rounded-[20px] transition-all duration-200 relative ${n.isUnread ? 'bg-primary/5 hover:bg-primary/10' : 'bg-transparent hover:bg-sub-background'}`}
                   >
-                    <div className="relative shrink-0 pt-0.5">
-                      {n.type === 'system_alert' ? (
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-[18px] bg-primary/10">
-                          <Bot className="w-[20px] h-[20px] text-primary" />
-                        </div>
-                      ) : (
-                        <UserAvatar alt="Leader" size={40} shape="circle" avatarSeed="leader-kim" />
-                      )}
-                      {n.isUnread && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
-                      )}
-                    </div>
-                    
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start w-full mb-0.5">
                         <span className={`text-[14px] font-medium truncate pr-2 ${n.isUnread ? 'text-primary' : 'text-[#8B95A1]'}`}>
                           {n.actionItemName}
+                          {n.isUnread && (
+                            <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full ml-1.5 mb-0.5 align-middle" />
+                          )}
                         </span>
                         <span className="text-[12px] text-[#8B95A1] shrink-0 mt-0.5">{n.date}</span>
                       </div>
@@ -371,7 +368,7 @@ export function TeamMemberCheckIn() {
                     <span className="text-[13px] font-bold text-primary">{t("system")}</span>
                     <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem?.sentAt)}</span>
                   </div>
-                  <div className="bg-primary/10 rounded-[24px] rounded-tl-[8px] p-5">
+                  <div className="bg-primary/10 rounded-[16px] p-5">
                     <h2 className="text-[16px] font-bold text-[#191F28] leading-[1.4] tracking-tight mb-2">
                       {t.rich("msgNoLogRich", { measureName: selectedItem?.actionItemName || '', highlight: (chunks) => <span className="text-primary">{chunks}</span> })}
                     </h2>
@@ -458,7 +455,7 @@ export function TeamMemberCheckIn() {
                               <span className="text-[13px] font-bold text-[#4E5968]">{t("myRequest")}</span>
                               <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem.respondedAt)}</span>
                             </div>
-                            <div className="bg-[#F2F4F6] rounded-[24px] rounded-tl-[8px] p-5">
+                            <div className="bg-[#F2F4F6] rounded-[16px] p-5">
                               <div className="flex flex-col gap-1">
                                 <span className="text-[14px] font-bold text-[#8B95A1]">
                                   {t("statusAdjust")}
@@ -476,26 +473,63 @@ export function TeamMemberCheckIn() {
                         {(selectedItem.leaderComment || selectedItem.proposal) && (
                           <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
-                              <span className="text-[13px] font-bold text-primary">{t("leaderComment")}</span>
+                              <span className="text-[13px] font-bold text-primary">
+                                {t("leaderComment")}
+                              </span>
                               <span className="text-[13px] font-medium text-primary">{selectedItem.date}</span>
                             </div>
-                            <div className="bg-primary/10 rounded-[24px] rounded-tr-[8px] p-5">
+                            <div className="bg-primary/10 rounded-[16px] p-5">
                               {selectedItem.leaderComment && (
                                 <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
                                   {selectedItem.leaderComment}
                                 </p>
                               )}
-                              
                               {selectedItem.proposal && (
-                                <div className="bg-white rounded-[16px] p-4 border border-primary/10 shadow-[0_2px_10px_rgba(49,130,246,0.05)]">
-                                  <div className="flex flex-col gap-1">
-                                    <span className="text-[12px] font-bold text-primary">{t("leaderProposal")}</span>
-                                    <span className="text-[16px] font-bold text-[#191F28]">{selectedItem.proposal.description}</span>
-                                  </div>
+                                <div className={selectedItem.leaderComment ? 'pt-4 border-t border-primary/15' : ''}>
+                                  <p className="text-[16px] text-[#191F28] leading-relaxed font-bold">
+                                    {selectedItem.proposal.description}
+                                  </p>
                                 </div>
                               )}
                             </div>
                           </div>
+                        )}
+                        {(selectedItem.status === 'adjusted' || selectedItem.status === 'declined') && (
+                          <>
+                            {selectedItem.status === 'declined' && (
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between px-1">
+                                  <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
+                                  <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem.respondedAt)}</span>
+                                </div>
+                                <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                                  <span className="text-[14px] font-bold text-[#8B95A1]">
+                                    {getStatusUI(selectedItem.status)?.text}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+
+                            {selectedItem.status === 'adjusted' && selectedItem.proposal && (
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between px-1">
+                                  <span className="text-[13px] font-bold text-primary">{t("system")}</span>
+                                  <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem.respondedAt)}</span>
+                                </div>
+                                <div className="bg-primary/10 rounded-[16px] p-5">
+                                  <p className="text-[15px] text-[#191F28] leading-relaxed font-bold">
+                                    {selectedItem.proposal.rawActionType === "CHANGE_TARGET_COUNT" 
+                                      ? t("sysTargetCountChanged", { count: (selectedItem.proposal.rawPayload as { newTargetValue?: number })?.newTargetValue || 0 })
+                                      : selectedItem.proposal.rawActionType === "ARCHIVE_ACTION_ITEM"
+                                      ? t("sysArchiveChanged")
+                                      : selectedItem.proposal.rawActionType === "REPLACE_ACTION_ITEM"
+                                      ? t("sysReplaceChanged", { name: (selectedItem.proposal.rawPayload as { replacementName?: string })?.replacementName || "" })
+                                      : t("statusAdjusted")}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
@@ -518,6 +552,8 @@ export function TeamMemberCheckIn() {
                         </button>
                       </div>
                     )}
+
+
                   </div>
                 ) : (
                   <div className="flex flex-col h-full animate-dowin-in">
@@ -528,7 +564,7 @@ export function TeamMemberCheckIn() {
                             <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
                             <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem!.respondedAt)}</span>
                           </div>
-                          <div className="bg-[#F2F4F6] rounded-[24px] rounded-tl-[8px] p-5">
+                          <div className="bg-[#F2F4F6] rounded-[16px] p-5">
                             <span className="text-[14px] font-bold text-[#8B95A1]">
                               {getStatusUI(selectedItem!.status)?.text}
                             </span>
@@ -539,7 +575,6 @@ export function TeamMemberCheckIn() {
                             )}
                           </div>
                         </div>
-
                       </div>
                     </div>
                   </div>
