@@ -281,7 +281,11 @@ export function LeaderReport() {
                             <span className="truncate">{signal.memberNickname}</span>
                             <span className="text-[#B0B8C1] text-[12px] font-bold">•</span>
                             <span className={`text-[14px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-primary'}`}>
-                              {signal.isResolved ? '조율 중' : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                              {signal.isResolved 
+                                ? (signal.resolvedProposal?.status === 'ACCEPTED' ? t("statusAdjustDone") 
+                                 : signal.resolvedProposal?.status === 'DECLINED' ? t("statusDeclined") 
+                                 : t("statusAdjusting")) 
+                                : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
                             </span>
                           </div>
                         </div>
@@ -372,7 +376,6 @@ export function LeaderReport() {
                           {signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
                         </span>
                       </div>
-                      <span className="text-[14px] text-[#8B95A1] font-medium shrink-0">{formatDateRelative(signal.createdAt)}</span>
                     </div>
                     
                     <p className="text-[16px] text-[#4E5968] font-bold truncate leading-snug">
@@ -390,7 +393,7 @@ export function LeaderReport() {
                 <div className="px-1 space-y-7 mb-8">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-[13px] font-bold text-[#4E5968]">{signal.memberNickname} 팀원의 요청</span>
+                      <span className="text-[13px] font-bold text-[#4E5968]">{t("teamMember")}</span>
                       <span className="text-[13px] font-medium text-[#8B95A1]">{formatDateRelative(signal.createdAt)}</span>
                     </div>
                     <div className="bg-[#F2F4F6] rounded-[16px] p-5">
@@ -408,7 +411,7 @@ export function LeaderReport() {
                   {signal.isResolved && signal.resolvedProposal && (
                     <div className="flex flex-col gap-2 mt-4">
                       <div className="flex items-center justify-between px-1">
-                        <span className="text-[13px] font-bold text-primary">리더님의 응답</span>
+                        <span className="text-[13px] font-bold text-primary">{t("myResponse")}</span>
                         <span className="text-[13px] font-medium text-primary">{formatDateRelative(signal.resolvedProposal.createdAt)}</span>
                       </div>
                       <div className="bg-primary/10 rounded-[16px] p-5">
@@ -423,6 +426,20 @@ export function LeaderReport() {
                              signal.resolvedProposal.actionType === 'ARCHIVE_ACTION_ITEM' ? '아이템 보관 제안' : '대체 목표 제안'}
                           </p>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {signal.isResolved && signal.resolvedProposal && (signal.resolvedProposal.status === 'ACCEPTED' || signal.resolvedProposal.status === 'DECLINED') && (
+                    <div className="flex flex-col gap-2 mt-4">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[13px] font-bold text-[#4E5968]">{t("teamMember")}</span>
+                        <span className="text-[13px] font-medium text-[#8B95A1]">{formatDateRelative(signal.resolvedAt || signal.resolvedProposal.createdAt)}</span>
+                      </div>
+                      <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                        <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium">
+                          {signal.resolvedProposal.status === 'ACCEPTED' ? t("proposalAcceptedMsg") : t("proposalDeclinedMsg")}
+                        </p>
                       </div>
                     </div>
                   )}

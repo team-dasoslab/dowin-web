@@ -1527,6 +1527,10 @@
     "statusAdjustDone": "Adjusted",
     "msgNoLogRich": "You haven't logged <highlight>{measureName}</highlight> this week yet.",
     "msgNoLogSub": "Give it a go today?",
-    "confirmSave": "Save?"
+    "confirmSave": "Save?",
+    "memberResponse": "Team member's response",
+    "proposalAcceptedMsg": "The proposal was accepted and the target was adjusted.",
+    "proposalDeclinedMsg": "The proposal was declined and the original target was kept.",
+    "teamMember": "Team member"
   }
 }

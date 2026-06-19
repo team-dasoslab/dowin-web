@@ -1532,6 +1532,10 @@
     "statusAdjustDone": "조율 완료",
     "msgNoLogRich": "이번 주 <highlight>{measureName}</highlight> 기록이 아직 없어요.",
     "msgNoLogSub": "오늘 해볼까요?",
-    "confirmSave": "저장할까요?"
+    "confirmSave": "저장할까요?",
+    "memberResponse": "팀원의 응답",
+    "proposalAcceptedMsg": "제안을 수락하여 목표가 조정되었습니다.",
+    "proposalDeclinedMsg": "제안을 거절하고 기존 목표를 유지하기로 했습니다.",
+    "teamMember": "팀원"
   }
 }
