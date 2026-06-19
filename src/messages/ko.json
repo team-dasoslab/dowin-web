@@ -1464,7 +1464,7 @@
     "sentCount": "발송된 체크인",
     "countUnit": "건",
     "targetCount": "대상 {n}명",
-    "oneTapResponseRate": "1탭 반응률",
+    "oneTapResponseRate": "체크인 응답률",
     "respondedCount": "{n}명 응답",
     "resumedRate": "기록 재개율",
     "resumedWithin24h": "24시간 내 기록",

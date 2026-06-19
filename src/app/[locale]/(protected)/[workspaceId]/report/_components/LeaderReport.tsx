@@ -174,37 +174,37 @@ export function LeaderReport() {
       <section id="achievement" className="scroll-mt-28">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 px-2">
           <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-            <span className="text-[14px] text-text-secondary font-medium mb-4">발송된 체크인</span>
+            <span className="text-[14px] text-text-secondary font-medium mb-4">{t("sentCount")}</span>
             <div>
-              <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.sentCount || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">건</span></div>
-              <p className="text-[13px] text-text-muted mt-1">대상 {report?.summary?.recipientCount || 0}명</p>
+              <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.sentCount || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">{t("countUnit")}</span></div>
+              <p className="text-[13px] text-text-muted mt-1">{t("targetCount", { n: report?.summary?.recipientCount || 0 })}</p>
             </div>
           </div>
           
           <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-            <span className="text-[14px] text-text-secondary font-medium mb-4">1탭 반응률</span>
+            <span className="text-[14px] text-text-secondary font-medium mb-4">{t("oneTapResponseRate")}</span>
             <div>
               <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.oneTapResponseRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
-              <p className="text-[13px] text-text-muted mt-1">{report?.summary?.respondedCount || 0}명 응답</p>
+              <p className="text-[13px] text-text-muted mt-1">{t("respondedCount", { n: report?.summary?.respondedCount || 0 })}</p>
             </div>
           </div>
           
           <div className="bg-surface rounded-[24px] p-6 flex flex-col justify-between">
-            <span className="text-[14px] text-text-secondary font-medium mb-4">기록 재개율</span>
+            <span className="text-[14px] text-text-secondary font-medium mb-4">{t("resumedRate")}</span>
             <div>
               <div className="text-[32px] font-bold text-text-primary tracking-tight">{report?.summary?.resumedWithin24hRate || 0}<span className="text-[18px] text-text-muted ml-1 font-medium">%</span></div>
-              <p className="text-[13px] text-text-muted mt-1">24시간 내 기록</p>
+              <p className="text-[13px] text-text-muted mt-1">{t("resumedWithin24h")}</p>
             </div>
           </div>
           
           <div className="bg-danger/5 rounded-[24px] p-6 flex flex-col justify-between">
             <span className="text-[14px] text-danger font-bold mb-4 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-danger animate-pulse"></span>
-              확인 필요
+              {t("needsCheck")}
             </span>
             <div>
-              <div className="text-[32px] font-bold text-danger tracking-tight">{report?.summary?.adjustmentSignalCount || 0}<span className="text-[18px] text-danger/60 ml-1 font-medium">건</span></div>
-              <p className="text-[13px] text-danger/70 mt-1">도움이 필요해요</p>
+              <div className="text-[32px] font-bold text-danger tracking-tight">{report?.summary?.adjustmentSignalCount || 0}<span className="text-[18px] text-danger/60 ml-1 font-medium">{t("countUnit")}</span></div>
+              <p className="text-[13px] text-danger/70 mt-1">{t("needsHelp")}</p>
             </div>
           </div>
         </div>

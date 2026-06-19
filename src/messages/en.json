@@ -1460,7 +1460,7 @@
     "sentCount": "Sent check-ins",
     "countUnit": "",
     "targetCount": "{n} members",
-    "oneTapResponseRate": "1-Tap response rate",
+    "oneTapResponseRate": "Check-in response rate",
     "respondedCount": "{n} responded",
     "resumedRate": "Log resume rate",
     "resumedWithin24h": "Logged within 24h",
