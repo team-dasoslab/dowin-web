@@ -459,19 +459,21 @@ describe("WorkspaceService", () => {
       });
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
+        uid: "ws_team",
         name: "팀",
         planCode: "FREE",
       });
       mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMemberByInvite.mockResolvedValue(true);
 
-      await service.joinWorkspaceByInvite("abcd123456", 7);
+      const result = await service.joinWorkspaceByInvite("abcd123456", 7);
 
       expect(mockStorage.addMemberByInvite).toHaveBeenCalledWith({
         inviteId: 11,
         workspaceId: 1,
         userId: 7,
       });
+      expect(result.id).toBe("ws_team");
     });
 
     it("초대코드 참가 중 유니크 충돌이 발생하면 409 에러를 던진다", async () => {

@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSession = vi.fn();
-const mockJoinWorkspaceByInvite = vi.fn();
 const mockGuardRestrictedTestAccountWrite = vi.fn();
+const mockResolveWorkspaceIdByUid = vi.fn();
+const mockJoinWorkspace = vi.fn();
 const mockCookieSet = vi.fn();
 
 vi.mock("next/headers", () => ({
@@ -38,12 +39,13 @@ vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
   WorkspaceService: vi.fn(function MockWorkspaceService() {
     return {
-      joinWorkspaceByInvite: mockJoinWorkspaceByInvite,
+      resolveWorkspaceIdByUid: mockResolveWorkspaceIdByUid,
+      joinWorkspace: mockJoinWorkspace,
     };
   }),
 }));
 
-describe("POST /api/workspaces/join-by-invite", () => {
+describe("POST /api/workspaces/join", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
@@ -56,9 +58,9 @@ describe("POST /api/workspaces/join-by-invite", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/workspaces/join-by-invite", {
+      new Request("http://localhost/api/workspaces/join", {
         method: "POST",
-        body: JSON.stringify({ code: "ABCD123456" }),
+        body: JSON.stringify({ workspaceId: "ws_ops" }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -66,20 +68,18 @@ describe("POST /api/workspaces/join-by-invite", () => {
     );
 
     expect(response.status).toBe(401);
+    expect(mockJoinWorkspace).not.toHaveBeenCalled();
   });
 
-  it("초대코드로 참가 요청을 처리한다", async () => {
+  it("워크스페이스 참가 후 active workspace 쿠키를 갱신한다", async () => {
     mockGetSession.mockResolvedValue({ userId: 7 });
-    mockJoinWorkspaceByInvite.mockResolvedValue({
-      id: "ws_ops",
-      name: "운영팀",
-    });
+    mockResolveWorkspaceIdByUid.mockResolvedValue(3);
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/workspaces/join-by-invite", {
+      new Request("http://localhost/api/workspaces/join", {
         method: "POST",
-        body: JSON.stringify({ code: "ABCD123456" }),
+        body: JSON.stringify({ workspaceId: "ws_ops" }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -87,7 +87,7 @@ describe("POST /api/workspaces/join-by-invite", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockJoinWorkspaceByInvite).toHaveBeenCalledWith("ABCD123456", 7);
+    expect(mockJoinWorkspace).toHaveBeenCalledWith(3, 7);
     expect(mockCookieSet).toHaveBeenCalledWith(
       "dowin_workspace_id",
       "ws_ops",
