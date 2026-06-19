@@ -84,6 +84,14 @@ export function TeamMemberCheckIn() {
   const isWorkspaceAdmin = workspaceResponse?.status === 200 && workspaceResponse.data.role === "ADMIN";
   const checkinSettings = checkinSettingsResponse?.status === 200 && 'enabled' in checkinSettingsResponse.data ? checkinSettingsResponse.data : null;
   
+  if (!workspaceResponse || !checkinSettingsResponse) {
+    return null;
+  }
+
+  if (checkinSettingsResponse?.status === 200 && checkinSettings?.enabled === false) {
+    return null;
+  }
+
   if (isWorkspaceAdmin && !checkinSettings?.includeAdminAsMember) {
     return null;
   }

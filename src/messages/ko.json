@@ -1449,9 +1449,10 @@
     }
   },
   "TeamCheckin": {
-    "settingsTitle": "서비스 주도 팀 체크인",
-    "enabledToast": "팀 체크인이 활성화되었습니다.",
-    "disabledToast": "팀 체크인이 꺼졌습니다.",
+    "settingsTitle": "워크스페이스 체크인",
+    "enableServiceLedCheckin": "자동 체크인",
+    "enabledToast": "자동 체크인이 활성화되었습니다.",
+    "disabledToast": "자동 체크인이 비활성화되었습니다.",
     "updateFailedToast": "설정 변경에 실패했습니다.",
     "reportPageTitle": "팀 체크인 리포트",
     "today": "오늘",

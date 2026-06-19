@@ -1444,9 +1444,10 @@
     }
   },
   "TeamCheckin": {
-    "settingsTitle": "Service-Led Team Check-in",
-    "enabledToast": "Team check-in has been enabled.",
-    "disabledToast": "Team check-in has been disabled.",
+    "settingsTitle": "Workspace Check-in",
+    "enableServiceLedCheckin": "Auto Check-in",
+    "enabledToast": "Auto Check-in has been enabled.",
+    "disabledToast": "Auto Check-in has been disabled.",
     "updateFailedToast": "Failed to update settings.",
     "reportPageTitle": "Team Check-in Report",
     "today": "Today",
