@@ -265,23 +265,31 @@ export function LeaderReport() {
                 {t("noRecentActivity")}
               </div>
             ) : (
-              <div className="relative pl-6 space-y-8 before:absolute before:inset-0 before:ml-[31px] before:-translate-x-px before:h-full before:w-0.5 before:bg-border/40">
-                {report.activity.map((activity, i) => (
+              <div className="relative pl-6 space-y-8">
+                {report.activity.map((activity, i) => {
+                  const isLast = i === report.activity.length - 1;
+                  return (
                   <div key={activity.checkinId! + i} className="relative flex items-start">
                     <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
                       {activity.type === 'CHECKIN_SENT' ? <Bot className="w-5 h-5 text-white" /> : <CheckCircle2 className="w-5 h-5 text-white" />}
                     </div>
+
+                    {!isLast && (
+                      <div className="absolute -left-6 top-10 -bottom-8 w-10 flex justify-center">
+                        <div className="w-0.5 h-full bg-border/40" />
+                      </div>
+                    )}
                     
                     <div className="ml-10 pt-1">
                       <p className="text-[15px] text-text-primary font-bold leading-snug tracking-tight mb-1">
-                        {t("historyDesc", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" })}
+                        {activity.type === 'CHECKIN_SENT' ? t("historySent", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" }) : t("historyResponded", { nickname: activity.memberNickname || "", measureName: activity.leadMeasureName || "" })}
                       </p>
                       <p className="text-[13px] text-text-muted">
                         {formatDateRelative(activity.createdAt)}
                       </p>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             )}
           </div>
