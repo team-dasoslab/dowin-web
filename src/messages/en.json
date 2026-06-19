@@ -1447,6 +1447,8 @@
     "disabledToast": "Team check-in has been disabled.",
     "updateFailedToast": "Failed to update settings.",
     "reportPageTitle": "Team Check-in Report",
+    "today": "Today",
+    "yesterday": "Yesterday",
     "justNow": "Just now",
     "daysAgo": "{n} days ago",
     "hoursAgo": "{n} hours ago",
@@ -1485,7 +1487,7 @@
     "proposeReplacePlaceholder": "Please suggest a new action item name",
     "typeBlocked": "Reported blocked",
     "typeAdjust": "Requested adjustment",
-    "inboxEmpty": "No new notifications.",
+    "inboxEmpty": "No new check-in notifications.",
     "myRequest": "My Request",
     "requestAdjustDesc": "Requested goal adjustment based on situation.",
     "leaderComment": "Leader's Comment",
@@ -1509,11 +1511,16 @@
     "adjustPlaceholder": "How would you like to adjust it?",
     "msgNoLog": "You haven't logged [{measureName}] this week yet.\nPlease update with just one smallest execution possible today.",
     "msgSlowStart": "There's still time until this week's goal, but the start is getting delayed.\nPlease update with just one small execution.",
-    "btnLogNow": "Log now",
-    "btnLater": "Do it later today",
+    "btnLogNow": "Just finished it",
+    "btnLater": "I'll do it later today",
     "btnBlocked": "I'm blocked",
-    "btnAdjust": "Need goal adjustment",
+    "btnAdjust": "I want to adjust the goal",
     "system": "System",
-    "previous": "Previous"
+    "previous": "Previous",
+    "statusPending": "Waiting for response",
+    "statusAdjusting": "Adjustment in progress",
+    "statusAdjustDone": "Adjustment completed",
+    "msgNoLogRich": "You haven't logged <highlight>{measureName}</highlight> this week yet.",
+    "msgNoLogSub": "Please update with just one small execution today. A small start is important!"
   }
 }

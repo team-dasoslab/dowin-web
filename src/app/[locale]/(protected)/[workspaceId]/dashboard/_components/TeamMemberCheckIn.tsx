@@ -51,8 +51,8 @@ export function TeamMemberCheckIn() {
     if (isNaN(d.getTime())) return t("justNow");
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return "오늘";
-    if (diffDays === 1) return "어제";
+    if (diffDays === 0) return t("today");
+    if (diffDays === 1) return t("yesterday");
     return `${d.getMonth() + 1}/${d.getDate()}`;
   }
   const { workspaceId } = useParams() as { workspaceId: string };
@@ -117,7 +117,7 @@ export function TeamMemberCheckIn() {
       if (prop.status === "ACCEPTED") status = "adjusted";
       if (prop.status === "DECLINED") status = "declined";
       
-      let description = "목표 변경 제안";
+      let description = t("leaderProposal");
       let pType: ProposalAction["type"] = "update_metric";
       if (prop.actionType === "CHANGE_TARGET_COUNT") {
         const payload = prop.payload as { newTargetValue?: number };
@@ -237,7 +237,7 @@ export function TeamMemberCheckIn() {
               <div className="flex-1 overflow-y-auto px-2 pb-4">
                 {notifications.length === 0 ? (
                   <div className="py-12 text-center text-text-muted">
-                    새로운 체크인 알림이 없습니다.
+                    {t("inboxEmpty")}
                   </div>
                 ) : notifications.map((n) => (
                   <button
@@ -293,9 +293,9 @@ export function TeamMemberCheckIn() {
                   <div className="flex flex-col justify-center ml-2 mr-4 min-w-0">
                     <span className="text-[16px] font-bold text-[#191F28] truncate">{selectedItem.actionItemName}</span>
                     <span className={`text-[13px] font-bold ${selectedItem.status === 'adjusted' ? 'text-[#8B95A1]' : 'text-primary'}`}>
-                      {selectedItem.status === 'pending' ? '답변 대기 중' :
-                       selectedItem.status === 'leader_comment' ? '조율 진행 중' : 
-                       selectedItem.status === 'adjusted' ? '조율 완료됨' : 
+                      {selectedItem.status === 'pending' ? t("statusPending") :
+                       selectedItem.status === 'leader_comment' ? t("statusAdjusting") : 
+                       selectedItem.status === 'adjusted' ? t("statusAdjustDone") : 
                        getStatusUI(selectedItem.status)?.text}
                     </span>
                   </div>
@@ -306,15 +306,15 @@ export function TeamMemberCheckIn() {
                 {/* Initial System Request (Always Visible) */}
                 <div className="flex flex-col gap-2 mt-2 mb-8 shrink-0">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[13px] font-bold text-primary">시스템</span>
+                    <span className="text-[13px] font-bold text-primary">{t("system")}</span>
                     <span className="text-[13px] font-medium text-primary">{selectedItem?.date}</span>
                   </div>
                   <div className="bg-primary/10 rounded-[24px] rounded-tl-[8px] p-5">
                     <h2 className="text-[16px] font-bold text-[#191F28] leading-[1.4] tracking-tight mb-2">
-                      이번 주 <span className="text-primary">{selectedItem?.actionItemName}</span> 기록이 아직 없어요.
+                      {t.rich("msgNoLogRich", { measureName: selectedItem?.actionItemName || '', highlight: (chunks) => <span className="text-primary">{chunks}</span> })}
                     </h2>
                     <p className="text-[15px] text-[#191F28] leading-relaxed font-medium">
-                      오늘 가능한 가장 작은 실행을 하나만 업데이트해 주세요. 작은 시작이 중요해요!
+                      {t("msgNoLogSub")}
                     </p>
                   </div>
                 </div>
@@ -393,13 +393,13 @@ export function TeamMemberCheckIn() {
                         {selectedItem.myRequest && (
                           <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
-                              <span className="text-[13px] font-bold text-[#4E5968]">나의 요청</span>
-                              <span className="text-[13px] font-medium text-[#8B95A1]">이전</span>
+                              <span className="text-[13px] font-bold text-[#4E5968]">{t("myRequest")}</span>
+                              <span className="text-[13px] font-medium text-[#8B95A1]">{t("previous")}</span>
                             </div>
                             <div className="bg-[#F2F4F6] rounded-[24px] rounded-tl-[8px] p-5">
                               <div className="flex items-center gap-2 mb-2">
                                 <FileEdit className="w-4 h-4 text-[#8B95A1]" />
-                                <span className="text-[13px] font-bold text-[#8B95A1]">상황에 맞게 목표 조율을 요청했어요.</span>
+                                <span className="text-[13px] font-bold text-[#8B95A1]">{t("requestAdjustDesc")}</span>
                               </div>
                             </div>
                           </div>
@@ -408,7 +408,7 @@ export function TeamMemberCheckIn() {
                         {selectedItem.leaderComment && (
                           <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
-                              <span className="text-[13px] font-bold text-primary">리더 코멘트</span>
+                              <span className="text-[13px] font-bold text-primary">{t("leaderComment")}</span>
                               <span className="text-[13px] font-medium text-primary">{selectedItem.date}</span>
                             </div>
                             <div className="bg-primary/10 rounded-[24px] rounded-tr-[8px] p-5">
@@ -419,7 +419,7 @@ export function TeamMemberCheckIn() {
                               {selectedItem.proposal && (
                                 <div className="bg-white rounded-[16px] p-4 border border-primary/10 shadow-[0_2px_10px_rgba(49,130,246,0.05)]">
                                   <div className="flex flex-col gap-1">
-                                    <span className="text-[12px] font-bold text-primary">리더의 제안</span>
+                                    <span className="text-[12px] font-bold text-primary">{t("leaderProposal")}</span>
                                     <span className="text-[16px] font-bold text-[#191F28]">{selectedItem.proposal.description}</span>
                                   </div>
                                 </div>
@@ -455,7 +455,7 @@ export function TeamMemberCheckIn() {
                       <div className="px-1 space-y-7 mb-8">
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center justify-between px-1">
-                            <span className="text-[13px] font-bold text-[#4E5968]">나의 응답</span>
+                            <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
                             <span className="text-[13px] font-medium text-[#8B95A1]">{selectedItem!.date}</span>
                           </div>
                           <div className="bg-[#F2F4F6] rounded-[24px] rounded-tl-[8px] p-5">
@@ -463,9 +463,9 @@ export function TeamMemberCheckIn() {
                               {getStatusUI(selectedItem!.status)?.text}
                             </span>
                             <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
-                              {selectedItem!.status === 'done' && '오늘 가능한 가장 작은 실행을 완료했어요.'}
-                              {selectedItem!.status === 'later' && '오늘은 어렵지만 나중에 꼭 할게요.'}
-                              {selectedItem!.status === 'blocked' && '막힘 상태를 리더에게 전달했어요.'}
+                              {selectedItem!.status === 'done' && '{t("statusDoneDesc")}'}
+                              {selectedItem!.status === 'later' && '{t("statusLaterDesc")}'}
+                              {selectedItem!.status === 'blocked' && '{t("statusBlockedDesc")}'}
                               {selectedItem!.status === 'adjust' && '상황에 맞게 목표 조율을 요청했어요.'}
                             </p>
                           </div>
@@ -473,8 +473,8 @@ export function TeamMemberCheckIn() {
 
                         <div className="flex flex-col gap-2">
                           <div className="flex items-center justify-between px-1">
-                            <span className="text-[13px] font-bold text-primary">시스템</span>
-                            <span className="text-[13px] font-medium text-primary">방금 전</span>
+                            <span className="text-[13px] font-bold text-primary">{t("system")}</span>
+                            <span className="text-[13px] font-medium text-primary">{t("justNow")}</span>
                           </div>
                           <div className="bg-primary/10 rounded-[24px] rounded-tr-[8px] p-5">
                             <p className="text-[15px] text-[#191F28] leading-relaxed font-medium">
