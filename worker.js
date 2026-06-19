@@ -1,4 +1,5 @@
 import { runDailyReminder } from "@/domain/notification/services/run-daily-reminder";
+import { runTeamCheckin } from "@/domain/team-checkin/services/run-team-checkin";
 import openNextWorker, {
   BucketCachePurge,
   DOQueueHandler,
@@ -28,6 +29,16 @@ const worker = {
             ),
           )
           .catch((err) => console.error("Daily reminder run failed:", err)),
+      );
+      ctx.waitUntil(
+        runTeamCheckin(env)
+          .then((res) =>
+            console.log(
+              "Team checkin run successfully:",
+              JSON.stringify(res),
+            ),
+          )
+          .catch((err) => console.error("Team checkin run failed:", err)),
       );
     }
   },

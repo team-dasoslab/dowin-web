@@ -42,6 +42,7 @@ const DEFAULT_SETTINGS = {
   dailyWorkspaceLimit: 30,
 };
 const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
+const DEFAULT_TIMEZONE = "Asia/Seoul";
 
 type TeamCheckinServiceOptions = {
   leadMeasureAgeGateEnabled?: boolean;
@@ -495,7 +496,6 @@ export class TeamCheckinService {
     let failedCount = 0;
 
     for (const { settings, workspace } of settingsRows) {
-      const { weekStart, weekEnd } = getKstWeekRange(now);
       const candidates = (await this.storage.findCandidates(workspace.id)).filter(
         (candidate) =>
           settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
@@ -505,59 +505,92 @@ export class TeamCheckinService {
         if (!this.leadMeasureAgeGateEnabled) return true;
         return isOldEnoughForCheckin(candidate.leadMeasureCreatedAt, now);
       });
+      const candidateContexts = weeklyCandidates.map((candidate) => {
+        const timezone = resolveTimezone(candidate.timezone);
+
+        return {
+          candidate,
+          localTime: getLocalTimeParts(now, timezone),
+          weekRange: getLocalWeekRange(now, timezone),
+          dayRange: getLocalDayRange(now, timezone),
+        };
+      });
+      const logRange = getCombinedLogRange(
+        candidateContexts.map((context) => context.weekRange),
+      );
       const logs = await this.storage.findLogsForCandidates(
         weeklyCandidates.map((candidate) => candidate.leadMeasureId),
-        weekStart,
-        weekEnd,
+        logRange.from,
+        logRange.to,
       );
       const logsByMeasure = groupLogs(logs);
-      const dayRange = getKstDayRange(now);
+      const deliveryRange = getCombinedDeliveryRange(
+        candidateContexts.map((context) => context.dayRange),
+      );
       const existingToday =
         await this.storage.findDeliveriesWithResponsesForWorkspaceOnDate(
           workspace.id,
-          dayRange.start,
-          dayRange.end,
+          deliveryRange.start,
+          deliveryRange.end,
         );
-      let workspaceDeliveryCount = existingToday.length;
-      const memberDeliveryCount = new Map<number, number>();
-      const suppressedMeasureKeys = new Set<string>();
-      for (const row of existingToday) {
-        memberDeliveryCount.set(
-          row.delivery.memberUserId,
-          (memberDeliveryCount.get(row.delivery.memberUserId) ?? 0) + 1,
-        );
-        if (
-          row.response &&
-          ["SNOOZE_TODAY", "BLOCKED", "ADJUSTMENT_REQUESTED"].includes(
-            row.response.responseType,
-          )
-        ) {
-          suppressedMeasureKeys.add(
-            `${row.delivery.memberUserId}:${row.delivery.leadMeasureId}`,
-          );
-        }
-      }
+      const createdDuringRun: Array<{
+        memberUserId: number;
+        leadMeasureId: number;
+        createdAt: Date;
+      }> = [];
 
-      for (const candidate of weeklyCandidates) {
-        const reasonCode = getReasonCode(candidate, logsByMeasure, now, settings);
+      for (const {
+        candidate,
+        localTime,
+        weekRange,
+        dayRange,
+      } of candidateContexts) {
+        const reasonCode = getReasonCode(
+          candidate,
+          logsByMeasure.get(candidate.leadMeasureId) ?? [],
+          localTime,
+          weekRange,
+          settings,
+        );
         if (!reasonCode) continue;
         candidateCount += 1;
 
+        const workspaceDeliveryCount =
+          existingToday.filter((row) =>
+            isWithinRange(row.delivery.createdAt, dayRange),
+          ).length +
+          createdDuringRun.filter((row) => isWithinRange(row.createdAt, dayRange))
+            .length;
         if (workspaceDeliveryCount >= settings.dailyWorkspaceLimit) {
           skippedCount += 1;
           continue;
         }
         const memberCount =
-          memberDeliveryCount.get(candidate.memberUserId) ?? 0;
+          existingToday.filter(
+            (row) =>
+              row.delivery.memberUserId === candidate.memberUserId &&
+              isWithinRange(row.delivery.createdAt, dayRange),
+          ).length +
+          createdDuringRun.filter(
+            (row) =>
+              row.memberUserId === candidate.memberUserId &&
+              isWithinRange(row.createdAt, dayRange),
+          ).length;
         if (memberCount >= settings.dailyMemberLimit) {
           skippedCount += 1;
           continue;
         }
-        if (
-          suppressedMeasureKeys.has(
-            `${candidate.memberUserId}:${candidate.leadMeasureId}`,
-          )
-        ) {
+        const isSuppressedToday = existingToday.some(
+          (row) =>
+            row.delivery.memberUserId === candidate.memberUserId &&
+            row.delivery.leadMeasureId === candidate.leadMeasureId &&
+            isWithinRange(row.delivery.createdAt, dayRange) &&
+            row.response &&
+            ["SNOOZE_TODAY", "BLOCKED", "ADJUSTMENT_REQUESTED"].includes(
+              row.response.responseType,
+            ),
+        );
+        if (isSuppressedToday) {
           skippedCount += 1;
           continue;
         }
@@ -570,8 +603,8 @@ export class TeamCheckinService {
           leadMeasureId: candidate.leadMeasureId,
           scoreboardId: candidate.scoreboardId,
           reasonCode,
-          periodStart: weekStart,
-          periodEnd: weekEnd,
+          periodStart: weekRange.weekStart,
+          periodEnd: weekRange.weekEnd,
           scheduledFor: now,
           sendStatus: "PENDING",
           messageTitle: title,
@@ -579,8 +612,11 @@ export class TeamCheckinService {
           deeplinkPath: `/${candidate.userLocale ?? "ko"}/${candidate.workspaceUid}/dashboard/my`,
         });
         if (!delivery) continue;
-        workspaceDeliveryCount += 1;
-        memberDeliveryCount.set(candidate.memberUserId, memberCount + 1);
+        createdDuringRun.push({
+          memberUserId: candidate.memberUserId,
+          leadMeasureId: candidate.leadMeasureId,
+          createdAt: now,
+        });
         createdDeliveryCount += 1;
 
         const tokens = await this.storage.findActiveDeviceTokens(
@@ -793,6 +829,7 @@ function getRate(value: number, total: number) {
 function groupLogs(
   logs: Array<{
     leadMeasureId: number;
+    logDate: string;
     value: boolean;
     count: number;
   }>,
@@ -812,34 +849,53 @@ function isOldEnoughForCheckin(createdAt: Date, now: Date) {
 
 function getReasonCode(
   candidate: TeamCheckinCandidate,
-  logsByMeasure: Map<number, Array<{ value: boolean; count: number }>>,
-  now: Date,
+  logsForMeasure: Array<{ logDate: string; value: boolean; count: number }>,
+  localTime: { day: number; hour: number },
+  weekRange: { weekStart: string; weekEnd: string },
   settings: {
     triggerNoWeeklyLogEnabled: boolean;
     triggerSlowStartEnabled: boolean;
   },
 ) {
-  const achievedCount = (logsByMeasure.get(candidate.leadMeasureId) ?? []).filter(
-    (log) =>
-      candidate.trackingMode === "COUNT"
+  const achievedCount = logsForMeasure.filter(
+    (log) => {
+      if (log.logDate < weekRange.weekStart || log.logDate > weekRange.weekEnd) {
+        return false;
+      }
+
+      return candidate.trackingMode === "COUNT"
         ? log.count >= candidate.dailyTargetCount
-        : log.value,
+        : log.value;
+    },
   ).length;
-  const kstDay = getKstDay(now);
-  const kstHour = getKstHour(now);
 
   if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
     return "NO_WEEKLY_LOG" as const;
   }
 
   if (settings.triggerSlowStartEnabled) {
-    if (candidate.targetValue === 1 && kstDay >= 5 && kstHour >= 10 && achievedCount === 0) {
+    if (
+      candidate.targetValue === 1 &&
+      localTime.day >= 5 &&
+      localTime.hour >= 10 &&
+      achievedCount === 0
+    ) {
       return "SLOW_WEEKLY_START" as const;
     }
-    if (candidate.targetValue === 2 && kstDay >= 3 && kstHour >= 10 && achievedCount === 0) {
+    if (
+      candidate.targetValue === 2 &&
+      localTime.day >= 3 &&
+      localTime.hour >= 10 &&
+      achievedCount === 0
+    ) {
       return "SLOW_WEEKLY_START" as const;
     }
-    if (candidate.targetValue >= 3 && kstDay >= 3 && kstHour >= 10 && achievedCount <= 1) {
+    if (
+      candidate.targetValue >= 3 &&
+      localTime.day >= 3 &&
+      localTime.hour >= 10 &&
+      achievedCount <= 1
+    ) {
       return "SLOW_WEEKLY_START" as const;
     }
   }
@@ -864,35 +920,6 @@ function resolvePushLocale(locale?: string | null): Locale {
   return isSupportedLocale(locale) ? locale : DEFAULT_LOCALE;
 }
 
-function getKstWeekRange(now: Date) {
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  const day = kst.getUTCDay() === 0 ? 7 : kst.getUTCDay();
-  const monday = new Date(kst);
-  monday.setUTCDate(kst.getUTCDate() - day + 1);
-  const weekStart = formatUtcDate(monday);
-  return {
-    weekStart,
-    weekEnd: addDaysToDateString(weekStart, 6),
-  };
-}
-
-function getKstDayRange(now: Date) {
-  const date = formatUtcDate(new Date(now.getTime() + 9 * 60 * 60 * 1000));
-  return {
-    start: new Date(`${date}T00:00:00.000+09:00`),
-    end: new Date(`${date}T23:59:59.999+09:00`),
-  };
-}
-
-function getKstDay(now: Date) {
-  const day = new Date(now.getTime() + 9 * 60 * 60 * 1000).getUTCDay();
-  return day === 0 ? 7 : day;
-}
-
-function getKstHour(now: Date) {
-  return new Date(now.getTime() + 9 * 60 * 60 * 1000).getUTCHours();
-}
-
 function addDaysToDateString(date: string, days: number) {
   const next = new Date(`${date}T00:00:00.000Z`);
   next.setUTCDate(next.getUTCDate() + days);
@@ -901,4 +928,134 @@ function addDaysToDateString(date: string, days: number) {
 
 function formatUtcDate(date: Date) {
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+}
+
+function resolveTimezone(timezone?: string | null) {
+  const value = timezone || DEFAULT_TIMEZONE;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: value }).format(new Date(0));
+    return value;
+  } catch {
+    return DEFAULT_TIMEZONE;
+  }
+}
+
+function getLocalTimeParts(now: Date, timezone: string) {
+  const parts = getLocalDateTimeParts(now, timezone);
+  return {
+    day: parts.day,
+    hour: parts.hour,
+  };
+}
+
+function getLocalWeekRange(now: Date, timezone: string) {
+  const parts = getLocalDateTimeParts(now, timezone);
+  const weekStart = addDaysToDateString(parts.date, -parts.day + 1);
+  return {
+    weekStart,
+    weekEnd: addDaysToDateString(weekStart, 6),
+  };
+}
+
+function getLocalDayRange(now: Date, timezone: string) {
+  const { date } = getLocalDateTimeParts(now, timezone);
+  const nextDate = addDaysToDateString(date, 1);
+  return {
+    start: zonedDateTimeToUtc(date, timezone),
+    end: new Date(zonedDateTimeToUtc(nextDate, timezone).getTime() - 1),
+  };
+}
+
+function getCombinedLogRange(
+  ranges: Array<{ weekStart: string; weekEnd: string }>,
+) {
+  if (ranges.length === 0) {
+    return { from: "9999-12-31", to: "0000-01-01" };
+  }
+
+  return {
+    from: ranges.reduce(
+      (min, range) => (range.weekStart < min ? range.weekStart : min),
+      ranges[0].weekStart,
+    ),
+    to: ranges.reduce(
+      (max, range) => (range.weekEnd > max ? range.weekEnd : max),
+      ranges[0].weekEnd,
+    ),
+  };
+}
+
+function getCombinedDeliveryRange(ranges: Array<{ start: Date; end: Date }>) {
+  if (ranges.length === 0) {
+    const now = new Date();
+    return { start: now, end: now };
+  }
+
+  return {
+    start: ranges.reduce(
+      (min, range) => (range.start < min ? range.start : min),
+      ranges[0].start,
+    ),
+    end: ranges.reduce(
+      (max, range) => (range.end > max ? range.end : max),
+      ranges[0].end,
+    ),
+  };
+}
+
+function isWithinRange(value: Date, range: { start: Date; end: Date }) {
+  return value >= range.start && value <= range.end;
+}
+
+function getLocalDateTimeParts(now: Date, timezone: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    weekday: "short",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+  const weekday = get("weekday");
+  const day = weekdayToIsoDay(weekday);
+  const year = get("year");
+  const month = get("month");
+  const dateDay = get("day");
+
+  return {
+    date: `${year}-${month}-${dateDay}`,
+    day,
+    hour: Number(get("hour")),
+    minute: Number(get("minute")),
+  };
+}
+
+function weekdayToIsoDay(value: string) {
+  const days: Record<string, number> = {
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+    Sun: 7,
+  };
+  return days[value] ?? 1;
+}
+
+function zonedDateTimeToUtc(date: string, timezone: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  const utcGuess = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+  const localParts = getLocalDateTimeParts(utcGuess, timezone);
+  const localAsUtc = new Date(
+    `${localParts.date}T${String(localParts.hour).padStart(2, "0")}:${String(
+      localParts.minute,
+    ).padStart(2, "0")}:00.000Z`,
+  );
+  const offsetMs = localAsUtc.getTime() - utcGuess.getTime();
+  return new Date(utcGuess.getTime() - offsetMs);
 }

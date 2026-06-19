@@ -9,6 +9,7 @@ import {
   teamCheckinAdjustmentProposals,
   teamCheckinDeliveries,
   teamCheckinResponses,
+  userNotificationSettings,
   users,
   workspaceMembers,
   workspaceTeamCheckinSettings,
@@ -38,6 +39,7 @@ export type TeamCheckinCandidate = {
   memberUserId: number;
   memberRole: "ADMIN" | "MEMBER";
   userLocale: string | null;
+  timezone: string | null;
   scoreboardId: number;
   leadMeasureId: number;
   leadMeasureName: string;
@@ -136,6 +138,7 @@ export class TeamCheckinStorage {
         memberUserId: workspaceMembers.userId,
         memberRole: workspaceMembers.role,
         userLocale: users.locale,
+        timezone: userNotificationSettings.timezone,
         scoreboardId: scoreboards.id,
         leadMeasureId: leadMeasures.id,
         leadMeasureName: leadMeasures.name,
@@ -147,6 +150,10 @@ export class TeamCheckinStorage {
       })
       .from(workspaceMembers)
       .innerJoin(users, eq(workspaceMembers.userId, users.id))
+      .leftJoin(
+        userNotificationSettings,
+        eq(userNotificationSettings.userId, workspaceMembers.userId),
+      )
       .innerJoin(
         workspaces,
         eq(workspaceMembers.workspaceId, workspaces.id),

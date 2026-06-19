@@ -940,6 +940,31 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /push/settings/timezone:
+    put:
+      summary: 내 알림 시간대 동기화
+      tags: [Notification]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserNotificationTimezoneUpdateRequest"
+      responses:
+        "200":
+          description: 동기화 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserNotificationSettings" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /notifications/devices:
     post:
       summary: 현재 기기 알림 토큰 등록
@@ -4189,6 +4214,14 @@ components:
           type: string
           pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
           example: "20:30"
+
+    UserNotificationTimezoneUpdateRequest:
+      type: object
+      required: [timezone]
+      properties:
+        timezone:
+          type: string
+          example: America/Los_Angeles
 
     DevicePushTokenRegisterRequest:
       type: object

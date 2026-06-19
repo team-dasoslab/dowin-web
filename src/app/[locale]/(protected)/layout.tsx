@@ -7,6 +7,7 @@ import { MainContentWrapper } from "./_components/MainContentWrapper";
 import { ProtectedContentLayout } from "./_components/ProtectedContentLayout";
 import { ProtectedLayoutShell } from "./_components/ProtectedLayoutShell";
 import { Sidebar } from "./_components/Sidebar";
+import { TimezoneSync } from "./_components/TimezoneSync";
 
 export default async function ProtectedLayout({
   children,
@@ -26,6 +27,7 @@ export default async function ProtectedLayout({
 
   return (
     <SidebarProvider>
+      <TimezoneSync />
       <ProtectedLayoutShell sidebar={<Sidebar />}>
         <MainContentWrapper>
           <ProtectedContentLayout>{children}</ProtectedContentLayout>
