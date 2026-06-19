@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.6](https://github.com/team-dasoslab/dowin-web/compare/v1.6.5...v1.6.6) (2026-06-19)
+
+
+### Bug Fixes
+
+* 계정 삭제시 워크스페이스 참조 문제 개선 ([#167](https://github.com/team-dasoslab/dowin-web/issues/167)) ([8a5cfc8](https://github.com/team-dasoslab/dowin-web/commit/8a5cfc8453c7e16ec3d9849e4d69d11d3f07bf7c))
+
 ## [1.6.5](https://github.com/team-dasoslab/dowin-web/compare/v1.6.4...v1.6.5) (2026-06-19)
 
 
