@@ -41,6 +41,7 @@ export type TeamCheckinCandidate = {
   scoreboardId: number;
   leadMeasureId: number;
   leadMeasureName: string;
+  leadMeasureCreatedAt: Date;
   targetValue: number;
   period: "DAILY" | "WEEKLY" | "MONTHLY";
   trackingMode: "BOOLEAN" | "COUNT";
@@ -138,6 +139,7 @@ export class TeamCheckinStorage {
         scoreboardId: scoreboards.id,
         leadMeasureId: leadMeasures.id,
         leadMeasureName: leadMeasures.name,
+        leadMeasureCreatedAt: leadMeasures.createdAt,
         targetValue: leadMeasures.targetValue,
         period: leadMeasures.period,
         trackingMode: leadMeasures.trackingMode,

@@ -3218,6 +3218,17 @@ components:
               note: { type: string, nullable: true }
               createdAt: { type: string, format: date-time }
               openProposalId: { type: string, nullable: true }
+              isResolved: { type: boolean }
+              resolvedAt: { type: string, format: date-time, nullable: true }
+              resolvedProposal:
+                type: object
+                nullable: true
+                properties:
+                  actionType: { type: string }
+                  leaderNote: { type: string, nullable: true }
+                  payloadJson: { type: string }
+                  status: { type: string }
+                  createdAt: { type: string, format: date-time }
         activity:
           type: array
           items:
