@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.4](https://github.com/team-dasoslab/dowin-web/compare/v1.6.3...v1.6.4) (2026-06-19)
+
+
+### Bug Fixes
+
+* 알림 timezone 대응 ([#157](https://github.com/team-dasoslab/dowin-web/issues/157)) ([7a8e546](https://github.com/team-dasoslab/dowin-web/commit/7a8e5461e394e37d23925b413443ba4785dde7f2))
+
 ## [1.6.3](https://github.com/team-dasoslab/dowin-web/compare/v1.6.2...v1.6.3) (2026-06-19)
 
 
