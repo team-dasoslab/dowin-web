@@ -44,3 +44,31 @@ jobs:
 
       - name: Run build
         run: yarn build
+
+      - name: Run Cloudflare preview smoke
+        run: |
+          set -euo pipefail
+
+          yarn preview --port 8788 > /tmp/dowin-preview.log 2>&1 &
+          preview_pid=$!
+
+          cleanup() {
+            kill "$preview_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          for attempt in {1..60}; do
+            if curl -fsS http://127.0.0.1:8788/ >/tmp/dowin-root.html; then
+              exit 0
+            fi
+
+            if ! kill -0 "$preview_pid" 2>/dev/null; then
+              cat /tmp/dowin-preview.log
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          cat /tmp/dowin-preview.log
+          exit 1
