@@ -22,6 +22,7 @@ import {
 import {
   TeamCheckinReportResponseAttentionItemsItem
 } from "@/api/generated/dowin.schemas";
+import { buildAdjustmentProposalDraft } from "../_lib/team-checkin-proposal";
 
 export function LeaderReport() {
   const t = useTranslations("TeamCheckin");
@@ -127,31 +128,20 @@ export function LeaderReport() {
   const handleResolveSignal = async (signal: TeamCheckinReportResponseAttentionItemsItem) => {
     if (!signal.responseId) return;
     
-    let actionType: "CHANGE_TARGET_COUNT" | "ARCHIVE_ACTION_ITEM" | "REPLACE_ACTION_ITEM" | undefined;
-    let payload: Record<string, unknown> = {};
-
-    if (proposalType === 'archive') {
-      actionType = "ARCHIVE_ACTION_ITEM";
-      payload = { reason: commentText || "액션 아이템 보관 처리" };
-    } else if (proposalType === 'update_metric' && proposalNumber !== "") {
-      actionType = "CHANGE_TARGET_COUNT";
-      payload = { newTargetValue: Number(proposalNumber) };
-    } else if (proposalType === 'replace_action_item' && proposalReplacementText.trim() !== "") {
-      actionType = "REPLACE_ACTION_ITEM";
-      payload = { replacementName: proposalReplacementText };
-    } else {
-      // Just a comment, mapped as ARCHIVE for now or maybe we just don't allow comment-only in API
-      // Since MVP requires an actionType, we will require at least one proposal type
-      return;
-    }
+    const proposalDraft = buildAdjustmentProposalDraft({
+      proposalType,
+      proposalNumber,
+      proposalReplacementText,
+    });
+    if (!proposalDraft) return;
 
     try {
       await submitProposal.mutateAsync({
         workspaceId,
         data: {
           sourceResponseId: signal.responseId,
-          actionType: actionType,
-          payload: payload,
+          actionType: proposalDraft.actionType,
+          payload: proposalDraft.payload,
           leaderNote: commentText || null
         }
       });
@@ -353,9 +343,11 @@ export function LeaderReport() {
         const signal = attentionItems.find(s => s.responseId === activeSignalModal);
         if (!signal) return null;
         
-        const canSubmit = (proposalType === 'archive') || 
-                          (proposalType === 'update_metric' && proposalNumber !== "") || 
-                          (proposalType === 'replace_action_item' && proposalReplacementText.trim() !== "");
+        const canSubmit = buildAdjustmentProposalDraft({
+          proposalType,
+          proposalNumber,
+          proposalReplacementText,
+        }) !== null;
 
         return (
           <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 animate-in fade-in duration-200" onClick={closeModal}>
@@ -482,6 +474,7 @@ export function LeaderReport() {
                           placeholder={t("proposeTargetLabel2")}
                           className="w-20 bg-white border border-primary/30 shadow-sm rounded-[10px] px-3 py-2 text-center text-[15px] font-bold text-primary outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
                           min={1}
+                          max={7}
                           autoFocus
                         />
                         <span className="text-[14px] text-[#333D4B] font-medium">회로 조정 제안</span>
