@@ -42,12 +42,6 @@ export function LeaderReport() {
     return t("justNow");
   }
 
-  function formatDateRange(start?: string, end?: string) {
-    if (!start || !end) return "";
-    const s = new Date(start);
-    const e = new Date(end);
-    return `${s.getMonth() + 1}.${s.getDate()} - ${e.getMonth() + 1}.${e.getDate()}`;
-  }
   const { workspaceId } = useParams() as { workspaceId: string };
   const queryClient = useQueryClient();
   
@@ -267,7 +261,7 @@ export function LeaderReport() {
             ) : (
               <div className="relative pl-6 space-y-8">
                 {report.activity.map((activity, i) => {
-                  const isLast = i === report.activity.length - 1;
+                  const isLast = i === report.activity!.length - 1;
                   return (
                   <div key={activity.checkinId! + i} className="relative flex items-start">
                     <div className={`absolute -left-6 flex items-center justify-center w-10 h-10 rounded-full z-10 transition-transform ${activity.type === 'CHECKIN_SENT' ? 'bg-primary' : 'bg-success'}`}>
