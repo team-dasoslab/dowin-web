@@ -10,7 +10,6 @@ import {
   usePostWorkspacesWorkspaceIdTeamCheckinsCheckinIdResponse,
   usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdAccept,
   usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline,
-  getGetWorkspacesWorkspaceIdTeamCheckinsInboxQueryKey,
   useGetWorkspacesWorkspaceIdTeamCheckinsSettings
 } from "@/api/generated/team-checkins/team-checkins";
 import { useGetUsersMe } from "@/api/generated/profile/profile";
@@ -19,6 +18,7 @@ import {
   TeamCheckinInboxCheckinItem,
   TeamCheckinInboxProposalItem,
 } from "@/api/generated/dowin.schemas";
+import { useToast } from "@/context/ToastContext";
 
 type CheckInStatus = "pending" | "done" | "later" | "blocked" | "adjust" | "leader_comment" | "adjusted" | "declined";
 
@@ -49,16 +49,21 @@ export function TeamMemberCheckIn() {
 
   function formatDate(dateString?: string | null) {
     if (!dateString) return t("justNow");
-    const d = new Date(dateString);
-    if (isNaN(d.getTime())) return t("justNow");
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return t("today");
-    if (diffDays === 1) return t("yesterday");
-    return `${d.getMonth() + 1}/${d.getDate()}`;
+    const d = new Date(dateString).getTime();
+    if (isNaN(d)) return t("justNow");
+    
+    const diffMin = Math.floor((Date.now() - d) / (1000 * 60));
+    if (diffMin <= 0) return t("justNow");
+    if (diffMin < 60) return t("minsAgo", { n: diffMin });
+    
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return t("hoursAgo", { n: diffHour });
+    
+    return t("daysAgo", { n: Math.floor(diffHour / 24) });
   }
   const { workspaceId } = useParams() as { workspaceId: string };
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -146,23 +151,25 @@ export function TeamMemberCheckIn() {
 
       const existing = checkinMap.get(prop.sourceCheckinId!);
       if (existing) {
+        const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
         existing.proposalId = prop.id;
         existing.leaderComment = prop.leaderNote || t("statusAdjust");
         existing.proposal = { type: pType, description };
         existing.status = status;
         if (prop.status === "PROPOSED") existing.isUnread = true;
-        existing.date = formatDate(prop.expiresAt); // update date to proposal's date
+        existing.date = formatDate(proposalCreatedAt); // update date to proposal's date
         existing.content = t("actionProposalTitle");
         // Keep original myRequest or undefined
         existing.type = "human";
       } else {
         // Fallback for standalone proposal (should be rare)
+        const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
         checkinMap.set(prop.id!, {
           id: prop.id!,
           proposalId: prop.id,
           sourceCheckinId: prop.sourceCheckinId,
           actionItemName: prop.leadMeasureName || "",
-          date: formatDate(prop.expiresAt),
+          date: formatDate(proposalCreatedAt),
           isUnread: prop.status === "PROPOSED",
           content: t("actionProposalTitle"),
           status,
@@ -191,6 +198,19 @@ export function TeamMemberCheckIn() {
   const selectedItem = notifications.find(n => n.id === selectedId);
   const unreadCount = notifications.filter(n => n.isUnread).length;
 
+  const invalidateWorkspaceData = () => {
+    queryClient.invalidateQueries({
+      predicate: (query) => {
+        const key = query.queryKey[0];
+        if (typeof key !== 'string') return false;
+        return key.startsWith(`/api/workspaces/${workspaceId}/team-checkins`) ||
+               key.startsWith(`/api/workspaces/${workspaceId}/scoreboards`) ||
+               key.startsWith(`/api/workspaces/${workspaceId}/dashboard`) ||
+               key.startsWith(`/api/workspaces/${workspaceId}/action-items`);
+      }
+    });
+  };
+
   const handleResponse = async (checkinId: string, responseType: "LOG_NOW" | "SNOOZE_TODAY" | "BLOCKED" | "ADJUSTMENT_REQUESTED", note?: string) => {
     try {
       await submitResponse.mutateAsync({
@@ -201,7 +221,11 @@ export function TeamMemberCheckIn() {
           note: note || null,
         }
       });
-      queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsInboxQueryKey(workspaceId) });
+      invalidateWorkspaceData();
+      if (responseType === "LOG_NOW") showToast("success", t("statusDone"));
+      else if (responseType === "SNOOZE_TODAY") showToast("success", t("statusLater"));
+      else if (responseType === "BLOCKED") showToast("success", t("statusBlocked"));
+      else if (responseType === "ADJUSTMENT_REQUESTED") showToast("success", t("statusAdjust"));
     } catch (e) {
       console.error(e);
     }
@@ -211,10 +235,12 @@ export function TeamMemberCheckIn() {
     try {
       if (decision === "accept") {
         await acceptProposal.mutateAsync({ workspaceId, proposalId });
+        showToast("success", t("statusAdjusted"));
       } else {
         await declineProposal.mutateAsync({ workspaceId, proposalId, data: { reason: "KEEP_CURRENT_GOAL" } });
+        showToast("success", t("statusDeclined"));
       }
-      queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsInboxQueryKey(workspaceId) });
+      invalidateWorkspaceData();
     } catch (e) {
       console.error(e);
     }
@@ -429,7 +455,7 @@ export function TeamMemberCheckIn() {
                           <div className="flex flex-col gap-2">
                             <div className="flex items-center justify-between px-1">
                               <span className="text-[13px] font-bold text-[#4E5968]">{t("myRequest")}</span>
-                              <span className="text-[13px] font-medium text-[#8B95A1]">{t("previous")}</span>
+                              <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem.respondedAt)}</span>
                             </div>
                             <div className="bg-[#F2F4F6] rounded-[24px] rounded-tl-[8px] p-5">
                               <div className="flex flex-col gap-1">
