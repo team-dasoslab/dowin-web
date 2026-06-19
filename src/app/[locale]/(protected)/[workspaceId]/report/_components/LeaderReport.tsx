@@ -301,7 +301,7 @@ export function LeaderReport() {
                                 ? (signal.resolvedProposal?.status === 'ACCEPTED' ? t("statusAdjustDone") 
                                  : signal.resolvedProposal?.status === 'DECLINED' ? t("statusDeclined") 
                                  : t("statusAdjusting")) 
-                                : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                                : signal.signalType === 'BLOCKED' ? t("signalBlocked") : t("signalAdjust")}
                             </span>
                           </div>
                         </div>
@@ -388,8 +388,12 @@ export function LeaderReport() {
                           {signal.memberNickname}
                         </span>
                         <span className="text-[#B0B8C1] text-[12px] font-bold">•</span>
-                        <span className={`text-[15px] font-bold ${signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-blue-500'}`}>
-                          {signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                        <span className={`text-[15px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-primary'}`}>
+                          {signal.isResolved 
+                            ? (signal.resolvedProposal?.status === 'ACCEPTED' ? t("statusAdjustDone") 
+                             : signal.resolvedProposal?.status === 'DECLINED' ? t("statusDeclined") 
+                             : t("statusAdjusting")) 
+                            : signal.signalType === 'BLOCKED' ? t("signalBlocked") : t("signalAdjust")}
                         </span>
                       </div>
                     </div>
@@ -415,7 +419,7 @@ export function LeaderReport() {
                     <div className="bg-[#F2F4F6] rounded-[16px] p-5">
                       <div className="flex flex-col gap-1">
                         <span className="text-[14px] font-bold text-[#8B95A1]">
-                          {signal.signalType === 'BLOCKED' ? '막힘 발생 보고' : '목표 조율 요청'}
+                          {signal.signalType === 'BLOCKED' ? t("typeBlocked") : t("typeAdjust")}
                         </span>
                         <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
                           {signal.note || "도움이 필요합니다."}
