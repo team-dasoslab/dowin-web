@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/team-dasoslab/dowin-web/compare/v1.6.1...v1.6.2) (2026-06-19)
+
+
+### Bug Fixes
+
+* 초대코드로 조인시 쿠키 갱신 ([8591375](https://github.com/team-dasoslab/dowin-web/commit/8591375b4b8816a6e5e8d53ab97f2cf84f146f9f))
+
 ## [1.6.1](https://github.com/team-dasoslab/dowin-web/compare/v1.6.0...v1.6.1) (2026-06-19)
 
 
