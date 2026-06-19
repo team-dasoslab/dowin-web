@@ -20,6 +20,7 @@ export const GET = withErrorHandler(
       await routeContext.service.getReport(
         routeContext.context,
         parsed.data.weekStart,
+        parsed.data.activeOnly
       ),
     );
   },
