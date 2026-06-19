@@ -116,7 +116,7 @@ export class TeamCheckinService {
             reasonCode: item.delivery.reasonCode,
             periodStart: item.delivery.periodStart,
             periodEnd: item.delivery.periodEnd,
-            sentAt: item.delivery.sentAt?.toISOString() ?? null,
+            sentAt: item.delivery.sentAt?.toISOString() ?? item.delivery.createdAt.toISOString(),
             response: item.response
               ? {
                   id: item.response.uid,
