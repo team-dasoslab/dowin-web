@@ -253,7 +253,7 @@ export class TeamCheckinService {
           proposalRows.length,
         ),
       },
-      attentionItems: attentionRows
+      attentionItems: adjustmentRows
         .map((row) => ({
           responseId: row.response?.uid ?? null,
           checkinId: row.uid,
@@ -266,6 +266,17 @@ export class TeamCheckinService {
           createdAt: row.response?.createdAt.toISOString() ?? row.createdAt.toISOString(),
           openProposalId:
             row.proposal?.status === "PROPOSED" ? row.proposal.uid : null,
+          isResolved: !!row.proposal,
+          resolvedAt: row.proposal?.createdAt.toISOString() ?? null,
+          resolvedProposal: row.proposal
+            ? {
+                actionType: row.proposal.actionType,
+                leaderNote: row.proposal.leaderNote,
+                payloadJson: row.proposal.payloadJson,
+                status: row.proposal.status,
+                createdAt: row.proposal.createdAt.toISOString(),
+              }
+            : null,
         })),
       activity: rows.slice(0, 20).map((row) => ({
         type: row.response ? "CHECKIN_RESPONDED" : "CHECKIN_SENT",

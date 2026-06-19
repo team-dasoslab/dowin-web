@@ -175,6 +175,18 @@ export const TeamCheckinReportResponseAttentionItemsItemSignalType = {
   ADJUSTMENT_REQUESTED: 'ADJUSTMENT_REQUESTED',
 } as const;
 
+/**
+ * @nullable
+ */
+export type TeamCheckinReportResponseAttentionItemsItemResolvedProposal = {
+  actionType?: string;
+  /** @nullable */
+  leaderNote?: string | null;
+  payloadJson?: string;
+  status?: string;
+  createdAt?: string;
+} | null;
+
 export type TeamCheckinReportResponseAttentionItemsItem = {
   /** @nullable */
   responseId?: string | null;
@@ -190,6 +202,11 @@ export type TeamCheckinReportResponseAttentionItemsItem = {
   createdAt?: string;
   /** @nullable */
   openProposalId?: string | null;
+  isResolved?: boolean;
+  /** @nullable */
+  resolvedAt?: string | null;
+  /** @nullable */
+  resolvedProposal?: TeamCheckinReportResponseAttentionItemsItemResolvedProposal;
 };
 
 export type TeamCheckinReportResponseActivityItemType = typeof TeamCheckinReportResponseActivityItemType[keyof typeof TeamCheckinReportResponseActivityItemType];

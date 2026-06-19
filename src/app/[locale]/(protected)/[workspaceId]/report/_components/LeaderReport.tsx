@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Bot, HelpCircle, CheckCircle2, X, FileEdit } from "lucide-react";
+import { Bot, HelpCircle, CheckCircle2, X } from "lucide-react";
+import { UserAvatar } from "@/components/UserAvatar";
 import { Area, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
@@ -107,7 +108,6 @@ export function LeaderReport() {
   };
 
   const attentionItems = (report?.attentionItems || []).filter(item => item.responseId && !item.openProposalId && !resolvedIds.includes(item.responseId));
-  const pendingCount = attentionItems.length;
 
   const trendPoints = [...(weeklyReport?.trends || [])]
     .sort((a, b) => (a.weekStart || "").localeCompare(b.weekStart || ""))
@@ -283,11 +283,6 @@ export function LeaderReport() {
         <section id="attention" className="flex flex-col h-full scroll-mt-28">
           <div className="flex items-center justify-between mb-5 px-2">
             <h3 className="text-[20px] font-bold text-text-primary">{t("attentionItems")}</h3>
-            {pendingCount > 0 && (
-              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center transition-all">
-                <span className="text-red-500 font-bold text-[16px]">{pendingCount}</span>
-              </div>
-            )}
           </div>
           
           <div className="bg-surface rounded-[28px] p-4 flex flex-col gap-2 h-full">
@@ -305,10 +300,14 @@ export function LeaderReport() {
                 >
                   <div className="flex gap-4 items-center">
                     <div className="relative shrink-0">
-                      <div className={`w-[46px] h-[46px] rounded-full flex items-center justify-center text-[22px] bg-[#F2F4F6]`}>
-                        {signal.signalType === 'BLOCKED' ? '🚨' : '🤔'}
-                      </div>
-                      <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                      <UserAvatar
+                        avatarSeed={signal.memberNickname || "Member"}
+                        alt={signal.memberNickname || "Member"}
+                        size={46}
+                      />
+                      {!signal.isResolved && (
+                        <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                      )}
                     </div>
                     
                     <div className="flex-1 min-w-0 py-0.5">
@@ -317,8 +316,8 @@ export function LeaderReport() {
                           {signal.memberNickname}
                         </span>
                         <div className="w-1 h-1 rounded-full bg-[#D1D6DB]" />
-                        <span className={`text-[13px] font-bold ${signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-blue-500'}`}>
-                          {signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
+                        <span className={`text-[13px] font-bold ${signal.isResolved ? 'text-[#8B95A1]' : signal.signalType === 'BLOCKED' ? 'text-red-500' : 'text-blue-500'}`}>
+                          {signal.isResolved ? '조율 중' : signal.signalType === 'BLOCKED' ? '막힘 발생' : '목표 조정 필요'}
                         </span>
                         <div className="w-1 h-1 rounded-full bg-[#D1D6DB]" />
                         <span className="text-[13px] font-bold text-[#8B95A1]">{formatDateRelative(signal.createdAt)}</span>
@@ -356,10 +355,14 @@ export function LeaderReport() {
               <div className="px-6 py-5 flex items-start shrink-0 bg-white z-10 rounded-t-[32px] border-b border-[#F2F4F6] relative">
                 <div className="flex gap-4 items-center w-full pr-8">
                   <div className="relative shrink-0">
-                    <div className={`w-[46px] h-[46px] rounded-full flex items-center justify-center text-[22px] bg-[#F2F4F6]`}>
-                      {signal.signalType === 'BLOCKED' ? '🚨' : '🤔'}
-                    </div>
-                    <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                    <UserAvatar
+                      avatarSeed={signal.memberNickname || "Member"}
+                      alt={signal.memberNickname || "Member"}
+                      size={46}
+                    />
+                    {!signal.isResolved && (
+                      <div className="absolute -top-0.5 -right-0.5 w-[14px] h-[14px] bg-red-500 rounded-full border-[2.5px] border-white" />
+                    )}
                   </div>
                   
                   <div className="flex-1 min-w-0">
@@ -387,26 +390,51 @@ export function LeaderReport() {
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col gap-6">
-                <div className="px-2 space-y-6">
+              <div className="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col gap-6 bg-white">
+                <div className="px-1 space-y-7 mb-8">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-[14px] font-bold text-[#4E5968]">{signal.memberNickname} 팀원의 요청</span>
+                      <span className="text-[13px] font-bold text-[#4E5968]">{signal.memberNickname} 팀원의 요청</span>
+                      <span className="text-[13px] font-medium text-[#8B95A1]">{formatDateRelative(signal.createdAt)}</span>
                     </div>
-                    <div className="bg-white rounded-[24px] p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                      <div className="flex items-center gap-2 mb-2">
-                        <FileEdit className="w-4 h-4 text-[#8B95A1]" />
-                        <span className="text-[14px] font-bold text-[#8B95A1]">{signal.signalType === 'BLOCKED' ? '막힘 발생 보고' : '목표 조율 요청'}</span>
+                    <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[14px] font-bold text-[#8B95A1]">
+                          {signal.signalType === 'BLOCKED' ? '막힘 발생 보고' : '목표 조율 요청'}
+                        </span>
+                        <p className="text-[15px] text-[#333D4B] leading-relaxed font-medium mt-1">
+                          {signal.note || "도움이 필요합니다."}
+                        </p>
                       </div>
-                      <p className="text-[16px] text-[#333D4B] leading-relaxed">
-                        {signal.note || "도움이 필요합니다."}
-                      </p>
                     </div>
                   </div>
+
+                  {signal.isResolved && signal.resolvedProposal && (
+                    <div className="flex flex-col gap-2 mt-4">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-[13px] font-bold text-primary">리더님의 응답</span>
+                        <span className="text-[13px] font-medium text-primary">{formatDateRelative(signal.resolvedProposal.createdAt)}</span>
+                      </div>
+                      <div className="bg-primary/10 rounded-[16px] p-5">
+                        {signal.resolvedProposal.leaderNote && (
+                          <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium mb-4 whitespace-pre-wrap`}>
+                            {signal.resolvedProposal.leaderNote}
+                          </p>
+                        )}
+                        <div className={signal.resolvedProposal.leaderNote ? 'pt-4 border-t border-primary/15' : ''}>
+                          <p className="text-[16px] text-[#191F28] leading-relaxed font-bold">
+                            {signal.resolvedProposal.actionType === 'CHANGE_TARGET_COUNT' ? '실행 횟수 조정 제안' : 
+                             signal.resolvedProposal.actionType === 'ARCHIVE_ACTION_ITEM' ? '아이템 보관 제안' : '대체 목표 제안'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="p-5 bg-white shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] rounded-b-[32px]">
+              {!signal.isResolved && (
+                <div className="p-5 bg-white shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] rounded-b-[32px]">
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2">
                     <input
@@ -496,6 +524,7 @@ export function LeaderReport() {
                   </div>
                 </div>
               </div>
+              )}
 
             </div>
           </div>
