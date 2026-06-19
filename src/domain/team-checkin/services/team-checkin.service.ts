@@ -1,4 +1,5 @@
 import { customAlphabet } from "nanoid";
+import { serverRuntimeConfig } from "@/config/server-runtime-config";
 import {
   ConflictError,
   ForbiddenError,
@@ -33,6 +34,10 @@ const DEFAULT_SETTINGS = {
 };
 const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
 
+type TeamCheckinServiceOptions = {
+  leadMeasureAgeGateEnabled?: boolean;
+};
+
 type FcmSender = (
   messages: Array<{
     token: string;
@@ -45,10 +50,17 @@ type FcmSender = (
 ) => Promise<{ success: number; failed: number; disabledTokens: string[] }>;
 
 export class TeamCheckinService {
+  private leadMeasureAgeGateEnabled: boolean;
+
   constructor(
     private storage: TeamCheckinStorage,
     private sendFcmMessages?: FcmSender,
-  ) {}
+    options: TeamCheckinServiceOptions = {},
+  ) {
+    this.leadMeasureAgeGateEnabled =
+      options.leadMeasureAgeGateEnabled ??
+      serverRuntimeConfig.teamCheckinLeadMeasureAgeGateEnabled;
+  }
 
   async getSettings(context: WorkspaceAccessContext) {
     await this.assertBasic(context);
@@ -468,11 +480,11 @@ export class TeamCheckinService {
         (candidate) =>
           settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
       );
-      const weeklyCandidates = candidates.filter(
-        (candidate) =>
-          candidate.period === "WEEKLY" &&
-          isOldEnoughForCheckin(candidate.leadMeasureCreatedAt, now),
-      );
+      const weeklyCandidates = candidates.filter((candidate) => {
+        if (candidate.period !== "WEEKLY") return false;
+        if (!this.leadMeasureAgeGateEnabled) return true;
+        return isOldEnoughForCheckin(candidate.leadMeasureCreatedAt, now);
+      });
       const logs = await this.storage.findLogsForCandidates(
         weeklyCandidates.map((candidate) => candidate.leadMeasureId),
         weekStart,
@@ -784,6 +796,7 @@ function getReasonCode(
   logsByMeasure: Map<number, Array<{ value: boolean; count: number }>>,
   now: Date,
   settings: {
+    triggerNoWeeklyLogEnabled: boolean;
     triggerSlowStartEnabled: boolean;
   },
 ) {
@@ -795,6 +808,10 @@ function getReasonCode(
   ).length;
   const kstDay = getKstDay(now);
   const kstHour = getKstHour(now);
+
+  if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
+    return "NO_WEEKLY_LOG" as const;
+  }
 
   if (settings.triggerSlowStartEnabled) {
     if (candidate.targetValue === 1 && kstDay >= 5 && kstHour >= 10 && achievedCount === 0) {

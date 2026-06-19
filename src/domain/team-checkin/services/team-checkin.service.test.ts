@@ -91,7 +91,7 @@ describe("TeamCheckinService", () => {
     ).rejects.toThrow("TEAM_CHECKIN_ALREADY_RESPONDED");
   });
 
-  it("does not send a weekly target 2 checkin on Monday before slow-start threshold", async () => {
+  it("does not send a weekly target 2 checkin on Monday before slow-start threshold when no-log trigger is disabled", async () => {
     const createDelivery = vi.fn();
     const service = new TeamCheckinService(
       createStorage({
@@ -100,7 +100,7 @@ describe("TeamCheckinService", () => {
             settings: {
               enabled: true,
               includeAdminAsMember: false,
-              triggerNoWeeklyLogEnabled: true,
+              triggerNoWeeklyLogEnabled: false,
               triggerSlowStartEnabled: true,
               dailyMemberLimit: 2,
               dailyWorkspaceLimit: 30,
@@ -146,7 +146,71 @@ describe("TeamCheckinService", () => {
     expect(createDelivery).not.toHaveBeenCalled();
   });
 
-  it("does not send a checkin until the lead measure is at least 7 days old", async () => {
+  it("creates a no-weekly-log checkin when no-log trigger is enabled", async () => {
+    const createDelivery = vi.fn().mockResolvedValue({
+      id: 1,
+      uid: "chk_1",
+      deeplinkPath: "/ko/ws_uid/dashboard/my",
+    });
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: false,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-19T00:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        findActiveDeviceTokens: vi.fn().mockResolvedValue([]),
+        markDeliverySkipped: vi.fn(),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-19T00:48:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 1,
+      createdDeliveryCount: 1,
+      skippedCount: 1,
+    });
+    expect(createDelivery).toHaveBeenCalledWith(
+      expect.objectContaining({ reasonCode: "NO_WEEKLY_LOG" }),
+    );
+  });
+
+  it("evaluates a recent lead measure while the age gate is disabled", async () => {
     const createDelivery = vi.fn();
     const service = new TeamCheckinService(
       createStorage({
@@ -186,6 +250,65 @@ describe("TeamCheckinService", () => {
         findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
         createDelivery,
       }),
+      undefined,
+      { leadMeasureAgeGateEnabled: false },
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-17T01:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 1,
+      createdDeliveryCount: 0,
+    });
+    expect(createDelivery).toHaveBeenCalledOnce();
+  });
+
+  it("skips a recent lead measure while the age gate is enabled", async () => {
+    const createDelivery = vi.fn();
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: true,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-12T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        createDelivery,
+      }),
+      undefined,
+      { leadMeasureAgeGateEnabled: true },
     );
 
     await expect(
