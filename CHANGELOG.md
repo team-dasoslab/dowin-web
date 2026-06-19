@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.7](https://github.com/team-dasoslab/dowin-web/compare/v1.6.6...v1.6.7) (2026-06-19)
+
+
+### Bug Fixes
+
+* Cloudflare 런타임 호환성을 위해 next 다운그레이드 ([7ed3426](https://github.com/team-dasoslab/dowin-web/commit/7ed342614c32865dcaba937f6dce6f3d663b04fe))
+
 ## [1.6.6](https://github.com/team-dasoslab/dowin-web/compare/v1.6.5...v1.6.6) (2026-06-19)
 
 
