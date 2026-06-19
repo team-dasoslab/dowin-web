@@ -31,6 +31,7 @@ const DEFAULT_SETTINGS = {
   dailyMemberLimit: 2,
   dailyWorkspaceLimit: 30,
 };
+const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
 
 type FcmSender = (
   messages: Array<{
@@ -468,7 +469,9 @@ export class TeamCheckinService {
           settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
       );
       const weeklyCandidates = candidates.filter(
-        (candidate) => candidate.period === "WEEKLY",
+        (candidate) =>
+          candidate.period === "WEEKLY" &&
+          isOldEnoughForCheckin(candidate.leadMeasureCreatedAt, now),
       );
       const logs = await this.storage.findLogsForCandidates(
         weeklyCandidates.map((candidate) => candidate.leadMeasureId),
@@ -770,6 +773,10 @@ function groupLogs(
     map.set(log.leadMeasureId, current);
   }
   return map;
+}
+
+function isOldEnoughForCheckin(createdAt: Date, now: Date) {
+  return now.getTime() - createdAt.getTime() >= MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS;
 }
 
 function getReasonCode(

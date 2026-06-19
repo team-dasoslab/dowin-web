@@ -120,6 +120,7 @@ describe("TeamCheckinService", () => {
             scoreboardId: 30,
             leadMeasureId: 20,
             leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-01T01:00:00.000Z"),
             targetValue: 2,
             period: "WEEKLY",
             trackingMode: "BOOLEAN",
@@ -135,6 +136,61 @@ describe("TeamCheckinService", () => {
     await expect(
       service.run({
         now: "2026-06-15T01:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 0,
+      createdDeliveryCount: 0,
+    });
+    expect(createDelivery).not.toHaveBeenCalled();
+  });
+
+  it("does not send a checkin until the lead measure is at least 7 days old", async () => {
+    const createDelivery = vi.fn();
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: true,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-12T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-17T01:00:00.000Z",
         dryRun: true,
       }),
     ).resolves.toMatchObject({
