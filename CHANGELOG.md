@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/team-dasoslab/dowin-web/compare/v1.6.2...v1.6.3) (2026-06-19)
+
+
+### Bug Fixes
+
+* 현재 워크스페이스 역할 판정 정리 ([17e9df1](https://github.com/team-dasoslab/dowin-web/commit/17e9df182eebf191dcbf543565a9010a08be11b7))
+
 ## [1.6.2](https://github.com/team-dasoslab/dowin-web/compare/v1.6.1...v1.6.2) (2026-06-19)
 
 
