@@ -1,0 +1,566 @@
+"use client";
+
+import React, { useState } from "react";
+import { Inbox, ChevronLeft, CheckCircle2, Clock, AlertCircle, FileEdit, X } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  useGetWorkspacesWorkspaceIdTeamCheckinsInbox,
+  usePostWorkspacesWorkspaceIdTeamCheckinsCheckinIdResponse,
+  usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdAccept,
+  usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline,
+  useGetWorkspacesWorkspaceIdTeamCheckinsSettings
+} from "@/api/generated/team-checkins/team-checkins";
+import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
+import { useTranslations } from "next-intl";
+import {
+  TeamCheckinInboxCheckinItem,
+  TeamCheckinInboxProposalItem,
+} from "@/api/generated/dowin.schemas";
+import { useToast } from "@/context/ToastContext";
+
+type CheckInStatus = "pending" | "done" | "later" | "blocked" | "adjust" | "leader_comment" | "adjusted" | "declined";
+
+interface ProposalAction {
+  type: "update_metric" | "archive" | "create_new";
+  description: string;
+  rawActionType?: string;
+  rawPayload?: Record<string, unknown>;
+}
+
+interface NotificationItem {
+  id: string;
+  sourceCheckinId?: string;
+  proposalId?: string;
+  actionItemName: string;
+  date: string;
+  sentAt?: string | null;
+  respondedAt?: string | null;
+  isUnread: boolean;
+  content: string;
+  status: CheckInStatus;
+  leaderComment?: string;
+  myRequest?: string;
+  proposal?: ProposalAction;
+  type?: "human" | "system_alert";
+}
+
+export function TeamMemberCheckIn() {
+  const t = useTranslations("TeamCheckin");
+
+  function formatDate(dateString?: string | null) {
+    if (!dateString) return t("justNow");
+    const d = new Date(dateString).getTime();
+    if (isNaN(d)) return t("justNow");
+    
+    const diffMin = Math.floor((Date.now() - d) / (1000 * 60));
+    if (diffMin <= 0) return t("justNow");
+    if (diffMin < 60) return t("minsAgo", { n: diffMin });
+    
+    const diffHour = Math.floor(diffMin / 60);
+    if (diffHour < 24) return t("hoursAgo", { n: diffHour });
+    
+    return t("daysAgo", { n: Math.floor(diffHour / 24) });
+  }
+  const { workspaceId } = useParams() as { workspaceId: string };
+  const queryClient = useQueryClient();
+  const { showToast } = useToast();
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  
+  const { data: inboxResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsInbox(
+    workspaceId,
+    { status: "all" }
+  );
+  
+  const { data: workspaceResponse } = useGetWorkspacesMe();
+  const { data: checkinSettingsResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId);
+
+  const submitResponse = usePostWorkspacesWorkspaceIdTeamCheckinsCheckinIdResponse();
+  const acceptProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdAccept();
+  const declineProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline();
+
+  const isWorkspaceAdmin = workspaceResponse?.status === 200 && workspaceResponse.data.role === "ADMIN";
+  const checkinSettings = checkinSettingsResponse?.status === 200 && 'enabled' in checkinSettingsResponse.data ? checkinSettingsResponse.data : null;
+  
+  if (!workspaceResponse || !checkinSettingsResponse) {
+    return null;
+  }
+
+  if (checkinSettingsResponse?.status === 200 && checkinSettings?.enabled === false) {
+    return null;
+  }
+
+  if (isWorkspaceAdmin && !checkinSettings?.includeAdminAsMember) {
+    return null;
+  }
+
+  const inboxItems = inboxResponse?.status === 200 ? inboxResponse.data.items || [] : [];
+  
+  // Map API items to NotificationItem and group by conversation
+  const checkinMap = new Map<string, NotificationItem>();
+
+  // 1. Create base CHECKIN items
+  inboxItems.forEach((item) => {
+    if (item.type === "CHECKIN") {
+      const chk = item as TeamCheckinInboxCheckinItem;
+      let status: CheckInStatus = "pending";
+      let content = t("msgNoLog", { measureName: chk.leadMeasureName || "" });
+      
+      if (chk.reasonCode === "SLOW_WEEKLY_START") {
+        content = t("msgSlowStart");
+      }
+
+      if (chk.response) {
+        if (chk.response.responseType === "LOG_NOW") { status = "done"; content = t("statusDone"); }
+        else if (chk.response.responseType === "SNOOZE_TODAY") { status = "later"; content = t("statusLater"); }
+        else if (chk.response.responseType === "BLOCKED") { status = "blocked"; content = t("statusBlocked"); }
+        else if (chk.response.responseType === "ADJUSTMENT_REQUESTED") { status = "adjust"; content = t("statusAdjust"); }
+      }
+
+      checkinMap.set(chk.id!, {
+        id: chk.id!,
+        actionItemName: chk.leadMeasureName || "",
+        date: formatDate(chk.response?.createdAt || chk.sentAt),
+        sentAt: chk.sentAt,
+        respondedAt: chk.response?.createdAt,
+        isUnread: !chk.response,
+        content,
+        status,
+        myRequest: chk.response?.note || undefined,
+        type: "system_alert"
+      });
+    }
+  });
+
+  // 2. Merge PROPOSAL items into their source check-ins
+  inboxItems.forEach((item) => {
+    if (item.type === "ADJUSTMENT_PROPOSAL") {
+      const prop = item as TeamCheckinInboxProposalItem;
+      
+      let description = t("leaderProposal");
+      let pType: ProposalAction["type"] = "update_metric";
+      if (prop.actionType === "CHANGE_TARGET_COUNT") {
+        const payload = prop.payload as { newTargetValue?: number };
+        description = t("actionTargetCount", { count: payload.newTargetValue || 0 });
+      } else if (prop.actionType === "ARCHIVE_ACTION_ITEM") {
+        pType = "archive";
+        description = t("actionArchive");
+      } else if (prop.actionType === "REPLACE_ACTION_ITEM") {
+        pType = "create_new";
+        const payload = prop.payload as { replacementName?: string };
+        description = t("actionReplace", { name: payload.replacementName || "" });
+      }
+
+      const existing = checkinMap.get(prop.sourceCheckinId!);
+      if (existing) {
+        const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const status = prop.status === "ACCEPTED" ? "adjusted" : 
+                          prop.status === "DECLINED" ? "declined" : "leader_comment";
+        const proposalContent = status === "adjusted" ? t("statusAdjusted") : status === "declined" ? t("statusDeclined") : t("actionProposalTitle");
+        
+        existing.status = status;
+        existing.leaderComment = prop.leaderNote || undefined;
+        existing.proposalId = prop.id;
+        existing.proposal = { 
+          type: pType, 
+          description,
+          rawActionType: prop.actionType,
+          rawPayload: prop.payload,
+        };
+        if (prop.status === "PROPOSED") existing.isUnread = true;
+        existing.date = formatDate(proposalCreatedAt);
+        existing.content = proposalContent;
+        existing.type = "human";
+      } else {
+        // Fallback for standalone proposal (should be rare)
+        const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const status = prop.status === "ACCEPTED" ? "adjusted" : 
+                          prop.status === "DECLINED" ? "declined" : "leader_comment";
+        checkinMap.set(prop.id!, {
+          id: prop.id!,
+          proposalId: prop.id,
+          sourceCheckinId: prop.sourceCheckinId,
+          actionItemName: prop.leadMeasureName || "",
+          date: formatDate(proposalCreatedAt),
+          isUnread: prop.status === "PROPOSED",
+          content: status === "adjusted" ? t("statusAdjusted") : status === "declined" ? t("statusDeclined") : t("actionProposalTitle"),
+          status,
+          leaderComment: prop.leaderNote || undefined,
+          myRequest: t("requestAdjustDesc"),
+          proposal: { type: pType, description },
+          type: "human"
+        });
+      }
+    }
+  });
+
+  // 3. Preserve sort order based on the API response
+  const notifications: NotificationItem[] = [];
+  const added = new Set<string>();
+  
+  inboxItems.forEach(item => {
+    const targetId = item.type === "CHECKIN" ? item.id! : (item as TeamCheckinInboxProposalItem).sourceCheckinId!;
+    const finalId = checkinMap.has(targetId) ? targetId : item.id!;
+    if (!added.has(finalId)) {
+      added.add(finalId);
+      notifications.push(checkinMap.get(finalId)!);
+    }
+  });
+
+  const selectedItem = notifications.find(n => n.id === selectedId);
+  const unreadCount = notifications.filter(n => n.isUnread).length;
+
+  const invalidateWorkspaceData = () => {
+    queryClient.invalidateQueries({
+      predicate: (query) => {
+        const key = query.queryKey[0];
+        if (typeof key !== 'string') return false;
+        return key.startsWith(`/api/workspaces/${workspaceId}/team-checkins`) ||
+               key.startsWith(`/api/workspaces/${workspaceId}/scoreboards`) ||
+               key.startsWith(`/api/workspaces/${workspaceId}/dashboard`) ||
+               key.startsWith(`/api/workspaces/${workspaceId}/action-items`);
+      }
+    });
+  };
+
+  const handleResponse = async (checkinId: string, responseType: "LOG_NOW" | "SNOOZE_TODAY" | "BLOCKED" | "ADJUSTMENT_REQUESTED", note?: string) => {
+    try {
+      await submitResponse.mutateAsync({
+        workspaceId,
+        checkinId,
+        data: {
+          responseType,
+          note: note || null,
+        }
+      });
+      invalidateWorkspaceData();
+      if (responseType === "LOG_NOW") showToast("success", t("statusDone"));
+      else if (responseType === "SNOOZE_TODAY") showToast("success", t("statusLater"));
+      else if (responseType === "BLOCKED") showToast("success", t("statusBlocked"));
+      else if (responseType === "ADJUSTMENT_REQUESTED") showToast("success", t("statusAdjust"));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleProposalDecision = async (proposalId: string, decision: "accept" | "decline") => {
+    try {
+      if (decision === "accept") {
+        await acceptProposal.mutateAsync({ workspaceId, proposalId });
+        showToast("success", t("statusAdjusted"));
+      } else {
+        await declineProposal.mutateAsync({ workspaceId, proposalId, data: { reason: "KEEP_CURRENT_GOAL" } });
+        showToast("success", t("statusDeclined"));
+      }
+      invalidateWorkspaceData();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const getStatusUI = (status: CheckInStatus) => {
+    switch (status) {
+      case "done": return { icon: <CheckCircle2 className="w-8 h-8 text-primary" />, text: t("statusDone"), color: "text-primary" };
+      case "later": return { icon: <Clock className="w-8 h-8 text-text-primary" />, text: t("statusLater"), color: "text-text-primary" };
+      case "blocked": return { icon: <AlertCircle className="w-8 h-8 text-danger" />, text: t("statusBlocked"), color: "text-danger" };
+      case "adjust": return { icon: <FileEdit className="w-8 h-8 text-text-secondary" />, text: t("statusAdjust"), color: "text-text-secondary" };
+      case "adjusted": return { icon: <CheckCircle2 className="w-8 h-8 text-primary" />, text: t("statusAdjusted"), color: "text-primary" };
+      case "declined": return { icon: <X className="w-8 h-8 text-text-secondary" />, text: t("statusDeclined"), color: "text-text-secondary" };
+      case "leader_comment": return null;
+      default: return null;
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`fixed bottom-[90px] lg:bottom-6 right-4 lg:right-6 z-[9990] w-14 h-14 rounded-[20px] shadow-lg flex items-center justify-center transition-colors duration-300 ${
+          isOpen ? "hidden lg:flex bg-surface border border-border/40 text-text-primary" : "bg-primary text-white"
+        }`}
+      >
+        {isOpen ? <X className="w-6 h-6" /> : <Inbox className="w-6 h-6" />}
+        {unreadCount > 0 && !isOpen && (
+          <span className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 w-5 h-5 bg-danger text-white text-[11px] font-bold flex items-center justify-center rounded-full border-[2.5px] border-surface">
+            {unreadCount}
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="fixed inset-0 z-[9999] lg:inset-auto lg:bottom-24 right-0 lg:right-6 lg:w-[380px] h-[100dvh] lg:h-[640px] lg:max-h-[85vh] bg-surface lg:rounded-[28px] lg:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-dowin-in lg:origin-bottom-right">
+          
+          {!selectedId ? (
+            <>
+              <div className="bg-surface px-5 pt-12 lg:pt-8 pb-4 shrink-0 flex items-center justify-between">
+                <h1 className="text-[24px] font-bold text-text-primary tracking-tight flex items-center gap-2">
+                  Inbox
+                  {unreadCount > 0 && (
+                    <span className="ml-2 text-primary">{unreadCount}</span>
+                  )}
+                </h1>
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  className="lg:hidden p-2 -mr-2 text-text-muted hover:bg-sub-background rounded-full"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto px-5 pb-4">
+                {notifications.length === 0 ? (
+                  <div className="py-12 text-center text-text-muted">
+                    {t("inboxEmpty")}
+                  </div>
+                ) : notifications.map((n) => (
+                  <button
+                    key={n.id}
+                    onClick={() => {
+                      setSelectedId(n.id);
+                    }}
+                    className="w-full flex gap-3 text-left p-4 rounded-[20px] transition-all duration-200 relative bg-transparent hover:bg-sub-background"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start w-full mb-0.5">
+                        <span className={`text-[14px] font-medium truncate pr-2 ${n.isUnread ? 'text-primary' : 'text-text-muted'}`}>
+                          {n.actionItemName}
+                          {n.isUnread && (
+                            <span className="inline-block w-1.5 h-1.5 bg-red-500 rounded-full ml-1.5 mb-0.5 align-middle" />
+                          )}
+                        </span>
+                        <span className="text-[12px] text-text-muted shrink-0 mt-0.5">{n.date}</span>
+                      </div>
+                      
+                      <p className={`text-[15px] leading-snug tracking-tight line-clamp-2 ${n.isUnread ? 'font-bold text-text-primary' : 'font-medium text-text-secondary'}`}>
+                        {n.content.split('\n')[0]}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col h-full bg-surface">
+              <div className="px-5 py-4 pt-12 lg:pt-4 flex items-center shrink-0">
+                <button
+                  onClick={() => {
+                    setSelectedId(null);
+                  }}
+                  className="-ml-2 p-2 hover:bg-sub-background rounded-full transition-colors text-text-primary shrink-0"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                {selectedItem && (
+                  <div className="flex flex-col justify-center ml-2 mr-4 min-w-0">
+                    <span className="text-[16px] font-bold text-text-primary truncate">{selectedItem.actionItemName}</span>
+                    <span className={`text-[13px] font-bold ${selectedItem.status === 'adjusted' ? 'text-text-muted' : 'text-primary'}`}>
+                      {selectedItem.status === 'pending' ? t("statusPending") :
+                       selectedItem.status === 'leader_comment' ? t("statusAdjusting") : 
+                       selectedItem.status === 'adjusted' ? t("statusAdjustDone") : 
+                       getStatusUI(selectedItem.status)?.text}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 px-5 pb-6 overflow-y-auto flex flex-col animate-dowin-in">
+                {/* Initial System Request (Always Visible) */}
+                <div className="flex flex-col gap-2 mt-2 mb-8 shrink-0">
+                  <div className="flex items-center justify-between px-4">
+                    <span className="text-[13px] font-bold text-primary">{t("system")}</span>
+                    <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem?.sentAt)}</span>
+                  </div>
+                  <div className="bg-primary/10 rounded-[20px] p-4">
+                    <h2 className="text-[16px] font-bold text-text-primary leading-[1.4] tracking-tight mb-2">
+                      {t.rich("msgNoLogRich", { measureName: selectedItem?.actionItemName || '', highlight: (chunks) => <span className="text-primary">{chunks}</span> })}
+                    </h2>
+                    <p className="text-[15px] text-text-primary leading-relaxed font-medium">
+                      {t("msgNoLogSub")}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedItem?.status === "pending" ? (
+                  <div className="flex flex-col h-full animate-dowin-in">
+                    <div className="mt-auto flex flex-col gap-3">
+                      <button
+                        onClick={() => { if (window.confirm(t("confirmLogNow"))) handleResponse(selectedItem.id, "LOG_NOW"); }}
+                        disabled={submitResponse.isPending}
+                        className="w-full py-[18px] rounded-[20px] bg-primary text-white text-[16px] font-bold transition-colors shadow-[0_4px_12px_rgba(49,130,246,0.15)] hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        {t("actionLogNow")}
+                      </button>
+                      <button
+                        onClick={() => { if (window.confirm(t("confirmSnooze"))) handleResponse(selectedItem.id, "SNOOZE_TODAY"); }}
+                        disabled={submitResponse.isPending}
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors hover:bg-border disabled:opacity-50"
+                      >
+                        {t("actionSnooze")}
+                      </button>
+                      <button
+                        onClick={() => {
+                          const note = window.prompt(t("blockedPlaceholder"));
+                          if (note !== null) handleResponse(selectedItem.id, "BLOCKED", note.trim() || undefined);
+                        }}
+                        disabled={submitResponse.isPending}
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors disabled:opacity-50 hover:bg-border"
+                      >
+                        {t("actionBlocked")}
+                      </button>
+                      <button
+                        onClick={() => {
+                          const note = window.prompt(t("adjustPlaceholder"));
+                          if (note !== null) handleResponse(selectedItem.id, "ADJUSTMENT_REQUESTED", note.trim() || undefined);
+                        }}
+                        disabled={submitResponse.isPending}
+                        className="w-full py-[18px] rounded-[20px] bg-sub-background text-text-secondary text-[16px] font-bold transition-colors disabled:opacity-50 hover:bg-border"
+                      >
+                        {t("actionAdjust")}
+                      </button>
+                    </div>
+                  </div>
+                ) : selectedItem?.status === "leader_comment" || selectedItem?.status === "adjusted" || selectedItem?.status === "declined" ? (
+                  <div className="flex flex-col h-full">
+                    <div className="flex flex-col gap-6">
+
+                      <div className="px-1 space-y-7 mb-8">
+                        {selectedItem.myRequest && (
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between px-4">
+                              <span className="text-[13px] font-bold text-text-secondary">{t("myRequest")}</span>
+                              <span className="text-[13px] font-medium text-text-muted">{formatDate(selectedItem.respondedAt)}</span>
+                            </div>
+                            <div className="bg-sub-background rounded-[20px] p-4">
+                              <div className="flex flex-col gap-1">
+                                <span className="text-[14px] font-bold text-text-muted">
+                                  {t("statusAdjust")}
+                                </span>
+                                {selectedItem.myRequest && (
+                                  <p className="text-[15px] text-text-secondary leading-relaxed font-medium">
+                                    {selectedItem.myRequest}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {(selectedItem.leaderComment || selectedItem.proposal) && (
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between px-4">
+                              <span className="text-[13px] font-bold text-primary">
+                                {t("leaderComment")}
+                              </span>
+                              <span className="text-[13px] font-medium text-primary">{selectedItem.date}</span>
+                            </div>
+                            <div className="bg-primary/10 rounded-[20px] p-4">
+                              {selectedItem.leaderComment && (
+                                <p className={`text-[15px] text-text-primary leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
+                                  {selectedItem.leaderComment}
+                                </p>
+                              )}
+                              {selectedItem.proposal && (
+                                <div className={selectedItem.leaderComment ? 'pt-4 border-t border-primary/15' : ''}>
+                                  <p className="text-[16px] text-text-primary leading-relaxed font-bold">
+                                    {selectedItem.proposal.description}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {(selectedItem.status === 'adjusted' || selectedItem.status === 'declined') && (
+                          <>
+                            {selectedItem.status === 'declined' && (
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between px-4">
+                                  <span className="text-[13px] font-bold text-text-secondary">{t("myResponse")}</span>
+                                  <span className="text-[13px] font-medium text-text-muted">{formatDate(selectedItem.respondedAt)}</span>
+                                </div>
+                                <div className="bg-sub-background rounded-[20px] p-4">
+                                  <span className="text-[14px] font-bold text-text-muted">
+                                    {getStatusUI(selectedItem.status)?.text}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+
+                            {selectedItem.status === 'adjusted' && selectedItem.proposal && (
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between px-4">
+                                  <span className="text-[13px] font-bold text-primary">{t("system")}</span>
+                                  <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem.respondedAt)}</span>
+                                </div>
+                                <div className="bg-primary/10 rounded-[20px] p-4">
+                                  <p className="text-[15px] text-text-primary leading-relaxed font-bold">
+                                    {selectedItem.proposal.rawActionType === "CHANGE_TARGET_COUNT" 
+                                      ? t("sysTargetCountChanged", { count: (selectedItem.proposal.rawPayload as { newTargetValue?: number })?.newTargetValue || 0 })
+                                      : selectedItem.proposal.rawActionType === "ARCHIVE_ACTION_ITEM"
+                                      ? t("sysArchiveChanged")
+                                      : selectedItem.proposal.rawActionType === "REPLACE_ACTION_ITEM"
+                                      ? t("sysReplaceChanged", { name: (selectedItem.proposal.rawPayload as { replacementName?: string })?.replacementName || "" })
+                                      : t("statusAdjusted")}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {selectedItem.status === 'leader_comment' && selectedItem.proposalId && (
+                      <div className="mt-auto flex gap-3 pt-8 pb-2">
+                        <button 
+                          disabled={acceptProposal.isPending || declineProposal.isPending}
+                          onClick={() => { if (window.confirm(t("confirmSave"))) handleProposalDecision(selectedItem.proposalId!, "decline"); }}
+                          className="flex-1 py-4 bg-sub-background hover:bg-border text-text-secondary text-[16px] font-bold rounded-[16px] transition-colors disabled:opacity-50"
+                        >
+                          {t("keepCurrentGoal")}
+                        </button>
+                        <button 
+                          disabled={acceptProposal.isPending || declineProposal.isPending}
+                          onClick={() => { if (window.confirm(t("confirmSave"))) handleProposalDecision(selectedItem.proposalId!, "accept"); }}
+                          className="flex-1 py-4 bg-primary hover:bg-primary/90 text-white text-[16px] font-bold rounded-[16px] transition-colors shadow-sm disabled:opacity-50"
+                        >
+                          {t("acceptProposal")}
+                        </button>
+                      </div>
+                    )}
+
+
+                  </div>
+                ) : (
+                  <div className="flex flex-col h-full animate-dowin-in">
+                    <div className="flex flex-col gap-6">
+                      <div className="px-1 space-y-7 mb-8">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between px-4">
+                            <span className="text-[13px] font-bold text-text-secondary">{t("myResponse")}</span>
+                            <span className="text-[13px] font-medium text-text-muted">{formatDate(selectedItem!.respondedAt)}</span>
+                          </div>
+                          <div className="bg-sub-background rounded-[20px] p-4">
+                            <span className="text-[14px] font-bold text-text-muted">
+                              {getStatusUI(selectedItem!.status)?.text}
+                            </span>
+                            {selectedItem!.myRequest && (
+                              <p className="text-[15px] text-text-secondary leading-relaxed font-medium mt-1">
+                                {selectedItem!.myRequest}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+}

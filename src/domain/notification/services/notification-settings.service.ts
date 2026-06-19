@@ -39,12 +39,47 @@ export class NotificationSettingsService {
       dailyReminderMinute: number;
     },
   ) {
+    const currentSettings =
+      await this.notificationStorage.findUserNotificationSettings(userId);
     const settings = await this.notificationStorage.upsertUserNotificationSettings({
       userId,
       dailyReminderEnabled: input.dailyReminderEnabled,
       dailyReminderHour: input.dailyReminderHour,
       dailyReminderMinute: input.dailyReminderMinute,
-      timezone: DEFAULT_TIMEZONE,
+      timezone: currentSettings?.timezone ?? DEFAULT_TIMEZONE,
+    });
+
+    return {
+      dailyReminderEnabled: settings.dailyReminderEnabled,
+      dailyReminderTime: formatHourMinute(
+        settings.dailyReminderHour,
+        settings.dailyReminderMinute,
+      ),
+      timezone: settings.timezone,
+    };
+  }
+
+  async updateMyTimezone(userId: number, timezone: string) {
+    const currentSettings =
+      await this.notificationStorage.findUserNotificationSettings(userId);
+
+    if (currentSettings?.timezone === timezone) {
+      return {
+        dailyReminderEnabled: currentSettings.dailyReminderEnabled,
+        dailyReminderTime: formatHourMinute(
+          currentSettings.dailyReminderHour,
+          currentSettings.dailyReminderMinute,
+        ),
+        timezone: currentSettings.timezone,
+      };
+    }
+
+    const settings = await this.notificationStorage.upsertUserNotificationSettings({
+      userId,
+      dailyReminderEnabled: currentSettings?.dailyReminderEnabled ?? true,
+      dailyReminderHour: currentSettings?.dailyReminderHour ?? 21,
+      dailyReminderMinute: currentSettings?.dailyReminderMinute ?? 0,
+      timezone,
     });
 
     return {

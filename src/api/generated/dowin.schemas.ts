@@ -20,6 +20,304 @@ export interface User {
   locale?: UserLocale;
 }
 
+export interface TeamCheckinSettings {
+  enabled: boolean;
+  includeAdminAsMember: boolean;
+  triggerNoWeeklyLogEnabled: boolean;
+  triggerSlowStartEnabled: boolean;
+  /**
+   * @minimum 1
+   * @maximum 10
+   */
+  dailyMemberLimit: number;
+  /**
+   * @minimum 1
+   * @maximum 500
+   */
+  dailyWorkspaceLimit: number;
+}
+
+export type TeamCheckinResponseResponseType = typeof TeamCheckinResponseResponseType[keyof typeof TeamCheckinResponseResponseType];
+
+
+export const TeamCheckinResponseResponseType = {
+  LOG_NOW: 'LOG_NOW',
+  SNOOZE_TODAY: 'SNOOZE_TODAY',
+  BLOCKED: 'BLOCKED',
+  ADJUSTMENT_REQUESTED: 'ADJUSTMENT_REQUESTED',
+} as const;
+
+export interface TeamCheckinResponse {
+  id?: string;
+  responseType?: TeamCheckinResponseResponseType;
+  /** @nullable */
+  note?: string | null;
+  createdAt?: string;
+}
+
+export type TeamCheckinResponseCreateRequestResponseType = typeof TeamCheckinResponseCreateRequestResponseType[keyof typeof TeamCheckinResponseCreateRequestResponseType];
+
+
+export const TeamCheckinResponseCreateRequestResponseType = {
+  LOG_NOW: 'LOG_NOW',
+  SNOOZE_TODAY: 'SNOOZE_TODAY',
+  BLOCKED: 'BLOCKED',
+  ADJUSTMENT_REQUESTED: 'ADJUSTMENT_REQUESTED',
+} as const;
+
+export interface TeamCheckinResponseCreateRequest {
+  responseType: TeamCheckinResponseCreateRequestResponseType;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  note?: string | null;
+}
+
+export type TeamCheckinInboxCheckinItemType = typeof TeamCheckinInboxCheckinItemType[keyof typeof TeamCheckinInboxCheckinItemType];
+
+
+export const TeamCheckinInboxCheckinItemType = {
+  CHECKIN: 'CHECKIN',
+} as const;
+
+export type TeamCheckinInboxCheckinItemReasonCode = typeof TeamCheckinInboxCheckinItemReasonCode[keyof typeof TeamCheckinInboxCheckinItemReasonCode];
+
+
+export const TeamCheckinInboxCheckinItemReasonCode = {
+  NO_WEEKLY_LOG: 'NO_WEEKLY_LOG',
+  SLOW_WEEKLY_START: 'SLOW_WEEKLY_START',
+} as const;
+
+export interface TeamCheckinInboxCheckinItem {
+  type?: TeamCheckinInboxCheckinItemType;
+  id?: string;
+  workspaceId?: string;
+  leadMeasureId?: number;
+  leadMeasureName?: string;
+  reasonCode?: TeamCheckinInboxCheckinItemReasonCode;
+  periodStart?: string;
+  periodEnd?: string;
+  /** @nullable */
+  sentAt?: string | null;
+  response?: TeamCheckinResponse | null;
+}
+
+export type TeamCheckinInboxProposalItemType = typeof TeamCheckinInboxProposalItemType[keyof typeof TeamCheckinInboxProposalItemType];
+
+
+export const TeamCheckinInboxProposalItemType = {
+  ADJUSTMENT_PROPOSAL: 'ADJUSTMENT_PROPOSAL',
+} as const;
+
+export type TeamCheckinInboxProposalItemActionType = typeof TeamCheckinInboxProposalItemActionType[keyof typeof TeamCheckinInboxProposalItemActionType];
+
+
+export const TeamCheckinInboxProposalItemActionType = {
+  CHANGE_TARGET_COUNT: 'CHANGE_TARGET_COUNT',
+  ARCHIVE_ACTION_ITEM: 'ARCHIVE_ACTION_ITEM',
+  REPLACE_ACTION_ITEM: 'REPLACE_ACTION_ITEM',
+} as const;
+
+export type TeamCheckinInboxProposalItemStatus = typeof TeamCheckinInboxProposalItemStatus[keyof typeof TeamCheckinInboxProposalItemStatus];
+
+
+export const TeamCheckinInboxProposalItemStatus = {
+  PROPOSED: 'PROPOSED',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  EXPIRED: 'EXPIRED',
+  CANCELED: 'CANCELED',
+  APPLY_FAILED: 'APPLY_FAILED',
+} as const;
+
+export type TeamCheckinInboxProposalItemPayload = { [key: string]: unknown };
+
+export interface TeamCheckinInboxProposalItem {
+  type?: TeamCheckinInboxProposalItemType;
+  id?: string;
+  sourceCheckinId?: string;
+  leadMeasureId?: number;
+  leadMeasureName?: string;
+  actionType?: TeamCheckinInboxProposalItemActionType;
+  payload?: TeamCheckinInboxProposalItemPayload;
+  /** @nullable */
+  leaderNote?: string | null;
+  status?: TeamCheckinInboxProposalItemStatus;
+  expiresAt?: string;
+}
+
+export interface TeamCheckinInboxResponse {
+  items?: (TeamCheckinInboxCheckinItem | TeamCheckinInboxProposalItem)[];
+  /** @nullable */
+  nextCursor?: string | null;
+}
+
+export type TeamCheckinReportResponseSummary = {
+  sentCount?: number;
+  recipientCount?: number;
+  respondedCount?: number;
+  oneTapResponseRate?: number;
+  resumedWithin24hCount?: number;
+  resumedWithin24hRate?: number;
+  adjustmentSignalCount?: number;
+  proposalAcceptanceRate?: number;
+};
+
+/**
+ * @nullable
+ */
+export type TeamCheckinReportResponseAttentionItemsItemSignalType = typeof TeamCheckinReportResponseAttentionItemsItemSignalType[keyof typeof TeamCheckinReportResponseAttentionItemsItemSignalType] | null;
+
+
+export const TeamCheckinReportResponseAttentionItemsItemSignalType = {
+  BLOCKED: 'BLOCKED',
+  ADJUSTMENT_REQUESTED: 'ADJUSTMENT_REQUESTED',
+} as const;
+
+/**
+ * @nullable
+ */
+export type TeamCheckinReportResponseAttentionItemsItemResolvedProposal = {
+  actionType?: string;
+  /** @nullable */
+  leaderNote?: string | null;
+  payloadJson?: string;
+  status?: string;
+  createdAt?: string;
+} | null;
+
+export type TeamCheckinReportResponseAttentionItemsItem = {
+  /** @nullable */
+  responseId?: string | null;
+  checkinId?: string;
+  memberUserId?: number;
+  memberNickname?: string;
+  leadMeasureId?: number;
+  leadMeasureName?: string;
+  /** @nullable */
+  signalType?: TeamCheckinReportResponseAttentionItemsItemSignalType;
+  /** @nullable */
+  note?: string | null;
+  createdAt?: string;
+  /** @nullable */
+  openProposalId?: string | null;
+  isResolved?: boolean;
+  /** @nullable */
+  resolvedAt?: string | null;
+  /** @nullable */
+  resolvedProposal?: TeamCheckinReportResponseAttentionItemsItemResolvedProposal;
+};
+
+export type TeamCheckinReportResponseActivityItemType = typeof TeamCheckinReportResponseActivityItemType[keyof typeof TeamCheckinReportResponseActivityItemType];
+
+
+export const TeamCheckinReportResponseActivityItemType = {
+  CHECKIN_SENT: 'CHECKIN_SENT',
+  CHECKIN_RESPONDED: 'CHECKIN_RESPONDED',
+} as const;
+
+export type TeamCheckinReportResponseActivityItem = {
+  type?: TeamCheckinReportResponseActivityItemType;
+  checkinId?: string;
+  memberNickname?: string;
+  leadMeasureName?: string;
+  createdAt?: string;
+};
+
+export interface TeamCheckinReportResponse {
+  workspaceId?: string;
+  weekStart?: string;
+  weekEnd?: string;
+  summary?: TeamCheckinReportResponseSummary;
+  attentionItems?: TeamCheckinReportResponseAttentionItemsItem[];
+  activity?: TeamCheckinReportResponseActivityItem[];
+}
+
+export type TeamCheckinAdjustmentProposalActionType = typeof TeamCheckinAdjustmentProposalActionType[keyof typeof TeamCheckinAdjustmentProposalActionType];
+
+
+export const TeamCheckinAdjustmentProposalActionType = {
+  CHANGE_TARGET_COUNT: 'CHANGE_TARGET_COUNT',
+  ARCHIVE_ACTION_ITEM: 'ARCHIVE_ACTION_ITEM',
+  REPLACE_ACTION_ITEM: 'REPLACE_ACTION_ITEM',
+} as const;
+
+export type TeamCheckinAdjustmentProposalPayload = { [key: string]: unknown };
+
+export type TeamCheckinAdjustmentProposalStatus = typeof TeamCheckinAdjustmentProposalStatus[keyof typeof TeamCheckinAdjustmentProposalStatus];
+
+
+export const TeamCheckinAdjustmentProposalStatus = {
+  PROPOSED: 'PROPOSED',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  EXPIRED: 'EXPIRED',
+  CANCELED: 'CANCELED',
+  APPLY_FAILED: 'APPLY_FAILED',
+} as const;
+
+export interface TeamCheckinAdjustmentProposal {
+  id?: string;
+  actionType?: TeamCheckinAdjustmentProposalActionType;
+  payload?: TeamCheckinAdjustmentProposalPayload;
+  /** @nullable */
+  leaderNote?: string | null;
+  status?: TeamCheckinAdjustmentProposalStatus;
+  expiresAt?: string;
+  createdAt?: string;
+}
+
+export type TeamCheckinAdjustmentProposalCreateRequestActionType = typeof TeamCheckinAdjustmentProposalCreateRequestActionType[keyof typeof TeamCheckinAdjustmentProposalCreateRequestActionType];
+
+
+export const TeamCheckinAdjustmentProposalCreateRequestActionType = {
+  CHANGE_TARGET_COUNT: 'CHANGE_TARGET_COUNT',
+  ARCHIVE_ACTION_ITEM: 'ARCHIVE_ACTION_ITEM',
+  REPLACE_ACTION_ITEM: 'REPLACE_ACTION_ITEM',
+} as const;
+
+export type TeamCheckinAdjustmentProposalCreateRequestPayload = { [key: string]: unknown };
+
+export interface TeamCheckinAdjustmentProposalCreateRequest {
+  sourceResponseId: string;
+  actionType: TeamCheckinAdjustmentProposalCreateRequestActionType;
+  payload: TeamCheckinAdjustmentProposalCreateRequestPayload;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  leaderNote?: string | null;
+}
+
+export type TeamCheckinAdjustmentProposalDeclineRequestReason = typeof TeamCheckinAdjustmentProposalDeclineRequestReason[keyof typeof TeamCheckinAdjustmentProposalDeclineRequestReason];
+
+
+export const TeamCheckinAdjustmentProposalDeclineRequestReason = {
+  KEEP_CURRENT_GOAL: 'KEEP_CURRENT_GOAL',
+  NOT_NOW: 'NOT_NOW',
+  OTHER: 'OTHER',
+} as const;
+
+export interface TeamCheckinAdjustmentProposalDeclineRequest {
+  reason?: TeamCheckinAdjustmentProposalDeclineRequestReason;
+}
+
+export type TeamCheckinAdjustmentProposalApplyResponseStatus = typeof TeamCheckinAdjustmentProposalApplyResponseStatus[keyof typeof TeamCheckinAdjustmentProposalApplyResponseStatus];
+
+
+export const TeamCheckinAdjustmentProposalApplyResponseStatus = {
+  ACCEPTED: 'ACCEPTED',
+} as const;
+
+export type TeamCheckinAdjustmentProposalApplyResponseResult = { [key: string]: unknown };
+
+export interface TeamCheckinAdjustmentProposalApplyResponse {
+  status?: TeamCheckinAdjustmentProposalApplyResponseStatus;
+  appliedAt?: string;
+  result?: TeamCheckinAdjustmentProposalApplyResponseResult;
+}
+
 export interface RecoveryAccount {
   customId: string;
   nickname: string;
@@ -741,10 +1039,19 @@ export const WorkspacePlanCode = {
   STANDARD: 'STANDARD',
 } as const;
 
+export type WorkspaceRole = typeof WorkspaceRole[keyof typeof WorkspaceRole];
+
+
+export const WorkspaceRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
 export interface Workspace {
   id?: string;
   name?: string;
   planCode?: WorkspacePlanCode;
+  role?: WorkspaceRole;
   /** @minimum 0 */
   memberCount?: number;
   /** @minimum 1 */
@@ -980,6 +1287,10 @@ export interface UserNotificationSettingsUpdateRequest {
   dailyReminderEnabled: boolean;
   /** @pattern ^([01]\d|2[0-3]):([0-5]\d)$ */
   dailyReminderTime: string;
+}
+
+export interface UserNotificationTimezoneUpdateRequest {
+  timezone: string;
 }
 
 export type DevicePushTokenRegisterRequestProvider = typeof DevicePushTokenRegisterRequestProvider[keyof typeof DevicePushTokenRegisterRequestProvider];
@@ -1877,6 +2188,51 @@ weekStart?: string;
  * @maximum 12
  */
 weeks?: number;
+};
+
+export type GetWorkspacesWorkspaceIdTeamCheckinsInboxParams = {
+status?: GetWorkspacesWorkspaceIdTeamCheckinsInboxStatus;
+/**
+ * @minimum 1
+ * @maximum 50
+ */
+limit?: number;
+};
+
+export type GetWorkspacesWorkspaceIdTeamCheckinsInboxStatus = typeof GetWorkspacesWorkspaceIdTeamCheckinsInboxStatus[keyof typeof GetWorkspacesWorkspaceIdTeamCheckinsInboxStatus];
+
+
+export const GetWorkspacesWorkspaceIdTeamCheckinsInboxStatus = {
+  open: 'open',
+  all: 'all',
+  resolved: 'resolved',
+} as const;
+
+export type GetWorkspacesWorkspaceIdTeamCheckinsReportParams = {
+weekStart: string;
+activeOnly?: boolean;
+};
+
+export type PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status = typeof PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status[keyof typeof PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status];
+
+
+export const PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status = {
+  DECLINED: 'DECLINED',
+} as const;
+
+export type PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200 = {
+  status?: PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline200Status;
+};
+
+export type PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdCancel200Status = typeof PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdCancel200Status[keyof typeof PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdCancel200Status];
+
+
+export const PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdCancel200Status = {
+  CANCELED: 'CANCELED',
+} as const;
+
+export type PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdCancel200 = {
+  status?: PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdCancel200Status;
 };
 
 export type GetWorkspacesWorkspaceIdDashboardTeamMemosParams = {

@@ -23,6 +23,11 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetWorkspacesWorkspaceIdTeamCheckinsSettings, usePutWorkspacesWorkspaceIdTeamCheckinsSettings, getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey } from "@/api/generated/team-checkins/team-checkins";
+import { TeamCheckinSettings } from "@/api/generated/dowin.schemas";
+import { Switch } from "@/components/ui/Switch";
+import { Bot } from "lucide-react";
 
 interface MenuItem {
   id: string;
@@ -39,6 +44,7 @@ export default function WorkspaceSettingsPage() {
   const t = useTranslations("Profile");
   const commonT = useTranslations("Common");
   const dashboardT = useTranslations("Dashboard");
+  const checkinT = useTranslations("TeamCheckin");
   const isNativeApp = useNativeApp();
   const router = useRouter();
   const workspaceId = useParams().workspaceId as string | undefined;
@@ -63,6 +69,28 @@ export default function WorkspaceSettingsPage() {
     },
   });
 
+  const queryClient = useQueryClient();
+  const { data: checkinSettingsRes } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId || "", { query: { enabled: !!workspaceId } });
+  const checkinSettings = checkinSettingsRes?.status === 200 ? (checkinSettingsRes.data as TeamCheckinSettings) : null;
+  const updateSettings = usePutWorkspacesWorkspaceIdTeamCheckinsSettings();
+
+  const handleToggleCheckin = async (checked: boolean) => {
+    if (!workspaceId || !checkinSettings) return;
+    try {
+      await updateSettings.mutateAsync({
+        workspaceId,
+        data: {
+          ...checkinSettings,
+          enabled: checked
+        }
+      });
+      queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey(workspaceId) });
+      showToast("success", checked ? checkinT("enabledToast") : checkinT("disabledToast"));
+    } catch {
+      showToast("error", checkinT("updateFailedToast"));
+    }
+  };
+
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
@@ -70,7 +98,7 @@ export default function WorkspaceSettingsPage() {
 
   const showBillingSurface = !isNativeApp;
   const hasWorkspace = workspace !== null;
-  const isWorkspaceAdmin = hasWorkspace && user?.role === "ADMIN";
+  const isWorkspaceAdmin = hasWorkspace && workspace.role === "ADMIN";
 
   const {
     changeWorkspaceName,
@@ -92,7 +120,7 @@ export default function WorkspaceSettingsPage() {
       if (!container) return;
       const scrollPosition = container.scrollTop + 150;
       let currentSectionId = activeSection;
-      const sections = ["general", "workspaces"];
+      const sections = ["general", "checkin", "workspaces"];
       for (const id of sections) {
         const el = sectionRefs.current[id];
         if (el && el.offsetTop <= scrollPosition) {
@@ -189,6 +217,38 @@ export default function WorkspaceSettingsPage() {
           ]
         : [],
     },
+    {
+      id: "checkin",
+      label: checkinT("settingsTitle"),
+      items: hasWorkspace && isWorkspaceAdmin
+        ? [
+            {
+              id: "checkin-settings-master",
+              icon: <Bot className="w-4 h-4" />,
+              title: checkinT("enableServiceLedCheckin"),
+              rightElement: checkinSettings ? (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Switch 
+                    checked={checkinSettings.enabled} 
+                    onCheckedChange={handleToggleCheckin} 
+                    disabled={updateSettings.isPending}
+                  />
+                </div>
+              ) : undefined,
+            },
+            ...(checkinSettings?.enabled
+              ? [
+                  {
+                    id: "checkin-report",
+                    icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+                    title: dashboardT("checkinReport"),
+                    href: getWorkspacePath(workspaceId, "/workspace/report/checkin"),
+                  },
+                ]
+              : []),
+          ]
+        : [],
+    },
   ];
 
   if (isProfileLoading || isWorkspaceLoading) {
@@ -226,6 +286,7 @@ export default function WorkspaceSettingsPage() {
           <PageSidebarNav
             items={[
               { id: "general", label: t("workspaceManagement") },
+              { id: "checkin", label: checkinT("settingsTitle") },
               { id: "workspaces", label: t("workspaceList") },
             ]}
             activeId={activeSection}

@@ -1,6 +1,6 @@
 {
   "name": "dowin",
-  "version": "1.4.3",
+  "version": "1.6.6",
   "private": true,
   "packageManager": "yarn@4.10.0",
   "scripts": {
@@ -17,6 +17,7 @@
     "test:backend": "vitest --run src/app/api src/domain src/lib/server",
     "test:ui": "vitest --ui",
     "test:storybook": "vitest --config vitest.storybook.config.mts",
+    "test:checkin": "node --env-file=.env scripts/test-team-checkin.mjs",
     "gen:api": "orval",
     "mig:local": "npx drizzle-kit generate && npx wrangler d1 migrations apply wig-db --local",
     "mig:remote": "drizzle-kit generate && wrangler d1 migrations apply wig-db --remote",
@@ -34,16 +35,16 @@
     "@tanstack/react-query": "^5.90.21",
     "@webview-bridge/web": "^1.7.9",
     "ai": "^6.0.104",
-    "axios": "^1.13.6",
+    "axios": "^1.16.0",
     "bcryptjs": "^3.0.3",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.45.1",
+    "drizzle-orm": "^0.45.2",
     "html-to-image": "^1.11.13",
     "lucide-react": "^1.9.0",
     "nanoid": "^5.1.6",
-    "next": "^16.1.6",
-    "next-intl": "^4.9.1",
+    "next": "^16.2.6",
+    "next-intl": "^4.9.2",
     "next-themes": "^0.4.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -88,8 +89,8 @@
     "storybook": "^10.2.19",
     "tailwindcss": "^4",
     "typescript": "^5.7.4",
-    "vite": "^8.0.0",
-    "vitest": "^4.0.18",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.0",
     "wrangler": "^4.69.0"
   }
 }

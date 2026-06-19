@@ -34,7 +34,8 @@ import type {
   PostNotificationsDevicesStatus200,
   UnauthorizedErrorResponse,
   UserNotificationSettings,
-  UserNotificationSettingsUpdateRequest
+  UserNotificationSettingsUpdateRequest,
+  UserNotificationTimezoneUpdateRequest
 } from '../dowin.schemas';
 
 import { customInstance } from '../../mutator';
@@ -254,6 +255,100 @@ export const usePutPushSettings = <TError = UnauthorizedErrorResponse | ErrorRes
         TContext
       > => {
       return useMutation(getPutPushSettingsMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary 내 알림 시간대 동기화
+ */
+export type putPushSettingsTimezoneResponse200 = {
+  data: UserNotificationSettings
+  status: 200
+}
+
+export type putPushSettingsTimezoneResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type putPushSettingsTimezoneResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type putPushSettingsTimezoneResponseSuccess = (putPushSettingsTimezoneResponse200) & {
+  headers: Headers;
+};
+export type putPushSettingsTimezoneResponseError = (putPushSettingsTimezoneResponse401 | putPushSettingsTimezoneResponse422) & {
+  headers: Headers;
+};
+
+export type putPushSettingsTimezoneResponse = (putPushSettingsTimezoneResponseSuccess | putPushSettingsTimezoneResponseError)
+
+export const getPutPushSettingsTimezoneUrl = () => {
+
+
+  
+
+  return `/api/push/settings/timezone`
+}
+
+export const putPushSettingsTimezone = async (userNotificationTimezoneUpdateRequest: UserNotificationTimezoneUpdateRequest, options?: RequestInit): Promise<putPushSettingsTimezoneResponse> => {
+  
+  return customInstance<putPushSettingsTimezoneResponse>(getPutPushSettingsTimezoneUrl(),
+  {      
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      userNotificationTimezoneUpdateRequest,)
+  }
+);}
+  
+
+
+
+export const getPutPushSettingsTimezoneMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putPushSettingsTimezone>>, TError,{data: UserNotificationTimezoneUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof putPushSettingsTimezone>>, TError,{data: UserNotificationTimezoneUpdateRequest}, TContext> => {
+
+const mutationKey = ['putPushSettingsTimezone'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putPushSettingsTimezone>>, {data: UserNotificationTimezoneUpdateRequest}> = (props) => {
+          const {data} = props ?? {};
+
+          return  putPushSettingsTimezone(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutPushSettingsTimezoneMutationResult = NonNullable<Awaited<ReturnType<typeof putPushSettingsTimezone>>>
+    export type PutPushSettingsTimezoneMutationBody = UserNotificationTimezoneUpdateRequest
+    export type PutPushSettingsTimezoneMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 내 알림 시간대 동기화
+ */
+export const usePutPushSettingsTimezone = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putPushSettingsTimezone>>, TError,{data: UserNotificationTimezoneUpdateRequest}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putPushSettingsTimezone>>,
+        TError,
+        {data: UserNotificationTimezoneUpdateRequest},
+        TContext
+      > => {
+      return useMutation(getPutPushSettingsTimezoneMutationOptions(options), queryClient);
     }
     /**
  * @summary 현재 기기 알림 토큰 등록

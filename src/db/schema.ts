@@ -1053,6 +1053,288 @@ export const dailyLogsRelations = relations(dailyLogs, ({ one }) => ({
   }),
 }));
 
+export const workspaceTeamCheckinSettings = sqliteTable(
+  "workspace_team_checkin_settings",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(false),
+    includeAdminAsMember: integer("include_admin_as_member", {
+      mode: "boolean",
+    })
+      .notNull()
+      .default(false),
+    triggerNoWeeklyLogEnabled: integer("trigger_no_weekly_log_enabled", {
+      mode: "boolean",
+    })
+      .notNull()
+      .default(true),
+    triggerSlowStartEnabled: integer("trigger_slow_start_enabled", {
+      mode: "boolean",
+    })
+      .notNull()
+      .default(true),
+    dailyMemberLimit: integer("daily_member_limit").notNull().default(2),
+    dailyWorkspaceLimit: integer("daily_workspace_limit").notNull().default(30),
+    quietStartHour: integer("quiet_start_hour"),
+    quietEndHour: integer("quiet_end_hour"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("workspace_team_checkin_settings_workspace_unique").on(
+      table.workspaceId,
+    ),
+  ],
+);
+
+export const teamCheckinDeliveries = sqliteTable(
+  "team_checkin_deliveries",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    uid: text("uid").notNull().unique(),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    memberUserId: integer("member_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    leadMeasureId: integer("lead_measure_id")
+      .notNull()
+      .references(() => leadMeasures.id, { onDelete: "cascade" }),
+    scoreboardId: integer("scoreboard_id")
+      .notNull()
+      .references(() => scoreboards.id, { onDelete: "cascade" }),
+    reasonCode: text("reason_code", {
+      enum: ["NO_WEEKLY_LOG", "SLOW_WEEKLY_START"],
+    }).notNull(),
+    periodStart: text("period_start").notNull(),
+    periodEnd: text("period_end").notNull(),
+    scheduledFor: integer("scheduled_for", { mode: "timestamp" }).notNull(),
+    sentAt: integer("sent_at", { mode: "timestamp" }),
+    sendStatus: text("send_status", {
+      enum: ["PENDING", "SENT", "SKIPPED", "FAILED"],
+    })
+      .notNull()
+      .default("PENDING"),
+    skipReason: text("skip_reason"),
+    messageTitle: text("message_title").notNull(),
+    messageBody: text("message_body").notNull(),
+    deeplinkPath: text("deeplink_path").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("team_checkin_deliveries_period_unique").on(
+      table.workspaceId,
+      table.memberUserId,
+      table.leadMeasureId,
+      table.reasonCode,
+      table.periodStart,
+    ),
+    index("team_checkin_deliveries_workspace_period_idx").on(
+      table.workspaceId,
+      table.periodStart,
+    ),
+    index("team_checkin_deliveries_member_created_idx").on(
+      table.memberUserId,
+      table.createdAt,
+    ),
+    index("team_checkin_deliveries_measure_created_idx").on(
+      table.leadMeasureId,
+      table.createdAt,
+    ),
+  ],
+);
+
+export const teamCheckinResponses = sqliteTable(
+  "team_checkin_responses",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    uid: text("uid").notNull().unique(),
+    deliveryId: integer("delivery_id")
+      .notNull()
+      .references(() => teamCheckinDeliveries.id, { onDelete: "cascade" }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    memberUserId: integer("member_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    responseType: text("response_type", {
+      enum: ["LOG_NOW", "SNOOZE_TODAY", "BLOCKED", "ADJUSTMENT_REQUESTED"],
+    }).notNull(),
+    note: text("note"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("team_checkin_responses_delivery_unique").on(table.deliveryId),
+    index("team_checkin_responses_workspace_created_idx").on(
+      table.workspaceId,
+      table.createdAt,
+    ),
+  ],
+);
+
+export const teamCheckinAdjustmentProposals = sqliteTable(
+  "team_checkin_adjustment_proposals",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    uid: text("uid").notNull().unique(),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    sourceDeliveryId: integer("source_delivery_id")
+      .notNull()
+      .references(() => teamCheckinDeliveries.id, { onDelete: "cascade" }),
+    sourceResponseId: integer("source_response_id")
+      .notNull()
+      .references(() => teamCheckinResponses.id, { onDelete: "cascade" }),
+    leaderUserId: integer("leader_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    memberUserId: integer("member_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    leadMeasureId: integer("lead_measure_id")
+      .notNull()
+      .references(() => leadMeasures.id, { onDelete: "cascade" }),
+    actionType: text("action_type", {
+      enum: [
+        "CHANGE_TARGET_COUNT",
+        "ARCHIVE_ACTION_ITEM",
+        "REPLACE_ACTION_ITEM",
+      ],
+    }).notNull(),
+    payloadJson: text("payload_json").notNull(),
+    leaderNote: text("leader_note"),
+    status: text("status", {
+      enum: [
+        "PROPOSED",
+        "ACCEPTED",
+        "DECLINED",
+        "EXPIRED",
+        "CANCELED",
+        "APPLY_FAILED",
+      ],
+    })
+      .notNull()
+      .default("PROPOSED"),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    respondedAt: integer("responded_at", { mode: "timestamp" }),
+    appliedAt: integer("applied_at", { mode: "timestamp" }),
+    applyErrorCode: text("apply_error_code"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    index("team_checkin_adjustment_proposals_workspace_status_idx").on(
+      table.workspaceId,
+      table.status,
+    ),
+    index("team_checkin_adjustment_proposals_member_status_idx").on(
+      table.memberUserId,
+      table.status,
+    ),
+    index("team_checkin_adjustment_proposals_response_idx").on(
+      table.sourceResponseId,
+    ),
+  ],
+);
+
+export const teamCheckinAdjustmentAuditLogs = sqliteTable(
+  "team_checkin_adjustment_audit_logs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    proposalId: integer("proposal_id")
+      .notNull()
+      .references(() => teamCheckinAdjustmentProposals.id, {
+        onDelete: "cascade",
+      }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    actorUserId: integer("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    eventType: text("event_type", {
+      enum: [
+        "PROPOSED",
+        "ACCEPTED",
+        "DECLINED",
+        "EXPIRED",
+        "CANCELED",
+        "APPLIED",
+        "APPLY_FAILED",
+      ],
+    }).notNull(),
+    snapshotJson: text("snapshot_json").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    index("team_checkin_adjustment_audit_logs_proposal_idx").on(
+      table.proposalId,
+    ),
+  ],
+);
+
+export const basicUsageEvents = sqliteTable(
+  "basic_usage_events",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    actorUserId: integer("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    targetUserId: integer("target_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    leadMeasureId: integer("lead_measure_id").references(() => leadMeasures.id, {
+      onDelete: "set null",
+    }),
+    eventType: text("event_type", {
+      enum: [
+        "TEAM_CHECKIN_ENABLED",
+        "TEAM_CHECKIN_DELIVERY_SENT",
+        "TEAM_CHECKIN_RESPONSE_SUBMITTED",
+        "TEAM_CHECKIN_FOLLOWUP_RESUMED_24H",
+        "TEAM_CHECKIN_REPORT_VIEWED",
+        "TEAM_CHECKIN_ADJUSTMENT_PROPOSED",
+        "TEAM_CHECKIN_ADJUSTMENT_ACCEPTED",
+        "TEAM_CHECKIN_ADJUSTMENT_APPLIED",
+      ],
+    }).notNull(),
+    occurredAt: integer("occurred_at", { mode: "timestamp" }).notNull(),
+    metadataJson: text("metadata_json").notNull().default("{}"),
+  },
+  (table) => [
+    index("basic_usage_events_workspace_occurred_idx").on(
+      table.workspaceId,
+      table.occurredAt,
+    ),
+  ],
+);
+
 export const teamMemos = sqliteTable("team_memos", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   workspaceId: integer("workspace_id")

@@ -1,5 +1,61 @@
 # Changelog
 
+## [1.6.6](https://github.com/team-dasoslab/dowin-web/compare/v1.6.5...v1.6.6) (2026-06-19)
+
+
+### Bug Fixes
+
+* 계정 삭제시 워크스페이스 참조 문제 개선 ([#167](https://github.com/team-dasoslab/dowin-web/issues/167)) ([8a5cfc8](https://github.com/team-dasoslab/dowin-web/commit/8a5cfc8453c7e16ec3d9849e4d69d11d3f07bf7c))
+
+## [1.6.5](https://github.com/team-dasoslab/dowin-web/compare/v1.6.4...v1.6.5) (2026-06-19)
+
+
+### Bug Fixes
+
+* 체크인 기능 QA ([#165](https://github.com/team-dasoslab/dowin-web/issues/165)) ([b8ebca5](https://github.com/team-dasoslab/dowin-web/commit/b8ebca5dedda05070ce9559c704eaafe2af55e69))
+
+## [1.6.4](https://github.com/team-dasoslab/dowin-web/compare/v1.6.3...v1.6.4) (2026-06-19)
+
+
+### Bug Fixes
+
+* 알림 timezone 대응 ([#157](https://github.com/team-dasoslab/dowin-web/issues/157)) ([7a8e546](https://github.com/team-dasoslab/dowin-web/commit/7a8e5461e394e37d23925b413443ba4785dde7f2))
+
+## [1.6.3](https://github.com/team-dasoslab/dowin-web/compare/v1.6.2...v1.6.3) (2026-06-19)
+
+
+### Bug Fixes
+
+* 현재 워크스페이스 역할 판정 정리 ([17e9df1](https://github.com/team-dasoslab/dowin-web/commit/17e9df182eebf191dcbf543565a9010a08be11b7))
+
+## [1.6.2](https://github.com/team-dasoslab/dowin-web/compare/v1.6.1...v1.6.2) (2026-06-19)
+
+
+### Bug Fixes
+
+* 초대코드로 조인시 쿠키 갱신 ([8591375](https://github.com/team-dasoslab/dowin-web/commit/8591375b4b8816a6e5e8d53ab97f2cf84f146f9f))
+
+## [1.6.1](https://github.com/team-dasoslab/dowin-web/compare/v1.6.0...v1.6.1) (2026-06-19)
+
+
+### Bug Fixes
+
+* 체크인 기능 QA 및 개선 ([#153](https://github.com/team-dasoslab/dowin-web/issues/153)) ([77269d4](https://github.com/team-dasoslab/dowin-web/commit/77269d40e700f549cbbdd09366119e3c7729c4e1))
+
+## [1.6.0](https://github.com/team-dasoslab/dowin-web/compare/v1.5.0...v1.6.0) (2026-06-18)
+
+
+### Features
+
+* 체크인 기능 API 연동 ([#151](https://github.com/team-dasoslab/dowin-web/issues/151)) ([6370062](https://github.com/team-dasoslab/dowin-web/commit/637006255b33b57faf83cb8c46f1913b92f4a566))
+
+## [1.5.0](https://github.com/team-dasoslab/dowin-web/compare/v1.4.3...v1.5.0) (2026-06-18)
+
+
+### Features
+
+* 체크인 기능 API ([#149](https://github.com/team-dasoslab/dowin-web/issues/149)) ([6c48809](https://github.com/team-dasoslab/dowin-web/commit/6c4880981fa1003d97d4b64d1bd4d732d2ef6dbb))
+
 ## [1.4.3](https://github.com/team-dasoslab/dowin-web/compare/v1.4.2...v1.4.3) (2026-06-16)
 
 

@@ -2,6 +2,21 @@ import { z } from "zod";
 
 const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
+const timezoneSchema = z
+  .string()
+  .trim()
+  .min(1, "유효한 시간대가 필요합니다.")
+  .refine((timezone) => {
+    try {
+      new Intl.DateTimeFormat("en-US", { timeZone: timezone }).format(
+        new Date(0),
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }, "유효한 시간대가 필요합니다.");
+
 export const parseTimeString = (time: string) => {
   const matched = TIME_REGEX.exec(time);
   if (!matched) {
@@ -19,6 +34,10 @@ export const userNotificationSettingsUpdateSchema = z.object({
   dailyReminderTime: z
     .string()
     .regex(TIME_REGEX, "시간은 HH:mm 형식이어야 합니다."),
+});
+
+export const userNotificationTimezoneUpdateSchema = z.object({
+  timezone: timezoneSchema,
 });
 
 export const devicePushTokenRegisterSchema = z.object({

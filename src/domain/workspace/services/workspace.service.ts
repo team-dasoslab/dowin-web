@@ -22,6 +22,7 @@ type WorkspaceWithPlanLimits = PublicWorkspace & {
   freeMemberLimit: number;
   isOverFreeMemberLimit: boolean;
   memberCount: number;
+  role: "ADMIN" | "MEMBER";
 };
 type WorkspaceListItem = {
   id: string;
@@ -183,12 +184,16 @@ export class WorkspaceService {
 
   async getMyWorkspace(userId: number, currentWorkspaceUid?: string): Promise<WorkspaceWithPlanLimits> {
     let workspace = null;
+    let currentMembership: Awaited<
+      ReturnType<WorkspaceStoragePort["findMembership"]>
+    > = null;
 
     if (currentWorkspaceUid) {
       const internalId = await this.storage.resolveIdByUid(currentWorkspaceUid);
       if (internalId) {
         const membership = await this.storage.findMembership(internalId, userId);
         if (membership) {
+          currentMembership = membership;
           workspace = await this.storage.findWorkspaceById(internalId);
         }
       }
@@ -199,6 +204,12 @@ export class WorkspaceService {
     }
 
     if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+    if (!currentMembership) {
+      currentMembership = await this.storage.findMembership(workspace.id, userId);
+    }
+    if (!currentMembership) {
       throw new NotFoundError("NOT_FOUND");
     }
     const memberCapacity = await getWorkspaceMemberCapacity(
@@ -217,6 +228,7 @@ export class WorkspaceService {
       freeMemberLimit: memberLimit,
       isOverFreeMemberLimit: memberCapacity.memberCount > memberLimit,
       memberCount: memberCapacity.memberCount,
+      role: currentMembership.role,
     };
   }
 
@@ -399,7 +411,10 @@ export class WorkspaceService {
     await this.storage.deleteTag(workspaceId, tagId);
   }
 
-  async joinWorkspaceByInvite(code: string, userId: number): Promise<void> {
+  async joinWorkspaceByInvite(
+    code: string,
+    userId: number,
+  ): Promise<PublicWorkspace> {
     const normalizedCode = code.trim().toUpperCase();
     const invite = await this.storage.findInviteByCode(normalizedCode);
     if (!invite) {
@@ -455,6 +470,8 @@ export class WorkspaceService {
 
       throw new ConflictError("INVITE_CODE_USAGE_LIMIT_REACHED");
     }
+
+    return toPublicWorkspace(workspace);
   }
 
   private async ensureWorkspaceHasMemberCapacity(workspace: Workspace) {

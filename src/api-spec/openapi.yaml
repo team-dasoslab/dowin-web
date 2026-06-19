@@ -940,6 +940,31 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /push/settings/timezone:
+    put:
+      summary: 내 알림 시간대 동기화
+      tags: [Notification]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserNotificationTimezoneUpdateRequest"
+      responses:
+        "200":
+          description: 동기화 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UserNotificationSettings" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /notifications/devices:
     post:
       summary: 현재 기기 알림 토큰 등록
@@ -2661,6 +2686,298 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /workspaces/{workspaceId}/team-checkins/settings:
+    get:
+      summary: 팀 체크인 정책 조회
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamCheckinSettings" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: Basic 구독 필요
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+    put:
+      summary: 팀 체크인 정책 저장
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TeamCheckinSettings" }
+      responses:
+        "200":
+          description: 저장 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamCheckinSettings" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 관리자 권한 또는 Basic 구독 필요
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "422":
+          description: 입력값 유효성 오류
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/team-checkins/inbox:
+    get:
+      summary: 팀원 체크인 Inbox 조회
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [open, all, resolved], default: open }
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamCheckinInboxResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: Basic 구독 필요
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/team-checkins/{checkinId}/response:
+    post:
+      summary: 팀 체크인 응답 제출
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: checkinId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TeamCheckinResponseCreateRequest" }
+      responses:
+        "200":
+          description: 응답 저장 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamCheckinResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: 체크인을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 이미 응답한 체크인
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/team-checkins/report:
+    get:
+      summary: 리더용 팀 체크인 리포트 조회
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: weekStart
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: activeOnly
+          in: query
+          required: false
+          schema: { type: boolean, default: false }
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamCheckinReportResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 관리자 권한 또는 Basic 구독 필요
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/team-checkins/adjustment-proposals:
+    post:
+      summary: 리더 조정 제안 생성
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalCreateRequest" }
+      responses:
+        "201":
+          description: 생성 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposal" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 관리자 권한 또는 Basic 구독 필요
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 생성할 수 없는 응답 또는 이미 열린 제안
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/team-checkins/adjustment-proposals/{proposalId}/accept:
+    post:
+      summary: 조정 제안 수락
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: proposalId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: 수락 및 적용 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalApplyResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: 제안을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 이미 종료 또는 만료된 제안
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/team-checkins/adjustment-proposals/{proposalId}/decline:
+    post:
+      summary: 조정 제안 거절
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: proposalId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalDeclineRequest" }
+      responses:
+        "200":
+          description: 거절 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, enum: [DECLINED] }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "404":
+          description: 제안을 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/team-checkins/adjustment-proposals/{proposalId}/cancel:
+    post:
+      summary: 조정 제안 취소
+      tags: [TeamCheckins]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: proposalId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: 취소 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, enum: [CANCELED] }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 관리자 권한 필요
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
   /workspaces/{workspaceId}/dashboard/team/memos:
     get:
       summary: 팀 대시보드 사용자 메모 조회
@@ -2811,6 +3128,186 @@ components:
         nickname: { type: string }
         isFirstLogin: { type: boolean }
         locale: { type: string, enum: [ko, en] }
+
+    TeamCheckinSettings:
+      type: object
+      required:
+        - enabled
+        - includeAdminAsMember
+        - triggerNoWeeklyLogEnabled
+        - triggerSlowStartEnabled
+        - dailyMemberLimit
+        - dailyWorkspaceLimit
+      properties:
+        enabled: { type: boolean }
+        includeAdminAsMember: { type: boolean }
+        triggerNoWeeklyLogEnabled: { type: boolean }
+        triggerSlowStartEnabled: { type: boolean }
+        dailyMemberLimit: { type: integer, minimum: 1, maximum: 10 }
+        dailyWorkspaceLimit: { type: integer, minimum: 1, maximum: 500 }
+
+    TeamCheckinResponse:
+      type: object
+      properties:
+        id: { type: string }
+        responseType:
+          type: string
+          enum: [LOG_NOW, SNOOZE_TODAY, BLOCKED, ADJUSTMENT_REQUESTED]
+        note: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    TeamCheckinResponseCreateRequest:
+      type: object
+      required: [responseType]
+      properties:
+        responseType:
+          type: string
+          enum: [LOG_NOW, SNOOZE_TODAY, BLOCKED, ADJUSTMENT_REQUESTED]
+        note: { type: string, nullable: true, maxLength: 500 }
+
+    TeamCheckinInboxResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/TeamCheckinInboxCheckinItem"
+              - $ref: "#/components/schemas/TeamCheckinInboxProposalItem"
+        nextCursor: { type: string, nullable: true }
+
+    TeamCheckinInboxCheckinItem:
+      type: object
+      properties:
+        type: { type: string, enum: [CHECKIN] }
+        id: { type: string }
+        workspaceId: { type: string }
+        leadMeasureId: { type: integer }
+        leadMeasureName: { type: string }
+        reasonCode: { type: string, enum: [NO_WEEKLY_LOG, SLOW_WEEKLY_START] }
+        periodStart: { type: string, format: date }
+        periodEnd: { type: string, format: date }
+        sentAt: { type: string, format: date-time, nullable: true }
+        response:
+          oneOf:
+            - $ref: "#/components/schemas/TeamCheckinResponse"
+          nullable: true
+
+    TeamCheckinInboxProposalItem:
+      type: object
+      properties:
+        type: { type: string, enum: [ADJUSTMENT_PROPOSAL] }
+        id: { type: string }
+        sourceCheckinId: { type: string }
+        leadMeasureId: { type: integer }
+        leadMeasureName: { type: string }
+        actionType:
+          type: string
+          enum:
+            [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
+        payload: { type: object, additionalProperties: true }
+        leaderNote: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [PROPOSED, ACCEPTED, DECLINED, EXPIRED, CANCELED, APPLY_FAILED]
+        expiresAt: { type: string, format: date-time }
+
+    TeamCheckinReportResponse:
+      type: object
+      properties:
+        workspaceId: { type: string }
+        weekStart: { type: string, format: date }
+        weekEnd: { type: string, format: date }
+        summary:
+          type: object
+          properties:
+            sentCount: { type: integer }
+            recipientCount: { type: integer }
+            respondedCount: { type: integer }
+            oneTapResponseRate: { type: number }
+            resumedWithin24hCount: { type: integer }
+            resumedWithin24hRate: { type: number }
+            adjustmentSignalCount: { type: integer }
+            proposalAcceptanceRate: { type: number }
+        attentionItems:
+          type: array
+          items:
+            type: object
+            properties:
+              responseId: { type: string, nullable: true }
+              checkinId: { type: string }
+              memberUserId: { type: integer }
+              memberNickname: { type: string }
+              leadMeasureId: { type: integer }
+              leadMeasureName: { type: string }
+              signalType:
+                type: string
+                enum: [BLOCKED, ADJUSTMENT_REQUESTED]
+                nullable: true
+              note: { type: string, nullable: true }
+              createdAt: { type: string, format: date-time }
+              openProposalId: { type: string, nullable: true }
+              isResolved: { type: boolean }
+              resolvedAt: { type: string, format: date-time, nullable: true }
+              resolvedProposal:
+                type: object
+                nullable: true
+                properties:
+                  actionType: { type: string }
+                  leaderNote: { type: string, nullable: true }
+                  payloadJson: { type: string }
+                  status: { type: string }
+                  createdAt: { type: string, format: date-time }
+        activity:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, enum: [CHECKIN_SENT, CHECKIN_RESPONDED] }
+              checkinId: { type: string }
+              memberNickname: { type: string }
+              leadMeasureName: { type: string }
+              createdAt: { type: string, format: date-time }
+
+    TeamCheckinAdjustmentProposal:
+      type: object
+      properties:
+        id: { type: string }
+        actionType:
+          type: string
+          enum:
+            [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
+        payload: { type: object, additionalProperties: true }
+        leaderNote: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [PROPOSED, ACCEPTED, DECLINED, EXPIRED, CANCELED, APPLY_FAILED]
+        expiresAt: { type: string, format: date-time }
+        createdAt: { type: string, format: date-time }
+
+    TeamCheckinAdjustmentProposalCreateRequest:
+      type: object
+      required: [sourceResponseId, actionType, payload]
+      properties:
+        sourceResponseId: { type: string }
+        actionType:
+          type: string
+          enum:
+            [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
+        payload: { type: object, additionalProperties: true }
+        leaderNote: { type: string, nullable: true, maxLength: 500 }
+
+    TeamCheckinAdjustmentProposalDeclineRequest:
+      type: object
+      properties:
+        reason: { type: string, enum: [KEEP_CURRENT_GOAL, NOT_NOW, OTHER] }
+
+    TeamCheckinAdjustmentProposalApplyResponse:
+      type: object
+      properties:
+        status: { type: string, enum: [ACCEPTED] }
+        appliedAt: { type: string, format: date-time }
+        result: { type: object, additionalProperties: true }
 
     RecoveryAccount:
       type: object
@@ -3483,6 +3980,9 @@ components:
         planCode:
           type: string
           enum: [BASIC, FREE, STANDARD]
+        role:
+          type: string
+          enum: [ADMIN, MEMBER]
         memberCount:
           type: integer
           minimum: 0
@@ -3718,6 +4218,14 @@ components:
           type: string
           pattern: "^([01]\\d|2[0-3]):([0-5]\\d)$"
           example: "20:30"
+
+    UserNotificationTimezoneUpdateRequest:
+      type: object
+      required: [timezone]
+      properties:
+        timezone:
+          type: string
+          example: America/Los_Angeles
 
     DevicePushTokenRegisterRequest:
       type: object

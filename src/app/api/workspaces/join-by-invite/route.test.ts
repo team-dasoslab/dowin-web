@@ -4,6 +4,16 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSession = vi.fn();
 const mockJoinWorkspaceByInvite = vi.fn();
+const mockGuardRestrictedTestAccountWrite = vi.fn();
+const mockCookieSet = vi.fn();
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(() => ({
+    get: vi.fn(),
+    set: mockCookieSet,
+  })),
+  headers: vi.fn(() => new Headers()),
+}));
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -17,13 +27,12 @@ vi.mock("@/lib/server/auth", () => ({
   getSessionWithRefresh: mockGetSession,
 }));
 
-const mockFindInviteByCode = vi.fn();
+vi.mock("@/lib/server/restricted-test-account", () => ({
+  guardRestrictedTestAccountWrite: mockGuardRestrictedTestAccountWrite,
+}));
+
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
-    return {
-      findInviteByCode: mockFindInviteByCode,
-    };
-  }),
+  WorkspaceStorage: vi.fn(),
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
@@ -39,6 +48,7 @@ describe("POST /api/workspaces/join-by-invite", () => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockGuardRestrictedTestAccountWrite.mockResolvedValue(null);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
@@ -60,6 +70,10 @@ describe("POST /api/workspaces/join-by-invite", () => {
 
   it("초대코드로 참가 요청을 처리한다", async () => {
     mockGetSession.mockResolvedValue({ userId: 7 });
+    mockJoinWorkspaceByInvite.mockResolvedValue({
+      id: "ws_ops",
+      name: "운영팀",
+    });
 
     const { POST } = await import("./route");
     const response = await POST(
@@ -74,5 +88,14 @@ describe("POST /api/workspaces/join-by-invite", () => {
 
     expect(response.status).toBe(200);
     expect(mockJoinWorkspaceByInvite).toHaveBeenCalledWith("ABCD123456", 7);
+    expect(mockCookieSet).toHaveBeenCalledWith(
+      "dowin_workspace_id",
+      "ws_ops",
+      expect.objectContaining({
+        httpOnly: true,
+        path: "/",
+        sameSite: "lax",
+      }),
+    );
   });
 });
