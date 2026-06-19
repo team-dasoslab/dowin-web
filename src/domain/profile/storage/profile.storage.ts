@@ -1,6 +1,11 @@
-import { users, workspaceMembers, workspaces } from "@/db/schema";
+import {
+  users,
+  workspaceBillingState,
+  workspaceMembers,
+  workspaces,
+} from "@/db/schema";
 import { getDb } from "@/db";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 export type ProfileRecord = {
   id: number;
@@ -81,14 +86,32 @@ export class ProfileStorage {
   }
 
   async countWorkspaceAdmins(workspaceId: number): Promise<number> {
-    const members = await this.db.query.workspaceMembers.findMany({
-      where: eq(workspaceMembers.workspaceId, workspaceId),
-    });
+    const [result] = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(
+        and(
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.role, "ADMIN"),
+          isNull(workspaces.deletedAt),
+        ),
+      );
 
-    return members.filter((member) => member.role === "ADMIN").length;
+    return Number(result?.count ?? 0);
   }
 
   async deleteUser(userId: number): Promise<void> {
+    await this.db
+      .update(workspaces)
+      .set({ billingOwnerUserId: null })
+      .where(eq(workspaces.billingOwnerUserId, userId));
+
+    await this.db
+      .update(workspaceBillingState)
+      .set({ billingOwnerUserId: null })
+      .where(eq(workspaceBillingState.billingOwnerUserId, userId));
+
     await this.db.delete(users).where(eq(users.id, userId));
   }
 
@@ -123,11 +146,14 @@ export class ProfileStorage {
   }
 
   private async findCurrentMembershipByUserId(userId: number) {
-    return (
-      (await this.db.query.workspaceMembers.findFirst({
-        where: eq(workspaceMembers.userId, userId),
-        orderBy: (members, { asc }) => [asc(members.createdAt), asc(members.id)],
-      })) ?? null
-    );
+    const result = await this.db
+      .select({ member: workspaceMembers })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(and(eq(workspaceMembers.userId, userId), isNull(workspaces.deletedAt)))
+      .orderBy(workspaceMembers.createdAt, workspaceMembers.id)
+      .limit(1);
+
+    return result[0]?.member ?? null;
   }
 }

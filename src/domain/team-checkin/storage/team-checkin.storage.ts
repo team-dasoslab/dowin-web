@@ -497,7 +497,7 @@ export class TeamCheckinStorage {
           eq(workspaceMembers.workspaceId, workspaceId),
           eq(workspaceMembers.userId, teamCheckinDeliveries.memberUserId)
         )
-      ) as any;
+      ) as typeof baseQuery;
     }
 
     const rows = await baseQuery
