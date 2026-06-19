@@ -399,7 +399,10 @@ export class WorkspaceService {
     await this.storage.deleteTag(workspaceId, tagId);
   }
 
-  async joinWorkspaceByInvite(code: string, userId: number): Promise<void> {
+  async joinWorkspaceByInvite(
+    code: string,
+    userId: number,
+  ): Promise<PublicWorkspace> {
     const normalizedCode = code.trim().toUpperCase();
     const invite = await this.storage.findInviteByCode(normalizedCode);
     if (!invite) {
@@ -455,6 +458,8 @@ export class WorkspaceService {
 
       throw new ConflictError("INVITE_CODE_USAGE_LIMIT_REACHED");
     }
+
+    return toPublicWorkspace(workspace);
   }
 
   private async ensureWorkspaceHasMemberCapacity(workspace: Workspace) {

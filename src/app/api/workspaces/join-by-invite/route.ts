@@ -7,6 +7,7 @@ import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { cookies } from "next/headers";
 
 export const POST = withErrorHandler(async (request: Request) => {
   const { env } = getCloudflareContext();
@@ -36,10 +37,15 @@ export const POST = withErrorHandler(async (request: Request) => {
     return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
-  await service.joinWorkspaceByInvite(parsed.data.code, session.userId);
-  const invite = await storage.findInviteByCode(parsed.data.code.trim().toUpperCase());
-  if (invite) {
-  }
+  const workspace = await service.joinWorkspaceByInvite(parsed.data.code, session.userId);
+  const cookieStore = await cookies();
+  cookieStore.set("dowin_workspace_id", workspace.id, {
+    path: "/",
+    maxAge: 31536000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
 
   return apiSuccess({ message: "워크스페이스에 참가했습니다." });
 });

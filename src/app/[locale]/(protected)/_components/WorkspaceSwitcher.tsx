@@ -37,6 +37,9 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
           window.location.href = `/${locale}/${newWorkspaceId}/dashboard/my`;
         }
       },
+      onError: () => {
+        setOptimisticWorkspaceId(null);
+      },
     },
   });
 
