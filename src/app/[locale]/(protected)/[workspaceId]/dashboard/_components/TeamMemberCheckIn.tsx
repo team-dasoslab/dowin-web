@@ -106,10 +106,10 @@ export function TeamMemberCheckIn() {
       }
 
       if (chk.response) {
-        if (chk.response.responseType === "LOG_NOW") status = "done";
-        if (chk.response.responseType === "SNOOZE_TODAY") status = "later";
-        if (chk.response.responseType === "BLOCKED") status = "blocked";
-        if (chk.response.responseType === "ADJUSTMENT_REQUESTED") status = "adjust";
+        if (chk.response.responseType === "LOG_NOW") { status = "done"; content = t("statusDone"); }
+        else if (chk.response.responseType === "SNOOZE_TODAY") { status = "later"; content = t("statusLater"); }
+        else if (chk.response.responseType === "BLOCKED") { status = "blocked"; content = t("statusBlocked"); }
+        else if (chk.response.responseType === "ADJUSTMENT_REQUESTED") { status = "adjust"; content = t("statusAdjust"); }
       }
 
       checkinMap.set(chk.id!, {
@@ -152,13 +152,14 @@ export function TeamMemberCheckIn() {
       const existing = checkinMap.get(prop.sourceCheckinId!);
       if (existing) {
         const proposalCreatedAt = new Date(new Date(prop.expiresAt!).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+        const proposalContent = status === "adjusted" ? t("statusAdjusted") : status === "declined" ? t("statusDeclined") : t("actionProposalTitle");
         existing.proposalId = prop.id;
         existing.leaderComment = prop.leaderNote || undefined;
         existing.proposal = { type: pType, description };
         existing.status = status;
         if (prop.status === "PROPOSED") existing.isUnread = true;
         existing.date = formatDate(proposalCreatedAt); // update date to proposal's date
-        existing.content = t("actionProposalTitle");
+        existing.content = proposalContent;
         // Keep original myRequest or undefined
         existing.type = "human";
       } else {
@@ -171,7 +172,7 @@ export function TeamMemberCheckIn() {
           actionItemName: prop.leadMeasureName || "",
           date: formatDate(proposalCreatedAt),
           isUnread: prop.status === "PROPOSED",
-          content: t("actionProposalTitle"),
+          content: status === "adjusted" ? t("statusAdjusted") : status === "declined" ? t("statusDeclined") : t("actionProposalTitle"),
           status,
           leaderComment: prop.leaderNote || undefined,
           myRequest: t("requestAdjustDesc"),
