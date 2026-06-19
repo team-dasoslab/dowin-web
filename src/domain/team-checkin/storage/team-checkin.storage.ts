@@ -463,8 +463,9 @@ export class TeamCheckinStorage {
   async findReportRows(
     workspaceId: number,
     periodStart: string,
+    activeOnly: boolean = false,
   ): Promise<TeamCheckinReportRow[]> {
-    const rows = await this.db
+    let baseQuery = this.db
       .select({
         delivery: teamCheckinDeliveries,
         response: teamCheckinResponses,
@@ -487,7 +488,19 @@ export class TeamCheckinStorage {
       .leftJoin(
         teamCheckinAdjustmentProposals,
         eq(teamCheckinAdjustmentProposals.sourceResponseId, teamCheckinResponses.id),
-      )
+      );
+
+    if (activeOnly) {
+      baseQuery = baseQuery.innerJoin(
+        workspaceMembers,
+        and(
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.userId, teamCheckinDeliveries.memberUserId)
+        )
+      ) as any;
+    }
+
+    const rows = await baseQuery
       .where(
         and(
           eq(teamCheckinDeliveries.workspaceId, workspaceId),

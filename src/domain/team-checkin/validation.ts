@@ -17,6 +17,7 @@ export const teamCheckinInboxQuerySchema = z.object({
 
 export const teamCheckinReportQuerySchema = z.object({
   weekStart: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  activeOnly: z.preprocess((val) => val === "true" || val === true, z.boolean().default(false)),
 });
 
 export const teamCheckinResponseSchema = z.object({

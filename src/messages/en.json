@@ -1531,6 +1531,7 @@
     "memberResponse": "Team member's response",
     "proposalAcceptedMsg": "The proposal was accepted and the target was adjusted.",
     "proposalDeclinedMsg": "The proposal was declined and the original target was kept.",
-    "teamMember": "Team member"
+    "teamMember": "Team member",
+    "activeMembersOnly": "Hide departed members"
   }
 }
