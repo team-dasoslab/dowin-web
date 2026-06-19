@@ -288,7 +288,7 @@ export function TeamMemberCheckIn() {
           
           {!selectedId ? (
             <>
-              <div className="bg-surface px-6 pt-12 lg:pt-8 pb-4 shrink-0 flex items-center justify-between">
+              <div className="bg-surface px-5 pt-12 lg:pt-8 pb-4 shrink-0 flex items-center justify-between">
                 <h1 className="text-[24px] font-bold text-text-primary tracking-tight flex items-center gap-2">
                   Inbox
                   {unreadCount > 0 && (
@@ -303,7 +303,7 @@ export function TeamMemberCheckIn() {
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto px-2 pb-4">
+              <div className="flex-1 overflow-y-auto px-5 pb-4">
                 {notifications.length === 0 ? (
                   <div className="py-12 text-center text-text-muted">
                     {t("inboxEmpty")}
@@ -314,7 +314,7 @@ export function TeamMemberCheckIn() {
                     onClick={() => {
                       setSelectedId(n.id);
                     }}
-                    className={`w-full flex gap-3 text-left p-4 rounded-[20px] transition-all duration-200 relative ${n.isUnread ? 'bg-primary/5 hover:bg-primary/10' : 'bg-transparent hover:bg-sub-background'}`}
+                    className="w-full flex gap-3 text-left p-4 rounded-[20px] transition-all duration-200 relative bg-transparent hover:bg-sub-background"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start w-full mb-0.5">
@@ -337,14 +337,14 @@ export function TeamMemberCheckIn() {
             </>
           ) : (
             <div className="flex flex-col h-full bg-surface">
-              <div className="px-4 py-4 pt-12 lg:pt-4 flex items-center shrink-0">
+              <div className="px-5 py-4 pt-12 lg:pt-4 flex items-center shrink-0">
                 <button
                   onClick={() => {
                     setSelectedId(null);
                     setPendingAction(null);
                     setActionReason("");
                   }}
-                  className="p-2 hover:bg-sub-background rounded-full transition-colors text-text-primary shrink-0"
+                  className="-ml-2 p-2 hover:bg-sub-background rounded-full transition-colors text-text-primary shrink-0"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
@@ -361,14 +361,14 @@ export function TeamMemberCheckIn() {
                 )}
               </div>
 
-              <div className="flex-1 px-6 pb-6 overflow-y-auto flex flex-col animate-dowin-in">
+              <div className="flex-1 px-5 pb-6 overflow-y-auto flex flex-col animate-dowin-in">
                 {/* Initial System Request (Always Visible) */}
                 <div className="flex flex-col gap-2 mt-2 mb-8 shrink-0">
-                  <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center justify-between px-4">
                     <span className="text-[13px] font-bold text-primary">{t("system")}</span>
                     <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem?.sentAt)}</span>
                   </div>
-                  <div className="bg-primary/10 rounded-[16px] p-5">
+                  <div className="bg-primary/10 rounded-[20px] p-4">
                     <h2 className="text-[16px] font-bold text-[#191F28] leading-[1.4] tracking-tight mb-2">
                       {t.rich("msgNoLogRich", { measureName: selectedItem?.actionItemName || '', highlight: (chunks) => <span className="text-primary">{chunks}</span> })}
                     </h2>
@@ -451,11 +451,11 @@ export function TeamMemberCheckIn() {
                       <div className="px-1 space-y-7 mb-8">
                         {selectedItem.myRequest && (
                           <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between px-1">
+                            <div className="flex items-center justify-between px-4">
                               <span className="text-[13px] font-bold text-[#4E5968]">{t("myRequest")}</span>
                               <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem.respondedAt)}</span>
                             </div>
-                            <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                            <div className="bg-[#F2F4F6] rounded-[20px] p-4">
                               <div className="flex flex-col gap-1">
                                 <span className="text-[14px] font-bold text-[#8B95A1]">
                                   {t("statusAdjust")}
@@ -472,13 +472,13 @@ export function TeamMemberCheckIn() {
 
                         {(selectedItem.leaderComment || selectedItem.proposal) && (
                           <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between px-1">
+                            <div className="flex items-center justify-between px-4">
                               <span className="text-[13px] font-bold text-primary">
                                 {t("leaderComment")}
                               </span>
                               <span className="text-[13px] font-medium text-primary">{selectedItem.date}</span>
                             </div>
-                            <div className="bg-primary/10 rounded-[16px] p-5">
+                            <div className="bg-primary/10 rounded-[20px] p-4">
                               {selectedItem.leaderComment && (
                                 <p className={`text-[15px] text-[#191F28] leading-relaxed font-medium ${selectedItem.proposal ? 'mb-4' : ''}`}>
                                   {selectedItem.leaderComment}
@@ -498,11 +498,11 @@ export function TeamMemberCheckIn() {
                           <>
                             {selectedItem.status === 'declined' && (
                               <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between px-1">
+                                <div className="flex items-center justify-between px-4">
                                   <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
                                   <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem.respondedAt)}</span>
                                 </div>
-                                <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                                <div className="bg-[#F2F4F6] rounded-[20px] p-4">
                                   <span className="text-[14px] font-bold text-[#8B95A1]">
                                     {getStatusUI(selectedItem.status)?.text}
                                   </span>
@@ -512,11 +512,11 @@ export function TeamMemberCheckIn() {
 
                             {selectedItem.status === 'adjusted' && selectedItem.proposal && (
                               <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between px-1">
+                                <div className="flex items-center justify-between px-4">
                                   <span className="text-[13px] font-bold text-primary">{t("system")}</span>
                                   <span className="text-[13px] font-medium text-primary">{formatDate(selectedItem.respondedAt)}</span>
                                 </div>
-                                <div className="bg-primary/10 rounded-[16px] p-5">
+                                <div className="bg-primary/10 rounded-[20px] p-4">
                                   <p className="text-[15px] text-[#191F28] leading-relaxed font-bold">
                                     {selectedItem.proposal.rawActionType === "CHANGE_TARGET_COUNT" 
                                       ? t("sysTargetCountChanged", { count: (selectedItem.proposal.rawPayload as { newTargetValue?: number })?.newTargetValue || 0 })
@@ -560,11 +560,11 @@ export function TeamMemberCheckIn() {
                     <div className="flex flex-col gap-6">
                       <div className="px-1 space-y-7 mb-8">
                         <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between px-1">
+                          <div className="flex items-center justify-between px-4">
                             <span className="text-[13px] font-bold text-[#4E5968]">{t("myResponse")}</span>
                             <span className="text-[13px] font-medium text-[#8B95A1]">{formatDate(selectedItem!.respondedAt)}</span>
                           </div>
-                          <div className="bg-[#F2F4F6] rounded-[16px] p-5">
+                          <div className="bg-[#F2F4F6] rounded-[20px] p-4">
                             <span className="text-[14px] font-bold text-[#8B95A1]">
                               {getStatusUI(selectedItem!.status)?.text}
                             </span>
