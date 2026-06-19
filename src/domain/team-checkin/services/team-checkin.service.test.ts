@@ -117,6 +117,7 @@ describe("TeamCheckinService", () => {
             memberUserId: 11,
             memberRole: "MEMBER",
             userLocale: "ko",
+            timezone: "Asia/Seoul",
             scoreboardId: 30,
             leadMeasureId: 20,
             leadMeasureName: "고객 인터뷰",
@@ -176,6 +177,7 @@ describe("TeamCheckinService", () => {
             memberUserId: 11,
             memberRole: "MEMBER",
             userLocale: "ko",
+            timezone: "Asia/Seoul",
             scoreboardId: 30,
             leadMeasureId: 20,
             leadMeasureName: "고객 인터뷰",
@@ -191,6 +193,7 @@ describe("TeamCheckinService", () => {
             memberUserId: 12,
             memberRole: "MEMBER",
             userLocale: "en",
+            timezone: "UTC",
             scoreboardId: 31,
             leadMeasureId: 21,
             leadMeasureName: "Customer interviews",
@@ -224,8 +227,7 @@ describe("TeamCheckinService", () => {
       1,
       expect.objectContaining({
         messageTitle: "Dowin",
-        messageBody:
-          "이번 주 고객 인터뷰 기록이 아직 없어요. 오늘 할 수 있는 가장 작은 한 걸음부터 남겨주세요.",
+        messageBody: "이번 주 고객 인터뷰 기록이 아직 없어요. 오늘 해볼까요?",
         reasonCode: "NO_WEEKLY_LOG",
       }),
     );
@@ -234,8 +236,93 @@ describe("TeamCheckinService", () => {
       expect.objectContaining({
         messageTitle: "Dowin",
         messageBody:
-          "You haven't logged Customer interviews this week. Start with one small step you can do today.",
+          "No log for Customer interviews this week. Give it a go today?",
         reasonCode: "NO_WEEKLY_LOG",
+      }),
+    );
+  });
+
+  it("evaluates slow-start thresholds in each member timezone", async () => {
+    const createDelivery = vi.fn().mockResolvedValue({
+      id: 1,
+      uid: "chk_1",
+      deeplinkPath: "/ko/ws_uid/dashboard/my",
+    });
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: false,
+              triggerSlowStartEnabled: true,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            timezone: "Asia/Seoul",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-01T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 12,
+            memberRole: "MEMBER",
+            userLocale: "en",
+            timezone: "America/Los_Angeles",
+            scoreboardId: 31,
+            leadMeasureId: 21,
+            leadMeasureName: "Customer interviews",
+            leadMeasureCreatedAt: new Date("2026-06-01T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        findActiveDeviceTokens: vi.fn().mockResolvedValue([]),
+        markDeliverySkipped: vi.fn(),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-17T01:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 1,
+      createdDeliveryCount: 1,
+    });
+    expect(createDelivery).toHaveBeenCalledWith(
+      expect.objectContaining({
+        memberUserId: 11,
+        reasonCode: "SLOW_WEEKLY_START",
+        periodStart: "2026-06-15",
+        periodEnd: "2026-06-21",
       }),
     );
   });
@@ -266,6 +353,7 @@ describe("TeamCheckinService", () => {
             memberUserId: 11,
             memberRole: "MEMBER",
             userLocale: "ko",
+            timezone: "Asia/Seoul",
             scoreboardId: 30,
             leadMeasureId: 20,
             leadMeasureName: "고객 인터뷰",
@@ -323,6 +411,7 @@ describe("TeamCheckinService", () => {
             memberUserId: 11,
             memberRole: "MEMBER",
             userLocale: "ko",
+            timezone: "Asia/Seoul",
             scoreboardId: 30,
             leadMeasureId: 20,
             leadMeasureName: "고객 인터뷰",
