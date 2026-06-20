@@ -35,12 +35,23 @@ const grantedSeatCountSchema = z
   .min(1, "좌석 수는 1 이상이어야 합니다.")
   .max(10, "프로모션 코드는 최대 10명까지 제공할 수 있습니다.");
 
+const expiresAtSchema = z.coerce.date().nullable().optional();
+
+const entitlementDurationDaysSchema = z
+  .number()
+  .int("혜택 유지 일수는 정수여야 합니다.")
+  .min(1, "혜택 유지 일수는 1 이상이어야 합니다.")
+  .nullable()
+  .optional();
+
 export const marketingInviteCodeCreateSchema = z.object({
   code: inviteCodeSchema.optional(),
   campaignName: campaignNameSchema,
   description: descriptionSchema,
   maxUses: maxUsesSchema,
   grantedSeatCount: grantedSeatCountSchema,
+  expiresAt: expiresAtSchema,
+  entitlementDurationDays: entitlementDurationDaysSchema,
 });
 
 export const marketingInviteCodeUpdateSchema = z
@@ -49,6 +60,8 @@ export const marketingInviteCodeUpdateSchema = z
     description: descriptionSchema,
     maxUses: maxUsesSchema.optional(),
     grantedSeatCount: grantedSeatCountSchema.optional(),
+    expiresAt: expiresAtSchema,
+    entitlementDurationDays: entitlementDurationDaysSchema,
     status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   })
   .refine((value) => Object.keys(value).length > 0, {
