@@ -1194,7 +1194,7 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "409":
-          description: 비활성/사용 횟수 초과/중복 사용 초대코드
+          description: 비활성/사용 횟수 초과/중복 사용/만료된 초대코드
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -3642,6 +3642,14 @@ components:
         updatedAt:
           type: string
           format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        entitlementDurationDays:
+          type: integer
+          minimum: 1
+          nullable: true
 
     MarketingInviteRedemption:
       type: object
@@ -3710,6 +3718,14 @@ components:
           type: integer
           minimum: 1
           maximum: 10
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        entitlementDurationDays:
+          type: integer
+          minimum: 1
+          nullable: true
 
     MarketingInviteCodeUpdateRequest:
       type: object
@@ -3730,6 +3746,14 @@ components:
           type: integer
           minimum: 1
           maximum: 10
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        entitlementDurationDays:
+          type: integer
+          minimum: 1
+          nullable: true
         status:
           $ref: "#/components/schemas/MarketingInviteCodeStatus"
 

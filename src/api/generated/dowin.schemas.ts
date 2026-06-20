@@ -696,6 +696,13 @@ export interface MarketingInviteCodeSummary {
   createdByAdminUserId: number;
   createdAt: string;
   updatedAt: string;
+  /** @nullable */
+  expiresAt?: string | null;
+  /**
+   * @minimum 1
+   * @nullable
+   */
+  entitlementDurationDays?: number | null;
 }
 
 export type MarketingInviteRedemptionAcquisitionSource = typeof MarketingInviteRedemptionAcquisitionSource[keyof typeof MarketingInviteRedemptionAcquisitionSource];
@@ -750,6 +757,13 @@ export interface MarketingInviteCodeCreateRequest {
    * @maximum 10
    */
   grantedSeatCount: number;
+  /** @nullable */
+  expiresAt?: string | null;
+  /**
+   * @minimum 1
+   * @nullable
+   */
+  entitlementDurationDays?: number | null;
 }
 
 export interface MarketingInviteCodeUpdateRequest {
@@ -773,6 +787,13 @@ export interface MarketingInviteCodeUpdateRequest {
    * @maximum 10
    */
   grantedSeatCount?: number;
+  /** @nullable */
+  expiresAt?: string | null;
+  /**
+   * @minimum 1
+   * @nullable
+   */
+  entitlementDurationDays?: number | null;
   status?: MarketingInviteCodeStatus;
 }
 
