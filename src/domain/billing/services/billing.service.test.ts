@@ -55,6 +55,7 @@ describe("BillingService", () => {
       pendingSeatEffectiveAt: null,
       usedSeatCount: 1,
       canManageBilling: true,
+      promotionalDurationDays: null,
     });
   });
 

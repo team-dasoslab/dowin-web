@@ -184,6 +184,14 @@ export class MarketingInviteStorage {
         role: "ADMIN",
       });
 
+      let currentPeriodEnd: Date | null = null;
+      if (input.code.entitlementDurationDays) {
+        currentPeriodEnd = new Date(input.now);
+        currentPeriodEnd.setDate(
+          currentPeriodEnd.getDate() + input.code.entitlementDurationDays,
+        );
+      }
+
       await this.db.insert(workspaceBillingState).values({
         workspaceId: workspace.id,
         provider: null,
@@ -192,7 +200,7 @@ export class MarketingInviteStorage {
         entitlementSource: "BETA_PROMOTIONAL_GRANT",
         customerKey: null,
         subscriptionKey: null,
-        currentPeriodEnd: null,
+        currentPeriodEnd: currentPeriodEnd,
         cancelAtPeriodEnd: false,
         billingOwnerUserId: input.userId,
         lastEventId: null,

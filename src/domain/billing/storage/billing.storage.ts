@@ -8,6 +8,8 @@ import {
   workspaceSeatEntitlements,
   workspaceMembers,
   workspaces,
+  marketingInviteCodes,
+  marketingInviteRedemptions,
 } from "@/db/schema";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { and, asc, desc, eq, gte, inArray, like, or, sql } from "drizzle-orm";
@@ -29,6 +31,23 @@ export class BillingStorage {
         where: eq(workspaceBillingState.workspaceId, workspaceId),
       })) ?? null
     );
+  }
+
+  async findLatestPromotionalGrantDuration(workspaceId: number) {
+    const [result] = await this.db
+      .select({
+        durationDays: marketingInviteCodes.entitlementDurationDays,
+      })
+      .from(marketingInviteRedemptions)
+      .innerJoin(
+        marketingInviteCodes,
+        eq(marketingInviteRedemptions.marketingInviteCodeId, marketingInviteCodes.id)
+      )
+      .where(eq(marketingInviteRedemptions.workspaceId, workspaceId))
+      .orderBy(desc(marketingInviteRedemptions.redeemedAt))
+      .limit(1);
+
+    return result?.durationDays ?? null;
   }
 
   async findBillingEventByProviderEventId(providerEventId: string) {
