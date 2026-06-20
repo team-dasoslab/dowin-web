@@ -1295,6 +1295,8 @@ export interface BillingOverview {
    * @minimum 0
    */
   usedSeatCount: number;
+  /** @nullable */
+  promotionalDurationDays: number | null;
   canManageBilling: boolean;
 }
 
