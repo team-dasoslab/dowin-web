@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/team-dasoslab/dowin-web/compare/v1.7.0...v1.7.1) (2026-06-20)
+
+
+### Bug Fixes
+
+* 유저 친화적인 에러 및 안내 메시지로 다국어 문구 개선 ([bc408c8](https://github.com/team-dasoslab/dowin-web/commit/bc408c81dc7d52c313c3117ddb3821d420157867))
+
 ## [1.7.0](https://github.com/team-dasoslab/dowin-web/compare/v1.6.7...v1.7.0) (2026-06-20)
 
 
