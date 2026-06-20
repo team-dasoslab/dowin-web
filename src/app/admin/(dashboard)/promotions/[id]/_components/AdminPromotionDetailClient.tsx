@@ -152,6 +152,25 @@ export default function AdminPromotionDetailClient({ promotionId }: { promotionI
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-[11px] font-black text-text-muted block mb-1">
+                      코드 만료 일시
+                    </span>
+                    <span className="text-sm font-bold text-text-primary">
+                      {detailData.expiresAt ? new Date(detailData.expiresAt).toLocaleString() : "무제한"}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-black text-text-muted block mb-1">
+                      혜택 유지 기간
+                    </span>
+                    <span className="text-sm font-bold text-text-primary">
+                      {detailData.entitlementDurationDays ? `${detailData.entitlementDurationDays}일` : "영구"}
+                    </span>
+                  </div>
+                </div>
+
                 <div>
                   <span className="text-[11px] font-black text-text-muted block mb-1">
                     설명

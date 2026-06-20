@@ -127,6 +127,12 @@ export default function AdminPromotionsPageClient() {
                       Usage (Used / Max)
                     </th>
                     <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
+                      Code Expires At
+                    </th>
+                    <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
+                      Duration
+                    </th>
+                    <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase">
                       Status
                     </th>
                     <th className="px-6 py-4 text-[13px] font-black tracking-wider text-text-muted uppercase text-right">
@@ -169,6 +175,16 @@ export default function AdminPromotionsPageClient() {
                       <td className="px-6 py-4">
                         <span className="text-[14px] font-bold text-text-primary">
                           {code.usedCount} / {code.maxUses}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[13px] font-bold text-text-primary">
+                          {code.expiresAt ? new Date(code.expiresAt).toLocaleDateString() : "무제한"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-[13px] font-bold text-text-primary">
+                          {code.entitlementDurationDays ? `${code.entitlementDurationDays}일` : "영구"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
