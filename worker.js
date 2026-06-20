@@ -14,9 +14,6 @@ const worker = {
     return openNextWorker.fetch(request, env, ctx);
   },
   async scheduled(controller, env, ctx) {
-    console.log(
-      `Cron triggered: ${controller.cron}, Time: ${new Date().toISOString()}`,
-    );
     if (
       controller.cron === DAILY_REMINDER_CRON ||
       controller.cron === "0 * * * *"
