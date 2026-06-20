@@ -1,6 +1,6 @@
 {
   "name": "dowin",
-  "version": "1.6.7",
+  "version": "1.7.0",
   "private": true,
   "packageManager": "yarn@4.10.0",
   "scripts": {
@@ -18,6 +18,7 @@
     "test:ui": "vitest --ui",
     "test:storybook": "vitest --config vitest.storybook.config.mts",
     "test:checkin": "node --env-file=.env scripts/test-team-checkin.mjs",
+    "test:billing": "node --env-file=.env scripts/test-billing-revocation.mjs",
     "gen:api": "orval",
     "mig:local": "npx drizzle-kit generate && npx wrangler d1 migrations apply wig-db --local",
     "mig:remote": "drizzle-kit generate && wrangler d1 migrations apply wig-db --remote",

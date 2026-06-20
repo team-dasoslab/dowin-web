@@ -32,6 +32,8 @@ describe("MarketingInviteService", () => {
     entitlementSource: "BETA_PROMOTIONAL_GRANT",
     status: "ACTIVE",
     createdByAdminUserId: 1,
+    expiresAt: null,
+    entitlementDurationDays: null,
     createdAt: new Date("2026-06-01T00:00:00.000Z"),
     updatedAt: new Date("2026-06-01T00:00:00.000Z"),
   };
@@ -163,6 +165,17 @@ describe("MarketingInviteService", () => {
       await expect(
         service.redeemCode(123, { code: "BETA2026", workspaceName: "Team" }),
       ).rejects.toThrow("BETA_PROMOTION_CODE_USAGE_LIMIT_REACHED");
+    });
+
+    it("만료일이 지난 코드는 막는다", async () => {
+      mockStorage.findCodeByCode.mockResolvedValue({
+        ...activeCode,
+        expiresAt: new Date(Date.now() - 10000), // 과거 시간
+      });
+
+      await expect(
+        service.redeemCode(123, { code: "BETA2026", workspaceName: "Team" }),
+      ).rejects.toThrow("EXPIRED_INVITE_CODE");
     });
 
     it("같은 사용자가 같은 코드를 중복 사용할 수 없다", async () => {

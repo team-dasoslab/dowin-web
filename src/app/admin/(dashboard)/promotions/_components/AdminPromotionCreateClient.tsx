@@ -22,6 +22,8 @@ export default function AdminPromotionCreateClient() {
   const [description, setDescription] = useState("");
   const [maxUses, setMaxUses] = useState("10");
   const [grantedSeatCount, setGrantedSeatCount] = useState("10");
+  const [expiresAt, setExpiresAt] = useState("");
+  const [entitlementDurationDays, setEntitlementDurationDays] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +44,8 @@ export default function AdminPromotionCreateClient() {
           description: description || undefined,
           maxUses: maxUsesNum,
           grantedSeatCount: grantedSeatCountNum,
+          expiresAt: expiresAt ? new Date(expiresAt).toISOString() : undefined,
+          entitlementDurationDays: entitlementDurationDays ? parseInt(entitlementDurationDays, 10) : undefined,
         },
       });
 
@@ -145,6 +149,53 @@ export default function AdminPromotionCreateClient() {
                 className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                 required
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
+                코드 만료 일시 (선택)
+              </label>
+              <Input
+                type="datetime-local"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">
+                혜택 유지 기간 (일수, 선택)
+              </label>
+              <Input
+                type="number"
+                min={1}
+                value={entitlementDurationDays}
+                onChange={(e) => setEntitlementDurationDays(e.target.value)}
+                placeholder="예: 14 (제한 없음은 비워두세요)"
+                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary placeholder:text-zinc-400"
+              />
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {[
+                  { label: "1주", value: "7" },
+                  { label: "2주", value: "14" },
+                  { label: "1달", value: "30" },
+                  { label: "2달", value: "60" },
+                  { label: "1년", value: "365" },
+                  { label: "무제한", value: "" },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    onClick={() => setEntitlementDurationDays(preset.value)}
+                    className="px-2.5 py-1 text-[11px] font-bold bg-zinc-100 text-text-secondary hover:bg-zinc-200 rounded-[8px] transition-colors border border-transparent hover:border-zinc-300"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 

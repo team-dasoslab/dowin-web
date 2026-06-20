@@ -791,6 +791,8 @@ export const marketingInviteCodes = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),
+    expiresAt: integer("expires_at", { mode: "timestamp" }),
+    entitlementDurationDays: integer("entitlement_duration_days"),
   },
   (table) => [
     uniqueIndex("marketing_invite_codes_code_unique").on(table.code),

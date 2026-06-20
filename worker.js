@@ -1,5 +1,6 @@
 import { runDailyReminder } from "@/domain/notification/services/run-daily-reminder";
 import { runTeamCheckin } from "@/domain/team-checkin/services/run-team-checkin";
+import { runBillingRevocation } from "@/domain/billing/services/run-billing-revocation";
 import openNextWorker, {
   BucketCachePurge,
   DOQueueHandler,
@@ -13,9 +14,6 @@ const worker = {
     return openNextWorker.fetch(request, env, ctx);
   },
   async scheduled(controller, env, ctx) {
-    console.log(
-      `Cron triggered: ${controller.cron}, Time: ${new Date().toISOString()}`,
-    );
     if (
       controller.cron === DAILY_REMINDER_CRON ||
       controller.cron === "0 * * * *"
@@ -40,6 +38,20 @@ const worker = {
           )
           .catch((err) => console.error("Team checkin run failed:", err)),
       );
+
+      const currentUTCHour = new Date().getUTCHours();
+      if (currentUTCHour === 0 || currentUTCHour === 15) {
+        ctx.waitUntil(
+          runBillingRevocation(env)
+            .then((res) =>
+              console.log(
+                "Billing revocation run successfully:",
+                JSON.stringify(res),
+              ),
+            )
+            .catch((err) => console.error("Billing revocation run failed:", err)),
+        );
+      }
     }
   },
 };
