@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/team-dasoslab/dowin-web/compare/v1.6.7...v1.7.0) (2026-06-20)
+
+
+### Features
+
+* 프로모션 코드 기한 제한 ([#173](https://github.com/team-dasoslab/dowin-web/issues/173)) ([0be4af8](https://github.com/team-dasoslab/dowin-web/commit/0be4af8f49377a2a91a92f32e5f659663208b0e7))
+
 ## [1.6.7](https://github.com/team-dasoslab/dowin-web/compare/v1.6.6...v1.6.7) (2026-06-19)
 
 
