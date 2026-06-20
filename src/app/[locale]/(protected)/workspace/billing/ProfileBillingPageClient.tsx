@@ -214,7 +214,16 @@ export function ProfileBillingPageClient() {
                 size="14px"
                 className="mt-0.5 shrink-0"
               />
-              {t("betaPromotionalGrantNotice")}
+              {billing.promotionalDurationDays !== undefined && billing.promotionalDurationDays !== null
+                ? t("betaPromotionalGrantNoticeDynamic", {
+                    duration: billing.promotionalDurationDays === 7 ? t("promoDurationWeeks", { count: 1 }) :
+                              billing.promotionalDurationDays === 14 ? t("promoDurationWeeks", { count: 2 }) :
+                              billing.promotionalDurationDays === 30 ? t("promoDurationMonths", { count: 1 }) :
+                              billing.promotionalDurationDays === 60 ? t("promoDurationMonths", { count: 2 }) :
+                              billing.promotionalDurationDays === 365 ? t("promoDurationYears", { count: 1 }) :
+                              t("promoDurationDays", { count: billing.promotionalDurationDays })
+                  })
+                : t("betaPromotionalGrantNotice")}
             </div>
           ) : billing.entitlementSource && !isPolarEntitlement ? (
             <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-amber-500/10 px-4 py-3 text-[12px] font-medium leading-relaxed text-amber-500">
@@ -342,17 +351,39 @@ export function ProfileBillingPageClient() {
                   </div>
                 </>
               )}
-            <div className="flex items-center justify-between px-6 py-4">
-              <span className="text-[15px] font-medium text-text-secondary">
-                {t(getPeriodEndLabelKey(billing.billingStatus))}
-              </span>
-              <span className="text-[15px] font-bold text-text-primary">
-                {formatDateLabel(
-                  billing.currentPeriodEnd,
-                  t("notAvailable"),
-                  locale,
-                )}
-              </span>
+            <div className="flex flex-col px-6 py-4 gap-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[15px] font-medium text-text-secondary">
+                  {billing.entitlementSource === "BETA_PROMOTIONAL_GRANT"
+                    ? t("promotionProvidedPeriod")
+                    : t(getPeriodEndLabelKey(billing.billingStatus))}
+                </span>
+                <span className="text-[15px] font-bold text-text-primary text-right">
+                  {billing.entitlementSource === "BETA_PROMOTIONAL_GRANT"
+                    ? (
+                        billing.currentPeriodEnd 
+                          ? `${billing.promotionalDurationDays !== undefined && billing.promotionalDurationDays !== null ? `${formatDateLabel(
+                              new Date(new Date(billing.currentPeriodEnd).getTime() - billing.promotionalDurationDays * 24 * 60 * 60 * 1000).toISOString(),
+                              t("notAvailable"),
+                              locale
+                            )} ~ ` : ""}${formatDateLabel(
+                              billing.currentPeriodEnd,
+                              t("notAvailable"),
+                              locale
+                            )}`
+                          : t("promoDurationLifetime")
+                      )
+                    : (
+                        <span className="flex items-center justify-end gap-1.5">
+                          {formatDateLabel(
+                            billing.currentPeriodEnd,
+                            t("notAvailable"),
+                            locale,
+                          )}
+                        </span>
+                      )}
+                </span>
+              </div>
             </div>
           </div>
         </section>

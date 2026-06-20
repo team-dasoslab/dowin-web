@@ -61,6 +61,8 @@ export class MarketingInviteService {
       description?: string | null;
       maxUses: number;
       grantedSeatCount: number;
+      expiresAt?: Date | null;
+      entitlementDurationDays?: number | null;
     },
   ): Promise<MarketingInviteCodeDetail> {
     const created = await this.createCodeWithRetry({
@@ -69,6 +71,8 @@ export class MarketingInviteService {
       description: normalizeNullableText(input.description),
       maxUses: input.maxUses,
       grantedSeatCount: input.grantedSeatCount,
+      expiresAt: input.expiresAt ?? null,
+      entitlementDurationDays: input.entitlementDurationDays ?? null,
       createdByAdminUserId: adminUserId,
     });
 
@@ -83,6 +87,8 @@ export class MarketingInviteService {
         campaignName: created.campaignName,
         maxUses: created.maxUses,
         grantedSeatCount: created.grantedSeatCount,
+        expiresAt: created.expiresAt,
+        entitlementDurationDays: created.entitlementDurationDays,
       }),
     });
 
@@ -97,6 +103,8 @@ export class MarketingInviteService {
       description?: string | null;
       maxUses?: number;
       grantedSeatCount?: number;
+      expiresAt?: Date | null;
+      entitlementDurationDays?: number | null;
       status?: "ACTIVE" | "INACTIVE";
     },
   ): Promise<MarketingInviteCodeDetail> {
@@ -119,6 +127,10 @@ export class MarketingInviteService {
       ...(input.maxUses !== undefined ? { maxUses: input.maxUses } : {}),
       ...(input.grantedSeatCount !== undefined
         ? { grantedSeatCount: input.grantedSeatCount }
+        : {}),
+      ...(input.expiresAt !== undefined ? { expiresAt: input.expiresAt } : {}),
+      ...(input.entitlementDurationDays !== undefined
+        ? { entitlementDurationDays: input.entitlementDurationDays }
         : {}),
       ...(input.status !== undefined ? { status: input.status } : {}),
     });
@@ -192,6 +204,10 @@ export class MarketingInviteService {
       throw new ConflictError("BETA_PROMOTION_CODE_INACTIVE");
     }
 
+    if (code.expiresAt && code.expiresAt < new Date()) {
+      throw new ConflictError("EXPIRED_INVITE_CODE");
+    }
+
     if (code.usedCount >= code.maxUses) {
       throw new ConflictError("BETA_PROMOTION_CODE_USAGE_LIMIT_REACHED");
     }
@@ -215,6 +231,9 @@ export class MarketingInviteService {
       const latestCode = await this.storage.findCodeById(code.id);
       if (!latestCode || latestCode.status !== "ACTIVE") {
         throw new ConflictError("BETA_PROMOTION_CODE_INACTIVE");
+      }
+      if (latestCode.expiresAt && latestCode.expiresAt < new Date()) {
+        throw new ConflictError("EXPIRED_INVITE_CODE");
       }
       if (latestCode.usedCount >= latestCode.maxUses) {
         throw new ConflictError("BETA_PROMOTION_CODE_USAGE_LIMIT_REACHED");
@@ -247,6 +266,8 @@ export class MarketingInviteService {
     description: string | null;
     maxUses: number;
     grantedSeatCount: number;
+    expiresAt: Date | null;
+    entitlementDurationDays: number | null;
     createdByAdminUserId: number;
   }): Promise<MarketingInviteCode> {
     if (input.code) {
@@ -290,6 +311,8 @@ function snapshotInviteCode(code: MarketingInviteCode) {
     maxUses: code.maxUses,
     usedCount: code.usedCount,
     grantedSeatCount: code.grantedSeatCount,
+    expiresAt: code.expiresAt,
+    entitlementDurationDays: code.entitlementDurationDays,
     status: code.status,
   };
 }
