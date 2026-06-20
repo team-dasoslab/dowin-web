@@ -49,6 +49,7 @@ export type BillingOverview = {
   pendingSeatEffectiveAt: string | null;
   usedSeatCount: number;
   canManageBilling: boolean;
+  promotionalDurationDays?: number | null;
 };
 
 type BillingPort = Pick<
@@ -57,6 +58,7 @@ type BillingPort = Pick<
   | "findActiveProviderProduct"
   | "getRecentBillingRiskSummary"
   | "upsertWorkspaceSeatEntitlement"
+  | "findLatestPromotionalGrantDuration"
 >;
 
 type BillingRiskScope = {
@@ -128,7 +130,7 @@ export class BillingService {
     const billingState = await this.billingStorage.findWorkspaceBillingState(
       workspace.id,
     );
-    const [riskSummary, seatEntitlement, usedSeatCount, pendingSeatUpdate] =
+    const [riskSummary, seatEntitlement, usedSeatCount, pendingSeatUpdate, promotionalDurationDays] =
       await Promise.all([
       this.getBillingRiskSummary({
         workspaceId: workspace.id,
@@ -142,6 +144,9 @@ export class BillingService {
       this.workspaceStorage.findSeatEntitlement(workspace.id),
       this.workspaceStorage.countMembers(workspace.id),
       this.getPendingSeatUpdate(billingState),
+      billingState?.entitlementSource === "BETA_PROMOTIONAL_GRANT" 
+        ? this.billingStorage.findLatestPromotionalGrantDuration(workspace.id)
+        : null,
     ]);
 
     const purchasedSeatCount = this.getAuthoritativePurchasedSeatCount(
@@ -182,6 +187,7 @@ export class BillingService {
           : null,
       usedSeatCount,
       canManageBilling: membership?.role === "ADMIN",
+      promotionalDurationDays: promotionalDurationDays ?? null,
     };
   }
 
