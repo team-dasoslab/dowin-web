@@ -177,7 +177,7 @@ describe("ProfileBillingPageClient", () => {
     expect(
       screen.getByText("수동 검토가 필요한 결제 이력이 감지됐어요"),
     ).toBeInTheDocument();
-    expect(screen.getByText(/최근 30일 동안 환불 2건, 즉시 취소 1건/)).toBeInTheDocument();
+    expect(screen.getByText(/안전한 결제 환경을 위해 결제 내역 확인이 필요합니다/)).toBeInTheDocument();
   });
 
   it("handles checkout return query and exposes manual refresh", async () => {
