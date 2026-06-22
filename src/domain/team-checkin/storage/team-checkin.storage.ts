@@ -10,6 +10,7 @@ import {
   teamCheckinDeliveries,
   teamCheckinResponses,
   userNotificationSettings,
+  workspaceBillingState,
   users,
   workspaceMembers,
   workspaceTeamCheckinSettings,
@@ -116,16 +117,33 @@ export class TeamCheckinStorage {
         workspaces,
         eq(workspaceTeamCheckinSettings.workspaceId, workspaces.id),
       )
+      .innerJoin(
+        workspaceBillingState,
+        eq(
+          workspaceTeamCheckinSettings.workspaceId,
+          workspaceBillingState.workspaceId,
+        ),
+      )
       .where(
         workspaceId
           ? and(
               eq(workspaceTeamCheckinSettings.enabled, true),
               eq(workspaceTeamCheckinSettings.workspaceId, workspaceId),
               isNull(workspaces.deletedAt),
+              inArray(workspaceBillingState.planCode, ["BASIC", "STANDARD"]),
+              inArray(workspaceBillingState.billingStatus, [
+                "ACTIVE",
+                "CANCELED",
+              ]),
             )
           : and(
               eq(workspaceTeamCheckinSettings.enabled, true),
               isNull(workspaces.deletedAt),
+              inArray(workspaceBillingState.planCode, ["BASIC", "STANDARD"]),
+              inArray(workspaceBillingState.billingStatus, [
+                "ACTIVE",
+                "CANCELED",
+              ]),
             ),
       );
   }
