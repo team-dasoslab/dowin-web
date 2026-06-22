@@ -1,4 +1,9 @@
 import { ForbiddenError, ConflictError } from "@/lib/server/errors";
+import {
+  hasBasicOperationalEntitlement,
+  type BillingPlanCode,
+  type BillingStatus,
+} from "@/domain/billing/entitlement-policy";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
 
 type WorkspacePlanSummary = {
@@ -7,8 +12,8 @@ type WorkspacePlanSummary = {
 };
 
 type WorkspaceBillingState = {
-  planCode: "BASIC" | "FREE" | "STANDARD";
-  billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  planCode: BillingPlanCode;
+  billingStatus: BillingStatus;
   entitlementSource: NullableEntitlementSource;
 };
 
@@ -48,15 +53,7 @@ export async function getPlanMemberLimitFromStorage(
 export function hasActiveBasicEntitlement(
   billingState: WorkspaceBillingState | null,
 ) {
-  if (!billingState) return false;
-  if (billingState.planCode !== "BASIC" && billingState.planCode !== "STANDARD") {
-    return false;
-  }
-
-  return (
-    billingState.billingStatus === "ACTIVE" ||
-    billingState.billingStatus === "CANCELED"
-  );
+  return hasBasicOperationalEntitlement(billingState);
 }
 
 export class CapacityPolicy {
