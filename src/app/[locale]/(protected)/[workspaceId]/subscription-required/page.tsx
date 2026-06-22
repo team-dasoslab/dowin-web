@@ -10,7 +10,7 @@ import { Logo } from "@/components/ui/Logo";
 import { Link, useRouter } from "@/i18n/routing";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { hasWorkspaceOperationalAccess } from "@/lib/client/workspace-operational-access";
-import { CreditCard, Settings, Users } from "lucide-react";
+import { CreditCard, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
@@ -133,20 +133,7 @@ export default function SubscriptionRequiredPage() {
             )}
           </div>
 
-          {/* Allowed access notice */}
-          <div className="pt-8 border-t border-border">
-            <div className="flex items-start gap-4">
-              <Users className="mt-0.5 size-5 shrink-0 text-text-muted" />
-              <div className="space-y-1.5">
-                <p className="text-[15px] font-bold text-text-primary leading-none">
-                  {t("allowedTitle")}
-                </p>
-                <p className="text-[14px] leading-relaxed text-text-muted break-keep">
-                  {t("allowedDescription")}
-                </p>
-              </div>
-            </div>
-          </div>
+
         </Card>
       </div>
     </div>
