@@ -1,5 +1,9 @@
 import { getDb } from "@/db";
 import {
+  BASIC_OPERATIONAL_BILLING_STATUSES,
+  BASIC_OPERATIONAL_PLAN_CODES,
+} from "@/domain/billing/entitlement-policy";
+import {
   basicUsageEvents,
   dailyLogs,
   devicePushTokens,
@@ -130,19 +134,17 @@ export class TeamCheckinStorage {
               eq(workspaceTeamCheckinSettings.enabled, true),
               eq(workspaceTeamCheckinSettings.workspaceId, workspaceId),
               isNull(workspaces.deletedAt),
-              inArray(workspaceBillingState.planCode, ["BASIC", "STANDARD"]),
+              inArray(workspaceBillingState.planCode, BASIC_OPERATIONAL_PLAN_CODES),
               inArray(workspaceBillingState.billingStatus, [
-                "ACTIVE",
-                "CANCELED",
+                ...BASIC_OPERATIONAL_BILLING_STATUSES,
               ]),
             )
           : and(
               eq(workspaceTeamCheckinSettings.enabled, true),
               isNull(workspaces.deletedAt),
-              inArray(workspaceBillingState.planCode, ["BASIC", "STANDARD"]),
+              inArray(workspaceBillingState.planCode, BASIC_OPERATIONAL_PLAN_CODES),
               inArray(workspaceBillingState.billingStatus, [
-                "ACTIVE",
-                "CANCELED",
+                ...BASIC_OPERATIONAL_BILLING_STATUSES,
               ]),
             ),
       );
