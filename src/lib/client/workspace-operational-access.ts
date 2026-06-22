@@ -1,8 +1,11 @@
-type BillingStatus = "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-type PlanCode = "BASIC" | "FREE" | "STANDARD";
+import {
+  hasBasicOperationalEntitlement,
+  type BillingPlanCode,
+  type BillingStatus,
+} from "@/domain/billing/entitlement-policy";
 
 export type WorkspaceOperationalBilling = {
-  planCode: PlanCode;
+  planCode: BillingPlanCode;
   billingStatus: BillingStatus;
   requiresManualReview?: boolean;
 };
@@ -21,13 +24,8 @@ export function hasWorkspaceOperationalAccess(
 ) {
   if (!billing) return false;
   if (billing.requiresManualReview) return false;
-  if (billing.planCode !== "BASIC" && billing.planCode !== "STANDARD") {
-    return false;
-  }
 
-  return (
-    billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED"
-  );
+  return hasBasicOperationalEntitlement(billing);
 }
 
 export function isWorkspaceOperationalPath(
