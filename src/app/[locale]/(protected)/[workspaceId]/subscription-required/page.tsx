@@ -6,10 +6,11 @@ import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/b
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Logo } from "@/components/ui/Logo";
 import { Link, useRouter } from "@/i18n/routing";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { hasWorkspaceOperationalAccess } from "@/lib/client/workspace-operational-access";
-import { CreditCard, Settings, Users } from "lucide-react";
+import { CreditCard, Settings } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
@@ -52,26 +53,29 @@ export default function SubscriptionRequiredPage() {
   }, [billing, router, workspaceId]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[480px] space-y-4 animate-dowin-in">
-
-        {/* Main card */}
-        <Card className="divide-y divide-zinc-100 border-border bg-surface">
-          {/* Title + description */}
-          <div className="px-6 py-6 text-center">
-            <h1 className="text-lg font-black tracking-tight text-text-primary">
-              {canManageBilling ? t("adminTitle") : t("memberTitle")}
-            </h1>
-            <p className="mt-2 text-sm leading-6 text-text-muted">
-              {canManageBilling ? t("adminDescription") : t("memberDescription")}
-            </p>
+    <div className="flex min-h-screen items-center justify-center p-4 md:p-10 lg:p-12">
+      <div className="flex justify-center w-full">
+        <Card className="max-w-[480px] w-full bg-surface border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in text-left">
+          
+          <div className="space-y-5">
+            <Logo size="32px" className="text-text-primary" />
+            <div className="space-y-2">
+              <h1 className="text-[24px] font-black tracking-tight text-text-primary leading-none">
+                {canManageBilling ? t("adminTitle") : t("memberTitle")}
+              </h1>
+              <div className="text-[15px] font-medium text-text-muted tracking-tight break-keep pt-1">
+                {canManageBilling ? t("adminDescription") : t("memberDescription")}
+              </div>
+            </div>
           </div>
 
           {/* Actions */}
-          <div className="space-y-2.5 px-6 py-5">
+          <div className="space-y-3 pt-2">
             {canStartCheckout ? (
               <Button
-                className="w-full justify-center gap-2 rounded-button bg-primary py-3 text-sm font-black text-white transition-all"
+                variant="hero"
+                size="hero"
+                className="w-full"
                 disabled={isCheckoutPending}
                 onClick={() => {
                   void startBasicCheckout();
@@ -84,25 +88,27 @@ export default function SubscriptionRequiredPage() {
                   </>
                 ) : (
                   <>
-                    <CreditCard className="size-4" />
+                    <CreditCard className="size-5" />
                     {t("checkoutAction")}
                   </>
                 )}
               </Button>
-            ) : (
+            ) : canManageBilling ? (
               <Button
                 asChild
-                className="w-full justify-center gap-2 rounded-button bg-primary py-3 text-sm font-black text-white transition-all"
+                variant="hero"
+                size="hero"
+                className="w-full"
               >
                 <Link href={getWorkspacePath(workspaceId, "/workspace/billing")}>
-                  <CreditCard className="size-4" />
+                  <CreditCard className="size-5" />
                   {t("billingAction")}
                 </Link>
               </Button>
-            )}
+            ) : null}
             {canOpenPortal ? (
               <Button
-                className="w-full justify-center gap-2 rounded-button border border-border bg-surface py-3 text-sm font-black text-text-secondary transition-all"
+                className="h-[56px] w-full justify-center gap-3 rounded-[24px] border border-border bg-surface px-8 text-[16px] font-black text-text-secondary transition-all"
                 disabled={isPortalPending}
                 onClick={() => {
                   void openPortal();
@@ -111,14 +117,14 @@ export default function SubscriptionRequiredPage() {
                 {isPortalPending ? (
                   <InlineSpinner size="sm" />
                 ) : (
-                  <Settings className="size-4" />
+                  <Settings className="size-5" />
                 )}
                 {t("portalAction")}
               </Button>
             ) : (
               <Button
                 asChild
-                className="w-full justify-center gap-2 rounded-button border border-border bg-surface py-3 text-sm font-black text-text-secondary transition-all"
+                className="h-[56px] w-full justify-center gap-3 rounded-[24px] border border-border bg-surface px-8 text-[16px] font-black text-text-secondary transition-all"
               >
                 <Link href={getWorkspacePath(workspaceId, "/profile/contact")}>
                   {t("contactAction")}
@@ -127,20 +133,7 @@ export default function SubscriptionRequiredPage() {
             )}
           </div>
 
-          {/* Allowed access notice */}
-          <div className="px-6 py-4">
-            <div className="flex items-start gap-3 rounded-content bg-sub-background p-4">
-              <Users className="mt-0.5 size-4 shrink-0 text-text-muted" />
-              <div>
-                <p className="text-sm font-bold text-text-primary">
-                  {t("allowedTitle")}
-                </p>
-                <p className="mt-1 text-xs leading-5 text-text-muted">
-                  {t("allowedDescription")}
-                </p>
-              </div>
-            </div>
-          </div>
+
         </Card>
       </div>
     </div>

@@ -226,15 +226,15 @@ export default function WorkspaceSettingsPage() {
               id: "checkin-settings-master",
               icon: <Bot className="w-4 h-4" />,
               title: checkinT("enableServiceLedCheckin"),
-              rightElement: checkinSettings ? (
+              rightElement: (
                 <div onClick={(e) => e.stopPropagation()}>
                   <Switch 
-                    checked={checkinSettings.enabled} 
+                    checked={checkinSettings?.enabled ?? false} 
                     onCheckedChange={handleToggleCheckin} 
-                    disabled={updateSettings.isPending}
+                    disabled={!checkinSettings || updateSettings.isPending}
                   />
                 </div>
-              ) : undefined,
+              ),
             },
             ...(checkinSettings?.enabled
               ? [

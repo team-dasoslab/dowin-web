@@ -1,4 +1,5 @@
 import { NotFoundError } from "@/lib/server/errors";
+import { hasBasicOperationalEntitlement } from "@/domain/billing/entitlement-policy";
 import { type NullableEntitlementSource } from "@/domain/billing/types";
 
 type WorkspaceStoragePort = {
@@ -58,9 +59,10 @@ export async function requireWorkspaceAccess(
   const entitlementSource = billingState?.entitlementSource ?? null;
 
   // FREE/STANDARD는 과거 호환 코드값일 뿐이며, 제품 권한은 Basic entitlement 활성 여부로 해석한다.
-  const canAccessBasicSubscription =
-    (planCode === "BASIC" || planCode === "STANDARD") &&
-    (billingStatus === "ACTIVE" || billingStatus === "CANCELED");
+  const canAccessBasicSubscription = hasBasicOperationalEntitlement({
+    planCode,
+    billingStatus,
+  });
 
   return {
     workspaceId: workspace.id,

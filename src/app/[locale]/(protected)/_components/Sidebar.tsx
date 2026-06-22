@@ -61,6 +61,7 @@ export function Sidebar() {
     "/dashboard",
     "/workspace/settings",
     "/profile",
+    "/subscription-required",
   ];
 
   const normalizedPathname =
