@@ -113,7 +113,7 @@ describe("SubscriptionRequiredPage", () => {
     );
   });
 
-  it("shows billing and contact links for members who cannot manage billing", () => {
+  it("shows only the contact link for members who cannot manage billing", () => {
     mockBilling({
       billingStatus: "NONE",
       canManageBilling: false,
@@ -128,8 +128,8 @@ describe("SubscriptionRequiredPage", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("link", { name: /결제 상태 확인하기/ }),
-    ).toHaveAttribute("href", "/workspace-1/workspace/billing");
+      screen.queryByRole("link", { name: /결제 상태 확인하기/ }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "문의하기" })).toHaveAttribute(
       "href",
       "/workspace-1/profile/contact",
