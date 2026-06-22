@@ -93,7 +93,7 @@ export default function SubscriptionRequiredPage() {
                   </>
                 )}
               </Button>
-            ) : (
+            ) : canManageBilling ? (
               <Button
                 asChild
                 variant="hero"
@@ -105,7 +105,7 @@ export default function SubscriptionRequiredPage() {
                   {t("billingAction")}
                 </Link>
               </Button>
-            )}
+            ) : null}
             {canOpenPortal ? (
               <Button
                 className="h-[56px] w-full justify-center gap-3 rounded-[24px] border border-border bg-surface px-8 text-[16px] font-black text-text-secondary transition-all"
