@@ -29,7 +29,7 @@ describe("runBillingRevocation", () => {
     expect(mockDb.batch).not.toHaveBeenCalled();
   });
 
-  it("과거에 만료된 워크스페이스의 권한을 강등하고 일괄 처리(batch)를 호출한다", async () => {
+  it("과거에 만료된 활성 또는 해지 예정 워크스페이스의 권한을 강등하고 일괄 처리(batch)를 호출한다", async () => {
     mockDb.where.mockResolvedValue([
       { workspaceId: 101 },
       { workspaceId: 202 },

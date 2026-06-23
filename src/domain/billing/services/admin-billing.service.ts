@@ -546,7 +546,7 @@ function isExpiredManualEntitlement(input: {
   now: Date;
 }) {
   return (
-    input.billingStatus === "ACTIVE" &&
+    (input.billingStatus === "ACTIVE" || input.billingStatus === "CANCELED") &&
     MANUAL_EXPIRABLE_ENTITLEMENT_SOURCES.includes(input.entitlementSource) &&
     input.currentPeriodEnd !== null &&
     input.currentPeriodEnd < input.now

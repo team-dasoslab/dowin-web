@@ -424,7 +424,7 @@ describe("AdminBillingService", () => {
     vi.useRealTimers();
   });
 
-  it("전체 sync는 과거 종료일의 수동 권한을 만료 상태로 보정한다", async () => {
+  it("전체 sync는 과거 종료일의 활성 또는 해지 예정 수동 권한을 만료 상태로 보정한다", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-23T12:00:00.000Z"));
 
@@ -433,7 +433,7 @@ describe("AdminBillingService", () => {
         workspaceId: 3,
         workspaceName: "Dowin",
         planCode: "BASIC",
-        billingStatus: "ACTIVE",
+        billingStatus: "CANCELED",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
         currentPeriodEnd: new Date("2026-06-22T00:00:00.000Z"),
@@ -470,7 +470,7 @@ describe("AdminBillingService", () => {
         workspaceId: 3,
         workspaceName: "Dowin",
         planCode: "BASIC",
-        billingStatus: "ACTIVE",
+        billingStatus: "CANCELED",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
         currentPeriodEnd: new Date("2026-06-22T00:00:00.000Z"),
