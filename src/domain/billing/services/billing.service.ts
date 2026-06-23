@@ -391,10 +391,6 @@ export class BillingService {
       throw new ConflictError("BILLING_NOT_READY");
     }
 
-    if (billingState && billingState.entitlementSource !== "POLAR") {
-      throw new ConflictError("BILLING_NOT_READY");
-    }
-
     if (!this.polarClient) {
       throw new ConflictError("BILLING_NOT_READY");
     }
@@ -435,6 +431,19 @@ export class BillingService {
       });
     } catch (error) {
       if (isPolarRecoverableError(error)) {
+        const polarError = getPolarApiErrorInfo(error);
+        console.error("[billing.checkout] Polar checkout request failed", {
+          workspaceUid: input.workspaceUid,
+          workspaceId: workspace.id,
+          userId: input.userId,
+          billingStatus,
+          entitlementSource: billingState?.entitlementSource ?? null,
+          hasBillingCustomerExternalRef: Boolean(
+            workspace.billingCustomerExternalRef,
+          ),
+          polarStatus: polarError?.status ?? null,
+          polarBody: polarError ? truncateForLog(polarError.body) : null,
+        });
         throw new ConflictError("BILLING_NOT_READY");
       }
 
