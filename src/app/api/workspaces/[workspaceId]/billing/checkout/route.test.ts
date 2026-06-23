@@ -90,7 +90,10 @@ describe("POST /api/workspaces/[workspaceId]/billing/checkout", () => {
       new Request("http://localhost", {
         method: "POST",
         headers: { "Idempotency-Key": "idem_1" },
-        body: JSON.stringify({ seatCount: 3 }),
+        body: JSON.stringify({
+          seatCount: 3,
+          returnTo: "/ko/ws_uid/dashboard/my?view=week",
+        }),
       }),
       { params: Promise.resolve({ workspaceId: "ws_uid" }) },
     );
@@ -110,6 +113,7 @@ describe("POST /api/workspaces/[workspaceId]/billing/checkout", () => {
       seatCount: 3,
       locale: "ko",
       idempotencyKey: "idem_1",
+      returnPath: "/ko/ws_uid/dashboard/my?view=week",
     });
   });
 

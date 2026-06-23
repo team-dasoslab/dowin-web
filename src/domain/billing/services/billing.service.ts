@@ -355,6 +355,7 @@ export class BillingService {
     seatCount?: number;
     locale: "ko" | "en";
     idempotencyKey: string;
+    returnPath?: string;
   }): Promise<{ checkoutUrl: string; checkoutId: string | null }> {
     const { workspace, membership } = await this.getWorkspace(
       input.workspaceUid,
@@ -420,6 +421,7 @@ export class BillingService {
         minSeats: minSeatCount,
         maxSeats: BASIC_CHECKOUT_MAX_SEATS,
         successPath: "/billing/polar/success",
+        returnPath: input.returnPath,
         metadata: {
           flow: "workspace_resubscribe",
           workspaceId: String(workspace.id),

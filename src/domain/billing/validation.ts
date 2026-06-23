@@ -14,6 +14,16 @@ export const workspaceBillingCheckoutSchema = z.object({
     .min(1, "좌석 수는 1 이상이어야 합니다.")
     .max(999, "좌석 수는 999 이하여야 합니다.")
     .optional(),
+  returnTo: z
+    .string()
+    .trim()
+    .min(1)
+    .max(1000)
+    .refine(
+      (value) => value.startsWith("/") && !value.startsWith("//"),
+      "returnTo는 내부 경로여야 합니다.",
+    )
+    .optional(),
 });
 
 export const workspaceBillingSeatUpdateSchema = z.object({
