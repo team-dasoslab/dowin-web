@@ -3,14 +3,18 @@
 import { useState } from "react";
 import {
   useGetAdminBillingWorkspaces,
+  usePostAdminBillingWorkspacesSyncStatus,
 } from "@/api/generated/admin-billing/admin-billing";
 import { InlineSpinner } from "@/components/InlineSpinner";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 import { AdminBillingWorkspaceSummary } from "@/api/generated/dowin.schemas";
 
 export default function AdminBillingPageClient() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [workspaceId, setWorkspaceId] = useState<string>("");
   const [workspaceName, setWorkspaceName] = useState<string>("");
 
@@ -18,10 +22,11 @@ export default function AdminBillingPageClient() {
   const [filterPlan, setFilterPlan] = useState<string>("ALL");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
 
-  const { data: listData, isLoading: isListLoading } = useGetAdminBillingWorkspaces({
+  const { data: listData, isLoading: isListLoading, refetch } = useGetAdminBillingWorkspaces({
     workspaceId: workspaceId ? Number(workspaceId) : undefined,
     workspaceName: workspaceName || undefined,
   });
+  const syncStatusMutation = usePostAdminBillingWorkspacesSyncStatus();
 
   const workspaces: AdminBillingWorkspaceSummary[] = Array.isArray(listData?.data)
     ? (listData.data as AdminBillingWorkspaceSummary[])
@@ -33,15 +38,51 @@ export default function AdminBillingPageClient() {
     return true;
   });
 
+  const handleSyncAllStatuses = async () => {
+    try {
+      const response = await syncStatusMutation.mutateAsync();
+
+      if (response.status === 200) {
+        showToast(
+          "success",
+          `현재 기준으로 ${response.data.syncedCount}개 워크스페이스의 billing 상태를 동기화했습니다.`,
+        );
+        refetch();
+      } else {
+        showToast("error", "billing 상태 전체 동기화에 실패했습니다.");
+      }
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      showToast(
+        "error",
+        error?.response?.data?.message || error?.message || "billing 상태 전체 동기화에 실패했습니다."
+      );
+    }
+  };
+
   return (
     <div className="space-y-8 animate-dowin-in">
-      <div className="space-y-1.5">
-        <h1 className="text-[28px] font-black tracking-tighter text-text-primary leading-tight">
-          결제 지원 센터
-        </h1>
-        <p className="text-[14px] font-bold text-text-secondary">
-          워크스페이스의 결제 정보와 활성화 상태를 확인하고 보정할 수 있습니다.
-        </p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-1.5">
+          <h1 className="text-[28px] font-black tracking-tighter text-text-primary leading-tight">
+            결제 지원 센터
+          </h1>
+          <p className="text-[14px] font-bold text-text-secondary">
+            워크스페이스의 결제 정보와 활성화 상태를 확인하고 보정할 수 있습니다.
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={handleSyncAllStatuses}
+          disabled={syncStatusMutation.isPending}
+          className="h-11 shrink-0 rounded-[14px] bg-text-primary px-5 text-[13px] font-black text-white transition-all"
+        >
+          {syncStatusMutation.isPending ? (
+            <InlineSpinner />
+          ) : (
+            <span>전체 상태 동기화</span>
+          )}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

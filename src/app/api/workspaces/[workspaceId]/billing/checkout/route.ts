@@ -69,6 +69,7 @@ export const POST = withErrorHandler(
       seatCount: body.data.seatCount,
       locale,
       idempotencyKey: headers.data.idempotencyKey,
+      returnPath: body.data.returnTo,
     });
 
     return apiSuccess(result, 201);

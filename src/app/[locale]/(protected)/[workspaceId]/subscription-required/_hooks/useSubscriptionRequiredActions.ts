@@ -22,7 +22,9 @@ export const useSubscriptionRequiredActions = (workspaceId: string) => {
     try {
       const response = await postWorkspacesWorkspaceIdBillingCheckout(
         workspaceId,
-        {},
+        {
+          returnTo: `${window.location.pathname}${window.location.search}`,
+        },
         {
           headers: {
             "Idempotency-Key": createBillingCheckoutIdempotencyKey(),

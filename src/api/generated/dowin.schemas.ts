@@ -470,6 +470,12 @@ export interface AdminBillingWorkspaceSummary {
   purchasedSeatCount: number | null;
 }
 
+export interface AdminBillingStatusSyncResult {
+  /** @minimum 0 */
+  syncedCount: number;
+  workspaceIds: number[];
+}
+
 export type AdminBillingProviderProductProvider = typeof AdminBillingProviderProductProvider[keyof typeof AdminBillingProviderProductProvider];
 
 
@@ -1135,6 +1141,12 @@ export interface WorkspaceBillingCheckoutRequest {
    * @maximum 999
    */
   seatCount?: number;
+  /**
+   * Polar checkout 성공 또는 복귀 후 돌아갈 내부 경로
+   * @minLength 1
+   * @maxLength 1000
+   */
+  returnTo?: string;
 }
 
 export interface WorkspaceBillingCheckoutResponse {
