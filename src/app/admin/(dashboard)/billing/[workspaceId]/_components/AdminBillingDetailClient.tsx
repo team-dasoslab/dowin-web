@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import {
   useGetAdminBillingWorkspacesWorkspaceId,
   usePostAdminBillingWorkspacesWorkspaceIdManualOverride,
-  usePostAdminBillingWorkspacesWorkspaceIdSyncStatus,
 } from "@/api/generated/admin-billing/admin-billing";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
@@ -59,8 +58,6 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
   );
 
   const overrideMutation = usePostAdminBillingWorkspacesWorkspaceIdManualOverride();
-  const syncStatusMutation = usePostAdminBillingWorkspacesWorkspaceIdSyncStatus();
-
   const detail = detailData?.data as AdminBillingWorkspaceSummary | undefined;
 
   useEffect(() => {
@@ -116,25 +113,6 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
     }
   };
 
-  const handleSyncStatus = async () => {
-    try {
-      const response = await syncStatusMutation.mutateAsync({ workspaceId });
-
-      if (response.status === 200) {
-        showToast("success", "현재 기준으로 billing 상태를 동기화했습니다.");
-        refetch();
-      } else {
-        showToast("error", "billing 상태 동기화에 실패했습니다.");
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      showToast(
-        "error",
-        error?.response?.data?.message || error?.message || "billing 상태 동기화에 실패했습니다."
-      );
-    }
-  };
-
   const availableStatuses =
     editPlanCode === "BASIC" || editPlanCode === "STANDARD"
       ? STANDARD_BILLING_STATUSES
@@ -161,7 +139,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
           </div>
         ) : (
           <div className="space-y-5">
-            <div className="grid grid-cols-1 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none sm:grid-cols-[1fr_1fr_auto]">
+            <div className="grid grid-cols-2 gap-4 bg-zinc-50 p-5 rounded-[24px] border-none">
               <div>
                 <span className="text-xs font-bold tracking-tight text-text-muted block mb-1">
                   워크스페이스 명
@@ -177,20 +155,6 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                 <span className="text-sm font-bold text-text-primary">
                   {detail.planCode}
                 </span>
-              </div>
-              <div className="flex items-end sm:justify-end">
-                <Button
-                  type="button"
-                  onClick={handleSyncStatus}
-                  disabled={syncStatusMutation.isPending}
-                  className="h-10 rounded-[12px] bg-sub-background px-4 text-xs font-black text-text-secondary hover:bg-border transition-colors"
-                >
-                  {syncStatusMutation.isPending ? (
-                    <InlineSpinner />
-                  ) : (
-                    <span>현재 상태 동기화</span>
-                  )}
-                </Button>
               </div>
             </div>
 
@@ -412,7 +376,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                 <Button
                   type="button"
                   onClick={handleSaveOverride}
-                  disabled={overrideMutation.isPending || syncStatusMutation.isPending}
+                  disabled={overrideMutation.isPending}
                   className="px-8 py-3.5 bg-text-primary text-white font-black text-[14px] rounded-button transition-all flex items-center justify-center gap-2"
                 >
                   {overrideMutation.isPending ? (

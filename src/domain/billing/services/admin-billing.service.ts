@@ -85,6 +85,11 @@ export type AdminBillingProviderProduct = {
   updatedAt: string;
 };
 
+export type AdminBillingStatusSyncResult = {
+  syncedCount: number;
+  workspaceIds: number[];
+};
+
 type BillingWorkspaceSearchResult = Awaited<
   ReturnType<BillingStorage["searchAdminBillingWorkspaces"]>
 >[number];
@@ -183,9 +188,38 @@ export class AdminBillingService {
     };
   }
 
-  async syncWorkspaceBillingStatus(
+  async syncAllWorkspaceBillingStatuses(
+    adminUserId: number,
+  ): Promise<AdminBillingStatusSyncResult> {
+    const workspaces = await this.billingStorage.searchAdminBillingWorkspaces();
+    const now = new Date();
+    const expiredWorkspaces = workspaces.filter((workspace) =>
+      isExpiredManualEntitlement({
+        billingStatus: workspace.billingStatus,
+        entitlementSource: workspace.entitlementSource ?? null,
+        currentPeriodEnd: workspace.currentPeriodEnd ?? null,
+        now,
+      }),
+    );
+
+    for (const workspace of expiredWorkspaces) {
+      await this.syncWorkspaceBillingStatus(
+        adminUserId,
+        workspace.workspaceId,
+        now,
+      );
+    }
+
+    return {
+      syncedCount: expiredWorkspaces.length,
+      workspaceIds: expiredWorkspaces.map((workspace) => workspace.workspaceId),
+    };
+  }
+
+  private async syncWorkspaceBillingStatus(
     adminUserId: number,
     workspaceId: number,
+    occurredAt = new Date(),
   ): Promise<AdminBillingWorkspaceDetail> {
     const existing =
       await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
@@ -194,7 +228,6 @@ export class AdminBillingService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const occurredAt = new Date();
     const shouldExpireImmediately = isExpiredManualEntitlement({
       billingStatus: existing.billingStatus,
       entitlementSource: existing.entitlementSource ?? null,

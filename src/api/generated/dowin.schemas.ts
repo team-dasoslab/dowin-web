@@ -470,6 +470,12 @@ export interface AdminBillingWorkspaceSummary {
   purchasedSeatCount: number | null;
 }
 
+export interface AdminBillingStatusSyncResult {
+  /** @minimum 0 */
+  syncedCount: number;
+  workspaceIds: number[];
+}
+
 export type AdminBillingProviderProductProvider = typeof AdminBillingProviderProductProvider[keyof typeof AdminBillingProviderProductProvider];
 
 

@@ -4,7 +4,7 @@ const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockRequireAdminSession = vi.fn();
 const mockRequireAdminRole = vi.fn();
-const mockSyncWorkspaceBillingStatus = vi.fn();
+const mockSyncAllWorkspaceBillingStatuses = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
   getCloudflareContext: mockGetCloudflareContext,
@@ -30,12 +30,12 @@ vi.mock("@/domain/audit/storage/audit-log.storage", () => ({
 vi.mock("@/domain/billing/services/admin-billing.service", () => ({
   AdminBillingService: vi.fn(function MockAdminBillingService() {
     return {
-      syncWorkspaceBillingStatus: mockSyncWorkspaceBillingStatus,
+      syncAllWorkspaceBillingStatuses: mockSyncAllWorkspaceBillingStatuses,
     };
   }),
 }));
 
-describe("POST /api/admin/billing/workspaces/[workspaceId]/sync-status", () => {
+describe("POST /api/admin/billing/workspaces/sync-status", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
@@ -44,24 +44,21 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/sync-status", () => {
     mockRequireAdminRole.mockResolvedValue({ role: "SYSTEM_ADMIN" });
   });
 
-  it("system admin이 billing 상태 단건 동기화를 실행한다", async () => {
-    mockSyncWorkspaceBillingStatus.mockResolvedValue({
-      workspaceId: 3,
-      workspaceName: "Dowin",
-      planCode: "FREE",
-      billingStatus: "EXPIRED",
-      entitlementSource: "MANUAL_GRANT",
-      events: [],
+  it("system admin이 billing 상태 전체 동기화를 실행한다", async () => {
+    mockSyncAllWorkspaceBillingStatuses.mockResolvedValue({
+      syncedCount: 2,
+      workspaceIds: [3, 4],
     });
 
     const { POST } = await import("./route");
-    const response = await POST(new Request("https://example.com"), {
-      params: Promise.resolve({ workspaceId: "3" }),
-    });
-    const body = (await response.json()) as { workspaceId: number };
+    const response = await POST();
+    const body = (await response.json()) as {
+      syncedCount: number;
+      workspaceIds: number[];
+    };
 
     expect(response.status).toBe(200);
-    expect(body.workspaceId).toBe(3);
-    expect(mockSyncWorkspaceBillingStatus).toHaveBeenCalledWith(1, 3);
+    expect(body).toEqual({ syncedCount: 2, workspaceIds: [3, 4] });
+    expect(mockSyncAllWorkspaceBillingStatuses).toHaveBeenCalledWith(1);
   });
 });

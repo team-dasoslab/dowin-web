@@ -424,10 +424,46 @@ describe("AdminBillingService", () => {
     vi.useRealTimers();
   });
 
-  it("단건 sync는 과거 종료일의 수동 권한을 만료 상태로 보정한다", async () => {
+  it("전체 sync는 과거 종료일의 수동 권한을 만료 상태로 보정한다", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-23T12:00:00.000Z"));
 
+    const searchAdminBillingWorkspaces = vi.fn().mockResolvedValue([
+      {
+        workspaceId: 3,
+        workspaceName: "Dowin",
+        planCode: "BASIC",
+        billingStatus: "ACTIVE",
+        entitlementSource: "MANUAL_GRANT",
+        provider: null,
+        currentPeriodEnd: new Date("2026-06-22T00:00:00.000Z"),
+        cancelAtPeriodEnd: false,
+        billingOwnerUserId: null,
+        customerKey: null,
+        subscriptionKey: null,
+        billingCustomerExternalRef: "workspace:3",
+        lastEventOccurredAt: null,
+        updatedAt: null,
+        purchasedSeatCount: 5,
+      },
+      {
+        workspaceId: 4,
+        workspaceName: "Future",
+        planCode: "BASIC",
+        billingStatus: "ACTIVE",
+        entitlementSource: "MANUAL_GRANT",
+        provider: null,
+        currentPeriodEnd: new Date("2026-07-01T00:00:00.000Z"),
+        cancelAtPeriodEnd: false,
+        billingOwnerUserId: null,
+        customerKey: null,
+        subscriptionKey: null,
+        billingCustomerExternalRef: "workspace:4",
+        lastEventOccurredAt: null,
+        updatedAt: null,
+        purchasedSeatCount: 5,
+      },
+    ]);
     const findWorkspaceBillingAdminDetail = vi
       .fn()
       .mockResolvedValueOnce({
@@ -472,7 +508,7 @@ describe("AdminBillingService", () => {
       {
         listProviderProducts: vi.fn(),
         upsertProviderProduct: vi.fn(),
-        searchAdminBillingWorkspaces: vi.fn(),
+        searchAdminBillingWorkspaces,
         findWorkspaceBillingAdminDetail,
         listBillingEventsForWorkspace: vi.fn().mockResolvedValue([]),
         getRecentBillingRiskSummaries: vi.fn().mockResolvedValue(new Map()),
@@ -485,7 +521,7 @@ describe("AdminBillingService", () => {
       { create: createAuditLog },
     );
 
-    const result = await service.syncWorkspaceBillingStatus(1, 3);
+    const result = await service.syncAllWorkspaceBillingStatuses(1);
 
     expect(appendBillingEvent).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -513,39 +549,36 @@ describe("AdminBillingService", () => {
         actionType: "UPDATE",
       }),
     );
-    expect(result).toEqual(
-      expect.objectContaining({
-        planCode: "FREE",
-        billingStatus: "EXPIRED",
-      }),
-    );
+    expect(result).toEqual({ syncedCount: 1, workspaceIds: [3] });
     vi.useRealTimers();
   });
 
-  it("단건 sync는 이미 현재 상태와 맞는 워크스페이스에 이벤트를 남기지 않는다", async () => {
-    const findWorkspaceBillingAdminDetail = vi.fn().mockResolvedValue({
-      workspaceId: 3,
-      workspaceName: "Dowin",
-      planCode: "BASIC",
-      billingStatus: "ACTIVE",
-      entitlementSource: "MANUAL_GRANT",
-      provider: null,
-      currentPeriodEnd: new Date("2026-07-01T00:00:00.000Z"),
-      cancelAtPeriodEnd: false,
-      billingOwnerUserId: null,
-      customerKey: null,
-      subscriptionKey: null,
-      billingCustomerExternalRef: "workspace:3",
-      lastEventOccurredAt: null,
-      updatedAt: null,
-      purchasedSeatCount: 5,
-    });
+  it("전체 sync는 이미 현재 상태와 맞는 워크스페이스에 이벤트를 남기지 않는다", async () => {
+    const findWorkspaceBillingAdminDetail = vi.fn();
     const appendBillingEvent = vi.fn();
     const service = new AdminBillingService(
       {
         listProviderProducts: vi.fn(),
         upsertProviderProduct: vi.fn(),
-        searchAdminBillingWorkspaces: vi.fn(),
+        searchAdminBillingWorkspaces: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 3,
+            workspaceName: "Dowin",
+            planCode: "BASIC",
+            billingStatus: "ACTIVE",
+            entitlementSource: "MANUAL_GRANT",
+            provider: null,
+            currentPeriodEnd: new Date("2026-07-01T00:00:00.000Z"),
+            cancelAtPeriodEnd: false,
+            billingOwnerUserId: null,
+            customerKey: null,
+            subscriptionKey: null,
+            billingCustomerExternalRef: "workspace:3",
+            lastEventOccurredAt: null,
+            updatedAt: null,
+            purchasedSeatCount: 5,
+          },
+        ]),
         findWorkspaceBillingAdminDetail,
         listBillingEventsForWorkspace: vi.fn().mockResolvedValue([]),
         getRecentBillingRiskSummaries: vi.fn().mockResolvedValue(new Map()),
@@ -558,9 +591,11 @@ describe("AdminBillingService", () => {
       { create: vi.fn() },
     );
 
-    await service.syncWorkspaceBillingStatus(1, 3);
+    const result = await service.syncAllWorkspaceBillingStatuses(1);
 
+    expect(result).toEqual({ syncedCount: 0, workspaceIds: [] });
     expect(appendBillingEvent).not.toHaveBeenCalled();
+    expect(findWorkspaceBillingAdminDetail).not.toHaveBeenCalled();
   });
 
   it("BASIC 수동 보정 seat가 현재 멤버 수보다 작으면 현재 멤버 수로 보정한다", async () => {
