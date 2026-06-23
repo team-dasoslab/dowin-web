@@ -103,6 +103,7 @@ export type PolarBillingClient = {
     successPath?:
       | "/billing/polar/success"
       | "/workspace/checkout/success";
+    returnPath?: string;
     workspaceCheckoutId?: string;
   }): Promise<{ checkoutUrl: string; checkoutId: string | null }>;
   createCustomerSession(
@@ -187,6 +188,7 @@ function buildCheckoutCallbackUrl({
   locale,
   billing,
   workspaceCheckoutId,
+  returnPath,
 }: {
   appBaseUrl: string;
   path:
@@ -196,6 +198,7 @@ function buildCheckoutCallbackUrl({
   locale: "ko" | "en";
   billing?: "success";
   workspaceCheckoutId?: string;
+  returnPath?: string;
 }) {
   const url = new URL(`${appBaseUrl}${path}`);
   url.searchParams.set("locale", locale);
@@ -206,6 +209,10 @@ function buildCheckoutCallbackUrl({
 
   if (workspaceCheckoutId) {
     url.searchParams.set("workspace_checkout_id", workspaceCheckoutId);
+  }
+
+  if (returnPath) {
+    url.searchParams.set("return_path", returnPath);
   }
 
   if (path !== "/billing/polar/return") {
@@ -274,6 +281,7 @@ export function createPolarBillingClient(
       minSeats,
       maxSeats,
       successPath = "/billing/polar/success",
+      returnPath,
       workspaceCheckoutId,
     }) {
       const response = await fetch(`${apiBaseUrl}/checkouts`, {
@@ -296,11 +304,13 @@ export function createPolarBillingClient(
             billing:
               successPath === "/billing/polar/success" ? "success" : undefined,
             workspaceCheckoutId,
+            returnPath,
           }),
           return_url: buildCheckoutCallbackUrl({
             appBaseUrl,
             path: "/billing/polar/return",
             locale,
+            returnPath,
           }),
           metadata,
         }),

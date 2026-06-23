@@ -29,7 +29,7 @@ describe("runBillingRevocation", () => {
     expect(mockDb.batch).not.toHaveBeenCalled();
   });
 
-  it("과거에 만료된 워크스페이스의 권한을 강등하고 일괄 처리(batch)를 호출한다", async () => {
+  it("과거에 만료된 활성 또는 해지 예정 워크스페이스의 권한을 강등하고 일괄 처리(batch)를 호출한다", async () => {
     mockDb.where.mockResolvedValue([
       { workspaceId: 101 },
       { workspaceId: 202 },
@@ -41,6 +41,11 @@ describe("runBillingRevocation", () => {
     
     // update를 4번(workspace 2개 * 테이블 2개) 호출했는지 확인
     expect(mockDb.update).toHaveBeenCalledTimes(4);
+    expect(mockDb.set).toHaveBeenCalledWith({
+      billingStatus: "EXPIRED",
+      planCode: "FREE",
+    });
+    expect(mockDb.set).toHaveBeenCalledWith({ planCode: "FREE" });
     
     // batch가 한 번 호출되었는지 확인
     expect(mockDb.batch).toHaveBeenCalledTimes(1);

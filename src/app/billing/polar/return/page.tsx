@@ -8,6 +8,7 @@ export default async function PolarBillingReturnPage({
   searchParams: Promise<{
     locale?: string;
     checkout_id?: string;
+    return_path?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -18,6 +19,7 @@ export default async function PolarBillingReturnPage({
       locale: params.locale,
       acceptLanguage: headerList.get("accept-language"),
       checkoutId: params.checkout_id,
+      returnPath: params.return_path,
     }),
   );
 }

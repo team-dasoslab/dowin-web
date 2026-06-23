@@ -58,7 +58,6 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
   );
 
   const overrideMutation = usePostAdminBillingWorkspacesWorkspaceIdManualOverride();
-
   const detail = detailData?.data as AdminBillingWorkspaceSummary | undefined;
 
   useEffect(() => {
