@@ -624,4 +624,102 @@ export const usePostAdminBillingWorkspacesWorkspaceIdManualOverride = <TError = 
       > => {
       return useMutation(getPostAdminBillingWorkspacesWorkspaceIdManualOverrideMutationOptions(options), queryClient);
     }
+    /**
+ * @summary 운영자 billing 상태 단건 동기화
+ */
+export type postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse200 = {
+  data: AdminBillingWorkspaceDetail
+  status: 200
+}
+
+export type postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postAdminBillingWorkspacesWorkspaceIdSyncStatusResponseSuccess = (postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse200) & {
+  headers: Headers;
+};
+export type postAdminBillingWorkspacesWorkspaceIdSyncStatusResponseError = (postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse401 | postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse403 | postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse404) & {
+  headers: Headers;
+};
+
+export type postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse = (postAdminBillingWorkspacesWorkspaceIdSyncStatusResponseSuccess | postAdminBillingWorkspacesWorkspaceIdSyncStatusResponseError)
+
+export const getPostAdminBillingWorkspacesWorkspaceIdSyncStatusUrl = (workspaceId: number,) => {
+
+
+  
+
+  return `/api/admin/billing/workspaces/${workspaceId}/sync-status`
+}
+
+export const postAdminBillingWorkspacesWorkspaceIdSyncStatus = async (workspaceId: number, options?: RequestInit): Promise<postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse> => {
+  
+  return customInstance<postAdminBillingWorkspacesWorkspaceIdSyncStatusResponse>(getPostAdminBillingWorkspacesWorkspaceIdSyncStatusUrl(workspaceId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+  
+
+
+
+export const getPostAdminBillingWorkspacesWorkspaceIdSyncStatusMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdSyncStatus>>, TError,{workspaceId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdSyncStatus>>, TError,{workspaceId: number}, TContext> => {
+
+const mutationKey = ['postAdminBillingWorkspacesWorkspaceIdSyncStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdSyncStatus>>, {workspaceId: number}> = (props) => {
+          const {workspaceId} = props ?? {};
+
+          return  postAdminBillingWorkspacesWorkspaceIdSyncStatus(workspaceId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAdminBillingWorkspacesWorkspaceIdSyncStatusMutationResult = NonNullable<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdSyncStatus>>>
+    
+    export type PostAdminBillingWorkspacesWorkspaceIdSyncStatusMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 운영자 billing 상태 단건 동기화
+ */
+export const usePostAdminBillingWorkspacesWorkspaceIdSyncStatus = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdSyncStatus>>, TError,{workspaceId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAdminBillingWorkspacesWorkspaceIdSyncStatus>>,
+        TError,
+        {workspaceId: number},
+        TContext
+      > => {
+      return useMutation(getPostAdminBillingWorkspacesWorkspaceIdSyncStatusMutationOptions(options), queryClient);
+    }
     

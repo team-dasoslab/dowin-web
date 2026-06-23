@@ -41,6 +41,11 @@ describe("runBillingRevocation", () => {
     
     // update를 4번(workspace 2개 * 테이블 2개) 호출했는지 확인
     expect(mockDb.update).toHaveBeenCalledTimes(4);
+    expect(mockDb.set).toHaveBeenCalledWith({
+      billingStatus: "EXPIRED",
+      planCode: "FREE",
+    });
+    expect(mockDb.set).toHaveBeenCalledWith({ planCode: "FREE" });
     
     // batch가 한 번 호출되었는지 확인
     expect(mockDb.batch).toHaveBeenCalledTimes(1);

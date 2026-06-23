@@ -32,6 +32,8 @@ type AuditLogPort = Pick<AuditLogStorage, "create">;
 
 const BILLING_RISK_REVIEW_THRESHOLD = 2;
 const BILLING_RISK_LOOKBACK_DAYS = 30;
+const MANUAL_EXPIRABLE_ENTITLEMENT_SOURCES: readonly NullableEntitlementSource[] =
+  ["BETA_PROMOTIONAL_GRANT", "MANUAL_GRANT"];
 
 type AdminBillingWorkspaceBase = {
   workspaceId: number;
@@ -181,6 +183,100 @@ export class AdminBillingService {
     };
   }
 
+  async syncWorkspaceBillingStatus(
+    adminUserId: number,
+    workspaceId: number,
+  ): Promise<AdminBillingWorkspaceDetail> {
+    const existing =
+      await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
+
+    if (!existing) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const occurredAt = new Date();
+    const shouldExpireImmediately = isExpiredManualEntitlement({
+      billingStatus: existing.billingStatus,
+      entitlementSource: existing.entitlementSource ?? null,
+      currentPeriodEnd: existing.currentPeriodEnd ?? null,
+      now: occurredAt,
+    });
+
+    if (!shouldExpireImmediately) {
+      return this.getWorkspaceDetail(workspaceId);
+    }
+
+    const nextState = {
+      planCode: "FREE" as const,
+      billingStatus: "EXPIRED" as const,
+      entitlementSource: existing.entitlementSource ?? null,
+      customerKey: existing.customerKey ?? null,
+      subscriptionKey: existing.subscriptionKey ?? null,
+      currentPeriodEnd: existing.currentPeriodEnd ?? null,
+      cancelAtPeriodEnd: false,
+      billingOwnerUserId: existing.billingOwnerUserId ?? null,
+      purchasedSeatCount: existing.purchasedSeatCount ?? null,
+      syncedFrom: {
+        planCode: existing.planCode,
+        billingStatus: existing.billingStatus,
+      },
+    };
+    const event = await this.billingStorage.appendBillingEvent({
+      workspaceId,
+      providerEventId: null,
+      eventType: "admin.billing_status_sync",
+      subscriptionKey: normalizeNullableText(existing.subscriptionKey),
+      customerKey: normalizeNullableText(existing.customerKey),
+      occurredAt,
+      payloadJson: JSON.stringify({
+        actorAdminUserId: adminUserId,
+        previousState: snapshotBillingState(existing),
+        nextState,
+      }),
+      status: "ACCEPTED",
+      failureReason: null,
+      source: "MANUAL_CORRECTION",
+    });
+
+    await this.billingStorage.upsertWorkspaceBillingState({
+      workspaceId,
+      billingStatus: nextState.billingStatus,
+      planCode: nextState.planCode,
+      entitlementSource: nextState.entitlementSource,
+      customerKey: nextState.customerKey,
+      subscriptionKey: nextState.subscriptionKey,
+      currentPeriodEnd: nextState.currentPeriodEnd,
+      cancelAtPeriodEnd: nextState.cancelAtPeriodEnd,
+      billingOwnerUserId: nextState.billingOwnerUserId,
+      lastEventId: event.id,
+      lastEventOccurredAt: occurredAt,
+    });
+
+    await this.billingStorage.updateWorkspaceBillingProjection({
+      workspaceId,
+      planCode: nextState.planCode,
+      billingCustomerExternalRef: existing.billingCustomerExternalRef ?? null,
+      billingOwnerUserId: nextState.billingOwnerUserId,
+    });
+
+    await this.auditLogStorage.create({
+      actorType: "ADMIN",
+      actorAdminUserId: adminUserId,
+      workspaceId,
+      entityType: "WORKSPACE",
+      entityId: workspaceId,
+      actionType: "UPDATE",
+      metadata: JSON.stringify({
+        domain: "BILLING",
+        action: "SYNC_STATUS",
+        previousState: snapshotBillingState(existing),
+        nextState,
+      }),
+    });
+
+    return this.getWorkspaceDetail(workspaceId);
+  }
+
   async applyManualOverride(
     adminUserId: number,
     workspaceId: number,
@@ -218,9 +314,19 @@ export class AdminBillingService {
       input.billingOwnerUserId !== undefined
         ? input.billingOwnerUserId
         : existing.billingOwnerUserId ?? null;
+    const shouldExpireImmediately = isExpiredManualEntitlement({
+      billingStatus: input.billingStatus,
+      entitlementSource: nextEntitlementSource,
+      currentPeriodEnd,
+      now: occurredAt,
+    });
+    const nextPlanCode = shouldExpireImmediately ? "FREE" : input.planCode;
+    const nextBillingStatus = shouldExpireImmediately
+      ? "EXPIRED"
+      : input.billingStatus;
     const shouldApplySeatEntitlement =
-      input.planCode === "BASIC" &&
-      (input.billingStatus === "ACTIVE" || input.billingStatus === "CANCELED");
+      nextPlanCode === "BASIC" &&
+      (nextBillingStatus === "ACTIVE" || nextBillingStatus === "CANCELED");
     const memberCount = shouldApplySeatEntitlement
       ? await this.billingStorage.countWorkspaceMembers(workspaceId)
       : 0;
@@ -241,8 +347,8 @@ export class AdminBillingService {
         reason: input.changeReason,
         previousState: snapshotBillingState(existing),
         nextState: {
-          planCode: input.planCode,
-          billingStatus: input.billingStatus,
+          planCode: nextPlanCode,
+          billingStatus: nextBillingStatus,
           entitlementSource: nextEntitlementSource,
           customerKey: normalizeNullableText(input.customerKey),
           subscriptionKey: normalizeNullableText(input.subscriptionKey),
@@ -250,6 +356,7 @@ export class AdminBillingService {
           cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
           billingOwnerUserId: nextBillingOwnerUserId,
           purchasedSeatCount: nextPurchasedSeatCount,
+          expiredImmediately: shouldExpireImmediately,
         },
       }),
       status: "ACCEPTED",
@@ -259,8 +366,8 @@ export class AdminBillingService {
 
     await this.billingStorage.upsertWorkspaceBillingState({
       workspaceId,
-      billingStatus: input.billingStatus,
-      planCode: input.planCode,
+      billingStatus: nextBillingStatus,
+      planCode: nextPlanCode,
       entitlementSource: nextEntitlementSource,
       customerKey: normalizeNullableText(input.customerKey),
       subscriptionKey: normalizeNullableText(input.subscriptionKey),
@@ -273,7 +380,7 @@ export class AdminBillingService {
 
     await this.billingStorage.updateWorkspaceBillingProjection({
       workspaceId,
-      planCode: input.planCode,
+      planCode: nextPlanCode,
       billingCustomerExternalRef: existing.billingCustomerExternalRef ?? null,
       billingOwnerUserId: nextBillingOwnerUserId,
     });
@@ -298,8 +405,8 @@ export class AdminBillingService {
         reason: input.changeReason,
         previousState: snapshotBillingState(existing),
         nextState: {
-          planCode: input.planCode,
-          billingStatus: input.billingStatus,
+          planCode: nextPlanCode,
+          billingStatus: nextBillingStatus,
           entitlementSource: nextEntitlementSource,
           customerKey: normalizeNullableText(input.customerKey),
           subscriptionKey: normalizeNullableText(input.subscriptionKey),
@@ -307,6 +414,7 @@ export class AdminBillingService {
           cancelAtPeriodEnd: input.cancelAtPeriodEnd ?? false,
           billingOwnerUserId: nextBillingOwnerUserId,
           purchasedSeatCount: nextPurchasedSeatCount,
+          expiredImmediately: shouldExpireImmediately,
         },
       }),
     });
@@ -396,6 +504,20 @@ function getBillingRiskLookbackStart(now: Date): Date {
   const lookback = new Date(now);
   lookback.setDate(lookback.getDate() - BILLING_RISK_LOOKBACK_DAYS);
   return lookback;
+}
+
+function isExpiredManualEntitlement(input: {
+  billingStatus: BillingState;
+  entitlementSource: NullableEntitlementSource;
+  currentPeriodEnd: Date | null;
+  now: Date;
+}) {
+  return (
+    input.billingStatus === "ACTIVE" &&
+    MANUAL_EXPIRABLE_ENTITLEMENT_SOURCES.includes(input.entitlementSource) &&
+    input.currentPeriodEnd !== null &&
+    input.currentPeriodEnd < input.now
+  );
 }
 
 function normalizeNullableText(value: string | null | undefined) {
