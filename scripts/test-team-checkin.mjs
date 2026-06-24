@@ -9,18 +9,34 @@ const args = parseArgs({
   },
 });
 
-const dayMap = {
-  mon: "2026-06-15",
-  tue: "2026-06-16",
-  wed: "2026-06-17",
-  thu: "2026-06-18",
-  fri: "2026-06-19",
-  sat: "2026-06-20",
-  sun: "2026-06-21",
-};
+function getCurrentWeekDates() {
+  const now = new Date();
+  const day = now.getDay();
+  // Monday is 1, Sunday is 0. If Sunday, diff is -6, else 1
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(now.setDate(diff));
+  
+  const dates = {};
+  const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    dates[days[i]] = `${yyyy}-${mm}-${dd}`;
+  }
+  return dates;
+}
 
-const dayStr = args.values.day?.toLowerCase();
-const datePrefix = dayMap[dayStr] || "2026-06-15"; // default to Monday
+const dayMap = getCurrentWeekDates();
+
+const daysArr = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const todayStr = daysArr[new Date().getDay()];
+
+const dayStr = args.values.day?.toLowerCase() || todayStr;
+const datePrefix = dayMap[dayStr];
 
 // We simulate 10:00 AM KST = 01:00:00Z UTC
 const now = `${datePrefix}T01:00:00Z`;
@@ -34,18 +50,15 @@ async function run() {
   
   const payload = {
     dryRun: !args.values.live,
+    now: now // Always simulate 10:00 AM KST
   };
-  
-  if (args.values.day) {
-    payload.now = now;
-  }
   
   if (args.values.workspace) {
     payload.workspaceId = args.values.workspace;
   }
 
   const isTimeTravel = !!args.values.day;
-  const timeDesc = isTimeTravel ? `[시간 여행] ${dayStr.toUpperCase()}요일 10:00 AM (${now})` : `[현재 시스템 시간]`;
+  const timeDesc = isTimeTravel ? `[시간 여행] ${dayStr.toUpperCase()}요일 10:00 AM (${now})` : `[현재 시스템 날짜 기준] 오전 10:00 시뮬레이션 (${now})`;
   console.log(`🚀 팀 체크인 발송 테스트 실행...`);
   console.log(`⏰ 설정된 시간: ${timeDesc}`);
   console.log(`🔔 FCM 푸시 알림 발송 모드: ${args.values.live ? "ON (실제 발송)" : "OFF (DB에만 기록)"}`);

@@ -236,10 +236,9 @@ export function TeamMemberCheckIn() {
         }
       });
       invalidateWorkspaceData();
-      if (responseType === "LOG_NOW") showToast("success", t("statusDone"));
-      else if (responseType === "SNOOZE_TODAY") showToast("success", t("statusLater"));
-      else if (responseType === "BLOCKED") showToast("success", t("statusBlocked"));
-      else if (responseType === "ADJUSTMENT_REQUESTED") showToast("success", t("statusAdjust"));
+      if (responseType === "LOG_NOW") showToast("success", t("toastStatusDone"));
+      else if (responseType === "BLOCKED") showToast("success", t("toastStatusBlocked"));
+      else if (responseType === "ADJUSTMENT_REQUESTED") showToast("success", t("toastStatusAdjust"));
     } catch (e) {
       console.error(e);
     }
@@ -249,10 +248,10 @@ export function TeamMemberCheckIn() {
     try {
       if (decision === "accept") {
         await acceptProposal.mutateAsync({ workspaceId, proposalId });
-        showToast("success", t("statusAdjusted"));
+        showToast("success", t("toastStatusAdjusted"));
       } else {
         await declineProposal.mutateAsync({ workspaceId, proposalId, data: { reason: "KEEP_CURRENT_GOAL" } });
-        showToast("success", t("statusDeclined"));
+        showToast("success", t("toastStatusDeclined"));
       }
       invalidateWorkspaceData();
     } catch (e) {
