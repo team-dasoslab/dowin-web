@@ -155,6 +155,42 @@ export class DashboardService {
       trends,
     };
   }
+
+  async getTeamTrend(context: WorkspaceAccessContext, weekStart?: string, weeks = 5) {
+    await assertWorkspaceOperationAllowed(
+      { id: context.workspaceId, planCode: context.entitlement.planCode },
+      this.workspaceStorage,
+    );
+    const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
+    const boundedWeeks = Math.min(Math.max(weeks, 1), 12);
+    const trendWeekStarts = getPreviousWeekStarts(
+      normalizedWeekStart,
+      boundedWeeks,
+    );
+    const earliestWeekStart = trendWeekStarts[0] ?? normalizedWeekStart;
+
+    const members = await this.workspaceStorage.findMembers(context.workspaceId);
+    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
+      context.workspaceId,
+    );
+    const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
+    const trendEnd = getWeekDates(normalizedWeekStart)[6];
+    const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
+      allLeadMeasureIds,
+      earliestWeekStart,
+      trendEnd,
+    );
+    const trends = trendWeekStarts.map((trendWeekStart) =>
+      buildWeeklyTrend({
+        weekStart: trendWeekStart,
+        members,
+        scoreboards,
+        logs,
+      }),
+    );
+
+    return { trends };
+  }
 }
 
 function buildTeamDashboard({
