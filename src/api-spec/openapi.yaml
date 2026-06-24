@@ -1158,7 +1158,8 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/WorkspaceCheckoutCompleteRequest" }
+            schema:
+              { $ref: "#/components/schemas/WorkspaceCheckoutCompleteRequest" }
       responses:
         "201":
           description: 결제 검증 및 워크스페이스 생성 완료
@@ -1171,7 +1172,10 @@ paths:
                 }
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/WorkspaceCheckoutCompleteResponse" }
+              schema:
+                {
+                  $ref: "#/components/schemas/WorkspaceCheckoutCompleteResponse",
+                }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "404":
@@ -1199,13 +1203,15 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/MarketingInviteRedeemRequest" }
+            schema:
+              { $ref: "#/components/schemas/MarketingInviteRedeemRequest" }
       responses:
         "201":
           description: 프로모션 코드 워크스페이스 생성 성공
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/MarketingInviteRedeemResponse" }
+              schema:
+                { $ref: "#/components/schemas/MarketingInviteRedeemResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "404":
@@ -2402,7 +2408,8 @@ paths:
           description: 조회 성공
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/MonthlyLogsSummaryResponse" }
+              schema:
+                { $ref: "#/components/schemas/MonthlyLogsSummaryResponse" }
         "404":
           description: 점수판을 찾을 수 없음
           content:
@@ -2557,13 +2564,17 @@ paths:
         required: false
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/WorkspaceBillingCheckoutRequest" }
+            schema:
+              { $ref: "#/components/schemas/WorkspaceBillingCheckoutRequest" }
       responses:
         "201":
           description: Basic checkout 준비 완료
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/WorkspaceBillingCheckoutResponse" }
+              schema:
+                {
+                  $ref: "#/components/schemas/WorkspaceBillingCheckoutResponse",
+                }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -2603,13 +2614,17 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateRequest" }
+            schema:
+              { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateRequest" }
       responses:
         "200":
           description: seat 변경 요청 접수
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateResponse" }
+              schema:
+                {
+                  $ref: "#/components/schemas/WorkspaceBillingSeatUpdateResponse",
+                }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -2667,7 +2682,7 @@ paths:
 
   /workspaces/{workspaceId}/reports/team-weekly:
     get:
-      summary: 리더용 주간 팀 리포트 조회
+      summary: "[detached] 리더용 주간 팀 리포트 조회"
       tags: [Reports]
       security: [{ sessionCookie: [] }]
       parameters:
@@ -2693,6 +2708,47 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/TeamWeeklyReportResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 워크스페이스 관리자 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/reports/team-trend:
+    get:
+      summary: 리더용 주간 트렌드 조회
+      tags: [Reports]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: weekStart
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - name: weeks
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            default: 5
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TeamTrendResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -2812,7 +2868,8 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/TeamCheckinResponseCreateRequest" }
+            schema:
+              { $ref: "#/components/schemas/TeamCheckinResponseCreateRequest" }
       responses:
         "200":
           description: 응답 저장 성공
@@ -2878,13 +2935,17 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalCreateRequest" }
+            schema:
+              {
+                $ref: "#/components/schemas/TeamCheckinAdjustmentProposalCreateRequest",
+              }
       responses:
         "201":
           description: 생성 성공
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposal" }
+              schema:
+                { $ref: "#/components/schemas/TeamCheckinAdjustmentProposal" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -2917,7 +2978,10 @@ paths:
           description: 수락 및 적용 성공
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalApplyResponse" }
+              schema:
+                {
+                  $ref: "#/components/schemas/TeamCheckinAdjustmentProposalApplyResponse",
+                }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "404":
@@ -2949,7 +3013,10 @@ paths:
         required: false
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalDeclineRequest" }
+            schema:
+              {
+                $ref: "#/components/schemas/TeamCheckinAdjustmentProposalDeclineRequest",
+              }
       responses:
         "200":
           description: 거절 성공
@@ -3223,8 +3290,7 @@ components:
         leadMeasureName: { type: string }
         actionType:
           type: string
-          enum:
-            [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
+          enum: [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
         payload: { type: object, additionalProperties: true }
         leaderNote: { type: string, nullable: true }
         status:
@@ -3295,8 +3361,7 @@ components:
         id: { type: string }
         actionType:
           type: string
-          enum:
-            [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
+          enum: [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
         payload: { type: object, additionalProperties: true }
         leaderNote: { type: string, nullable: true }
         status:
@@ -3312,8 +3377,7 @@ components:
         sourceResponseId: { type: string }
         actionType:
           type: string
-          enum:
-            [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
+          enum: [CHANGE_TARGET_COUNT, ARCHIVE_ACTION_ITEM, REPLACE_ACTION_ITEM]
         payload: { type: object, additionalProperties: true }
         leaderNote: { type: string, nullable: true, maxLength: 500 }
 
@@ -3419,7 +3483,14 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
+          enum:
+            [
+              POLAR,
+              MANUAL_GRANT,
+              PARTNER,
+              INTERNAL_TEST,
+              BETA_PROMOTIONAL_GRANT,
+            ]
           nullable: true
         provider:
           type: string
@@ -3514,7 +3585,8 @@ components:
 
     AdminBillingProviderProductUpsertRequest:
       type: object
-      required: [provider, environment, planCode, providerProductId, changeReason]
+      required:
+        [provider, environment, planCode, providerProductId, changeReason]
       properties:
         provider:
           type: string
@@ -3595,7 +3667,14 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
+          enum:
+            [
+              POLAR,
+              MANUAL_GRANT,
+              PARTNER,
+              INTERNAL_TEST,
+              BETA_PROMOTIONAL_GRANT,
+            ]
           nullable: true
         customerKey:
           type: string
@@ -4217,7 +4296,14 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
+          enum:
+            [
+              POLAR,
+              MANUAL_GRANT,
+              PARTNER,
+              INTERNAL_TEST,
+              BETA_PROMOTIONAL_GRANT,
+            ]
           nullable: true
         provider:
           type: string
@@ -4760,6 +4846,13 @@ components:
             trends:
               type: array
               items: { $ref: "#/components/schemas/TeamWeeklyReportTrend" }
+
+    TeamTrendResponse:
+      type: object
+      properties:
+        trends:
+          type: array
+          items: { $ref: "#/components/schemas/TeamWeeklyReportTrend" }
 
     DashboardTeamMemoAuthor:
       type: object
