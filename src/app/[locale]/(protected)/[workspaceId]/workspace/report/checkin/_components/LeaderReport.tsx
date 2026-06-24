@@ -7,7 +7,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { Area, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetWorkspacesWorkspaceIdReportsTeamWeekly } from "@/api/generated/reports/reports";
+import { useGetWorkspacesWorkspaceIdReportsTeamTrend } from "@/api/generated/reports/reports";
 import {
   addDays,
   getTodayInKst,
@@ -82,11 +82,11 @@ export function LeaderReport() {
   const [showActiveOnly, setShowActiveOnly] = useState(true);
 
   const { data: reportResponse, isFetching: isPeriodLoading } = useGetWorkspacesWorkspaceIdTeamCheckinsReport(workspaceId, { weekStart: selectedWeekStart, activeOnly: showActiveOnly });
-  const { data: weeklyReportResponse, isFetching: isWeeklyLoading } = useGetWorkspacesWorkspaceIdReportsTeamWeekly(workspaceId, { weekStart: selectedWeekStart, weeks: 5 });
+  const { data: trendResponse, isFetching: isTrendLoading } = useGetWorkspacesWorkspaceIdReportsTeamTrend(workspaceId, { weekStart: selectedWeekStart, weeks: 5 });
   const submitProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposals();
 
   const report = reportResponse?.status === 200 ? reportResponse.data : null;
-  const weeklyReport = weeklyReportResponse?.status === 200 ? weeklyReportResponse.data : null;
+  const rawTrends = trendResponse?.status === 200 ? trendResponse.data.trends : [];
 
   const weekDates = getWeekDatesFromStart(report?.weekStart ?? selectedWeekStart);
   const weekLabel = weekDates.length === 7 
@@ -128,7 +128,7 @@ export function LeaderReport() {
 
   const activityLog = (report?.activity || []);
 
-  const trendPoints = [...(weeklyReport?.trends || [])]
+  const trendPoints = [...(rawTrends || [])]
     .sort((a, b) => (a.weekStart || "").localeCompare(b.weekStart || ""))
     .map(trend => {
       const s = new Date(trend.weekStart!);
@@ -140,7 +140,7 @@ export function LeaderReport() {
       };
     });
 
-  const currentTrend = weeklyReport?.trends?.find(t => t.weekStart === selectedWeekStart);
+  const currentTrend = rawTrends?.find(t => t.weekStart === selectedWeekStart);
   const currentWinRate = currentTrend?.winRate || 0;
   const currentExecutionRate = currentTrend?.executionRate || 0;
 
@@ -177,7 +177,7 @@ export function LeaderReport() {
       {/* Week Selector Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
         <TeamPeriodControls
-          isPeriodLoading={isPeriodLoading || isWeeklyLoading}
+          isPeriodLoading={isPeriodLoading || isTrendLoading}
           isPreviousDisabled={false}
           isResetVisible={selectedWeekStart !== currentWeekStart}
           movePeriod={movePeriod}

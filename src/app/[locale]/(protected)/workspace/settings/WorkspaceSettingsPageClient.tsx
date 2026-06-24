@@ -2,7 +2,7 @@
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useGetWorkspacesMe, useGetWorkspaces, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
-import { publicRuntimeConfig } from "@/config/public-runtime-config";
+
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
