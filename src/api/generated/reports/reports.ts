@@ -22,7 +22,9 @@ import type {
 
 import type {
   ErrorResponse,
+  GetWorkspacesWorkspaceIdReportsTeamTrendParams,
   GetWorkspacesWorkspaceIdReportsTeamWeeklyParams,
+  TeamTrendResponse,
   TeamWeeklyReportResponse,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
@@ -35,7 +37,7 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary 리더용 주간 팀 리포트 조회
+ * @summary [detached] 리더용 주간 팀 리포트 조회
  */
 export type getWorkspacesWorkspaceIdReportsTeamWeeklyResponse200 = {
   data: TeamWeeklyReportResponse
@@ -157,7 +159,7 @@ export function useGetWorkspacesWorkspaceIdReportsTeamWeekly<TData = Awaited<Ret
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
- * @summary 리더용 주간 팀 리포트 조회
+ * @summary [detached] 리더용 주간 팀 리포트 조회
  */
 
 export function useGetWorkspacesWorkspaceIdReportsTeamWeekly<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamWeekly>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
@@ -167,6 +169,148 @@ export function useGetWorkspacesWorkspaceIdReportsTeamWeekly<TData = Awaited<Ret
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdReportsTeamWeeklyQueryOptions(workspaceId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * @summary 리더용 주간 트렌드 조회
+ */
+export type getWorkspacesWorkspaceIdReportsTeamTrendResponse200 = {
+  data: TeamTrendResponse
+  status: 200
+}
+
+export type getWorkspacesWorkspaceIdReportsTeamTrendResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type getWorkspacesWorkspaceIdReportsTeamTrendResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getWorkspacesWorkspaceIdReportsTeamTrendResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getWorkspacesWorkspaceIdReportsTeamTrendResponseSuccess = (getWorkspacesWorkspaceIdReportsTeamTrendResponse200) & {
+  headers: Headers;
+};
+export type getWorkspacesWorkspaceIdReportsTeamTrendResponseError = (getWorkspacesWorkspaceIdReportsTeamTrendResponse401 | getWorkspacesWorkspaceIdReportsTeamTrendResponse403 | getWorkspacesWorkspaceIdReportsTeamTrendResponse404) & {
+  headers: Headers;
+};
+
+export type getWorkspacesWorkspaceIdReportsTeamTrendResponse = (getWorkspacesWorkspaceIdReportsTeamTrendResponseSuccess | getWorkspacesWorkspaceIdReportsTeamTrendResponseError)
+
+export const getGetWorkspacesWorkspaceIdReportsTeamTrendUrl = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamTrendParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/reports/team-trend?${stringifiedParams}` : `/api/workspaces/${workspaceId}/reports/team-trend`
+}
+
+export const getWorkspacesWorkspaceIdReportsTeamTrend = async (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamTrendParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdReportsTeamTrendResponse> => {
+  
+  return customInstance<getWorkspacesWorkspaceIdReportsTeamTrendResponse>(getGetWorkspacesWorkspaceIdReportsTeamTrendUrl(workspaceId,params),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+);}
+  
+
+
+
+
+export const getGetWorkspacesWorkspaceIdReportsTeamTrendQueryKey = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamTrendParams,) => {
+    return [
+    `/api/workspaces/${workspaceId}/reports/team-trend`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getGetWorkspacesWorkspaceIdReportsTeamTrendQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdReportsTeamTrendQueryKey(workspaceId,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>> = ({ signal }) => getWorkspacesWorkspaceIdReportsTeamTrend(workspaceId,params, { signal, ...requestOptions });
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetWorkspacesWorkspaceIdReportsTeamTrendQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>>
+export type GetWorkspacesWorkspaceIdReportsTeamTrendQueryError = UnauthorizedErrorResponse | ErrorResponse
+
+
+export function useGetWorkspacesWorkspaceIdReportsTeamTrend<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: undefined |  GetWorkspacesWorkspaceIdReportsTeamTrendParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesWorkspaceIdReportsTeamTrend<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesWorkspaceIdReportsTeamTrend<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 리더용 주간 트렌드 조회
+ */
+
+export function useGetWorkspacesWorkspaceIdReportsTeamTrend<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdReportsTeamTrendParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdReportsTeamTrend>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetWorkspacesWorkspaceIdReportsTeamTrendQueryOptions(workspaceId,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
