@@ -244,18 +244,18 @@ export function LeaderReport() {
           <div className="flex items-center gap-8 mb-6 px-2">
             <div>
               <div className="relative group flex items-center gap-1.5 mb-1 w-max">
-                <span className="text-[13px] font-bold text-text-muted">달성률</span>
-                <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
-              </div>
-              <div className="text-[28px] font-black tracking-tight text-text-primary">{currentWinRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
-            </div>
-            
-            <div>
-              <div className="relative group flex items-center gap-1.5 mb-1 w-max">
                 <span className="text-[13px] font-bold text-text-muted">실행률</span>
                 <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
               </div>
               <div className="text-[28px] font-black tracking-tight text-text-primary">{currentExecutionRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
+            </div>
+
+            <div>
+              <div className="relative group flex items-center gap-1.5 mb-1 w-max">
+                <span className="text-[13px] font-bold text-text-muted">달성률</span>
+                <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
+              </div>
+              <div className="text-[28px] font-black tracking-tight text-text-primary">{currentWinRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
             </div>
           </div>
 
@@ -623,20 +623,20 @@ function WeeklyRateTrendChart({ points }: { points: { label: string; rate: numbe
             const executionRatePayload = payload.find(p => p.dataKey === 'executionRate');
             return (
               <div className="rounded-[12px] bg-zinc-800 px-3 py-1.5 shadow-xl">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#3a64c7" }} />
-                  <p className="font-mono text-[12px] font-bold text-white/70">
-                    달성률 <span className="text-white ml-1">{ratePayload?.value ?? 0}%</span>
-                  </p>
-                </div>
                 {executionRatePayload && (
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#84cc16" }} />
                     <p className="font-mono text-[12px] font-bold text-white/70">
                       실행률 <span className="text-white ml-1">{executionRatePayload.value}%</span>
                     </p>
                   </div>
                 )}
+                <div className={`flex items-center gap-2 ${executionRatePayload ? 'mt-1' : ''}`}>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#3a64c7" }} />
+                  <p className="font-mono text-[12px] font-bold text-white/70">
+                    달성률 <span className="text-white ml-1">{ratePayload?.value ?? 0}%</span>
+                  </p>
+                </div>
               </div>
             );
           }}
