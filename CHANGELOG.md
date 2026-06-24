@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.4](https://github.com/team-dasoslab/dowin-web/compare/v1.7.3...v1.7.4) (2026-06-24)
+
+
+### Bug Fixes
+
+* 체크인 QA ([#184](https://github.com/team-dasoslab/dowin-web/issues/184)) ([1049740](https://github.com/team-dasoslab/dowin-web/commit/1049740413267178d38d616783d04488248b26ee))
+
 ## [1.7.3](https://github.com/team-dasoslab/dowin-web/compare/v1.7.2...v1.7.3) (2026-06-23)
 
 
