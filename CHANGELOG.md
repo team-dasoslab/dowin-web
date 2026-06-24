@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.5](https://github.com/team-dasoslab/dowin-web/compare/v1.7.4...v1.7.5) (2026-06-24)
+
+
+### Bug Fixes
+
+* 주간 리포트 기능 제거 ([#187](https://github.com/team-dasoslab/dowin-web/issues/187)) ([eddfe8d](https://github.com/team-dasoslab/dowin-web/commit/eddfe8d51423ba5098790935029c6c41a67c31cd))
+
 ## [1.7.4](https://github.com/team-dasoslab/dowin-web/compare/v1.7.3...v1.7.4) (2026-06-24)
 
 
