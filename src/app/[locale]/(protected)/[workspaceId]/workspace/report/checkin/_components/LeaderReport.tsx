@@ -619,19 +619,21 @@ function WeeklyRateTrendChart({ points }: { points: { label: string; rate: numbe
           cursor={{ stroke: "rgba(0,0,0,0.05)", strokeWidth: 2, strokeDasharray: "4 4" }}
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
+            const ratePayload = payload.find(p => p.dataKey === 'rate');
+            const executionRatePayload = payload.find(p => p.dataKey === 'executionRate');
             return (
               <div className="rounded-[12px] bg-zinc-800 px-3 py-1.5 shadow-xl">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#3a64c7" }} />
                   <p className="font-mono text-[12px] font-bold text-white/70">
-                    달성률 <span className="text-white ml-1">{payload[0].value}%</span>
+                    달성률 <span className="text-white ml-1">{ratePayload?.value ?? 0}%</span>
                   </p>
                 </div>
-                {payload[1] && (
+                {executionRatePayload && (
                   <div className="flex items-center gap-2 mt-1">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#84cc16" }} />
                     <p className="font-mono text-[12px] font-bold text-white/70">
-                      실행률 <span className="text-white ml-1">{payload[1].value}%</span>
+                      실행률 <span className="text-white ml-1">{executionRatePayload.value}%</span>
                     </p>
                   </div>
                 )}
