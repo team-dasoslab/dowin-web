@@ -7,7 +7,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { Area, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useGetWorkspacesWorkspaceIdReportsTeamWeekly } from "@/api/generated/reports/reports";
+import { useGetWorkspacesWorkspaceIdReportsTeamTrend } from "@/api/generated/reports/reports";
 import {
   addDays,
   getTodayInKst,
@@ -82,11 +82,11 @@ export function LeaderReport() {
   const [showActiveOnly, setShowActiveOnly] = useState(true);
 
   const { data: reportResponse, isFetching: isPeriodLoading } = useGetWorkspacesWorkspaceIdTeamCheckinsReport(workspaceId, { weekStart: selectedWeekStart, activeOnly: showActiveOnly });
-  const { data: weeklyReportResponse, isFetching: isWeeklyLoading } = useGetWorkspacesWorkspaceIdReportsTeamWeekly(workspaceId, { weekStart: selectedWeekStart, weeks: 5 });
+  const { data: trendResponse, isFetching: isTrendLoading } = useGetWorkspacesWorkspaceIdReportsTeamTrend(workspaceId, { weekStart: selectedWeekStart, weeks: 5 });
   const submitProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposals();
 
   const report = reportResponse?.status === 200 ? reportResponse.data : null;
-  const weeklyReport = weeklyReportResponse?.status === 200 ? weeklyReportResponse.data : null;
+  const rawTrends = trendResponse?.status === 200 ? trendResponse.data.trends : [];
 
   const weekDates = getWeekDatesFromStart(report?.weekStart ?? selectedWeekStart);
   const weekLabel = weekDates.length === 7 
@@ -128,7 +128,7 @@ export function LeaderReport() {
 
   const activityLog = (report?.activity || []);
 
-  const trendPoints = [...(weeklyReport?.trends || [])]
+  const trendPoints = [...(rawTrends || [])]
     .sort((a, b) => (a.weekStart || "").localeCompare(b.weekStart || ""))
     .map(trend => {
       const s = new Date(trend.weekStart!);
@@ -140,7 +140,7 @@ export function LeaderReport() {
       };
     });
 
-  const currentTrend = weeklyReport?.trends?.find(t => t.weekStart === selectedWeekStart);
+  const currentTrend = rawTrends?.find(t => t.weekStart === selectedWeekStart);
   const currentWinRate = currentTrend?.winRate || 0;
   const currentExecutionRate = currentTrend?.executionRate || 0;
 
@@ -177,7 +177,7 @@ export function LeaderReport() {
       {/* Week Selector Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
         <TeamPeriodControls
-          isPeriodLoading={isPeriodLoading || isWeeklyLoading}
+          isPeriodLoading={isPeriodLoading || isTrendLoading}
           isPreviousDisabled={false}
           isResetVisible={selectedWeekStart !== currentWeekStart}
           movePeriod={movePeriod}
@@ -244,18 +244,18 @@ export function LeaderReport() {
           <div className="flex items-center gap-8 mb-6 px-2">
             <div>
               <div className="relative group flex items-center gap-1.5 mb-1 w-max">
-                <span className="text-[13px] font-bold text-text-muted">달성률</span>
-                <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
-              </div>
-              <div className="text-[28px] font-black tracking-tight text-text-primary">{currentWinRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
-            </div>
-            
-            <div>
-              <div className="relative group flex items-center gap-1.5 mb-1 w-max">
                 <span className="text-[13px] font-bold text-text-muted">실행률</span>
                 <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
               </div>
               <div className="text-[28px] font-black tracking-tight text-text-primary">{currentExecutionRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
+            </div>
+
+            <div>
+              <div className="relative group flex items-center gap-1.5 mb-1 w-max">
+                <span className="text-[13px] font-bold text-text-muted">달성률</span>
+                <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-pointer hover:text-text-primary transition-colors" />
+              </div>
+              <div className="text-[28px] font-black tracking-tight text-text-primary">{currentWinRate}<span className="text-[16px] text-text-muted ml-0.5">%</span></div>
             </div>
           </div>
 
@@ -619,22 +619,24 @@ function WeeklyRateTrendChart({ points }: { points: { label: string; rate: numbe
           cursor={{ stroke: "rgba(0,0,0,0.05)", strokeWidth: 2, strokeDasharray: "4 4" }}
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
+            const ratePayload = payload.find(p => p.dataKey === 'rate');
+            const executionRatePayload = payload.find(p => p.dataKey === 'executionRate');
             return (
               <div className="rounded-[12px] bg-zinc-800 px-3 py-1.5 shadow-xl">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#3a64c7" }} />
-                  <p className="font-mono text-[12px] font-bold text-white/70">
-                    달성률 <span className="text-white ml-1">{payload[0].value}%</span>
-                  </p>
-                </div>
-                {payload[1] && (
-                  <div className="flex items-center gap-2 mt-1">
+                {executionRatePayload && (
+                  <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#84cc16" }} />
                     <p className="font-mono text-[12px] font-bold text-white/70">
-                      실행률 <span className="text-white ml-1">{payload[1].value}%</span>
+                      실행률 <span className="text-white ml-1">{executionRatePayload.value}%</span>
                     </p>
                   </div>
                 )}
+                <div className={`flex items-center gap-2 ${executionRatePayload ? 'mt-1' : ''}`}>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: "#3a64c7" }} />
+                  <p className="font-mono text-[12px] font-bold text-white/70">
+                    달성률 <span className="text-white ml-1">{ratePayload?.value ?? 0}%</span>
+                  </p>
+                </div>
               </div>
             );
           }}

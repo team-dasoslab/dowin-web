@@ -1905,6 +1905,10 @@ export type TeamWeeklyReportResponse = TeamDashboardResponse & {
   trends?: TeamWeeklyReportTrend[];
 };
 
+export interface TeamTrendResponse {
+  trends?: TeamWeeklyReportTrend[];
+}
+
 export interface DashboardTeamMemoAuthor {
   userId: number;
   nickname: string;
@@ -2217,6 +2221,15 @@ cursor?: string;
 };
 
 export type GetWorkspacesWorkspaceIdReportsTeamWeeklyParams = {
+weekStart?: string;
+/**
+ * @minimum 1
+ * @maximum 12
+ */
+weeks?: number;
+};
+
+export type GetWorkspacesWorkspaceIdReportsTeamTrendParams = {
 weekStart?: string;
 /**
  * @minimum 1
