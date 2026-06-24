@@ -10,7 +10,7 @@ export const runBillingRevocation = async (env: CloudflareEnv) => {
     .from(workspaceBillingState)
     .where(
       and(
-        eq(workspaceBillingState.billingStatus, "ACTIVE"),
+        inArray(workspaceBillingState.billingStatus, ["ACTIVE", "CANCELED"]),
         inArray(workspaceBillingState.entitlementSource, [
           "BETA_PROMOTIONAL_GRANT",
           "MANUAL_GRANT",
@@ -28,7 +28,7 @@ export const runBillingRevocation = async (env: CloudflareEnv) => {
     batchStmts.push(
       db
         .update(workspaceBillingState)
-        .set({ billingStatus: "EXPIRED" })
+        .set({ billingStatus: "EXPIRED", planCode: "FREE" })
         .where(eq(workspaceBillingState.workspaceId, state.workspaceId)),
     );
 

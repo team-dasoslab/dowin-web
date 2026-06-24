@@ -15,6 +15,7 @@ import {
   isValidDateString,
 } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { TeamPeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamPeriodControls";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import {
   useGetWorkspacesWorkspaceIdTeamCheckinsReport,
   usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposals,
@@ -100,9 +101,6 @@ export function LeaderReport() {
   const [proposalNumber, setProposalNumber] = useState<number | "">("");
   const [proposalReplacementText, setProposalReplacementText] = useState("");
   
-  // Local state to eagerly hide resolved items to avoid layout jump waiting for query invalidate
-  const [resolvedIds, setResolvedIds] = useState<string[]>([]);
-
   const closeModal = () => {
     setActiveSignalModal(null);
     setProposalType(null);
@@ -111,8 +109,22 @@ export function LeaderReport() {
     setCommentText("");
   };
 
+  const [attentionFilter, setAttentionFilter] = useState<'ALL' | 'REQUESTED' | 'ADJUSTING' | 'RESOLVED'>('ALL');
+
   const attentionItems = (report?.attentionItems || [])
-    .filter(item => item.responseId && !item.openProposalId && !resolvedIds.includes(item.responseId));
+    .filter(item => item.responseId)
+    .filter(item => {
+      if (attentionFilter === 'ALL') return true;
+      
+      const isRequested = !item.isResolved;
+      const isAdjusting = item.isResolved && item.resolvedProposal?.status === 'PROPOSED';
+      const isResolved = item.isResolved && (item.resolvedProposal?.status === 'ACCEPTED' || item.resolvedProposal?.status === 'DECLINED');
+      
+      if (attentionFilter === 'REQUESTED') return isRequested;
+      if (attentionFilter === 'ADJUSTING') return isAdjusting;
+      if (attentionFilter === 'RESOLVED') return isResolved;
+      return true;
+    });
 
   const activityLog = (report?.activity || []);
 
@@ -152,7 +164,6 @@ export function LeaderReport() {
           leaderNote: commentText || null
         }
       });
-      setResolvedIds(prev => [...prev, signal.responseId!]);
       queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsReportQueryKey(workspaceId) });
       closeModal();
     } catch (e) {
@@ -256,8 +267,19 @@ export function LeaderReport() {
 
       {/* Attention Needed */}
       <section id="attention" className="flex flex-col scroll-mt-28 px-2">
-            <div className="flex items-center justify-between mb-5 px-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 px-2 gap-4">
               <h3 className="text-[20px] font-bold text-text-primary">{t("attentionItems")}</h3>
+              <SegmentedControl
+                size="sm"
+                value={attentionFilter}
+                onChange={setAttentionFilter}
+                options={[
+                  { value: 'ALL', label: t('filterAll') },
+                  { value: 'REQUESTED', label: t('filterRequested') },
+                  { value: 'ADJUSTING', label: t('filterAdjusting') },
+                  { value: 'RESOLVED', label: t('filterResolved') },
+                ]}
+              />
             </div>
             
             <div className="bg-surface rounded-[28px] p-6 flex flex-col">

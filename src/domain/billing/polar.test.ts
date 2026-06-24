@@ -128,6 +128,47 @@ describe("createPolarBillingClient", () => {
     );
   });
 
+  it("checkout 성공과 복귀 URL에 return path를 포함한다", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: "checkout_123",
+          url: "https://polar.sh/checkout/checkout_123",
+        }),
+        {
+          status: 201,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = createPolarBillingClient({
+      POLAR_ENV: "sandbox",
+      POLAR_ACCESS_TOKEN: "polar_oat_sandbox",
+      APP_BASE_URL: "http://localhost:3000",
+    });
+
+    await client?.createCheckoutSession({
+      productId: "prod_basic",
+      externalCustomerId: "workspace:1",
+      idempotencyKey: "idem_1",
+      locale: "ko",
+      metadata: { flow: "workspace_resubscribe" },
+      returnPath: "/ko/ws_1/dashboard/my?view=week",
+    });
+
+    const body = JSON.parse(
+      String((fetchMock.mock.calls[0]?.[1] as RequestInit | undefined)?.body),
+    ) as { success_url: string; return_url: string };
+    expect(new URL(body.success_url).searchParams.get("return_path")).toBe(
+      "/ko/ws_1/dashboard/my?view=week",
+    );
+    expect(new URL(body.return_url).searchParams.get("return_path")).toBe(
+      "/ko/ws_1/dashboard/my?view=week",
+    );
+  });
+
   it("subscription의 pending seat 변경을 조회한다", async () => {
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(

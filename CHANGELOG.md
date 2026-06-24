@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.7.4](https://github.com/team-dasoslab/dowin-web/compare/v1.7.3...v1.7.4) (2026-06-24)
+
+
+### Bug Fixes
+
+* 체크인 QA ([#184](https://github.com/team-dasoslab/dowin-web/issues/184)) ([1049740](https://github.com/team-dasoslab/dowin-web/commit/1049740413267178d38d616783d04488248b26ee))
+
+## [1.7.3](https://github.com/team-dasoslab/dowin-web/compare/v1.7.2...v1.7.3) (2026-06-23)
+
+
+### Bug Fixes
+
+* 결제 상태 동기화 버그 개선 ([#182](https://github.com/team-dasoslab/dowin-web/issues/182)) ([82318e0](https://github.com/team-dasoslab/dowin-web/commit/82318e0886c31e3f231700a7fb5d2e30de31efd4))
+
 ## [1.7.2](https://github.com/team-dasoslab/dowin-web/compare/v1.7.1...v1.7.2) (2026-06-22)
 
 
