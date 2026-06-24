@@ -18,6 +18,7 @@
     "test:ui": "vitest --ui",
     "test:storybook": "vitest --config vitest.storybook.config.mts",
     "test:checkin": "node --env-file=.env scripts/test-team-checkin.mjs",
+    "test:checkin:clear": "bash scripts/clear-team-checkins.sh",
     "test:billing": "node --env-file=.env scripts/test-billing-revocation.mjs",
     "gen:api": "orval",
     "mig:local": "npx drizzle-kit generate && npx wrangler d1 migrations apply wig-db --local",
