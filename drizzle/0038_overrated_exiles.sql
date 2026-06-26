@@ -1,0 +1,1 @@
+ALTER TABLE `workspace_team_checkin_settings` ADD `send_hour` integer DEFAULT 16 NOT NULL;

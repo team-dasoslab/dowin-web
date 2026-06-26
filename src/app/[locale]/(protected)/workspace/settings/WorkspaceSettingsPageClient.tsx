@@ -10,6 +10,7 @@ import {
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
+import { TIME_OPTIONS } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { Button } from "@/components/ui/Button";
@@ -86,6 +87,24 @@ export default function WorkspaceSettingsPage() {
       });
       queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey(workspaceId) });
       showToast("success", checked ? checkinT("enabledToast") : checkinT("disabledToast"));
+    } catch {
+      showToast("error", checkinT("updateFailedToast"));
+    }
+  };
+
+  const handleChangeCheckinSendTime = async (time: string) => {
+    if (!workspaceId || !checkinSettings) return;
+    const [hour] = time.split(":").map(Number);
+    try {
+      await updateSettings.mutateAsync({
+        workspaceId,
+        data: {
+          ...checkinSettings,
+          sendHour: hour,
+        },
+      });
+      queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey(workspaceId) });
+      showToast("success", checkinT("sendTimeChangedToast"));
     } catch {
       showToast("error", checkinT("updateFailedToast"));
     }
@@ -229,6 +248,27 @@ export default function WorkspaceSettingsPage() {
             },
             ...(checkinSettings?.enabled
               ? [
+                  {
+                    id: "checkin-send-time",
+                    icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
+                    title: checkinT("sendTime"),
+                    rightElement: (
+                      <select
+                        value={`${String(checkinSettings?.sendHour ?? 16).padStart(2, "0")}:00`}
+                        disabled={!checkinSettings || updateSettings.isPending}
+                        onChange={(event) => {
+                          void handleChangeCheckinSendTime(event.target.value);
+                        }}
+                        className="h-9 cursor-pointer rounded-[12px] border-none bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-border disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {TIME_OPTIONS.map((time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        ))}
+                      </select>
+                    ),
+                  },
                   {
                     id: "checkin-report",
                     icon: <DowinIcon name="nav-report" className="w-4 h-4" />,

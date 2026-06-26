@@ -1078,6 +1078,7 @@ export const workspaceTeamCheckinSettings = sqliteTable(
     })
       .notNull()
       .default(true),
+    sendHour: integer("send_hour").notNull().default(16),
     dailyMemberLimit: integer("daily_member_limit").notNull().default(2),
     dailyWorkspaceLimit: integer("daily_workspace_limit").notNull().default(30),
     quietStartHour: integer("quiet_start_hour"),

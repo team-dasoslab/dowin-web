@@ -1456,6 +1456,8 @@
     "enabledToast": "Auto Check-in has been enabled.",
     "disabledToast": "Auto Check-in has been disabled.",
     "updateFailedToast": "Failed to update settings.",
+    "sendTime": "Check-in Time",
+    "sendTimeChangedToast": "Check-in time has been updated.",
     "reportPageTitle": "Team Check-in Report",
     "today": "Today",
     "yesterday": "Yesterday",

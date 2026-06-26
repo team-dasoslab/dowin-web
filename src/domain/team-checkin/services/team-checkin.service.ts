@@ -33,16 +33,18 @@ const createUid = customAlphabet(
   12,
 );
 
+const DEFAULT_TIMEZONE = "Asia/Seoul";
+const DEFAULT_CHECKIN_SEND_HOUR = 16;
+
 const DEFAULT_SETTINGS = {
   enabled: false,
   includeAdminAsMember: false,
   triggerNoWeeklyLogEnabled: true,
-  triggerSlowStartEnabled: true,
+  triggerSlowStartEnabled: false,
+  sendHour: DEFAULT_CHECKIN_SEND_HOUR,
   dailyMemberLimit: 2,
   dailyWorkspaceLimit: 30,
 };
-const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
-const DEFAULT_TIMEZONE = "Asia/Seoul";
 
 type TeamCheckinServiceOptions = {
   leadMeasureAgeGateEnabled?: boolean;
@@ -87,6 +89,8 @@ export class TeamCheckinService {
     const settings = await this.storage.upsertSettings({
       workspaceId: context.workspaceId,
       ...input,
+      triggerSlowStartEnabled: false,
+      sendHour: normalizeSendHour(input.sendHour),
     });
 
     if (settings.enabled) {
@@ -500,26 +504,34 @@ export class TeamCheckinService {
         (candidate) =>
           settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
       );
-      const weeklyCandidates = candidates.filter((candidate) => {
-        if (candidate.period !== "WEEKLY") return false;
-        if (!this.leadMeasureAgeGateEnabled) return true;
-        return isOldEnoughForCheckin(candidate.leadMeasureCreatedAt, now);
-      });
-      const candidateContexts = weeklyCandidates.map((candidate) => {
-        const timezone = resolveTimezone(candidate.timezone);
+      const candidateContexts = candidates
+        .filter((candidate) => candidate.period === "WEEKLY")
+        .map((candidate) => {
+          const timezone = resolveTimezone(candidate.timezone);
+          const localTime = getLocalDateTimeParts(now, timezone);
+          const weekRange = getLocalWeekRange(now, timezone);
 
-        return {
-          candidate,
-          localTime: getLocalTimeParts(now, timezone),
-          weekRange: getLocalWeekRange(now, timezone),
-          dayRange: getLocalDayRange(now, timezone),
-        };
-      });
+          return {
+            candidate,
+            timezone,
+            localHour: localTime.hour,
+            weekRange,
+            dayRange: getLocalDayRange(now, timezone),
+          };
+        })
+        .filter(({ candidate, timezone, weekRange }) => {
+          if (!this.leadMeasureAgeGateEnabled) return true;
+          return wasCreatedBeforeLocalWeek(
+            candidate,
+            timezone,
+            weekRange.weekStart,
+          );
+        });
       const logRange = getCombinedLogRange(
         candidateContexts.map((context) => context.weekRange),
       );
       const logs = await this.storage.findLogsForCandidates(
-        weeklyCandidates.map((candidate) => candidate.leadMeasureId),
+        candidateContexts.map(({ candidate }) => candidate.leadMeasureId),
         logRange.from,
         logRange.to,
       );
@@ -541,14 +553,15 @@ export class TeamCheckinService {
 
       for (const {
         candidate,
-        localTime,
+        localHour,
         weekRange,
         dayRange,
       } of candidateContexts) {
+        if (localHour !== normalizeSendHour(settings.sendHour)) continue;
+
         const reasonCode = getReasonCode(
           candidate,
           logsByMeasure.get(candidate.leadMeasureId) ?? [],
-          localTime,
           weekRange,
           settings,
         );
@@ -689,7 +702,8 @@ export class TeamCheckinService {
       enabled: record.enabled,
       includeAdminAsMember: record.includeAdminAsMember,
       triggerNoWeeklyLogEnabled: record.triggerNoWeeklyLogEnabled,
-      triggerSlowStartEnabled: record.triggerSlowStartEnabled,
+      triggerSlowStartEnabled: false,
+      sendHour: normalizeSendHour(record.sendHour),
       dailyMemberLimit: record.dailyMemberLimit,
       dailyWorkspaceLimit: record.dailyWorkspaceLimit,
     };
@@ -843,18 +857,24 @@ function groupLogs(
   return map;
 }
 
-function isOldEnoughForCheckin(createdAt: Date, now: Date) {
-  return now.getTime() - createdAt.getTime() >= MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS;
+function wasCreatedBeforeLocalWeek(
+  candidate: TeamCheckinCandidate,
+  timezone: string,
+  weekStart: string,
+) {
+  const createdLocalDate = getLocalDateTimeParts(
+    candidate.leadMeasureCreatedAt,
+    timezone,
+  ).date;
+  return createdLocalDate < weekStart;
 }
 
 function getReasonCode(
   candidate: TeamCheckinCandidate,
   logsForMeasure: Array<{ logDate: string; value: boolean; count: number }>,
-  localTime: { day: number; hour: number },
   weekRange: { weekStart: string; weekEnd: string },
   settings: {
     triggerNoWeeklyLogEnabled: boolean;
-    triggerSlowStartEnabled: boolean;
   },
 ) {
   const achievedCount = logsForMeasure.filter(
@@ -871,33 +891,6 @@ function getReasonCode(
 
   if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
     return "NO_WEEKLY_LOG" as const;
-  }
-
-  if (settings.triggerSlowStartEnabled) {
-    if (
-      candidate.targetValue === 1 &&
-      localTime.day >= 5 &&
-      localTime.hour >= 10 &&
-      achievedCount === 0
-    ) {
-      return "SLOW_WEEKLY_START" as const;
-    }
-    if (
-      candidate.targetValue === 2 &&
-      localTime.day >= 3 &&
-      localTime.hour >= 10 &&
-      achievedCount === 0
-    ) {
-      return "SLOW_WEEKLY_START" as const;
-    }
-    if (
-      candidate.targetValue >= 3 &&
-      localTime.day >= 3 &&
-      localTime.hour >= 10 &&
-      achievedCount <= 1
-    ) {
-      return "SLOW_WEEKLY_START" as const;
-    }
   }
 
   return null;
@@ -940,12 +933,10 @@ function resolveTimezone(timezone?: string | null) {
   }
 }
 
-function getLocalTimeParts(now: Date, timezone: string) {
-  const parts = getLocalDateTimeParts(now, timezone);
-  return {
-    day: parts.day,
-    hour: parts.hour,
-  };
+function normalizeSendHour(value: number | null | undefined): number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 23
+    ? value
+    : DEFAULT_CHECKIN_SEND_HOUR;
 }
 
 function getLocalWeekRange(now: Date, timezone: string) {

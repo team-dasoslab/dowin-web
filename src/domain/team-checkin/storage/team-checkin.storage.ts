@@ -87,6 +87,7 @@ export class TeamCheckinStorage {
     includeAdminAsMember: boolean;
     triggerNoWeeklyLogEnabled: boolean;
     triggerSlowStartEnabled: boolean;
+    sendHour: number;
     dailyMemberLimit: number;
     dailyWorkspaceLimit: number;
   }): Promise<TeamCheckinSettingsRecord> {
@@ -100,6 +101,7 @@ export class TeamCheckinStorage {
           includeAdminAsMember: input.includeAdminAsMember,
           triggerNoWeeklyLogEnabled: input.triggerNoWeeklyLogEnabled,
           triggerSlowStartEnabled: input.triggerSlowStartEnabled,
+          sendHour: input.sendHour,
           dailyMemberLimit: input.dailyMemberLimit,
           dailyWorkspaceLimit: input.dailyWorkspaceLimit,
           updatedAt: new Date(),
