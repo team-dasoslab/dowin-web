@@ -33,7 +33,6 @@ const createUid = customAlphabet(
   12,
 );
 
-const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
 const DEFAULT_TIMEZONE = "Asia/Seoul";
 const DEFAULT_CHECKIN_SEND_HOUR = 16;
 
@@ -505,27 +504,34 @@ export class TeamCheckinService {
         (candidate) =>
           settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
       );
-      const weeklyCandidates = candidates.filter((candidate) => {
-        if (candidate.period !== "WEEKLY") return false;
-        if (!this.leadMeasureAgeGateEnabled) return true;
-        return isOldEnoughForCheckin(candidate.leadMeasureCreatedAt, now);
-      });
-      const candidateContexts = weeklyCandidates.map((candidate) => {
-        const timezone = resolveTimezone(candidate.timezone);
-        const localTime = getLocalDateTimeParts(now, timezone);
+      const candidateContexts = candidates
+        .filter((candidate) => candidate.period === "WEEKLY")
+        .map((candidate) => {
+          const timezone = resolveTimezone(candidate.timezone);
+          const localTime = getLocalDateTimeParts(now, timezone);
+          const weekRange = getLocalWeekRange(now, timezone);
 
-        return {
-          candidate,
-          localHour: localTime.hour,
-          weekRange: getLocalWeekRange(now, timezone),
-          dayRange: getLocalDayRange(now, timezone),
-        };
-      });
+          return {
+            candidate,
+            timezone,
+            localHour: localTime.hour,
+            weekRange,
+            dayRange: getLocalDayRange(now, timezone),
+          };
+        })
+        .filter(({ candidate, timezone, weekRange }) => {
+          if (!this.leadMeasureAgeGateEnabled) return true;
+          return wasCreatedBeforeLocalWeek(
+            candidate,
+            timezone,
+            weekRange.weekStart,
+          );
+        });
       const logRange = getCombinedLogRange(
         candidateContexts.map((context) => context.weekRange),
       );
       const logs = await this.storage.findLogsForCandidates(
-        weeklyCandidates.map((candidate) => candidate.leadMeasureId),
+        candidateContexts.map(({ candidate }) => candidate.leadMeasureId),
         logRange.from,
         logRange.to,
       );
@@ -851,8 +857,16 @@ function groupLogs(
   return map;
 }
 
-function isOldEnoughForCheckin(createdAt: Date, now: Date) {
-  return now.getTime() - createdAt.getTime() >= MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS;
+function wasCreatedBeforeLocalWeek(
+  candidate: TeamCheckinCandidate,
+  timezone: string,
+  weekStart: string,
+) {
+  const createdLocalDate = getLocalDateTimeParts(
+    candidate.leadMeasureCreatedAt,
+    timezone,
+  ).date;
+  return createdLocalDate < weekStart;
 }
 
 function getReasonCode(
