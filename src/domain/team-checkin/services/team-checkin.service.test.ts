@@ -54,7 +54,7 @@ describe("TeamCheckinService", () => {
       enabled: false,
       includeAdminAsMember: false,
       triggerNoWeeklyLogEnabled: true,
-      triggerSlowStartEnabled: true,
+      triggerSlowStartEnabled: false,
       dailyMemberLimit: 2,
       dailyWorkspaceLimit: 30,
     });
@@ -242,7 +242,7 @@ describe("TeamCheckinService", () => {
     );
   });
 
-  it("evaluates slow-start thresholds in each member timezone", async () => {
+  it("does not create slow-start checkins even when the stored setting is enabled", async () => {
     const createDelivery = vi.fn().mockResolvedValue({
       id: 1,
       uid: "chk_1",
@@ -314,17 +314,10 @@ describe("TeamCheckinService", () => {
       }),
     ).resolves.toMatchObject({
       evaluatedWorkspaceCount: 1,
-      candidateCount: 1,
-      createdDeliveryCount: 1,
+      candidateCount: 0,
+      createdDeliveryCount: 0,
     });
-    expect(createDelivery).toHaveBeenCalledWith(
-      expect.objectContaining({
-        memberUserId: 11,
-        reasonCode: "SLOW_WEEKLY_START",
-        periodStart: "2026-06-15",
-        periodEnd: "2026-06-21",
-      }),
-    );
+    expect(createDelivery).not.toHaveBeenCalled();
   });
 
   it("evaluates a recent lead measure while the age gate is disabled", async () => {

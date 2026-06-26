@@ -37,7 +37,7 @@ const DEFAULT_SETTINGS = {
   enabled: false,
   includeAdminAsMember: false,
   triggerNoWeeklyLogEnabled: true,
-  triggerSlowStartEnabled: true,
+  triggerSlowStartEnabled: false,
   dailyMemberLimit: 2,
   dailyWorkspaceLimit: 30,
 };
@@ -87,6 +87,7 @@ export class TeamCheckinService {
     const settings = await this.storage.upsertSettings({
       workspaceId: context.workspaceId,
       ...input,
+      triggerSlowStartEnabled: false,
     });
 
     if (settings.enabled) {
@@ -510,7 +511,6 @@ export class TeamCheckinService {
 
         return {
           candidate,
-          localTime: getLocalTimeParts(now, timezone),
           weekRange: getLocalWeekRange(now, timezone),
           dayRange: getLocalDayRange(now, timezone),
         };
@@ -541,14 +541,12 @@ export class TeamCheckinService {
 
       for (const {
         candidate,
-        localTime,
         weekRange,
         dayRange,
       } of candidateContexts) {
         const reasonCode = getReasonCode(
           candidate,
           logsByMeasure.get(candidate.leadMeasureId) ?? [],
-          localTime,
           weekRange,
           settings,
         );
@@ -689,7 +687,7 @@ export class TeamCheckinService {
       enabled: record.enabled,
       includeAdminAsMember: record.includeAdminAsMember,
       triggerNoWeeklyLogEnabled: record.triggerNoWeeklyLogEnabled,
-      triggerSlowStartEnabled: record.triggerSlowStartEnabled,
+      triggerSlowStartEnabled: false,
       dailyMemberLimit: record.dailyMemberLimit,
       dailyWorkspaceLimit: record.dailyWorkspaceLimit,
     };
@@ -850,11 +848,9 @@ function isOldEnoughForCheckin(createdAt: Date, now: Date) {
 function getReasonCode(
   candidate: TeamCheckinCandidate,
   logsForMeasure: Array<{ logDate: string; value: boolean; count: number }>,
-  localTime: { day: number; hour: number },
   weekRange: { weekStart: string; weekEnd: string },
   settings: {
     triggerNoWeeklyLogEnabled: boolean;
-    triggerSlowStartEnabled: boolean;
   },
 ) {
   const achievedCount = logsForMeasure.filter(
@@ -871,33 +867,6 @@ function getReasonCode(
 
   if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
     return "NO_WEEKLY_LOG" as const;
-  }
-
-  if (settings.triggerSlowStartEnabled) {
-    if (
-      candidate.targetValue === 1 &&
-      localTime.day >= 5 &&
-      localTime.hour >= 10 &&
-      achievedCount === 0
-    ) {
-      return "SLOW_WEEKLY_START" as const;
-    }
-    if (
-      candidate.targetValue === 2 &&
-      localTime.day >= 3 &&
-      localTime.hour >= 10 &&
-      achievedCount === 0
-    ) {
-      return "SLOW_WEEKLY_START" as const;
-    }
-    if (
-      candidate.targetValue >= 3 &&
-      localTime.day >= 3 &&
-      localTime.hour >= 10 &&
-      achievedCount <= 1
-    ) {
-      return "SLOW_WEEKLY_START" as const;
-    }
   }
 
   return null;
@@ -938,14 +907,6 @@ function resolveTimezone(timezone?: string | null) {
   } catch {
     return DEFAULT_TIMEZONE;
   }
-}
-
-function getLocalTimeParts(now: Date, timezone: string) {
-  const parts = getLocalDateTimeParts(now, timezone);
-  return {
-    day: parts.day,
-    hour: parts.hour,
-  };
 }
 
 function getLocalWeekRange(now: Date, timezone: string) {
