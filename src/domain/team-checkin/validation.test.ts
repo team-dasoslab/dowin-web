@@ -13,6 +13,7 @@ describe("team-checkin validation", () => {
         includeAdminAsMember: false,
         triggerNoWeeklyLogEnabled: true,
         triggerSlowStartEnabled: true,
+        sendHour: 16,
         dailyMemberLimit: 2,
         dailyWorkspaceLimit: 30,
       }).success,
@@ -24,7 +25,20 @@ describe("team-checkin validation", () => {
         includeAdminAsMember: false,
         triggerNoWeeklyLogEnabled: true,
         triggerSlowStartEnabled: true,
+        sendHour: 16,
         dailyMemberLimit: 0,
+        dailyWorkspaceLimit: 30,
+      }).success,
+    ).toBe(false);
+
+    expect(
+      teamCheckinSettingsSchema.safeParse({
+        enabled: true,
+        includeAdminAsMember: false,
+        triggerNoWeeklyLogEnabled: true,
+        triggerSlowStartEnabled: true,
+        sendHour: 24,
+        dailyMemberLimit: 2,
         dailyWorkspaceLimit: 30,
       }).success,
     ).toBe(false);
