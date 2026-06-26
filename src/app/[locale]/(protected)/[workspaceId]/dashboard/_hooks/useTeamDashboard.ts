@@ -89,7 +89,7 @@ export const useTeamDashboard = (workspaceId: string) => {
   return {
     dashboard,
     hasNoWorkspace,
-    isLoading,
+    isLoading: isLoading && !lastDashboard,
     isPeriodLoading: isFetching,
     isPreviousDisabled: false,
     isResetVisible: selectedWeekStart !== currentWeekStart,
