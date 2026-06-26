@@ -37,6 +37,7 @@ describe("TeamCheckinService", () => {
         includeAdminAsMember: false,
         triggerNoWeeklyLogEnabled: true,
         triggerSlowStartEnabled: true,
+        sendHour: 16,
         dailyMemberLimit: 2,
         dailyWorkspaceLimit: 30,
       }),
@@ -55,6 +56,7 @@ describe("TeamCheckinService", () => {
       includeAdminAsMember: false,
       triggerNoWeeklyLogEnabled: true,
       triggerSlowStartEnabled: false,
+      sendHour: 16,
       dailyMemberLimit: 2,
       dailyWorkspaceLimit: 30,
     });
@@ -102,6 +104,7 @@ describe("TeamCheckinService", () => {
               includeAdminAsMember: false,
               triggerNoWeeklyLogEnabled: false,
               triggerSlowStartEnabled: true,
+              sendHour: 16,
               dailyMemberLimit: 2,
               dailyWorkspaceLimit: 30,
             },
@@ -162,6 +165,7 @@ describe("TeamCheckinService", () => {
               includeAdminAsMember: false,
               triggerNoWeeklyLogEnabled: true,
               triggerSlowStartEnabled: false,
+              sendHour: 16,
               dailyMemberLimit: 2,
               dailyWorkspaceLimit: 30,
             },
@@ -193,7 +197,7 @@ describe("TeamCheckinService", () => {
             memberUserId: 12,
             memberRole: "MEMBER",
             userLocale: "en",
-            timezone: "UTC",
+            timezone: "Asia/Seoul",
             scoreboardId: 31,
             leadMeasureId: 21,
             leadMeasureName: "Customer interviews",
@@ -214,7 +218,7 @@ describe("TeamCheckinService", () => {
 
     await expect(
       service.run({
-        now: "2026-06-19T00:48:00.000Z",
+        now: "2026-06-19T07:48:00.000Z",
         dryRun: true,
       }),
     ).resolves.toMatchObject({
@@ -242,6 +246,126 @@ describe("TeamCheckinService", () => {
     );
   });
 
+  it("does not create checkins outside the default 16:00 local send hour", async () => {
+    const createDelivery = vi.fn();
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: false,
+              sendHour: 16,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            timezone: "Asia/Seoul",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-01T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-26T14:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 0,
+      createdDeliveryCount: 0,
+    });
+    expect(createDelivery).not.toHaveBeenCalled();
+  });
+
+  it("creates checkins at the configured local send hour", async () => {
+    const createDelivery = vi.fn().mockResolvedValue({
+      id: 1,
+      uid: "chk_1",
+      deeplinkPath: "/ko/ws_uid/dashboard/my",
+    });
+    const service = new TeamCheckinService(
+      createStorage({
+        findEnabledSettingsWithWorkspaces: vi.fn().mockResolvedValue([
+          {
+            settings: {
+              enabled: true,
+              includeAdminAsMember: false,
+              triggerNoWeeklyLogEnabled: true,
+              triggerSlowStartEnabled: false,
+              sendHour: 15,
+              dailyMemberLimit: 2,
+              dailyWorkspaceLimit: 30,
+            },
+            workspace: {
+              id: 1,
+            },
+          },
+        ]),
+        findCandidates: vi.fn().mockResolvedValue([
+          {
+            workspaceId: 1,
+            workspaceUid: "ws_uid",
+            memberUserId: 11,
+            memberRole: "MEMBER",
+            userLocale: "ko",
+            timezone: "Asia/Seoul",
+            scoreboardId: 30,
+            leadMeasureId: 20,
+            leadMeasureName: "고객 인터뷰",
+            leadMeasureCreatedAt: new Date("2026-06-01T01:00:00.000Z"),
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "BOOLEAN",
+            dailyTargetCount: 1,
+          },
+        ]),
+        findLogsForCandidates: vi.fn().mockResolvedValue([]),
+        findDeliveriesWithResponsesForWorkspaceOnDate: vi.fn().mockResolvedValue([]),
+        findActiveDeviceTokens: vi.fn().mockResolvedValue([]),
+        markDeliverySkipped: vi.fn(),
+        createDelivery,
+      }),
+    );
+
+    await expect(
+      service.run({
+        now: "2026-06-26T06:00:00.000Z",
+        dryRun: true,
+      }),
+    ).resolves.toMatchObject({
+      evaluatedWorkspaceCount: 1,
+      candidateCount: 1,
+      createdDeliveryCount: 1,
+    });
+    expect(createDelivery).toHaveBeenCalledOnce();
+  });
+
   it("does not create slow-start checkins even when the stored setting is enabled", async () => {
     const createDelivery = vi.fn().mockResolvedValue({
       id: 1,
@@ -257,6 +381,7 @@ describe("TeamCheckinService", () => {
               includeAdminAsMember: false,
               triggerNoWeeklyLogEnabled: false,
               triggerSlowStartEnabled: true,
+              sendHour: 16,
               dailyMemberLimit: 2,
               dailyWorkspaceLimit: 30,
             },
@@ -309,7 +434,7 @@ describe("TeamCheckinService", () => {
 
     await expect(
       service.run({
-        now: "2026-06-17T01:00:00.000Z",
+        now: "2026-06-17T07:00:00.000Z",
         dryRun: true,
       }),
     ).resolves.toMatchObject({
@@ -331,6 +456,7 @@ describe("TeamCheckinService", () => {
               includeAdminAsMember: false,
               triggerNoWeeklyLogEnabled: true,
               triggerSlowStartEnabled: true,
+              sendHour: 16,
               dailyMemberLimit: 2,
               dailyWorkspaceLimit: 30,
             },
@@ -367,7 +493,7 @@ describe("TeamCheckinService", () => {
 
     await expect(
       service.run({
-        now: "2026-06-17T01:00:00.000Z",
+        now: "2026-06-17T07:00:00.000Z",
         dryRun: true,
       }),
     ).resolves.toMatchObject({
@@ -389,6 +515,7 @@ describe("TeamCheckinService", () => {
               includeAdminAsMember: false,
               triggerNoWeeklyLogEnabled: true,
               triggerSlowStartEnabled: true,
+              sendHour: 16,
               dailyMemberLimit: 2,
               dailyWorkspaceLimit: 30,
             },

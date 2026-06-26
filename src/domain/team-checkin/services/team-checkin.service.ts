@@ -33,16 +33,19 @@ const createUid = customAlphabet(
   12,
 );
 
+const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
+const DEFAULT_TIMEZONE = "Asia/Seoul";
+const DEFAULT_CHECKIN_SEND_HOUR = 16;
+
 const DEFAULT_SETTINGS = {
   enabled: false,
   includeAdminAsMember: false,
   triggerNoWeeklyLogEnabled: true,
   triggerSlowStartEnabled: false,
+  sendHour: DEFAULT_CHECKIN_SEND_HOUR,
   dailyMemberLimit: 2,
   dailyWorkspaceLimit: 30,
 };
-const MIN_LEAD_MEASURE_AGE_FOR_CHECKIN_MS = 7 * 24 * 60 * 60 * 1000;
-const DEFAULT_TIMEZONE = "Asia/Seoul";
 
 type TeamCheckinServiceOptions = {
   leadMeasureAgeGateEnabled?: boolean;
@@ -88,6 +91,7 @@ export class TeamCheckinService {
       workspaceId: context.workspaceId,
       ...input,
       triggerSlowStartEnabled: false,
+      sendHour: normalizeSendHour(input.sendHour),
     });
 
     if (settings.enabled) {
@@ -508,9 +512,11 @@ export class TeamCheckinService {
       });
       const candidateContexts = weeklyCandidates.map((candidate) => {
         const timezone = resolveTimezone(candidate.timezone);
+        const localTime = getLocalDateTimeParts(now, timezone);
 
         return {
           candidate,
+          localHour: localTime.hour,
           weekRange: getLocalWeekRange(now, timezone),
           dayRange: getLocalDayRange(now, timezone),
         };
@@ -541,9 +547,12 @@ export class TeamCheckinService {
 
       for (const {
         candidate,
+        localHour,
         weekRange,
         dayRange,
       } of candidateContexts) {
+        if (localHour !== normalizeSendHour(settings.sendHour)) continue;
+
         const reasonCode = getReasonCode(
           candidate,
           logsByMeasure.get(candidate.leadMeasureId) ?? [],
@@ -688,6 +697,7 @@ export class TeamCheckinService {
       includeAdminAsMember: record.includeAdminAsMember,
       triggerNoWeeklyLogEnabled: record.triggerNoWeeklyLogEnabled,
       triggerSlowStartEnabled: false,
+      sendHour: normalizeSendHour(record.sendHour),
       dailyMemberLimit: record.dailyMemberLimit,
       dailyWorkspaceLimit: record.dailyWorkspaceLimit,
     };
@@ -907,6 +917,12 @@ function resolveTimezone(timezone?: string | null) {
   } catch {
     return DEFAULT_TIMEZONE;
   }
+}
+
+function normalizeSendHour(value: number | null | undefined): number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 23
+    ? value
+    : DEFAULT_CHECKIN_SEND_HOUR;
 }
 
 function getLocalWeekRange(now: Date, timezone: string) {

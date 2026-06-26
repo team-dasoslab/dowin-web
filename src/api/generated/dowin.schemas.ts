@@ -26,6 +26,11 @@ export interface TeamCheckinSettings {
   triggerNoWeeklyLogEnabled: boolean;
   triggerSlowStartEnabled: boolean;
   /**
+   * @minimum 0
+   * @maximum 23
+   */
+  sendHour: number;
+  /**
    * @minimum 1
    * @maximum 10
    */
