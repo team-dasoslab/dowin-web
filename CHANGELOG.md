@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.8](https://github.com/team-dasoslab/dowin-web/compare/v1.7.7...v1.7.8) (2026-06-26)
+
+
+### Bug Fixes
+
+* 푸시 알림 탭 시 payload의 url로 자동 라우팅 지원 및 중복 실행 방지 ([f9c10c4](https://github.com/team-dasoslab/dowin-web/commit/f9c10c48eadbd2f59fe400810ed1f8ad437f88e8))
+
 ## [1.7.7](https://github.com/team-dasoslab/dowin-web/compare/v1.7.6...v1.7.7) (2026-06-26)
 
 
