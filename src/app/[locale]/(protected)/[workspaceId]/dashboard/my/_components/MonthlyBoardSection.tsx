@@ -13,6 +13,7 @@ interface MonthlyBoardSectionProps {
   monthlyOverallRate: number;
   monthlySummary: ReturnType<typeof useDashboardScoreboard>["monthlySummary"];
   today: string;
+  isLoading?: boolean;
 }
 
 export function MonthlyBoardSection({
@@ -21,6 +22,7 @@ export function MonthlyBoardSection({
   monthWeeks,
   monthlyLeadMeasures,
   today,
+  isLoading,
 }: MonthlyBoardSectionProps) {
   const t = useTranslations("Dashboard");
   const tagsByMeasureId = new Map(
@@ -43,7 +45,12 @@ export function MonthlyBoardSection({
     <div className="space-y-4">
 
 
-      {monthlyLeadMeasures.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col gap-4">
+          <div className="h-[200px] w-full animate-pulse rounded-[24px] bg-border" />
+          <div className="h-[300px] w-full animate-pulse rounded-[24px] bg-border" />
+        </div>
+      ) : monthlyLeadMeasures.length === 0 ? (
         <div className="rounded-[24px] bg-surface p-8 text-center text-[14px] font-medium text-text-muted">
           {t("noMonthlyMeasures")}
         </div>

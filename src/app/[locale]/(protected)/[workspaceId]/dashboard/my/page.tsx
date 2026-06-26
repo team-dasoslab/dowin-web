@@ -287,6 +287,7 @@ export default function MyDashboardPage() {
                   monthlyOverallRate={monthlyOverallRate}
                   monthlySummary={monthlySummary}
                   today={today}
+                  isLoading={isPeriodLoading}
                 />
               ) : (
                 <WeeklyBoardSection

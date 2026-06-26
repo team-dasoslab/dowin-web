@@ -3223,6 +3223,7 @@ components:
         - includeAdminAsMember
         - triggerNoWeeklyLogEnabled
         - triggerSlowStartEnabled
+        - sendHour
         - dailyMemberLimit
         - dailyWorkspaceLimit
       properties:
@@ -3230,6 +3231,7 @@ components:
         includeAdminAsMember: { type: boolean }
         triggerNoWeeklyLogEnabled: { type: boolean }
         triggerSlowStartEnabled: { type: boolean }
+        sendHour: { type: integer, minimum: 0, maximum: 23 }
         dailyMemberLimit: { type: integer, minimum: 1, maximum: 10 }
         dailyWorkspaceLimit: { type: integer, minimum: 1, maximum: 500 }
 

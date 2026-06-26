@@ -5,6 +5,7 @@ export const teamCheckinSettingsSchema = z.object({
   includeAdminAsMember: z.boolean(),
   triggerNoWeeklyLogEnabled: z.boolean(),
   triggerSlowStartEnabled: z.boolean(),
+  sendHour: z.number().int().min(0).max(23),
   dailyMemberLimit: z.number().int().min(1).max(10),
   dailyWorkspaceLimit: z.number().int().min(1).max(500),
 });
