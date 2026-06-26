@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.6](https://github.com/team-dasoslab/dowin-web/compare/v1.7.5...v1.7.6) (2026-06-26)
+
+
+### Bug Fixes
+
+* 대시보드 로딩 스켈레톤 UX 개선 ([589d68a](https://github.com/team-dasoslab/dowin-web/commit/589d68a4025ff1dd19455d201bacde33879050fe))
+
 ## [1.7.5](https://github.com/team-dasoslab/dowin-web/compare/v1.7.4...v1.7.5) (2026-06-24)
 
 
