@@ -30,8 +30,10 @@ import type {
   DashboardTeamMemoListResponse,
   DashboardTeamMemoResolveRequest,
   ErrorResponse,
+  GetWorkspacesWorkspaceIdDashboardMyParams,
   GetWorkspacesWorkspaceIdDashboardTeamMemosParams,
   GetWorkspacesWorkspaceIdDashboardTeamParams,
+  MyDashboardResponse,
   TeamDashboardResponse,
   UnauthorizedErrorResponse
 } from '../dowin.schemas';
@@ -40,6 +42,143 @@ import { customInstance } from '../../mutator';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+/**
+ * @summary 개인 대시보드 통합 조회
+ */
+export type getWorkspacesWorkspaceIdDashboardMyResponse200 = {
+  data: MyDashboardResponse
+  status: 200
+}
+
+export type getWorkspacesWorkspaceIdDashboardMyResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type getWorkspacesWorkspaceIdDashboardMyResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getWorkspacesWorkspaceIdDashboardMyResponseSuccess = (getWorkspacesWorkspaceIdDashboardMyResponse200) & {
+  headers: Headers;
+};
+export type getWorkspacesWorkspaceIdDashboardMyResponseError = (getWorkspacesWorkspaceIdDashboardMyResponse401 | getWorkspacesWorkspaceIdDashboardMyResponse404) & {
+  headers: Headers;
+};
+
+export type getWorkspacesWorkspaceIdDashboardMyResponse = (getWorkspacesWorkspaceIdDashboardMyResponseSuccess | getWorkspacesWorkspaceIdDashboardMyResponseError)
+
+export const getGetWorkspacesWorkspaceIdDashboardMyUrl = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardMyParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/workspaces/${workspaceId}/dashboard/my?${stringifiedParams}` : `/api/workspaces/${workspaceId}/dashboard/my`
+}
+
+export const getWorkspacesWorkspaceIdDashboardMy = async (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardMyParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdDashboardMyResponse> => {
+
+  return customInstance<getWorkspacesWorkspaceIdDashboardMyResponse>(getGetWorkspacesWorkspaceIdDashboardMyUrl(workspaceId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWorkspacesWorkspaceIdDashboardMyQueryKey = (workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardMyParams,) => {
+    return [
+    `/api/workspaces/${workspaceId}/dashboard/my`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetWorkspacesWorkspaceIdDashboardMyQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardMyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdDashboardMyQueryKey(workspaceId,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>> = ({ signal }) => getWorkspacesWorkspaceIdDashboardMy(workspaceId,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetWorkspacesWorkspaceIdDashboardMyQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>>
+export type GetWorkspacesWorkspaceIdDashboardMyQueryError = UnauthorizedErrorResponse | ErrorResponse
+
+
+export function useGetWorkspacesWorkspaceIdDashboardMy<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params: undefined |  GetWorkspacesWorkspaceIdDashboardMyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesWorkspaceIdDashboardMy<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardMyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>,
+          TError,
+          Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetWorkspacesWorkspaceIdDashboardMy<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardMyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary 개인 대시보드 통합 조회
+ */
+
+export function useGetWorkspacesWorkspaceIdDashboardMy<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
+ workspaceId: string,
+    params?: GetWorkspacesWorkspaceIdDashboardMyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardMy>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetWorkspacesWorkspaceIdDashboardMyQueryOptions(workspaceId,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
 
 
 
@@ -75,7 +214,7 @@ export const getGetWorkspacesWorkspaceIdDashboardTeamUrl = (workspaceId: string,
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
+
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
@@ -88,16 +227,16 @@ export const getGetWorkspacesWorkspaceIdDashboardTeamUrl = (workspaceId: string,
 
 export const getWorkspacesWorkspaceIdDashboardTeam = async (workspaceId: string,
     params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdDashboardTeamResponse> => {
-  
+
   return customInstance<getWorkspacesWorkspaceIdDashboardTeamResponse>(getGetWorkspacesWorkspaceIdDashboardTeamUrl(workspaceId,params),
-  {      
+  {
     ...options,
     method: 'GET'
-    
-    
+
+
   }
 );}
-  
+
 
 
 
@@ -109,7 +248,7 @@ export const getGetWorkspacesWorkspaceIdDashboardTeamQueryKey = (workspaceId: st
     ] as const;
     }
 
-    
+
 export const getGetWorkspacesWorkspaceIdDashboardTeamQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
     params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
@@ -118,13 +257,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdDashboardTeamQueryKey(workspaceId,params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>> = ({ signal }) => getWorkspacesWorkspaceIdDashboardTeam(workspaceId,params, { signal, ...requestOptions });
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -167,7 +306,7 @@ export function useGetWorkspacesWorkspaceIdDashboardTeam<TData = Awaited<ReturnT
 export function useGetWorkspacesWorkspaceIdDashboardTeam<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  workspaceId: string,
     params?: GetWorkspacesWorkspaceIdDashboardTeamParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeam>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdDashboardTeamQueryOptions(workspaceId,params,options)
@@ -217,7 +356,7 @@ export const getGetWorkspacesWorkspaceIdDashboardTeamMemosUrl = (workspaceId: st
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
+
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
@@ -230,16 +369,16 @@ export const getGetWorkspacesWorkspaceIdDashboardTeamMemosUrl = (workspaceId: st
 
 export const getWorkspacesWorkspaceIdDashboardTeamMemos = async (workspaceId: string,
     params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: RequestInit): Promise<getWorkspacesWorkspaceIdDashboardTeamMemosResponse> => {
-  
+
   return customInstance<getWorkspacesWorkspaceIdDashboardTeamMemosResponse>(getGetWorkspacesWorkspaceIdDashboardTeamMemosUrl(workspaceId,params),
-  {      
+  {
     ...options,
     method: 'GET'
-    
-    
+
+
   }
 );}
-  
+
 
 
 
@@ -251,7 +390,7 @@ export const getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryKey = (workspaceI
     ] as const;
     }
 
-    
+
 export const getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryOptions = <TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(workspaceId: string,
     params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
 ) => {
@@ -260,13 +399,13 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryKey(workspaceId,params);
 
-  
+
 
     const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>> = ({ signal }) => getWorkspacesWorkspaceIdDashboardTeamMemos(workspaceId,params, { signal, ...requestOptions });
 
-      
 
-      
+
+
 
    return  { queryKey, queryFn, enabled: !!(workspaceId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
@@ -309,7 +448,7 @@ export function useGetWorkspacesWorkspaceIdDashboardTeamMemos<TData = Awaited<Re
 export function useGetWorkspacesWorkspaceIdDashboardTeamMemos<TData = Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError = UnauthorizedErrorResponse | ErrorResponse>(
  workspaceId: string,
     params: GetWorkspacesWorkspaceIdDashboardTeamMemosParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkspacesWorkspaceIdDashboardTeamMemos>>, TError, TData>>, request?: SecondParameter<typeof customInstance>}
- , queryClient?: QueryClient 
+ , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetWorkspacesWorkspaceIdDashboardTeamMemosQueryOptions(workspaceId,params,options)
@@ -357,16 +496,16 @@ export type postWorkspacesWorkspaceIdDashboardTeamMemosResponse = (postWorkspace
 export const getPostWorkspacesWorkspaceIdDashboardTeamMemosUrl = (workspaceId: string,) => {
 
 
-  
+
 
   return `/api/workspaces/${workspaceId}/dashboard/team/memos`
 }
 
 export const postWorkspacesWorkspaceIdDashboardTeamMemos = async (workspaceId: string,
     dashboardTeamMemoCreateRequest: DashboardTeamMemoCreateRequest, options?: RequestInit): Promise<postWorkspacesWorkspaceIdDashboardTeamMemosResponse> => {
-  
+
   return customInstance<postWorkspacesWorkspaceIdDashboardTeamMemosResponse>(getPostWorkspacesWorkspaceIdDashboardTeamMemosUrl(workspaceId),
-  {      
+  {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -374,7 +513,7 @@ export const postWorkspacesWorkspaceIdDashboardTeamMemos = async (workspaceId: s
       dashboardTeamMemoCreateRequest,)
   }
 );}
-  
+
 
 
 
@@ -389,7 +528,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesWorkspaceIdDashboardTeamMemos>>, {workspaceId: string;data: DashboardTeamMemoCreateRequest}> = (props) => {
@@ -400,7 +539,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -463,7 +602,7 @@ export const getPatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveUrl = (
     memoId: number,) => {
 
 
-  
+
 
   return `/api/workspaces/${workspaceId}/dashboard/team/memos/${memoId}/resolve`
 }
@@ -471,9 +610,9 @@ export const getPatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveUrl = (
 export const patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve = async (workspaceId: string,
     memoId: number,
     dashboardTeamMemoResolveRequest: DashboardTeamMemoResolveRequest, options?: RequestInit): Promise<patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse> => {
-  
+
   return customInstance<patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveResponse>(getPatchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolveUrl(workspaceId,memoId),
-  {      
+  {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -481,7 +620,7 @@ export const patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve = async (
       dashboardTeamMemoResolveRequest,)
   }
 );}
-  
+
 
 
 
@@ -496,7 +635,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResolve>>, {workspaceId: string;memoId: number;data: DashboardTeamMemoResolveRequest}> = (props) => {
@@ -507,7 +646,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
@@ -565,23 +704,23 @@ export const getDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdUrl = (worksp
     memoId: number,) => {
 
 
-  
+
 
   return `/api/workspaces/${workspaceId}/dashboard/team/memos/${memoId}`
 }
 
 export const deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId = async (workspaceId: string,
     memoId: number, options?: RequestInit): Promise<deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse> => {
-  
+
   return customInstance<deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdResponse>(getDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdUrl(workspaceId,memoId),
-  {      
+  {
     ...options,
     method: 'DELETE'
-    
-    
+
+
   }
 );}
-  
+
 
 
 
@@ -596,7 +735,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       : {...options, mutation: {...options.mutation, mutationKey}}
       : {mutation: { mutationKey, }, request: undefined};
 
-      
+
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>, {workspaceId: string;memoId: number}> = (props) => {
@@ -607,13 +746,13 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-        
+
 
 
   return  { mutationFn, ...mutationOptions }}
 
     export type DeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId>>>
-    
+
     export type DeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdMutationError = UnauthorizedErrorResponse | ErrorResponse
 
     /**
@@ -629,4 +768,3 @@ export const useDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoId = <TError = 
       > => {
       return useMutation(getDeleteWorkspacesWorkspaceIdDashboardTeamMemosMemoIdMutationOptions(options), queryClient);
     }
-    

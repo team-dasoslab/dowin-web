@@ -543,6 +543,14 @@ describe("useScoreboardSetup update mode", () => {
     expect(result.current.measures).toEqual([
       expect.objectContaining({
         existingId: 11,
+        initialPayload: {
+          dailyTargetCount: 1,
+          name: "기존 활성 액션",
+          period: "WEEKLY",
+          tagIds: [1],
+          targetValue: 3,
+          trackingMode: "BOOLEAN",
+        },
         initialStatus: "ACTIVE",
         name: "기존 활성 액션",
         period: "WEEKLY",
@@ -573,6 +581,95 @@ describe("useScoreboardSetup update mode", () => {
         }),
       }),
     );
+  });
+
+  it("does not update unchanged existing lead measures", async () => {
+    const { result } = renderScoreboardSetup();
+    let submitResult = false;
+
+    await waitFor(() => {
+      expect(result.current.measures).toHaveLength(2);
+    });
+
+    act(() => {
+      result.current.setGoalName("수정 목표");
+    });
+
+    await act(async () => {
+      submitResult = await result.current.submit();
+    });
+
+    expect(submitResult).toBe(true);
+    expect(updateScoreboardMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      id: 101,
+      data: {
+        goalName: "수정 목표",
+        lagMeasure: "기존 성공 기준",
+      },
+    });
+    expect(updateLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(createLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(reactivateLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(archiveLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(deleteLeadMeasureMutateAsync).not.toHaveBeenCalled();
+  });
+
+  it("does not update an unchanged scoreboard when a lead measure changes", async () => {
+    const { result } = renderScoreboardSetup();
+    let submitResult = false;
+
+    await waitFor(() => {
+      expect(result.current.measures).toHaveLength(2);
+    });
+
+    act(() => {
+      result.current.handleMeasureChange("11", "name", "수정 활성 액션");
+    });
+
+    await act(async () => {
+      submitResult = await result.current.submit();
+    });
+
+    expect(submitResult).toBe(true);
+    expect(updateScoreboardMutateAsync).not.toHaveBeenCalled();
+    expect(updateLeadMeasureMutateAsync).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      id: 11,
+      data: {
+        dailyTargetCount: 1,
+        name: "수정 활성 액션",
+        period: "WEEKLY",
+        tagIds: [1],
+        targetValue: 3,
+        trackingMode: "BOOLEAN",
+      },
+    });
+    expect(createLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(reactivateLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(archiveLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(deleteLeadMeasureMutateAsync).not.toHaveBeenCalled();
+  });
+
+  it("does not call update APIs when the edit form is unchanged", async () => {
+    const { result } = renderScoreboardSetup();
+    let submitResult = false;
+
+    await waitFor(() => {
+      expect(result.current.measures).toHaveLength(2);
+    });
+
+    await act(async () => {
+      submitResult = await result.current.submit();
+    });
+
+    expect(submitResult).toBe(true);
+    expect(updateScoreboardMutateAsync).not.toHaveBeenCalled();
+    expect(updateLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(createLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(reactivateLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(archiveLeadMeasureMutateAsync).not.toHaveBeenCalled();
+    expect(deleteLeadMeasureMutateAsync).not.toHaveBeenCalled();
   });
 
   it("marks existing rows for archive, reactivation, delete, and restore locally", async () => {

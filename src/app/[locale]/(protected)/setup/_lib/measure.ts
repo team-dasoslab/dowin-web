@@ -4,6 +4,7 @@ export type MeasureInput = {
   id: string;
   existingId: number | null;
   initialStatus: "ACTIVE" | "ARCHIVED" | null;
+  initialPayload?: MeasurePayloadSnapshot | null;
   status: "ACTIVE" | "ARCHIVED";
   name: string;
   period: "WEEKLY" | "MONTHLY";
@@ -17,6 +18,15 @@ export type MeasureInput = {
 export type SetupTag = {
   id: number;
   name: string;
+};
+
+export type MeasurePayloadSnapshot = {
+  name: string;
+  period: "WEEKLY" | "MONTHLY";
+  targetValue: number;
+  trackingMode: "BOOLEAN" | "COUNT";
+  dailyTargetCount: number;
+  tagIds: number[];
 };
 
 export const MOCK_SETUP_TAGS: SetupTag[] = [
@@ -71,6 +81,7 @@ export const createEmptyMeasure = (): MeasureInput => ({
   id: generateId(),
   existingId: null,
   initialStatus: null,
+  initialPayload: null,
   status: "ACTIVE",
   name: "",
   period: "WEEKLY",

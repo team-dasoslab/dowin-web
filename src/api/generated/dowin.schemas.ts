@@ -1820,6 +1820,79 @@ export interface AnalyticsExportDataResponse {
   dailyRows: AnalyticsExportDailyRow[];
 }
 
+export type MyDashboardWorkspacePlanCode = typeof MyDashboardWorkspacePlanCode[keyof typeof MyDashboardWorkspacePlanCode];
+
+
+export const MyDashboardWorkspacePlanCode = {
+  BASIC: 'BASIC',
+  FREE: 'FREE',
+  STANDARD: 'STANDARD',
+} as const;
+
+export type MyDashboardWorkspaceRole = typeof MyDashboardWorkspaceRole[keyof typeof MyDashboardWorkspaceRole];
+
+
+export const MyDashboardWorkspaceRole = {
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER',
+} as const;
+
+export interface MyDashboardWorkspace {
+  id: string;
+  name: string;
+  planCode: MyDashboardWorkspacePlanCode;
+  role: MyDashboardWorkspaceRole;
+  /** @minimum 0 */
+  memberCount: number;
+  /** @minimum 1 */
+  freeMemberLimit: number;
+  isOverFreeMemberLimit: boolean;
+}
+
+export interface MyDashboardTrendPoint {
+  label: string;
+  /**
+   * @minimum 0
+   * @maximum 100
+   */
+  rate: number;
+  weekStart: string;
+}
+
+export type ScoreboardSummaryStatus = typeof ScoreboardSummaryStatus[keyof typeof ScoreboardSummaryStatus];
+
+
+export const ScoreboardSummaryStatus = {
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED',
+} as const;
+
+export interface ScoreboardSummary {
+  id?: number;
+  userId?: number;
+  workspaceId?: number;
+  goalName?: string;
+  lagMeasure?: string;
+  status?: ScoreboardSummaryStatus;
+  startDate?: string;
+  /** @nullable */
+  endDate?: string | null;
+  createdAt?: string;
+}
+
+export type Scoreboard = ScoreboardSummary & {
+  leadMeasures?: LeadMeasure[];
+};
+
+export interface MyDashboardResponse {
+  workspace: MyDashboardWorkspace;
+  activeScoreboard: Scoreboard | null;
+  weeklyLogs: WeeklyLogsResponse | null;
+  monthlyLogs: MonthlyLogsResponse | null;
+  monthlySummary: MonthlyLogsSummaryResponse | null;
+  weeklyTrendPoints: MyDashboardTrendPoint[];
+}
+
 export type TeamDashboardMemberMeasurePeriod = typeof TeamDashboardMemberMeasurePeriod[keyof typeof TeamDashboardMemberMeasurePeriod];
 
 
@@ -1953,31 +2026,6 @@ export interface DashboardTeamMemoCreateRequest {
 export interface DashboardTeamMemoResolveRequest {
   isResolved: boolean;
 }
-
-export type ScoreboardSummaryStatus = typeof ScoreboardSummaryStatus[keyof typeof ScoreboardSummaryStatus];
-
-
-export const ScoreboardSummaryStatus = {
-  ACTIVE: 'ACTIVE',
-  ARCHIVED: 'ARCHIVED',
-} as const;
-
-export interface ScoreboardSummary {
-  id?: number;
-  userId?: number;
-  workspaceId?: number;
-  goalName?: string;
-  lagMeasure?: string;
-  status?: ScoreboardSummaryStatus;
-  startDate?: string;
-  /** @nullable */
-  endDate?: string | null;
-  createdAt?: string;
-}
-
-export type Scoreboard = ScoreboardSummary & {
-  leadMeasures?: LeadMeasure[];
-};
 
 export interface ScoreboardCreateRequest {
   goalName: string;
@@ -2219,6 +2267,20 @@ export const GetWorkspacesWorkspaceIdAnalyticsExportDataView = {
 export type GetWorkspacesWorkspaceIdBillingPortal200 = {
   portalUrl: string;
 };
+
+export type GetWorkspacesWorkspaceIdDashboardMyParams = {
+weekStart?: string;
+monthStart?: string;
+view?: GetWorkspacesWorkspaceIdDashboardMyView;
+};
+
+export type GetWorkspacesWorkspaceIdDashboardMyView = typeof GetWorkspacesWorkspaceIdDashboardMyView[keyof typeof GetWorkspacesWorkspaceIdDashboardMyView];
+
+
+export const GetWorkspacesWorkspaceIdDashboardMyView = {
+  week: 'week',
+  month: 'month',
+} as const;
 
 export type GetWorkspacesWorkspaceIdDashboardTeamParams = {
 weekStart?: string;
