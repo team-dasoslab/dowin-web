@@ -9,13 +9,16 @@ import {
   useDeleteWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
   usePutWorkspacesWorkspaceIdLeadMeasuresLeadMeasureIdLogsDate,
 } from "@/api/generated/daily-log/daily-log";
+import { getGetWorkspacesWorkspaceIdDashboardMyQueryKey } from "@/api/generated/dashboard/dashboard";
 import type { DailyLogUpsertRequest } from "@/api/generated/dowin.schemas";
 import {
   DailyLogValue,
   DashboardView,
+  MyDashboardQueryData,
   ToggleLogContext,
   WeeklyLogsQueryData,
   getNextLogValue,
+  updateMyDashboardCache,
   updateWeeklyLogsCache,
 } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-scoreboard";
 import { getApiErrorMessage } from "@/lib/client/frontend-api";
@@ -40,6 +43,9 @@ type UseDashboardLogMutationParams = {
   monthlySummaryQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey
   > | null;
+  myDashboardQueryKey: ReturnType<
+    typeof getGetWorkspacesWorkspaceIdDashboardMyQueryKey
+  > | null;
   workspaceId: string;
 };
 
@@ -51,6 +57,7 @@ export const useDashboardLogMutation = ({
   weeklyLogsQueryKey,
   monthlyLogsQueryKey,
   monthlySummaryQueryKey,
+  myDashboardQueryKey,
   workspaceId,
 }: UseDashboardLogMutationParams) => {
   const t = useTranslations("Dashboard.My");
@@ -102,6 +109,14 @@ export const useDashboardLogMutation = ({
       );
     }
 
+    if (context?.myDashboardQueryKey) {
+      invalidations.push(
+        queryClient.invalidateQueries({
+          queryKey: context.myDashboardQueryKey,
+        }),
+      );
+    }
+
     await Promise.all(invalidations);
   };
 
@@ -115,6 +130,10 @@ export const useDashboardLogMutation = ({
       weeklyLogsQueryKey === null
         ? undefined
         : queryClient.getQueryData<WeeklyLogsQueryData>(weeklyLogsQueryKey);
+    const previousMyDashboard =
+      myDashboardQueryKey === null
+        ? undefined
+        : queryClient.getQueryData<MyDashboardQueryData>(myDashboardQueryKey);
 
     addPendingLogKey(currentLogKey);
 
@@ -125,12 +144,26 @@ export const useDashboardLogMutation = ({
       );
     }
 
+    if (myDashboardQueryKey !== null) {
+      queryClient.setQueryData<MyDashboardQueryData>(
+        myDashboardQueryKey,
+        updateMyDashboardCache(
+          previousMyDashboard,
+          leadMeasureId,
+          date,
+          value,
+        ),
+      );
+    }
+
     return {
       currentLogKey,
+      previousMyDashboard,
       previousWeeklyLogs,
       weeklyLogsQueryKey,
       monthlyLogsQueryKey,
       monthlySummaryQueryKey,
+      myDashboardQueryKey,
     };
   };
 
@@ -139,6 +172,13 @@ export const useDashboardLogMutation = ({
       queryClient.setQueryData(
         context.weeklyLogsQueryKey,
         context.previousWeeklyLogs,
+      );
+    }
+
+    if (context?.myDashboardQueryKey !== null && context !== undefined) {
+      queryClient.setQueryData(
+        context.myDashboardQueryKey,
+        context.previousMyDashboard,
       );
     }
 
@@ -193,6 +233,9 @@ export const useDashboardLogMutation = ({
         }) => {
           await queryClient.cancelQueries({
             queryKey: weeklyLogsQueryKey ?? undefined,
+          });
+          await queryClient.cancelQueries({
+            queryKey: myDashboardQueryKey ?? undefined,
           });
 
           const leadMeasure = weeklyById.get(leadMeasureId);
@@ -258,6 +301,9 @@ export const useDashboardLogMutation = ({
         }) => {
           await queryClient.cancelQueries({
             queryKey: weeklyLogsQueryKey ?? undefined,
+          });
+          await queryClient.cancelQueries({
+            queryKey: myDashboardQueryKey ?? undefined,
           });
 
           return createToggleLogContext(leadMeasureId, date, null);

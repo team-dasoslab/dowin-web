@@ -2648,6 +2648,46 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
 
+  /workspaces/{workspaceId}/dashboard/my:
+    get:
+      summary: 개인 대시보드 통합 조회
+      tags: [Dashboard]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+          description: 워크스페이스 public ID
+        - name: weekStart
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - name: monthStart
+          in: query
+          required: false
+          schema: { type: string, format: date }
+        - name: view
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [week, month]
+            default: week
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/MyDashboardResponse" }
+        "404":
+          description: 워크스페이스를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
   /workspaces/{workspaceId}/dashboard/team:
     get:
       summary: 팀 대시보드 조회
@@ -4773,6 +4813,79 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AnalyticsExportDailyRow"
+
+    MyDashboardWorkspace:
+      type: object
+      required:
+        [
+          id,
+          name,
+          planCode,
+          role,
+          memberCount,
+          freeMemberLimit,
+          isOverFreeMemberLimit,
+        ]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        planCode:
+          type: string
+          enum: [BASIC, FREE, STANDARD]
+        role:
+          type: string
+          enum: [ADMIN, MEMBER]
+        memberCount:
+          type: integer
+          minimum: 0
+        freeMemberLimit:
+          type: integer
+          minimum: 1
+        isOverFreeMemberLimit:
+          type: boolean
+
+    MyDashboardTrendPoint:
+      type: object
+      required: [label, rate, weekStart]
+      properties:
+        label: { type: string }
+        rate: { type: integer, minimum: 0, maximum: 100 }
+        weekStart: { type: string, format: date }
+
+    MyDashboardResponse:
+      type: object
+      required:
+        [
+          workspace,
+          activeScoreboard,
+          weeklyLogs,
+          monthlyLogs,
+          monthlySummary,
+          weeklyTrendPoints,
+        ]
+      properties:
+        workspace:
+          $ref: "#/components/schemas/MyDashboardWorkspace"
+        activeScoreboard:
+          allOf:
+            - $ref: "#/components/schemas/Scoreboard"
+          nullable: true
+        weeklyLogs:
+          allOf:
+            - $ref: "#/components/schemas/WeeklyLogsResponse"
+          nullable: true
+        monthlyLogs:
+          allOf:
+            - $ref: "#/components/schemas/MonthlyLogsResponse"
+          nullable: true
+        monthlySummary:
+          allOf:
+            - $ref: "#/components/schemas/MonthlyLogsSummaryResponse"
+          nullable: true
+        weeklyTrendPoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/MyDashboardTrendPoint"
 
     TeamDashboardMemberMeasure:
       type: object

@@ -370,6 +370,9 @@ describe("MyDashboardPage", () => {
           id: "workspace-1",
           isOverFreeMemberLimit: true,
           memberCount: 5,
+          name: "Workspace",
+          planCode: "BASIC",
+          role: "ADMIN",
         },
       }),
     );
