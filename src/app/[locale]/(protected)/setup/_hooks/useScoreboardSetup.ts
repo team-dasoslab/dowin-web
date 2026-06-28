@@ -28,6 +28,7 @@ import {
 } from "@/api/generated/workspace/workspace";
 import type {
   MeasureInput,
+  MeasurePayloadSnapshot,
   SetupTag,
 } from "@/app/[locale]/(protected)/setup/_lib/measure";
 import {
@@ -52,6 +53,11 @@ import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+type ScoreboardPayloadSnapshot = {
+  goalName: string;
+  lagMeasure: string;
+};
+
 export const useScoreboardSetup = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,6 +69,8 @@ export const useScoreboardSetup = () => {
 
   const [goalName, setGoalName] = useState("");
   const [lagMeasure, setLagMeasure] = useState("");
+  const [initialScoreboardPayload, setInitialScoreboardPayload] =
+    useState<ScoreboardPayloadSnapshot | null>(null);
   const [measures, setMeasures] = useState<MeasureInput[]>([]);
   const [activeTooltip, setActiveTooltip] = useState<"lag" | "lead" | null>(
     null,
@@ -170,31 +178,45 @@ export const useScoreboardSetup = () => {
       leadMeasuresResponse?.status === 200
     ) {
       const nextLeadMeasures = leadMeasuresResponse.data ?? [];
+      const nextScoreboardPayload = {
+        goalName: activeScoreboard.goalName ?? "",
+        lagMeasure: activeScoreboard.lagMeasure ?? "",
+      };
 
-      setGoalName(activeScoreboard.goalName ?? "");
-      setLagMeasure(activeScoreboard.lagMeasure ?? "");
+      setGoalName(nextScoreboardPayload.goalName);
+      setLagMeasure(nextScoreboardPayload.lagMeasure);
+      setInitialScoreboardPayload(nextScoreboardPayload);
       setMeasures(
-        nextLeadMeasures.map((leadMeasure) => ({
-          id: String(leadMeasure.id ?? generateId()),
-          existingId: toNumberId(leadMeasure.id),
-          initialStatus: leadMeasure.status ?? "ACTIVE",
-          status: leadMeasure.status ?? "ACTIVE",
-          name: leadMeasure.name ?? "",
-          period: leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
-          targetValue: clampMeasureTargetValue(
-            leadMeasure.targetValue ?? 1,
-            leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY",
-            monthlyTargetMax,
-          ),
-          trackingMode:
-            ((leadMeasure as { trackingMode?: string }).trackingMode === "COUNT" ? "COUNT" : "BOOLEAN") as import("@/api/generated/dowin.schemas").LeadMeasureCreateRequestTrackingMode,
-          dailyTargetCount: (leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ?? 1,
-          tags:
-            leadMeasure.tags?.map((tag: { id: number; name: string }) => ({
-              id: tag.id,
-              name: tag.name,
-            })) ?? [],
-        })),
+        nextLeadMeasures.map((leadMeasure) => {
+          const period =
+            leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY";
+          const measure: MeasureInput = {
+            id: String(leadMeasure.id ?? generateId()),
+            existingId: toNumberId(leadMeasure.id),
+            initialStatus: leadMeasure.status ?? "ACTIVE",
+            status: leadMeasure.status ?? "ACTIVE",
+            name: leadMeasure.name ?? "",
+            period,
+            targetValue: clampMeasureTargetValue(
+              leadMeasure.targetValue ?? 1,
+              period,
+              monthlyTargetMax,
+            ),
+            trackingMode:
+              ((leadMeasure as { trackingMode?: string }).trackingMode === "COUNT" ? "COUNT" : "BOOLEAN") as import("@/api/generated/dowin.schemas").LeadMeasureCreateRequestTrackingMode,
+            dailyTargetCount: (leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ?? 1,
+            tags:
+              leadMeasure.tags?.map((tag: { id: number; name: string }) => ({
+                id: tag.id,
+                name: tag.name,
+              })) ?? [],
+          };
+
+          return {
+            ...measure,
+            initialPayload: getMeasurePayloadSnapshot(measure),
+          };
+        }),
       );
       return;
     }
@@ -202,6 +224,7 @@ export const useScoreboardSetup = () => {
     if (!isEditMode) {
       setGoalName("");
       setLagMeasure("");
+      setInitialScoreboardPayload(null);
       setMeasures([createEmptyMeasure()]);
     }
   }, [activeScoreboard, isEditMode, leadMeasuresResponse, monthlyTargetMax]);
@@ -643,6 +666,50 @@ export const useScoreboardSetup = () => {
     await Promise.all(invalidations);
   };
 
+  const getMeasurePayloadSnapshot = (
+    measure: MeasureInput,
+  ): MeasurePayloadSnapshot => ({
+    name: measure.name,
+    period: measure.period,
+    targetValue: measure.targetValue,
+    trackingMode: measure.trackingMode,
+    dailyTargetCount: measure.dailyTargetCount,
+    tagIds: measure.tags
+      .map((tag: { id: number }) => tag.id)
+      .sort((a, b) => a - b),
+  });
+
+  const isExistingMeasureChanged = (measure: MeasureInput) => {
+    if (!measure.initialPayload) {
+      return true;
+    }
+
+    const current = getMeasurePayloadSnapshot(measure);
+
+    return (
+      current.name !== measure.initialPayload.name ||
+      current.period !== measure.initialPayload.period ||
+      current.targetValue !== measure.initialPayload.targetValue ||
+      current.trackingMode !== measure.initialPayload.trackingMode ||
+      current.dailyTargetCount !== measure.initialPayload.dailyTargetCount ||
+      current.tagIds.length !== measure.initialPayload.tagIds.length ||
+      current.tagIds.some(
+        (tagId, index) => tagId !== measure.initialPayload?.tagIds[index],
+      )
+    );
+  };
+
+  const isScoreboardChanged = () => {
+    if (!initialScoreboardPayload) {
+      return true;
+    }
+
+    return (
+      goalName !== initialScoreboardPayload.goalName ||
+      lagMeasure !== initialScoreboardPayload.lagMeasure
+    );
+  };
+
   const submit = async () => {
     const activeMeasures = measures.filter(
       (measure) => measure.status === "ACTIVE" && !measure.isDeleted,
@@ -731,14 +798,16 @@ export const useScoreboardSetup = () => {
       }
 
       if (scoreboardId !== null) {
-        await updateScoreboardMutation.mutateAsync({
-          workspaceId,
-          id: scoreboardId,
-          data: {
-            goalName,
-            lagMeasure,
-          },
-        });
+        if (isScoreboardChanged()) {
+          await updateScoreboardMutation.mutateAsync({
+            workspaceId,
+            id: scoreboardId,
+            data: {
+              goalName,
+              lagMeasure,
+            },
+          });
+        }
 
         const nextExistingIds = new Set<number>();
 
@@ -752,18 +821,20 @@ export const useScoreboardSetup = () => {
             }
 
             nextExistingIds.add(measure.existingId);
-            await updateLeadMeasureMutation.mutateAsync({
-              workspaceId,
-              id: measure.existingId,
-              data: {
-                name: measure.name,
-                targetValue: measure.targetValue,
-                period: measure.period,
-                trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureUpdateRequestTrackingMode,
-                dailyTargetCount: measure.dailyTargetCount,
-                tagIds: measure.tags.map((tag: { id: number }) => tag.id),
-              },
-            });
+            if (isExistingMeasureChanged(measure)) {
+              await updateLeadMeasureMutation.mutateAsync({
+                workspaceId,
+                id: measure.existingId,
+                data: {
+                  name: measure.name,
+                  targetValue: measure.targetValue,
+                  period: measure.period,
+                  trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureUpdateRequestTrackingMode,
+                  dailyTargetCount: measure.dailyTargetCount,
+                  tagIds: measure.tags.map((tag: { id: number }) => tag.id),
+                },
+              });
+            }
             continue;
           }
 
