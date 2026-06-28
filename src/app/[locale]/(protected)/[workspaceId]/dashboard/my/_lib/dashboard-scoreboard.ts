@@ -4,11 +4,18 @@ import {
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
   getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200,
 } from "@/api/generated/daily-log/daily-log";
+import {
+  getGetWorkspacesWorkspaceIdDashboardMyQueryKey,
+  getWorkspacesWorkspaceIdDashboardMyResponse200,
+} from "@/api/generated/dashboard/dashboard";
 import { getWeekDates } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { toNumberId } from "@/lib/client/frontend-api";
 
 export type WeeklyLogsQueryData =
   | getWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyResponse200
+  | undefined;
+export type MyDashboardQueryData =
+  | getWorkspacesWorkspaceIdDashboardMyResponse200
   | undefined;
 
 import type { DailyLogCell } from "@/api/generated/dowin.schemas";
@@ -20,8 +27,12 @@ export type DashboardView = "week" | "month";
 export type ToggleLogContext = {
   currentLogKey: string;
   previousWeeklyLogs: WeeklyLogsQueryData;
+  previousMyDashboard: MyDashboardQueryData;
   weeklyLogsQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey
+  > | null;
+  myDashboardQueryKey: ReturnType<
+    typeof getGetWorkspacesWorkspaceIdDashboardMyQueryKey
   > | null;
   monthlyLogsQueryKey: ReturnType<
     typeof getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey
@@ -144,6 +155,36 @@ export const updateWeeklyLogsCache = (
           achievementRate,
         };
       }),
+    },
+  };
+};
+
+export const updateMyDashboardCache = (
+  previous: MyDashboardQueryData,
+  leadMeasureId: number,
+  date: string,
+  value: DailyLogValue,
+): MyDashboardQueryData => {
+  if (!previous || previous.status !== 200 || !previous.data.weeklyLogs) {
+    return previous;
+  }
+
+  const nextWeeklyLogs = updateWeeklyLogsCache(
+    { data: previous.data.weeklyLogs, status: 200 },
+    leadMeasureId,
+    date,
+    value,
+  );
+
+  if (!nextWeeklyLogs || nextWeeklyLogs.status !== 200) {
+    return previous;
+  }
+
+  return {
+    ...previous,
+    data: {
+      ...previous.data,
+      weeklyLogs: nextWeeklyLogs.data,
     },
   };
 };

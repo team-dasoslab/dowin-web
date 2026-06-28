@@ -52,7 +52,16 @@ describe("WorkspaceService", () => {
 
   describe("getMyWorkspace", () => {
     it("사용자가 속한 워크스페이스가 있으면 이를 반환한다", async () => {
-      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: "FREE" };
+      const createdAt = new Date("2026-04-01T00:00:00.000Z");
+      const mockWorkspace = {
+        id: 1,
+        uid: "ws_1",
+        name: "Workspace",
+        planCode: "FREE",
+        billingCustomerExternalRef: "workspace-checkout:pending_1",
+        billingOwnerUserId: 123,
+        createdAt,
+      };
       mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
 
       const result = await service.getMyWorkspace(123);
@@ -61,11 +70,14 @@ describe("WorkspaceService", () => {
         id: "ws_1",
         name: "Workspace",
         planCode: "FREE",
+        createdAt,
         freeMemberLimit: 10,
         isOverFreeMemberLimit: false,
         memberCount: 1,
         role: "ADMIN",
       });
+      expect(result).not.toHaveProperty("billingCustomerExternalRef");
+      expect(result).not.toHaveProperty("billingOwnerUserId");
     });
 
     it("FREE 플랜 멤버 한도 초과 상태를 함께 반환한다", async () => {

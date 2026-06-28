@@ -245,7 +245,7 @@ yarn preview
 
 주의할 점도 있다.
 
-- My View는 별도 `/api/dashboard/me` 집계 엔드포인트가 아니라 활성 점수판 조회와 주간/월간 로그 조회 조합으로 구성된다.
+- My View는 `/api/workspaces/:workspaceId/dashboard/my` 통합 조회를 우선 사용한다. 기존 활성 점수판/주간/월간 로그 API는 저장 후 무효화와 호환 경로로 유지한다.
 - 계약을 바꾸면 반드시 `src/api-spec/openapi.yaml`부터 수정해야 한다.
 
 ## 8. 데이터 모델 핵심

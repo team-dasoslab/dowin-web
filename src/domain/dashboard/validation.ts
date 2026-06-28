@@ -4,6 +4,12 @@ export const dashboardTeamQuerySchema = z.object({
   weekStart: z.string().date().optional(),
 });
 
+export const dashboardMyQuerySchema = z.object({
+  weekStart: z.string().date().optional(),
+  monthStart: z.string().date().optional(),
+  view: z.enum(["week", "month"]).default("week"),
+});
+
 export const teamWeeklyReportQuerySchema = z.object({
   weekStart: z.string().date().optional(),
   weeks: z.coerce.number().int().min(1).max(12).default(5),

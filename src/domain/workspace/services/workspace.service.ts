@@ -15,8 +15,11 @@ import { customAlphabet } from "nanoid";
 type Workspace = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["findUserWorkspace"]>>
 >;
-type PublicWorkspace = Omit<Workspace, "id" | "uid" | "deletedAt"> & {
+type PublicWorkspace = {
   id: string;
+  name: string;
+  planCode: "BASIC" | "FREE" | "STANDARD";
+  createdAt: Date;
 };
 type WorkspaceWithPlanLimits = PublicWorkspace & {
   freeMemberLimit: number;
@@ -118,8 +121,6 @@ const toPublicWorkspace = (workspace: Workspace): PublicWorkspace => {
     id: getWorkspacePublicId(workspace),
     name: workspace.name,
     planCode: workspace.planCode,
-    billingCustomerExternalRef: workspace.billingCustomerExternalRef,
-    billingOwnerUserId: workspace.billingOwnerUserId,
     createdAt: workspace.createdAt,
   };
 };

@@ -7,15 +7,16 @@ describe("DashboardService", () => {
   const findBillingState = vi.fn();
   const findPlanLimit = vi.fn();
   const findActiveScoreboardsByWorkspace = vi.fn();
+  const findActiveScoreboard = vi.fn();
   const findLogsForLeadMeasures = vi.fn();
 
   const service = new DashboardService(
     { findMembers, countMembers, findBillingState, findPlanLimit },
-    { findActiveScoreboardsByWorkspace },
+    { findActiveScoreboard, findActiveScoreboardsByWorkspace },
     { findLogsForLeadMeasures },
   );
 
-  const context: Parameters<typeof service.getTeamDashboard>[0] = { workspaceId: 3, workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getTeamDashboard>[0];
+  const context: Parameters<typeof service.getTeamDashboard>[0] = { workspaceId: 3, workspacePublicId: "workspace-3", workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getTeamDashboard>[0];
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -198,6 +199,70 @@ describe("DashboardService", () => {
       "2026-02-23",
       "2026-03-31",
     );
+  });
+
+  it("개인 대시보드 통합 조회는 활성 점수판과 기간 데이터를 한 번에 반환한다", async () => {
+    findActiveScoreboard.mockResolvedValue({
+      id: 25,
+      userId: 11,
+      goalName: "러닝 루틴 만들기",
+      lagMeasure: "주 5회 달리기",
+      startDate: "2026-03-01",
+      endDate: null,
+      status: "ACTIVE",
+      createdAt: new Date("2026-03-01T00:00:00.000Z"),
+      leadMeasures: [
+        {
+          id: 31,
+          scoreboardId: 25,
+          name: "아침 러닝",
+          targetValue: 5,
+          period: "WEEKLY",
+          trackingMode: "BOOLEAN",
+          dailyTargetCount: 1,
+          status: "ACTIVE",
+          createdAt: new Date("2026-03-01T00:00:00.000Z"),
+          archivedAt: null,
+          tags: [{ id: 1, name: "운동" }],
+        },
+        {
+          id: 32,
+          scoreboardId: 25,
+          name: "월간 회고",
+          targetValue: 1,
+          period: "MONTHLY",
+          trackingMode: "COUNT",
+          dailyTargetCount: 2,
+          status: "ACTIVE",
+          createdAt: new Date("2026-03-01T00:00:00.000Z"),
+          archivedAt: null,
+          tags: [],
+        },
+      ],
+    });
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 31, logDate: "2026-06-22", value: true, count: 1 },
+      { leadMeasureId: 31, logDate: "2026-06-23", value: true, count: 1 },
+      { leadMeasureId: 32, logDate: "2026-06-24", value: true, count: 2 },
+    ]);
+
+    const result = await service.getMyDashboard(context, {
+      monthStart: "2026-06-01",
+      view: "month",
+      weekStart: "2026-06-22",
+    });
+
+    expect(findActiveScoreboard).toHaveBeenCalledWith(11, 3);
+    expect(findLogsForLeadMeasures).toHaveBeenCalledTimes(1);
+    expect(result.workspace).toMatchObject({
+      id: "workspace-3",
+      memberCount: 2,
+      role: "ADMIN",
+    });
+    expect(result.activeScoreboard?.id).toBe(25);
+    expect(result.weeklyLogs?.leadMeasures[0]?.achieved).toBe(2);
+    expect(result.monthlyLogs?.summary.achieved).toBe(3);
+    expect(result.weeklyTrendPoints).toHaveLength(4);
   });
 
   it("팀 주간 리포트는 현재 주 대시보드와 최근 주차별 추세를 함께 반환한다", async () => {

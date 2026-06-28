@@ -69,11 +69,6 @@ export function TeamMemberCheckIn() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   
-  const { data: inboxResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsInbox(
-    workspaceId,
-    { status: "all" }
-  );
-  
   const { data: workspaceResponse } = useGetWorkspacesMe();
   const { data: checkinSettingsResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId);
 
@@ -82,7 +77,26 @@ export function TeamMemberCheckIn() {
   const declineProposal = usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdDecline();
 
   const isWorkspaceAdmin = workspaceResponse?.status === 200 && workspaceResponse.data.role === "ADMIN";
-  const checkinSettings = checkinSettingsResponse?.status === 200 && 'enabled' in checkinSettingsResponse.data ? checkinSettingsResponse.data : null;
+  const checkinSettings =
+    checkinSettingsResponse?.status === 200 &&
+    "enabled" in checkinSettingsResponse.data
+      ? checkinSettingsResponse.data
+      : null;
+  const shouldFetchInbox =
+    Boolean(workspaceId) &&
+    workspaceResponse?.status === 200 &&
+    checkinSettings !== null &&
+    checkinSettings.enabled !== false &&
+    !(isWorkspaceAdmin && checkinSettings?.includeAdminAsMember === false);
+  const { data: inboxResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsInbox(
+    workspaceId,
+    { status: "all" },
+    {
+      query: {
+        enabled: shouldFetchInbox,
+      },
+    },
+  );
   
   if (!workspaceResponse || !checkinSettingsResponse) {
     return null;
