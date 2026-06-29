@@ -831,13 +831,17 @@ function getWeekStart(dateString: string) {
 }
 
 function getWeekStartsInMonth(monthDates: string[]) {
-  const weekStarts = new Set<string>();
+  const weekStarts = Array.from(new Set(monthDates.map((date) => getWeekStart(date))));
+  if (monthDates.length === 0) return weekStarts;
+  const monthStart = monthDates[0];
+  const monthEnd = monthDates[monthDates.length - 1];
 
-  for (const date of monthDates) {
-    weekStarts.add(getWeekStart(date));
-  }
-
-  return Array.from(weekStarts.values());
+  return weekStarts.filter((ws) => {
+    const [year, month, day] = ws.split("-").map(Number);
+    const thursday = new Date(year, month - 1, day + 3);
+    const thursdayStr = formatDateLocal(thursday);
+    return thursdayStr >= monthStart && thursdayStr <= monthEnd;
+  });
 }
 
 function pad2(value: number) {

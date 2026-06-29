@@ -1052,7 +1052,17 @@ function getWeekStart(date: string) {
 }
 
 function getWeekStartsInMonth(monthDates: string[]) {
-  return [...new Set(monthDates.map((date) => getWeekStart(date)))];
+  const weekStarts = [...new Set(monthDates.map((date) => getWeekStart(date)))];
+  if (monthDates.length === 0) return weekStarts;
+  const monthStart = monthDates[0];
+  const monthEnd = monthDates[monthDates.length - 1];
+
+  return weekStarts.filter((ws) => {
+    const thursday = parseDate(ws);
+    thursday.setUTCDate(thursday.getUTCDate() + 3);
+    const thursdayStr = formatDate(thursday);
+    return thursdayStr >= monthStart && thursdayStr <= monthEnd;
+  });
 }
 
 function getEffectiveWeekStarts(measure: { createdAt?: Date }, weekStarts: string[]) {

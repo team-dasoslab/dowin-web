@@ -127,7 +127,7 @@ describe("DashboardService", () => {
           total: 5,
           achievementRate: 40,
           weeklyAchievementRate: 40,
-          monthlyAchievementRate: 13,
+          monthlyAchievementRate: 18,
           isWinning: false,
           leadMeasures: [
             {
@@ -196,7 +196,7 @@ describe("DashboardService", () => {
     expect(findActiveScoreboardsByWorkspace).toHaveBeenCalledWith(3);
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [31, 32],
-      "2026-02-23",
+      "2026-03-02",
       "2026-03-31",
     );
   });
@@ -621,6 +621,6 @@ describe("DashboardService", () => {
     // Total weekly target = 8, achieved = 4 => 50%
     
     expect(member?.weeklyAchievementRate).toBe(50);
-    expect(member?.monthlyAchievementRate).toBe(11);
+    expect(member?.monthlyAchievementRate).toBe(15);
   });
 });
