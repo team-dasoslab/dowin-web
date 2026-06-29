@@ -1,0 +1,1 @@
+ALTER TABLE `workspaces` ADD `allow_past_daily_log_edit` integer DEFAULT false NOT NULL;

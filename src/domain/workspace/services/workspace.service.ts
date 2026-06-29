@@ -19,6 +19,7 @@ type PublicWorkspace = {
   id: string;
   name: string;
   planCode: "BASIC" | "FREE" | "STANDARD";
+  allowPastDailyLogEdit: boolean;
   createdAt: Date;
 };
 type WorkspaceWithPlanLimits = PublicWorkspace & {
@@ -33,6 +34,7 @@ type WorkspaceListItem = {
   planCode: "BASIC" | "FREE" | "STANDARD";
   role: "ADMIN" | "MEMBER";
   isCurrent: boolean;
+  allowPastDailyLogEdit: boolean;
   createdAt: Date;
 };
 type WorkspaceMemberListItem = {
@@ -121,6 +123,7 @@ const toPublicWorkspace = (workspace: Workspace): PublicWorkspace => {
     id: getWorkspacePublicId(workspace),
     name: workspace.name,
     planCode: workspace.planCode,
+    allowPastDailyLogEdit: workspace.allowPastDailyLogEdit,
     createdAt: workspace.createdAt,
   };
 };
@@ -131,7 +134,7 @@ export interface WorkspaceStoragePort {
   findUserWorkspace: WorkspaceStorage["findUserWorkspace"];
   listUserWorkspaces: WorkspaceStorage["listUserWorkspaces"];
   createWorkspace: WorkspaceStorage["createWorkspace"];
-  updateWorkspaceName: WorkspaceStorage["updateWorkspaceName"];
+  updateWorkspace: WorkspaceStorage["updateWorkspace"];
   addMember: WorkspaceStorage["addMember"];
   findMembershipById: WorkspaceStorage["findMembershipById"];
   findMembership: WorkspaceStorage["findMembership"];
@@ -179,6 +182,7 @@ export class WorkspaceService {
       planCode: membership.workspace.planCode,
       role: membership.role,
       isCurrent: membership.workspace.id === resolvedCurrentWorkspaceId,
+      allowPastDailyLogEdit: membership.workspace.allowPastDailyLogEdit ?? false,
       createdAt: membership.workspace.createdAt,
     }));
   }
@@ -246,18 +250,18 @@ export class WorkspaceService {
     return toPublicWorkspace(workspace);
   }
 
-  async updateWorkspaceName(
+  async updateWorkspace(
     workspaceId: number,
-    name: string,
+    data: { name: string; allowPastDailyLogEdit?: boolean },
   ): Promise<PublicWorkspace> {
     const workspace = await this.storage.findWorkspaceById(workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const updatedWorkspace = await this.storage.updateWorkspaceName(
+    const updatedWorkspace = await this.storage.updateWorkspace(
       workspaceId,
-      name,
+      data,
     );
     if (!updatedWorkspace) {
       throw new NotFoundError("NOT_FOUND");
