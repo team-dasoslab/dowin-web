@@ -1089,6 +1089,7 @@ export interface Workspace {
   /** @minimum 1 */
   freeMemberLimit?: number;
   isOverFreeMemberLimit?: boolean;
+  allowPastDailyLogEdit?: boolean;
   createdAt?: string;
 }
 
@@ -1115,6 +1116,7 @@ export interface WorkspaceListItem {
   planCode: WorkspaceListItemPlanCode;
   role: WorkspaceListItemRole;
   isCurrent: boolean;
+  allowPastDailyLogEdit?: boolean;
   createdAt: string;
 }
 
@@ -1847,6 +1849,7 @@ export interface MyDashboardWorkspace {
   /** @minimum 1 */
   freeMemberLimit: number;
   isOverFreeMemberLimit: boolean;
+  allowPastDailyLogEdit: boolean;
 }
 
 export interface MyDashboardTrendPoint {
@@ -2190,6 +2193,7 @@ export type PostWorkspacesJoinByInvite200 = {
 
 export type PutWorkspacesIdBody = {
   name: string;
+  allowPastDailyLogEdit?: boolean;
 };
 
 export type PostWorkspacesIdTransferAdmin200 = {
