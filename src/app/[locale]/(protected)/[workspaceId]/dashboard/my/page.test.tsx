@@ -373,6 +373,7 @@ describe("MyDashboardPage", () => {
           name: "Workspace",
           planCode: "BASIC",
           role: "ADMIN",
+          allowPastDailyLogEdit: false,
         },
       }),
     );
