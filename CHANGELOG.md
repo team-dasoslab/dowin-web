@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.8.0](https://github.com/team-dasoslab/dowin-web/compare/v1.7.9...v1.8.0) (2026-06-29)
+
+
+### Features
+
+* 워크스페이스 지난주 기록 수정 허용 설정 추가 ([#200](https://github.com/team-dasoslab/dowin-web/issues/200)) ([ad3af2f](https://github.com/team-dasoslab/dowin-web/commit/ad3af2f3330de848386e32ac909b50f9683acef0))
+
+## [1.7.9](https://github.com/team-dasoslab/dowin-web/compare/v1.7.8...v1.7.9) (2026-06-29)
+
+
+### Bug Fixes
+
+* QA ([#198](https://github.com/team-dasoslab/dowin-web/issues/198)) ([f971f4e](https://github.com/team-dasoslab/dowin-web/commit/f971f4e4343f19042514fb1766e07d031a523a0d))
+
 ## [1.7.8](https://github.com/team-dasoslab/dowin-web/compare/v1.7.7...v1.7.8) (2026-06-26)
 
 

@@ -67,21 +67,18 @@ export const getMonthDates = (monthStart: string) => {
 
 export const getMonthCalendarWeeks = (monthStart: string) => {
   const monthDates = getMonthDates(monthStart);
-  const weeks: Array<Array<string | null>> = [];
-  let currentWeek = new Array<string | null>(7).fill(null);
+  if (monthDates.length === 0) return [];
 
-  monthDates.forEach((date, index) => {
-    const day = new Date(`${date}T00:00:00Z`).getUTCDay();
-    const dayIndex = day === 0 ? 6 : day - 1;
-    currentWeek[dayIndex] = date;
+  const weekStarts = Array.from(
+    new Set(monthDates.map((date) => getWeekDates(date)[0]))
+  );
 
-    if (dayIndex === 6 || index === monthDates.length - 1) {
-      weeks.push(currentWeek);
-      currentWeek = new Array<string | null>(7).fill(null);
-    }
+  const isoWeekStarts = weekStarts.filter((ws) => {
+    const thursday = addDays(ws, 3);
+    return thursday >= monthDates[0] && thursday <= monthDates[monthDates.length - 1];
   });
 
-  return weeks;
+  return isoWeekStarts.map((ws) => getWeekDates(ws));
 };
 
 export const getTodayInKst = () => {

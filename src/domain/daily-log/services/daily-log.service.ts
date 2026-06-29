@@ -3,7 +3,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/lib/server/errors";
-import { WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
+import { WorkspaceLookupPort, WorkspaceSummary } from "@/domain/scoreboard/services/scoreboard.service";
 import { DailyLogRecord, DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import {
@@ -12,11 +12,6 @@ import {
   LeadMeasureSummaryRecord,
   LeadMeasureTagRecord,
 } from "@/domain/lead-measure/storage/lead-measure.storage";
-
-type WorkspaceSummary = {
-  id: number;
-  planCode?: string | null;
-};
 
 type DailyLogWorkspacePort = WorkspaceLookupPort & {
   findAccessibleWorkspaceByUid?(
@@ -87,12 +82,12 @@ export class DailyLogService {
     date: string,
     input: DailyLogUpsertInput,
   ): Promise<DailyLogResponse> {
-    assertPastWeekLogEditable(date);
     const { measure, workspace } = await this.getOwnedLeadMeasureWithWorkspace(
       workspaceUid,
       leadMeasureId,
       userId,
     );
+    assertPastWeekLogEditable(date, workspace.allowPastDailyLogEdit);
     await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
@@ -114,12 +109,12 @@ export class DailyLogService {
   }
 
   async deleteLog(workspaceUid: string, leadMeasureId: number, userId: number, date: string): Promise<void> {
-    assertPastWeekLogEditable(date);
     const { workspace } = await this.getOwnedLeadMeasureWithWorkspace(
       workspaceUid,
       leadMeasureId,
       userId,
     );
+    assertPastWeekLogEditable(date, workspace.allowPastDailyLogEdit);
     await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     await this.dailyLogStorage.deleteLog(leadMeasureId, date);
   }
@@ -162,10 +157,10 @@ export class DailyLogService {
     const weekEnd = weekDates[6];
     const previousWeekStart = addDays(normalizedWeekStart, -7);
     const shouldIncludeGuide = normalizedWeekStart === getCurrentWeekStart();
-    const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
+    const measures = (await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       "active",
-    );
+    )).filter((measure) => isMeasureActiveInPeriod(measure, weekEnd));
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
       previousWeekStart,
@@ -286,7 +281,8 @@ export class DailyLogService {
       (
         measure,
       ): measure is LeadMeasureRecordWithTags & { period: "DAILY" | "WEEKLY" | "MONTHLY" } =>
-        measure.period === "DAILY" || measure.period === "WEEKLY" || measure.period === "MONTHLY",
+        (measure.period === "DAILY" || measure.period === "WEEKLY" || measure.period === "MONTHLY") &&
+        isMeasureActiveInPeriod(measure, monthEnd),
     );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
@@ -340,7 +336,8 @@ export class DailyLogService {
       if (measure.period === "MONTHLY") {
         totalAchieved += Math.min(monthlySummaryAchieved, measure.targetValue);
       } else {
-        totalAchieved += weekStarts.reduce(
+        const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
+        totalAchieved += effectiveWeekStarts.reduce(
           (weekAccumulator, weekStart) =>
             weekAccumulator +
             Math.min(
@@ -370,7 +367,8 @@ export class DailyLogService {
         return accumulator + measure.targetValue;
       }
 
-      return accumulator + measure.targetValue * weekStarts.length;
+      const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
+      return accumulator + measure.targetValue * effectiveWeekStarts.length;
     }, 0);
     const summaryRate =
       totalTarget > 0
@@ -434,7 +432,7 @@ export class DailyLogService {
       await this.leadMeasureStorage.findActiveLeadMeasureSummariesByScoreboard(
         scoreboardId,
       )
-    ).filter(isMonthlySummaryMeasure);
+    ).filter((measure) => isMonthlySummaryMeasure(measure) && isMeasureActiveInPeriod(measure, monthEnd));
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
       fetchStart,
@@ -533,7 +531,7 @@ function calculateMonthlySummary({
   weekStarts,
 }: {
   logs: DailyLogRecord[];
-  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue" | "trackingMode" | "dailyTargetCount">>;
+  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue" | "trackingMode" | "dailyTargetCount" | "status" | "createdAt">>;
   monthEnd: string;
   monthStart: string;
   weekStarts: string[];
@@ -573,9 +571,10 @@ function calculateMonthlySummary({
       weeklyCounts.set(weekStart, (weeklyCounts.get(weekStart) ?? 0) + 1);
     }
 
+    const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
     return (
       total +
-      weekStarts.reduce(
+      effectiveWeekStarts.reduce(
         (weekTotal, weekStart) =>
           weekTotal +
           Math.min(weeklyCounts.get(weekStart) ?? 0, measure.targetValue),
@@ -588,7 +587,8 @@ function calculateMonthlySummary({
       return accumulator + measure.targetValue;
     }
 
-    return accumulator + measure.targetValue * weekStarts.length;
+    const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
+    return accumulator + measure.targetValue * effectiveWeekStarts.length;
   }, 0);
   const achievementRate =
     total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
@@ -694,6 +694,18 @@ function groupLogsByLeadMeasure(logs: DailyLogRecord[]) {
   }
 
   return byLeadMeasure;
+}
+
+function getEffectiveWeekStarts(measure: { createdAt?: Date | null }, weekStarts: string[]) {
+  if (!measure.createdAt) return weekStarts;
+  const createdWeekStart = getWeekStart(formatDateLocal(measure.createdAt));
+  return weekStarts.filter((ws) => ws >= createdWeekStart);
+}
+
+function isMeasureActiveInPeriod(measure: { status: string; createdAt?: Date | null }, periodEnd: string) {
+  if (measure.status !== "ACTIVE") return false;
+  if (measure.createdAt && formatDateLocal(measure.createdAt) > periodEnd) return false;
+  return true;
 }
 
 function getMonthLabel(monthStart: string) {
@@ -814,13 +826,17 @@ function getWeekStart(dateString: string) {
 }
 
 function getWeekStartsInMonth(monthDates: string[]) {
-  const weekStarts = new Set<string>();
+  const weekStarts = Array.from(new Set(monthDates.map((date) => getWeekStart(date))));
+  if (monthDates.length === 0) return weekStarts;
+  const monthStart = monthDates[0];
+  const monthEnd = monthDates[monthDates.length - 1];
 
-  for (const date of monthDates) {
-    weekStarts.add(getWeekStart(date));
-  }
-
-  return Array.from(weekStarts.values());
+  return weekStarts.filter((ws) => {
+    const [year, month, day] = ws.split("-").map(Number);
+    const thursday = new Date(year, month - 1, day + 3);
+    const thursdayStr = formatDateLocal(thursday);
+    return thursdayStr >= monthStart && thursdayStr <= monthEnd;
+  });
 }
 
 function pad2(value: number) {
@@ -833,7 +849,10 @@ function formatDateLocal(date: Date) {
   )}`;
 }
 
-function assertPastWeekLogEditable(date: string) {
+function assertPastWeekLogEditable(date: string, allowPastEdit: boolean = false) {
+  if (allowPastEdit) {
+    return;
+  }
   if (date < getCurrentWeekStart()) {
     throw new ForbiddenError("PAST_WEEK_LOG_EDIT_NOT_ALLOWED");
   }

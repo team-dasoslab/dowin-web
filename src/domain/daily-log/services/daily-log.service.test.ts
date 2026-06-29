@@ -46,18 +46,34 @@ describe("DailyLogService", () => {
   });
 
   it("이번 주 이전 날짜는 기록할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(2);
+    findWorkspaceById.mockResolvedValue({ id: 2, allowPastDailyLogEdit: false });
+    findMembership.mockResolvedValue(true);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+
     await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-05", { value: true })).rejects.toThrow(
       "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
     );
-    expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
     expect(upsertLog).not.toHaveBeenCalled();
   });
 
   it("이번 주 이전 날짜는 삭제할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(2);
+    findWorkspaceById.mockResolvedValue({ id: 2, allowPastDailyLogEdit: false });
+    findMembership.mockResolvedValue(true);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+
     await expect(service.deleteLog("ws_uid", 1, 100, "2026-04-05")).rejects.toThrow(
       "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
     );
-    expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
     expect(deleteLog).not.toHaveBeenCalled();
   });
 
@@ -519,8 +535,8 @@ describe("DailyLogService", () => {
     expect(result.monthLabel).toBe("2026.03");
     expect(result.summary).toEqual({
       achieved: 5,
-      total: 30,
-      achievementRate: 16.7,
+      total: 24, // 3 targets * 4 weeks + 12 monthly = 24
+      achievementRate: 20.8,
       isWinning: false,
     });
     expect(result.leadMeasures).toHaveLength(2);
@@ -540,8 +556,8 @@ describe("DailyLogService", () => {
     );
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [10, 11],
-      "2026-02-23",
-      "2026-04-05",
+      "2026-03-02",
+      "2026-03-29",
     );
   });
 
@@ -555,11 +571,13 @@ describe("DailyLogService", () => {
         id: 10,
         targetValue: 3,
         period: "WEEKLY",
+        status: "ACTIVE",
       },
       {
         id: 11,
         targetValue: 12,
         period: "MONTHLY",
+        status: "ACTIVE",
       },
     ]);
     findLogsForLeadMeasures.mockResolvedValue([
@@ -579,8 +597,8 @@ describe("DailyLogService", () => {
       monthLabel: "2026.03",
       summary: {
         achieved: 5,
-        total: 30,
-        achievementRate: 16.7,
+        total: 24,
+        achievementRate: 20.8,
         isWinning: false,
       },
     });
@@ -588,8 +606,8 @@ describe("DailyLogService", () => {
     expect(findLeadMeasuresByScoreboard).not.toHaveBeenCalled();
     expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
       [10, 11],
-      "2026-02-23",
-      "2026-04-05",
+      "2026-03-02",
+      "2026-03-29",
     );
   });
 
@@ -636,8 +654,8 @@ describe("DailyLogService", () => {
 
     expect(result.summary).toEqual({
       achieved: 3,
-      total: 18,
-      achievementRate: 16.7,
+      total: 12, // 3 targets * 4 weeks = 12
+      achievementRate: 25,
       isWinning: false,
     });
   });

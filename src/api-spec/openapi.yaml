@@ -1642,6 +1642,7 @@ paths:
               required: [name]
               properties:
                 name: { type: string, example: "새 워크스페이스 이름" }
+                allowPastDailyLogEdit: { type: boolean, example: true }
       responses:
         "200":
           description: 수정 성공
@@ -4168,6 +4169,8 @@ components:
           minimum: 1
         isOverFreeMemberLimit:
           type: boolean
+        allowPastDailyLogEdit:
+          type: boolean
         createdAt: { type: string, format: date-time }
 
     WorkspaceListItem:
@@ -4183,6 +4186,8 @@ components:
           type: string
           enum: [ADMIN, MEMBER]
         isCurrent:
+          type: boolean
+        allowPastDailyLogEdit:
           type: boolean
         createdAt: { type: string, format: date-time }
 
@@ -4825,6 +4830,7 @@ components:
           memberCount,
           freeMemberLimit,
           isOverFreeMemberLimit,
+          allowPastDailyLogEdit,
         ]
       properties:
         id: { type: string }
@@ -4842,6 +4848,8 @@ components:
           type: integer
           minimum: 1
         isOverFreeMemberLimit:
+          type: boolean
+        allowPastDailyLogEdit:
           type: boolean
 
     MyDashboardTrendPoint:

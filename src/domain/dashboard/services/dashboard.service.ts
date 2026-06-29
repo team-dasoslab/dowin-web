@@ -344,7 +344,7 @@ function buildMyWeeklyLogs({
     weekStart,
     weekEnd,
     leadMeasures: scoreboard.leadMeasures
-      .filter((measure) => measure.status === "ACTIVE")
+      .filter((measure) => isMeasureActiveInPeriod(measure, weekEnd))
       .map((measure) => {
         const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
         const logMap = Object.fromEntries(
@@ -412,7 +412,7 @@ function buildMyMonthlyLogs({
   const monthEnd = monthDates[monthDates.length - 1];
   const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
   const leadMeasures = scoreboard.leadMeasures
-    .filter((measure) => measure.status === "ACTIVE")
+    .filter((measure) => isMeasureActiveInPeriod(measure, monthEnd))
     .map((measure) => {
       const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
       const logMap = Object.fromEntries(
@@ -452,8 +452,8 @@ function buildMyMonthlyLogs({
     monthLabel: getMonthLabel(monthStart),
     summary: calculateMyMonthlySummary({
       logs,
-      measures: scoreboard.leadMeasures.filter(
-        (measure) => measure.status === "ACTIVE",
+      measures: scoreboard.leadMeasures.filter((measure) =>
+        isMeasureActiveInPeriod(measure, monthEnd),
       ),
       monthEnd,
       monthStart,
@@ -481,8 +481,8 @@ function buildMyMonthlySummary({
     monthLabel: getMonthLabel(monthStart),
     summary: calculateMyMonthlySummary({
       logs,
-      measures: scoreboard.leadMeasures.filter(
-        (measure) => measure.status === "ACTIVE",
+      measures: scoreboard.leadMeasures.filter((measure) =>
+        isMeasureActiveInPeriod(measure, monthEnd),
       ),
       monthEnd,
       monthStart,
@@ -539,9 +539,10 @@ function calculateMyMonthlySummary({
       weeklyCounts.set(weekStart, (weeklyCounts.get(weekStart) ?? 0) + 1);
     }
 
+    const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
     return (
       total +
-      weekStarts.reduce(
+      effectiveWeekStarts.reduce(
         (weekTotal, weekStart) =>
           weekTotal +
           Math.min(weeklyCounts.get(weekStart) ?? 0, measure.targetValue),
@@ -554,7 +555,8 @@ function calculateMyMonthlySummary({
       return accumulator + measure.targetValue;
     }
 
-    return accumulator + measure.targetValue * weekStarts.length;
+    const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
+    return accumulator + measure.targetValue * effectiveWeekStarts.length;
   }, 0);
   const achievementRate =
     total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
@@ -579,7 +581,9 @@ function getMyWeeklyRate({
   const weekEnd = getWeekDates(weekStart)[6];
   const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
   const weeklyTargetMeasures = activeLeadMeasures.filter(
-    (measure) => measure.period !== "MONTHLY",
+    (measure) =>
+      measure.period !== "MONTHLY" &&
+      isMeasureActiveInPeriod(measure, weekEnd),
   );
   const achieved = weeklyTargetMeasures.reduce((sum, measure) => {
     const measureAchieved = (logsByLeadMeasure.get(measure.id) ?? []).filter(
@@ -659,7 +663,7 @@ function buildTeamDashboard({
       }
 
       const leadMeasures = scoreboard.leadMeasures
-        .filter((leadMeasure) => leadMeasure.status === "ACTIVE")
+        .filter((leadMeasure) => isMeasureActiveInPeriod(leadMeasure, weekEnd))
         .map((leadMeasure) => {
           const logMap = Object.fromEntries(
             weekDates.map((date) => [date, null as DailyLogCell | null]),
@@ -689,6 +693,7 @@ function buildTeamDashboard({
             trackingMode: getTrackingMode(leadMeasure),
             dailyTargetCount: getDailyTargetCount(leadMeasure),
             tags: leadMeasure.tags,
+            createdAt: leadMeasure.createdAt,
             achieved,
             total: leadMeasure.targetValue,
             achievementRate,
@@ -725,7 +730,8 @@ function buildTeamDashboard({
           return sum + Math.min(monthlyLogsCount, leadMeasure.targetValue);
         }
 
-        const weeklyAchieved = weekStartsInMonth.reduce((weekSum, monthWeekStart) => {
+        const effectiveWeekStarts = getEffectiveWeekStarts(leadMeasure, weekStartsInMonth);
+        const weeklyAchieved = effectiveWeekStarts.reduce((weekSum, monthWeekStart) => {
           const weekTrueCount = truthyLogs.filter(
             (log) => getWeekStart(log.logDate) === monthWeekStart,
           ).length;
@@ -740,7 +746,8 @@ function buildTeamDashboard({
           return sum + leadMeasure.targetValue;
         }
 
-        return sum + leadMeasure.targetValue * weekStartsInMonth.length;
+        const effectiveWeekStarts = getEffectiveWeekStarts(leadMeasure, weekStartsInMonth);
+        return sum + leadMeasure.targetValue * effectiveWeekStarts.length;
       }, 0);
       const monthlyAchievementRate =
         monthlyTotal > 0
@@ -807,7 +814,8 @@ function buildWeeklyTrend({
 
     const weeklyLeadMeasures = scoreboard.leadMeasures.filter(
       (leadMeasure) =>
-        leadMeasure.status === "ACTIVE" && leadMeasure.period !== "MONTHLY",
+        leadMeasure.period !== "MONTHLY" &&
+        isMeasureActiveInPeriod(leadMeasure, weekEnd),
     );
     const achieved = weeklyLeadMeasures.reduce((sum, leadMeasure) => {
       const truthyLogCount = (logsByLeadMeasure.get(leadMeasure.id) ?? []).filter(
@@ -1044,7 +1052,29 @@ function getWeekStart(date: string) {
 }
 
 function getWeekStartsInMonth(monthDates: string[]) {
-  return [...new Set(monthDates.map((date) => getWeekStart(date)))];
+  const weekStarts = [...new Set(monthDates.map((date) => getWeekStart(date)))];
+  if (monthDates.length === 0) return weekStarts;
+  const monthStart = monthDates[0];
+  const monthEnd = monthDates[monthDates.length - 1];
+
+  return weekStarts.filter((ws) => {
+    const thursday = parseDate(ws);
+    thursday.setUTCDate(thursday.getUTCDate() + 3);
+    const thursdayStr = formatDate(thursday);
+    return thursdayStr >= monthStart && thursdayStr <= monthEnd;
+  });
+}
+
+function getEffectiveWeekStarts(measure: { createdAt?: Date }, weekStarts: string[]) {
+  if (!measure.createdAt) return weekStarts;
+  const createdWeekStart = getWeekStart(formatDate(measure.createdAt));
+  return weekStarts.filter((ws) => ws >= createdWeekStart);
+}
+
+function isMeasureActiveInPeriod(measure: { status: string; createdAt?: Date }, periodEnd: string) {
+  if (measure.status !== "ACTIVE") return false;
+  if (measure.createdAt && formatDate(measure.createdAt) > periodEnd) return false;
+  return true;
 }
 
 function getMonthLabel(monthStart: string) {

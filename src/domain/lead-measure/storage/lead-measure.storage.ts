@@ -16,7 +16,7 @@ export type LeadMeasureForPushRecord = Pick<
 >;
 export type LeadMeasureSummaryRecord = Pick<
   LeadMeasureRecord,
-  "id" | "targetValue" | "period" | "trackingMode" | "dailyTargetCount"
+  "id" | "targetValue" | "period" | "trackingMode" | "dailyTargetCount" | "status" | "createdAt"
 >;
 
 export type CreateLeadMeasureInput = {

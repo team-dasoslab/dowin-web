@@ -8,7 +8,7 @@ describe("WorkspaceService", () => {
     findUserWorkspace: vi.fn(),
     listUserWorkspaces: vi.fn(),
     createWorkspace: vi.fn(),
-    updateWorkspaceName: vi.fn(),
+    updateWorkspace: vi.fn(),
     addMember: vi.fn(),
     findMembershipById: vi.fn(),
     findMembership: vi.fn(),
@@ -302,38 +302,42 @@ describe("WorkspaceService", () => {
     });
   });
 
-  describe("updateWorkspaceName", () => {
+  describe("updateWorkspace", () => {
     it("기존 워크스페이스 이름을 수정해 반환한다", async () => {
-      const mockWorkspace = {
+      mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         uid: "ws_1",
         name: "기존 이름",
         planCode: "FREE",
         createdAt: new Date("2026-03-18T00:00:00.000Z"),
-      };
+      } as unknown as NonNullable<Awaited<ReturnType<typeof mockStorage.findWorkspaceById>>>);
+
       const updatedWorkspace = {
-        ...mockWorkspace,
+        id: 1,
+        uid: "ws_1",
         name: "새 이름",
+        planCode: "FREE",
+        allowPastDailyLogEdit: false,
+        createdAt: new Date("2026-03-18T00:00:00.000Z"),
       };
+      mockStorage.updateWorkspace.mockResolvedValue(updatedWorkspace);
 
-      mockStorage.findWorkspaceById.mockResolvedValue(mockWorkspace);
-      mockStorage.updateWorkspaceName.mockResolvedValue(updatedWorkspace);
-
-      const result = await service.updateWorkspaceName(1, "새 이름");
+      const result = await service.updateWorkspace(1, { name: "새 이름" });
 
       expect(result).toEqual({
         id: "ws_1",
         name: "새 이름",
         planCode: "FREE",
-        createdAt: new Date("2026-03-18T00:00:00.000Z"),
+        allowPastDailyLogEdit: false,
+        createdAt: expect.any(Date),
       });
-      expect(mockStorage.updateWorkspaceName).toHaveBeenCalledWith(1, "새 이름");
+      expect(mockStorage.updateWorkspace).toHaveBeenCalledWith(1, { name: "새 이름" });
     });
 
     it("워크스페이스가 없으면 404 에러를 던진다", async () => {
       mockStorage.findWorkspaceById.mockResolvedValue(null);
 
-      await expect(service.updateWorkspaceName(1, "새 이름")).rejects.toThrow(
+      await expect(service.updateWorkspace(1, { name: "새 이름" })).rejects.toThrow(
         "NOT_FOUND",
       );
     });
