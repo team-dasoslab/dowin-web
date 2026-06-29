@@ -23,6 +23,7 @@ interface WeeklyBoardSectionProps {
   weekDates: string[];
   weeklyGuideById: Map<number | null, WeeklyLogGuide | null>;
   weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
+  allowPastDailyLogEdit?: boolean;
 }
 
 function CountPopoverContent({
@@ -135,6 +136,7 @@ export function WeeklyBoardSection({
   weekDates,
   weeklyGuideById,
   weeklyById,
+  allowPastDailyLogEdit = false,
 }: WeeklyBoardSectionProps) {
   const t = useTranslations("Dashboard");
   const [activeGuideId, setActiveGuideId] = useState<number | null>(null);
@@ -262,7 +264,7 @@ export function WeeklyBoardSection({
                         const isCount = trackingMode === "COUNT";
 
                         const isToday = date === today;
-                        const isEditable = isEditableDailyLogDate(date, today);
+                        const isEditable = isEditableDailyLogDate(date, today, allowPastDailyLogEdit);
                         const currentLogKey =
                           leadMeasureId === null
                             ? null

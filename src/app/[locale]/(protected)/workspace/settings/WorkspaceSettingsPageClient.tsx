@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { useGetWorkspacesMe, useGetWorkspaces, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
+import { useGetWorkspacesMe, useGetWorkspaces, usePutWorkspacesCurrent, usePutWorkspacesId, getGetWorkspacesMeQueryKey, getGetWorkspacesQueryKey } from "@/api/generated/workspace/workspace";
 
 import {
   ProtectedPageContainer,
@@ -110,6 +110,26 @@ export default function WorkspaceSettingsPage() {
     }
   };
 
+  const updateWorkspace = usePutWorkspacesId();
+
+  const handleTogglePastDailyLogEdit = async (checked: boolean) => {
+    if (!workspaceId || !workspace) return;
+    try {
+      await updateWorkspace.mutateAsync({
+        id: workspaceId,
+        data: {
+          name: workspace.name ?? "",
+          allowPastDailyLogEdit: checked,
+        },
+      });
+      await queryClient.invalidateQueries({ queryKey: getGetWorkspacesMeQueryKey() });
+      await queryClient.invalidateQueries({ queryKey: getGetWorkspacesQueryKey() });
+      showToast("success", checked ? "과거 기록 수정이 허용되었습니다." : "과거 기록 수정이 제한되었습니다.");
+    } catch {
+      showToast("error", "설정 변경에 실패했습니다.");
+    }
+  };
+
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
@@ -207,6 +227,20 @@ export default function WorkspaceSettingsPage() {
               icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
               title: t("manageInvites"),
               href: getWorkspacePath(workspaceId, "/workspace/invites"),
+            },
+            {
+              id: "past-daily-log-edit",
+              icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
+              title: "지난주 기록 수정 허용",
+              rightElement: (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Switch
+                    checked={workspace.allowPastDailyLogEdit ?? false}
+                    onCheckedChange={handleTogglePastDailyLogEdit}
+                    disabled={updateWorkspace.isPending}
+                  />
+                </div>
+              ),
             },
             {
               id: "workspace-delete",
