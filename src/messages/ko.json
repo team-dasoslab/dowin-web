@@ -131,8 +131,8 @@
         "ariaLabel": "액션 아이템 가이드 보기",
         "changeProposal": "액션 아이템 변경 제안",
         "adjustProposal": "횟수 조정 제안",
-        "changeProposalDesc": "2주 연속 기록이 없어요. 이 선행지표는 다른 행동으로 바꿔보세요.",
-        "adjustProposalDesc": "2주 연속 50% 미만이에요. 이 선행지표는 횟수를 조금 낮춰보세요."
+        "changeProposalDesc": "2주 연속 기록이 없어요. 이 액션 아이템은 다른 행동으로 바꿔보세요.",
+        "adjustProposalDesc": "2주 연속 50% 미만이에요. 이 액션 아이템은 횟수를 조금 낮춰보세요."
       }
     },
     "Team": {
