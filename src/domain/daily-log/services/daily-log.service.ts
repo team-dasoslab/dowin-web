@@ -162,10 +162,10 @@ export class DailyLogService {
     const weekEnd = weekDates[6];
     const previousWeekStart = addDays(normalizedWeekStart, -7);
     const shouldIncludeGuide = normalizedWeekStart === getCurrentWeekStart();
-    const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
+    const measures = (await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       "active",
-    );
+    )).filter((measure) => isMeasureActiveInPeriod(measure, weekEnd));
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
       previousWeekStart,
@@ -286,7 +286,8 @@ export class DailyLogService {
       (
         measure,
       ): measure is LeadMeasureRecordWithTags & { period: "DAILY" | "WEEKLY" | "MONTHLY" } =>
-        measure.period === "DAILY" || measure.period === "WEEKLY" || measure.period === "MONTHLY",
+        (measure.period === "DAILY" || measure.period === "WEEKLY" || measure.period === "MONTHLY") &&
+        isMeasureActiveInPeriod(measure, monthEnd),
     );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
@@ -340,7 +341,8 @@ export class DailyLogService {
       if (measure.period === "MONTHLY") {
         totalAchieved += Math.min(monthlySummaryAchieved, measure.targetValue);
       } else {
-        totalAchieved += weekStarts.reduce(
+        const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
+        totalAchieved += effectiveWeekStarts.reduce(
           (weekAccumulator, weekStart) =>
             weekAccumulator +
             Math.min(
@@ -370,7 +372,8 @@ export class DailyLogService {
         return accumulator + measure.targetValue;
       }
 
-      return accumulator + measure.targetValue * weekStarts.length;
+      const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
+      return accumulator + measure.targetValue * effectiveWeekStarts.length;
     }, 0);
     const summaryRate =
       totalTarget > 0
@@ -434,7 +437,7 @@ export class DailyLogService {
       await this.leadMeasureStorage.findActiveLeadMeasureSummariesByScoreboard(
         scoreboardId,
       )
-    ).filter(isMonthlySummaryMeasure);
+    ).filter((measure) => isMonthlySummaryMeasure(measure) && isMeasureActiveInPeriod(measure, monthEnd));
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
       fetchStart,
@@ -533,7 +536,7 @@ function calculateMonthlySummary({
   weekStarts,
 }: {
   logs: DailyLogRecord[];
-  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue" | "trackingMode" | "dailyTargetCount">>;
+  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue" | "trackingMode" | "dailyTargetCount" | "status" | "createdAt">>;
   monthEnd: string;
   monthStart: string;
   weekStarts: string[];
@@ -573,9 +576,10 @@ function calculateMonthlySummary({
       weeklyCounts.set(weekStart, (weeklyCounts.get(weekStart) ?? 0) + 1);
     }
 
+    const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
     return (
       total +
-      weekStarts.reduce(
+      effectiveWeekStarts.reduce(
         (weekTotal, weekStart) =>
           weekTotal +
           Math.min(weeklyCounts.get(weekStart) ?? 0, measure.targetValue),
@@ -588,7 +592,8 @@ function calculateMonthlySummary({
       return accumulator + measure.targetValue;
     }
 
-    return accumulator + measure.targetValue * weekStarts.length;
+    const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
+    return accumulator + measure.targetValue * effectiveWeekStarts.length;
   }, 0);
   const achievementRate =
     total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
@@ -694,6 +699,18 @@ function groupLogsByLeadMeasure(logs: DailyLogRecord[]) {
   }
 
   return byLeadMeasure;
+}
+
+function getEffectiveWeekStarts(measure: { createdAt?: Date | null }, weekStarts: string[]) {
+  if (!measure.createdAt) return weekStarts;
+  const createdWeekStart = getWeekStart(formatDateLocal(measure.createdAt));
+  return weekStarts.filter((ws) => ws >= createdWeekStart);
+}
+
+function isMeasureActiveInPeriod(measure: { status: string; createdAt?: Date | null }, periodEnd: string) {
+  if (measure.status !== "ACTIVE") return false;
+  if (measure.createdAt && formatDateLocal(measure.createdAt) > periodEnd) return false;
+  return true;
 }
 
 function getMonthLabel(monthStart: string) {

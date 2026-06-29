@@ -543,4 +543,84 @@ describe("DashboardService", () => {
 
     expect(result.members.map((member) => member.userId)).toEqual([11, 12, 13]);
   });
+
+  it("팀 대시보드 주간 및 월간 달성률은 지표가 생성된 주차부터 계산한다", async () => {
+    findMembers.mockResolvedValue([
+      {
+        id: 100,
+        workspaceId: 3,
+        userId: 11,
+        role: "ADMIN",
+        user: { nickname: "지훈", avatarKey: "smile.blue" },
+      },
+    ]);
+    findActiveScoreboardsByWorkspace.mockResolvedValue([
+      {
+        id: 21,
+        userId: 11,
+        goalName: "루틴 만들기",
+        lagMeasure: "주간 실행",
+        status: "ACTIVE",
+        leadMeasures: [
+          {
+            id: 31,
+            name: "과거 생성 지표",
+            targetValue: 3,
+            period: "WEEKLY",
+            status: "ACTIVE",
+            createdAt: new Date("2026-02-01T00:00:00.000Z"),
+            tags: [],
+          },
+          {
+            id: 32,
+            name: "이번 주 생성 지표",
+            targetValue: 5,
+            period: "WEEKLY",
+            status: "ACTIVE",
+            createdAt: new Date("2026-03-11T00:00:00.000Z"), // Wednesday of 2026-03-09 week
+            tags: [],
+          },
+          {
+            id: 33,
+            name: "다음 주 생성 지표",
+            targetValue: 4,
+            period: "WEEKLY",
+            status: "ACTIVE",
+            createdAt: new Date("2026-03-16T00:00:00.000Z"), // Monday of next week
+            tags: [],
+          },
+        ],
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 31, logDate: "2026-03-09", value: true },
+      { leadMeasureId: 31, logDate: "2026-03-10", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-12", value: true },
+      { leadMeasureId: 32, logDate: "2026-03-13", value: true },
+    ]);
+
+    const result = await service.getTeamDashboard(context, "2026-03-09");
+
+    // id: 33 should not be in the weekly leadMeasures since it's created after weekEnd
+    const member = result.members[0];
+    expect(member?.leadMeasures.map(m => m.id)).toEqual([31, 32]);
+
+    // monthlyAchievementRate check:
+    // weekStarts in month: 2026-02-23, 03-02, 03-09, 03-16, 03-23, 03-30 (6 weeks)
+    // 31: created 2026-02-01. Effective weeks: 6. target = 18. achieved = 2
+    // 32: created 2026-03-11. Effective weeks: 4 (03-09, 03-16, 03-23, 03-30). target = 20. achieved = 2
+    // 33: created 2026-03-16. Effective weeks: 3 (03-16, 03-23, 03-30). target = 12. achieved = 0
+    // Total monthly target = 18 + 20 = 38 (33 is excluded)
+    // Total monthly achieved = 2 + 2 = 4
+    // Monthly rate = Math.round(4 / 38 * 100) = 11
+    
+    // Weekly rate check:
+    // 31 target: 3, achieved: 2
+    // 32 target: 5, achieved: 2
+    // 33 target is omitted (not counted for this week since created after weekEnd)
+    // Total weekly target = 8, achieved = 4 => 50%
+    
+    expect(member?.weeklyAchievementRate).toBe(50);
+    expect(member?.monthlyAchievementRate).toBe(11);
+  });
 });
