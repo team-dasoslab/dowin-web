@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 export interface SegmentedControlOption<T extends string> {
   value: T;
   label: ReactNode;
+  disabled?: boolean;
 }
 
 export interface SegmentedControlProps<T extends string> {
@@ -45,11 +46,13 @@ export function SegmentedControl<T extends string>({
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
-            disabled={disabled}
+            disabled={disabled || option.disabled}
             className={`flex-1 font-black whitespace-nowrap transition-all ${buttonClasses[size]} ${
               isActive
                 ? "bg-white dark:bg-black text-zinc-900 dark:text-white shadow-sm"
-                : "text-text-muted hover:text-text-secondary"
+                : option.disabled
+                  ? "text-border cursor-not-allowed"
+                  : "text-text-muted hover:text-text-secondary"
             }`}
           >
             {option.label}
