@@ -3,7 +3,7 @@ import {
   ForbiddenError,
   NotFoundError,
 } from "@/lib/server/errors";
-import { WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
+import { WorkspaceLookupPort, WorkspaceSummary } from "@/domain/scoreboard/services/scoreboard.service";
 import { DailyLogRecord, DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
 import {
@@ -12,11 +12,6 @@ import {
   LeadMeasureSummaryRecord,
   LeadMeasureTagRecord,
 } from "@/domain/lead-measure/storage/lead-measure.storage";
-
-type WorkspaceSummary = {
-  id: number;
-  planCode?: string | null;
-};
 
 type DailyLogWorkspacePort = WorkspaceLookupPort & {
   findAccessibleWorkspaceByUid?(
@@ -87,12 +82,12 @@ export class DailyLogService {
     date: string,
     input: DailyLogUpsertInput,
   ): Promise<DailyLogResponse> {
-    assertPastWeekLogEditable(date);
     const { measure, workspace } = await this.getOwnedLeadMeasureWithWorkspace(
       workspaceUid,
       leadMeasureId,
       userId,
     );
+    assertPastWeekLogEditable(date, workspace.allowPastDailyLogEdit);
     await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
 
     if (measure.status === "ARCHIVED") {
@@ -114,12 +109,12 @@ export class DailyLogService {
   }
 
   async deleteLog(workspaceUid: string, leadMeasureId: number, userId: number, date: string): Promise<void> {
-    assertPastWeekLogEditable(date);
     const { workspace } = await this.getOwnedLeadMeasureWithWorkspace(
       workspaceUid,
       leadMeasureId,
       userId,
     );
+    assertPastWeekLogEditable(date, workspace.allowPastDailyLogEdit);
     await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     await this.dailyLogStorage.deleteLog(leadMeasureId, date);
   }
@@ -854,7 +849,10 @@ function formatDateLocal(date: Date) {
   )}`;
 }
 
-function assertPastWeekLogEditable(date: string) {
+function assertPastWeekLogEditable(date: string, allowPastEdit: boolean = false) {
+  if (allowPastEdit) {
+    return;
+  }
   if (date < getCurrentWeekStart()) {
     throw new ForbiddenError("PAST_WEEK_LOG_EDIT_NOT_ALLOWED");
   }

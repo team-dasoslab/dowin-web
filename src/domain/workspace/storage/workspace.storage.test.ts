@@ -135,18 +135,19 @@ describe("WorkspaceStorage", () => {
     });
   });
 
-  describe("updateWorkspaceName", () => {
-    it("워크스페이스 이름을 수정하고 반환한다", async () => {
+  describe("updateWorkspace", () => {
+    it("워크스페이스 정보를 수정하고 반환한다", async () => {
       const mockWorkspace = { id: 1, name: "새 이름", planCode: "FREE" };
       mockDb.returning.mockResolvedValue([mockWorkspace]);
 
-      const result = await storage.updateWorkspaceName(1, "새 이름");
+      const result = await storage.updateWorkspace(1, { name: "새 이름" });
 
       expect(result).toEqual(mockWorkspace);
       expect(mockDb.update).toHaveBeenCalledWith(workspaces);
       expect(mockDb.set).toHaveBeenCalledWith({
         name: "새 이름",
       });
+      expect(mockDb.where).toHaveBeenCalled();
     });
   });
 

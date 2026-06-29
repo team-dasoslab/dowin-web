@@ -262,13 +262,13 @@ export class WorkspaceStorage {
     return workspace;
   }
 
-  async updateWorkspaceName(
+  async updateWorkspace(
     workspaceId: number,
-    name: string,
+    data: { name: string; allowPastDailyLogEdit?: boolean },
   ): Promise<Workspace | null> {
     const [updatedWorkspace] = await this.db
       .update(workspaces)
-      .set({ name })
+      .set(data)
       .where(eq(workspaces.id, workspaceId))
       .returning();
 

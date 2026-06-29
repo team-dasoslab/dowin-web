@@ -23,6 +23,7 @@ type WeeklyMobileCardsProps = {
   weekDates: string[];
   weeklyGuideById: Map<number | null, WeeklyLogGuide | null>;
   weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
+  allowPastDailyLogEdit?: boolean;
 };
 
 type WeeklyMobileCardProps = {
@@ -34,10 +35,11 @@ type WeeklyMobileCardProps = {
   weekDates: string[];
   weeklyGuideById: WeeklyMobileCardsProps["weeklyGuideById"];
   weeklyById: WeeklyMobileCardsProps["weeklyById"];
+  allowPastDailyLogEdit?: boolean;
 };
 
 export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
-  const { activeLeadMeasures, weeklyById } = props;
+  const { activeLeadMeasures, weeklyById, allowPastDailyLogEdit = false } = props;
   const t = useTranslations("Dashboard");
   const localizedDays = [
     t("mon"),
@@ -55,6 +57,7 @@ export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
         <WeeklyMobileCard
           key={`weekly-mobile-${leadMeasure.id}`}
           {...props}
+          allowPastDailyLogEdit={allowPastDailyLogEdit}
           weeklyById={weeklyById}
           leadMeasure={leadMeasure}
           localizedDays={localizedDays}
@@ -74,6 +77,7 @@ function WeeklyMobileCard({
   weeklyGuideById,
   weeklyById,
   localizedDays,
+  allowPastDailyLogEdit,
 }: WeeklyMobileCardProps & {
   localizedDays: string[];
 }) {
@@ -121,6 +125,7 @@ function WeeklyMobileCard({
             pendingLogKeys={pendingLogKeys}
             today={today}
             toggleLog={toggleLog}
+            allowPastDailyLogEdit={allowPastDailyLogEdit}
             trackingMode={
               (leadMeasure as { trackingMode?: string }).trackingMode
             }
@@ -147,6 +152,7 @@ type WeeklyMobileCardDayProps = {
   pendingLogKeys: WeeklyMobileCardsProps["pendingLogKeys"];
   today: string;
   toggleLog: WeeklyMobileCardsProps["toggleLog"];
+  allowPastDailyLogEdit?: boolean;
   trackingMode?: string;
   dailyTargetCount?: number;
   value: import("@/api/generated/dowin.schemas").DailyLogCell | null;
@@ -161,12 +167,13 @@ function WeeklyMobileCardDay({
   pendingLogKeys,
   today,
   toggleLog,
+  allowPastDailyLogEdit,
   trackingMode,
   dailyTargetCount = 1,
   value,
 }: WeeklyMobileCardDayProps) {
   const isToday = date === today;
-  const isEditable = isEditableDailyLogDate(date, today);
+  const isEditable = isEditableDailyLogDate(date, today, allowPastDailyLogEdit);
   const currentLogKey =
     leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
   const isPending = currentLogKey !== null && pendingLogKeys.has(currentLogKey);

@@ -59,9 +59,9 @@ export const PUT = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsedBody.error.flatten().fieldErrors);
     }
 
-    const workspace = await service.updateWorkspaceName(
+    const workspace = await service.updateWorkspace(
       resolvedId,
-      parsedBody.data.name,
+      parsedBody.data,
     );
 
     return apiSuccess(workspace);
