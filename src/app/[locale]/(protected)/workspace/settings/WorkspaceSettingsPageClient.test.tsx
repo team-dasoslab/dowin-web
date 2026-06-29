@@ -6,6 +6,7 @@ import {
   useGetWorkspaces,
   useGetWorkspacesMe,
   usePutWorkspacesCurrent,
+  usePutWorkspacesId,
 } from "@/api/generated/workspace/workspace";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
 import { useToast } from "@/context/ToastContext";
@@ -22,6 +23,15 @@ vi.mock("@/api/generated/workspace/workspace", () => ({
   useGetWorkspaces: vi.fn(),
   useGetWorkspacesMe: vi.fn(),
   usePutWorkspacesCurrent: vi.fn(),
+  usePutWorkspacesId: vi.fn(),
+  getGetWorkspacesMeQueryKey: vi.fn(() => ["workspaces", "me"]),
+  getGetWorkspacesQueryKey: vi.fn(() => ["workspaces"]),
+}));
+
+vi.mock("@/api/generated/team-checkins/team-checkins", () => ({
+  useGetWorkspacesWorkspaceIdTeamCheckinsSettings: vi.fn(),
+  usePutWorkspacesWorkspaceIdTeamCheckinsSettings: vi.fn(),
+  getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey: vi.fn(() => ["team-checkins"]),
 }));
 
 vi.mock("@/app/[locale]/(protected)/profile/_hooks/useProfileActions", () => ({
@@ -149,7 +159,7 @@ function mockProfileActions(
 }
 
 describe("WorkspaceSettingsPage", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     vi.mocked(useRouter).mockReturnValue({
       refresh,
@@ -162,6 +172,21 @@ describe("WorkspaceSettingsPage", () => {
       isPending: false,
       mutate: switchWorkspace,
     } as unknown as ReturnType<typeof usePutWorkspacesCurrent>);
+    vi.mocked(usePutWorkspacesId).mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn(),
+    } as unknown as ReturnType<typeof usePutWorkspacesId>);
+    
+    // team-checkins
+    const { useGetWorkspacesWorkspaceIdTeamCheckinsSettings, usePutWorkspacesWorkspaceIdTeamCheckinsSettings } = await import("@/api/generated/team-checkins/team-checkins");
+    vi.mocked(useGetWorkspacesWorkspaceIdTeamCheckinsSettings).mockReturnValue({
+      data: { data: { enabled: true, sendHour: 10 } },
+      status: 200,
+    } as any);
+    vi.mocked(usePutWorkspacesWorkspaceIdTeamCheckinsSettings).mockReturnValue({
+      isPending: false,
+      mutateAsync: vi.fn(),
+    } as any);
     mockProfile();
     mockWorkspace();
     mockWorkspaces();
