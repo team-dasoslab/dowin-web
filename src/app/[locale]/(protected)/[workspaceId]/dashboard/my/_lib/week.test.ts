@@ -74,9 +74,8 @@ describe("dashboard week helpers", () => {
     ]);
   });
 
-  it("builds Monday-first calendar weeks with null padding", () => {
+  it("builds Monday-first calendar weeks using ISO-8601 boundaries", () => {
     expect(getMonthCalendarWeeks("2026-02-01")).toEqual([
-      [null, null, null, null, null, null, "2026-02-01"],
       [
         "2026-02-02",
         "2026-02-03",
@@ -111,7 +110,7 @@ describe("dashboard week helpers", () => {
         "2026-02-26",
         "2026-02-27",
         "2026-02-28",
-        null,
+        "2026-03-01",
       ],
     ]);
   });

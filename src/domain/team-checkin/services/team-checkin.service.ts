@@ -515,6 +515,7 @@ export class TeamCheckinService {
             candidate,
             timezone,
             localHour: localTime.hour,
+            localDay: localTime.day,
             weekRange,
             dayRange: getLocalDayRange(now, timezone),
           };
@@ -554,6 +555,7 @@ export class TeamCheckinService {
       for (const {
         candidate,
         localHour,
+        localDay,
         weekRange,
         dayRange,
       } of candidateContexts) {
@@ -563,6 +565,7 @@ export class TeamCheckinService {
           candidate,
           logsByMeasure.get(candidate.leadMeasureId) ?? [],
           weekRange,
+          localDay,
           settings,
         );
         if (!reasonCode) continue;
@@ -873,6 +876,7 @@ function getReasonCode(
   candidate: TeamCheckinCandidate,
   logsForMeasure: Array<{ logDate: string; value: boolean; count: number }>,
   weekRange: { weekStart: string; weekEnd: string },
+  localIsoDay: number,
   settings: {
     triggerNoWeeklyLogEnabled: boolean;
   },
@@ -889,11 +893,23 @@ function getReasonCode(
     },
   ).length;
 
-  if (settings.triggerNoWeeklyLogEnabled && achievedCount === 0) {
+  if (
+    settings.triggerNoWeeklyLogEnabled &&
+    achievedCount === 0 &&
+    canSendNoWeeklyLogCheckin(candidate.targetValue, localIsoDay)
+  ) {
     return "NO_WEEKLY_LOG" as const;
   }
 
   return null;
+}
+
+function canSendNoWeeklyLogCheckin(targetValue: number, localIsoDay: number) {
+  if (targetValue <= 1) {
+    return localIsoDay >= 4;
+  }
+
+  return localIsoDay >= 3;
 }
 
 function buildPushMessage(candidate: TeamCheckinCandidate) {

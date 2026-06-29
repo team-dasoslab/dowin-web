@@ -292,9 +292,9 @@
     "guide": {
       "title": "Measure Setup Guide",
       "lagTitle": "Success Criteria",
-      "lagDesc": "The final target value you want to achieve. (e.g., Lose 5kg)",
+      "lagDesc": "The final target value you want to achieve. (e.g., Close 5 new contracts in Q3)",
       "leadTitle": "Action Items",
-      "leadDesc": "Repeatable actions you can control to reach your goal. (e.g., Exercise 3 times a week)"
+      "leadDesc": "Repeatable actions you can control to reach your goal. (e.g., 3 prospect meetings per week)"
     },
     "saveChanges": "Save Changes",
     "createScoreboard": "Create Scoreboard",

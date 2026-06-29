@@ -48,16 +48,20 @@ export function BridgeInitializer({ isNative }: { isNative: boolean }) {
       }
 
       // 2. Handle Deep Links
-      if (state.lastDeepLink && state.lastDeepLink !== processedDeepLink.current) {
-        processedDeepLink.current = state.lastDeepLink;
-        try {
-          const url = new URL(state.lastDeepLink);
-          if (url.origin === window.location.origin) {
-            router.push(url.pathname + url.search + url.hash);
-          }
-        } catch {
-          if (state.lastDeepLink.startsWith("/")) {
-            router.push(state.lastDeepLink);
+      if (state.lastDeepLink) {
+        const processedSession = sessionStorage.getItem("processedDeepLink");
+        if (state.lastDeepLink !== processedDeepLink.current && state.lastDeepLink !== processedSession) {
+          processedDeepLink.current = state.lastDeepLink;
+          sessionStorage.setItem("processedDeepLink", state.lastDeepLink);
+          try {
+            const url = new URL(state.lastDeepLink);
+            if (url.origin === window.location.origin) {
+              router.push(url.pathname + url.search + url.hash);
+            }
+          } catch {
+            if (state.lastDeepLink.startsWith("/")) {
+              router.push(state.lastDeepLink);
+            }
           }
         }
       }
@@ -65,8 +69,11 @@ export function BridgeInitializer({ isNative }: { isNative: boolean }) {
       // 3. Handle Notifications
       if (state.lastNotification) {
         const notificationStr = JSON.stringify(state.lastNotification);
-        if (notificationStr !== processedNotification.current) {
+        const processedSession = sessionStorage.getItem("processedNotification");
+        
+        if (notificationStr !== processedNotification.current && notificationStr !== processedSession) {
           processedNotification.current = notificationStr;
+          sessionStorage.setItem("processedNotification", notificationStr);
           
           const url = state.lastNotification.url;
           if (typeof url === "string" && url) {

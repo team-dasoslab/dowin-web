@@ -226,6 +226,9 @@ function LeadMeasureRow({
                 "targetValue",
                 period === "WEEKLY" ? 3 : 1,
               );
+              if (period === "MONTHLY" && measure.trackingMode === "COUNT") {
+                handleMeasureChange(measure.id, "trackingMode", "BOOLEAN");
+              }
             }}
             disabled={isMutating}
             size="md"
@@ -237,7 +240,11 @@ function LeadMeasureRow({
           <SegmentedControl
             options={[
               { value: "BOOLEAN", label: t("trackingModeBoolean") },
-              { value: "COUNT", label: t("trackingModeCount") },
+              { 
+                value: "COUNT", 
+                label: t("trackingModeCount"),
+                disabled: measure.period === "MONTHLY" 
+              },
             ]}
             value={measure.trackingMode}
             onChange={(mode) =>

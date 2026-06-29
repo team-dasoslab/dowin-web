@@ -113,8 +113,18 @@ export const useDashboardScoreboardQueries = ({
     dashboard?.monthlyLogs?.summary ?? dashboard?.monthlySummary?.summary;
   const monthLabel =
     dashboard?.monthlyLogs?.monthLabel ?? dashboard?.monthlySummary?.monthLabel;
+  const periodEnd = selectedView === "month" ? (dashboard?.monthlyLogs?.monthEnd ?? dashboard?.monthlySummary?.monthEnd ?? weekDates[6]) : weekDates[6];
   const activeLeadMeasures = (activeScoreboard?.leadMeasures ?? []).filter(
-    (leadMeasure) => leadMeasure.status === "ACTIVE",
+    (leadMeasure) => {
+      if (leadMeasure.status !== "ACTIVE") return false;
+      if (!leadMeasure.createdAt) return true;
+      const d = new Date(leadMeasure.createdAt);
+      if (isNaN(d.getTime())) return leadMeasure.createdAt.split("T")[0] <= periodEnd;
+      const kstMs = d.getTime() + 9 * 60 * 60 * 1000;
+      const kstDate = new Date(kstMs);
+      const createdAtDate = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
+      return createdAtDate <= periodEnd;
+    }
   );
   const weeklyTargetMeasures = activeLeadMeasures.filter(
     (leadMeasure) => leadMeasure.period !== "MONTHLY",

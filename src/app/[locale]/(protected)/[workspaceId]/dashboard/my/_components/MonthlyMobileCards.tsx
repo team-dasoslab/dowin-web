@@ -26,6 +26,7 @@ type MonthlyMobileWeekCardProps = {
     number | null,
     Array<{ id?: number | null; name?: string | null }>
   >;
+  createdAtById: Map<number | null, Date | string | null>;
   today: string;
   weekDatesInMonth: ReturnType<typeof getMonthCalendarWeeks>[number];
   weekIndex: number;
@@ -47,6 +48,12 @@ export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
       leadMeasure.tags ?? [],
     ]),
   );
+  const createdAtById = new Map(
+    activeLeadMeasures.map((leadMeasure) => [
+      leadMeasure.id ?? null,
+      leadMeasure.createdAt ?? null,
+    ]),
+  );
   const localizedDays = [
     t("mon"),
     t("tue"),
@@ -65,6 +72,7 @@ export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
           monthLabel={monthLabel}
           monthlyLeadMeasures={monthlyLeadMeasures}
           tagsByMeasureId={tagsByMeasureId}
+          createdAtById={createdAtById}
           today={today}
           weekDatesInMonth={weekDatesInMonth}
           weekIndex={weekIndex}
@@ -79,12 +87,55 @@ function MonthlyMobileWeekCard({
   monthLabel,
   monthlyLeadMeasures,
   tagsByMeasureId,
+  createdAtById,
   today,
   weekDatesInMonth,
   weekIndex,
   localizedDays,
 }: MonthlyMobileWeekCardProps) {
   const t = useTranslations("Dashboard");
+
+  const weekFilteredMeasures = monthlyLeadMeasures.filter((leadMeasure) => {
+    const createdAt = createdAtById.get(leadMeasure.id ?? null);
+    if (!createdAt) return true;
+    
+    const weekEnd = weekDatesInMonth.filter((d): d is string => d !== null).at(-1);
+    if (!weekEnd) return true;
+    
+    const d = new Date(createdAt);
+    if (isNaN(d.getTime())) {
+      return (createdAt as string).split("T")[0] <= weekEnd;
+    }
+    const kstMs = d.getTime() + 9 * 60 * 60 * 1000;
+    const kstDate = new Date(kstMs);
+    const createdAtDate = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
+    
+    return createdAtDate <= weekEnd;
+  });
+
+  if (weekFilteredMeasures.length === 0) {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2 px-1 pt-2">
+          <p className="text-[14px] font-black text-text-primary">
+            {t("weekNumber", { n: weekIndex + 1 })}
+          </p>
+          <p className="text-[12px] font-mono font-medium text-text-muted">
+            {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
+            {" – "}
+            {weekDatesInMonth
+              .filter((date): date is string => date !== null)
+              .at(-1)
+              ?.slice(5)
+              .replace("-", ".")}
+          </p>
+        </div>
+        <div className="rounded-[24px] bg-surface p-8 text-center text-[13px] font-medium text-text-muted">
+          {t("noActiveMeasures")}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -104,7 +155,7 @@ function MonthlyMobileWeekCard({
       </div>
 
       <div className="space-y-3">
-        {monthlyLeadMeasures.map((leadMeasure) => (
+        {weekFilteredMeasures.map((leadMeasure) => (
           <MonthlyMobileMeasureCard
             key={`${monthLabel}-${weekIndex}-${leadMeasure.id}-mobile`}
             leadMeasure={leadMeasure}
