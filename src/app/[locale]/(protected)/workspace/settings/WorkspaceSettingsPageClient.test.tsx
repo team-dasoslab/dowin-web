@@ -182,11 +182,11 @@ describe("WorkspaceSettingsPage", () => {
     vi.mocked(useGetWorkspacesWorkspaceIdTeamCheckinsSettings).mockReturnValue({
       data: { data: { enabled: true, sendHour: 10 } },
       status: 200,
-    } as any);
+    } as unknown as ReturnType<typeof useGetWorkspacesWorkspaceIdTeamCheckinsSettings>);
     vi.mocked(usePutWorkspacesWorkspaceIdTeamCheckinsSettings).mockReturnValue({
       isPending: false,
       mutateAsync: vi.fn(),
-    } as any);
+    } as unknown as ReturnType<typeof usePutWorkspacesWorkspaceIdTeamCheckinsSettings>);
     mockProfile();
     mockWorkspace();
     mockWorkspaces();
