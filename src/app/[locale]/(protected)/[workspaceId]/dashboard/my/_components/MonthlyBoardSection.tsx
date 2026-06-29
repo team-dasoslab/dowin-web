@@ -31,6 +31,12 @@ export function MonthlyBoardSection({
       leadMeasure.tags ?? [],
     ]),
   );
+  const createdAtById = new Map(
+    activeLeadMeasures.map((leadMeasure) => [
+      leadMeasure.id ?? null,
+      leadMeasure.createdAt ?? null,
+    ]),
+  );
   const localizedDays = [
     t("mon"),
     t("tue"),
@@ -65,7 +71,55 @@ export function MonthlyBoardSection({
           />
 
           <div className="hidden space-y-4 md:block">
-            {monthWeeks.map((weekDatesInMonth, weekIndex) => (
+            {monthWeeks.map((weekDatesInMonth, weekIndex) => {
+              const weekFilteredMeasures = monthlyLeadMeasures.filter((leadMeasure) => {
+                const createdAt = createdAtById.get(leadMeasure.id ?? null);
+                if (!createdAt) return true;
+                
+                const weekEnd = weekDatesInMonth.filter((d): d is string => d !== null).at(-1);
+                if (!weekEnd) return true;
+                
+                const d = new Date(createdAt);
+                if (isNaN(d.getTime())) {
+                  return (createdAt as string).split("T")[0] <= weekEnd;
+                }
+                const kstMs = d.getTime() + 9 * 60 * 60 * 1000;
+                const kstDate = new Date(kstMs);
+                const createdAtDate = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
+                
+                return createdAtDate <= weekEnd;
+              });
+
+              if (weekFilteredMeasures.length === 0) {
+                return (
+                  <div
+                    key={`${monthLabel}-week-${weekIndex + 1}`}
+                    className="overflow-hidden rounded-[24px] bg-surface"
+                  >
+                    <div className="border-b border-border bg-surface px-6 py-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[14px] font-black text-text-primary">
+                          {t("weekNumber", { n: weekIndex + 1 })}
+                        </p>
+                        <p className="text-[12px] font-mono font-medium text-text-muted">
+                          {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
+                          {" – "}
+                          {weekDatesInMonth
+                            .filter((date): date is string => date !== null)
+                            .at(-1)
+                            ?.slice(5)
+                            .replace("-", ".")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-8 text-center text-[13px] font-medium text-text-muted">
+                      {t("noActiveMeasures")}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
               <div
                 key={`${monthLabel}-week-${weekIndex + 1}`}
                 className="overflow-hidden rounded-[24px] bg-surface"
@@ -143,7 +197,7 @@ export function MonthlyBoardSection({
                         <col className="w-[16%]" />
                       </colgroup>
                       <tbody className="divide-y divide-border">
-                        {monthlyLeadMeasures.map((leadMeasure) => {
+                        {weekFilteredMeasures.map((leadMeasure) => {
                           const targetValue = leadMeasure.targetValue ?? 0;
                           const tags =
                             tagsByMeasureId.get(leadMeasure.id ?? null) ?? [];
@@ -278,7 +332,8 @@ export function MonthlyBoardSection({
                   </div>
                 </div>
               </div>
-            ))}
+            );
+          })}
           </div>
         </>
       )}
