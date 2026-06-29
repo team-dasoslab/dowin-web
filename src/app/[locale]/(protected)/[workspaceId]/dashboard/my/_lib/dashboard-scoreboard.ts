@@ -57,7 +57,9 @@ export const getNextLogValue = (
   return value === true ? null : true;
 };
 
-export const isEditableDailyLogDate = (date: string, today: string) => {
+export const isEditableDailyLogDate = (date: string, today: string, allowPastEdit: boolean = false) => {
+  if (allowPastEdit) return true;
+
   const currentWeekStart = getWeekDates(today)[0];
 
   if (!currentWeekStart) {

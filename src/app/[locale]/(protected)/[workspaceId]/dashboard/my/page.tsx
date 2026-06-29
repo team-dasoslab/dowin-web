@@ -299,6 +299,7 @@ export default function MyDashboardPage() {
                   weekDates={weekDates}
                   weeklyGuideById={weeklyGuideById}
                   weeklyById={weeklyById}
+                  allowPastDailyLogEdit={workspace?.allowPastDailyLogEdit}
                 />
               )}
             </section>

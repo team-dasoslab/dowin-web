@@ -13,9 +13,10 @@ import {
   UpdateScoreboardInput,
 } from "@/domain/scoreboard/storage/scoreboard.storage";
 
-type WorkspaceSummary = {
+export type WorkspaceSummary = {
   id: number;
   planCode?: string;
+  allowPastDailyLogEdit?: boolean;
 };
 
 export interface WorkspaceLookupPort {

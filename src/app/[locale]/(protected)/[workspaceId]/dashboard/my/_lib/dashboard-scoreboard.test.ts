@@ -23,6 +23,10 @@ describe("dashboard scoreboard", () => {
     expect(isEditableDailyLogDate("2026-04-05", "2026-04-09")).toBe(false);
   });
 
+  it("allows editing past dates if allowPastEdit is true", () => {
+    expect(isEditableDailyLogDate("2026-04-05", "2026-04-09", true)).toBe(true);
+  });
+
   it("recognizes supported dashboard views", () => {
     expect(isDashboardView("week")).toBe(true);
     expect(isDashboardView("month")).toBe(true);

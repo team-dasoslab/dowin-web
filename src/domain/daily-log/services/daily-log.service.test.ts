@@ -46,18 +46,34 @@ describe("DailyLogService", () => {
   });
 
   it("이번 주 이전 날짜는 기록할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(2);
+    findWorkspaceById.mockResolvedValue({ id: 2, allowPastDailyLogEdit: false });
+    findMembership.mockResolvedValue(true);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+
     await expect(service.upsertLog("ws_uid", 10, 100, "2026-04-05", { value: true })).rejects.toThrow(
       "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
     );
-    expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
     expect(upsertLog).not.toHaveBeenCalled();
   });
 
   it("이번 주 이전 날짜는 삭제할 수 없다", async () => {
+    resolveIdByUid.mockResolvedValue(2);
+    findWorkspaceById.mockResolvedValue({ id: 2, allowPastDailyLogEdit: false });
+    findMembership.mockResolvedValue(true);
+    findOwnedLeadMeasure.mockResolvedValue({
+      id: 10,
+      status: "ACTIVE",
+      scoreboard: { id: 2, status: "ACTIVE" },
+    });
+
     await expect(service.deleteLog("ws_uid", 1, 100, "2026-04-05")).rejects.toThrow(
       "PAST_WEEK_LOG_EDIT_NOT_ALLOWED",
     );
-    expect(findOwnedLeadMeasure).not.toHaveBeenCalled();
     expect(deleteLog).not.toHaveBeenCalled();
   });
 

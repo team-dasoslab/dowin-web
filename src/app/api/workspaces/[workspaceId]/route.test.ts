@@ -6,7 +6,7 @@ const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockRequireWorkspaceAdminInWorkspace = vi.fn();
 const mockResolveIdByUid = vi.fn();
-const mockUpdateWorkspaceName = vi.fn();
+const mockUpdateWorkspace = vi.fn();
 const mockDeleteWorkspace = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -32,7 +32,7 @@ vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
   WorkspaceService: vi.fn(function MockWorkspaceService() {
     return {
-      updateWorkspaceName: mockUpdateWorkspaceName,
+      updateWorkspace: mockUpdateWorkspace,
       deleteWorkspace: mockDeleteWorkspace,
     };
   }),
@@ -87,7 +87,7 @@ describe("PUT /api/workspaces/[id]", () => {
     );
 
     expect(response.status).toBe(403);
-    expect(mockUpdateWorkspaceName).not.toHaveBeenCalled();
+    expect(mockUpdateWorkspace).not.toHaveBeenCalled();
   });
 
   it("관리자면 워크스페이스 이름을 수정하고 200을 반환한다", async () => {
@@ -96,7 +96,7 @@ describe("PUT /api/workspaces/[id]", () => {
       id: 1,
       role: "ADMIN",
     });
-    mockUpdateWorkspaceName.mockResolvedValue({
+    mockUpdateWorkspace.mockResolvedValue({
       id: 1,
       name: "새 이름",
       planCode: "FREE",
@@ -116,7 +116,7 @@ describe("PUT /api/workspaces/[id]", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(mockUpdateWorkspaceName).toHaveBeenCalledWith(1, "새 이름");
+    expect(mockUpdateWorkspace).toHaveBeenCalledWith(1, { name: "새 이름" });
   });
 });
 

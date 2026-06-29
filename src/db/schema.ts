@@ -349,6 +349,9 @@ export const workspaces = sqliteTable("workspaces", {
     () => users.id,
     { onDelete: "set null" },
   ),
+  allowPastDailyLogEdit: integer("allow_past_daily_log_edit", { mode: "boolean" })
+    .notNull()
+    .default(false),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
     .default(sql`(strftime('%s', 'now'))`),
