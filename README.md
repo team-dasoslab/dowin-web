@@ -1,18 +1,19 @@
-# Dowin (Wildly Important Goals)
+# Dowin
 
-DOWIN는 개인/팀의 목표 실행과 주간 운영을 관리하는 서비스입니다.
-기록을 쌓는 데서 끝나지 않고, 이번 주 승패(Win/Loss)를 점수판으로 명확하게 보여주도록 설계했습니다.
+Dowin은 개인/팀의 목표 실행과 주간 운영을 관리하는 서비스입니다.
 
 ## 핵심 기능
 
 - 인증 및 세션 기반 로그인 (`dowin_sid` 쿠키)
-- 워크스페이스 생성/참가, 이름 변경, 멤버 관리
+- 워크스페이스 생성/참가, 초대 링크, 멤버 관리
 - 핵심 목표 점수판 생성, 보관, 재활성화
 - 액션 아이템 생성/관리
 - 일일 O/X 기록 및 주간/월간 달성률 집계
+- 팀 체크인 생성, 응답, 인박스 조회 및 주간 리포트
+- 체크인 기반 조정 제안(Adjustment Proposal) 생성 및 승인
 - 내 대시보드 / 팀 대시보드 조회
-- 프로필 조회/수정, preset avatar 선택, 푸시 알림 토글 및 개인 리마인드 시간 설정
-- 액션 아이템 CSV export
+- 구독 및 결제 (Polar 연동)
+- 푸시 알림 토글 및 개인 리마인드 시간 설정
 
 ## 기술 스택
 
@@ -62,11 +63,6 @@ yarn install
 
 로컬 실행 전 환경 변수를 준비하세요.
 
-- 필수/주요 키
-  - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
-  - `VAPID_PRIVATE_KEY`
-  - `CRON_SECRET`
-
 `.env.example`를 기준으로 로컬용 `.env.local`과 `.dev.vars`를 작성하면 됩니다.
 
 둘을 나누는 이유는 값을 읽는 실행 환경이 다르기 때문입니다.
@@ -78,15 +74,10 @@ yarn install
   - `wrangler dev`로 실행되는 Worker 런타임이 읽습니다.
   - API 라우트에서 `env.*`로 접근하는 값이 여기서 주입됩니다.
 
-현재 DOWIN에서는 `NEXT_PUBLIC_VAPID_PUBLIC_KEY`가 클라이언트와 서버 양쪽에서 모두 필요하므로 두 파일에 모두 넣습니다.
+`.dev.vars`의 구성은 `.env.example`과 동일합니다. `.env.example`을 복사해서 `.dev.vars`로 저장한 뒤 실제 값으로 채우면 됩니다.
 
-- `.env.local`
-  - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
-- `.dev.vars`
-  - `NEXTJS_ENV`
-  - `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
-  - `VAPID_PRIVATE_KEY`
-  - `CRON_SECRET`
+> **Polar 샌드박스 로컬 테스트 시 주의**: Polar 웹훅은 public URL로 전송되므로 `localhost`에서는 수신할 수 없습니다.
+> Cloudflare Tunnel(`cloudflared tunnel`)로 로컬 서버를 외부에 노출한 뒤, 해당 URL을 `APP_BASE_URL`에 설정하세요.
 
 ### 4) 로컬 DB 마이그레이션
 
@@ -100,8 +91,8 @@ yarn mig:local
 yarn dev
 ```
 
-- 앱: `http://localhost:3000`
-- 스웨거: `http://localhost:3000/api-docs`
+- 앱: `http://localhost:4000`
+- 스웨거: `http://localhost:4000/api-docs`
 - Storybook: `yarn storybook` 실행 후 `http://localhost:6006`
 
 ## 주요 명령어
