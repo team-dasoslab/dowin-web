@@ -9,6 +9,7 @@ type WorkspaceStoragePort = {
       uid: string | null;
       name: string;
       planCode: "BASIC" | "FREE" | "STANDARD";
+      allowPastDailyLogEdit?: boolean | null;
     };
     member: {
       id: number;
@@ -30,6 +31,7 @@ export type WorkspaceAccessContext = {
   userId: number;
   role: "ADMIN" | "MEMBER";
   membershipId: number;
+  allowPastDailyLogEdit: boolean;
   entitlement: {
     canAccessBasicSubscription: boolean;
     entitlementSource: NullableEntitlementSource;
@@ -71,6 +73,7 @@ export async function requireWorkspaceAccess(
     userId: member.userId,
     role: member.role,
     membershipId: member.id,
+    allowPastDailyLogEdit: workspace.allowPastDailyLogEdit ?? false,
     entitlement: {
       canAccessBasicSubscription,
       entitlementSource,

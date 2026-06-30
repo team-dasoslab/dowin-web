@@ -31,6 +31,7 @@ describe("TeamMemoService", () => {
     userId: 11,
     role: "MEMBER" as const,
     membershipId: 100,
+    allowPastDailyLogEdit: false,
     entitlement: {
       canAccessBasicSubscription: true,
       entitlementSource: "POLAR" as const,
