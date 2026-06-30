@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.1](https://github.com/team-dasoslab/dowin-web/compare/v1.8.0...v1.8.1) (2026-06-30)
+
+
+### Bug Fixes
+
+* 대시보드 API 응답에 과거 기록 수정 허용 여부 누락 수정 ([756583b](https://github.com/team-dasoslab/dowin-web/commit/756583b5962bb7419f254352878faffa33e0fc89))
+
 ## [1.8.0](https://github.com/team-dasoslab/dowin-web/compare/v1.7.9...v1.8.0) (2026-06-29)
 
 
