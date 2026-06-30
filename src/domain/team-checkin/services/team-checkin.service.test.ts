@@ -10,6 +10,7 @@ const adminContext: WorkspaceAccessContext = {
   userId: 10,
   role: "ADMIN",
   membershipId: 100,
+  allowPastDailyLogEdit: false,
   entitlement: {
     canAccessBasicSubscription: true,
     entitlementSource: "POLAR",

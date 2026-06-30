@@ -321,6 +321,7 @@ export class DashboardService {
       memberCount: memberCapacity.memberCount,
       freeMemberLimit: memberLimit,
       isOverFreeMemberLimit: memberCapacity.memberCount > memberLimit,
+      allowPastDailyLogEdit: context.allowPastDailyLogEdit,
     };
   }
 }
