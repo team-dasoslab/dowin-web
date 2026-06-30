@@ -54,14 +54,12 @@ describe("DailyReminderPushService", () => {
         token: "token-1",
         title: "Dowin",
         body: "오늘의 액션 아이템을 기록했나요? 지금 바로 체크해보세요!",
-        url: "/ko/dashboard/my",
       },
       {
         userId: 2,
         token: "token-2",
         title: "Dowin",
         body: "Did you record your lead measures today? Check them now!",
-        url: "/en/dashboard/my",
       },
     ]);
     expect(result.summary).toMatchObject({
