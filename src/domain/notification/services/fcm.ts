@@ -2,7 +2,7 @@ type FcmMessage = {
   token: string;
   title: string;
   body: string;
-  url: string;
+  url?: string;
   pushType: string;
   campaignId: string;
 };
