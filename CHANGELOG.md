@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.2](https://github.com/team-dasoslab/dowin-web/compare/v1.8.1...v1.8.2) (2026-06-30)
+
+
+### Bug Fixes
+
+* 일일 리마인드 url 제거 ([238596d](https://github.com/team-dasoslab/dowin-web/commit/238596ddadfc9f2e60a4d406981bccd6b59e3ad5))
+
 ## [1.8.1](https://github.com/team-dasoslab/dowin-web/compare/v1.8.0...v1.8.1) (2026-06-30)
 
 
