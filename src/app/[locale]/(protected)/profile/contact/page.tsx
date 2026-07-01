@@ -188,9 +188,9 @@ function ContactInquiryComposer({
             <Button
               type="button"
               onClick={onClose}
-              variant="subtle"
+              variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-full bg-transparent hover:bg-border/50 p-0"
+              className="h-10 w-10 rounded-full p-0"
             >
               <DowinIcon name="action-dismiss" size="24px" />
             </Button>

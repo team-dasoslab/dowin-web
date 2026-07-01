@@ -124,7 +124,7 @@ export default function ProfileMembersPage() {
               asChild
               variant="subtle"
               size="primary"
-              className="font-bold hover:bg-border"
+              className="font-bold"
             >
               <Link
                 href={getWorkspacePath(workspaceParamId, "/workspace/invites")}

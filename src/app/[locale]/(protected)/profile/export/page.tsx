@@ -153,7 +153,7 @@ export default function ProfileExportPage() {
                 onClick={toggleSelectAllMeasures}
                 variant="subtle"
                 size="sm"
-                className="h-8 rounded-[12px] px-3 text-[11px] font-black hover:bg-border"
+                className="h-8 rounded-[12px] px-3 text-[11px] font-black"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -232,7 +232,7 @@ function ExportUnavailableInAppState() {
               asChild
               variant="subtle"
               size="primary"
-              className="w-fit rounded-[16px] font-black text-text-primary hover:bg-border"
+              className="w-fit rounded-[16px] font-black text-text-primary"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}

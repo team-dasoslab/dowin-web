@@ -200,7 +200,8 @@ export default function DashboardPage() {
                     type="button"
                     onClick={saveImage}
                     disabled={isExporting}
-                    className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all w-full sm:w-auto"
+                    variant="ghost"
+                    className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary w-full sm:w-auto"
                   >
                     {isShareSupported
                       ? t("shareScoreboard")

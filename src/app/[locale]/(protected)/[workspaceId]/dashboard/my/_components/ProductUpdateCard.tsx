@@ -26,7 +26,8 @@ export function ProductUpdateCard({
         <Button
           type="button"
           onClick={onDismiss}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[12px] bg-black/5 dark:bg-white/5 text-text-muted hover:bg-black/10 dark:hover:bg-white/10 transition-colors border-none"
+          variant="subtle"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[12px] p-0 border-none"
           aria-label={t("dismissUpdate")}
         >
           <DowinIcon name="action-dismiss" size="14px" />

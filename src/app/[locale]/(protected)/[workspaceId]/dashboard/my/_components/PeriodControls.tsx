@@ -58,11 +58,11 @@ export function PeriodControls({
 
           <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-surface p-1.5 h-10">
             <Button
-              type="button"
               aria-label={t("previousPeriod")}
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-text-muted hover:bg-sub-background transition-colors disabled:opacity-30"
+              variant="ghost"
+              className="h-8 w-8 p-0 shrink-0"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
@@ -72,11 +72,11 @@ export function PeriodControls({
             </div>
 
             <Button
-              type="button"
               aria-label={t("nextPeriod")}
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[12px] text-text-muted hover:bg-sub-background transition-colors disabled:opacity-30"
+              variant="ghost"
+              className="h-8 w-8 p-0 shrink-0"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
@@ -87,11 +87,11 @@ export function PeriodControls({
 
             {isResetVisible ? (
               <Button
-                type="button"
                 aria-label={t("backToToday")}
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-8 shrink-0 items-center gap-1 rounded-[12px] px-3 text-[11px] font-bold text-text-muted hover:bg-sub-background transition-colors"
+                variant="ghost"
+                className="h-8 px-3 gap-1 shrink-0"
               >
                 <span className="hidden min-[360px]:inline">
                   {t("backToToday")}
@@ -127,11 +127,11 @@ export function PeriodControls({
             {/* Primary Group: Date Navigation */}
             <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-surface p-1.5 h-10 sm:justify-start lg:flex-none">
               <Button
-                type="button"
                 aria-label={t("previousPeriod")}
                 onClick={() => movePeriod(-1)}
                 disabled={isPreviousDisabled || isPeriodLoading}
-                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-text-muted hover:bg-sub-background transition-colors disabled:opacity-30"
+                variant="ghost"
+                className="h-8 w-8 p-0"
               >
                 <DowinIcon name="nav-chevron-left" size="14px" />
               </Button>
@@ -141,11 +141,11 @@ export function PeriodControls({
               </div>
 
               <Button
-                type="button"
                 aria-label={t("nextPeriod")}
                 onClick={() => movePeriod(1)}
                 disabled={isPeriodLoading}
-                className="flex h-8 w-8 items-center justify-center rounded-[12px] text-text-muted hover:bg-sub-background transition-colors disabled:opacity-30"
+                variant="ghost"
+                className="h-8 w-8 p-0"
               >
                 <DowinIcon name="nav-chevron-right" size="14px" />
               </Button>
@@ -156,11 +156,11 @@ export function PeriodControls({
 
               {isResetVisible && (
                 <Button
-                  type="button"
                   aria-label={t("backToToday")}
                   onClick={resetToToday}
                   disabled={isPeriodLoading}
-                  className="flex h-8 items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-bold text-text-muted hover:bg-sub-background transition-colors"
+                  variant="ghost"
+                  className="h-8 px-3 gap-1.5"
                 >
                   <span>{t("backToToday")}</span>
                 </Button>

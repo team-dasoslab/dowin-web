@@ -305,15 +305,16 @@ export function WeeklyBoardSection({
                                       );
                                     }
                                   }}
-                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
+                                  variant={
                                     isAchievedDaily
-                                      ? "bg-primary text-white"
+                                      ? "primary"
                                       : count > 0
-                                        ? "bg-primary/15 text-primary"
+                                        ? "primary-subtle"
                                         : date === today
-                                          ? "bg-primary/5 text-primary"
-                                          : "bg-sub-background text-text-muted hover:bg-sub-background"
-                                  } ${
+                                          ? "primary-ghost"
+                                          : "secondary"
+                                  }
+                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
                                     isPending || !isEditable
                                       ? "cursor-not-allowed opacity-50"
                                       : "cursor-pointer"
@@ -378,13 +379,14 @@ export function WeeklyBoardSection({
                                     void toggleLog(leadMeasureId, date);
                                   }
                                 }}
-                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
+                                variant={
                                   currentValue === true
-                                    ? "bg-primary text-white"
+                                    ? "primary"
                                     : isToday
-                                      ? "bg-primary/5 text-primary"
-                                      : "bg-sub-background text-text-muted hover:bg-sub-background"
-                                } ${
+                                      ? "primary-ghost"
+                                      : "secondary"
+                                }
+                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
                                   isPending || !isEditable
                                     ? "cursor-not-allowed opacity-50"
                                     : "cursor-pointer"

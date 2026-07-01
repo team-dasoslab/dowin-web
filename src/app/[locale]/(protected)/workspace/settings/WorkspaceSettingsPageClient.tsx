@@ -444,7 +444,8 @@ export default function WorkspaceSettingsPage() {
                               type="button"
                               disabled={isActionPending}
                               onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              className="flex h-10 items-center justify-center rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-border min-h-0"
+                              variant="subtle"
+                              className="flex h-10 items-center justify-center rounded-[12px] px-5 text-sm font-bold min-h-0"
                             >
                             {commonT("switchWorkspace")}
                           </Button>
@@ -516,7 +517,7 @@ function MenuItemRow({
   if (item.onClick) {
     return (
       <div className={itemWrapperClassName}>
-        <Button disabled={isActionPending} onClick={item.onClick} className="block w-full text-left transition-colors hover:bg-sub-background justify-start items-stretch rounded-none h-auto p-0 font-normal">
+        <Button disabled={isActionPending} onClick={item.onClick} variant="ghost" className="block w-full text-left justify-start items-stretch rounded-none h-auto p-0 font-normal">
           {Content}
         </Button>
       </div>

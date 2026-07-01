@@ -16,7 +16,7 @@ import { useTranslations } from "next-intl";
 export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
   const t = useTranslations("ProductUpdates");
   return (
-    <div className="rounded-[24px] bg-surface p-5" radius="xl">
+    <div className="rounded-[24px] bg-surface p-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
@@ -47,7 +47,7 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
           asChild
           variant="subtle"
           size="sm"
-          className="shrink-0 self-start sm:self-auto rounded-[12px] hover:bg-border"
+          className="shrink-0 self-start sm:self-auto"
         >
           <Link
             href={item.ctaHref}

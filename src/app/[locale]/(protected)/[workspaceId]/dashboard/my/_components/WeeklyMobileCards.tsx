@@ -215,15 +215,16 @@ function WeeklyMobileCardDay({
                 setOpenPopover(!openPopover);
               }
             }}
-            className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 ${
+            variant={
               isAchieved
-                ? "bg-primary text-white"
+                ? "primary"
                 : (count ?? 0) > 0
-                  ? "bg-primary/15 text-primary"
+                  ? "primary-subtle"
                   : isToday
-                    ? "bg-primary/5 text-primary"
-                    : "bg-sub-background text-text-muted"
-            }`}
+                    ? "primary-ghost"
+                    : "secondary"
+            }
+            className="flex aspect-square w-full items-center justify-center !rounded-[12px] p-0"
           >
             <span className="text-[12px] font-bold tracking-tighter leading-none">
               {(count ?? 0) > 0 ? `${count}/${dailyTargetCount}` : ""}
@@ -342,13 +343,14 @@ function WeeklyMobileCardDay({
               void toggleLog(leadMeasureId, date);
             }
           }}
-          className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 ${
+          variant={
             isAchieved
-              ? "bg-primary text-white"
+              ? "primary"
               : isToday
-                ? "bg-primary/15 text-primary"
-                : "bg-sub-background text-text-muted"
-          }`}
+                ? "primary-ghost"
+                : "secondary"
+          }
+          className="flex aspect-square w-full items-center justify-center !rounded-[12px] p-0"
         >
           {isAchieved ? (
             <DowinIcon

@@ -50,7 +50,7 @@ export function ActiveScoreboardSection({
               }}
               variant="subtle"
               size="sm"
-              className="flex-shrink-0 gap-1.5 whitespace-nowrap font-black text-text-primary hover:bg-border"
+              className="flex-shrink-0 gap-1.5 whitespace-nowrap font-black text-text-primary"
             >
               {pendingActionId === activeScoreboardId && (
                 <InlineSpinner

@@ -454,7 +454,8 @@ function MenuItemRow({
         <Button
           disabled={isActionPending}
           onClick={item.onClick}
-          className="block w-full text-left transition-colors hover:bg-sub-background justify-start items-stretch rounded-none h-auto p-0 font-normal"
+          variant="ghost"
+          className="block w-full text-left justify-start items-stretch rounded-none h-auto p-0 font-normal"
         >
           {Content}
         </Button>
