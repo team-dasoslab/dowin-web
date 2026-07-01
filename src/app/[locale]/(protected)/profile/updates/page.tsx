@@ -42,7 +42,7 @@ export default function UpdatesPage() {
       <div className="rounded-[24px] bg-surface px-6 py-6">
         <div className="max-w-[720px] space-y-3">
           <div>
-            <Badge className="w-fit rounded-[8px] bg-primary/5 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+            <Badge variant="ghost-primary" className="w-fit">
               {t("recommendedBadge")}
             </Badge>
 

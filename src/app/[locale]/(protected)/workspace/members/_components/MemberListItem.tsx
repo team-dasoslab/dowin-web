@@ -58,7 +58,7 @@ export function MemberListItem({
               {member.role === "ADMIN" ? "ADMIN" : "MEMBER"}
             </Badge>
             {isSelf ? (
-              <Badge className="rounded-full bg-sub-background px-2 py-0.5 text-[10px] font-bold text-text-muted">
+              <Badge variant="secondary">
                 {t("me")}
               </Badge>
             ) : null}
@@ -70,9 +70,10 @@ export function MemberListItem({
         {canTransferAdmin ? (
           <Button
             type="button"
+            variant="ghost-primary"
             disabled={isPendingTransfer || isPendingDelete}
             onClick={() => onTransferAdmin(memberId, nickname)}
-            className="flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] bg-primary/10 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+            className="flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] px-3 py-2 text-xs transition-colors"
           >
             <DowinIcon name="status-locked" size="14px" />
             <span>{isPendingTransfer ? t("processing") : t("transferAdmin")}</span>
@@ -81,12 +82,13 @@ export function MemberListItem({
 
         <Button
           type="button"
+          variant={canRemove ? "danger" : "secondary"}
           disabled={!canRemove || isPendingDelete || isPendingTransfer}
           onClick={() => onRemove(memberId, nickname)}
-          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] px-3 py-2 text-xs font-bold transition-colors ${
+          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] px-3 py-2 text-xs transition-colors ${
             canRemove
-              ? "bg-danger/10 text-danger hover:bg-danger/20"
-              : "cursor-not-allowed bg-sub-background text-text-muted"
+              ? "hover:bg-danger/20"
+              : "cursor-not-allowed"
           }`}
         >
           <DowinIcon name="action-member-remove" size="14px" />

@@ -42,7 +42,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
                 {member.nickname}
               </p>
               {isMe ? (
-                <Badge className="rounded-[12px] border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+                <Badge variant="primary">
                   {tc("me")}
                 </Badge>
               ) : null}

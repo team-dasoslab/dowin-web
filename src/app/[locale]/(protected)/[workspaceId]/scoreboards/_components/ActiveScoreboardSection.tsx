@@ -87,7 +87,8 @@ function EmptyActiveScoreboardCard() {
       <div className="flex justify-center">
         <Button
           asChild
-          className="btn-dowin-primary rounded-[16px] px-5 py-3 text-[14px] font-black"
+          variant="primary"
+          className="rounded-[16px] px-5 py-3 text-[14px] font-black"
         >
           <Link href={`/${workspaceId}/setup?mode=create`}>
             {td("createScoreboard")}

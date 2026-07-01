@@ -303,7 +303,8 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+              variant="primary"
+              className="flex items-center gap-2 w-fit px-5 py-3 text-sm"
             >
               <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>
                 새 점수판 만들기

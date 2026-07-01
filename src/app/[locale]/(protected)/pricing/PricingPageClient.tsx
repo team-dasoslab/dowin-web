@@ -134,9 +134,10 @@ export function PricingPageClient() {
           {canManageViaPolar ? (
             <Button
               type="button"
+              variant="primary"
               onClick={() => void openPortal()}
               disabled={isPortalPending}
-              className="btn-dowin-primary h-11 w-full text-sm font-black sm:w-auto sm:px-6"
+              className="h-11 w-full text-sm font-black sm:w-auto sm:px-6"
             >
               {isPortalPending ? t("portalLoading") : t("portalButton")}
             </Button>
