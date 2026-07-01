@@ -4,6 +4,7 @@ import { usePostAdminAuthLogout } from "@/api/generated/admin-auth/admin-auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
+import { Button } from "@/components/ui/Button";
 
 export default function AdminHeaderClient() {
   const router = useRouter();
@@ -77,12 +78,13 @@ export default function AdminHeaderClient() {
         </div>
 
         <div className="flex items-center">
-          <button
+          <Button
             onClick={handleLogout}
-            className="px-4 py-2 bg-zinc-100 text-text-muted hover:bg-border hover:text-text-primary rounded-full transition-colors text-[13px] font-bold"
+            variant="secondary"
+            size="sm"
           >
             로그아웃
-          </button>
+          </Button>
         </div>
       </div>
       

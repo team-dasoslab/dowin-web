@@ -78,7 +78,7 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
       description="고객 문의 상세 내용을 확인하고 상태 및 답변을 업데이트합니다."
       backHref="/admin/inquiries"
     >
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8 space-y-6">
+      <Card className="space-y-6" radius="xl" padding="lg" variant="white" shadow="none">
         {isDetailLoading ? (
           <div className="py-12 flex justify-center">
             <InlineSpinner />

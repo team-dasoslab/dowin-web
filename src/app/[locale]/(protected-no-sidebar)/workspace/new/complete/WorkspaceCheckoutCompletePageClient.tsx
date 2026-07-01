@@ -57,7 +57,7 @@ export default function WorkspaceCheckoutCompletePageClient({
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-[420px] bg-surface border border-border rounded-content p-8 md:p-10 space-y-8 animate-dowin-in">
+      <Card className="w-full max-w-[420px] space-y-8 animate-dowin-in" padding="xl">
         <div className="space-y-5 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-content bg-primary/10">
             <Logo size="24px" className="text-primary" />

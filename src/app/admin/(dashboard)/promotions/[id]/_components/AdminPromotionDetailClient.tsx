@@ -89,7 +89,7 @@ export default function AdminPromotionDetailClient({ promotionId }: { promotionI
       description="프로모션 코드 상세 정보와 사용 내역을 조회하고 피드백 상태를 관리합니다."
       backHref="/admin/promotions"
     >
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8 space-y-6">
+      <Card className="space-y-6" radius="xl" padding="lg" variant="white" shadow="none">
         {isDetailLoading ? (
           <div className="py-12 flex justify-center">
             <InlineSpinner />

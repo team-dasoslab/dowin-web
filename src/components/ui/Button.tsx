@@ -9,15 +9,18 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "",
-        primary: "bg-primary text-white font-bold border border-black/5 active:bg-primary-light rounded-[12px]", // --radius-button is 0.75rem (12px)
-        hero: "bg-zinc-950 dark:bg-black text-white disabled:bg-zinc-800 disabled:dark:bg-zinc-800 disabled:text-zinc-500 shadow-sm", // had shadow-sm originally
-        outline: "border border-border text-text-primary hover:bg-sub-background",
-        "outline-subtle": "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50",
-        "ghost-primary": "bg-primary/10 text-primary font-bold hover:bg-primary/20",
-        danger: "bg-danger/10 text-danger font-bold hover:bg-danger/20",
-        secondary: "bg-sub-background text-text-muted font-bold cursor-not-allowed",
-        subtle: "bg-sub-background text-text-secondary hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors",
-        "solid-dark": "bg-text-primary text-white font-black hover:bg-text-primary/90",
+        primary: "bg-primary text-white font-bold border border-black/5 active:bg-primary-light rounded-[12px] hover:bg-primary/90", // added hover
+        hero: "bg-zinc-950 dark:bg-black text-white disabled:bg-zinc-800 disabled:dark:bg-zinc-800 disabled:text-zinc-500 shadow-sm hover:bg-zinc-800 active:bg-zinc-700", 
+        outline: "border border-border text-text-primary hover:bg-sub-background active:bg-border/50 disabled:bg-white disabled:text-text-muted",
+        "outline-subtle": "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 active:bg-zinc-100",
+        ghost: "hover:bg-sub-background active:bg-border/50 text-text-secondary disabled:bg-transparent disabled:text-text-muted/50",
+        "ghost-primary": "bg-primary/10 text-primary font-bold hover:bg-primary/20 active:bg-primary/30",
+        "primary-subtle": "bg-primary/15 text-primary shadow-none hover:bg-primary/25 active:bg-primary/30 disabled:bg-primary/10",
+        "primary-ghost": "bg-primary/5 text-primary shadow-none hover:bg-primary/10 active:bg-primary/20 disabled:bg-transparent",
+        danger: "bg-danger/10 text-danger font-bold hover:bg-danger/20 active:bg-danger/30",
+        secondary: "bg-sub-background text-text-muted font-bold hover:bg-border/50 active:bg-border",
+        subtle: "bg-sub-background text-text-secondary hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors active:bg-zinc-300",
+        "solid-dark": "bg-text-primary text-white font-black hover:bg-text-primary/90 active:bg-text-primary/80 disabled:bg-text-primary/50",
       },
       size: {
         default: "",

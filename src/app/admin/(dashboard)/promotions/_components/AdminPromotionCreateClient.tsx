@@ -69,7 +69,7 @@ export default function AdminPromotionCreateClient() {
       description="워크스페이스 프로모션 코드(Basic) 프로모션 초대코드를 새로 발급합니다."
       backHref="/admin/promotions"
     >
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8">
+      <Card radius="xl" padding="lg" variant="white" shadow="none">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="text-[11px] font-black text-text-muted uppercase tracking-[0.1em] ml-1 block">

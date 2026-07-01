@@ -128,7 +128,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
       description="워크스페이스의 결제 정보를 확인하고 필요시 수동으로 보정합니다."
       backHref="/admin/billing"
     >
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8 space-y-6">
+      <Card className="space-y-6" radius="xl" padding="lg" variant="white" shadow="none">
         {isDetailLoading ? (
           <div className="py-12 flex justify-center">
             <InlineSpinner />

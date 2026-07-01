@@ -488,7 +488,7 @@ export default async function DocsViewerPage({
 
         <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)_280px] items-start">
           <aside className="space-y-6 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto [&::-webkit-scrollbar]:hidden">
-            <Card className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <Card radius="lg" padding="default" variant="white-outline" shadow="sm">
               <SectionHeader title={t("tree.title")} />
               <div className="mt-4 max-h-[560px] overflow-y-auto pr-1">
                 <DocsTree
@@ -504,7 +504,7 @@ export default async function DocsViewerPage({
           </aside>
 
           <section className="space-y-4 flex flex-col">
-            <Card className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <Card radius="lg" padding="default" variant="white-outline" shadow="sm">
               <details
                 open={section !== "all" || topic !== "all" || lens !== "all"}
                 className="group/filters mb-4 border-b border-zinc-100 pb-4"
@@ -735,7 +735,7 @@ export default async function DocsViewerPage({
                 )}
               </div>
             ) : (
-              <Card className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+              <Card radius="lg" padding="default" variant="white-outline" shadow="sm">
                 <SectionHeader
                   title={t("feed.title")}
                   description={t("feed.description", {
@@ -1019,7 +1019,7 @@ function DocumentPanel({
   const blocks = parseContentBlocks(activeDoc.content);
 
   return (
-    <Card className="rounded-xl border border-zinc-200 bg-white p-6 md:p-8 shadow-sm">
+    <Card className="md:" radius="lg" padding="lg" variant="white-outline" shadow="sm">
       <div className="mb-8 rounded-xl border border-zinc-200 bg-zinc-50 p-5 shadow-sm">
         <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
           {t("detail.title")}

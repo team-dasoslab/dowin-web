@@ -68,7 +68,7 @@ export default function AdminProductCreateClient() {
       backHref="/admin/products"
     >
 
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8">
+      <Card radius="xl" padding="lg" variant="white" shadow="none">
         <form onSubmit={handleCreate} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">

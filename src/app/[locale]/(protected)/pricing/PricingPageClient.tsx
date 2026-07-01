@@ -76,7 +76,7 @@ export function PricingPageClient() {
           description={t("description")}
         />
 
-        <Card className="space-y-5 border-border bg-surface p-5 md:p-6">
+        <Card className="space-y-5 border-border bg-surface" padding="lg">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <p className="text-xs font-bold text-text-muted">
@@ -200,7 +200,7 @@ function InfoItem({ label, value }: { label: string; value: string }) {
 
 function GuideCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <Card className="space-y-2 border-border bg-surface p-5">
+    <Card className="space-y-2 border-border bg-surface" padding="default">
       <h3 className="text-[14px] font-black text-text-primary">{title}</h3>
       <p className="text-[12px] font-medium leading-relaxed text-text-muted">
         {desc}
@@ -250,7 +250,7 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-border bg-surface p-8 text-center shadow-xl shadow-zinc-200/50">
+        <Card className="w-full space-y-6 border-border bg-surface text-center" padding="lg" shadow="xl">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Logo size="32px" />
           </div>
@@ -277,7 +277,7 @@ function PricingErrorState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-border bg-surface p-8 text-center shadow-xl shadow-zinc-200/50">
+        <Card className="w-full space-y-6 border-border bg-surface text-center" padding="lg" shadow="xl">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <DowinIcon name="status-warning" size="24px" />
           </div>

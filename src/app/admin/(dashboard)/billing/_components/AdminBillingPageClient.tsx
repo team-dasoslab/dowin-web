@@ -11,6 +11,7 @@ import { Card } from "@/components/ui/Card";
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
 import { AdminBillingWorkspaceSummary } from "@/api/generated/dowin.schemas";
+import { Badge } from "@/components/ui/Badge";
 
 export default function AdminBillingPageClient() {
   const router = useRouter();
@@ -155,7 +156,7 @@ export default function AdminBillingPageClient() {
         </div>
       </div>
 
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden">
+      <Card radius="xl" variant="white" shadow="none">
         <div className="w-full">
           {isListLoading ? (
             <div className="p-12 text-center">
@@ -203,30 +204,34 @@ export default function AdminBillingPageClient() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`text-[12px] font-black px-2.5 py-1 rounded-full border ${
+                        <Badge
+                          variant={
                             ws.planCode === "STANDARD"
-                              ? "bg-primary/5 text-primary border-primary/10"
+                              ? "primary"
                               : ws.planCode === "BASIC"
-                                ? "bg-blue-500/5 text-blue-600 border-blue-500/10"
-                                : "bg-zinc-100 text-zinc-600 border-none"
-                          }`}
+                                ? "info"
+                                : "default"
+                          }
+                          shape="pill"
+                          className="w-fit"
                         >
                           {ws.planCode}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`text-[12px] font-black px-2.5 py-1 rounded-full border ${
+                        <Badge
+                          variant={
                             ws.billingStatus === "ACTIVE"
-                              ? "bg-success/5 text-success border-success/10"
+                              ? "success"
                               : ws.billingStatus === "CANCELED"
-                                ? "bg-warning/5 text-warning border-warning/10"
-                                : "bg-zinc-100 text-zinc-600 border-none"
-                          }`}
+                                ? "warning"
+                                : "default"
+                          }
+                          shape="pill"
+                          className="w-fit"
                         >
                           {ws.billingStatus}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-[14px] font-bold text-text-primary">
@@ -236,9 +241,9 @@ export default function AdminBillingPageClient() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-[12px] font-black px-3 py-1 bg-zinc-100 text-zinc-600 rounded-full uppercase tracking-wider w-fit">
+                        <Badge variant="default" shape="pill" className="w-fit uppercase tracking-wider">
                           {ws.entitlementSource || "None"}
-                        </span>
+                        </Badge>
                       </td>
                     </tr>
                   ))}

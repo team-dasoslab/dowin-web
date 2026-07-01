@@ -44,7 +44,7 @@ export default function AdminLoginPageClient() {
     <div className="min-h-screen relative flex items-center justify-center bg-sub-background px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] bg-surface border border-border rounded-content p-8 md:p-12 animate-dowin-in relative z-10">
+      <Card className="w-full max-w-[480px] animate-dowin-in relative z-10" padding="xl">
         <div className="flex flex-col items-start text-left space-y-5 mb-12">
           <Logo size="32px" className="text-text-primary" />
           <div className="space-y-1.5">

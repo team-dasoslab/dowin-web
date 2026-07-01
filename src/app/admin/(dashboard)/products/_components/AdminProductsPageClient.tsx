@@ -79,7 +79,7 @@ export default function AdminProductsPageClient() {
       </div>
 
       <div className="w-full">
-        <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden">
+        <Card radius="xl" variant="white" shadow="none">
           {isProductLoading ? (
             <div className="p-12 text-center">
               <InlineSpinner />
