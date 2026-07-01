@@ -49,16 +49,15 @@ export function MemberListItem({
               {nickname}
             </p>
             <Badge
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                member.role === "ADMIN"
-                  ? "bg-primary/10 text-primary"
-                  : "bg-sub-background text-text-muted"
-              }`}
+              variant={member.role === "ADMIN" ? "primary" : "secondary"}
+              size="sm"
+              shape="pill"
+              className="flex-shrink-0"
             >
               {member.role === "ADMIN" ? "ADMIN" : "MEMBER"}
             </Badge>
             {isSelf ? (
-              <Badge variant="secondary">
+              <Badge variant="secondary" size="sm" shape="pill">
                 {t("me")}
               </Badge>
             ) : null}

@@ -16,15 +16,15 @@ import { useTranslations } from "next-intl";
 export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
   const t = useTranslations("ProductUpdates");
   return (
-    <div className="rounded-[24px] bg-surface p-5">
+    <div className="rounded-[24px] bg-surface p-5" radius="xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="ghost-secondary">
+            <Badge variant="ghost-secondary" size="lg">
               {t(`tags.${item.tag}`)}
             </Badge>
             {item.isNew ? (
-              <Badge variant="ghost-primary">
+              <Badge variant="ghost-primary" size="lg">
                 NEW
               </Badge>
             ) : null}

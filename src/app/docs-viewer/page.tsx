@@ -468,7 +468,7 @@ export default async function DocsViewerPage({
               <h1 className="text-xl font-black text-text-primary tracking-tight">
                 Dowin Docs
               </h1>
-              <Badge variant="primary">
+              <Badge variant="primary" size="sm">
                 Internal
               </Badge>
             </div>

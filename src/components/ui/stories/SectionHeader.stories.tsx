@@ -21,7 +21,7 @@ export const Default: Story = {
 export const WithBadgeAndAction: Story = {
   args: {
     title: "Team Overview",
-    badge: <Badge variant="primary">New</Badge>,
+    badge: <Badge variant="primary" size="sm">New</Badge>,
     rightElement: <Button variant="outline" size="sm">Settings</Button>,
   },
 };
