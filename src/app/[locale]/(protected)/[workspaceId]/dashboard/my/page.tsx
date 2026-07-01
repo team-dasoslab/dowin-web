@@ -188,7 +188,9 @@ export default function MyDashboardPage() {
             <div className="flex flex-wrap gap-2">
               <Button
                 asChild
-                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all "
+                variant="subtle"
+                size="sm"
+                className="font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background"
               >
                 <Link href={`/${workspaceId}/scoreboards`}>
                   {t("scoreboardArchive")}
@@ -196,7 +198,9 @@ export default function MyDashboardPage() {
               </Button>
               <Button
                 asChild
-                className="h-10 px-4 text-[13px] font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background transition-all "
+                variant="subtle"
+                size="sm"
+                className="font-black !rounded-2xl bg-surface text-text-primary hover:bg-sub-background"
               >
                 <Link href={`/${workspaceId}/setup?mode=update`}>
                   {t("manageScoreboard")}

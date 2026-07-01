@@ -188,7 +188,8 @@ export function TeamMemberMemoPanel({
                       type="button"
                       onClick={() => void handleAddMemo()}
                       disabled={!memoDraft.trim() || isCreatePending}
-                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
+                      variant="ghost-primary"
+                      className="h-10 w-10 shrink-0 rounded-full"
                       aria-label={t("submitMemo")}
                     >
                       <DowinIcon name="action-send" size="16px" />
@@ -297,7 +298,8 @@ export function TeamMemberMemoPanel({
                   type="button"
                   onClick={() => void handleAddMemo()}
                   disabled={!memoDraft.trim() || isCreatePending}
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
+                  variant="ghost-primary"
+                  className="h-8 w-8 shrink-0 rounded-full"
                   aria-label={t("submitMemo")}
                 >
                   <DowinIcon name="action-send" size="16px" />
@@ -394,11 +396,9 @@ function MemoCard({
                 type="button"
                 onClick={() => void onResolve(memo)}
                 disabled={isResolvePending || isOptimisticMemo}
-                className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 rounded-none p-0 min-h-0 ${
-                  memo.isResolved
-                    ? "bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-border"
-                }`}
+                variant={memo.isResolved ? "ghost-primary" : "subtle"}
+                size="icon"
+                className="rounded-none bg-transparent hover:bg-border/50"
                 aria-label={t("verifyMemo")}
               >
                 <DowinIcon name="action-checkmark" size="16px" />
@@ -409,7 +409,9 @@ function MemoCard({
                 type="button"
                 onClick={() => void onDelete(memo.id)}
                 disabled={isDeletePending || isOptimisticMemo}
-                className="inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors disabled:opacity-50 hover:bg-border rounded-none p-0 min-h-0"
+                variant="subtle"
+                size="icon"
+                className="rounded-none bg-transparent hover:bg-border/50"
                 aria-label={t("deleteMemo")}
               >
                 <DowinIcon name="action-delete" size="16px" />

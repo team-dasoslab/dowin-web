@@ -377,7 +377,9 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                   type="button"
                   onClick={handleSaveOverride}
                   disabled={overrideMutation.isPending}
-                  className="px-8 py-3.5 bg-text-primary text-white font-black text-[14px] rounded-button transition-all flex items-center justify-center gap-2"
+                  variant="solid-dark"
+                  size="primary"
+                  className="gap-2"
                 >
                   {overrideMutation.isPending ? (
                     <InlineSpinner />

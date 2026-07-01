@@ -244,7 +244,9 @@ export default function LoginPageClient() {
               <Button
                 type="button"
                 onClick={handleCopyRecoveryCodes}
-                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-sub-background hover:bg-zinc-200 dark:hover:bg-zinc-800 text-text-secondary transition-colors "
+                variant="subtle"
+                size="xl"
+                className="flex-1"
               >
                 {isCopied ? (
                   <span className="inline-flex items-center gap-2">
@@ -269,7 +271,9 @@ export default function LoginPageClient() {
               <Button
                 type="button"
                 onClick={handleDownloadRecoveryCodes}
-                className="flex-1 h-[56px] rounded-[24px] text-[15px] font-semibold border-none bg-sub-background hover:bg-zinc-200 dark:hover:bg-zinc-800 text-text-secondary transition-colors "
+                variant="subtle"
+                size="xl"
+                className="flex-1"
               >
                 {t("recovery.saveTxt")}
               </Button>
@@ -279,7 +283,9 @@ export default function LoginPageClient() {
               onClick={() => {
                 router.push("/workspace/new");
               }}
-              className="w-full h-[56px] rounded-[24px] text-[17px] font-bold border-none bg-zinc-900 text-white hover:bg-zinc-800 transition-transform "
+              variant="solid-dark"
+              size="xl"
+              className="w-full transition-transform"
             >
               {t("continue")}
             </Button>

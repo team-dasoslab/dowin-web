@@ -188,7 +188,9 @@ export function ProfileBillingPageClient() {
                   type="button"
                   onClick={() => void openPortal()}
                   disabled={isPortalPending}
-                  className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary hover:bg-border transition-colors"
+                  variant="subtle"
+                  size="primary"
+                  className="font-bold"
                 >
                   {isPortalPending ? t("portalLoading") : t("portalButton")}
                 </Button>
@@ -321,7 +323,9 @@ export function ProfileBillingPageClient() {
                             type="button"
                             onClick={handleSeatChangeClick}
                             disabled={isUpdatingSeats}
-                            className="whitespace-nowrap h-8 rounded-[12px] bg-sub-background px-3 text-xs font-bold text-text-secondary hover:bg-border transition-colors"
+                            variant="subtle"
+                            size="sm"
+                            className="whitespace-nowrap font-bold"
                           >
                             {isUpdatingSeats
                               ? t("seatChangeDialogSubmitting")
@@ -406,7 +410,9 @@ export function ProfileBillingPageClient() {
                 <Button
                   type="button"
                   onClick={() => void refetch()}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] bg-primary px-4 text-[12px] font-bold text-white transition-all"
+                  variant="primary"
+                  size="sm"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] px-4 text-[12px] font-bold transition-all"
                 >
                   <DowinIcon
                     name="action-refresh"
@@ -484,7 +490,9 @@ function BillingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-[12px] bg-sub-background px-5 py-3 text-sm font-bold text-text-primary hover:bg-border transition-colors"
+              variant="subtle"
+              size="primary"
+              className="rounded-[12px] font-bold text-text-primary hover:bg-border"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -615,7 +623,9 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
           <Button
             type="button"
             onClick={onRefresh}
-            className="rounded-[12px] bg-primary text-white h-12 w-full text-[15px] font-bold hover:bg-primary/90 transition-colors"
+            variant="primary"
+            size="lg"
+            className="rounded-[12px] w-full font-bold"
           >
             {t("refresh")}
           </Button>

@@ -113,7 +113,8 @@ export function RootLandingPage() {
           <div className="mt-16 flex flex-col gap-4 sm:flex-row sm:items-center">
             <Button
               asChild
-              className="h-14 rounded-button bg-primary px-12 text-[18px] font-bold text-white"
+              variant="primary"
+              size="lg"
             >
               <Link href="/login">{t("Hero.primaryCta")}</Link>
             </Button>
@@ -335,7 +336,7 @@ export function RootLandingPage() {
                   </li>
                 ))}
               </ul>
-              <Button asChild className="mt-14 h-14 w-full rounded-button bg-primary text-[18px] font-bold text-white">
+              <Button asChild variant="primary" size="lg" className="mt-14 w-full px-0">
                 <Link href="/login">{t("Pricing.cta")}</Link>
               </Button>
             </div>
@@ -362,7 +363,9 @@ export function RootLandingPage() {
             <div className="mt-16">
               <Button
                 asChild
-                className="h-14 w-full sm:w-auto min-w-[280px] rounded-button bg-primary px-10 text-[20px] font-bold text-white"
+                variant="primary"
+                size="lg"
+                className="w-full sm:w-auto min-w-[280px] px-10 text-[20px]"
               >
                 <Link href="/login">
                   {t("FinalCta.cta")}

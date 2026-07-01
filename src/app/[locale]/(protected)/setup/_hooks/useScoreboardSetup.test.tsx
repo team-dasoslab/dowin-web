@@ -377,7 +377,7 @@ describe("useScoreboardSetup create mode", () => {
         dailyTargetCount: 4,
         name: "신규 액션 아이템",
         period: "MONTHLY",
-        targetValue: 30,
+        targetValue: 31,
         trackingMode: "COUNT",
       }),
     );

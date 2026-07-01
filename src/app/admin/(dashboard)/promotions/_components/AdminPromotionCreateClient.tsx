@@ -87,7 +87,9 @@ export default function AdminPromotionCreateClient() {
               <Button
                 type="button"
                 onClick={() => setCode(generatePromotionCode())}
-                className="shrink-0 px-4 py-3 bg-primary/10 text-primary font-bold text-[14px] rounded-[16px] transition-colors hover:bg-primary/20"
+                variant="ghost-primary"
+                size="primary"
+                className="shrink-0"
               >
                 자동 생성
               </Button>
@@ -203,7 +205,9 @@ export default function AdminPromotionCreateClient() {
             <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-8 py-3.5 bg-text-primary text-white font-black text-[14px] rounded-button transition-all flex items-center justify-center gap-2"
+              variant="solid-dark"
+              size="primary"
+              className="gap-2"
             >
               {createMutation.isPending ? <InlineSpinner /> : <span>생성하기</span>}
             </Button>

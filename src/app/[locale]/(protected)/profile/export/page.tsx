@@ -151,7 +151,9 @@ export default function ProfileExportPage() {
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                className="h-8 rounded-[12px] bg-sub-background px-3 text-[11px] font-black text-text-secondary transition-colors hover:bg-border"
+                variant="subtle"
+                size="sm"
+                className="h-8 rounded-[12px] px-3 text-[11px] font-black hover:bg-border"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -196,7 +198,9 @@ export default function ProfileExportPage() {
               type="button"
               onClick={() => void exportCsv()}
               disabled={isExporting || !isExportAvailable}
-              className="h-9 w-full rounded-[12px] bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
+              variant="primary"
+              size="sm"
+              className="w-full sm:w-auto rounded-[12px] gap-1.5"
             >
               <DowinIcon name="action-download" size="14px" />
               {isExportAvailable
@@ -226,7 +230,9 @@ function ExportUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="w-fit rounded-[16px] bg-sub-background px-5 py-3 text-sm font-black text-text-primary transition-colors hover:bg-border"
+              variant="subtle"
+              size="primary"
+              className="w-fit rounded-[16px] font-black text-text-primary hover:bg-border"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -304,7 +310,8 @@ function NoScoreboardState() {
             <Button
               asChild
               variant="primary"
-              className="flex items-center gap-2 w-fit px-5 py-3 text-sm"
+              size="primary"
+              className="w-fit gap-2"
             >
               <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>
                 새 점수판 만들기

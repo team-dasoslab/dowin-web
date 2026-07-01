@@ -152,7 +152,9 @@ export default function AdminProductCreateClient() {
             <Button
               type="submit"
               disabled={createMutation.isPending}
-              className="px-8 py-3.5 bg-text-primary text-white font-black text-[14px] rounded-button transition-all flex items-center justify-center gap-2"
+              variant="solid-dark"
+              size="primary"
+              className="gap-2"
             >
               {createMutation.isPending ? <InlineSpinner /> : <span>저장하기</span>}
             </Button>

@@ -122,7 +122,9 @@ export default function ProfileMembersPage() {
           <div className="flex shrink-0 items-center">
             <Button
               asChild
-              className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-border"
+              variant="subtle"
+              size="primary"
+              className="font-bold hover:bg-border"
             >
               <Link
                 href={getWorkspacePath(workspaceParamId, "/workspace/invites")}
@@ -257,7 +259,9 @@ function NoAccessState() {
           </div>
           <Button
             asChild
-            className="w-full rounded-content border border-border bg-surface py-3 text-sm font-semibold text-text-primary"
+            variant="outline"
+            size="primary"
+            className="w-full font-semibold"
           >
             <Link href={getWorkspacePath(workspaceId, "/profile")}>
               {t("backToSettings")}

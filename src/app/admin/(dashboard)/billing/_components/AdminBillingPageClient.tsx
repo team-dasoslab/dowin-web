@@ -75,7 +75,9 @@ export default function AdminBillingPageClient() {
           type="button"
           onClick={handleSyncAllStatuses}
           disabled={syncStatusMutation.isPending}
-          className="h-11 shrink-0 rounded-[14px] bg-text-primary px-5 text-[13px] font-black text-white transition-all"
+          variant="solid-dark"
+          size="sm"
+          className="shrink-0"
         >
           {syncStatusMutation.isPending ? (
             <InlineSpinner />

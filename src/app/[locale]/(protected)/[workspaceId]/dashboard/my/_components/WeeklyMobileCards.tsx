@@ -215,7 +215,7 @@ function WeeklyMobileCardDay({
                 setOpenPopover(!openPopover);
               }
             }}
-            className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all ${
+            className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 ${
               isAchieved
                 ? "bg-primary text-white"
                 : (count ?? 0) > 0
@@ -223,7 +223,7 @@ function WeeklyMobileCardDay({
                   : isToday
                     ? "bg-primary/5 text-primary"
                     : "bg-sub-background text-text-muted"
-            } ${isPending || !isEditable ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
+            }`}
           >
             <span className="text-[12px] font-bold tracking-tighter leading-none">
               {(count ?? 0) > 0 ? `${count}/${dailyTargetCount}` : ""}
@@ -247,7 +247,9 @@ function WeeklyMobileCardDay({
                 >
                   <Button
                     aria-label={t("closeDailyCount")}
-                    className="absolute top-3 right-3 p-2 min-h-0 rounded-full bg-transparent hover:bg-sub-background"
+                    variant="subtle"
+                    size="icon"
+                    className="absolute top-3 right-3 rounded-full bg-transparent hover:bg-sub-background"
                     onClick={() => setOpenPopover(false)}
                   >
                     <svg
@@ -291,7 +293,9 @@ function WeeklyMobileCardDay({
 
                     <div className="flex w-full gap-2 mt-3">
                       <Button
-                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
+                        variant="subtle"
+                        size="lg"
+                        className="flex-1 text-[24px]"
                         onClick={() =>
                           setLocalCount(Math.max(0, localCount - 1))
                         }
@@ -299,15 +303,19 @@ function WeeklyMobileCardDay({
                         -
                       </Button>
                       <Button
-                        className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
+                        variant="subtle"
+                        size="lg"
+                        className="flex-1 text-[24px]"
                         onClick={() => setLocalCount(localCount + 1)}
                       >
                         +
                       </Button>
                     </div>
                     <Button
+                      variant="primary"
+                      size="lg"
                       aria-label={t("saveDailyCount")}
-                      className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white transition-all"
+                      className="w-full mt-4"
                       onClick={() => {
                         handleCountSave(localCount);
                         setOpenPopover(false);
@@ -334,16 +342,12 @@ function WeeklyMobileCardDay({
               void toggleLog(leadMeasureId, date);
             }
           }}
-          className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 transition-all ${
+          className={`flex aspect-square w-full items-center justify-center !rounded-[12px] p-0 ${
             isAchieved
               ? "bg-primary text-white"
               : isToday
                 ? "bg-primary/15 text-primary"
                 : "bg-sub-background text-text-muted"
-          } ${
-            isPending || !isEditable
-              ? "cursor-not-allowed opacity-50"
-              : "cursor-pointer"
           }`}
         >
           {isAchieved ? (

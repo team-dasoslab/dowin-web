@@ -85,11 +85,8 @@ export function MemberListItem({
           variant={canRemove ? "danger" : "secondary"}
           disabled={!canRemove || isPendingDelete || isPendingTransfer}
           onClick={() => onRemove(memberId, nickname)}
-          className={`flex min-w-fit items-center justify-center gap-1.5 rounded-[12px] px-3 py-2 text-xs transition-colors ${
-            canRemove
-              ? "hover:bg-danger/20"
-              : "cursor-not-allowed"
-          }`}
+          size="sm"
+          className="flex min-w-fit items-center gap-1.5"
         >
           <DowinIcon name="action-member-remove" size="14px" />
           <span>{isPendingDelete ? t("processing") : t("remove")}</span>

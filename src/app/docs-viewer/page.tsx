@@ -457,7 +457,9 @@ export default async function DocsViewerPage({
             <div className="flex flex-wrap items-center gap-3">
               <Button
                 asChild
-                className="min-h-10 border border-zinc-200 bg-white px-4 text-sm font-bold text-zinc-700 transition-colors"
+                variant="outline-subtle"
+                size="sm"
+                className="font-bold"
               >
                 <NextLink href="/">
                   {locale === "ko" ? "← 앱으로 돌아가기" : "← Back to app"}
@@ -474,7 +476,9 @@ export default async function DocsViewerPage({
             <div className="flex items-center gap-2">
               <Button
                 asChild
-                className="min-h-10 border border-zinc-200 bg-white px-4 text-sm font-bold text-zinc-700 transition-colors"
+                variant="outline-subtle"
+                size="sm"
+                className="font-bold"
               >
                 <NextLink href="/api-docs">{t("cta.apiDocs")}</NextLink>
               </Button>
@@ -527,12 +531,9 @@ export default async function DocsViewerPage({
                           <Button
                             key={sectionId}
                             asChild
-                            className={cn(
-                              "min-h-8 px-3 text-xs font-medium transition-colors rounded-lg",
-                              active
-                                ? "bg-zinc-900 text-white"
-                                : "border border-zinc-200 bg-zinc-50 text-zinc-600",
-                            )}
+                            variant={active ? "solid-dark" : "outline-subtle"}
+                            size="sm"
+                            
                           >
                             <NextLink
                               href={buildHref({
@@ -562,12 +563,9 @@ export default async function DocsViewerPage({
                           <Button
                             key={id}
                             asChild
-                            className={cn(
-                              "min-h-8 px-3 text-xs font-medium transition-colors rounded-lg",
-                              active
-                                ? "bg-primary text-white"
-                                : "border border-zinc-200 bg-zinc-50 text-zinc-600",
-                            )}
+                            variant={active ? "primary" : "outline-subtle"}
+                            size="sm"
+                            
                           >
                             <NextLink
                               href={buildHref({
@@ -598,12 +596,9 @@ export default async function DocsViewerPage({
                           <Button
                             key={id}
                             asChild
-                            className={cn(
-                              "min-h-8 px-3 text-xs font-medium transition-colors rounded-lg",
-                              active
-                                ? "bg-zinc-900 text-white"
-                                : "border border-zinc-200 bg-zinc-50 text-zinc-600",
-                            )}
+                            variant={active ? "solid-dark" : "outline-subtle"}
+                            size="sm"
+                            
                           >
                             <NextLink
                               href={buildHref({
@@ -654,7 +649,8 @@ export default async function DocsViewerPage({
                 />
                 <Button
                   type="submit"
-                  className="min-h-11 bg-primary px-4 text-sm font-semibold text-white transition-colors"
+                  variant="primary"
+                  size="primary"
                 >
                   {t("searchButton")}
                 </Button>
@@ -1247,11 +1243,10 @@ function DocsTreeNodeItem({
     return (
       <Button
         asChild
+        variant={isSelected ? "ghost-primary" : "default"}
         className={cn(
           "flex min-h-8 w-full justify-start rounded-lg px-3 text-left text-[13px] font-medium transition-colors",
-          isSelected
-            ? "bg-primary/10 text-primary font-bold"
-            : "bg-transparent text-zinc-600",
+          !isSelected && "bg-transparent text-zinc-600",
         )}
         style={{ paddingLeft: `${depth * 14 + 12}px` }}
       >

@@ -98,14 +98,14 @@ function CountPopoverContent({
         </div>
 
         <div className="flex w-full gap-2 mt-3">
-          <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
+          <Button variant="subtle" size="lg"
+            className="flex-1 text-[24px]"
             onClick={() => setLocalCount(Math.max(0, localCount - 1))}
           >
             -
           </Button>
-          <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
+          <Button variant="subtle" size="lg"
+            className="flex-1 text-[24px]"
             onClick={() => setLocalCount(localCount + 1)}
           >
             +
@@ -113,8 +113,10 @@ function CountPopoverContent({
         </div>
 
         <Button
+          variant="primary"
+          size="lg"
           aria-label={saveLabel}
-          className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white transition-all"
+          className="w-full mt-4"
           onClick={() => {
             onSave(localCount);
             onClose();

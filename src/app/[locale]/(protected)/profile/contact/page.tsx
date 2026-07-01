@@ -13,8 +13,6 @@ import {
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Input } from "@/components/ui/Input";
-import { Textarea } from "@/components/ui/Textarea";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
@@ -53,7 +51,9 @@ export default function ProfileContactPage() {
                 onClick={() => {
                   setIsComposerOpen(true);
                 }}
-                className="h-10 bg-primary px-4 text-sm font-black text-white"
+                variant="primary"
+                size="sm"
+                className="font-black"
               >
                 {t("composeButton")}
               </Button>
@@ -188,7 +188,9 @@ function ContactInquiryComposer({
             <Button
               type="button"
               onClick={onClose}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-colors p-0 min-h-0"
+              variant="subtle"
+              size="icon"
+              className="h-10 w-10 rounded-full bg-transparent hover:bg-border/50 p-0"
             >
               <DowinIcon name="action-dismiss" size="24px" />
             </Button>
@@ -198,118 +200,120 @@ function ContactInquiryComposer({
           <div className="max-h-[60vh] overflow-y-auto px-6 py-8 md:px-8">
             <form
               id="contact-inquiry-form"
-              className="space-y-8"
               onSubmit={async (event) => {
                 event.preventDefault();
                 const parsed = form.validate();
                 if (!parsed) return;
                 await submit(parsed);
               }}
+              className="space-y-8"
             >
-              {/* Category Selection */}
-              <div className="space-y-3">
-                <span className="text-[13px] font-black tracking-wide text-text-primary">
-                  {t("categoryLabel")}
-                </span>
+              <div className="space-y-2">
+                <label className="block text-[13px] font-bold text-text-primary">
+                  {t("categoryLabel")}{" "}
+                  <span className="text-danger">*</span>
+                </label>
                 <div className="flex flex-wrap gap-2">
-                  {categories.map((category) => {
-                    const isSelected = form.values.category === category.value;
-                    return (
-                      <Button
-                        key={category.value}
-                        type="button"
-                        disabled={isSubmitting}
-                        onClick={() =>
-                          form.setField("category", category.value)
-                        }
-                        className={`inline-flex items-center justify-center h-10 rounded-[12px] px-5 text-[13px] font-bold transition-all ${
-                          isSelected
-                            ? "bg-primary border border-primary text-white"
-                            : "bg-surface border border-border text-text-muted"
-                        }`}
-                      >
-                        {category.label}
-                      </Button>
-                    );
-                  })}
+                  {categories.map((category) => (
+                    <button
+                      key={category.value}
+                      type="button"
+                      onClick={() =>
+                        form.setField("category", category.value)
+                      }
+                      className={`h-11 rounded-[16px] px-4 text-sm font-bold transition-all ${
+                        form.values.category === category.value
+                          ? "bg-text-primary text-white"
+                          : "bg-sub-background text-text-secondary hover:bg-border/50"
+                      }`}
+                    >
+                      {category.label}
+                    </button>
+                  ))}
                 </div>
                 <FieldError message={form.errors.category} />
               </div>
 
-              {/* Reply Email */}
-              <Input
-                label={t("replyEmailLabel")}
-                type="email"
-                value={form.values.replyEmail}
-                onChange={(event) =>
-                  form.setField("replyEmail", event.target.value)
-                }
-                placeholder={t("replyEmailPlaceholder")}
-                disabled={isSubmitting}
-              />
-              <FieldError message={form.errors.replyEmail} />
-
-              {/* Subject */}
-              <Input
-                label={t("subjectLabel")}
-                value={form.values.subject}
-                onChange={(event) =>
-                  form.setField("subject", event.target.value)
-                }
-                placeholder={t("subjectPlaceholder")}
-                disabled={isSubmitting}
-              />
-              <FieldError message={form.errors.subject} />
-
-              {/* Message */}
-              <div className="flex flex-col gap-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-[13px] font-black tracking-wide text-text-primary">
-                    {t("messageLabel")}
-                  </label>
-                  <span className="text-[12px] font-bold text-text-muted">
-                    {t("messageCount", {
-                      count: form.values.message.length,
-                    })}
-                  </span>
-                </div>
-                <Textarea
-                  value={form.values.message}
-                  onChange={(event) =>
-                    form.setField("message", event.target.value)
+              <div className="space-y-2">
+                <label
+                  htmlFor="replyEmail"
+                  className="block text-[13px] font-bold text-text-primary"
+                >
+                  {t("replyEmailLabel")}{" "}
+                  <span className="text-danger">*</span>
+                </label>
+                <input
+                  id="replyEmail"
+                  type="email"
+                  value={form.values.replyEmail}
+                  onChange={(e) =>
+                    form.setField("replyEmail", e.target.value)
                   }
+                  className="h-12 w-full rounded-[16px] border border-border bg-surface px-4 text-sm text-text-primary outline-none transition-colors focus:border-text-primary"
+                  placeholder={t("replyEmailPlaceholder")}
+                  autoComplete="email"
+                />
+                <p className="text-[12px] text-text-muted">
+                  {t("replyEmailHint")}
+                </p>
+                <FieldError message={form.errors.replyEmail} />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="subject"
+                  className="block text-[13px] font-bold text-text-primary"
+                >
+                  {t("subjectLabel")}{" "}
+                  <span className="text-danger">*</span>
+                </label>
+                <input
+                  id="subject"
+                  type="text"
+                  value={form.values.subject}
+                  onChange={(e) =>
+                    form.setField("subject", e.target.value)
+                  }
+                  className="h-12 w-full rounded-[16px] border border-border bg-surface px-4 text-sm text-text-primary outline-none transition-colors focus:border-text-primary"
+                  placeholder={t("subjectPlaceholder")}
+                  maxLength={100}
+                />
+                <FieldError message={form.errors.subject} />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="message"
+                  className="block text-[13px] font-bold text-text-primary"
+                >
+                  {t("messageLabel")}{" "}
+                  <span className="text-danger">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  value={form.values.message}
+                  onChange={(e) =>
+                    form.setField("message", e.target.value)
+                  }
+                  className="min-h-[160px] w-full resize-y rounded-[20px] border border-border bg-surface p-4 text-sm leading-relaxed text-text-primary outline-none transition-colors focus:border-text-primary"
                   placeholder={t("messagePlaceholder")}
-                  disabled={isSubmitting}
-                  rows={8}
-                  className="min-h-[160px] w-full rounded-[16px] border-none bg-sub-background px-4 py-3 text-[14px] font-bold leading-6 text-text-primary outline-none transition focus:bg-surface focus:ring-4 focus:ring-primary/5"
+                  maxLength={3000}
                 />
                 <FieldError message={form.errors.message} />
               </div>
 
-              {/* Notice & Privacy */}
-              <div className="space-y-4">
-                <div className="rounded-[16px] bg-sub-background/70 p-5">
-                  <div className="space-y-3 text-[13px] leading-6 text-text-muted">
-                    <p className="font-black text-text-primary">
-                      {t("noticeTitle")}
-                    </p>
-                    <ul className="list-disc space-y-1 pl-4">
-                      <li>{t("noticeBody1")}</li>
-                      <li>{t("noticeBody2")}</li>
-                    </ul>
+              <div className="space-y-3 rounded-[20px] bg-sub-background p-5">
+                <label className="flex items-start gap-3">
+                  <div className="flex h-5 items-center">
+                    <input
+                      type="checkbox"
+                      checked={form.values.privacyConsent}
+                      onChange={(e) =>
+                        form.setField("privacyConsent", e.target.checked)
+                      }
+                      className="h-4 w-4 rounded border-border text-primary outline-none focus:ring-0"
+                    />
                   </div>
-                </div>
-
-                <label className="flex items-start gap-3 rounded-[16px] bg-sub-background p-4 transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={form.values.privacyConsent}
-                    onChange={(event) =>
-                      form.setField("privacyConsent", event.target.checked)
-                    }
-                    disabled={isSubmitting}
-                    className="mt-1 h-4 w-4 rounded border-border-hover text-primary focus:ring-primary"
-                  />
                   <div className="space-y-1">
                     <p className="text-[14px] font-black tracking-tight text-text-primary">
                       {t("privacyConsentTitle")}
@@ -338,14 +342,18 @@ function ContactInquiryComposer({
                   !form.values.message ||
                   !form.values.privacyConsent
                 }
-                className="inline-flex h-14 flex-1 items-center justify-center bg-primary text-[16px] font-black tracking-tight text-white disabled:cursor-not-allowed disabled:bg-border disabled:text-text-muted"
+                variant="primary"
+                size="lg"
+                className="flex-1 tracking-tight disabled:bg-border disabled:text-text-muted"
               >
                 {isSubmitting ? t("submittingButton") : t("submitButton")}
               </Button>
               <Button
                 type="button"
                 onClick={onClose}
-                className="inline-flex h-14 flex-1 items-center justify-center border border-border bg-surface text-[16px] font-black tracking-tight text-text-secondary"
+                variant="outline"
+                size="lg"
+                className="flex-1 tracking-tight"
               >
                 {t("cancelButton")}
               </Button>
@@ -421,7 +429,8 @@ function ListStatusCard({
             <Button
               type="button"
               onClick={onAction}
-              className="h-10 bg-primary px-4 text-sm font-black text-white"
+              variant="primary"
+              size="sm"
             >
               {actionLabel}
             </Button>

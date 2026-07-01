@@ -222,7 +222,9 @@ function PricingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-button border border-border bg-surface px-5 py-3 text-sm font-black text-text-primary transition-colors"
+              variant="outline"
+              size="primary"
+              className="bg-surface font-black transition-colors"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
