@@ -1,8 +1,5 @@
 import { Button } from "@/components/ui/Button";
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { Logo } from "@/components/ui/Logo";
-import { Link } from "@/i18n/routing";
 
 const meta: Meta<typeof Button> = {
   title: "UI/Button",
@@ -19,47 +16,53 @@ type Story = StoryObj<typeof Button>;
 export const Default: Story = {
   args: {
     children: "Default Button",
-    className: "px-4 py-2 border border-border text-sm",
+    variant: "default",
+    size: "sm",
+    className: "border border-border",
   },
 };
 
 export const Primary: Story = {
   args: {
-    children: (
-      <div className="flex items-center gap-2">
-        <Logo size="16px" />
-        <span>Primary Action</span>
-      </div>
-    ),
-    className:
-      "btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+    variant: "primary",
+    size: "primary",
+    children: "Primary Action",
+  },
+};
+
+export const Outline: Story = {
+  args: {
+    variant: "outline",
+    size: "sm",
+    children: "Outline Action",
   },
 };
 
 export const AsChildLink: Story = {
   args: {
     asChild: true,
-    children: <Link href="#">Go to Dashboard</Link>,
-    className:
-      "btn-dowin-primary flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold",
+    variant: "primary",
+    size: "primary",
+    children: <a href="#">Go to Dashboard</a>,
   },
 };
 
 export const Loading: Story = {
   args: {
+    variant: "primary",
+    size: "primary",
     disabled: true,
     children: (
       <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
     ),
-    className:
-      "bg-primary/50 text-white px-5 py-3 flex items-center justify-center",
   },
 };
 
 export const IconButton: Story = {
   args: {
-    children: <DowinIcon name="action-add" size="16px" />,
-    className:
-      "w-8 h-8 border border-border flex items-center justify-center text-text-muted transition-colors",
+    variant: "outline",
+    size: "icon",
+    children: <span className="text-[16px] leading-none">+</span>,
+    className: "border border-border text-text-muted transition-colors rounded-2xl",
   },
 };
