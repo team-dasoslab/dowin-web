@@ -1,52 +1,16 @@
 "use client";
 
+import { useExportImage } from "@/app/og/_hooks/useExportImage";
 import { Logo } from "@/components/ui/Logo";
 import { CheckCircle2, Download, TrendingUp } from "lucide-react";
 import { notFound } from "next/navigation";
-import { useRef, useState } from "react";
 
 export default function OGImagePreviewPage() {
   if (process.env.NODE_ENV === "production") {
     notFound();
   }
 
-  const exportRef = useRef<HTMLDivElement>(null);
-  const [isExporting, setIsExporting] = useState(false);
-
-  const handleDownload = async () => {
-    if (!exportRef.current || isExporting) return;
-
-    try {
-      setIsExporting(true);
-
-      if (document.fonts && document.fonts.ready) {
-        await document.fonts.ready;
-      }
-
-      const { toPng } = await import("html-to-image");
-
-      const dataUrl = await toPng(exportRef.current, {
-        cacheBust: true,
-        pixelRatio: 2, // for high resolution
-        backgroundColor: "#ffffff",
-        width: 1200,
-        height: 630,
-      });
-
-      const link = document.createElement("a");
-      link.download = "dowin-og-image.png";
-      link.href = dataUrl;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      console.error("Failed to export image", err);
-      alert("이미지 저장에 실패했습니다.");
-    } finally {
-      setIsExporting(false);
-    }
-  };
+  const { exportRef, isExporting, handleDownload } = useExportImage();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-100 p-8">

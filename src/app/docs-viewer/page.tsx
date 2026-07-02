@@ -25,6 +25,19 @@ import { cookies, headers } from "next/headers";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import { DocumentOutlineClient } from "./DocumentOutlineClient";
+import {
+  buildDocsTree,
+  buildHref,
+  createTranslate,
+  getLensBadges,
+  hasSelectedDescendant,
+  parseContentBlocks,
+  pickLens,
+  pickSection,
+  pickTopic,
+  type DocsTreeNode,
+  type Translate,
+} from "./_utils/docs-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -60,339 +73,10 @@ type ViewerSearchParams = {
 };
 
 type DocsViewerMessages = typeof koMessages.DocsViewer;
-type Translate = (
-  key: string,
-  values?: Record<string, string | number>,
-) => string;
-
-type DocsTreeNode = {
-  name: string;
-  path: string;
-  type: "directory" | "file";
-  children?: DocsTreeNode[];
-  doc?: DocsViewerDoc;
-};
-
 const DOCS_VIEWER_MESSAGES: Record<Locale, DocsViewerMessages> = {
   ko: koMessages.DocsViewer,
   en: enMessages.DocsViewer,
 };
-
-function createTranslate(messages: DocsViewerMessages): Translate {
-  return (key, values) => {
-    const resolved = key.split(".").reduce<unknown>((current, part) => {
-      if (typeof current === "object" && current !== null && part in current) {
-        return (current as Record<string, unknown>)[part];
-      }
-
-      return undefined;
-    }, messages);
-
-    if (typeof resolved !== "string") {
-      return key;
-    }
-
-    if (!values) {
-      return resolved;
-    }
-
-    return resolved.replace(/\{(\w+)\}/g, (_, token) => {
-      return String(values[token] ?? "");
-    });
-  };
-}
-
-function pickSection(value?: string): DocsViewerSection | "all" {
-  return SECTION_IDS.includes(value as (typeof SECTION_IDS)[number])
-    ? (value as DocsViewerSection | "all")
-    : "planning";
-}
-
-function pickTopic(value?: string): DocsViewerTopic {
-  return TOPIC_IDS.includes(value as (typeof TOPIC_IDS)[number])
-    ? (value as DocsViewerTopic)
-    : "all";
-}
-
-function pickLens(value?: string): DocsViewerLens {
-  return LENS_IDS.includes(value as (typeof LENS_IDS)[number])
-    ? (value as DocsViewerLens)
-    : "all";
-}
-
-function buildHref(params: {
-  section: DocsViewerSection | "all";
-  topic: DocsViewerTopic;
-  lens: DocsViewerLens;
-  q?: string;
-  doc?: string | null;
-  tab?: "doc" | "feed" | "todos";
-}) {
-  const searchParams = new URLSearchParams();
-  searchParams.set("section", params.section);
-
-  if (params.topic !== "all") {
-    searchParams.set("topic", params.topic);
-  }
-
-  if (params.lens !== "all") {
-    searchParams.set("lens", params.lens);
-  }
-
-  if (params.q?.trim()) {
-    searchParams.set("q", params.q.trim());
-  }
-
-  if (params.doc) {
-    searchParams.set("doc", params.doc);
-  }
-
-  if (params.tab) {
-    searchParams.set("tab", params.tab);
-  }
-
-  const query = searchParams.toString();
-  return query.length > 0 ? `/docs-viewer?${query}` : "/docs-viewer";
-}
-
-function getLensBadges(doc: DocsViewerDoc) {
-  const badges: DocsViewerLens[] = [];
-
-  if (doc.isFocus) {
-    badges.push("focus");
-  }
-  if (doc.isRecent) {
-    badges.push("recent");
-  }
-  if (doc.isConnected) {
-    badges.push("connected");
-  }
-  if (doc.isHistory) {
-    badges.push("history");
-  }
-
-  return badges;
-}
-
-function insertDocNode(root: DocsTreeNode[], doc: DocsViewerDoc) {
-  const segments = doc.relativePath.split("/");
-  let currentLevel = root;
-  let currentPath = "";
-
-  segments.forEach((segment, index) => {
-    currentPath = currentPath ? `${currentPath}/${segment}` : segment;
-    const isFile = index === segments.length - 1;
-    let existing = currentLevel.find((node) => node.path === currentPath);
-
-    if (!existing) {
-      existing = {
-        name: segment,
-        path: currentPath,
-        type: isFile ? "file" : "directory",
-        children: isFile ? undefined : [],
-        doc: isFile ? doc : undefined,
-      };
-      currentLevel.push(existing);
-    }
-
-    if (!isFile) {
-      currentLevel = existing.children ?? [];
-      existing.children = currentLevel;
-    }
-  });
-}
-
-function buildDocsTree(docs: DocsViewerDoc[]) {
-  const root: DocsTreeNode[] = [];
-
-  docs.forEach((doc) => insertDocNode(root, doc));
-
-  const sortNodes = (nodes: DocsTreeNode[]) => {
-    nodes.sort((a, b) => {
-      if (a.type !== b.type) {
-        return a.type === "directory" ? -1 : 1;
-      }
-
-      return a.name.localeCompare(b.name);
-    });
-
-    nodes.forEach((node) => {
-      if (node.children) {
-        sortNodes(node.children);
-      }
-    });
-  };
-
-  sortNodes(root);
-  return root;
-}
-
-function hasSelectedDescendant(
-  node: DocsTreeNode,
-  selectedPath: string | null,
-): boolean {
-  if (!selectedPath) {
-    return false;
-  }
-
-  if (node.type === "file") {
-    return node.path === selectedPath;
-  }
-
-  return (
-    node.children?.some((child) =>
-      hasSelectedDescendant(child, selectedPath),
-    ) ?? false
-  );
-}
-
-function parseContentBlocks(content: string) {
-  const lines = content.split("\n");
-  const blocks: Array<
-    | { type: "heading"; depth: number; text: string; id: string }
-    | { type: "paragraph"; text: string }
-    | {
-        type: "list";
-        items: { text: string; ordered: boolean; indent: number }[];
-      }
-    | { type: "quote"; text: string }
-    | { type: "code"; text: string }
-    | { type: "divider" }
-  > = [];
-
-  let index = 0;
-  const headingIds = new Map<string, number>();
-
-  while (index < lines.length) {
-    const rawLine = lines[index];
-    const line = rawLine.trimEnd();
-    const trimmed = line.trim();
-
-    if (!trimmed) {
-      index += 1;
-      continue;
-    }
-
-    if (trimmed === "---" || trimmed === "***" || trimmed === "___") {
-      blocks.push({ type: "divider" });
-      index += 1;
-      continue;
-    }
-
-    if (trimmed.startsWith("```")) {
-      const codeLines: string[] = [];
-      index += 1;
-      while (index < lines.length && !lines[index].trim().startsWith("```")) {
-        codeLines.push(lines[index]);
-        index += 1;
-      }
-      index += 1;
-      blocks.push({ type: "code", text: codeLines.join("\n") });
-      continue;
-    }
-
-    const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
-    if (headingMatch) {
-      const depth = headingMatch[1].length;
-      const text = headingMatch[2].trim();
-      const baseId = text
-        .toLowerCase()
-        .replace(/[`*_~]/g, "")
-        .replace(/[^a-z0-9가-힣\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
-      const count = headingIds.get(baseId) ?? 0;
-      headingIds.set(baseId, count + 1);
-      const id = count === 0 ? baseId : `${baseId}-${count + 1}`;
-
-      blocks.push({ type: "heading", depth, text, id });
-      index += 1;
-      continue;
-    }
-
-    if (trimmed.startsWith(">")) {
-      const quoteLines: string[] = [];
-      while (index < lines.length && lines[index].trim().startsWith(">")) {
-        quoteLines.push(lines[index].trim().replace(/^>\s?/, ""));
-        index += 1;
-      }
-      blocks.push({ type: "quote", text: quoteLines.join(" ") });
-      continue;
-    }
-
-    if (/^[-*]\s+/.test(trimmed) || /^\d+\.\s+/.test(trimmed)) {
-      const items: { text: string; ordered: boolean; indent: number }[] = [];
-
-      while (index < lines.length) {
-        const rawLine = lines[index];
-        const current = rawLine.trim();
-
-        if (!current) {
-          const nextLine =
-            index + 1 < lines.length ? lines[index + 1].trim() : "";
-          if (/^[-*]\s+/.test(nextLine) || /^\d+\.\s+/.test(nextLine)) {
-            index += 1;
-            continue;
-          }
-          index += 1;
-          break;
-        }
-
-        const indentMatch = rawLine.match(/^\s+/);
-        const indent = indentMatch ? indentMatch[0].length : 0;
-
-        if (/^\d+\.\s+/.test(current)) {
-          items.push({
-            text: current.replace(/^\d+\.\s+/, ""),
-            ordered: true,
-            indent,
-          });
-          index += 1;
-          continue;
-        }
-
-        if (/^[-*]\s+/.test(current)) {
-          items.push({
-            text: current.replace(/^[-*]\s+/, ""),
-            ordered: false,
-            indent,
-          });
-          index += 1;
-          continue;
-        }
-
-        break;
-      }
-
-      blocks.push({ type: "list", items });
-      continue;
-    }
-
-    const paragraphLines = [trimmed];
-    index += 1;
-    while (index < lines.length) {
-      const current = lines[index].trim();
-      if (
-        !current ||
-        current.startsWith("#") ||
-        current.startsWith(">") ||
-        current.startsWith("```") ||
-        current === "---" ||
-        /^[-*]\s+/.test(current) ||
-        /^\d+\.\s+/.test(current)
-      ) {
-        break;
-      }
-
-      paragraphLines.push(current);
-      index += 1;
-    }
-
-    blocks.push({ type: "paragraph", text: paragraphLines.join(" ") });
-  }
-
-  return blocks;
-}
 
 export default async function DocsViewerPage({
   searchParams,
@@ -488,7 +172,12 @@ export default async function DocsViewerPage({
 
         <div className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)_280px] items-start">
           <aside className="space-y-6 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto [&::-webkit-scrollbar]:hidden">
-            <Card radius="lg" padding="default" variant="white-outline" shadow="sm">
+            <Card
+              radius="lg"
+              padding="default"
+              variant="white-outline"
+              shadow="sm"
+            >
               <SectionHeader title={t("tree.title")} />
               <div className="mt-4 max-h-[560px] overflow-y-auto pr-1">
                 <DocsTree
@@ -504,7 +193,12 @@ export default async function DocsViewerPage({
           </aside>
 
           <section className="space-y-4 flex flex-col">
-            <Card radius="lg" padding="default" variant="white-outline" shadow="sm">
+            <Card
+              radius="lg"
+              padding="default"
+              variant="white-outline"
+              shadow="sm"
+            >
               <details
                 open={section !== "all" || topic !== "all" || lens !== "all"}
                 className="group/filters mb-4 border-b border-zinc-100 pb-4"
@@ -533,7 +227,6 @@ export default async function DocsViewerPage({
                             asChild
                             variant={active ? "solid-dark" : "outline-subtle"}
                             size="sm"
-                            
                           >
                             <NextLink
                               href={buildHref({
@@ -565,7 +258,6 @@ export default async function DocsViewerPage({
                             asChild
                             variant={active ? "primary" : "outline-subtle"}
                             size="sm"
-                            
                           >
                             <NextLink
                               href={buildHref({
@@ -598,7 +290,6 @@ export default async function DocsViewerPage({
                             asChild
                             variant={active ? "solid-dark" : "outline-subtle"}
                             size="sm"
-                            
                           >
                             <NextLink
                               href={buildHref({
@@ -647,11 +338,7 @@ export default async function DocsViewerPage({
                   placeholder={t("searchPlaceholder")}
                   className="input-dowin min-h-11 flex-1 px-4 text-sm"
                 />
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="primary"
-                >
+                <Button type="submit" variant="primary" size="primary">
                   {t("searchButton")}
                 </Button>
               </form>
@@ -726,16 +413,18 @@ export default async function DocsViewerPage({
             {tab === "doc" ? (
               <div className="space-y-4">
                 {selectedDoc ? (
-                  <DocumentPanel
-                    activeDoc={selectedDoc}
-                    t={t}
-                  />
+                  <DocumentPanel activeDoc={selectedDoc} t={t} />
                 ) : (
                   <EmptyFeedCard message={t("empty")} />
                 )}
               </div>
             ) : (
-              <Card radius="lg" padding="default" variant="white-outline" shadow="sm">
+              <Card
+                radius="lg"
+                padding="default"
+                variant="white-outline"
+                shadow="sm"
+              >
                 <SectionHeader
                   title={t("feed.title")}
                   description={t("feed.description", {
@@ -1019,7 +708,13 @@ function DocumentPanel({
   const blocks = parseContentBlocks(activeDoc.content);
 
   return (
-    <Card className="md:" radius="lg" padding="lg" variant="white-outline" shadow="sm">
+    <Card
+      className="md:"
+      radius="lg"
+      padding="lg"
+      variant="white-outline"
+      shadow="sm"
+    >
       <div className="mb-8 rounded-xl border border-zinc-200 bg-zinc-50 p-5 shadow-sm">
         <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
           {t("detail.title")}
@@ -1035,7 +730,9 @@ function DocumentPanel({
           </div>
           {activeDoc.summary && (
             <div className="flex items-start gap-4 text-sm">
-              <span className="w-12 pt-0.5 font-bold text-text-muted">목적</span>
+              <span className="w-12 pt-0.5 font-bold text-text-muted">
+                목적
+              </span>
               <span className="flex-1 font-medium leading-relaxed text-text-primary">
                 {activeDoc.summary}
               </span>
