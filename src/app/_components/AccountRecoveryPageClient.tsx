@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  usePostAuthRecoveryCodesVerify,
-  usePutAuthPasswordByRecoveryCode,
-} from "@/api/generated/auth/auth";
+import { useAccountRecoveryForm } from "@/app/_hooks/useAccountRecoveryForm";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -11,117 +8,32 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Link } from "@/i18n/routing";
-import {
-  getApiErrorMessage,
-  getApiErrorStatus,
-} from "@/lib/client/frontend-api";
-import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
-import { z } from "zod";
 
 export default function AccountRecoveryPageClient() {
-  const t = useTranslations("Auth");
-  const passwordSchema = useMemo(
-    () =>
-      z
-        .string()
-        .regex(
-          /^[a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|:<>?,./~]{8,}$/,
-          t("errors.invalidPassword"),
-        ),
-    [t],
-  );
-  const [recoveryCode, setRecoveryCode] = useState("");
-  const [recoveryAccount, setRecoveryAccount] = useState<{
-    customId: string;
-    nickname: string;
-  } | null>(null);
-  const [newPassword, setNewPassword] = useState("");
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const verifyRecoveryCodeMutation = usePostAuthRecoveryCodesVerify();
-  const resetPasswordByRecoveryCodeMutation =
-    usePutAuthPasswordByRecoveryCode();
-  const isPending =
-    verifyRecoveryCodeMutation.isPending ||
-    resetPasswordByRecoveryCodeMutation.isPending;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setNotice("");
-
-    if (!recoveryAccount) {
-      try {
-        const response = await verifyRecoveryCodeMutation.mutateAsync({
-          data: {
-            recoveryCode,
-          },
-        });
-
-        if (response.status !== 200 || !response.data.user) {
-          setError(t("recoveryPage.errors.checkCode"));
-          return;
-        }
-
-        setRecoveryAccount(response.data.user);
-        return;
-      } catch (verifyError) {
-        const status = getApiErrorStatus(verifyError);
-        if (status === 404) {
-          setError(t("recoveryPage.errors.checkCode"));
-        } else {
-          setError(
-            getApiErrorMessage(verifyError, t("recoveryPage.errors.checkCode")),
-          );
-        }
-        return;
-      }
-    }
-
-    const parsedPassword = passwordSchema.safeParse(newPassword);
-    if (!parsedPassword.success) {
-      setError(
-        parsedPassword.error.issues[0]?.message || t("errors.invalidPassword"),
-      );
-      return;
-    }
-
-    try {
-      const response = await resetPasswordByRecoveryCodeMutation.mutateAsync({
-        data: {
-          recoveryCode,
-          newPassword,
-        },
-      });
-
-      if (response.status !== 200) {
-        setError(t("recoveryPage.errors.resetFailed"));
-        return;
-      }
-
-      setNotice(t("recoveryPage.resetSuccess"));
-      setRecoveryAccount(null);
-      setRecoveryCode("");
-      setNewPassword("");
-    } catch (resetError) {
-      const status = getApiErrorStatus(resetError);
-      if (status === 404) {
-        setError(t("recoveryPage.errors.checkCode"));
-      } else {
-        setError(
-          getApiErrorMessage(resetError, t("recoveryPage.errors.resetFailed")),
-        );
-      }
-    }
-  };
+  const {
+    error,
+    notice,
+    isPending,
+    recoveryCode,
+    setRecoveryCode,
+    recoveryAccount,
+    newPassword,
+    setNewPassword,
+    handleSubmit,
+    t,
+  } = useAccountRecoveryForm();
 
   return (
     <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
       {/* Background Grid */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] animate-dowin-in relative z-10" radius="xl" padding="xl" variant="subtle">
+      <Card
+        className="w-full max-w-[480px] animate-dowin-in relative z-10"
+        radius="xl"
+        padding="xl"
+        variant="subtle"
+      >
         <div className="flex flex-col items-start text-left space-y-5 mb-10">
           <DowinIcon
             name="auth-key-large"
