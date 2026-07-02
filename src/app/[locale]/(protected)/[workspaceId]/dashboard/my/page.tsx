@@ -1,12 +1,12 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
+import { TeamMemberCheckIn } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberCheckIn";
 import { MonthlyBoardSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/MonthlyBoardSection";
 import { PeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/PeriodControls";
 import { ProductUpdateCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ProductUpdateCard";
 import { ScoreboardOverviewSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ScoreboardOverviewSection";
 import { WeeklyBoardSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/WeeklyBoardSection";
-import { TeamMemberCheckIn } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberCheckIn";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { useLoginPushPrompt } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useLoginPushPrompt";
 import { useMyDashboardPageState } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useMyDashboardPageState";
@@ -25,12 +25,13 @@ import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { useToast } from "@/context/ToastContext";
+import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
@@ -97,8 +98,6 @@ export default function MyDashboardPage() {
 
   useLoginPushPrompt();
 
-  const [activeSection, setActiveSection] = useState("overview");
-
   const menuGroups = useMemo(
     () => [
       { id: "overview", label: t("recentTrend") },
@@ -107,29 +106,10 @@ export default function MyDashboardPage() {
     [t],
   );
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = document.getElementById("main-scroll-container");
-      if (!container) return;
-      const scrollPosition = container.scrollTop + 150;
-      let currentSectionId = activeSection;
-
-      for (const group of menuGroups) {
-        const el = document.getElementById(group.id);
-        if (el && el.offsetTop <= scrollPosition) {
-          currentSectionId = group.id;
-        }
-      }
-
-      if (currentSectionId !== activeSection) {
-        setActiveSection(currentSectionId);
-      }
-    };
-
-    const container = document.getElementById("main-scroll-container");
-    container?.addEventListener("scroll", handleScroll);
-    return () => container?.removeEventListener("scroll", handleScroll);
-  }, [activeSection, menuGroups]);
+  const [activeSection, setActiveSection] = useActiveSectionScroll(
+    menuGroups,
+    "overview",
+  );
 
   useEffect(() => {
     if (isLoading || isProfileLoading) {
@@ -370,12 +350,7 @@ function NoScoreboardState() {
           title={t("noScoreboardTitle")}
           description={t("noScoreboardDesc")}
           actions={
-            <Button
-              asChild
-              variant="hero"
-              size="hero"
-              className="w-full"
-            >
+            <Button asChild variant="hero" size="hero" className="w-full">
               <Link href={`/${workspaceId}/setup?mode=create`}>
                 {t("createScoreboard")}
               </Link>

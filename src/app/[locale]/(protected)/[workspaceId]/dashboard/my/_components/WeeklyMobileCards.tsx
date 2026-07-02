@@ -4,14 +4,16 @@ import { type WeeklyLogGuide } from "@/api/generated/dowin.schemas";
 import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
+import { useWeeklyMobileCardDayActions } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useWeeklyMobileCardDayActions";
 import { isEditableDailyLogDate } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/dashboard-scoreboard";
 import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/Dialog";
-type WeeklyMobileCardsProps = {
+
+export type WeeklyMobileCardsProps = {
   activeLeadMeasures: ReturnType<
     typeof useDashboardScoreboard
   >["activeLeadMeasures"];
@@ -38,7 +40,11 @@ type WeeklyMobileCardProps = {
 };
 
 export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
-  const { activeLeadMeasures, weeklyById, allowPastDailyLogEdit = false } = props;
+  const {
+    activeLeadMeasures,
+    weeklyById,
+    allowPastDailyLogEdit = false,
+  } = props;
   const t = useTranslations("Dashboard");
   const localizedDays = [
     t("mon"),
@@ -186,11 +192,11 @@ function WeeklyMobileCardDay({
   const [openPopover, setOpenPopover] = useState(false);
   const [localCount, setLocalCount] = useState(count || 0);
 
-  const handleCountSave = (newCount: number) => {
-    if (leadMeasureId !== null) {
-      toggleLog(leadMeasureId, date, newCount);
-    }
-  };
+  const { handleCountSave } = useWeeklyMobileCardDayActions(
+    leadMeasureId,
+    date,
+    toggleLog,
+  );
 
   return (
     <div className="text-center relative">
@@ -231,7 +237,7 @@ function WeeklyMobileCardDay({
           </Button>
 
           <Dialog open={openPopover} onOpenChange={setOpenPopover}>
-            <DialogContent 
+            <DialogContent
               className="bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
               overlayClassName="bg-black/20"
               hideCloseButton
@@ -287,9 +293,7 @@ function WeeklyMobileCardDay({
                     variant="subtle"
                     size="lg"
                     className="flex-1 text-[24px]"
-                    onClick={() =>
-                      setLocalCount(Math.max(0, localCount - 1))
-                    }
+                    onClick={() => setLocalCount(Math.max(0, localCount - 1))}
                   >
                     -
                   </Button>
@@ -332,11 +336,7 @@ function WeeklyMobileCardDay({
             }
           }}
           variant={
-            isAchieved
-              ? "primary"
-              : isToday
-                ? "primary-ghost"
-                : "secondary"
+            isAchieved ? "primary" : isToday ? "primary-ghost" : "secondary"
           }
           className="flex aspect-square w-full items-center justify-center !rounded-[12px] p-0"
         >
