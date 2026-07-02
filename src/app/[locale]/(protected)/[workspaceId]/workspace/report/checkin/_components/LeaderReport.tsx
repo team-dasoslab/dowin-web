@@ -25,6 +25,7 @@ import {
   TeamCheckinReportResponseAttentionItemsItem
 } from "@/api/generated/dowin.schemas";
 import { buildAdjustmentProposalDraft } from "../_lib/team-checkin-proposal";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 
 export function LeaderReport() {
   const t = useTranslations("TeamCheckin");
@@ -387,8 +388,11 @@ export function LeaderReport() {
         }) !== null;
 
         return (
-          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/60 animate-in fade-in duration-200" onClick={closeModal}>
-            <div className="bg-[#F2F4F6] w-full max-w-[480px] h-[85vh] max-h-[720px] rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-[0.98] duration-200" onClick={e => e.stopPropagation()}>
+          <Dialog open={!!activeSignalModal} onOpenChange={(open) => !open && closeModal()}>
+            <DialogContent 
+              className="bg-[#F2F4F6] w-full max-w-[480px] h-[85vh] max-h-[720px] rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-[0.98] duration-200 p-0"
+              overlayClassName="bg-black/60"
+            >
               
               <div className="px-6 py-5 flex items-start shrink-0 bg-white z-10 rounded-t-[32px] border-b border-[#F2F4F6] relative">
                 <div className="flex gap-4 items-center w-full pr-8">
@@ -581,8 +585,8 @@ export function LeaderReport() {
               </div>
               )}
 
-            </div>
-          </div>
+            </DialogContent>
+          </Dialog>
         );
       })()}
     </div>

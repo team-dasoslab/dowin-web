@@ -1,5 +1,6 @@
 "use client";
 
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { useGetContactInquiries } from "@/api/generated/contact/contact";
 import {
   ContactInquiryCreateRequestCategory,
@@ -15,8 +16,7 @@ import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useState } from "react";
 import { useContactInquiryForm } from "./_hooks/useContactInquiryForm";
 import { useContactInquiryMutation } from "./_hooks/useContactInquiryMutation";
 
@@ -133,19 +133,6 @@ function ContactInquiryComposer({
     },
   });
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen]);
-
   if (!isOpen) {
     return null;
   }
@@ -166,15 +153,9 @@ function ContactInquiryComposer({
   ];
 
   return (
-    <Portal>
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-        <button
-          type="button"
-          className="absolute inset-0 bg-black/55 backdrop-blur-[1px]"
-          onClick={onClose}
-          aria-label={t("cancelButton")}
-        />
-        <div className="relative w-full max-w-[640px] overflow-hidden rounded-[24px] bg-surface">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="w-full max-w-[640px] overflow-hidden p-0">
+        <div className="relative w-full flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-6 py-5">
             <div>
@@ -360,19 +341,9 @@ function ContactInquiryComposer({
             </div>
           </div>
         </div>
-      </div>
-    </Portal>
+      </DialogContent>
+    </Dialog>
   );
-}
-
-function Portal({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return mounted ? createPortal(children, document.body) : null;
 }
 
 function StatusPill({

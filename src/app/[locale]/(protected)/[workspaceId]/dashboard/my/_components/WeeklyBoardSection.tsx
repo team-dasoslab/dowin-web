@@ -10,7 +10,6 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 
 interface WeeklyBoardSectionProps {
   activeLeadMeasures: ReturnType<
@@ -25,6 +24,8 @@ interface WeeklyBoardSectionProps {
   weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
   allowPastDailyLogEdit?: boolean;
 }
+
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 
 function CountPopoverContent({
   initialCount,
@@ -53,9 +54,10 @@ function CountPopoverContent({
   }, [initialCount]);
 
   return (
-    <div
-      className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
-      onClick={(e) => e.stopPropagation()}
+    <DialogContent 
+      className="bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
+      overlayClassName="bg-black/20"
+      hideCloseButton
     >
       <Button
         aria-label={closeLabel}
@@ -125,7 +127,7 @@ function CountPopoverContent({
           확인
         </Button>
       </div>
-    </div>
+    </DialogContent>
   );
 }
 
@@ -327,40 +329,32 @@ export function WeeklyBoardSection({
                                   </span>
                                 </Button>
 
-                                {openPopoverKey ===
-                                  `${leadMeasure.id}-${date}` &&
-                                  typeof document !== "undefined" &&
-                                  createPortal(
-                                    <>
-                                      <div
-                                        className="fixed inset-0 z-[9999] bg-black/20 animate-in fade-in"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setOpenPopoverKey(null);
-                                        }}
-                                      />
-                                      <CountPopoverContent
-                                        initialCount={count}
-                                        dailyTargetCount={dailyTargetCount}
-                                        closeLabel={t("closeDailyCount")}
-                                        saveLabel={t("saveDailyCount")}
-                                        title={
-                                          leadMeasure.name ??
-                                          t("dailyCountTitle")
-                                        }
-                                        subtitle={date}
-                                        onClose={() => setOpenPopoverKey(null)}
-                                        onSave={(newCount) =>
-                                          toggleLog(
-                                            leadMeasureId ?? 0,
-                                            date,
-                                            newCount,
-                                          )
-                                        }
-                                      />
-                                    </>,
-                                    document.body,
-                                  )}
+                                <Dialog 
+                                  open={openPopoverKey === `${leadMeasure.id}-${date}`} 
+                                  onOpenChange={(open) => {
+                                    if (!open) setOpenPopoverKey(null);
+                                  }}
+                                >
+                                  <CountPopoverContent
+                                    initialCount={count}
+                                    dailyTargetCount={dailyTargetCount}
+                                    closeLabel={t("closeDailyCount")}
+                                    saveLabel={t("saveDailyCount")}
+                                    title={
+                                      leadMeasure.name ??
+                                      t("dailyCountTitle")
+                                    }
+                                    subtitle={date}
+                                    onClose={() => setOpenPopoverKey(null)}
+                                    onSave={(newCount) =>
+                                      toggleLog(
+                                        leadMeasureId ?? 0,
+                                        date,
+                                        newCount,
+                                      )
+                                    }
+                                  />
+                                </Dialog>
                               </div>
                             ) : (
                               <Button

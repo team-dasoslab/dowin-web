@@ -10,8 +10,7 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { createPortal } from "react-dom";
-
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 type WeeklyMobileCardsProps = {
   activeLeadMeasures: ReturnType<
     typeof useDashboardScoreboard
@@ -231,104 +230,93 @@ function WeeklyMobileCardDay({
             </span>
           </Button>
 
-          {openPopover &&
-            typeof document !== "undefined" &&
-            createPortal(
-              <>
-                <div
-                  className="fixed inset-0 z-[9999] bg-black/20 animate-in fade-in"
-                  onClick={(e) => {
-                    e.stopPropagation();
+          <Dialog open={openPopover} onOpenChange={setOpenPopover}>
+            <DialogContent 
+              className="bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
+              overlayClassName="bg-black/20"
+              hideCloseButton
+            >
+              <Button
+                aria-label={t("closeDailyCount")}
+                variant="subtle"
+                size="icon"
+                className="absolute top-3 right-3 rounded-full bg-transparent hover:bg-sub-background"
+                onClick={() => setOpenPopover(false)}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-text-muted"
+                >
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </Button>
+              <h3 className="text-lg font-bold text-center text-text-primary mb-1 pr-6 pl-6">
+                {t("dailyCountTitle")}
+              </h3>
+              <p className="text-sm text-center text-text-muted mb-8">
+                {date} ({dayLabel})
+              </p>
+
+              <div className="flex flex-col items-center gap-8">
+                <div className="flex items-end justify-center gap-2 w-full">
+                  <input
+                    type="number"
+                    min="0"
+                    value={localCount}
+                    onChange={(e) =>
+                      setLocalCount(parseInt(e.target.value, 10) || 0)
+                    }
+                    className="w-32 text-5xl font-black text-primary text-center bg-sub-background rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
+                    placeholder="0"
+                  />
+                  <span className="text-2xl text-text-muted/40 font-bold mb-2">
+                    / {dailyTargetCount}
+                  </span>
+                </div>
+
+                <div className="flex w-full gap-2 mt-3">
+                  <Button
+                    variant="subtle"
+                    size="lg"
+                    className="flex-1 text-[24px]"
+                    onClick={() =>
+                      setLocalCount(Math.max(0, localCount - 1))
+                    }
+                  >
+                    -
+                  </Button>
+                  <Button
+                    variant="subtle"
+                    size="lg"
+                    className="flex-1 text-[24px]"
+                    onClick={() => setLocalCount(localCount + 1)}
+                  >
+                    +
+                  </Button>
+                </div>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  aria-label={t("saveDailyCount")}
+                  className="w-full mt-4"
+                  onClick={() => {
+                    handleCountSave(localCount);
                     setOpenPopover(false);
                   }}
-                />
-                <div
-                  className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
-                  onClick={(e) => e.stopPropagation()}
                 >
-                  <Button
-                    aria-label={t("closeDailyCount")}
-                    variant="subtle"
-                    size="icon"
-                    className="absolute top-3 right-3 rounded-full bg-transparent hover:bg-sub-background"
-                    onClick={() => setOpenPopover(false)}
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-text-muted"
-                    >
-                      <path d="M18 6 6 18" />
-                      <path d="m6 6 12 12" />
-                    </svg>
-                  </Button>
-                  <h3 className="text-lg font-bold text-center text-text-primary mb-1 pr-6 pl-6">
-                    {t("dailyCountTitle")}
-                  </h3>
-                  <p className="text-sm text-center text-text-muted mb-8">
-                    {date} ({dayLabel})
-                  </p>
-
-                  <div className="flex flex-col items-center gap-8">
-                    <div className="flex items-end justify-center gap-2 w-full">
-                      <input
-                        type="number"
-                        min="0"
-                        value={localCount}
-                        onChange={(e) =>
-                          setLocalCount(parseInt(e.target.value, 10) || 0)
-                        }
-                        className="w-32 text-5xl font-black text-primary text-center bg-sub-background rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
-                        placeholder="0"
-                      />
-                      <span className="text-2xl text-text-muted/40 font-bold mb-2">
-                        / {dailyTargetCount}
-                      </span>
-                    </div>
-
-                    <div className="flex w-full gap-2 mt-3">
-                      <Button
-                        variant="subtle"
-                        size="lg"
-                        className="flex-1 text-[24px]"
-                        onClick={() =>
-                          setLocalCount(Math.max(0, localCount - 1))
-                        }
-                      >
-                        -
-                      </Button>
-                      <Button
-                        variant="subtle"
-                        size="lg"
-                        className="flex-1 text-[24px]"
-                        onClick={() => setLocalCount(localCount + 1)}
-                      >
-                        +
-                      </Button>
-                    </div>
-                    <Button
-                      variant="primary"
-                      size="lg"
-                      aria-label={t("saveDailyCount")}
-                      className="w-full mt-4"
-                      onClick={() => {
-                        handleCountSave(localCount);
-                        setOpenPopover(false);
-                      }}
-                    >
-                      확인
-                    </Button>
-                  </div>
-                </div>
-              </>,
-              document.body,
-            )}
+                  확인
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </>
       ) : (
         <Button
