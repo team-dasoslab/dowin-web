@@ -9,6 +9,7 @@ import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/das
 import { TeamMemberMemoPanel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberMemoPanel";
 import { useTeamMemos } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamMemos";
 import { UserAvatar } from "@/components/UserAvatar";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { toNumberId } from "@/lib/client/frontend-api";
@@ -122,9 +123,9 @@ export function WeeklyTable({
                 {member.nickname}
               </span>
               {isMe ? (
-                <span className="shrink-0 rounded-[12px] border border-primary/25 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                <Badge variant="primary" size="sm" shape="pill" className="shrink-0">
                   {tc("me")}
-                </span>
+                </Badge>
               ) : null}
               <span className="hidden truncate text-[12px] font-medium text-text-muted sm:inline">
                 — {member.goalName}
