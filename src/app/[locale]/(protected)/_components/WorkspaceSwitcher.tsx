@@ -1,14 +1,18 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Link } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
-import { useGetWorkspaces, useGetWorkspacesMe, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
+import {
+  useGetWorkspaces,
+  useGetWorkspacesMe,
+  usePutWorkspacesCurrent,
+} from "@/api/generated/workspace/workspace";
+import { useWorkspaceSwitcherActions } from "@/app/[locale]/(protected)/_hooks/useWorkspaceSwitcherActions";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { useState, useRef, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { useLocale } from "next-intl";
 import { useNativeApp } from "@/context/NativeAppContext";
+import { Link } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { useRef, useState } from "react";
 
 interface WorkspaceSwitcherProps {
   isCollapsed: boolean;
@@ -17,7 +21,9 @@ interface WorkspaceSwitcherProps {
 export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
   const commonT = useTranslations("Common");
   const [isOpen, setIsOpen] = useState(false);
-  const [optimisticWorkspaceId, setOptimisticWorkspaceId] = useState<string | null>(null);
+  const [optimisticWorkspaceId, setOptimisticWorkspaceId] = useState<
+    string | null
+  >(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const isNativeApp = useNativeApp();
 
@@ -32,7 +38,10 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
       onSuccess: (_, variables) => {
         const newWorkspaceId = variables.data.workspaceId;
         if (currentWorkspaceId) {
-          window.location.href = window.location.href.replace(`/${currentWorkspaceId}`, `/${newWorkspaceId}`);
+          window.location.href = window.location.href.replace(
+            `/${currentWorkspaceId}`,
+            `/${newWorkspaceId}`,
+          );
         } else {
           window.location.href = `/${locale}/${newWorkspaceId}/dashboard/my`;
         }
@@ -44,20 +53,15 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
   });
 
   const me = meResponse?.status === 200 ? meResponse.data : null;
-  const workspaces = workspacesResponse?.status === 200 ? workspacesResponse.data : [];
+  const workspaces =
+    workspacesResponse?.status === 200 ? workspacesResponse.data : [];
 
-  const displayWorkspaceId = optimisticWorkspaceId || currentWorkspaceId || me?.id;
-  const activeWorkspace = workspaces.find((ws) => ws.id === displayWorkspaceId) || me;
+  const displayWorkspaceId =
+    optimisticWorkspaceId || currentWorkspaceId || me?.id;
+  const activeWorkspace =
+    workspaces.find((ws) => ws.id === displayWorkspaceId) || me;
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  useWorkspaceSwitcherActions(containerRef, setIsOpen);
 
   if (isMeLoading && !activeWorkspace) {
     return (
@@ -81,16 +85,21 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
         disabled={isPending}
         className={cn(
           "flex h-10 w-fit items-center gap-1.5 rounded-[12px] transition-all px-3",
-          isOpen ? "bg-sub-background" : "bg-transparent hover:bg-sub-background/80",
+          isOpen
+            ? "bg-sub-background"
+            : "bg-transparent hover:bg-sub-background/80",
         )}
       >
         <span className="truncate text-[16px] font-bold text-text-primary whitespace-nowrap transition-all duration-300 pt-[2px]">
           {activeWorkspace.name}
         </span>
-        <DowinIcon 
-          name="nav-chevron-down" 
-          size="16px" 
-          className={cn("text-text-muted shrink-0 transition-transform duration-200", isOpen && "rotate-180")} 
+        <DowinIcon
+          name="nav-chevron-down"
+          size="16px"
+          className={cn(
+            "text-text-muted shrink-0 transition-transform duration-200",
+            isOpen && "rotate-180",
+          )}
         />
       </button>
 
@@ -108,7 +117,9 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
               }}
               className={cn(
                 "flex w-full items-center rounded-[12px] px-3 py-3 text-[15px] transition-colors hover:bg-sub-background",
-                ws.id === activeWorkspace.id ? "font-bold text-text-primary bg-sub-background/50" : "font-medium text-text-secondary"
+                ws.id === activeWorkspace.id
+                  ? "font-bold text-text-primary bg-sub-background/50"
+                  : "font-medium text-text-secondary",
               )}
             >
               <span className="truncate">{ws.name}</span>
