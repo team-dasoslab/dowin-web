@@ -81,7 +81,7 @@ export default function AdminPromotionCreateClient() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="예: DOWIN2026BETA"
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                
                 required
               />
               <Button
@@ -105,7 +105,7 @@ export default function AdminPromotionCreateClient() {
               value={campaignName}
               onChange={(e) => setCampaignName(e.target.value)}
               placeholder="예: 초기 클로즈드 베타 피드백 모집"
-              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+              
               required
             />
           </div>
@@ -132,7 +132,7 @@ export default function AdminPromotionCreateClient() {
                 value={maxUses}
                 min={1}
                 onChange={(e) => setMaxUses(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                
                 required
               />
             </div>
@@ -147,7 +147,7 @@ export default function AdminPromotionCreateClient() {
                 min={1}
                 max={10}
                 onChange={(e) => setGrantedSeatCount(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                
                 required
               />
             </div>
@@ -162,7 +162,7 @@ export default function AdminPromotionCreateClient() {
                 type="datetime-local"
                 value={expiresAt}
                 onChange={(e) => setExpiresAt(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                
               />
             </div>
 

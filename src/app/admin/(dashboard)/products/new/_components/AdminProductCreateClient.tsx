@@ -9,6 +9,7 @@ import {
 } from "@/api/generated/dowin.schemas";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Card } from "@/components/ui/Card";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { useToast } from "@/context/ToastContext";
@@ -116,7 +117,7 @@ export default function AdminProductCreateClient() {
                 value={providerProductId}
                 onChange={(e) => setProviderProductId(e.target.value)}
                 placeholder="Product ID 입력"
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                className="font-bold"
               />
             </div>
 
@@ -129,17 +130,15 @@ export default function AdminProductCreateClient() {
                 value={changeReason}
                 onChange={(e) => setChangeReason(e.target.value)}
                 placeholder="변경 사유 입력"
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                className="font-bold"
               />
             </div>
             
             <div className="space-y-2 md:col-span-2">
               <label className="flex items-center gap-2 px-4 py-3 border-none bg-zinc-100 rounded-[16px] cursor-pointer hover:bg-border transition-colors w-fit shrink-0">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={isActive}
                   onChange={(e) => setIsActive(e.target.checked)}
-                  className="rounded border-none bg-white text-primary focus:ring-primary h-4 w-4"
                 />
                 <span className="text-[13px] font-black text-text-primary">
                   Active (활성화)

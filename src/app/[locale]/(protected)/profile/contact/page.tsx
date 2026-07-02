@@ -13,6 +13,8 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { Button } from "@/components/ui/Button";
+import { Checkbox } from "@/components/ui/Checkbox";
+import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
@@ -224,20 +226,17 @@ function ContactInquiryComposer({
                   {t("replyEmailLabel")}{" "}
                   <span className="text-danger">*</span>
                 </label>
-                <input
+                <Input
                   id="replyEmail"
                   type="email"
                   value={form.values.replyEmail}
                   onChange={(e) =>
                     form.setField("replyEmail", e.target.value)
                   }
-                  className="h-12 w-full rounded-[16px] border border-border bg-surface px-4 text-sm text-text-primary outline-none transition-colors focus:border-text-primary"
                   placeholder={t("replyEmailPlaceholder")}
                   autoComplete="email"
                 />
-                <p className="text-[12px] text-text-muted">
-                  {t("replyEmailHint")}
-                </p>
+
                 <FieldError message={form.errors.replyEmail} />
               </div>
 
@@ -249,14 +248,13 @@ function ContactInquiryComposer({
                   {t("subjectLabel")}{" "}
                   <span className="text-danger">*</span>
                 </label>
-                <input
+                <Input
                   id="subject"
                   type="text"
                   value={form.values.subject}
                   onChange={(e) =>
                     form.setField("subject", e.target.value)
                   }
-                  className="h-12 w-full rounded-[16px] border border-border bg-surface px-4 text-sm text-text-primary outline-none transition-colors focus:border-text-primary"
                   placeholder={t("subjectPlaceholder")}
                   maxLength={100}
                 />
@@ -288,13 +286,11 @@ function ContactInquiryComposer({
               <div className="space-y-3 rounded-[20px] bg-sub-background p-5">
                 <label className="flex items-start gap-3">
                   <div className="flex h-5 items-center">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={form.values.privacyConsent}
                       onChange={(e) =>
                         form.setField("privacyConsent", e.target.checked)
                       }
-                      className="h-4 w-4 rounded border-border text-primary outline-none focus:ring-0"
                     />
                   </div>
                   <div className="space-y-1">

@@ -9,6 +9,7 @@ import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { useToast } from "@/context/ToastContext";
 import AdminFormLayout from "@/app/admin/_components/AdminFormLayout";
 import {
@@ -286,7 +287,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     type="date"
                     value={editPeriodEnd}
                     onChange={(e) => setEditPeriodEnd(e.target.value)}
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                    className="font-bold"
                   />
                 </div>
 
@@ -301,7 +302,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     onChange={(e) => setEditSeatCount(e.target.value)}
                     disabled={editPlanCode === "FREE"}
                     placeholder="지정 안 함 (자동 설정)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
+                    className="font-bold"
                   />
                   <p className="px-1 text-[11px] font-medium leading-relaxed text-text-muted mt-1">
                     빈 값이면 기존 값 유지 또는 현재 멤버 수 기준으로 자동 설정
@@ -310,13 +311,11 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
               </div>
 
               <div className="flex items-center gap-2 py-1">
-                <input
-                  type="checkbox"
+                <Checkbox
+                  id="cancel-at-end-root"
                   checked={editCancelAtEnd}
                   onChange={(e) => setEditCancelAtEnd(e.target.checked)}
                   disabled={editPlanCode === "FREE"}
-                  className="rounded border-none bg-white text-primary focus:ring-primary h-4 w-4"
-                  id="cancel-at-end-root"
                 />
                 <label
                   htmlFor="cancel-at-end-root"
@@ -340,7 +339,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     value={editCustomerKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-text-muted cursor-not-allowed select-all"
+                    className="font-bold select-all"
                   />
                 </div>
 
@@ -353,7 +352,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     value={editSubscriptionKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-text-muted cursor-not-allowed select-all"
+                    className="font-bold select-all"
                   />
                 </div>
               </div>
@@ -367,7 +366,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                   value={changeReason}
                   onChange={(e) => setChangeReason(e.target.value)}
                   placeholder="수동 보정 사유를 적어주세요..."
-                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                  className="font-bold"
                   required
                 />
               </div>

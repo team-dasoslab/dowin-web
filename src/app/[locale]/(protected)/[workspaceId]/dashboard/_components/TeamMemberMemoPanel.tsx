@@ -9,6 +9,7 @@ import { useMobileViewSheet } from "@/app/[locale]/(protected)/[workspaceId]/das
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { UserAvatar } from "@/components/UserAvatar";
+import { Input } from "@/components/ui/Input";
 import { useTranslations } from "next-intl";
 import { TouchEvent, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -171,7 +172,7 @@ export function TeamMemberMemoPanel({
                   className="absolute inset-x-0 bottom-0 bg-surface px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
                 >
                   <div className="flex items-center gap-2">
-                    <input
+                    <Input
                       value={memoDraft}
                       onChange={(event) => setMemoDraft(event.target.value)}
                       onKeyDown={(event) => {
@@ -181,7 +182,8 @@ export function TeamMemberMemoPanel({
                         }
                       }}
                       placeholder={t("addComment")}
-                      className="h-10 flex-1 rounded-[16px] border-none bg-sub-background px-4 text-sm text-text-primary placeholder:text-text-muted outline-none"
+                      className="flex-1"
+                      size="sm"
                       disabled={isCreatePending}
                     />
                     <Button
@@ -281,7 +283,7 @@ export function TeamMemberMemoPanel({
           {isComposeMode ? (
             <div className="rounded-[24px] bg-surface p-2.5">
               <div className="flex items-center gap-2">
-                <input
+                <Input
                   value={memoDraft}
                   onChange={(event) => setMemoDraft(event.target.value)}
                   onKeyDown={(event) => {
@@ -291,7 +293,9 @@ export function TeamMemberMemoPanel({
                     }
                   }}
                   placeholder={t("addComment")}
-                  className="h-8 flex-1 border-0 bg-transparent px-2 text-sm text-text-primary outline-none placeholder:text-text-muted focus:outline-none focus:ring-0 w-full"
+                  className="flex-1 w-full"
+                  variant="ghost"
+                  size="sm"
                   disabled={isCreatePending}
                 />
                 <Button

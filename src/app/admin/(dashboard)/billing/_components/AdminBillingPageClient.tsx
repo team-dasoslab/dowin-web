@@ -7,6 +7,7 @@ import {
 } from "@/api/generated/admin-billing/admin-billing";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { useToast } from "@/context/ToastContext";
 import { useRouter } from "next/navigation";
@@ -136,22 +137,22 @@ export default function AdminBillingPageClient() {
 
       <div className="flex flex-col sm:flex-row gap-4 items-center">
         <div className="flex-1 w-full relative">
-          <input
+          <Input
             type="number"
-            min="1"
+            min={1}
             placeholder="워크스페이스 ID 검색..."
             value={workspaceId}
             onChange={(e) => setWorkspaceId(e.target.value)}
-            className="w-full pl-4 pr-4 py-3 bg-white border border-border/50 rounded-[16px] text-[14px] font-medium text-text-primary focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none transition-all shadow-sm placeholder:text-zinc-400"
+            variant="outline"
           />
         </div>
         <div className="flex-1 w-full relative">
-          <input
+          <Input
             type="text"
             placeholder="워크스페이스 이름 검색..."
             value={workspaceName}
             onChange={(e) => setWorkspaceName(e.target.value)}
-            className="w-full pl-4 pr-4 py-3 bg-white border border-border/50 rounded-[16px] text-[14px] font-medium text-text-primary focus:ring-2 focus:ring-primary/20 focus:border-primary/30 outline-none transition-all shadow-sm placeholder:text-zinc-400"
+            variant="outline"
           />
         </div>
       </div>

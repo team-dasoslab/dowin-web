@@ -161,7 +161,7 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                     value={changeReason}
                     onChange={(e) => setChangeReason(e.target.value)}
                     placeholder="상태 변경의 이유를 적어주세요..."
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                    className="font-bold"
                     required
                   />
                 </div>

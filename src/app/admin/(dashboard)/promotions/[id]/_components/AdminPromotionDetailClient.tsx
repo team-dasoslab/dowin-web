@@ -15,6 +15,7 @@ import {
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { useToast } from "@/context/ToastContext";
 import AdminFormLayout from "@/app/admin/_components/AdminFormLayout";
 
@@ -279,12 +280,13 @@ export default function AdminPromotionDetailClient({ promotionId }: { promotionI
                               <option value="RECEIVED">수신완료</option>
                               <option value="DROPPED">드롭됨</option>
                             </select>
-                            <input
+                            <Input
                               type="text"
                               value={operatorNote}
                               onChange={(e) => setOperatorNote(e.target.value)}
                               placeholder="노트 작성..."
-                              className="w-full px-3 py-2 bg-zinc-100 border-none rounded-[12px] text-[12px] focus:ring-2 focus:ring-primary/20 outline-none font-medium text-text-primary"
+                              size="sm"
+                              className="font-medium"
                               onBlur={(e) => {
                                 if (e.target.value) {
                                   setOperatorNote(e.target.value);

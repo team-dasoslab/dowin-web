@@ -11,6 +11,7 @@ import { useProfileExportData } from "@/app/[locale]/(protected)/profile/export/
 import { useProfileExportForm } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportForm";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useNativeApp } from "@/context/NativeAppContext";
@@ -167,11 +168,10 @@ export default function ProfileExportPage() {
                     key={measure.id}
                     className="flex items-center gap-2 rounded-[12px] bg-sub-background px-3 py-2 text-[13px] font-bold text-text-primary"
                   >
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={checked}
                       onChange={() => toggleExportMeasure(measure.id)}
-                      className="h-3.5 w-3.5"
+                      size="sm"
                     />
                     <span className="truncate">{measure.name}</span>
                   </label>
@@ -181,11 +181,10 @@ export default function ProfileExportPage() {
           </div>
 
           <label className="flex items-center gap-2 rounded-[12px] border-none bg-sub-background px-3 py-2 text-xs text-text-secondary">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={splitByWeek}
               onChange={(event) => toggleSplitByWeek(event.target.checked)}
-              className="h-3.5 w-3.5"
+              size="sm"
             />
             <span>주차별로 섹션 분리해서 내보내기</span>
           </label>

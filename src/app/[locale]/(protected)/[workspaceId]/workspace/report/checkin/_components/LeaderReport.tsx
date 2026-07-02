@@ -16,6 +16,8 @@ import {
 } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { TeamPeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamPeriodControls";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Checkbox } from "@/components/ui/Checkbox";
+import { Input } from "@/components/ui/Input";
 import {
   useGetWorkspacesWorkspaceIdTeamCheckinsReport,
   usePostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposals,
@@ -188,11 +190,9 @@ export function LeaderReport() {
           weekLabel={weekLabel}
         />
         <label className="flex items-center gap-2 cursor-pointer bg-surface px-3 py-2 rounded-[14px] shrink-0 border border-border/40 hover:bg-surface/80 transition-colors">
-          <input 
-            type="checkbox" 
+          <Checkbox 
             checked={showActiveOnly} 
             onChange={e => setShowActiveOnly(e.target.checked)}
-            className="w-4 h-4 rounded-[4px] border-border/60 text-primary focus:ring-primary/20 transition-all cursor-pointer"
           />
           <span className="text-[13px] font-bold text-text-secondary select-none">{t("activeMembersOnly")}</span>
         </label>
@@ -496,12 +496,12 @@ export function LeaderReport() {
                 <div className="p-5 bg-white shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.03)] rounded-b-[32px]">
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2">
-                    <input
+                    <Input
                       type="text"
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       placeholder={t("commentPlaceholder")}
-                      className="flex-1 bg-[#F2F4F6] rounded-[16px] px-5 py-4 text-[16px] text-[#191F28] placeholder:text-[#8B95A1] outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="flex-1"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && canSubmit && !submitProposal.isPending) {
                           handleResolveSignal(signal);
@@ -554,12 +554,14 @@ export function LeaderReport() {
                     {proposalType === 'update_metric' && (
                       <div className="mt-3.5 pt-3.5 border-t border-border/40 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 px-1">
                         <span className="text-[14px] text-[#333D4B] font-medium">실행 목표를</span>
-                        <input 
+                        <Input
                           type="number"
                           value={proposalNumber}
                           onChange={(e) => setProposalNumber(e.target.value === "" ? "" : Number(e.target.value))}
                           placeholder={t("proposeTargetLabel2")}
-                          className="w-20 bg-white border border-primary/30 shadow-sm rounded-[10px] px-3 py-2 text-center text-[15px] font-bold text-primary outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                          variant="outline"
+                          size="sm"
+                          className="w-20 text-center font-bold text-primary"
                           min={1}
                           max={7}
                           autoFocus
@@ -570,12 +572,14 @@ export function LeaderReport() {
 
                     {proposalType === 'replace_action_item' && (
                       <div className="mt-3.5 pt-3.5 border-t border-border/40 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 px-1">
-                        <input 
+                        <Input
                           type="text"
                           value={proposalReplacementText}
                           onChange={(e) => setProposalReplacementText(e.target.value)}
                           placeholder={t("proposeReplacePlaceholder")}
-                          className="flex-1 bg-white border border-primary/30 shadow-sm rounded-[10px] px-4 py-2.5 text-[15px] font-bold text-[#191F28] placeholder:text-[#8B95A1] placeholder:font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 font-bold"
                           autoFocus
                         />
                       </div>
