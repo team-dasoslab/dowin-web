@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
+import { useWeeklyTableActions } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useWeeklyTableActions";
 import { useParams } from "next/navigation";
 
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
@@ -81,31 +82,7 @@ export function WeeklyTable({
 
   const today = new Date().toISOString().split("T")[0];
   const hasMemos = memos.length > 0;
-
-  const handleComposeClick = () => {
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(max-width: 1599px)").matches
-    ) {
-      const content =
-        window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
-
-      if (!content) {
-        return;
-      }
-
-      void (async () => {
-        const isSuccess = await createMemo(content);
-
-        if (isSuccess) {
-          showToast("success", t("addedMemo"));
-        }
-      })();
-      return;
-    }
-
-    onToggleCompose?.();
-  };
+  const { handleComposeClick } = useWeeklyTableActions(createMemo, onToggleCompose);
 
   return (
     <div className="relative space-y-2 xl:pr-0">

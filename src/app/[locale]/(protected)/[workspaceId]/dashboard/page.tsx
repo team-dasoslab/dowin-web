@@ -17,6 +17,7 @@ import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
 import { Link } from "@/i18n/routing";
 import { trackEvent } from "@/lib/client/gtag";
 import { hashId } from "@/lib/client/id-hash";
@@ -58,8 +59,6 @@ export default function DashboardPage() {
     profileResponse?.status === 200 ? profileResponse.data.avatarKey : null;
   const hasTrackedViewRef = useRef(false);
 
-  const [activeSection, setActiveSection] = useState("summary");
-
   const menuGroups = useMemo(
     () => [
       { id: "summary", label: t("memberSummary") },
@@ -68,29 +67,10 @@ export default function DashboardPage() {
     [t],
   );
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = document.getElementById("main-scroll-container");
-      if (!container) return;
-      const scrollPosition = container.scrollTop + 150;
-      let currentSectionId = activeSection;
-
-      for (const group of menuGroups) {
-        const el = document.getElementById(group.id);
-        if (el && el.offsetTop <= scrollPosition) {
-          currentSectionId = group.id;
-        }
-      }
-
-      if (currentSectionId !== activeSection) {
-        setActiveSection(currentSectionId);
-      }
-    };
-
-    const container = document.getElementById("main-scroll-container");
-    container?.addEventListener("scroll", handleScroll);
-    return () => container?.removeEventListener("scroll", handleScroll);
-  }, [activeSection, menuGroups]);
+  const [activeSection, setActiveSection] = useActiveSectionScroll(
+    menuGroups,
+    "summary",
+  );
 
   useEffect(() => {
     if (
@@ -361,12 +341,7 @@ function DashboardNoScoreboardState() {
           title={t("noScoreboardTitle")}
           description={t("noScoreboardDesc")}
           actions={
-            <Button
-              asChild
-              variant="hero"
-              size="hero"
-              className="w-full"
-            >
+            <Button asChild variant="hero" size="hero" className="w-full">
               <Link href={`/${workspaceId}/setup?mode=create`}>
                 {t("createScoreboard")}
               </Link>

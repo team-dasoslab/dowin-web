@@ -11,7 +11,9 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Input } from "@/components/ui/Input";
 import { useTranslations } from "next-intl";
-import { TouchEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useTeamMemberMemoPanelActions } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamMemberMemoPanelActions";
+import { formatRelativeTime } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_utils/teamMemberMemo";
 import { createPortal } from "react-dom";
 
 const Portal = ({ children }: { children: React.ReactNode }) => {
@@ -58,10 +60,6 @@ export function TeamMemberMemoPanel({
   currentUserRole,
 }: TeamMemberMemoPanelProps) {
   const t = useTranslations("Comments");
-  const [memoDraft, setMemoDraft] = useState("");
-  const [sheetDragY, setSheetDragY] = useState(0);
-  const isSubmittingMemoRef = useRef(false);
-  const sheetTouchStartYRef = useRef<number | null>(null);
 
   const {
     isVisible: isMobileViewSheetVisible,
@@ -75,6 +73,25 @@ export function TeamMemberMemoPanel({
   const hasMemos = memos.length > 0;
   const isComposeMode = memoMode === "compose";
   const shouldShowMemoRail = memoMode !== null;
+
+  const {
+    memoDraft,
+    setMemoDraft,
+    sheetDragY,
+    handleAddMemo,
+    handleResolveMemo,
+    handleDeleteMemo,
+    handleSheetTouchStart,
+    handleSheetTouchMove,
+    handleSheetTouchEnd,
+    resetSheetDrag,
+  } = useTeamMemberMemoPanelActions({
+    createMemo,
+    resolveMemo,
+    deleteMemo,
+    closeMobileViewSheet,
+    isCreatePending,
+  });
 
   useEffect(() => {
     if (!shouldShowMemoRail) {
@@ -91,69 +108,9 @@ export function TeamMemberMemoPanel({
 
   useEffect(() => {
     if (memoMode !== "view") {
-      setSheetDragY(0);
-      sheetTouchStartYRef.current = null;
+      resetSheetDrag();
     }
   }, [memoMode]);
-
-  const handleAddMemo = async () => {
-    if (isSubmittingMemoRef.current || isCreatePending) {
-      return;
-    }
-
-    const content = memoDraft.trim();
-    if (!content) {
-      return;
-    }
-
-    isSubmittingMemoRef.current = true;
-
-    try {
-      const isSuccess = await createMemo(content);
-
-      if (isSuccess) {
-        setMemoDraft("");
-      }
-    } finally {
-      isSubmittingMemoRef.current = false;
-    }
-  };
-
-  const handleResolveMemo = async (memo: DashboardTeamMemo) => {
-    await resolveMemo(memo.id, !memo.isResolved);
-  };
-
-  const handleDeleteMemo = async (memoId: number) => {
-    await deleteMemo(memoId);
-  };
-
-  const handleSheetTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    sheetTouchStartYRef.current = event.touches[0]?.clientY ?? null;
-  };
-
-  const handleSheetTouchMove = (event: TouchEvent<HTMLDivElement>) => {
-    const startY = sheetTouchStartYRef.current;
-    const currentY = event.touches[0]?.clientY ?? null;
-
-    if (startY == null || currentY == null) {
-      return;
-    }
-
-    const nextDragY = Math.max(0, currentY - startY);
-    setSheetDragY(nextDragY);
-  };
-
-  const handleSheetTouchEnd = () => {
-    if (sheetDragY > 96) {
-      setSheetDragY(0);
-      closeMobileViewSheet();
-      sheetTouchStartYRef.current = null;
-      return;
-    }
-
-    setSheetDragY(0);
-    sheetTouchStartYRef.current = null;
-  };
 
   return (
     <>
@@ -445,28 +402,3 @@ function MemoStatusCard({ message }: { message: string }) {
   );
 }
 
-function formatRelativeTime(
-  createdAt: string,
-  t: ReturnType<typeof useTranslations>,
-) {
-  const createdAtTime = new Date(createdAt).getTime();
-
-  if (!Number.isFinite(createdAtTime)) {
-    return "";
-  }
-
-  const diffMin = Math.floor((Date.now() - createdAtTime) / (1000 * 60));
-  if (diffMin <= 0) {
-    return t("justNow");
-  }
-  if (diffMin < 60) {
-    return t("minsAgo", { n: diffMin });
-  }
-
-  const diffHour = Math.floor(diffMin / 60);
-  if (diffHour < 24) {
-    return t("hoursAgo", { n: diffHour });
-  }
-
-  return t("daysAgo", { n: Math.floor(diffHour / 24) });
-}
