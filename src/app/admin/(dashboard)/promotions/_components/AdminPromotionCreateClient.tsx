@@ -119,7 +119,6 @@ export default function AdminPromotionCreateClient() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="캠페인에 대한 운영자 메모를 남겨주세요."
               rows={3}
-              className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary resize-none placeholder:text-zinc-400 min-h-[auto]"
             />
           </div>
 
@@ -177,7 +176,7 @@ export default function AdminPromotionCreateClient() {
                 value={entitlementDurationDays}
                 onChange={(e) => setEntitlementDurationDays(e.target.value)}
                 placeholder="예: 14 (제한 없음은 비워두세요)"
-                className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary placeholder:text-zinc-400"
+                className="font-bold"
               />
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {[

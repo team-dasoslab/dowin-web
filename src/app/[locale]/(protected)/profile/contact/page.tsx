@@ -13,6 +13,7 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { Button } from "@/components/ui/Button";
+import { Textarea } from "@/components/ui/Textarea";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useLocale, useTranslations } from "next-intl";
@@ -270,13 +271,14 @@ function ContactInquiryComposer({
                   {t("messageLabel")}{" "}
                   <span className="text-danger">*</span>
                 </label>
-                <textarea
+                <Textarea
                   id="message"
                   value={form.values.message}
                   onChange={(e) =>
                     form.setField("message", e.target.value)
                   }
-                  className="min-h-[160px] w-full resize-y rounded-[20px] border border-border bg-surface p-4 text-sm leading-relaxed text-text-primary outline-none transition-colors focus:border-text-primary"
+                  variant="outline"
+                  size="lg"
                   placeholder={t("messagePlaceholder")}
                   maxLength={3000}
                 />

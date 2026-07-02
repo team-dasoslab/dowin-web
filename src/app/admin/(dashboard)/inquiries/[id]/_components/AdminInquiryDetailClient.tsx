@@ -176,7 +176,6 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                   onChange={(e) => setEditAnswer(e.target.value)}
                   placeholder="문의 처리에 대한 요약을 적어주세요..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary resize-none placeholder:text-zinc-400 min-h-[auto]"
                 />
               </div>
 
