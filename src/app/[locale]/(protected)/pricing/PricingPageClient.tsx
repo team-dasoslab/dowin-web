@@ -16,6 +16,7 @@ import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
+import { formatDateLabel } from "@/lib/client/date-utils";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useLocale, useTranslations } from "next-intl";
@@ -250,7 +251,11 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 border-border bg-surface text-center" padding="lg" shadow="xl">
+        <Card
+          className="w-full space-y-6 border-border bg-surface text-center"
+          padding="lg"
+          shadow="xl"
+        >
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Logo size="32px" />
           </div>
@@ -277,7 +282,11 @@ function PricingErrorState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 border-border bg-surface text-center" padding="lg" shadow="xl">
+        <Card
+          className="w-full space-y-6 border-border bg-surface text-center"
+          padding="lg"
+          shadow="xl"
+        >
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <DowinIcon name="status-warning" size="24px" />
           </div>
@@ -309,25 +318,4 @@ function PricingSkeleton() {
       </ProtectedPageContainer>
     </div>
   );
-}
-
-function formatDateLabel(
-  value: string | null | undefined,
-  fallback: string,
-  locale = "ko",
-) {
-  if (!value) {
-    return fallback;
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return fallback;
-  }
-
-  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ko-KR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
 }

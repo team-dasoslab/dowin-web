@@ -1,6 +1,5 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { useGetContactInquiries } from "@/api/generated/contact/contact";
 import {
   ContactInquiryCreateRequestCategory,
@@ -14,14 +13,17 @@ import {
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { DowinIcon } from "@/components/ui/DowinIcon";
+import { formatDateTime } from "@/lib/client/date-utils";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { useLocale, useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 import { useContactInquiryForm } from "./_hooks/useContactInquiryForm";
 import { useContactInquiryMutation } from "./_hooks/useContactInquiryMutation";
+import { getCategoryLabel } from "./_utils/contact-utils";
 
 export default function ProfileContactPage() {
   const t = useTranslations("ProfileContact");
@@ -194,17 +196,14 @@ function ContactInquiryComposer({
             >
               <div className="space-y-2">
                 <label className="block text-[13px] font-bold text-text-primary">
-                  {t("categoryLabel")}{" "}
-                  <span className="text-danger">*</span>
+                  {t("categoryLabel")} <span className="text-danger">*</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((category) => (
                     <button
                       key={category.value}
                       type="button"
-                      onClick={() =>
-                        form.setField("category", category.value)
-                      }
+                      onClick={() => form.setField("category", category.value)}
                       className={`h-11 rounded-[16px] px-4 text-sm font-bold transition-all ${
                         form.values.category === category.value
                           ? "bg-text-primary text-white"
@@ -223,16 +222,13 @@ function ContactInquiryComposer({
                   htmlFor="replyEmail"
                   className="block text-[13px] font-bold text-text-primary"
                 >
-                  {t("replyEmailLabel")}{" "}
-                  <span className="text-danger">*</span>
+                  {t("replyEmailLabel")} <span className="text-danger">*</span>
                 </label>
                 <Input
                   id="replyEmail"
                   type="email"
                   value={form.values.replyEmail}
-                  onChange={(e) =>
-                    form.setField("replyEmail", e.target.value)
-                  }
+                  onChange={(e) => form.setField("replyEmail", e.target.value)}
                   placeholder={t("replyEmailPlaceholder")}
                   autoComplete="email"
                 />
@@ -245,16 +241,13 @@ function ContactInquiryComposer({
                   htmlFor="subject"
                   className="block text-[13px] font-bold text-text-primary"
                 >
-                  {t("subjectLabel")}{" "}
-                  <span className="text-danger">*</span>
+                  {t("subjectLabel")} <span className="text-danger">*</span>
                 </label>
                 <Input
                   id="subject"
                   type="text"
                   value={form.values.subject}
-                  onChange={(e) =>
-                    form.setField("subject", e.target.value)
-                  }
+                  onChange={(e) => form.setField("subject", e.target.value)}
                   placeholder={t("subjectPlaceholder")}
                   maxLength={100}
                 />
@@ -266,15 +259,12 @@ function ContactInquiryComposer({
                   htmlFor="message"
                   className="block text-[13px] font-bold text-text-primary"
                 >
-                  {t("messageLabel")}{" "}
-                  <span className="text-danger">*</span>
+                  {t("messageLabel")} <span className="text-danger">*</span>
                 </label>
                 <Textarea
                   id="message"
                   value={form.values.message}
-                  onChange={(e) =>
-                    form.setField("message", e.target.value)
-                  }
+                  onChange={(e) => form.setField("message", e.target.value)}
                   variant="outline"
                   size="lg"
                   placeholder={t("messagePlaceholder")}
@@ -414,7 +404,10 @@ function InquiryListSkeleton() {
   return (
     <div className="grid gap-3">
       {Array.from({ length: 3 }).map((_, index) => (
-        <div key={index} className="animate-pulse rounded-[24px] bg-surface p-4">
+        <div
+          key={index}
+          className="animate-pulse rounded-[24px] bg-surface p-4"
+        >
           <div className="space-y-3">
             <div className="flex gap-2">
               <div className="h-6 w-20 rounded-full bg-border" />
@@ -441,36 +434,6 @@ function CategoryPill({
       {getCategoryLabel(category, t)}
     </span>
   );
-}
-
-function getCategoryLabel(
-  category: ContactInquirySummary["category"],
-  t: ReturnType<typeof useTranslations<"ProfileContact">>,
-) {
-  if (category === ContactInquiryCreateRequestCategory.BILLING) {
-    return t("category.billing");
-  }
-
-  if (category === ContactInquiryCreateRequestCategory.BUG_OR_ACCOUNT) {
-    return t("category.bugOrAccount");
-  }
-
-  return t("category.general");
-}
-
-function formatDateTime(value: string | null, locale: string) {
-  if (!value) {
-    return "-";
-  }
-
-  try {
-    return new Intl.DateTimeFormat(locale, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
 }
 
 function InquiryCard({
