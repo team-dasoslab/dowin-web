@@ -62,7 +62,8 @@ export function PeriodControls({
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
               variant="ghost"
-              className="h-8 w-8 p-0 shrink-0"
+              size="control-icon"
+              className="shrink-0"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
@@ -76,7 +77,8 @@ export function PeriodControls({
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
               variant="ghost"
-              className="h-8 w-8 p-0 shrink-0"
+              size="control-icon"
+              className="shrink-0"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
@@ -91,7 +93,8 @@ export function PeriodControls({
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
                 variant="ghost"
-                className="h-8 px-3 gap-1 shrink-0"
+                size="control"
+                className="gap-1 shrink-0 text-text-muted"
               >
                 <span className="hidden min-[360px]:inline">
                   {t("backToToday")}
@@ -131,7 +134,7 @@ export function PeriodControls({
                 onClick={() => movePeriod(-1)}
                 disabled={isPreviousDisabled || isPeriodLoading}
                 variant="ghost"
-                className="h-8 w-8 p-0"
+                size="control-icon"
               >
                 <DowinIcon name="nav-chevron-left" size="14px" />
               </Button>
@@ -145,7 +148,7 @@ export function PeriodControls({
                 onClick={() => movePeriod(1)}
                 disabled={isPeriodLoading}
                 variant="ghost"
-                className="h-8 w-8 p-0"
+                size="control-icon"
               >
                 <DowinIcon name="nav-chevron-right" size="14px" />
               </Button>
@@ -160,7 +163,8 @@ export function PeriodControls({
                   onClick={resetToToday}
                   disabled={isPeriodLoading}
                   variant="ghost"
-                  className="h-8 px-3 gap-1.5"
+                  size="control"
+                  className="gap-1.5 text-text-muted"
                 >
                   <span>{t("backToToday")}</span>
                 </Button>

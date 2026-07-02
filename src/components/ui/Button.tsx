@@ -24,12 +24,14 @@ const buttonVariants = cva(
       },
       size: {
         default: "",
-        sm: "px-4 py-2 text-sm", // from default story
-        primary: "px-5 py-3 text-sm", // from primary story
-        lg: "h-14 px-12 text-[18px] font-bold rounded-button", // landing page
-        xl: "h-[56px] px-6 text-[15px] rounded-[24px] font-semibold", // forms
-        hero: "h-[56px] w-full px-8 gap-3 text-[16px] rounded-[24px] font-black", // from original buttonSizes
-        icon: "w-8 h-8", // from icon story
+        sm: "px-4 py-2 text-sm",
+        primary: "px-5 py-3 text-sm",
+        lg: "h-14 px-12 text-[18px] font-bold rounded-button",
+        xl: "h-[56px] px-6 text-[15px] rounded-[24px] font-semibold",
+        hero: "h-[56px] w-full px-8 gap-3 text-[16px] rounded-[24px] font-black",
+        icon: "w-8 h-8",
+        "control-icon": "w-8 h-8 rounded-[12px] p-0",
+        control: "h-8 px-3 text-[12px] rounded-[12px] font-bold",
       },
     },
     defaultVariants: {
