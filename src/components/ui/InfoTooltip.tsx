@@ -3,6 +3,7 @@
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState } from "react";
+import { useInfoTooltipActions } from "@/components/ui/_hooks/useInfoTooltipActions";
 
 interface InfoTooltipProps {
   content: React.ReactNode;
@@ -42,16 +43,7 @@ export function InfoTooltip({
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const handleOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
-  }, [open]);
+  useInfoTooltipActions(open, setOpen, ref);
 
   const iconButton = (
     <button

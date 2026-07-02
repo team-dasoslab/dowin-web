@@ -1,6 +1,8 @@
-import React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { useSwitchActions } from "@/components/ui/_hooks/useSwitchActions";
+import { getSwitchTranslateClass } from "@/components/ui/_utils/switch";
 import { cn } from "@/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+import React from "react";
 
 const switchVariants = cva(
   "relative inline-flex flex-shrink-0 items-center justify-start rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 p-0 min-h-0",
@@ -15,7 +17,7 @@ const switchVariants = cva(
     defaultVariants: {
       size: "default",
     },
-  }
+  },
 );
 
 const thumbVariants = cva(
@@ -31,36 +33,36 @@ const thumbVariants = cva(
     defaultVariants: {
       size: "default",
     },
-  }
+  },
 );
 
-export interface SwitchProps 
-  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onChange">,
+export interface SwitchProps
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onChange">,
     VariantProps<typeof switchVariants> {
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
 }
 
 export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
-  ({ className, size, checked = false, onCheckedChange, disabled, onClick, ...props }, ref) => {
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-      onClick?.(e);
-      if (!disabled) {
-        onCheckedChange?.(!checked);
-      }
-    };
-
-    // Calculate translate offset based on size
-    const getTranslateClass = (isChecked: boolean, sizeType: "default" | "sm" | "lg" | null | undefined) => {
-      if (!isChecked) return "translate-x-0";
-      switch (sizeType) {
-        case "sm": return "translate-x-3";
-        case "lg": return "translate-x-5";
-        case "default":
-        default:
-          return "translate-x-[20px]";
-      }
-    };
+  (
+    {
+      className,
+      size,
+      checked = false,
+      onCheckedChange,
+      disabled,
+      onClick,
+      ...props
+    },
+    ref,
+  ) => {
+    const { handleClick } = useSwitchActions(
+      checked,
+      onCheckedChange,
+      disabled,
+      onClick,
+    );
 
     return (
       <button
@@ -74,19 +76,19 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
           switchVariants({ size }),
           disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           checked ? "bg-primary" : "bg-border",
-          className
+          className,
         )}
         {...props}
       >
         <span
           className={cn(
             thumbVariants({ size }),
-            getTranslateClass(checked, size)
+            getSwitchTranslateClass(checked, size),
           )}
         />
       </button>
     );
-  }
+  },
 );
 
 Switch.displayName = "Switch";

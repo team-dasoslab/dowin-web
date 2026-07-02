@@ -1,7 +1,8 @@
 "use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { getFadeInTransform } from "@/components/ui/_utils/fadeIn";
 import { cn } from "@/lib/utils";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 interface FadeInProps {
   children: ReactNode;
@@ -31,29 +32,18 @@ export function FadeIn({
           }
         });
       },
-      { rootMargin: "-100px", threshold: 0.1 }
+      { rootMargin: "-100px", threshold: 0.1 },
     );
-    
+
     const currentRef = domRef.current;
     if (currentRef) {
       observer.observe(currentRef);
     }
-    
+
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
   }, []);
-
-  const getTransform = () => {
-    if (isVisible) return "translate3d(0, 0, 0)";
-    switch (direction) {
-      case "up": return `translate3d(0, ${distance}px, 0)`;
-      case "down": return `translate3d(0, -${distance}px, 0)`;
-      case "left": return `translate3d(${distance}px, 0, 0)`;
-      case "right": return `translate3d(-${distance}px, 0, 0)`;
-      default: return "translate3d(0, 0, 0)";
-    }
-  };
 
   return (
     <div
@@ -61,7 +51,7 @@ export function FadeIn({
       className={cn(className)}
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: getTransform(),
+        transform: getFadeInTransform(isVisible, direction, distance),
         transition: `opacity 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98), transform 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98)`,
         transitionDelay: `${delay}s`,
         willChange: "opacity, transform",

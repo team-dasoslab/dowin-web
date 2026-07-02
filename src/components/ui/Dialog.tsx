@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { useDialogActions } from "@/components/ui/_hooks/useDialogActions";
 
 export interface DialogProps {
   open: boolean;
@@ -59,24 +60,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
       setMounted(true);
     }, []);
 
-    useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape" && open) {
-          onOpenChange(false);
-        }
-      };
-
-      if (open) {
-        document.body.style.overflow = "hidden";
-        window.addEventListener("keydown", handleKeyDown);
-      } else {
-        document.body.style.overflow = "";
-      }
-      return () => {
-        document.body.style.overflow = "";
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [open, onOpenChange]);
+    useDialogActions(open, onOpenChange);
 
     if (!mounted || !open) return null;
 
