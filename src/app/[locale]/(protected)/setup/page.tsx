@@ -1,26 +1,10 @@
-import { redirectToDefaultWorkspacePath } from "@/lib/server/workspace-redirect";
-import { getSession } from "@/lib/server/auth";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { redirect } from "@/i18n/routing";
+import { getSession } from "@/lib/server/auth";
+import { redirectToDefaultWorkspacePath } from "@/lib/server/workspace-redirect";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const buildSearch = (searchParams: Record<string, string | string[] | undefined>) => {
-  const params = new URLSearchParams();
-
-  for (const [key, value] of Object.entries(searchParams)) {
-    if (Array.isArray(value)) {
-      value.forEach((item) => params.append(key, item));
-      continue;
-    }
-
-    if (value !== undefined) {
-      params.set(key, value);
-    }
-  }
-
-  const query = params.toString();
-  return query ? `?${query}` : "";
-};
+import { buildSearch } from "@/lib/server/url-utils";
 
 export default async function SetupRedirectPage({
   params,
@@ -40,6 +24,10 @@ export default async function SetupRedirectPage({
     return null;
   }
 
-  await redirectToDefaultWorkspacePath(session.userId, locale, `/setup${query}`);
+  await redirectToDefaultWorkspacePath(
+    session.userId,
+    locale,
+    `/setup${query}`,
+  );
   return null;
 }
