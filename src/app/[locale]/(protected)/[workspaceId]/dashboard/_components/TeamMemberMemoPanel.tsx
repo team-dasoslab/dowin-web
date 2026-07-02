@@ -370,8 +370,8 @@ function MemoCard({
     <div
       className={`rounded-[16px] px-4 py-3 transition-colors ${
         memo.isResolved
-          ? "bg-sub-background"
-          : "bg-surface"
+          ? "bg-sub-background/50 xl:bg-surface/60"
+          : "bg-sub-background xl:bg-surface xl:shadow-sm"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
