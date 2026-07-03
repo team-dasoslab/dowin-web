@@ -1,7 +1,7 @@
 "use client";
 
-import { Footer } from "@/components/layout/Footer";
-import { LandingHeader } from "@/components/layout/LandingHeader";
+import { Footer } from "@/app/_components/Footer";
+import { LandingHeader } from "@/app/_components/LandingHeader";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/ui/FadeIn";
 import { Link } from "@/i18n/routing";
