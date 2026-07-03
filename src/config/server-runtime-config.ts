@@ -1,10 +1,7 @@
-const nodeEnv = process.env.NODE_ENV ?? "development";
+const nodeEnv = process.env.NODE_ENV ?? "";
 const runtimeEnv = process.env.NEXTJS_ENV ?? nodeEnv;
 const port = process.env.PORT ?? "4000";
-const appOrigin = (process.env.APP_BASE_URL ?? `http://localhost:${port}`).replace(
-  /\/+$/,
-  "",
-);
+const appOrigin = (process.env.APP_BASE_URL ?? `http://localhost:${port}`).replace(/\/+$/, "");
 
 export const serverRuntimeConfig = Object.freeze({
   nodeEnv,
