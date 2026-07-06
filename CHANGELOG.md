@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.3](https://github.com/team-dasoslab/dowin-web/compare/v1.8.2...v1.8.3) (2026-07-06)
+
+
+### Bug Fixes
+
+* 멤버는 체크인 메뉴 미노출 ([dbe3832](https://github.com/team-dasoslab/dowin-web/commit/dbe3832a3d81c61954c243e02ffc7de850b85e7c))
+
 ## [1.8.2](https://github.com/team-dasoslab/dowin-web/compare/v1.8.1...v1.8.2) (2026-06-30)
 
 
