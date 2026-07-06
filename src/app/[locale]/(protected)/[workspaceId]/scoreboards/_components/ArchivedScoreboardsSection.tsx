@@ -57,7 +57,8 @@ export function ArchivedScoreboardsSection({
 
                       onReactivate(scoreboardId);
                     }}
-                    className="flex h-10 items-center gap-1.5 rounded-[16px] bg-sub-background px-4 text-[13px] font-black text-text-primary transition-colors hover:bg-border whitespace-nowrap flex-shrink-0"
+                    variant="subtle"
+                    className="flex h-10 items-center gap-1.5 rounded-[16px] px-4 text-[13px] font-black text-text-primary whitespace-nowrap flex-shrink-0"
                   >
                     {pendingActionId === scoreboardId && (
                       <InlineSpinner

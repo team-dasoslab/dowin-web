@@ -11,6 +11,7 @@ import { useProfileExportData } from "@/app/[locale]/(protected)/profile/export/
 import { useProfileExportForm } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportForm";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Button } from "@/components/ui/Button";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
 import { useNativeApp } from "@/context/NativeAppContext";
@@ -151,7 +152,9 @@ export default function ProfileExportPage() {
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                className="h-8 rounded-[12px] bg-sub-background px-3 text-[11px] font-black text-text-secondary transition-colors hover:bg-border"
+                variant="subtle"
+                size="sm"
+                className="h-8 rounded-[12px] px-3 text-[11px] font-black"
               >
                 {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
               </Button>
@@ -165,11 +168,10 @@ export default function ProfileExportPage() {
                     key={measure.id}
                     className="flex items-center gap-2 rounded-[12px] bg-sub-background px-3 py-2 text-[13px] font-bold text-text-primary"
                   >
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={checked}
                       onChange={() => toggleExportMeasure(measure.id)}
-                      className="h-3.5 w-3.5"
+                      size="sm"
                     />
                     <span className="truncate">{measure.name}</span>
                   </label>
@@ -179,11 +181,10 @@ export default function ProfileExportPage() {
           </div>
 
           <label className="flex items-center gap-2 rounded-[12px] border-none bg-sub-background px-3 py-2 text-xs text-text-secondary">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={splitByWeek}
               onChange={(event) => toggleSplitByWeek(event.target.checked)}
-              className="h-3.5 w-3.5"
+              size="sm"
             />
             <span>주차별로 섹션 분리해서 내보내기</span>
           </label>
@@ -196,7 +197,9 @@ export default function ProfileExportPage() {
               type="button"
               onClick={() => void exportCsv()}
               disabled={isExporting || !isExportAvailable}
-              className="h-9 w-full rounded-[12px] bg-primary px-4 text-xs font-bold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto flex items-center justify-center gap-1.5"
+              variant="primary"
+              size="sm"
+              className="w-full sm:w-auto rounded-[12px] gap-1.5"
             >
               <DowinIcon name="action-download" size="14px" />
               {isExportAvailable
@@ -226,7 +229,9 @@ function ExportUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="w-fit rounded-[16px] bg-sub-background px-5 py-3 text-sm font-black text-text-primary transition-colors hover:bg-border"
+              variant="subtle"
+              size="primary"
+              className="w-fit rounded-[16px] font-black text-text-primary"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -303,7 +308,9 @@ function NoScoreboardState() {
           actions={
             <Button
               asChild
-              className="btn-dowin-primary flex items-center gap-2 w-fit px-5 py-3 text-sm"
+              variant="primary"
+              size="primary"
+              className="w-fit gap-2"
             >
               <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>
                 새 점수판 만들기

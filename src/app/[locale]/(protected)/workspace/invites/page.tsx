@@ -27,6 +27,7 @@ import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { useTranslations } from "next-intl";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 
 export default function ProfileInvitesPage() {
   const t = useTranslations("ProfileInvites");
@@ -48,7 +49,7 @@ export default function ProfileInvitesPage() {
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaceId = workspace?.id ?? "";
-  const isWorkspaceAdmin = workspace?.role === "ADMIN";
+  const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
 
   const { data: invitesResponse, isLoading: isInvitesLoading } =
     useGetWorkspacesIdInvites(workspaceId, {
@@ -76,9 +77,9 @@ export default function ProfileInvitesPage() {
   const {
     formError,
     maxUsesInput,
-    getValidatedMaxUses,
     handleMaxUsesInputChange,
     selectPresetMaxUses,
+    handleCreateInvite,
   } = useInviteForm();
   const {
     copiedInviteId,
@@ -107,14 +108,7 @@ export default function ProfileInvitesPage() {
     });
   }, [invites, filter]);
 
-  const handleCreateInvite = async () => {
-    const maxUses = getValidatedMaxUses();
-    if (maxUses === null) {
-      return;
-    }
 
-    await createInvite(maxUses);
-  };
 
   if (isLoading) {
     return <InvitePageSkeleton />;
@@ -199,7 +193,7 @@ export default function ProfileInvitesPage() {
 
               <Button
                 type="button"
-                onClick={() => void handleCreateInvite()}
+                onClick={() => void handleCreateInvite(createInvite)}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
                 className={`h-10 rounded-[12px] px-5 text-sm font-bold transition-colors ${
                   isCreatingInvite || isOverFreeMemberLimit

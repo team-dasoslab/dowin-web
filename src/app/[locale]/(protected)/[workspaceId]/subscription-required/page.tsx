@@ -55,7 +55,7 @@ export default function SubscriptionRequiredPage() {
   return (
     <div className="flex min-h-screen items-center justify-center p-4 md:p-10 lg:p-12">
       <div className="flex justify-center w-full">
-        <Card className="max-w-[480px] w-full bg-surface border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in text-left">
+        <Card className="max-w-[480px] w-full space-y-10 animate-dowin-in text-left" radius="xl" padding="xl" variant="subtle">
           
           <div className="space-y-5">
             <Logo size="32px" className="text-text-primary" />

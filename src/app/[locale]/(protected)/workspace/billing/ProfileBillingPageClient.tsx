@@ -8,7 +8,12 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
+import { useSeatChangeActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useSeatChangeActions";
 import { useUpdateWorkspaceSeatsMutation } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useUpdateWorkspaceSeatsMutation";
+import {
+  getEntitlementSourceLabel,
+  getPeriodEndLabelKey,
+} from "@/app/[locale]/(protected)/workspace/billing/_utils/billing-labels";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";
@@ -16,34 +21,13 @@ import { Logo } from "@/components/ui/Logo";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { useToast } from "@/context/ToastContext";
 import { Link } from "@/i18n/routing";
+import { formatDateLabel } from "@/lib/client/date-utils";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 // import { Activity } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-type EntitlementSource =
-  | "POLAR"
-  | "MANUAL_GRANT"
-  | "PARTNER"
-  | "INTERNAL_TEST"
-  | "BETA_PROMOTIONAL_GRANT"
-  | null;
-
-function getPeriodEndLabelKey(status?: string | null) {
-  switch (status) {
-    case "ACTIVE":
-      return "nextRenewalLabel" as const;
-    case "CANCELED":
-      return "scheduledEndLabel" as const;
-    case "EXPIRED":
-    case "REVOKED":
-      return "periodEndedLabel" as const;
-    default:
-      return "currentPeriodEndLabel" as const;
-  }
-}
 
 export function ProfileBillingPageClient() {
   const t = useTranslations("ProfileBilling");
@@ -69,45 +53,11 @@ export function ProfileBillingPageClient() {
     workspaceId ?? "",
   );
 
-  const handleSeatChangeClick = () => {
-    if (!billingResponse || billingResponse.status !== 200) return;
-    const currentBilling = billingResponse.data;
-    const currentUsedSeats = currentBilling.usedSeatCount ?? 1;
-    const initialSeats = currentBilling.purchasedSeatCount ?? currentUsedSeats;
-
-    const input = window.prompt(
-      t("seatChangeDialogDesc", {
-        currentLimit: initialSeats,
-        currentUsed: currentUsedSeats,
-      }),
-      initialSeats.toString(),
-    );
-    if (input === null) return;
-
-    const count = parseInt(input.trim(), 10);
-    if (isNaN(count)) {
-      alert(t("seatChangeMinError"));
-      return;
-    }
-
-    if (count < currentUsedSeats) {
-      alert(
-        t("seatChangeErrorLowerThanCurrent", {
-          current: currentUsedSeats,
-          requested: count,
-          removeCount: currentUsedSeats - count,
-        }),
-      );
-      return;
-    }
-
-    if (count > 999) {
-      alert(t("seatChangeMaxError"));
-      return;
-    }
-
-    updateSeats({ workspaceId: workspaceId ?? "", data: { seatCount: count } });
-  };
+  const { handleSeatChangeClick } = useSeatChangeActions(
+    billingResponse,
+    workspaceId,
+    updateSeats,
+  );
 
   useEffect(() => {
     const currentUrl = new URL(window.location.href);
@@ -188,7 +138,9 @@ export function ProfileBillingPageClient() {
                   type="button"
                   onClick={() => void openPortal()}
                   disabled={isPortalPending}
-                  className="h-10 rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary hover:bg-border transition-colors"
+                  variant="subtle"
+                  size="primary"
+                  className="font-bold"
                 >
                   {isPortalPending ? t("portalLoading") : t("portalButton")}
                 </Button>
@@ -207,22 +159,32 @@ export function ProfileBillingPageClient() {
             </div>
           ) : null}
 
-          {(billing.billingStatus === "ACTIVE" || billing.billingStatus === "CANCELED") && (
-            billing.entitlementSource === "BETA_PROMOTIONAL_GRANT" ? (
+          {(billing.billingStatus === "ACTIVE" ||
+            billing.billingStatus === "CANCELED") &&
+            (billing.entitlementSource === "BETA_PROMOTIONAL_GRANT" ? (
               <div className="flex items-start gap-2.5 rounded-[16px] border-none bg-primary/5 px-4 py-3 text-[12px] font-bold leading-relaxed text-primary">
                 <DowinIcon
                   name="status-info"
                   size="14px"
                   className="mt-0.5 shrink-0"
                 />
-                {billing.promotionalDurationDays !== undefined && billing.promotionalDurationDays !== null
+                {billing.promotionalDurationDays !== undefined &&
+                billing.promotionalDurationDays !== null
                   ? t("betaPromotionalGrantNoticeDynamic", {
-                      duration: billing.promotionalDurationDays === 7 ? t("promoDurationWeeks", { count: 1 }) :
-                                billing.promotionalDurationDays === 14 ? t("promoDurationWeeks", { count: 2 }) :
-                                billing.promotionalDurationDays === 30 ? t("promoDurationMonths", { count: 1 }) :
-                                billing.promotionalDurationDays === 60 ? t("promoDurationMonths", { count: 2 }) :
-                                billing.promotionalDurationDays === 365 ? t("promoDurationYears", { count: 1 }) :
-                                t("promoDurationDays", { count: billing.promotionalDurationDays })
+                      duration:
+                        billing.promotionalDurationDays === 7
+                          ? t("promoDurationWeeks", { count: 1 })
+                          : billing.promotionalDurationDays === 14
+                            ? t("promoDurationWeeks", { count: 2 })
+                            : billing.promotionalDurationDays === 30
+                              ? t("promoDurationMonths", { count: 1 })
+                              : billing.promotionalDurationDays === 60
+                                ? t("promoDurationMonths", { count: 2 })
+                                : billing.promotionalDurationDays === 365
+                                  ? t("promoDurationYears", { count: 1 })
+                                  : t("promoDurationDays", {
+                                      count: billing.promotionalDurationDays,
+                                    }),
                     })
                   : t("betaPromotionalGrantNotice")}
               </div>
@@ -250,8 +212,7 @@ export function ProfileBillingPageClient() {
                   })}
                 </span>
               </div>
-            ) : null
-          )}
+            ) : null)}
         </div>
 
         <section className="space-y-4">
@@ -321,7 +282,9 @@ export function ProfileBillingPageClient() {
                             type="button"
                             onClick={handleSeatChangeClick}
                             disabled={isUpdatingSeats}
-                            className="whitespace-nowrap h-8 rounded-[12px] bg-sub-background px-3 text-xs font-bold text-text-secondary hover:bg-border transition-colors"
+                            variant="subtle"
+                            size="sm"
+                            className="whitespace-nowrap font-bold"
                           >
                             {isUpdatingSeats
                               ? t("seatChangeDialogSubmitting")
@@ -353,7 +316,11 @@ export function ProfileBillingPageClient() {
                   </div>
                 </>
               )}
-            {!(billing.entitlementSource === "BETA_PROMOTIONAL_GRANT" && billing.billingStatus !== "ACTIVE" && billing.billingStatus !== "CANCELED") && (
+            {!(
+              billing.entitlementSource === "BETA_PROMOTIONAL_GRANT" &&
+              billing.billingStatus !== "ACTIVE" &&
+              billing.billingStatus !== "CANCELED"
+            ) && (
               <div className="flex flex-col px-6 py-4 gap-1">
                 <div className="flex items-center justify-between">
                   <span className="text-[15px] font-medium text-text-secondary">
@@ -362,29 +329,41 @@ export function ProfileBillingPageClient() {
                       : t(getPeriodEndLabelKey(billing.billingStatus))}
                   </span>
                   <span className="text-[15px] font-bold text-text-primary text-right">
-                    {billing.entitlementSource === "BETA_PROMOTIONAL_GRANT"
-                      ? (
-                          billing.currentPeriodEnd 
-                            ? `${billing.promotionalDurationDays !== undefined && billing.promotionalDurationDays !== null ? `${formatDateLabel(
-                                new Date(new Date(billing.currentPeriodEnd).getTime() - billing.promotionalDurationDays * 24 * 60 * 60 * 1000).toISOString(),
+                    {billing.entitlementSource === "BETA_PROMOTIONAL_GRANT" ? (
+                      billing.currentPeriodEnd ? (
+                        `${
+                          billing.promotionalDurationDays !== undefined &&
+                          billing.promotionalDurationDays !== null
+                            ? `${formatDateLabel(
+                                new Date(
+                                  new Date(billing.currentPeriodEnd).getTime() -
+                                    billing.promotionalDurationDays *
+                                      24 *
+                                      60 *
+                                      60 *
+                                      1000,
+                                ).toISOString(),
                                 t("notAvailable"),
-                                locale
-                              )} ~ ` : ""}${formatDateLabel(
-                                billing.currentPeriodEnd,
-                                t("notAvailable"),
-                                locale
-                              )}`
-                            : t("promoDurationLifetime")
-                        )
-                      : (
-                          <span className="flex items-center justify-end gap-1.5">
-                            {formatDateLabel(
-                              billing.currentPeriodEnd,
-                              t("notAvailable"),
-                              locale,
-                            )}
-                          </span>
+                                locale,
+                              )} ~ `
+                            : ""
+                        }${formatDateLabel(
+                          billing.currentPeriodEnd,
+                          t("notAvailable"),
+                          locale,
+                        )}`
+                      ) : (
+                        t("promoDurationLifetime")
+                      )
+                    ) : (
+                      <span className="flex items-center justify-end gap-1.5">
+                        {formatDateLabel(
+                          billing.currentPeriodEnd,
+                          t("notAvailable"),
+                          locale,
                         )}
+                      </span>
+                    )}
                   </span>
                 </div>
               </div>
@@ -406,7 +385,9 @@ export function ProfileBillingPageClient() {
                 <Button
                   type="button"
                   onClick={() => void refetch()}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] bg-primary px-4 text-[12px] font-bold text-white transition-all"
+                  variant="primary"
+                  size="sm"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-[12px] px-4 text-[12px] font-bold transition-all"
                 >
                   <DowinIcon
                     name="action-refresh"
@@ -440,7 +421,6 @@ export function ProfileBillingPageClient() {
         <section>
           <div className="rounded-[24px] bg-surface p-5">
             <h3 className="flex items-center gap-2 text-[14px] font-black text-text-primary">
-
               {t("downgradePolicyTitle")}
             </h3>
             <p className="mt-2 text-[12px] font-medium leading-relaxed text-text-muted">
@@ -484,7 +464,9 @@ function BillingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-[12px] bg-sub-background px-5 py-3 text-sm font-bold text-text-primary hover:bg-border transition-colors"
+              variant="subtle"
+              size="primary"
+              className="rounded-[12px] font-bold text-text-primary hover:bg-border"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -502,47 +484,6 @@ function BillingUnavailableInAppState() {
       </div>
     </div>
   );
-}
-
-function formatDateLabel(
-  value: string | null | undefined,
-  fallback: string,
-  locale = "ko",
-) {
-  if (!value) {
-    return fallback;
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return fallback;
-  }
-
-  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ko-KR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-}
-
-function getEntitlementSourceLabel(
-  source: EntitlementSource,
-  t: ReturnType<typeof useTranslations<"ProfileBilling">>,
-) {
-  switch (source) {
-    case "POLAR":
-      return t("entitlementSourcePolar");
-    case "MANUAL_GRANT":
-      return t("entitlementSourceManualGrant");
-    case "PARTNER":
-      return t("entitlementSourcePartner");
-    case "INTERNAL_TEST":
-      return t("entitlementSourceInternalTest");
-    case "BETA_PROMOTIONAL_GRANT":
-      return t("entitlementSourceBetaPromotionalGrant");
-    default:
-      return t("notAvailable");
-  }
 }
 
 function ProfileBillingSkeleton() {
@@ -615,7 +556,9 @@ function BillingErrorState({ onRefresh }: { onRefresh: () => void }) {
           <Button
             type="button"
             onClick={onRefresh}
-            className="rounded-[12px] bg-primary text-white h-12 w-full text-[15px] font-bold hover:bg-primary/90 transition-colors"
+            variant="primary"
+            size="lg"
+            className="rounded-[12px] w-full font-bold"
           >
             {t("refresh")}
           </Button>

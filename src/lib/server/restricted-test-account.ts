@@ -8,21 +8,17 @@ export type RestrictedWriteIntent =
   | "daily-log-upsert"
   | "profile-avatar-update";
 
-type RuntimeEnv = {
-  NEXTJS_ENV?: string;
-};
-
 type GuardParams = {
   db: ReturnType<typeof getDb>;
   userId: number;
-  env?: RuntimeEnv;
+  env?: unknown;
   intent: RestrictedWriteIntent;
 };
 
 const RESTRICTED_TEST_ACCOUNT_CUSTOM_IDS = new Set(["test2", "test3", "test4"]);
 
-const isProductionRuntime = (env?: RuntimeEnv) =>
-  (env?.NEXTJS_ENV ?? process.env.NODE_ENV) === "production";
+const isProductionRuntime = (env?: unknown) =>
+  ((env as Record<string, string | undefined>)?.NODE_ENV ?? process.env.NODE_ENV) === "production";
 
 const isRestrictedTestAccount = async (
   db: ReturnType<typeof getDb>,

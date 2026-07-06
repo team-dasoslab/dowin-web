@@ -48,10 +48,10 @@ export function TeamPeriodControls({
           <div className="flex flex-1 items-center justify-between gap-1 rounded-[16px] bg-surface p-1.5 h-10 sm:justify-start lg:flex-none">
             <Button
               aria-label={t("previousPeriod")}
-              type="button"
               onClick={() => movePeriod(-1)}
               disabled={isPreviousDisabled || isPeriodLoading}
-              className="flex h-8 w-8 items-center justify-center rounded-[12px] text-text-muted hover:bg-sub-background transition-colors disabled:opacity-30"
+              variant="ghost"
+              size="control-icon"
             >
               <DowinIcon name="nav-chevron-left" size="14px" />
             </Button>
@@ -62,10 +62,10 @@ export function TeamPeriodControls({
 
             <Button
               aria-label={t("nextPeriod")}
-              type="button"
               onClick={() => movePeriod(1)}
               disabled={isPeriodLoading}
-              className="flex h-8 w-8 items-center justify-center rounded-[12px] text-text-muted hover:bg-sub-background transition-colors disabled:opacity-30"
+              variant="ghost"
+              size="control-icon"
             >
               <DowinIcon name="nav-chevron-right" size="14px" />
             </Button>
@@ -77,10 +77,11 @@ export function TeamPeriodControls({
             {isResetVisible ? (
               <Button
                 aria-label={t("backToToday")}
-                type="button"
                 onClick={resetToToday}
                 disabled={isPeriodLoading}
-                className="flex h-8 items-center gap-1.5 rounded-[12px] px-3 text-[12px] font-bold text-text-muted hover:bg-sub-background transition-colors"
+                variant="ghost"
+                size="control"
+                className="gap-1.5 text-text-muted"
               >
                 <span>{t("backToToday")}</span>
               </Button>

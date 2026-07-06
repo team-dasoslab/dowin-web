@@ -12,8 +12,9 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 export default function ScoreboardsPage() {
   const t = useTranslations("Scoreboard");
@@ -28,8 +29,6 @@ export default function ScoreboardsPage() {
     reactivate,
   } = useScoreboardArchive();
 
-  const [activeSection, setActiveSection] = useState("active");
-
   const menuGroups = useMemo(
     () => [
       { id: "active", label: t("currentActive") },
@@ -38,29 +37,10 @@ export default function ScoreboardsPage() {
     [t],
   );
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = document.getElementById("main-scroll-container");
-      if (!container) return;
-      const scrollPosition = container.scrollTop + 150;
-      let currentSectionId = activeSection;
-
-      for (const group of menuGroups) {
-        const el = document.getElementById(group.id);
-        if (el && el.offsetTop <= scrollPosition) {
-          currentSectionId = group.id;
-        }
-      }
-
-      if (currentSectionId !== activeSection) {
-        setActiveSection(currentSectionId);
-      }
-    };
-
-    const container = document.getElementById("main-scroll-container");
-    container?.addEventListener("scroll", handleScroll);
-    return () => container?.removeEventListener("scroll", handleScroll);
-  }, [activeSection, menuGroups]);
+  const [activeSection] = useActiveSectionScroll(
+    menuGroups,
+    "active",
+  );
 
   if (isLoading) {
     return <ScoreboardsSkeleton />;

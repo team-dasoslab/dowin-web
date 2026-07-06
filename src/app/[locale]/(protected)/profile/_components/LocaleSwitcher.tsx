@@ -1,35 +1,12 @@
 "use client";
 
-import { usePutUsersMe } from "@/api/generated/profile/profile";
-import { useToast } from "@/context/ToastContext";
-import { usePathname, useRouter } from "@/i18n/routing";
+import { useLocaleSwitcherActions } from "@/app/[locale]/(protected)/profile/_hooks/useLocaleSwitcherActions";
 import { useLocale, useTranslations } from "next-intl";
 
 export function LocaleSwitcher() {
   const locale = useLocale() as "ko" | "en";
   const t = useTranslations("Profile");
-  const router = useRouter();
-  const pathname = usePathname();
-  const { showToast } = useToast();
-  const { mutate: updateProfile } = usePutUsersMe();
-
-  const handleLocaleChange = (newLocale: "ko" | "en") => {
-    if (newLocale === locale) return;
-
-    // 1. Update DB preference
-    updateProfile(
-      { data: { locale: newLocale } },
-      {
-        onSuccess: () => {
-          // 2. Switch URL
-          router.replace(pathname, { locale: newLocale });
-        },
-        onError: () => {
-          showToast("error", t("languageChangeFailed"));
-        },
-      },
-    );
-  };
+  const { handleLocaleChange } = useLocaleSwitcherActions(locale);
 
   return (
     <div className="flex shrink-0">

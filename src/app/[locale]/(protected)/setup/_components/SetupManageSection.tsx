@@ -29,7 +29,9 @@ export function SetupManageSection({
                 archive();
               }
             }}
-            className="rounded-[12px] bg-sub-background px-5 py-2.5 text-[14px] font-bold text-text-secondary transition-all "
+            variant="subtle"
+            size="sm"
+            className="font-bold"
           >
             {isArchivePending ? (
               <InlineSpinner

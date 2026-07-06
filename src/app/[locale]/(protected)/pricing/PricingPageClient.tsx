@@ -16,6 +16,7 @@ import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
+import { formatDateLabel } from "@/lib/client/date-utils";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useLocale, useTranslations } from "next-intl";
@@ -76,7 +77,7 @@ export function PricingPageClient() {
           description={t("description")}
         />
 
-        <Card className="space-y-5 border-border bg-surface p-5 md:p-6">
+        <Card className="space-y-5 border-border bg-surface" padding="lg">
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <p className="text-xs font-bold text-text-muted">
@@ -134,9 +135,10 @@ export function PricingPageClient() {
           {canManageViaPolar ? (
             <Button
               type="button"
+              variant="primary"
               onClick={() => void openPortal()}
               disabled={isPortalPending}
-              className="btn-dowin-primary h-11 w-full text-sm font-black sm:w-auto sm:px-6"
+              className="h-11 w-full text-sm font-black sm:w-auto sm:px-6"
             >
               {isPortalPending ? t("portalLoading") : t("portalButton")}
             </Button>
@@ -199,7 +201,7 @@ function InfoItem({ label, value }: { label: string; value: string }) {
 
 function GuideCard({ title, desc }: { title: string; desc: string }) {
   return (
-    <Card className="space-y-2 border-border bg-surface p-5">
+    <Card className="space-y-2 border-border bg-surface" padding="default">
       <h3 className="text-[14px] font-black text-text-primary">{title}</h3>
       <p className="text-[12px] font-medium leading-relaxed text-text-muted">
         {desc}
@@ -221,7 +223,9 @@ function PricingUnavailableInAppState() {
           actions={
             <Button
               asChild
-              className="rounded-button border border-border bg-surface px-5 py-3 text-sm font-black text-text-primary transition-colors"
+              variant="outline"
+              size="primary"
+              className="bg-surface font-black transition-colors"
             >
               <Link href={getWorkspacePath(workspaceId, "/profile")}>
                 {t("appUnavailableAction")}
@@ -247,7 +251,11 @@ function NoWorkspaceState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-border bg-surface p-8 text-center shadow-xl shadow-zinc-200/50">
+        <Card
+          className="w-full space-y-6 border-border bg-surface text-center"
+          padding="lg"
+          shadow="xl"
+        >
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Logo size="32px" />
           </div>
@@ -274,7 +282,11 @@ function PricingErrorState() {
   return (
     <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-[560px] items-center p-4 md:p-8">
-        <Card className="w-full space-y-6 rounded-content border-border bg-surface p-8 text-center shadow-xl shadow-zinc-200/50">
+        <Card
+          className="w-full space-y-6 border-border bg-surface text-center"
+          padding="lg"
+          shadow="xl"
+        >
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <DowinIcon name="status-warning" size="24px" />
           </div>
@@ -306,25 +318,4 @@ function PricingSkeleton() {
       </ProtectedPageContainer>
     </div>
   );
-}
-
-function formatDateLabel(
-  value: string | null | undefined,
-  fallback: string,
-  locale = "ko",
-) {
-  if (!value) {
-    return fallback;
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return fallback;
-  }
-
-  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ko-KR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
 }

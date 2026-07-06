@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
+import {
+  getRateBgColor,
+  getRateColor,
+} from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_utils/scoreboardOverviewSection";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -18,7 +22,9 @@ type WeeklyTrendPoint = {
 };
 
 interface ScoreboardOverviewSectionProps {
-  activeScoreboard: ReturnType<typeof useDashboardScoreboard>["activeScoreboard"];
+  activeScoreboard: ReturnType<
+    typeof useDashboardScoreboard
+  >["activeScoreboard"];
   isWeeklyTrendLoading: boolean;
   monthlyOverallRate: number;
   weeklyOverallRate: number;
@@ -74,14 +80,24 @@ export function ScoreboardOverviewSection({
             </p>
             <div className="mt-3 flex flex-col gap-3">
               <div className="flex items-baseline gap-0.5">
-                <span className={cn("text-[32px] font-black tracking-tighter leading-none", getRateColor(weeklyOverallRate))}>
+                <span
+                  className={cn(
+                    "text-[32px] font-black tracking-tighter leading-none",
+                    getRateColor(weeklyOverallRate),
+                  )}
+                >
                   {weeklyOverallRate}
                 </span>
-                <span className="text-[18px] font-bold text-text-muted leading-none">%</span>
+                <span className="text-[18px] font-bold text-text-muted leading-none">
+                  %
+                </span>
               </div>
               <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
                 <div
-                  className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(weeklyOverallRate))}
+                  className={cn(
+                    "h-full rounded-full transition-all duration-1000",
+                    getRateBgColor(weeklyOverallRate),
+                  )}
                   style={{ width: `${Math.min(weeklyOverallRate, 100)}%` }}
                 />
               </div>
@@ -95,14 +111,24 @@ export function ScoreboardOverviewSection({
             </p>
             <div className="mt-3 flex flex-col gap-3">
               <div className="flex items-baseline gap-0.5">
-                <span className={cn("text-[32px] font-black tracking-tighter leading-none", getRateColor(monthlyOverallRate))}>
+                <span
+                  className={cn(
+                    "text-[32px] font-black tracking-tighter leading-none",
+                    getRateColor(monthlyOverallRate),
+                  )}
+                >
                   {monthlyOverallRate}
                 </span>
-                <span className="text-[18px] font-bold text-text-muted leading-none">%</span>
+                <span className="text-[18px] font-bold text-text-muted leading-none">
+                  %
+                </span>
               </div>
               <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
                 <div
-                  className={cn("h-full rounded-full transition-all duration-1000", getRateBgColor(monthlyOverallRate))}
+                  className={cn(
+                    "h-full rounded-full transition-all duration-1000",
+                    getRateBgColor(monthlyOverallRate),
+                  )}
                   style={{ width: `${Math.min(monthlyOverallRate, 100)}%` }}
                 />
               </div>
@@ -121,19 +147,6 @@ export function ScoreboardOverviewSection({
   );
 }
 
-function getRateColor(v: number) {
-  if (v >= 80) return "text-success";
-  if (v >= 50) return "text-primary";
-  return "text-text-primary";
-}
-
-function getRateBgColor(v: number) {
-  if (v >= 80) return "bg-success";
-  if (v >= 50) return "bg-primary";
-  if (v > 0) return "bg-zinc-800";
-  return "bg-transparent";
-}
-
 function DashboardWeeklyTrendSection({
   isLoading,
   weeklyTrendPoints,
@@ -146,7 +159,9 @@ function DashboardWeeklyTrendSection({
   const t = useTranslations("Dashboard");
 
   return (
-    <div className={cn("flex flex-col p-5 rounded-[24px] bg-surface", className)}>
+    <div
+      className={cn("flex flex-col p-5 rounded-[24px] bg-surface", className)}
+    >
       <div className="flex items-center justify-between mb-2">
         <p className="text-[15px] font-bold text-text-primary">
           {t("recentTrend")}
@@ -176,16 +191,37 @@ function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
   if (!isMounted) return null;
 
   return (
-    <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} initialDimension={{ width: 10, height: 10 }}>
-      <AreaChart data={data} margin={{ top: 25, right: 10, left: 10, bottom: 0 }}>
+    <ResponsiveContainer
+      width="100%"
+      height="100%"
+      minWidth={1}
+      minHeight={1}
+      initialDimension={{ width: 10, height: 10 }}
+    >
+      <AreaChart
+        data={data}
+        margin={{ top: 25, right: 10, left: 10, bottom: 0 }}
+      >
         <defs>
           <linearGradient id="rateGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+            <stop
+              offset="5%"
+              stopColor="var(--color-primary)"
+              stopOpacity={0.2}
+            />
+            <stop
+              offset="95%"
+              stopColor="var(--color-primary)"
+              stopOpacity={0}
+            />
           </linearGradient>
         </defs>
         <Tooltip
-          cursor={{ stroke: "rgba(0,0,0,0.05)", strokeWidth: 2, strokeDasharray: "4 4" }}
+          cursor={{
+            stroke: "rgba(0,0,0,0.05)",
+            strokeWidth: 2,
+            strokeDasharray: "4 4",
+          }}
           content={({ active, payload }) => {
             if (!active || !payload?.length) return null;
             return (
@@ -211,12 +247,25 @@ function WeeklyRateTrendChart({ points }: { points: WeeklyTrendPoint[] }) {
           stroke="var(--color-primary)"
           strokeWidth={3}
           fill="url(#rateGrad)"
-          activeDot={{ r: 6, fill: "var(--color-primary)", stroke: "#fff", strokeWidth: 3 }}
+          activeDot={{
+            r: 6,
+            fill: "var(--color-primary)",
+            stroke: "#fff",
+            strokeWidth: 3,
+          }}
           dot={(props: { cx?: number; cy?: number; index?: number }) => {
             const { cx, cy, index } = props;
             if (index === data.length - 1) {
               return (
-                <circle key={`dot-${index}`} cx={cx} cy={cy} r={4} fill="var(--color-primary)" stroke="#fff" strokeWidth={2} />
+                <circle
+                  key={`dot-${index}`}
+                  cx={cx}
+                  cy={cy}
+                  r={4}
+                  fill="var(--color-primary)"
+                  stroke="#fff"
+                  strokeWidth={2}
+                />
               );
             }
             return <svg key={`dot-${index}`} />;
