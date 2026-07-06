@@ -27,6 +27,7 @@ import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { useTranslations } from "next-intl";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 
 export default function ProfileInvitesPage() {
   const t = useTranslations("ProfileInvites");
@@ -48,7 +49,7 @@ export default function ProfileInvitesPage() {
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaceId = workspace?.id ?? "";
-  const isWorkspaceAdmin = workspace?.role === "ADMIN";
+  const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
 
   const { data: invitesResponse, isLoading: isInvitesLoading } =
     useGetWorkspacesIdInvites(workspaceId, {

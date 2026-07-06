@@ -10,6 +10,7 @@ import {
 } from "@/api/generated/team-checkins/team-checkins";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { useTranslations } from "next-intl";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 import {
   TeamCheckinInboxCheckinItem,
   TeamCheckinInboxProposalItem,
@@ -59,7 +60,7 @@ export function TeamMemberCheckIn() {
   const { data: workspaceResponse } = useGetWorkspacesMe();
   const { data: checkinSettingsResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId);
 
-  const isWorkspaceAdmin = workspaceResponse?.status === 200 && workspaceResponse.data.role === "ADMIN";
+  const isWorkspaceAdmin = workspaceResponse?.status === 200 && isWorkspaceAdminRole(workspaceResponse.data);
   const checkinSettings =
     checkinSettingsResponse?.status === 200 &&
     "enabled" in checkinSettingsResponse.data
