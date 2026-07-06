@@ -123,7 +123,7 @@ export default function WorkspaceSettingsPage() {
     }
   }, [isProfileLoading, isWorkspaceLoading, hasWorkspace, router, showToast, t, workspaceId]);
 
-  const menuGroups: { id: string; label: string; items: MenuItem[] }[] = [
+  const menuGroups: { id: string; label: string; items: MenuItem[] }[] = useMemo(() => [
     {
       id: "general",
       label: t("workspaceManagement"),
@@ -245,14 +245,14 @@ export default function WorkspaceSettingsPage() {
           ]
         : [],
     },
-  ];
+  ], [hasWorkspace, isWorkspaceAdmin, showBillingSurface, workspaceId, t, checkinSettings, checkinT, dashboardT, handleTogglePastDailyLogEdit, isUpdateWorkspacePending, changeWorkspaceName, deleteWorkspace, leaveWorkspace, handleToggleCheckin, isUpdateSettingsPending, handleChangeCheckinSendTime, workspace?.allowPastDailyLogEdit]);
 
   const scrollGroups = useMemo(() => [
     ...menuGroups.filter(g => g.items.length > 0).map(g => ({ id: g.id })),
     { id: "workspaces" }
   ], [menuGroups]);
 
-  const [activeSection, setActiveSection] = useActiveSectionScroll(
+  const [activeSection] = useActiveSectionScroll(
     scrollGroups,
     "general"
   );

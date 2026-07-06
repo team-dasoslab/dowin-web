@@ -1,6 +1,6 @@
 export function formatRelativeTime(
   createdAt: string,
-  t: (key: string, values?: Record<string, any>) => string
+  t: (key: string, values?: Record<string, string | number>) => string
 ) {
   const createdAtTime = new Date(createdAt).getTime();
 

@@ -11,7 +11,7 @@ import { useTeamMemos } from "@/app/[locale]/(protected)/[workspaceId]/dashboard
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/context/ToastContext";
+
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useWeeklyTableActions } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useWeeklyTableActions";
@@ -51,7 +51,6 @@ export function WeeklyTable({
   const memberUserId = toNumberId(member.userId);
   const params = useParams();
   const workspaceId = params.workspaceId as string;
-  const { showToast } = useToast();
   const {
     memos,
     isLoading: isMemosLoading,
@@ -73,6 +72,8 @@ export function WeeklyTable({
     },
   });
 
+  const { handleComposeClick } = useWeeklyTableActions(createMemo, onToggleCompose);
+
   if (
     !(member.hasScoreboard ?? false) ||
     (member.leadMeasures?.length ?? 0) === 0
@@ -82,7 +83,6 @@ export function WeeklyTable({
 
   const today = new Date().toISOString().split("T")[0];
   const hasMemos = memos.length > 0;
-  const { handleComposeClick } = useWeeklyTableActions(createMemo, onToggleCompose);
 
   return (
     <div className="relative space-y-2 xl:pr-0">

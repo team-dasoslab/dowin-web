@@ -37,7 +37,7 @@ export default function ScoreboardsPage() {
     [t],
   );
 
-  const [activeSection, setActiveSection] = useActiveSectionScroll(
+  const [activeSection] = useActiveSectionScroll(
     menuGroups,
     "active",
   );

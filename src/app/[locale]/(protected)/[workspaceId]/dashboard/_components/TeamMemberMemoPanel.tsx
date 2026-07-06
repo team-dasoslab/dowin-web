@@ -110,7 +110,7 @@ export function TeamMemberMemoPanel({
     if (memoMode !== "view") {
       resetSheetDrag();
     }
-  }, [memoMode]);
+  }, [memoMode, resetSheetDrag]);
 
   return (
     <>

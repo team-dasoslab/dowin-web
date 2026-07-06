@@ -252,7 +252,7 @@ export default function ProfilePage() {
     },
   ];
 
-  const [activeSection, setActiveSection] = useActiveSectionScroll(
+  const [activeSection] = useActiveSectionScroll(
     menuGroups,
     "general",
   );

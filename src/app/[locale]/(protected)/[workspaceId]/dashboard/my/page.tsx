@@ -107,7 +107,7 @@ export default function MyDashboardPage() {
     [t],
   );
 
-  const [activeSection, setActiveSection] = useActiveSectionScroll(
+  const [activeSection] = useActiveSectionScroll(
     menuGroups,
     "overview",
   );
