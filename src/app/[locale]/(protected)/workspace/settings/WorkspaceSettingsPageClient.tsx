@@ -1,34 +1,33 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { useGetWorkspacesMe, useGetWorkspaces, usePutWorkspacesCurrent, usePutWorkspacesId, getGetWorkspacesMeQueryKey, getGetWorkspacesQueryKey } from "@/api/generated/workspace/workspace";
+import { useGetWorkspaces, useGetWorkspacesMe, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
 
+import { useGetWorkspacesWorkspaceIdTeamCheckinsSettings } from "@/api/generated/team-checkins/team-checkins";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
-import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
 import { TIME_OPTIONS } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
+import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
+import { useWorkspaceSettingsActions } from "@/app/[locale]/(protected)/workspace/settings/_hooks/useWorkspaceSettingsActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { SectionHeader } from "@/components/ui/SectionHeader";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/context/ToastContext";
+import { DowinIcon } from "@/components/ui/DowinIcon";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Switch } from "@/components/ui/Switch";
 import { useNativeApp } from "@/context/NativeAppContext";
+import { useToast } from "@/context/ToastContext";
+import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
-import { DowinIcon } from "@/components/ui/DowinIcon";
-import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { useLocale } from "next-intl";
-import { useEffect, useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useGetWorkspacesWorkspaceIdTeamCheckinsSettings, usePutWorkspacesWorkspaceIdTeamCheckinsSettings, getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey } from "@/api/generated/team-checkins/team-checkins";
-import { TeamCheckinSettings } from "@/api/generated/dowin.schemas";
-import { Switch } from "@/components/ui/Switch";
 import { Bot } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
+import { useEffect, useMemo, useRef } from "react";
 
 interface MenuItem {
   id: string;
@@ -57,6 +56,11 @@ export default function WorkspaceSettingsPage() {
     { query: { retry: false } }
   );
   const { data: allWorkspacesResponse } = useGetWorkspaces();
+  const { data: settingsResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId ?? "", {
+    query: {
+      enabled: !!workspaceId,
+    },
+  });
   const { mutate: switchWorkspace, isPending: isSwitching } = usePutWorkspacesCurrent({
     mutation: {
       onSuccess: (_, variables) => {
@@ -70,70 +74,19 @@ export default function WorkspaceSettingsPage() {
     },
   });
 
-  const queryClient = useQueryClient();
-  const { data: checkinSettingsRes } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId || "", { query: { enabled: !!workspaceId } });
-  const checkinSettings = checkinSettingsRes?.status === 200 ? (checkinSettingsRes.data as TeamCheckinSettings) : null;
-  const updateSettings = usePutWorkspacesWorkspaceIdTeamCheckinsSettings();
-
-  const handleToggleCheckin = async (checked: boolean) => {
-    if (!workspaceId || !checkinSettings) return;
-    try {
-      await updateSettings.mutateAsync({
-        workspaceId,
-        data: {
-          ...checkinSettings,
-          enabled: checked
-        }
-      });
-      queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey(workspaceId) });
-      showToast("success", checked ? checkinT("enabledToast") : checkinT("disabledToast"));
-    } catch {
-      showToast("error", checkinT("updateFailedToast"));
-    }
-  };
-
-  const handleChangeCheckinSendTime = async (time: string) => {
-    if (!workspaceId || !checkinSettings) return;
-    const [hour] = time.split(":").map(Number);
-    try {
-      await updateSettings.mutateAsync({
-        workspaceId,
-        data: {
-          ...checkinSettings,
-          sendHour: hour,
-        },
-      });
-      queryClient.invalidateQueries({ queryKey: getGetWorkspacesWorkspaceIdTeamCheckinsSettingsQueryKey(workspaceId) });
-      showToast("success", checkinT("sendTimeChangedToast"));
-    } catch {
-      showToast("error", checkinT("updateFailedToast"));
-    }
-  };
-
-  const updateWorkspace = usePutWorkspacesId();
-
-  const handleTogglePastDailyLogEdit = async (checked: boolean) => {
-    if (!workspaceId || !workspace) return;
-    try {
-      await updateWorkspace.mutateAsync({
-        id: workspaceId,
-        data: {
-          name: workspace.name ?? "",
-          allowPastDailyLogEdit: checked,
-        },
-      });
-      await queryClient.invalidateQueries({ queryKey: getGetWorkspacesMeQueryKey() });
-      await queryClient.invalidateQueries({ queryKey: getGetWorkspacesQueryKey() });
-      showToast("success", checked ? "과거 기록 수정이 허용되었습니다." : "과거 기록 수정이 제한되었습니다.");
-    } catch {
-      showToast("error", "설정 변경에 실패했습니다.");
-    }
-  };
-
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaces = allWorkspacesResponse?.status === 200 ? allWorkspacesResponse.data : [];
+  const checkinSettings = settingsResponse?.status === 200 && 'enabled' in settingsResponse.data ? settingsResponse.data : null;
+
+  const {
+    handleToggleCheckin,
+    handleChangeCheckinSendTime,
+    handleTogglePastDailyLogEdit,
+    isUpdateSettingsPending,
+    isUpdateWorkspacePending,
+  } = useWorkspaceSettingsActions(workspaceId, checkinSettings, workspace);
 
   const showBillingSurface = !isNativeApp;
   const hasWorkspace = workspace !== null;
@@ -150,31 +103,8 @@ export default function WorkspaceSettingsPage() {
     workspace,
   });
 
-  const [activeSection, setActiveSection] = useState<string>("general");
-  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = document.getElementById("main-scroll-container");
-      if (!container) return;
-      const scrollPosition = container.scrollTop + 150;
-      let currentSectionId = activeSection;
-      const sections = ["general", "checkin", "workspaces"];
-      for (const id of sections) {
-        const el = sectionRefs.current[id];
-        if (el && el.offsetTop <= scrollPosition) {
-          currentSectionId = id;
-        }
-      }
-      if (currentSectionId !== activeSection) {
-        setActiveSection(currentSectionId);
-      }
-    };
-    const container = document.getElementById("main-scroll-container");
-    container?.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => container?.removeEventListener("scroll", handleScroll);
-  }, [activeSection]);
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const wasWorkspacePresent = useRef(false);
   useEffect(() => {
@@ -235,9 +165,9 @@ export default function WorkspaceSettingsPage() {
               rightElement: (
                 <div onClick={(e) => e.stopPropagation()}>
                   <Switch
-                    checked={workspace.allowPastDailyLogEdit ?? false}
+                    checked={workspace?.allowPastDailyLogEdit ?? false}
                     onCheckedChange={handleTogglePastDailyLogEdit}
-                    disabled={updateWorkspace.isPending}
+                    disabled={isUpdateWorkspacePending}
                   />
                 </div>
               ),
@@ -275,7 +205,7 @@ export default function WorkspaceSettingsPage() {
                   <Switch 
                     checked={checkinSettings?.enabled ?? false} 
                     onCheckedChange={handleToggleCheckin} 
-                    disabled={!checkinSettings || updateSettings.isPending}
+                    disabled={!checkinSettings || isUpdateSettingsPending}
                   />
                 </div>
               ),
@@ -289,7 +219,7 @@ export default function WorkspaceSettingsPage() {
                     rightElement: (
                       <select
                         value={`${String(checkinSettings?.sendHour ?? 16).padStart(2, "0")}:00`}
-                        disabled={!checkinSettings || updateSettings.isPending}
+                        disabled={!checkinSettings || isUpdateSettingsPending}
                         onChange={(event) => {
                           void handleChangeCheckinSendTime(event.target.value);
                         }}
@@ -315,6 +245,16 @@ export default function WorkspaceSettingsPage() {
         : [],
     },
   ];
+
+  const scrollGroups = useMemo(() => [
+    ...menuGroups.map(g => ({ id: g.id })),
+    { id: "workspaces" }
+  ], [menuGroups]);
+
+  const [activeSection, setActiveSection] = useActiveSectionScroll(
+    scrollGroups,
+    "general"
+  );
 
   if (isProfileLoading || isWorkspaceLoading) {
     return (
@@ -444,7 +384,8 @@ export default function WorkspaceSettingsPage() {
                               type="button"
                               disabled={isActionPending}
                               onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              className="flex h-10 items-center justify-center rounded-[12px] bg-sub-background px-5 text-sm font-bold text-text-secondary transition-colors hover:bg-border min-h-0"
+                              variant="subtle"
+                              className="flex h-10 items-center justify-center rounded-[12px] px-5 text-sm font-bold min-h-0"
                             >
                             {commonT("switchWorkspace")}
                           </Button>
@@ -516,7 +457,7 @@ function MenuItemRow({
   if (item.onClick) {
     return (
       <div className={itemWrapperClassName}>
-        <Button disabled={isActionPending} onClick={item.onClick} className="block w-full text-left transition-colors hover:bg-sub-background justify-start items-stretch rounded-none h-auto p-0 font-normal">
+        <Button disabled={isActionPending} onClick={item.onClick} variant="ghost" className="block w-full text-left justify-start items-stretch rounded-none h-auto p-0 font-normal">
           {Content}
         </Button>
       </div>

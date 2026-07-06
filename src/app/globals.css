@@ -147,14 +147,6 @@ html {
   outline: none;
 }
 
-.btn-dowin-primary {
-  background: var(--color-primary);
-  color: rgba(255, 255, 255, 1);
-  border-radius: var(--radius-button);
-  font-weight: 700;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
 .bg-dowin-surface-gradient {
   background: linear-gradient(
     135deg,
@@ -178,10 +170,6 @@ html {
       transparent 32%
     ),
     linear-gradient(180deg, #f7f9fc 0%, #f5f7fb 100%);
-}
-
-.btn-dowin-primary:active {
-  background: var(--color-primary-light);
 }
 
 /* === Animations === */

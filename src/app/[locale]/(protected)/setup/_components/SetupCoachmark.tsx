@@ -1,15 +1,15 @@
 "use client";
 
+import { useSetupCoachmarkEventHook } from "@/app/[locale]/(protected)/setup/_hooks/useSetupCoachmarkEventHook";
 import {
   SETUP_COACHMARK_LEAD_TAGS_QUERY,
   SETUP_COACHMARK_OPTIONS,
   SETUP_COACHMARK_STYLES,
   getSetupCoachmarkSteps,
   getSetupLeadTagsCoachmarkSteps,
-  handleSetupCoachmarkEvent,
 } from "@/app/[locale]/(protected)/setup/_lib/setup-coachmark";
 import { useTranslations } from "next-intl";
-import { Joyride, type EventData } from "react-joyride";
+import { Joyride } from "react-joyride";
 
 interface SetupCoachmarkProps {
   mode?: "default" | typeof SETUP_COACHMARK_LEAD_TAGS_QUERY;
@@ -24,11 +24,7 @@ export function SetupCoachmark({
 }: SetupCoachmarkProps) {
   const t = useTranslations("Setup.Coachmark");
 
-  const handleEvent = (data: EventData) => {
-    handleSetupCoachmarkEvent(data, setIsRunning, {
-      persistDismissed: mode === "default",
-    });
-  };
+  const { handleEvent } = useSetupCoachmarkEventHook(mode, setIsRunning);
 
   const steps =
     mode === SETUP_COACHMARK_LEAD_TAGS_QUERY

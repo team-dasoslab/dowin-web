@@ -1,64 +1,25 @@
 "use client";
 
+import { useExportImage } from "@/app/og/_hooks/useExportImage";
 import { Logo } from "@/components/ui/Logo";
+import { publicRuntimeConfig } from "@/config/public-runtime-config";
 import { CheckCircle2, Download, TrendingUp } from "lucide-react";
 import { notFound } from "next/navigation";
-import { useRef, useState } from "react";
 
 export default function OGImagePreviewPage() {
-  if (process.env.NODE_ENV === "production") {
+  if (publicRuntimeConfig.isDevelopment) {
     notFound();
   }
 
-  const exportRef = useRef<HTMLDivElement>(null);
-  const [isExporting, setIsExporting] = useState(false);
-
-  const handleDownload = async () => {
-    if (!exportRef.current || isExporting) return;
-
-    try {
-      setIsExporting(true);
-
-      if (document.fonts && document.fonts.ready) {
-        await document.fonts.ready;
-      }
-
-      const { toPng } = await import("html-to-image");
-
-      const dataUrl = await toPng(exportRef.current, {
-        cacheBust: true,
-        pixelRatio: 2, // for high resolution
-        backgroundColor: "#ffffff",
-        width: 1200,
-        height: 630,
-      });
-
-      const link = document.createElement("a");
-      link.download = "dowin-og-image.png";
-      link.href = dataUrl;
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      console.error("Failed to export image", err);
-      alert("이미지 저장에 실패했습니다.");
-    } finally {
-      setIsExporting(false);
-    }
-  };
+  const { exportRef, isExporting, handleDownload } = useExportImage();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-slate-100 p-8">
       <div className="flex flex-col gap-4 max-w-[1200px] w-full">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">
-              OG Image Preview
-            </h1>
-            <p className="text-slate-500">
-              크기: 1200 x 630 (OG 이미지 표준 규격)
-            </p>
+            <h1 className="text-2xl font-bold text-slate-800">OG Image Preview</h1>
+            <p className="text-slate-500">크기: 1200 x 630 (OG 이미지 표준 규격)</p>
           </div>
           <button
             onClick={handleDownload}
@@ -87,9 +48,7 @@ export default function OGImagePreviewPage() {
           <div className="relative z-10 flex flex-col justify-center px-20 w-3/5 h-full">
             <div className="flex items-center gap-3 mb-8">
               <Logo size={48} className="text-slate-900" />
-              <span className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                Dowin
-              </span>
+              <span className="text-3xl font-extrabold text-slate-900 tracking-tight">Dowin</span>
             </div>
 
             <h2 className="text-[64px] leading-[1.2] font-bold text-slate-900 tracking-[-0.02em] mb-6">
@@ -108,9 +67,7 @@ export default function OGImagePreviewPage() {
                     <TrendingUp className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-slate-500">
-                      이번 주 목표 달성률
-                    </div>
+                    <div className="text-sm font-semibold text-slate-500">이번 주 목표 달성률</div>
                     <div className="text-2xl font-bold text-slate-900">85%</div>
                   </div>
                 </div>
@@ -122,10 +79,7 @@ export default function OGImagePreviewPage() {
                   { width: "w-[85%]", done: true },
                   { width: "w-[60%]", done: false },
                 ].map((task, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl"
-                  >
+                  <div key={i} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl">
                     <CheckCircle2
                       className={`w-6 h-6 shrink-0 ${
                         task.done ? "text-primary" : "text-slate-300"

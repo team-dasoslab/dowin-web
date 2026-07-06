@@ -18,8 +18,10 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import { useSetupPageActions } from "@/app/[locale]/(protected)/setup/_hooks/useSetupPageActions";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
@@ -61,14 +63,7 @@ export default function SetupPage() {
     toggleMeasureTag,
   } = useScoreboardSetup();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    void submit().then((isSuccess) => {
-      if (isSuccess) {
-        router.push(workspaceId ? `/${workspaceId}/dashboard/my` : "/");
-      }
-    });
-  };
+  const { handleSubmit } = useSetupPageActions(submit, router, workspaceId);
 
   useEffect(() => {
     const currentUrl = new URL(window.location.href);
@@ -94,8 +89,6 @@ export default function SetupPage() {
     }
   }, []);
 
-  const [activeSection, setActiveSection] = useState("dowin");
-
   const menuGroups = useMemo(
     () => [
       { id: "dowin", label: t("dowinShort") },
@@ -106,30 +99,10 @@ export default function SetupPage() {
     [isEditMode, t],
   );
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = document.getElementById("main-scroll-container");
-      if (!container) return;
-      const scrollPosition = container.scrollTop + 150;
-      let currentSectionId = activeSection;
-
-      const sectionIds = menuGroups.map((group) => group.id);
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (el && el.offsetTop <= scrollPosition) {
-          currentSectionId = id;
-        }
-      }
-
-      if (currentSectionId !== activeSection) {
-        setActiveSection(currentSectionId);
-      }
-    };
-
-    const container = document.getElementById("main-scroll-container");
-    container?.addEventListener("scroll", handleScroll);
-    return () => container?.removeEventListener("scroll", handleScroll);
-  }, [activeSection, menuGroups]);
+  const [activeSection, setActiveSection] = useActiveSectionScroll(
+    menuGroups,
+    "dowin",
+  );
 
   if (isRedirecting) {
     return null;

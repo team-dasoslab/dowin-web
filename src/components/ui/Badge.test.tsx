@@ -5,12 +5,12 @@ import { Badge } from "./Badge";
 
 describe("Badge", () => {
   it("renders a span with base and custom classes", () => {
-    render(<Badge className="bg-primary">Active</Badge>);
+    render(<Badge variant="primary">Active</Badge>);
 
     const badge = screen.getByText("Active");
     expect(badge.tagName).toBe("SPAN");
     expect(badge).toHaveClass("inline-flex");
-    expect(badge).toHaveClass("bg-primary");
+    expect(badge).toHaveClass("bg-primary/10");
   });
 
   it("forwards refs to the span element", () => {

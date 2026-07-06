@@ -48,7 +48,9 @@ export function ActiveScoreboardSection({
                   onArchive(activeScoreboardId);
                 }
               }}
-              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-sub-background px-4 text-[13px] font-black text-text-primary transition-colors hover:bg-border whitespace-nowrap flex-shrink-0"
+              variant="subtle"
+              size="sm"
+              className="flex-shrink-0 gap-1.5 whitespace-nowrap font-black text-text-primary"
             >
               {pendingActionId === activeScoreboardId && (
                 <InlineSpinner
@@ -87,7 +89,9 @@ function EmptyActiveScoreboardCard() {
       <div className="flex justify-center">
         <Button
           asChild
-          className="btn-dowin-primary rounded-[16px] px-5 py-3 text-[14px] font-black"
+          variant="primary"
+          size="primary"
+          className="font-black"
         >
           <Link href={`/${workspaceId}/setup?mode=create`}>
             {td("createScoreboard")}

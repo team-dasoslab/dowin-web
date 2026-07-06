@@ -20,11 +20,11 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="rounded-[8px] bg-sub-background px-2 py-1 text-[10px] font-bold text-text-secondary">
+            <Badge variant="ghost-secondary" size="lg">
               {t(`tags.${item.tag}`)}
             </Badge>
             {item.isNew ? (
-              <Badge className="rounded-[8px] bg-primary/5 px-2 py-1 text-[10px] font-bold text-primary">
+              <Badge variant="ghost-primary" size="lg">
                 NEW
               </Badge>
             ) : null}
@@ -45,7 +45,9 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
 
         <Button
           asChild
-          className="shrink-0 self-start rounded-[12px] bg-sub-background px-3 py-2 text-xs font-bold text-text-secondary sm:self-auto hover:bg-border transition-colors"
+          variant="subtle"
+          size="sm"
+          className="shrink-0 self-start sm:self-auto"
         >
           <Link
             href={item.ctaHref}

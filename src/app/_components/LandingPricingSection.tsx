@@ -66,7 +66,9 @@ export function LandingPricingSection() {
 
             <Button
               asChild
-              className="inline-flex h-12 w-full items-center justify-center rounded-[14px] bg-zinc-900 px-6 text-[15px] font-bold text-white transition-none"
+              variant="solid-dark"
+              size="xl"
+              className="w-full transition-none"
             >
               <Link href="/login">{t("cta")}</Link>
             </Button>

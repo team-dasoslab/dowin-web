@@ -1,5 +1,6 @@
 "use client";
 
+import { initializeSwaggerUi } from "@/app/api-docs/_utils/swaggerDocsClient";
 import Script from "next/script";
 import { useEffect } from "react";
 
@@ -7,23 +8,6 @@ declare global {
   interface Window {
     SwaggerUIBundle?: (config: Record<string, unknown>) => unknown;
   }
-}
-
-function initializeSwaggerUi() {
-  const root = document.getElementById("swagger-ui");
-
-  if (!root || root.childElementCount > 0 || !window.SwaggerUIBundle) {
-    return;
-  }
-
-  window.SwaggerUIBundle({
-    url: "/api/openapi",
-    dom_id: "#swagger-ui",
-    deepLinking: true,
-    docExpansion: "list",
-    displayRequestDuration: true,
-    persistAuthorization: true,
-  });
 }
 
 export function SwaggerDocsClient() {

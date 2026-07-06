@@ -1,16 +1,12 @@
-const nodeEnv = process.env.NODE_ENV ?? "development";
-const runtimeEnv = process.env.NEXTJS_ENV ?? nodeEnv;
+const nodeEnv = process.env.NODE_ENV ?? "";
+
 const port = process.env.PORT ?? "4000";
-const appOrigin = (process.env.APP_BASE_URL ?? `http://localhost:${port}`).replace(
-  /\/+$/,
-  "",
-);
+const appOrigin = (process.env.APP_BASE_URL ?? `http://localhost:${port}`).replace(/\/+$/, "");
 
 export const serverRuntimeConfig = Object.freeze({
   nodeEnv,
-  runtimeEnv,
   isDevelopment: nodeEnv === "development",
-  teamCheckinLeadMeasureAgeGateEnabled: runtimeEnv === "production",
+  teamCheckinLeadMeasureAgeGateEnabled: nodeEnv === "production",
   port,
   appOrigin,
   apiDocsUrl: new URL("/api-docs", appOrigin).toString(),

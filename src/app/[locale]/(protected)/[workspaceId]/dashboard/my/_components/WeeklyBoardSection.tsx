@@ -10,7 +10,6 @@ import { DowinIcon } from "@/components/ui/DowinIcon";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 
 interface WeeklyBoardSectionProps {
   activeLeadMeasures: ReturnType<
@@ -25,6 +24,8 @@ interface WeeklyBoardSectionProps {
   weeklyById: ReturnType<typeof useDashboardScoreboard>["weeklyById"];
   allowPastDailyLogEdit?: boolean;
 }
+
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 
 function CountPopoverContent({
   initialCount,
@@ -53,9 +54,10 @@ function CountPopoverContent({
   }, [initialCount]);
 
   return (
-    <div
-      className="fixed z-[10000] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
-      onClick={(e) => e.stopPropagation()}
+    <DialogContent 
+      className="bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
+      overlayClassName="bg-black/20"
+      hideCloseButton
     >
       <Button
         aria-label={closeLabel}
@@ -98,14 +100,14 @@ function CountPopoverContent({
         </div>
 
         <div className="flex w-full gap-2 mt-3">
-          <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
+          <Button variant="subtle" size="lg"
+            className="flex-1 text-[24px]"
             onClick={() => setLocalCount(Math.max(0, localCount - 1))}
           >
             -
           </Button>
-          <Button
-            className="flex-1 h-14 text-[24px] font-bold rounded-[16px] bg-sub-background text-text-secondary transition-colors active:bg-border/50 hover:bg-sub-background"
+          <Button variant="subtle" size="lg"
+            className="flex-1 text-[24px]"
             onClick={() => setLocalCount(localCount + 1)}
           >
             +
@@ -113,8 +115,10 @@ function CountPopoverContent({
         </div>
 
         <Button
+          variant="primary"
+          size="lg"
           aria-label={saveLabel}
-          className="w-full h-[52px] mt-4 rounded-[16px] text-[16px] font-bold bg-primary text-white transition-all"
+          className="w-full mt-4"
           onClick={() => {
             onSave(localCount);
             onClose();
@@ -123,7 +127,7 @@ function CountPopoverContent({
           확인
         </Button>
       </div>
-    </div>
+    </DialogContent>
   );
 }
 
@@ -303,15 +307,16 @@ export function WeeklyBoardSection({
                                       );
                                     }
                                   }}
-                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
+                                  variant={
                                     isAchievedDaily
-                                      ? "bg-primary text-white"
+                                      ? "primary"
                                       : count > 0
-                                        ? "bg-primary/15 text-primary"
+                                        ? "primary-subtle"
                                         : date === today
-                                          ? "bg-primary/5 text-primary"
-                                          : "bg-sub-background text-text-muted hover:bg-sub-background"
-                                  } ${
+                                          ? "primary-ghost"
+                                          : "secondary"
+                                  }
+                                  className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
                                     isPending || !isEditable
                                       ? "cursor-not-allowed opacity-50"
                                       : "cursor-pointer"
@@ -324,40 +329,32 @@ export function WeeklyBoardSection({
                                   </span>
                                 </Button>
 
-                                {openPopoverKey ===
-                                  `${leadMeasure.id}-${date}` &&
-                                  typeof document !== "undefined" &&
-                                  createPortal(
-                                    <>
-                                      <div
-                                        className="fixed inset-0 z-[9999] bg-black/20 animate-in fade-in"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setOpenPopoverKey(null);
-                                        }}
-                                      />
-                                      <CountPopoverContent
-                                        initialCount={count}
-                                        dailyTargetCount={dailyTargetCount}
-                                        closeLabel={t("closeDailyCount")}
-                                        saveLabel={t("saveDailyCount")}
-                                        title={
-                                          leadMeasure.name ??
-                                          t("dailyCountTitle")
-                                        }
-                                        subtitle={date}
-                                        onClose={() => setOpenPopoverKey(null)}
-                                        onSave={(newCount) =>
-                                          toggleLog(
-                                            leadMeasureId ?? 0,
-                                            date,
-                                            newCount,
-                                          )
-                                        }
-                                      />
-                                    </>,
-                                    document.body,
-                                  )}
+                                <Dialog 
+                                  open={openPopoverKey === `${leadMeasure.id}-${date}`} 
+                                  onOpenChange={(open) => {
+                                    if (!open) setOpenPopoverKey(null);
+                                  }}
+                                >
+                                  <CountPopoverContent
+                                    initialCount={count}
+                                    dailyTargetCount={dailyTargetCount}
+                                    closeLabel={t("closeDailyCount")}
+                                    saveLabel={t("saveDailyCount")}
+                                    title={
+                                      leadMeasure.name ??
+                                      t("dailyCountTitle")
+                                    }
+                                    subtitle={date}
+                                    onClose={() => setOpenPopoverKey(null)}
+                                    onSave={(newCount) =>
+                                      toggleLog(
+                                        leadMeasureId ?? 0,
+                                        date,
+                                        newCount,
+                                      )
+                                    }
+                                  />
+                                </Dialog>
                               </div>
                             ) : (
                               <Button
@@ -376,13 +373,14 @@ export function WeeklyBoardSection({
                                     void toggleLog(leadMeasureId, date);
                                   }
                                 }}
-                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
+                                variant={
                                   currentValue === true
-                                    ? "bg-primary text-white"
+                                    ? "primary"
                                     : isToday
-                                      ? "bg-primary/5 text-primary"
-                                      : "bg-sub-background text-text-muted hover:bg-sub-background"
-                                } ${
+                                      ? "primary-ghost"
+                                      : "secondary"
+                                }
+                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
                                   isPending || !isEditable
                                     ? "cursor-not-allowed opacity-50"
                                     : "cursor-pointer"

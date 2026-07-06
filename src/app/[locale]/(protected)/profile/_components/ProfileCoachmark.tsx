@@ -1,15 +1,9 @@
 "use client";
 
+import { useProfileCoachmarkEvent } from "@/app/[locale]/(protected)/profile/_hooks/useProfileCoachmarkEvent";
 import { useTranslations } from "next-intl";
 import { useMemo } from "react";
-import {
-  Joyride,
-  STATUS,
-  type EventData,
-  type Options,
-  type Step,
-  type Styles,
-} from "react-joyride";
+import { Joyride, type Options, type Step, type Styles } from "react-joyride";
 
 export const PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY = "personal-reminder";
 
@@ -25,8 +19,7 @@ const PROFILE_COACHMARK_STYLES: Partial<Styles> = {
   tooltip: {
     borderRadius: 12,
   },
-  tooltipContainer: {
-  },
+  tooltipContainer: {},
   tooltipTitle: {
     fontSize: "14px",
     fontWeight: 700,
@@ -83,11 +76,7 @@ export function ProfileCoachmark({
     [t],
   );
 
-  const handleEvent = (data: EventData) => {
-    if (data.status === STATUS.FINISHED || data.status === STATUS.SKIPPED) {
-      setIsRunning(false);
-    }
-  };
+  const { handleEvent } = useProfileCoachmarkEvent(setIsRunning);
 
   return (
     <Joyride

@@ -13,23 +13,20 @@ type Story = StoryObj<typeof Badge>;
 export const Default: Story = {
   args: {
     children: "80%",
-    className:
-      "px-2 py-0.5 rounded border border-border text-xs font-bold bg-surface text-text-primary",
+    variant: "default",
   },
 };
 
 export const Success: Story = {
   args: {
     children: "Success",
-    className:
-      "px-2 py-0.5 rounded border border-success/20 text-xs font-bold bg-success/10 text-success",
+    variant: "success",
   },
 };
 
 export const Primary: Story = {
   args: {
     children: "Member",
-    className:
-      "px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20",
+    variant: "primary",
   },
 };
