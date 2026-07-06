@@ -32,6 +32,7 @@ import { hashId } from "@/lib/client/id-hash";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 
 export default function MyDashboardPage() {
   const t = useTranslations("Dashboard");
@@ -79,7 +80,7 @@ export default function MyDashboardPage() {
     profileResponse?.status === 200
       ? (profileResponse.data.nickname ?? null)
       : null;
-  const isWorkspaceAdmin = workspace?.role === "ADMIN";
+  const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
   const {
     celebrationLevel,
     handleDismissProductUpdate,

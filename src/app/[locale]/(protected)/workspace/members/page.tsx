@@ -24,6 +24,7 @@ import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
 import { useTranslations } from "next-intl";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 
 export default function ProfileMembersPage() {
   const t = useTranslations("ProfileMembers");
@@ -45,7 +46,7 @@ export default function ProfileMembersPage() {
   const workspace =
     workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaceId = workspace?.id ?? "";
-  const isWorkspaceAdmin = workspace?.role === "ADMIN";
+  const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
 
   const { data: membersResponse, isLoading: isMembersLoading } =
     useGetWorkspacesIdMembers(workspaceId, {
@@ -74,7 +75,7 @@ export default function ProfileMembersPage() {
         return leftName.localeCompare(rightName);
       }
 
-      return left.role === "ADMIN" ? -1 : 1;
+      return isWorkspaceAdminRole(left) ? -1 : 1;
     });
   }, [membersResponse, t]);
 

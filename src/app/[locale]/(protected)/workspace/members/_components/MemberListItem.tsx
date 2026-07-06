@@ -5,6 +5,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 
 interface MemberListItemProps {
   member: WorkspaceMember;
@@ -29,7 +30,7 @@ export function MemberListItem({
   const memberId = member.id ?? 0;
   const nickname = member.nickname ?? t("defaultNickname");
   const isSelf = member.isMe === true;
-  const canTransferAdmin = !isSelf && member.role !== "ADMIN" && memberId > 0;
+  const canTransferAdmin = !isSelf && !isWorkspaceAdminRole(member) && memberId > 0;
   const canRemove = !isSelf && memberId > 0;
 
   return (
@@ -49,12 +50,12 @@ export function MemberListItem({
               {nickname}
             </p>
             <Badge
-              variant={member.role === "ADMIN" ? "primary" : "secondary"}
+              variant={isWorkspaceAdminRole(member) ? "primary" : "secondary"}
               size="sm"
               shape="pill"
               className="flex-shrink-0"
             >
-              {member.role === "ADMIN" ? "ADMIN" : "MEMBER"}
+              {isWorkspaceAdminRole(member) ? "ADMIN" : "MEMBER"}
             </Badge>
             {isSelf ? (
               <Badge variant="secondary" size="sm" shape="pill">
