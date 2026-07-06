@@ -14,14 +14,13 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
-import { useToast } from "@/context/ToastContext";
+
 
 export default function AdminBillingDetailClient({
   workspaceId,
 }: {
   workspaceId: number;
 }) {
-  const { showToast } = useToast();
 
   const {
     data: detailData,
@@ -50,7 +49,7 @@ export default function AdminBillingDetailClient({
     setChangeReason,
     isPending,
     handleSaveOverride,
-  } = useAdminBillingDetailActions(workspaceId, detail as any, refetch);
+  } = useAdminBillingDetailActions(workspaceId, detail as Parameters<typeof useAdminBillingDetailActions>[1], refetch);
 
   const availableStatuses =
     editPlanCode === "BASIC" || editPlanCode === "STANDARD"
@@ -163,7 +162,7 @@ export default function AdminBillingDetailClient({
                   </label>
                   <select
                     value={editPlanCode}
-                    onChange={(e) => setEditPlanCode(e.target.value as any)}
+                    onChange={(e) => setEditPlanCode(e.target.value as Parameters<typeof setEditPlanCode>[0])}
                     className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
                     <option value="FREE">FREE</option>
@@ -179,7 +178,7 @@ export default function AdminBillingDetailClient({
                   <select
                     value={editBillingStatus}
                     onChange={(e) =>
-                      setEditBillingStatus(e.target.value as any)
+                      setEditBillingStatus(e.target.value as Parameters<typeof setEditBillingStatus>[0])
                     }
                     className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >

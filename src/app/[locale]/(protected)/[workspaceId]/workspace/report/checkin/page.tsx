@@ -23,7 +23,7 @@ export default function ReportPage() {
     [t],
   );
 
-  const [activeSection, setActiveSection] = useActiveSectionScroll(
+  const [activeSection] = useActiveSectionScroll(
     menuGroups,
     "achievement",
   );

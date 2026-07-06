@@ -99,7 +99,7 @@ export default function SetupPage() {
     [isEditMode, t],
   );
 
-  const [activeSection, setActiveSection] = useActiveSectionScroll(
+  const [activeSection] = useActiveSectionScroll(
     menuGroups,
     "dowin",
   );

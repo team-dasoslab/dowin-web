@@ -16,9 +16,6 @@ export default function NewWorkspacePage() {
  const t = useTranslations("Workspace.new");
  const {
  error,
- getValidatedName,
- getValidatedSeatCount,
- getValidatedPromotionCode,
  name,
  seatCount,
  promotionCode,
