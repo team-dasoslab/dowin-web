@@ -39,7 +39,7 @@ export function BridgeInitializer({ isNative }: { isNative: boolean }) {
     return () => {
       unsubscribe();
     };
-  }, [router]);
+  }, [router, handleStateUpdate]);
 
   return null;
 }

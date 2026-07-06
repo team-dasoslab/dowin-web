@@ -77,7 +77,6 @@ export default function ProfileInvitesPage() {
   const {
     formError,
     maxUsesInput,
-    getValidatedMaxUses,
     handleMaxUsesInputChange,
     selectPresetMaxUses,
     handleCreateInvite,

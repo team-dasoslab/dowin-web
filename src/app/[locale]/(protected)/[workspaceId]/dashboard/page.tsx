@@ -67,7 +67,7 @@ export default function DashboardPage() {
     [t],
   );
 
-  const [activeSection, setActiveSection] = useActiveSectionScroll(
+  const [activeSection] = useActiveSectionScroll(
     menuGroups,
     "summary",
   );
