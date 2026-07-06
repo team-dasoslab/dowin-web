@@ -9,10 +9,12 @@ import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/das
 import { TeamMemberMemoPanel } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberMemoPanel";
 import { useTeamMemos } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamMemos";
 import { UserAvatar } from "@/components/UserAvatar";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { toNumberId } from "@/lib/client/frontend-api";
 import { useTranslations } from "next-intl";
+import { useWeeklyTableActions } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useWeeklyTableActions";
 import { useParams } from "next/navigation";
 
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
@@ -80,31 +82,7 @@ export function WeeklyTable({
 
   const today = new Date().toISOString().split("T")[0];
   const hasMemos = memos.length > 0;
-
-  const handleComposeClick = () => {
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(max-width: 1599px)").matches
-    ) {
-      const content =
-        window.prompt("메모 내용을 입력하세요.", "")?.trim() ?? "";
-
-      if (!content) {
-        return;
-      }
-
-      void (async () => {
-        const isSuccess = await createMemo(content);
-
-        if (isSuccess) {
-          showToast("success", t("addedMemo"));
-        }
-      })();
-      return;
-    }
-
-    onToggleCompose?.();
-  };
+  const { handleComposeClick } = useWeeklyTableActions(createMemo, onToggleCompose);
 
   return (
     <div className="relative space-y-2 xl:pr-0">
@@ -122,9 +100,9 @@ export function WeeklyTable({
                 {member.nickname}
               </span>
               {isMe ? (
-                <span className="shrink-0 rounded-[12px] border border-primary/25 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                <Badge variant="primary" size="sm" shape="pill" className="shrink-0">
                   {tc("me")}
-                </span>
+                </Badge>
               ) : null}
               <span className="hidden truncate text-[12px] font-medium text-text-muted sm:inline">
                 — {member.goalName}

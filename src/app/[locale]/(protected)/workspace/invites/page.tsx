@@ -79,6 +79,7 @@ export default function ProfileInvitesPage() {
     getValidatedMaxUses,
     handleMaxUsesInputChange,
     selectPresetMaxUses,
+    handleCreateInvite,
   } = useInviteForm();
   const {
     copiedInviteId,
@@ -107,14 +108,7 @@ export default function ProfileInvitesPage() {
     });
   }, [invites, filter]);
 
-  const handleCreateInvite = async () => {
-    const maxUses = getValidatedMaxUses();
-    if (maxUses === null) {
-      return;
-    }
 
-    await createInvite(maxUses);
-  };
 
   if (isLoading) {
     return <InvitePageSkeleton />;
@@ -199,7 +193,7 @@ export default function ProfileInvitesPage() {
 
               <Button
                 type="button"
-                onClick={() => void handleCreateInvite()}
+                onClick={() => void handleCreateInvite(createInvite)}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
                 className={`h-10 rounded-[12px] px-5 text-sm font-bold transition-colors ${
                   isCreatingInvite || isOverFreeMemberLimit

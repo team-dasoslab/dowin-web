@@ -1,5 +1,5 @@
 import { TeamDashboardMember } from "@/api/generated/dowin.schemas";
-import { getRateTone } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
+import { getRateVariant } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -42,7 +42,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
                 {member.nickname}
               </p>
               {isMe ? (
-                <Badge className="rounded-[12px] border border-primary/25 bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+                <Badge variant="primary" size="sm" shape="pill" className="shrink-0">
                   {tc("me")}
                 </Badge>
               ) : null}
@@ -65,7 +65,8 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
         <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("weeklyAchievement")}</span>
           <Badge
-            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-[8px] border-none ${getRateTone(weeklyAchievementRate)}`}
+            variant={getRateVariant(weeklyAchievementRate)}
+            className="flex-shrink-0"
           >
             {hasScoreboard ? `${weeklyAchievementRate}%` : tc("unsetTitle")}
           </Badge>
@@ -73,7 +74,8 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
         <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("monthlyAchievement")}</span>
           <Badge
-            className={`flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded-[8px] border-none ${getRateTone(monthlyAchievementRate)}`}
+            variant={getRateVariant(monthlyAchievementRate)}
+            className="flex-shrink-0"
           >
             {hasScoreboard ? `${monthlyAchievementRate}%` : tc("unsetTitle")}
           </Badge>

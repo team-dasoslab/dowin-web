@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, ReactNode } from "react";
+import { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -18,36 +19,9 @@ export default function AdminModal({
   title,
   maxWidth = "max-w-4xl",
 }: AdminModalProps) {
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    // Disable background scrolling when modal is active
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "auto";
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <div
-        className={`bg-white shadow-none border-none rounded-[24px] w-full ${maxWidth} max-h-[90vh] overflow-y-auto p-6 sm:p-8 animate-dowin-in space-y-6 select-text`}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className={`w-full ${maxWidth} max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 select-text`}>
         <div className="flex items-center justify-between">
           {title ? (
             <h3 className="text-[18px] font-black tracking-tight text-text-primary">
@@ -59,7 +33,8 @@ export default function AdminModal({
           <Button
             type="button"
             onClick={onClose}
-            className="text-text-muted transition-all p-2 rounded-full bg-transparent hover:bg-zinc-100 min-h-0"
+            variant="ghost"
+            className="text-text-muted p-2 rounded-full min-h-0"
             aria-label="Close"
           >
             <svg
@@ -79,7 +54,7 @@ export default function AdminModal({
           </Button>
         </div>
         {children}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -26,7 +26,8 @@ export function ProductUpdateCard({
         <Button
           type="button"
           onClick={onDismiss}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[12px] bg-black/5 dark:bg-white/5 text-text-muted hover:bg-black/10 dark:hover:bg-white/10 transition-colors border-none"
+          variant="subtle"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[12px] p-0 border-none"
           aria-label={t("dismissUpdate")}
         >
           <DowinIcon name="action-dismiss" size="14px" />
@@ -56,16 +57,10 @@ export function ProductUpdateCard({
           </div>
 
           <div className="flex flex-row flex-wrap items-center gap-2 pt-0.5">
-            <Button
-              asChild
-              className="justify-center rounded-[14px] bg-primary h-10 px-5 text-[13px] font-bold text-white transition-all shadow-none"
-            >
+            <Button variant="primary" asChild>
               <Link href={update.ctaHref}>{updateT("ctaLabel")}</Link>
             </Button>
-            <Button
-              asChild
-              className="justify-center rounded-[14px] bg-sub-background h-10 px-5 text-[13px] font-bold text-text-secondary transition-all border-none shadow-none hover:bg-border/50"
-            >
+            <Button variant="subtle" asChild>
               <Link href={getWorkspacePath(workspaceId, "/profile/updates")}>
                 {t("viewAllUpdates")}
               </Link>

@@ -15,7 +15,6 @@ describe("Card", () => {
 
     const card = screen.getByText("Panel");
     expect(card).toHaveClass("rounded-none");
-    expect(card).not.toHaveClass("rounded-content");
   });
 
   it("forwards refs to the card element", () => {

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 import { useNativeApp } from "@/context/NativeAppContext";
+import { useSidebarActions } from "@/app/[locale]/(protected)/_hooks/useSidebarActions";
 
 export function Sidebar() {
   const t = useTranslations("Dashboard");
@@ -32,29 +33,7 @@ export function Sidebar() {
       })
     : [];
 
-  const getIsActive = (href: string) => {
-    const hrefPathname = href.split("?")[0];
-
-    // 워크스페이스 하위 메뉴(billing, members, invites) 진입 시에도 '워크스페이스 설정' 메뉴가 active 되도록 예외 처리
-    const isWorkspaceMenu =
-      hrefPathname.endsWith("/workspace/settings") &&
-      pathname.includes("/workspace/");
-
-    return (
-      pathname === hrefPathname ||
-      isWorkspaceMenu ||
-      (hrefPathname !== "/" &&
-        pathname.startsWith(hrefPathname + "/") &&
-        !filteredLinks.some((link) => {
-          const linkPathname = link.href.split("?")[0];
-          return (
-            linkPathname !== hrefPathname &&
-            linkPathname.startsWith(hrefPathname + "/") &&
-            pathname.startsWith(linkPathname)
-          );
-        }))
-    );
-  };
+  const { getIsActive } = useSidebarActions(pathname, filteredLinks);
 
   const mainTabPaths = [
     "/dashboard/my",

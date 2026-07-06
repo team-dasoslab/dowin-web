@@ -6,9 +6,7 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { LocaleSwitcher } from "@/app/[locale]/(protected)/profile/_components/LocaleSwitcher";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { NotificationSettingControl } from "@/app/[locale]/(protected)/profile/_components/NotificationSettingControl";
 import {
   PROFILE_COACHMARK_PERSONAL_REMINDER_QUERY,
@@ -19,16 +17,19 @@ import {
   useNotificationSettings,
 } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
-import { useNativeApp } from "@/context/NativeAppContext";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { UserAvatar } from "@/components/UserAvatar";
-import { useToast } from "@/context/ToastContext";
+import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
-import { Link, useRouter } from "@/i18n/routing";
+import { DowinIcon } from "@/components/ui/DowinIcon";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { UserAvatar } from "@/components/UserAvatar";
+import { useNativeApp } from "@/context/NativeAppContext";
+import { useToast } from "@/context/ToastContext";
+import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
+import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -80,15 +81,11 @@ export default function ProfilePage() {
     refreshSettings,
     updateDailySettings,
   } = useNotificationSettings();
-  const {
-    changeNickname,
-    isActionPending,
-    logout,
-    pendingAction,
-  } = useProfileActions({
-    nickname,
-    workspace,
-  });
+  const { changeNickname, isActionPending, logout, pendingAction } =
+    useProfileActions({
+      nickname,
+      workspace,
+    });
 
   useEffect(() => {
     if (isProfileLoading || user || hasHandledMissingUserRef.current) {
@@ -100,7 +97,6 @@ export default function ProfilePage() {
     router.replace(getWorkspacePath(workspaceId, "/dashboard/my"));
   }, [isProfileLoading, router, showToast, user, t, workspaceId]);
 
-  const [activeSection, setActiveSection] = useState<string>("general");
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
   const menuGroups: { id: string; label: string; items: MenuItem[] }[] = [
@@ -256,39 +252,10 @@ export default function ProfilePage() {
     },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const container = document.getElementById("main-scroll-container");
-      if (!container) return;
-
-      // 현재 스크롤 위치에 따른 섹션 감지
-      const scrollPosition = container.scrollTop + 150; // 헤더 높이 등을 고려한 오프셋
-
-      let currentSectionId = activeSection;
-      const sortedSections = Object.entries(sectionRefs.current)
-        .filter(([, el]) => el !== null)
-        .sort((a, b) => (a[1]?.offsetTop ?? 0) - (b[1]?.offsetTop ?? 0));
-
-      for (const [id, el] of sortedSections) {
-        if (el && el.offsetTop <= scrollPosition) {
-          currentSectionId = id;
-        }
-      }
-
-      if (currentSectionId !== activeSection) {
-        setActiveSection(currentSectionId);
-      }
-    };
-
-    const container = document.getElementById("main-scroll-container");
-    container?.addEventListener("scroll", handleScroll, { passive: true });
-    // 초기 로드 시 한 번 실행
-    handleScroll();
-
-    return () => {
-      container?.removeEventListener("scroll", handleScroll);
-    };
-  }, [activeSection]);
+  const [activeSection, setActiveSection] = useActiveSectionScroll(
+    menuGroups,
+    "general",
+  );
 
   useEffect(() => {
     const currentUrl = new URL(window.location.href);
@@ -327,8 +294,8 @@ export default function ProfilePage() {
             pendingAction === "nickname"
               ? t("loadingNickname")
               : pendingAction === "LOGOUT"
-                  ? t("loadingLogout")
-                  : t("processing")
+                ? t("loadingLogout")
+                : t("processing")
           }
         />
       )}
@@ -367,8 +334,6 @@ export default function ProfilePage() {
                   </p>
                 </div>
               </div>
-
-
             </div>
 
             {/* 설정 그룹들 */}
@@ -385,8 +350,6 @@ export default function ProfilePage() {
                     className="space-y-5 scroll-mt-28"
                   >
                     <SectionHeader title={group.label} />
-
-
 
                     <div className="rounded-[24px] overflow-hidden bg-surface">
                       {group.items.map((item) => (
@@ -442,7 +405,10 @@ function MenuItemRow({
         {item.rightElement ? (
           item.rightElement
         ) : (
-          <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />
+          <DowinIcon
+            name="nav-chevron-right"
+            className="w-4 h-4 text-text-muted/50"
+          />
         )}
       </div>
     </div>
@@ -454,7 +420,8 @@ function MenuItemRow({
         <Button
           disabled={isActionPending}
           onClick={item.onClick}
-          className="block w-full text-left transition-colors hover:bg-sub-background justify-start items-stretch rounded-none h-auto p-0 font-normal"
+          variant="ghost"
+          className="block w-full text-left justify-start items-stretch rounded-none h-auto p-0 font-normal"
         >
           {Content}
         </Button>
@@ -465,7 +432,10 @@ function MenuItemRow({
   if (item.href) {
     return (
       <div className={itemWrapperClassName}>
-        <Link href={item.href} className="block w-full transition-colors hover:bg-sub-background">
+        <Link
+          href={item.href}
+          className="block w-full transition-colors hover:bg-sub-background"
+        >
           {Content}
         </Link>
       </div>

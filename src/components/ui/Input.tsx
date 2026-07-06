@@ -1,7 +1,33 @@
 import React, { useId } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+const inputVariants = cva(
+  "w-full outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold",
+  {
+    variants: {
+      variant: {
+        default: "border-none bg-sub-background text-text-primary placeholder:text-text-muted focus:bg-surface focus:ring-4 focus:ring-primary/5",
+        ghost: "border-none bg-transparent hover:bg-sub-background focus:bg-sub-background",
+        outline: "border-2 border-border bg-transparent focus:border-primary/50",
+      },
+      size: {
+        default: "h-[52px] rounded-[16px] px-5 text-[15px]",
+        sm: "h-10 rounded-[12px] px-3 text-sm",
+        md: "h-12 rounded-[14px] px-4 text-sm",
+        lg: "h-14 rounded-[20px] px-6 text-base",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+);
+
+export interface InputProps 
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">, 
+    VariantProps<typeof inputVariants> {
   label?: React.ReactNode;
   containerClassName?: string;
   rightElement?: React.ReactNode;
@@ -14,6 +40,8 @@ export const Input = ({
   id,
   label,
   rightElement,
+  variant,
+  size,
   ref,
   autoCapitalize = "none",
   autoCorrect = "off",
@@ -22,13 +50,12 @@ export const Input = ({
   const generatedId = useId();
   const inputId = id ?? (label ? generatedId : undefined);
   const inputElement = (
-    <div className="relative">
+    <div className="relative w-full">
       <input
         id={inputId}
         className={cn(
-          "h-[52px] w-full rounded-[16px] border-none bg-sub-background px-5 text-[15px] font-semibold text-text-primary outline-none transition-colors placeholder:text-text-muted focus:bg-surface focus:ring-4 focus:ring-primary/5 disabled:opacity-50 disabled:cursor-not-allowed",
-          rightElement ? "pr-14" : "",
-          className
+          inputVariants({ variant, size, className }),
+          rightElement ? "pr-14" : ""
         )}
         ref={ref}
         autoCapitalize={autoCapitalize}

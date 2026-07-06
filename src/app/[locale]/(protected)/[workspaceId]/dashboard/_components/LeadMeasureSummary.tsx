@@ -43,7 +43,9 @@ export function LeadMeasureSummary({
           {tags.map((tag, index) => (
             <Badge
               key={tag.id ?? `${tag.name ?? "tag"}-${index}`}
-              className="inline-flex items-center rounded-full border border-primary/15 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
+              variant="primary"
+              size="sm"
+              shape="pill"
             >
               #{tag.name}
             </Badge>

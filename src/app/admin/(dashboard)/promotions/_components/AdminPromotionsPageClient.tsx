@@ -1,59 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useGetAdminMarketingInviteCodes } from "@/api/generated/admin-marketing/admin-marketing";
 import {
-  useGetAdminMarketingInviteCodes,
-  usePatchAdminMarketingInviteCodesId,
-} from "@/api/generated/admin-marketing/admin-marketing";
-import {
-  MarketingInviteCodeSummary,
   MarketingInviteCodeStatus,
+  MarketingInviteCodeSummary,
 } from "@/api/generated/dowin.schemas";
+import { useAdminPromotionsListActions } from "@/app/admin/(dashboard)/promotions/_hooks/useAdminPromotionsListActions";
 import { InlineSpinner } from "@/components/InlineSpinner";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/context/ToastContext";
-import Link from "next/link";
+import { Card } from "@/components/ui/Card";
 import { Copy } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function AdminPromotionsPageClient() {
-  const { showToast } = useToast();
   const router = useRouter();
 
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
 
   // List Data
-  const { data: listData, isLoading: isListLoading, refetch: refetchList } = useGetAdminMarketingInviteCodes();
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    refetch: refetchList,
+  } = useGetAdminMarketingInviteCodes();
 
-  const patchCodeMutation = usePatchAdminMarketingInviteCodesId();
-
-  const handleUpdateListStatus = async (e: React.MouseEvent, codeId: number, currentStatus: MarketingInviteCodeStatus) => {
-    e.stopPropagation();
-    const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-    try {
-      const response = await patchCodeMutation.mutateAsync({
-        id: codeId,
-        data: {
-          status: newStatus,
-        },
-      });
-
-      if (response.status === 200) {
-        showToast("success", "프로모션 상태가 업데이트되었습니다.");
-        refetchList();
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      showToast("error", error?.response?.data?.message || "상태 업데이트 중 오류가 발생했습니다.");
-    }
-  };
-
-  const handleCopyCode = (e: React.MouseEvent, codeText: string) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(codeText);
-    showToast("success", "코드가 복사되었습니다.");
-  };
+  const { isPatching, handleUpdateListStatus, handleCopyCode } =
+    useAdminPromotionsListActions(refetchList);
 
   const codes: MarketingInviteCodeSummary[] = Array.isArray(listData?.data)
     ? (listData.data as MarketingInviteCodeSummary[])
@@ -100,7 +74,7 @@ export default function AdminPromotionsPageClient() {
       </div>
 
       <div className="w-full">
-        <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden">
+        <Card radius="xl" variant="white" shadow="none">
           {isListLoading ? (
             <div className="p-12 text-center">
               <InlineSpinner />
@@ -145,7 +119,9 @@ export default function AdminPromotionsPageClient() {
                     <tr
                       key={code.id}
                       className="hover:bg-zinc-50/50 cursor-pointer transition-colors"
-                      onClick={() => router.push(`/admin/promotions/${code.id}`)}
+                      onClick={() =>
+                        router.push(`/admin/promotions/${code.id}`)
+                      }
                     >
                       <td className="px-6 py-4">
                         <span className="text-[15px] font-black text-text-primary block">
@@ -179,12 +155,16 @@ export default function AdminPromotionsPageClient() {
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-[13px] font-bold text-text-primary">
-                          {code.expiresAt ? new Date(code.expiresAt).toLocaleDateString() : "무제한"}
+                          {code.expiresAt
+                            ? new Date(code.expiresAt).toLocaleDateString()
+                            : "무제한"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-[13px] font-bold text-text-primary">
-                          {code.entitlementDurationDays ? `${code.entitlementDurationDays}일` : "영구"}
+                          {code.entitlementDurationDays
+                            ? `${code.entitlementDurationDays}일`
+                            : "영구"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
@@ -193,16 +173,26 @@ export default function AdminPromotionsPageClient() {
                             type="button"
                             role="switch"
                             aria-checked={code.status === "ACTIVE"}
-                            disabled={patchCodeMutation.isPending}
-                            onClick={(e) => handleUpdateListStatus(e, code.id, code.status as MarketingInviteCodeStatus)}
+                            disabled={isPatching}
+                            onClick={(e) =>
+                              handleUpdateListStatus(
+                                e,
+                                code.id,
+                                code.status as MarketingInviteCodeStatus,
+                              )
+                            }
                             className={`relative inline-flex h-[20px] w-[34px] shrink-0 cursor-pointer items-center justify-center rounded-full border-none transition-colors duration-200 ease-in-out focus:outline-none ${
-                              code.status === "ACTIVE" ? "bg-primary" : "bg-border"
-                            } ${patchCodeMutation.isPending ? "opacity-50 cursor-not-allowed" : ""}`}
+                              code.status === "ACTIVE"
+                                ? "bg-primary"
+                                : "bg-border"
+                            } ${isPatching ? "opacity-50 cursor-not-allowed" : ""}`}
                           >
                             <span
                               aria-hidden="true"
                               className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                code.status === "ACTIVE" ? "translate-x-[7px]" : "-translate-x-[7px]"
+                                code.status === "ACTIVE"
+                                  ? "translate-x-[7px]"
+                                  : "-translate-x-[7px]"
                               }`}
                             />
                           </Button>

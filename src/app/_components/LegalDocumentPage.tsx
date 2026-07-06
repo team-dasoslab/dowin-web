@@ -1,6 +1,6 @@
-import { Footer } from "@/components/layout/Footer";
+import { Footer } from "@/app/_components/Footer";
 import { DowinIcon } from "@/components/ui/DowinIcon";
-import { LandingHeader } from "@/components/layout/LandingHeader";
+import { LandingHeader } from "@/app/_components/LandingHeader";
 
 type LegalDocumentSection = {
   heading: string;

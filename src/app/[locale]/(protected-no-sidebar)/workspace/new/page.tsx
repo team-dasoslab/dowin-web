@@ -26,32 +26,13 @@ export default function NewWorkspacePage() {
  handleNameChange,
  handleSeatCountChange,
  handlePromotionCodeChange,
+ handleSubmit,
  } = useCreateWorkspaceForm();
  const { isPending, submitCreateWorkspace } = useCreateWorkspaceMutation({
  onError: (message) => {
  setError(message);
  },
  });
-
- const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
- e.preventDefault();
-
- const validatedName = getValidatedName();
- if (!validatedName) {
- return;
- }
-
- let validatedSeatCount = 1;
- if (!promotionCode) {
- const seat = getValidatedSeatCount();
- if (seat === null) return;
- validatedSeatCount = seat;
- }
-
- const validatedPromotionCode = getValidatedPromotionCode();
-
- submitCreateWorkspace(validatedName, validatedSeatCount, validatedPromotionCode);
- };
 
  return (
  <div className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
@@ -81,7 +62,7 @@ export default function NewWorkspacePage() {
  </div>
 
  {/* 폼 */}
- <form onSubmit={handleSubmit} className="space-y-8">
+ <form onSubmit={(e) => handleSubmit(e, submitCreateWorkspace)} className="space-y-8">
  <Input
  label={t("label")}
  type="text"

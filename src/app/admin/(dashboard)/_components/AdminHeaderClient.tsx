@@ -1,25 +1,15 @@
 "use client";
 
-import { usePostAdminAuthLogout } from "@/api/generated/admin-auth/admin-auth";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { useAdminHeaderActions } from "@/app/admin/(dashboard)/_hooks/useAdminHeaderActions";
 
 export default function AdminHeaderClient() {
-  const router = useRouter();
   const pathname = usePathname();
-  const logoutMutation = usePostAdminAuthLogout();
-
-  const handleLogout = async () => {
-    if (!window.confirm("정말 로그아웃 하시겠습니까?")) return;
-
-    try {
-      await logoutMutation.mutateAsync();
-    } catch {
-      // Ignore
-    }
-    router.push("/admin/login");
-  };
+  const { handleLogout } = useAdminHeaderActions();
 
   const navItems = [
     {
@@ -77,15 +67,12 @@ export default function AdminHeaderClient() {
         </div>
 
         <div className="flex items-center">
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-zinc-100 text-text-muted hover:bg-border hover:text-text-primary rounded-full transition-colors text-[13px] font-bold"
-          >
+          <Button onClick={handleLogout} variant="secondary" size="sm">
             로그아웃
-          </button>
+          </Button>
         </div>
       </div>
-      
+
       {/* Mobile Navigation Row (visible only on small screens) */}
       <div className="sm:hidden border-t border-border bg-white/80 backdrop-blur-md overflow-x-auto hide-scrollbar">
         <nav className="flex items-center gap-2 p-2 px-4">

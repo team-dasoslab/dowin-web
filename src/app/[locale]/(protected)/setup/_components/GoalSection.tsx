@@ -28,7 +28,7 @@ export function GoalSection({
           disabled={isMutating}
           onChange={(e) => setGoalName(e.target.value)}
           placeholder={t("goalPlaceholder")}
-          className="h-11 w-full rounded-[12px] border-none bg-sub-background px-4 text-[15px] font-semibold text-text-primary outline-none transition-colors placeholder:text-text-muted focus:bg-surface focus:ring-4 focus:ring-primary/5"
+
           required
         />
       </div>

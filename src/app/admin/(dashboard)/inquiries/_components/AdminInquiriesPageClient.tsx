@@ -7,6 +7,7 @@ import {
 import {
   ContactInquirySummary,
 } from "@/api/generated/dowin.schemas";
+import { Badge } from "@/components/ui/Badge";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Card } from "@/components/ui/Card";
 import { useRouter } from "next/navigation";
@@ -89,7 +90,7 @@ export default function AdminInquiriesPageClient() {
         </div>
       </div>
 
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden">
+      <Card radius="xl" variant="white" shadow="none">
         <div className="w-full overflow-hidden">
           {isListLoading ? (
             <div className="p-12 text-center">
@@ -139,9 +140,9 @@ export default function AdminInquiriesPageClient() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-[12px] font-black px-3 py-1 bg-zinc-100 text-zinc-600 rounded-full uppercase tracking-wider w-fit">
+                        <Badge variant="default" shape="pill" className="w-fit uppercase tracking-wider">
                           {inquiry.category}
-                        </span>
+                        </Badge>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-[15px] font-bold text-text-primary break-all line-clamp-1">

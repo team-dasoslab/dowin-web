@@ -4,9 +4,10 @@ import {
   type WeeklyLogGuide,
   WeeklyLogGuideKind,
 } from "@/api/generated/dowin.schemas";
+import { useLeadMeasureGuideTooltipPosition } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useLeadMeasureGuideTooltipPosition";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 type LeadMeasureGuideTooltipProps = {
   active?: boolean;
@@ -23,7 +24,8 @@ const guideStyles = {
   },
   [WeeklyLogGuideKind.adjust]: {
     popupIconClassName: "text-amber-500",
-    buttonClassName: "text-amber-400 hover:text-amber-600 hover:bg-amber-500/10",
+    buttonClassName:
+      "text-amber-400 hover:text-amber-600 hover:bg-amber-500/10",
     activeClassName: "text-amber-600 bg-amber-100",
   },
 } as const;
@@ -36,41 +38,7 @@ export function LeadMeasureGuideTooltip({
 }: LeadMeasureGuideTooltipProps) {
   const style = guideStyles[guide.kind];
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const [position, setPosition] = useState<{
-    left: number;
-    bottom: number;
-  } | null>(null);
-
-  useEffect(() => {
-    if (!active) {
-      return;
-    }
-
-    const updatePosition = () => {
-      const rect = triggerRef.current?.getBoundingClientRect();
-
-      if (!rect) {
-        return;
-      }
-
-      setPosition({
-        // Align left with padding, keeping it within window width
-        left: Math.max(8, Math.min(rect.left, window.innerWidth - 296)), // 296 is w-72 (288) + 8px padding
-        // Position above the button
-        bottom: window.innerHeight - rect.top + 8,
-      });
-    };
-
-    updatePosition();
-    window.addEventListener("resize", updatePosition);
-    const container = document.getElementById("main-scroll-container");
-    container?.addEventListener("scroll", updatePosition, true);
-
-    return () => {
-      window.removeEventListener("resize", updatePosition);
-      container?.removeEventListener("scroll", updatePosition, true);
-    };
-  }, [active]);
+  const { position } = useLeadMeasureGuideTooltipPosition(active, triggerRef);
 
   const t = useTranslations("Dashboard.My.Guide");
 

@@ -1,117 +1,56 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useGetAdminBillingWorkspacesWorkspaceId } from "@/api/generated/admin-billing/admin-billing";
 import {
-  useGetAdminBillingWorkspacesWorkspaceId,
-  usePostAdminBillingWorkspacesWorkspaceIdManualOverride,
-} from "@/api/generated/admin-billing/admin-billing";
+  EditableEntitlementSource,
+  FREE_BILLING_STATUSES,
+  STANDARD_BILLING_STATUSES,
+  STANDARD_ENTITLEMENT_SOURCES,
+  useAdminBillingDetailActions,
+} from "@/app/admin/(dashboard)/billing/[workspaceId]/_hooks/useAdminBillingDetailActions";
+import AdminFormLayout from "@/app/admin/_components/AdminFormLayout";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
 import { useToast } from "@/context/ToastContext";
-import AdminFormLayout from "@/app/admin/_components/AdminFormLayout";
-import {
-  AdminBillingManualOverrideRequestPlanCode,
-  AdminBillingManualOverrideRequestBillingStatus,
-  AdminBillingManualOverrideRequestEntitlementSource,
-  AdminBillingWorkspaceSummary,
-} from "@/api/generated/dowin.schemas";
 
-type EditableEntitlementSource =
-  | Exclude<AdminBillingManualOverrideRequestEntitlementSource, null>
-  | "";
-
-const FREE_BILLING_STATUSES: AdminBillingManualOverrideRequestBillingStatus[] = [
-  "NONE",
-  "EXPIRED",
-  "REVOKED",
-];
-
-const STANDARD_BILLING_STATUSES: AdminBillingManualOverrideRequestBillingStatus[] = [
-  "ACTIVE",
-  "CANCELED",
-];
-
-const STANDARD_ENTITLEMENT_SOURCES: EditableEntitlementSource[] = [
-  "MANUAL_GRANT",
-  "PARTNER",
-  "INTERNAL_TEST",
-  "POLAR",
-];
-
-export default function AdminBillingDetailClient({ workspaceId }: { workspaceId: number }) {
+export default function AdminBillingDetailClient({
+  workspaceId,
+}: {
+  workspaceId: number;
+}) {
   const { showToast } = useToast();
 
-  const [editPlanCode, setEditPlanCode] = useState<AdminBillingManualOverrideRequestPlanCode>("FREE");
-  const [editBillingStatus, setEditBillingStatus] = useState<AdminBillingManualOverrideRequestBillingStatus>("NONE");
-  const [editEntitlementSource, setEditEntitlementSource] = useState<EditableEntitlementSource>("");
-  const [editPeriodEnd, setEditPeriodEnd] = useState<string>("");
-  const [editCancelAtEnd, setEditCancelAtEnd] = useState<boolean>(false);
-  const [editSeatCount, setEditSeatCount] = useState<string>("");
-  const [editCustomerKey, setEditCustomerKey] = useState<string>("");
-  const [editSubscriptionKey, setEditSubscriptionKey] = useState<string>("");
-  const [changeReason, setChangeReason] = useState<string>("워크스페이스 결제 정보 보정");
+  const {
+    data: detailData,
+    isLoading: isDetailLoading,
+    refetch,
+  } = useGetAdminBillingWorkspacesWorkspaceId(workspaceId);
 
-  const { data: detailData, isLoading: isDetailLoading, refetch } = useGetAdminBillingWorkspacesWorkspaceId(
-    workspaceId
-  );
+  const detail = detailData?.status === 200 ? detailData.data : undefined;
 
-  const overrideMutation = usePostAdminBillingWorkspacesWorkspaceIdManualOverride();
-  const detail = detailData?.data as AdminBillingWorkspaceSummary | undefined;
-
-  useEffect(() => {
-    if (detail) {
-      setEditPlanCode(detail.planCode || "FREE");
-      setEditBillingStatus(detail.billingStatus || "NONE");
-      setEditEntitlementSource(
-        normalizeEntitlementSource(
-          detail.planCode || "FREE",
-          detail.entitlementSource || "",
-        ),
-      );
-      setEditPeriodEnd(detail.currentPeriodEnd ? detail.currentPeriodEnd.split("T")[0] : "");
-      setEditCancelAtEnd(detail.cancelAtPeriodEnd || false);
-      setEditSeatCount(detail.purchasedSeatCount !== null && detail.purchasedSeatCount !== undefined ? String(detail.purchasedSeatCount) : "");
-      setEditCustomerKey(detail.customerKey || "");
-      setEditSubscriptionKey(detail.subscriptionKey || "");
-    }
-  }, [detail]);
-
-  const handleSaveOverride = async () => {
-    if (!changeReason.trim()) {
-      showToast("error", "변경 사유를 입력해주세요.");
-      return;
-    }
-
-    try {
-      const response = await overrideMutation.mutateAsync({
-        workspaceId: workspaceId,
-        data: {
-          planCode: editPlanCode,
-          billingStatus: editBillingStatus,
-          entitlementSource: editEntitlementSource || null,
-          currentPeriodEnd: editPeriodEnd ? new Date(editPeriodEnd).toISOString() : null,
-          cancelAtPeriodEnd: editCancelAtEnd,
-          purchasedSeatCount: editSeatCount ? Number(editSeatCount) : null,
-          changeReason,
-        },
-      });
-
-      if (response.status === 200) {
-        showToast("success", "결제 정보가 보정되었습니다.");
-        refetch();
-      } else {
-        showToast("error", "결제 정보 보정에 실패했습니다.");
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      showToast(
-        "error",
-        error?.response?.data?.message || error?.message || "결제 정보 보정에 실패했습니다."
-      );
-    }
-  };
+  const {
+    editPlanCode,
+    setEditPlanCode,
+    editBillingStatus,
+    setEditBillingStatus,
+    editEntitlementSource,
+    setEditEntitlementSource,
+    editPeriodEnd,
+    setEditPeriodEnd,
+    editCancelAtEnd,
+    setEditCancelAtEnd,
+    editSeatCount,
+    setEditSeatCount,
+    editCustomerKey,
+    editSubscriptionKey,
+    changeReason,
+    setChangeReason,
+    isPending,
+    handleSaveOverride,
+  } = useAdminBillingDetailActions(workspaceId, detail as any, refetch);
 
   const availableStatuses =
     editPlanCode === "BASIC" || editPlanCode === "STANDARD"
@@ -128,7 +67,13 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
       description="워크스페이스의 결제 정보를 확인하고 필요시 수동으로 보정합니다."
       backHref="/admin/billing"
     >
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8 space-y-6">
+      <Card
+        className="space-y-6"
+        radius="xl"
+        padding="lg"
+        variant="white"
+        shadow="none"
+      >
         {isDetailLoading ? (
           <div className="py-12 flex justify-center">
             <InlineSpinner />
@@ -198,7 +143,8 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                   멤버 한도 (Seats)
                 </span>
                 <span className="text-sm font-bold text-text-primary">
-                  {detail.purchasedSeatCount !== null && detail.purchasedSeatCount !== undefined
+                  {detail.purchasedSeatCount !== null &&
+                  detail.purchasedSeatCount !== undefined
                     ? `${detail.purchasedSeatCount}명`
                     : "자동 (Auto)"}
                 </span>
@@ -217,11 +163,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                   </label>
                   <select
                     value={editPlanCode}
-                    onChange={(e) =>
-                      setEditPlanCode(
-                        e.target.value as AdminBillingManualOverrideRequestPlanCode
-                      )
-                    }
+                    onChange={(e) => setEditPlanCode(e.target.value as any)}
                     className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
                     <option value="FREE">FREE</option>
@@ -237,9 +179,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                   <select
                     value={editBillingStatus}
                     onChange={(e) =>
-                      setEditBillingStatus(
-                        e.target.value as AdminBillingManualOverrideRequestBillingStatus
-                      )
+                      setEditBillingStatus(e.target.value as any)
                     }
                     className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
@@ -258,7 +198,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     value={editEntitlementSource}
                     onChange={(e) =>
                       setEditEntitlementSource(
-                        e.target.value as EditableEntitlementSource
+                        e.target.value as EditableEntitlementSource,
                       )
                     }
                     className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
@@ -286,7 +226,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     type="date"
                     value={editPeriodEnd}
                     onChange={(e) => setEditPeriodEnd(e.target.value)}
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                    className="font-bold"
                   />
                 </div>
 
@@ -301,7 +241,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     onChange={(e) => setEditSeatCount(e.target.value)}
                     disabled={editPlanCode === "FREE"}
                     placeholder="지정 안 함 (자동 설정)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary disabled:bg-border disabled:text-text-muted disabled:cursor-not-allowed"
+                    className="font-bold"
                   />
                   <p className="px-1 text-[11px] font-medium leading-relaxed text-text-muted mt-1">
                     빈 값이면 기존 값 유지 또는 현재 멤버 수 기준으로 자동 설정
@@ -310,13 +250,11 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
               </div>
 
               <div className="flex items-center gap-2 py-1">
-                <input
-                  type="checkbox"
+                <Checkbox
+                  id="cancel-at-end-root"
                   checked={editCancelAtEnd}
                   onChange={(e) => setEditCancelAtEnd(e.target.checked)}
                   disabled={editPlanCode === "FREE"}
-                  className="rounded border-none bg-white text-primary focus:ring-primary h-4 w-4"
-                  id="cancel-at-end-root"
                 />
                 <label
                   htmlFor="cancel-at-end-root"
@@ -340,7 +278,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     value={editCustomerKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-text-muted cursor-not-allowed select-all"
+                    className="font-bold select-all"
                   />
                 </div>
 
@@ -353,7 +291,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                     value={editSubscriptionKey}
                     readOnly
                     placeholder="없음 (None)"
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm outline-none transition-all font-bold text-text-muted cursor-not-allowed select-all"
+                    className="font-bold select-all"
                   />
                 </div>
               </div>
@@ -367,7 +305,7 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                   value={changeReason}
                   onChange={(e) => setChangeReason(e.target.value)}
                   placeholder="수동 보정 사유를 적어주세요..."
-                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                  className="font-bold"
                   required
                 />
               </div>
@@ -376,14 +314,12 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
                 <Button
                   type="button"
                   onClick={handleSaveOverride}
-                  disabled={overrideMutation.isPending}
-                  className="px-8 py-3.5 bg-text-primary text-white font-black text-[14px] rounded-button transition-all flex items-center justify-center gap-2"
+                  disabled={isPending}
+                  variant="solid-dark"
+                  size="primary"
+                  className="gap-2"
                 >
-                  {overrideMutation.isPending ? (
-                    <InlineSpinner />
-                  ) : (
-                    <span>수동 보정 적용</span>
-                  )}
+                  {isPending ? <InlineSpinner /> : <span>수동 보정 적용</span>}
                 </Button>
               </div>
             </div>
@@ -392,19 +328,4 @@ export default function AdminBillingDetailClient({ workspaceId }: { workspaceId:
       </Card>
     </AdminFormLayout>
   );
-}
-
-function normalizeEntitlementSource(
-  planCode: AdminBillingManualOverrideRequestPlanCode,
-  source: EditableEntitlementSource,
-): EditableEntitlementSource {
-  if (planCode === "BASIC" || planCode === "STANDARD") {
-    if (STANDARD_ENTITLEMENT_SOURCES.includes(source)) {
-      return source;
-    }
-
-    return "MANUAL_GRANT";
-  }
-
-  return source === "POLAR" ? "POLAR" : "";
 }

@@ -20,7 +20,7 @@ describe("guardRestrictedTestAccountWrite", () => {
     const response = await guardRestrictedTestAccountWrite({
       db: createDb("test2"),
       userId: 1,
-      env: { NEXTJS_ENV: "production" },
+      env: { NODE_ENV: "production" },
       intent: "general-write",
     });
 
@@ -38,7 +38,7 @@ describe("guardRestrictedTestAccountWrite", () => {
     const response = await guardRestrictedTestAccountWrite({
       db: createDb("test3"),
       userId: 1,
-      env: { NEXTJS_ENV: "production" },
+      env: { NODE_ENV: "production" },
       intent: "daily-log-upsert",
     });
 
@@ -49,7 +49,7 @@ describe("guardRestrictedTestAccountWrite", () => {
     const response = await guardRestrictedTestAccountWrite({
       db: createDb("test4"),
       userId: 1,
-      env: { NEXTJS_ENV: "production" },
+      env: { NODE_ENV: "production" },
       intent: "profile-avatar-update",
     });
 
@@ -60,7 +60,7 @@ describe("guardRestrictedTestAccountWrite", () => {
     const response = await guardRestrictedTestAccountWrite({
       db: createDb("test2"),
       userId: 1,
-      env: { NEXTJS_ENV: "development" },
+      env: { NODE_ENV: "development" },
       intent: "general-write",
     });
 
@@ -71,7 +71,7 @@ describe("guardRestrictedTestAccountWrite", () => {
     const response = await guardRestrictedTestAccountWrite({
       db: createDb("hb"),
       userId: 1,
-      env: { NEXTJS_ENV: "production" },
+      env: { NODE_ENV: "production" },
       intent: "general-write",
     });
 

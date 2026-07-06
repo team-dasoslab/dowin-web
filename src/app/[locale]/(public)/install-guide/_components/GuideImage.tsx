@@ -16,7 +16,7 @@ export function GuideImage({ alt, src }: GuideImageProps) {
 
   if (hasError) {
     return (
-      <Card className="mx-auto flex w-full max-w-[326px] items-center justify-center rounded-[1.75rem] border border-dashed border-border bg-sub-background/70 p-6 text-center">
+      <Card className="mx-auto flex w-full max-w-[326px] items-center justify-center border border-dashed border-border bg-sub-background/70 text-center" radius="2xl" padding="lg">
         <div className="space-y-3">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-text-muted shadow-sm">
             <DowinIcon name="domain-image-off" size="20px" />

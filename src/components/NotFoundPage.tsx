@@ -44,7 +44,7 @@ export function NotFoundPage({
     <main className="min-h-screen relative flex items-center justify-center px-4 py-12 overflow-y-auto selection:bg-primary/20">
       <div className="pointer-events-none absolute inset-0 -z-10 bg-dowin-grid-pattern bg-[size:32px_32px]"></div>
 
-      <Card className="w-full max-w-[480px] bg-white border-none rounded-[24px] p-8 md:p-12 space-y-10 animate-dowin-in relative z-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-left">
+      <Card className="w-full max-w-[480px] space-y-10 animate-dowin-in relative z-10 text-left" radius="xl" padding="xl" variant="white" shadow="lg">
         <div className="space-y-5">
           <div className="flex items-center justify-between">
             <div className="w-16 h-16 bg-white border-none rounded-[16px] flex items-center justify-center shadow-sm">

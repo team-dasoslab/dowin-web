@@ -58,6 +58,29 @@ export const useCreateWorkspaceForm = () => {
     return promotionCode.trim();
   };
 
+  const handleSubmit = (
+    e: React.FormEvent<HTMLFormElement>,
+    onSubmit: (name: string, seatCount: number, promotionCode: string) => void,
+  ) => {
+    e.preventDefault();
+
+    const validatedName = getValidatedName();
+    if (!validatedName) {
+      return;
+    }
+
+    let validatedSeatCount = 1;
+    if (!promotionCode) {
+      const seat = getValidatedSeatCount();
+      if (seat === null) return;
+      validatedSeatCount = seat;
+    }
+
+    const validatedPromotionCode = getValidatedPromotionCode();
+
+    onSubmit(validatedName, validatedSeatCount, validatedPromotionCode);
+  };
+
   return {
     error,
     getValidatedName,
@@ -70,5 +93,6 @@ export const useCreateWorkspaceForm = () => {
     handleNameChange,
     handleSeatCountChange,
     handlePromotionCodeChange,
+    handleSubmit,
   };
 };

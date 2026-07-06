@@ -41,7 +41,7 @@ export function DocumentOutlineClient({
   }, [headings]);
 
   return (
-    <Card className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+    <Card radius="lg" padding="default" variant="white-outline" shadow="sm">
       <SectionHeader title={title} />
       <div className="mt-4 space-y-1 max-h-[60vh] overflow-y-auto pr-2">
         {headings.length > 0 ? (

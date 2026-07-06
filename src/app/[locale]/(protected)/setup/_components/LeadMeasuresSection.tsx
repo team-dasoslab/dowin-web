@@ -86,7 +86,9 @@ export function LeadMeasuresSection({
           type="button"
           disabled={isMutating}
           onClick={addMeasureRow}
-          className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-primary/15 py-4 text-[15px] font-bold text-primary transition-all "
+          variant="ghost-primary"
+          size="lg"
+          className="w-full gap-2 rounded-[16px] bg-primary/15 text-[15px] transition-all hover:bg-primary/20"
         >
           <DowinIcon name="action-add" size="18px" />
           {t("addLeadMeasure")}
@@ -151,7 +153,9 @@ function LeadMeasureRow({
           type="button"
           disabled={isMutating}
           onClick={() => restoreMeasureRow(measure.id)}
-          className="w-full sm:w-auto rounded-[16px] border-none bg-border/50 px-5 py-3 text-[13px] font-black text-text-secondary transition-all shrink-0"
+          variant="subtle"
+          size="primary"
+          className="w-full sm:w-auto rounded-[16px] text-text-secondary transition-all shrink-0"
         >
           {t("cancelDelete")}
         </Button>
@@ -174,7 +178,9 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating || measuresCount <= 1}
                 onClick={() => archiveMeasureRow(measure.id)}
-                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-sub-background px-4 text-[13px] font-black text-text-primary transition-colors disabled:opacity-40 hover:bg-border"
+                variant="subtle"
+                size="sm"
+                className="gap-1.5 rounded-[16px] font-black text-text-primary hover:bg-border"
               >
                 {t("archiveMeasure")}
               </Button>
@@ -182,7 +188,9 @@ function LeadMeasureRow({
                 type="button"
                 disabled={isMutating}
                 onClick={() => removeMeasureRow(measure.id)}
-                className="flex h-10 items-center gap-1.5 rounded-[16px] bg-danger/10 px-4 text-[13px] font-black text-danger transition-colors disabled:opacity-40 hover:bg-danger/20"
+                variant="subtle"
+                size="sm"
+                className="gap-1.5 rounded-[16px] bg-danger/10 font-black text-danger hover:bg-danger/20"
               >
                 {t("delete")}
               </Button>
@@ -192,7 +200,9 @@ function LeadMeasureRow({
               type="button"
               disabled={isMutating}
               onClick={() => removeMeasureRow(measure.id)}
-              className="flex h-10 items-center gap-1.5 rounded-[16px] bg-danger/10 px-4 text-[13px] font-black text-danger transition-colors disabled:opacity-40 hover:bg-danger/20"
+              variant="subtle"
+              size="sm"
+              className="gap-1.5 rounded-[16px] bg-danger/10 font-black text-danger hover:bg-danger/20"
             >
               {t("delete")}
             </Button>
@@ -651,7 +661,9 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => restoreMeasureRow(measure.id)}
-                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-sub-background px-4 text-[13px] font-bold text-text-secondary transition-all disabled:opacity-55"
+                    variant="subtle"
+                    size="sm"
+                    className="gap-1.5 rounded-[12px] font-bold"
                   >
                     <span>{t("cancelDelete")}</span>
                   </Button>
@@ -705,7 +717,9 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => reactivateMeasureRow(measure.id)}
-                    className="flex h-10 items-center gap-1.5 rounded-[12px] bg-sub-background px-4 text-[13px] font-bold text-text-secondary transition-all disabled:opacity-55"
+                    variant="subtle"
+                    size="sm"
+                    className="gap-1.5 rounded-[12px] font-bold"
                   >
                     <DowinIcon name="action-undo" size="14px" />
                     <span>{t("reactivateMeasure")}</span>
@@ -714,7 +728,9 @@ function ArchivedMeasuresSection({
                     type="button"
                     disabled={isMutating}
                     onClick={() => removeMeasureRow(measure.id)}
-                    className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-danger/10 text-danger transition-all disabled:opacity-55 sm:w-auto sm:px-4 sm:bg-transparent"
+                    variant="subtle"
+                    size="sm"
+                    className="w-10 sm:w-auto justify-center rounded-[12px] bg-danger/10 text-danger sm:bg-transparent px-0 sm:px-4"
                   >
                     <DowinIcon
                       name="action-delete"

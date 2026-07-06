@@ -48,11 +48,21 @@ export const useInviteForm = () => {
     return parsed.data.maxUses;
   };
 
+  const handleCreateInvite = async (createInvite: (maxUses: number) => Promise<void>) => {
+    const maxUses = getValidatedMaxUses();
+    if (maxUses === null) {
+      return;
+    }
+
+    await createInvite(maxUses);
+  };
+
   return {
     formError,
     maxUsesInput,
     getValidatedMaxUses,
     handleMaxUsesInputChange,
     selectPresetMaxUses,
+    handleCreateInvite,
   };
 };

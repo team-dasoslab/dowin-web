@@ -9,8 +9,11 @@ import { useMobileViewSheet } from "@/app/[locale]/(protected)/[workspaceId]/das
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { UserAvatar } from "@/components/UserAvatar";
+import { Input } from "@/components/ui/Input";
 import { useTranslations } from "next-intl";
-import { TouchEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useTeamMemberMemoPanelActions } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useTeamMemberMemoPanelActions";
+import { formatRelativeTime } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_utils/teamMemberMemo";
 import { createPortal } from "react-dom";
 
 const Portal = ({ children }: { children: React.ReactNode }) => {
@@ -57,10 +60,6 @@ export function TeamMemberMemoPanel({
   currentUserRole,
 }: TeamMemberMemoPanelProps) {
   const t = useTranslations("Comments");
-  const [memoDraft, setMemoDraft] = useState("");
-  const [sheetDragY, setSheetDragY] = useState(0);
-  const isSubmittingMemoRef = useRef(false);
-  const sheetTouchStartYRef = useRef<number | null>(null);
 
   const {
     isVisible: isMobileViewSheetVisible,
@@ -74,6 +73,25 @@ export function TeamMemberMemoPanel({
   const hasMemos = memos.length > 0;
   const isComposeMode = memoMode === "compose";
   const shouldShowMemoRail = memoMode !== null;
+
+  const {
+    memoDraft,
+    setMemoDraft,
+    sheetDragY,
+    handleAddMemo,
+    handleResolveMemo,
+    handleDeleteMemo,
+    handleSheetTouchStart,
+    handleSheetTouchMove,
+    handleSheetTouchEnd,
+    resetSheetDrag,
+  } = useTeamMemberMemoPanelActions({
+    createMemo,
+    resolveMemo,
+    deleteMemo,
+    closeMobileViewSheet,
+    isCreatePending,
+  });
 
   useEffect(() => {
     if (!shouldShowMemoRail) {
@@ -90,69 +108,9 @@ export function TeamMemberMemoPanel({
 
   useEffect(() => {
     if (memoMode !== "view") {
-      setSheetDragY(0);
-      sheetTouchStartYRef.current = null;
+      resetSheetDrag();
     }
   }, [memoMode]);
-
-  const handleAddMemo = async () => {
-    if (isSubmittingMemoRef.current || isCreatePending) {
-      return;
-    }
-
-    const content = memoDraft.trim();
-    if (!content) {
-      return;
-    }
-
-    isSubmittingMemoRef.current = true;
-
-    try {
-      const isSuccess = await createMemo(content);
-
-      if (isSuccess) {
-        setMemoDraft("");
-      }
-    } finally {
-      isSubmittingMemoRef.current = false;
-    }
-  };
-
-  const handleResolveMemo = async (memo: DashboardTeamMemo) => {
-    await resolveMemo(memo.id, !memo.isResolved);
-  };
-
-  const handleDeleteMemo = async (memoId: number) => {
-    await deleteMemo(memoId);
-  };
-
-  const handleSheetTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    sheetTouchStartYRef.current = event.touches[0]?.clientY ?? null;
-  };
-
-  const handleSheetTouchMove = (event: TouchEvent<HTMLDivElement>) => {
-    const startY = sheetTouchStartYRef.current;
-    const currentY = event.touches[0]?.clientY ?? null;
-
-    if (startY == null || currentY == null) {
-      return;
-    }
-
-    const nextDragY = Math.max(0, currentY - startY);
-    setSheetDragY(nextDragY);
-  };
-
-  const handleSheetTouchEnd = () => {
-    if (sheetDragY > 96) {
-      setSheetDragY(0);
-      closeMobileViewSheet();
-      sheetTouchStartYRef.current = null;
-      return;
-    }
-
-    setSheetDragY(0);
-    sheetTouchStartYRef.current = null;
-  };
 
   return (
     <>
@@ -171,7 +129,7 @@ export function TeamMemberMemoPanel({
                   className="absolute inset-x-0 bottom-0 bg-surface px-4 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom,0px))]"
                 >
                   <div className="flex items-center gap-2">
-                    <input
+                    <Input
                       value={memoDraft}
                       onChange={(event) => setMemoDraft(event.target.value)}
                       onKeyDown={(event) => {
@@ -181,14 +139,16 @@ export function TeamMemberMemoPanel({
                         }
                       }}
                       placeholder={t("addComment")}
-                      className="h-10 flex-1 rounded-[16px] border-none bg-sub-background px-4 text-sm text-text-primary placeholder:text-text-muted outline-none"
+                      className="flex-1"
+                      size="sm"
                       disabled={isCreatePending}
                     />
                     <Button
                       type="button"
                       onClick={() => void handleAddMemo()}
                       disabled={!memoDraft.trim() || isCreatePending}
-                      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
+                      variant="ghost-primary"
+                      className="h-10 w-10 shrink-0 rounded-full"
                       aria-label={t("submitMemo")}
                     >
                       <DowinIcon name="action-send" size="16px" />
@@ -280,7 +240,7 @@ export function TeamMemberMemoPanel({
           {isComposeMode ? (
             <div className="rounded-[24px] bg-surface p-2.5">
               <div className="flex items-center gap-2">
-                <input
+                <Input
                   value={memoDraft}
                   onChange={(event) => setMemoDraft(event.target.value)}
                   onKeyDown={(event) => {
@@ -290,14 +250,17 @@ export function TeamMemberMemoPanel({
                     }
                   }}
                   placeholder={t("addComment")}
-                  className="h-8 flex-1 border-0 bg-transparent px-2 text-sm text-text-primary outline-none placeholder:text-text-muted focus:outline-none focus:ring-0 w-full"
+                  className="flex-1 w-full"
+                  variant="ghost"
+                  size="sm"
                   disabled={isCreatePending}
                 />
                 <Button
                   type="button"
                   onClick={() => void handleAddMemo()}
                   disabled={!memoDraft.trim() || isCreatePending}
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-all hover:bg-primary/20 disabled:opacity-40"
+                  variant="ghost-primary"
+                  className="h-8 w-8 shrink-0 rounded-full"
                   aria-label={t("submitMemo")}
                 >
                   <DowinIcon name="action-send" size="16px" />
@@ -364,8 +327,8 @@ function MemoCard({
     <div
       className={`rounded-[16px] px-4 py-3 transition-colors ${
         memo.isResolved
-          ? "bg-sub-background"
-          : "bg-surface"
+          ? "bg-sub-background/50 xl:bg-surface/60"
+          : "bg-sub-background xl:bg-surface xl:shadow-sm"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
@@ -394,11 +357,9 @@ function MemoCard({
                 type="button"
                 onClick={() => void onResolve(memo)}
                 disabled={isResolvePending || isOptimisticMemo}
-                className={`inline-flex h-8 w-8 items-center justify-center transition-colors disabled:opacity-50 rounded-none p-0 min-h-0 ${
-                  memo.isResolved
-                    ? "bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-border"
-                }`}
+                variant={memo.isResolved ? "ghost-primary" : "subtle"}
+                size="icon"
+                className="rounded-none bg-transparent hover:bg-border/50"
                 aria-label={t("verifyMemo")}
               >
                 <DowinIcon name="action-checkmark" size="16px" />
@@ -409,7 +370,9 @@ function MemoCard({
                 type="button"
                 onClick={() => void onDelete(memo.id)}
                 disabled={isDeletePending || isOptimisticMemo}
-                className="inline-flex h-8 w-8 items-center justify-center text-text-muted transition-colors disabled:opacity-50 hover:bg-border rounded-none p-0 min-h-0"
+                variant="subtle"
+                size="icon"
+                className="rounded-none bg-transparent hover:bg-border/50"
                 aria-label={t("deleteMemo")}
               >
                 <DowinIcon name="action-delete" size="16px" />
@@ -439,28 +402,3 @@ function MemoStatusCard({ message }: { message: string }) {
   );
 }
 
-function formatRelativeTime(
-  createdAt: string,
-  t: ReturnType<typeof useTranslations>,
-) {
-  const createdAtTime = new Date(createdAt).getTime();
-
-  if (!Number.isFinite(createdAtTime)) {
-    return "";
-  }
-
-  const diffMin = Math.floor((Date.now() - createdAtTime) / (1000 * 60));
-  if (diffMin <= 0) {
-    return t("justNow");
-  }
-  if (diffMin < 60) {
-    return t("minsAgo", { n: diffMin });
-  }
-
-  const diffHour = Math.floor(diffMin / 60);
-  if (diffHour < 24) {
-    return t("hoursAgo", { n: diffHour });
-  }
-
-  return t("daysAgo", { n: Math.floor(diffHour / 24) });
-}

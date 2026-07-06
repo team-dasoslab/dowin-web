@@ -1,76 +1,41 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import {
-  useGetAdminContactInquiriesId,
-  usePatchAdminContactInquiriesId,
-} from "@/api/generated/admin-contact/admin-contact";
+import { useGetAdminContactInquiriesId } from "@/api/generated/admin-contact/admin-contact";
 import {
   AdminContactInquiryUpdateRequestStatus,
   ContactInquiryDetail,
 } from "@/api/generated/dowin.schemas";
+import { useAdminInquiryDetailForm } from "@/app/admin/(dashboard)/inquiries/[id]/_hooks/useAdminInquiryDetailForm";
+import AdminFormLayout from "@/app/admin/_components/AdminFormLayout";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
-import { useToast } from "@/context/ToastContext";
-import AdminFormLayout from "@/app/admin/_components/AdminFormLayout";
 
-export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: number }) {
-  const { showToast } = useToast();
-
-  const [editStatus, setEditStatus] = useState<AdminContactInquiryUpdateRequestStatus>("RECEIVED");
-  const [editAnswer, setEditAnswer] = useState<string>("");
-  const [changeReason, setChangeReason] = useState<string>("문의 확인 및 처리");
-
-  const { data: detailData, isLoading: isDetailLoading, refetch } =
-    useGetAdminContactInquiriesId(inquiryId);
+export default function AdminInquiryDetailClient({
+  inquiryId,
+}: {
+  inquiryId: number;
+}) {
+  const {
+    data: detailData,
+    isLoading: isDetailLoading,
+    refetch,
+  } = useGetAdminContactInquiriesId(inquiryId);
 
   const detail = detailData?.data as ContactInquiryDetail | undefined;
 
-  const patchMutation = usePatchAdminContactInquiriesId();
-
-  useEffect(() => {
-    if (detail) {
-      setEditStatus(detail.status || "RECEIVED");
-      setEditAnswer(detail.answerSummary || "");
-      setChangeReason("문의 확인 및 처리");
-    }
-  }, [detail]);
-
-  const handleSave = async () => {
-    if (!changeReason) {
-      showToast("error", "변경 사유를 입력해주세요.");
-      return;
-    }
-
-    try {
-      const response = await patchMutation.mutateAsync({
-        id: inquiryId,
-        data: {
-          status: editStatus,
-          answerSummary: editAnswer || null,
-          changeReason,
-        },
-      });
-
-      if (response.status === 200) {
-        showToast("success", "문의 내역이 성공적으로 업데이트되었습니다.");
-        refetch();
-      } else {
-        showToast("error", "문의 내역 업데이트에 실패했습니다.");
-      }
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      showToast(
-        "error",
-        error?.response?.data?.message ||
-          error?.message ||
-          "문의 내역 업데이트에 실패했습니다."
-      );
-    }
-  };
+  const {
+    editStatus,
+    setEditStatus,
+    editAnswer,
+    setEditAnswer,
+    changeReason,
+    setChangeReason,
+    isPending,
+    handleSave,
+  } = useAdminInquiryDetailForm(inquiryId, detail, refetch);
 
   return (
     <AdminFormLayout
@@ -78,7 +43,13 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
       description="고객 문의 상세 내용을 확인하고 상태 및 답변을 업데이트합니다."
       backHref="/admin/inquiries"
     >
-      <Card className="bg-white border-none shadow-none rounded-[24px] overflow-hidden p-6 sm:p-8 space-y-6">
+      <Card
+        className="space-y-6"
+        radius="xl"
+        padding="lg"
+        variant="white"
+        shadow="none"
+      >
         {isDetailLoading ? (
           <div className="py-12 flex justify-center">
             <InlineSpinner />
@@ -143,7 +114,12 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                   </label>
                   <select
                     value={editStatus}
-                    onChange={(e) => setEditStatus(e.target.value as AdminContactInquiryUpdateRequestStatus)}
+                    onChange={(e) =>
+                      setEditStatus(
+                        e.target
+                          .value as AdminContactInquiryUpdateRequestStatus,
+                      )
+                    }
                     className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
                   >
                     <option value="RECEIVED">접수됨 (Received)</option>
@@ -161,7 +137,7 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                     value={changeReason}
                     onChange={(e) => setChangeReason(e.target.value)}
                     placeholder="상태 변경의 이유를 적어주세요..."
-                    className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary"
+                    className="font-bold"
                     required
                   />
                 </div>
@@ -176,7 +152,6 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                   onChange={(e) => setEditAnswer(e.target.value)}
                   placeholder="문의 처리에 대한 요약을 적어주세요..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-zinc-100 border-none rounded-[16px] text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all font-bold text-text-primary resize-none placeholder:text-zinc-400 min-h-[auto]"
                 />
               </div>
 
@@ -184,14 +159,12 @@ export default function AdminInquiryDetailClient({ inquiryId }: { inquiryId: num
                 <Button
                   type="button"
                   onClick={handleSave}
-                  disabled={patchMutation.isPending}
-                  className="px-8 py-3.5 bg-text-primary text-white font-black text-[14px] rounded-button transition-all flex items-center justify-center gap-2"
+                  disabled={isPending}
+                  variant="solid-dark"
+                  size="primary"
+                  className="gap-2"
                 >
-                  {patchMutation.isPending ? (
-                    <InlineSpinner />
-                  ) : (
-                    <span>업데이트 적용</span>
-                  )}
+                  {isPending ? <InlineSpinner /> : <span>업데이트 적용</span>}
                 </Button>
               </div>
             </div>
