@@ -28,6 +28,7 @@ import { Bot } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 
 interface MenuItem {
   id: string;
@@ -90,7 +91,7 @@ export default function WorkspaceSettingsPage() {
 
   const showBillingSurface = !isNativeApp;
   const hasWorkspace = workspace !== null;
-  const isWorkspaceAdmin = hasWorkspace && workspace.role === "ADMIN";
+  const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
 
   const {
     changeWorkspaceName,
@@ -247,7 +248,7 @@ export default function WorkspaceSettingsPage() {
   ];
 
   const scrollGroups = useMemo(() => [
-    ...menuGroups.map(g => ({ id: g.id })),
+    ...menuGroups.filter(g => g.items.length > 0).map(g => ({ id: g.id })),
     { id: "workspaces" }
   ], [menuGroups]);
 
@@ -291,7 +292,7 @@ export default function WorkspaceSettingsPage() {
           <PageSidebarNav
             items={[
               { id: "general", label: t("workspaceManagement") },
-              { id: "checkin", label: checkinT("settingsTitle") },
+              ...(hasWorkspace && isWorkspaceAdmin ? [{ id: "checkin", label: checkinT("settingsTitle") }] : []),
               { id: "workspaces", label: t("workspaceList") },
             ]}
             activeId={activeSection}
