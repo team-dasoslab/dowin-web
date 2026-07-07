@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/team-dasoslab/dowin-web/compare/v1.8.3...v1.9.0) (2026-07-07)
+
+
+### Features
+
+* 액션아이템 전주 대비 증감 표시 ([#211](https://github.com/team-dasoslab/dowin-web/issues/211)) ([5a77c38](https://github.com/team-dasoslab/dowin-web/commit/5a77c3825f249aa873eb82da1293e260364cf46e))
+
 ## [1.8.3](https://github.com/team-dasoslab/dowin-web/compare/v1.8.2...v1.8.3) (2026-07-06)
 
 
