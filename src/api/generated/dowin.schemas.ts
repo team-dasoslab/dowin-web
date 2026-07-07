@@ -1662,6 +1662,8 @@ export interface WeeklyLogItem {
   guide?: WeeklyLogGuide | null;
   logs?: WeeklyLogItemLogs;
   achieved?: number;
+  /** @nullable */
+  lastWeekAchieved?: number | null;
   total?: number;
   achievementRate?: number;
 }
@@ -1928,6 +1930,8 @@ export interface TeamDashboardMemberMeasure {
   dailyTargetCount?: number;
   tags?: LeadMeasureTag[];
   achieved?: number;
+  /** @nullable */
+  lastWeekAchieved?: number | null;
   total?: number;
   achievementRate?: number;
   logs?: TeamDashboardMemberMeasureLogs;

@@ -4677,6 +4677,7 @@ components:
           additionalProperties:
             $ref: "#/components/schemas/DailyLogCell"
         achieved: { type: integer }
+        lastWeekAchieved: { type: integer, nullable: true }
         total: { type: integer }
         achievementRate: { type: number }
 
@@ -4908,6 +4909,7 @@ components:
           type: array
           items: { $ref: "#/components/schemas/LeadMeasureTag" }
         achieved: { type: integer }
+        lastWeekAchieved: { type: integer, nullable: true }
         total: { type: integer }
         achievementRate: { type: number }
         logs:

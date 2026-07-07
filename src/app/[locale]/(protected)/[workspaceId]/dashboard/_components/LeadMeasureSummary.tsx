@@ -3,8 +3,10 @@
 import { type WeeklyLogGuide } from "@/api/generated/dowin.schemas";
 import { LeadMeasureGuideTooltip } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/LeadMeasureGuideTooltip";
 import { Badge } from "@/components/ui/Badge";
-
+import { ValueTrend } from "@/components/ui/ValueTrend";
 type LeadMeasureSummaryProps = {
+  achieved?: number;
+  lastWeekAchieved?: number | null;
   guide?: WeeklyLogGuide | null;
   guideActive?: boolean;
   name?: string | null;
@@ -15,6 +17,8 @@ type LeadMeasureSummaryProps = {
 };
 
 export function LeadMeasureSummary({
+  achieved,
+  lastWeekAchieved,
   guide = null,
   guideActive = false,
   name,
@@ -27,7 +31,8 @@ export function LeadMeasureSummary({
 
   return (
     <div className="min-w-0">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
+        <ValueTrend current={achieved} previous={lastWeekAchieved} />
         <p className={`min-w-0 truncate ${nameClassName}`}>{name}</p>
         {guide && hasGuideActions ? (
           <LeadMeasureGuideTooltip

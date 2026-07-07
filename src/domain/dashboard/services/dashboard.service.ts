@@ -102,9 +102,12 @@ export class DashboardService {
     );
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
     const logRange = getDashboardLogRange(normalizedWeekStart);
+    const lastWeekStart = addDays(normalizedWeekStart, -7);
+    const fetchStart = lastWeekStart < logRange.start ? lastWeekStart : logRange.start;
+
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       allLeadMeasureIds,
-      logRange.start,
+      fetchStart,
       logRange.end,
     );
 
@@ -383,6 +386,7 @@ function buildMyWeeklyLogs({
           tags: measure.tags,
           logs: logMap,
           achieved,
+          lastWeekAchieved: previousAchieved,
           total: measure.targetValue,
           achievementRate: getAchievementRate(achieved, measure.targetValue),
           guide: shouldIncludeGuide
@@ -681,6 +685,15 @@ function buildTeamDashboard({
           const achieved = weeklyLogs.filter((log) =>
             isLogAchieved(leadMeasure, log),
           ).length;
+          
+          const previousWeekStart = addDays(normalizedWeekStart, -7);
+          const previousWeekEnd = addDays(normalizedWeekStart, -1);
+          const lastWeekAchieved = measureLogs.filter((log) => 
+            log.logDate >= previousWeekStart && 
+            log.logDate <= previousWeekEnd && 
+            isLogAchieved(leadMeasure, log)
+          ).length;
+
           const achievementRate = getAchievementRate(
             achieved,
             leadMeasure.targetValue,
@@ -696,6 +709,7 @@ function buildTeamDashboard({
             tags: leadMeasure.tags,
             createdAt: leadMeasure.createdAt,
             achieved,
+            lastWeekAchieved,
             total: leadMeasure.targetValue,
             achievementRate,
             logs: logMap,
@@ -779,6 +793,7 @@ function buildTeamDashboard({
           dailyTargetCount: leadMeasure.dailyTargetCount,
           tags: leadMeasure.tags,
           achieved: leadMeasure.achieved,
+          lastWeekAchieved: leadMeasure.lastWeekAchieved,
           total: leadMeasure.total,
           achievementRate: leadMeasure.achievementRate,
           logs: leadMeasure.logs,
