@@ -234,6 +234,8 @@ export function WeeklyBoardSection({
                           guide={guide}
                           guideActive={activeGuideId === leadMeasureId}
                           name={leadMeasure.name}
+                          achieved={weekly?.achieved}
+                          lastWeekAchieved={weekly?.lastWeekAchieved}
                           nameClassName="block text-sm font-semibold text-text-primary"
                           onGuideClose={() => setActiveGuideId(null)}
                           onGuideToggle={() =>

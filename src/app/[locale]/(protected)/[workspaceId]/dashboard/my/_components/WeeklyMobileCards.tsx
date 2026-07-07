@@ -102,6 +102,8 @@ function WeeklyMobileCard({
             guide={guide}
             guideActive={isGuideOpen}
             name={leadMeasure.name}
+            achieved={weekly?.achieved}
+            lastWeekAchieved={weekly?.lastWeekAchieved}
             onGuideClose={() => setIsGuideOpen(false)}
             onGuideToggle={() => setIsGuideOpen((open) => !open)}
             tags={leadMeasure.tags ?? []}

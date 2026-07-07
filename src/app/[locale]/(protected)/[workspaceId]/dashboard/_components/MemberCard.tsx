@@ -64,12 +64,14 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
       <div className="space-y-1.5">
         <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("weeklyAchievement")}</span>
-          <Badge
-            variant={getRateVariant(weeklyAchievementRate)}
-            className="flex-shrink-0"
-          >
-            {hasScoreboard ? `${weeklyAchievementRate}%` : tc("unsetTitle")}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <Badge
+              variant={getRateVariant(weeklyAchievementRate)}
+              className="flex-shrink-0"
+            >
+              {hasScoreboard ? `${weeklyAchievementRate}%` : tc("unsetTitle")}
+            </Badge>
+          </div>
         </div>
         <div className="flex justify-between items-center text-[11px] text-text-primary">
           <span>{t("monthlyAchievement")}</span>
