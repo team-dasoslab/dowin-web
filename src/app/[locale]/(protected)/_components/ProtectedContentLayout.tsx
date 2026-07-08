@@ -1,7 +1,13 @@
 "use client";
 
 import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
+import {
+  getGetWorkspacesMeQueryKey,
+  useGetWorkspacesMe,
+  usePutWorkspacesCurrent,
+} from "@/api/generated/workspace/workspace";
 import { SubPageLayout } from "@/app/[locale]/(protected)/_components/SubPageLayout";
+import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useRouter } from "@/i18n/routing";
 import {
   hasWorkspaceOperationalAccess,
@@ -19,6 +25,23 @@ export function ProtectedContentLayout({
   const router = useRouter();
   const params = useParams();
   const workspaceId = params.workspaceId as string | undefined;
+  const queryClient = useQueryClient();
+
+  const { data: meResponse } = useGetWorkspacesMe({
+    query: { retry: false },
+  });
+  const currentWorkspaceId = meResponse?.status === 200 ? meResponse.data.id : null;
+
+  const { mutate: switchWorkspace } = usePutWorkspacesCurrent({
+    mutation: {
+      onSuccess: () => {
+        void queryClient.invalidateQueries({
+          queryKey: getGetWorkspacesMeQueryKey(),
+        });
+      },
+    },
+  });
+
   const profilePath = workspaceId ? `/${workspaceId}/profile` : "/profile";
   const pricingPath = workspaceId ? `/${workspaceId}/pricing` : "/pricing";
   const needsOperationalAccess = isWorkspaceOperationalPath(
@@ -70,6 +93,12 @@ export function ProtectedContentLayout({
       router.replace(`/${workspaceId}/subscription-required`);
     }
   }, [billing, needsOperationalAccess, router, workspaceId]);
+
+  useEffect(() => {
+    if (workspaceId && currentWorkspaceId && workspaceId !== currentWorkspaceId) {
+      switchWorkspace({ data: { workspaceId } });
+    }
+  }, [workspaceId, currentWorkspaceId, switchWorkspace]);
 
   if (!usesSubPageLayout) {
     return <>{children}</>;

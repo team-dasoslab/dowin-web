@@ -11,6 +11,20 @@ vi.mock("@/api/generated/billing/billing", () => ({
   useGetWorkspacesWorkspaceIdBillingMe: vi.fn(),
 }));
 
+vi.mock("@/api/generated/workspace/workspace", () => ({
+  useGetWorkspacesMe: vi.fn().mockReturnValue({ data: { status: 200, data: { id: "workspace-1" } } }),
+  usePutWorkspacesCurrent: vi.fn().mockReturnValue({ mutate: vi.fn() }),
+  getGetWorkspacesMeQueryKey: vi.fn(),
+}));
+
+vi.mock("@tanstack/react-query", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@tanstack/react-query")>();
+  return {
+    ...actual,
+    useQueryClient: vi.fn().mockReturnValue({ invalidateQueries: vi.fn() }),
+  };
+});
+
 const replace = vi.fn();
 vi.mock("@/i18n/routing", () => ({
   usePathname: vi.fn(),
