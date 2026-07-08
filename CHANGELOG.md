@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/team-dasoslab/dowin-web/compare/v1.9.0...v1.9.1) (2026-07-08)
+
+
+### Bug Fixes
+
+* 딥링크 진입 시 워크스페이스 상태 불일치 문제 해결 ([270c9df](https://github.com/team-dasoslab/dowin-web/commit/270c9df607f797b0e79a2537b0400818f369c8f9))
+
 ## [1.9.0](https://github.com/team-dasoslab/dowin-web/compare/v1.8.3...v1.9.0) (2026-07-07)
 
 
