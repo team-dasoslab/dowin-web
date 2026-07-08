@@ -1,6 +1,6 @@
 {
   "name": "dowin",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "private": true,
   "packageManager": "yarn@4.10.0",
   "scripts": {
