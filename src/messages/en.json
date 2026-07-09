@@ -916,6 +916,7 @@
     "standardOnly": "STANDARD Only",
     "tags": {
       "Dashboard": "Dashboard",
+      "Home": "Home",
       "Profile": "Profile",
       "Setup": "Setup",
       "Workspace": "Workspace",
