@@ -6,10 +6,9 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { useProfileExportAction } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportAction";
-import { useProfileExportData } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportData";
-import { useProfileExportForm } from "@/app/[locale]/(protected)/profile/export/_hooks/useProfileExportForm";
-import { UserAvatar } from "@/components/UserAvatar";
+import { useProfileExportAction } from "@/app/[locale]/(protected)/workspace/export/_hooks/useProfileExportAction";
+import { useProfileExportData } from "@/app/[locale]/(protected)/workspace/export/_hooks/useProfileExportData";
+import { useProfileExportForm } from "@/app/[locale]/(protected)/workspace/export/_hooks/useProfileExportForm";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { DowinIcon } from "@/components/ui/DowinIcon";
@@ -28,10 +27,9 @@ export default function ProfileExportPage() {
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
-    user,
     workspace,
   } = useProfileExportData();
-  const isExportAvailable = workspace?.planCode === "STANDARD";
+  const isExportAvailable = true;
   const {
     exportFrom,
     exportTo,
@@ -75,43 +73,9 @@ export default function ProfileExportPage() {
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <ProtectedPageHeader title="데이터 내보내기" />
 
-        <div className="rounded-[24px] bg-surface px-6 py-5 flex items-center gap-4">
-          <UserAvatar
-            avatarKey={user?.avatarKey}
-            avatarSeed={user?.nickname}
-            alt={`${user?.nickname ?? "사용자"} 아바타`}
-            size={44}
-            className="flex-shrink-0"
-          />
-          <div className="min-w-0">
-            <h1 className="text-lg font-black text-text-primary tracking-tight">
-              {user?.nickname ?? "사용자"}님의 CSV 다운로드
-            </h1>
-            <div className="mt-0.5 flex items-center gap-2 text-xs font-medium text-text-muted">
-              <span className="truncate">{workspace?.name}</span>
-              <span
-                className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-bold ${
-                  isExportAvailable
-                    ? "bg-primary/10 text-primary"
-                    : "bg-sub-background text-text-muted"
-                }`}
-              >
-                Basic
-              </span>
-            </div>
-          </div>
-        </div>
 
-        {!isExportAvailable ? (
-          <div className="rounded-[24px] p-4 space-y-2 bg-sub-background">
-            <p className="text-sm font-black text-text-primary">
-              CSV 다운로드는 현재 제공되지 않습니다.
-            </p>
-            <p className="text-[11px] leading-relaxed text-text-muted">
-              현재는 앱 안에서 기록과 조회를 계속 사용할 수 있습니다.
-            </p>
-          </div>
-        ) : null}
+
+
 
         <div className="rounded-[24px] bg-surface p-6 space-y-5">
           <div className="space-y-1">

@@ -45,7 +45,7 @@ describe("workspace operational access", () => {
   it("운영 화면 경로만 차단 대상으로 분류한다", () => {
     expect(isWorkspaceOperationalPath("/ws_1/dashboard", "ws_1")).toBe(true);
     expect(isWorkspaceOperationalPath("/ws_1/dashboard/my", "ws_1")).toBe(true);
-    expect(isWorkspaceOperationalPath("/ws_1/profile/export", "ws_1")).toBe(
+    expect(isWorkspaceOperationalPath("/ws_1/workspace/export", "ws_1")).toBe(
       true,
     );
     expect(isWorkspaceOperationalPath("/ws_1/workspace/billing", "ws_1")).toBe(

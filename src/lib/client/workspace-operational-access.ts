@@ -16,7 +16,7 @@ const OPERATIONAL_PATH_SUFFIXES = [
   "/setup",
   "/scoreboards",
   "/workspace/report",
-  "/profile/export",
+  "/workspace/export",
 ];
 
 export function hasWorkspaceOperationalAccess(
