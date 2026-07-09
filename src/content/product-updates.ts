@@ -1,5 +1,6 @@
 export const PRODUCT_UPDATE_TAGS = [
   "Dashboard",
+  "Home",
   "Profile",
   "Setup",
   "Workspace",
@@ -38,7 +39,7 @@ export type ProductUpdate = {
  *   publishedAt: "2026.03.18",
  *   tag: "Dashboard",
  *   ctaLabel: "바로 써보기",
- *   ctaHref: "/profile/export",
+ *   ctaHref: "/workspace/export",
  *   isMajor: true,
  * }
  */
@@ -50,10 +51,10 @@ export const productUpdates = [
     summary:
       "이번 주 액션 아이템이 지난주보다 얼마나 늘었거나 줄었는지 쉽게 파악할 수 있도록 대시보드에 증감 표시가 추가되었습니다.",
     publishedAt: "2026.07.07",
-    tag: "Dashboard",
+    tag: "Home",
     ctaLabel: "바로 써보기",
     ctaHref: "/dashboard/my",
-    isMajor: false,
+    isMajor: true,
   },
   {
     id: "2026-06-29-workspace-past-week-edit",
@@ -150,7 +151,7 @@ export const productUpdates = [
     publishedAt: "2026.03.18",
     tag: "Dashboard",
     ctaLabel: "바로 써보기",
-    ctaHref: "/profile/export",
+    ctaHref: "/workspace/export",
     isMajor: true,
     plan: "STANDARD",
   },
@@ -161,7 +162,7 @@ export const productUpdates = [
     summary:
       "주간과 월간 보기를 오가며 원하는 날짜 기준으로 흐름을 살펴볼 수 있습니다.",
     publishedAt: "2026.03.16",
-    tag: "Dashboard",
+    tag: "Home",
     ctaLabel: "바로 써보기",
     ctaHref: "/dashboard/my",
     isMajor: false,

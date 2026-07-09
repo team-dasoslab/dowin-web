@@ -920,6 +920,7 @@
     "standardOnly": "STANDARD 전용",
     "tags": {
       "Dashboard": "대시보드",
+      "Home": "홈",
       "Profile": "프로필",
       "Setup": "설정",
       "Workspace": "워크스페이스",
