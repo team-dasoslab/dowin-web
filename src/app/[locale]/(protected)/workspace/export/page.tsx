@@ -20,6 +20,7 @@ import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 
 export default function ProfileExportPage() {
+  const tExport = useTranslations("ProfileExport");
   const isNativeApp = useNativeApp();
   const {
     activeScoreboard,
@@ -71,25 +72,20 @@ export default function ProfileExportPage() {
   return (
     <div className="min-h-screen">
       <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
-        <ProtectedPageHeader title="데이터 내보내기" />
-
-
-
-
-
+        <ProtectedPageHeader title={tExport("csvDownloadTitle")} />
         <div className="rounded-[24px] bg-surface p-6 space-y-5">
           <div className="space-y-1">
             <h2 className="text-[15px] font-black text-text-primary">
-              내보내기 조건
+              {tExport("exportCondition")}
             </h2>
             <p className="text-[12px] font-medium text-text-muted">
-              기간(최대 92일)과 선행지표를 선택해 CSV 파일로 내려받습니다.
+              {tExport("exportConditionDesc")}
             </p>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-sub-background px-4 text-xs text-text-secondary">
-              <span className="shrink-0 text-[12px] font-bold">시작일</span>
+              <span className="shrink-0 text-[12px] font-bold">{tExport("startDate")}</span>
               <input
                 type="date"
                 value={exportFrom}
@@ -98,7 +94,7 @@ export default function ProfileExportPage() {
               />
             </label>
             <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-sub-background px-4 text-xs text-text-secondary">
-              <span className="shrink-0 text-[12px] font-bold">종료일</span>
+              <span className="shrink-0 text-[12px] font-bold">{tExport("endDate")}</span>
               <input
                 type="date"
                 value={exportTo}
@@ -111,7 +107,7 @@ export default function ProfileExportPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
               <p className="text-[12px] font-bold text-text-muted">
-                선행지표 선택
+                {tExport("selectMeasure")}
               </p>
               <Button
                 type="button"
@@ -120,7 +116,7 @@ export default function ProfileExportPage() {
                 size="sm"
                 className="h-8 rounded-[12px] px-3 text-[11px] font-black"
               >
-                {isAllMeasuresSelected ? "전체 해제" : "전체 선택"}
+                {isAllMeasuresSelected ? tExport("deselectAll") : tExport("selectAll")}
               </Button>
             </div>
             <div className="grid gap-1.5 sm:grid-cols-2">
@@ -150,12 +146,12 @@ export default function ProfileExportPage() {
               onChange={(event) => toggleSplitByWeek(event.target.checked)}
               size="sm"
             />
-            <span>주차별로 섹션 분리해서 내보내기</span>
+            <span>{tExport("splitByWeek")}</span>
           </label>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
             <p className="text-[12px] font-medium text-text-muted">
-              선택 지표 {selectedExportMeasureIds.length}개
+              {tExport("selectedMeasuresCount", { count: selectedExportMeasureIds.length })}
             </p>
             <Button
               type="button"
@@ -168,9 +164,9 @@ export default function ProfileExportPage() {
               <DowinIcon name="action-download" size="14px" />
               {isExportAvailable
                 ? isExporting
-                  ? "CSV 생성 중..."
-                  : "CSV 다운로드"
-                : "현재 사용 불가"}
+                  ? tExport("generatingCsv")
+                  : tExport("csvDownloadAction")
+                : tExport("currentlyUnavailable")}
             </Button>
           </div>
         </div>
@@ -209,10 +205,11 @@ function ExportUnavailableInAppState() {
 }
 
 function ProfileExportHeader() {
+  const tExport = useTranslations("ProfileExport");
   return (
     <header className="flex items-center justify-between">
       <SmartBackButton />
-      <p className="text-[13px] font-bold text-text-muted">데이터 내보내기</p>
+      <p className="text-[13px] font-bold text-text-muted">{tExport("csvDownloadTitle")}</p>
       <div className="w-8" />
     </header>
   );
@@ -234,17 +231,18 @@ function ExportSkeleton() {
 }
 
 function NoWorkspaceState() {
+  const tExport = useTranslations("ProfileExport");
   return (
     <div className="min-h-screen">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
-          title="소속된 워크스페이스가 없어요"
+          title={tExport("noWorkspaceTitle")}
           description={
             <>
-              CSV를 내보내기 전에 먼저 워크스페이스를 만들거나
+              {tExport("noWorkspaceDesc1")}
               <br />
-              초대받은 팀에 참여해주세요.
+              {tExport("noWorkspaceDesc2")}
             </>
           }
           actions={<NoWorkspaceActions />}
@@ -255,18 +253,19 @@ function NoWorkspaceState() {
 }
 
 function NoScoreboardState() {
+  const tExport = useTranslations("ProfileExport");
   const workspaceId = useParams().workspaceId as string | undefined;
   return (
     <div className="min-h-screen">
       <div className="max-w-[680px] mx-auto p-4 md:p-8 space-y-10 animate-dowin-in">
         <ProfileExportHeader />
         <EmptyStatePanel
-          title="아직 핵심 목표가 없어요"
+          title={tExport("noScoreboardTitle")}
           description={
             <>
-              먼저 점수판을 만들고 선행지표를 기록하면
+              {tExport("noScoreboardDesc1")}
               <br />
-              기간별 데이터를 CSV로 내려받을 수 있어요.
+              {tExport("noScoreboardDesc2")}
             </>
           }
           actions={
@@ -277,7 +276,7 @@ function NoScoreboardState() {
               className="w-fit gap-2"
             >
               <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>
-                새 점수판 만들기
+                {tExport("createNewScoreboard")}
               </Link>
             </Button>
           }

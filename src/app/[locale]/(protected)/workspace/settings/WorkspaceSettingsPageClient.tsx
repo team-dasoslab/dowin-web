@@ -162,7 +162,7 @@ export default function WorkspaceSettingsPage() {
             {
               id: "past-daily-log-edit",
               icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
-              title: "지난주 기록 수정 허용",
+              title: t("allowPastDailyLogEdit"),
               rightElement: (
                 <div onClick={(e) => e.stopPropagation()}>
                   <Switch
@@ -254,7 +254,6 @@ export default function WorkspaceSettingsPage() {
               id: "export-csv",
               icon: <DowinIcon name="action-download" className="w-4 h-4" />,
               title: t("csvDownload"),
-              description: t("csvDownloadDesc"),
               href: getWorkspacePath(workspaceId, "/workspace/export"),
             },
           ]
