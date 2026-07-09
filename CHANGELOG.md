@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.10.0](https://github.com/team-dasoslab/dowin-web/compare/v1.9.1...v1.10.0) (2026-07-09)
+
+
+### Features
+
+* 점수판 공유 이미지에 증감 표시 ([f12f1be](https://github.com/team-dasoslab/dowin-web/commit/f12f1be1830a2d5827d12007eaa7dcdc8e056f8d))
+
+
+### Bug Fixes
+
+* csv export 기능 활성화 ([9cc4a73](https://github.com/team-dasoslab/dowin-web/commit/9cc4a734c604ae071bbb6257c77cab416839648f))
+* 다국어 누락 수정 ([0a534f2](https://github.com/team-dasoslab/dowin-web/commit/0a534f2cb8a005950f0505aa288e5126c8466d33))
+* 홈 태그 추가 및 바로 써보기, 새로운 소식 버튼 제거 ([587b6ba](https://github.com/team-dasoslab/dowin-web/commit/587b6baccb829cfc59e91e5bc31e11116301def1))
+
 ## [1.9.1](https://github.com/team-dasoslab/dowin-web/compare/v1.9.0...v1.9.1) (2026-07-08)
 
 
