@@ -5,6 +5,7 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { Logo } from "@/components/ui/Logo";
 import { getLeadMeasureProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/scoreboard-image";
 import { useTranslations } from "next-intl";
+import { ValueTrend } from "@/components/ui/ValueTrend";
 
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
@@ -128,9 +129,15 @@ export function ScoreboardImageCard({
                 return (
                   <tr key={leadMeasure.id} className="bg-surface">
                     <td className="py-5 px-6">
-                      <p className="text-[14px] font-semibold text-text-primary break-words line-clamp-2 leading-relaxed">
-                        {leadMeasure.name}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <ValueTrend 
+                          current={leadMeasure.achieved} 
+                          previous={leadMeasure.lastWeekAchieved} 
+                        />
+                        <p className="text-[14px] font-semibold text-text-primary break-words line-clamp-2 leading-relaxed">
+                          {leadMeasure.name}
+                        </p>
+                      </div>
                     </td>
                     {weekDates.map((date) => {
                       const logData = leadMeasure.logs?.[date] as import("@/api/generated/dowin.schemas").DailyLogCell | null | undefined;
