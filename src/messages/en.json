@@ -922,6 +922,22 @@
       "Quality of Life": "QoL"
     },
     "updates": {
+      "2026-07-07-action-item-trend": {
+        "title": "See your action item trends at a glance",
+        "summary": "We've added a trend indicator to the dashboard so you can easily see how your action items compare to last week."
+      },
+      "2026-06-29-workspace-past-week-edit": {
+        "title": "Control past week record editing from workspace settings",
+        "summary": "You can now manage whether members can edit past week's records directly in the workspace settings to fit your team's workflow."
+      },
+      "2026-06-18-team-check-in": {
+        "title": "Team Check-in feature has been added",
+        "summary": "Share your status and progress more easily by running check-ins with your team members."
+      },
+      "2026-06-13-dark-mode": {
+        "title": "Eye-friendly dark mode is now available",
+        "summary": "Dark mode is now supported for a comfortable experience in dark environments. It applies automatically based on your system settings."
+      },
       "2026-04-14-personal-reminder-schedule": {
         "title": "Customize your personal record reminder time",
         "summary": "You can now receive daily record reminder push notifications at a time that fits your lifestyle from the profile notification settings."
