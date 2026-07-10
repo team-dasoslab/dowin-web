@@ -64,11 +64,7 @@ describe("ProductUpdateCard", () => {
 
     expect(screen.getByRole("link", { name: "바로 써보기" })).toHaveAttribute(
       "href",
-      "/profile?coachmark=personal-reminder",
-    );
-    expect(screen.getByRole("link", { name: "새로운 소식" })).toHaveAttribute(
-      "href",
-      "/workspace-1/profile/updates",
+      "/workspace-1/profile?coachmark=personal-reminder",
     );
   });
 
