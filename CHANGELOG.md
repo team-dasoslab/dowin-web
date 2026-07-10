@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.1](https://github.com/team-dasoslab/dowin-web/compare/v1.10.0...v1.10.1) (2026-07-10)
+
+
+### Bug Fixes
+
+* 카운터 타입 액션 아이템 달성/목표로 표기 ([2c88705](https://github.com/team-dasoslab/dowin-web/commit/2c8870558cde69fccd1dfbc7a9f347afac79c53d))
+
 ## [1.10.0](https://github.com/team-dasoslab/dowin-web/compare/v1.9.1...v1.10.0) (2026-07-09)
 
 
