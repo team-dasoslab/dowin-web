@@ -12,6 +12,8 @@ export type CsvData = {
     leadMeasureId: number;
     name: string;
     period: "DAILY" | "WEEKLY" | "MONTHLY";
+    trackingMode?: "BOOLEAN" | "COUNT";
+    dailyTargetCount?: number;
     achieved: number;
     total: number;
     achievementRate: number;
@@ -21,6 +23,8 @@ export type CsvData = {
     leadMeasureId: number;
     leadMeasureName: string;
     status: LogStatus;
+    trackingMode?: "BOOLEAN" | "COUNT";
+    count?: number;
   }>;
 };
 
@@ -45,8 +49,8 @@ export function buildExportCsv(data: CsvData, splitByWeek: boolean) {
   const dates = [...new Set(dailyRows.map((row) => row.date))].sort();
   const weekStarts = [...new Set(dates.map((date) => getWeekStart(date)))].sort();
   const monthStarts = [...new Set(dates.map((date) => date.slice(0, 7)))].sort();
-  const statusByMeasureDate = new Map<string, LogStatus>(
-    dailyRows.map((row) => [`${row.leadMeasureId}:${row.date}`, row.status]),
+  const rowByMeasureDate = new Map<string, NonNullable<CsvData["dailyRows"]>[number]>(
+    dailyRows.map((row) => [`${row.leadMeasureId}:${row.date}`, row]),
   );
 
   rows.push(`기간,${periodMeta.from ?? ""} ~ ${periodMeta.to ?? ""}`);
@@ -69,7 +73,7 @@ export function buildExportCsv(data: CsvData, splitByWeek: boolean) {
         rows,
         leadMeasureBreakdown,
         sectionDates,
-        statusByMeasureDate,
+        rowByMeasureDate,
         dates.length,
         weekStarts.length,
         monthStarts.length,
@@ -84,7 +88,7 @@ export function buildExportCsv(data: CsvData, splitByWeek: boolean) {
     rows,
     leadMeasureBreakdown,
     dates,
-    statusByMeasureDate,
+    rowByMeasureDate,
     dates.length,
     weekStarts.length,
     monthStarts.length,
@@ -143,7 +147,7 @@ function appendDashboardLikeTable(
   rows: string[],
   measures: NonNullable<CsvData["leadMeasureBreakdown"]>,
   dates: string[],
-  statusByMeasureDate: Map<string, LogStatus>,
+  rowByMeasureDate: Map<string, NonNullable<CsvData["dailyRows"]>[number]>,
   fullDateCount: number,
   fullWeekCount: number,
   fullMonthCount: number,
@@ -168,12 +172,24 @@ function appendDashboardLikeTable(
     );
     const unit =
       measure.period === "DAILY" ? "일" : measure.period === "WEEKLY" ? "주" : "월";
+      
+    const targetStr = `${targetValue}회/${unit}`;
+    
     const marks = dates.map((date) => {
-      const status = statusByMeasureDate.get(`${measure.leadMeasureId}:${date}`);
-      if (status === "ACHIEVED") {
+      const row = rowByMeasureDate.get(`${measure.leadMeasureId}:${date}`);
+      if (!row || row.status === "NOT_RECORDED") {
+        return "";
+      }
+      if (row.trackingMode === "COUNT") {
+        const count = row.count ?? 0;
+        return measure.dailyTargetCount !== undefined
+          ? `${count}/${measure.dailyTargetCount}`
+          : String(count);
+      }
+      if (row.status === "ACHIEVED") {
         return "O";
       }
-      if (status === "MISSED") {
+      if (row.status === "MISSED") {
         return "X";
       }
       return "";
@@ -184,7 +200,7 @@ function appendDashboardLikeTable(
       measure.period,
       dates,
       targetValue,
-      statusByMeasureDate,
+      rowByMeasureDate,
     );
     const bucketCount =
       measure.period === "DAILY"
@@ -199,7 +215,7 @@ function appendDashboardLikeTable(
       [
         escapeCsvCell(measure.name),
         getPeriodLabelKo(measure.period),
-        `${targetValue}회/${unit}`,
+        targetStr,
         ...marks,
         `${achieved}/${total}`,
         `${rate}%`,
@@ -215,6 +231,9 @@ function inferTargetValue(
   fullMonthCount: number,
 ) {
   if (measure.period === "DAILY") {
+    if (measure.dailyTargetCount !== undefined) {
+      return measure.dailyTargetCount;
+    }
     return fullDateCount > 0 ? Math.round(measure.total / fullDateCount) : 0;
   }
   if (measure.period === "WEEKLY") {
@@ -228,7 +247,7 @@ function calculateAchievedInRange(
   period: "DAILY" | "WEEKLY" | "MONTHLY",
   dates: string[],
   targetValue: number,
-  statusByMeasureDate: Map<string, LogStatus>,
+  rowByMeasureDate: Map<string, NonNullable<CsvData["dailyRows"]>[number]>,
 ) {
   if (targetValue <= 0 || dates.length === 0) {
     return 0;
@@ -236,15 +255,15 @@ function calculateAchievedInRange(
 
   if (period === "DAILY") {
     return dates.reduce((sum, date) => {
-      const status = statusByMeasureDate.get(`${leadMeasureId}:${date}`);
-      return status === "ACHIEVED" ? sum + 1 : sum;
+      const row = rowByMeasureDate.get(`${leadMeasureId}:${date}`);
+      return row?.status === "ACHIEVED" ? sum + 1 : sum;
     }, 0);
   }
 
   const bucketMap = new Map<string, number>();
   for (const date of dates) {
-    const status = statusByMeasureDate.get(`${leadMeasureId}:${date}`);
-    if (status !== "ACHIEVED") {
+    const row = rowByMeasureDate.get(`${leadMeasureId}:${date}`);
+    if (row?.status !== "ACHIEVED") {
       continue;
     }
 
