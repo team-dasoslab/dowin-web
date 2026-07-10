@@ -11,8 +11,8 @@ import { useProfileExportData } from "@/app/[locale]/(protected)/workspace/expor
 import { useProfileExportForm } from "@/app/[locale]/(protected)/workspace/export/_hooks/useProfileExportForm";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
-import { DowinIcon } from "@/components/ui/DowinIcon";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";
+import { Switch } from "@/components/ui/Switch";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { Link } from "@/i18n/routing";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
@@ -71,104 +71,125 @@ export default function ProfileExportPage() {
 
   return (
     <div className="min-h-screen">
-      <ProtectedPageContainer className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
+      <ProtectedPageContainer className="max-w-[640px] pb-32">
         <ProtectedPageHeader title={tExport("csvDownloadTitle")} />
-        <div className="rounded-[24px] bg-surface p-6 space-y-5">
-          <div className="space-y-1">
-            <h2 className="text-[15px] font-black text-text-primary">
-              {tExport("exportCondition")}
-            </h2>
-            <p className="text-[12px] font-medium text-text-muted">
-              {tExport("exportConditionDesc")}
-            </p>
-          </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-sub-background px-4 text-xs text-text-secondary">
-              <span className="shrink-0 text-[12px] font-bold">{tExport("startDate")}</span>
-              <input
-                type="date"
-                value={exportFrom}
-                onChange={(event) => handleExportFromChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-text-primary outline-none"
-              />
-            </label>
-            <label className="flex h-11 min-w-0 items-center gap-2 rounded-[16px] bg-sub-background px-4 text-xs text-text-secondary">
-              <span className="shrink-0 text-[12px] font-bold">{tExport("endDate")}</span>
-              <input
-                type="date"
-                value={exportTo}
-                onChange={(event) => handleExportToChange(event.target.value)}
-                className="min-w-0 flex-1 bg-transparent font-mono text-[13px] font-black text-text-primary outline-none"
-              />
-            </label>
-          </div>
+        <div className="space-y-8 mt-4 animate-dowin-in">
+          {/* Section 1: Dates */}
+          <section className="space-y-3">
+            <div className="px-2 space-y-0.5">
+              <h3 className="text-[14px] font-bold text-text-secondary">기간 선택</h3>
+              <p className="text-[12px] font-medium text-text-muted">{tExport("dateRangeLimit")}</p>
+            </div>
+            <div className="flex flex-col rounded-[24px] bg-surface p-1">
+              <label 
+                className="flex h-[56px] items-center justify-between rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors"
+                onClick={(e) => {
+                  const input = e.currentTarget.querySelector("input");
+                  if (input && "showPicker" in input) {
+                    try {
+                      input.showPicker();
+                    } catch {}
+                  }
+                }}
+              >
+                <span className="text-[15px] font-bold text-text-primary">{tExport("startDate")}</span>
+                <input
+                  type="date"
+                  value={exportFrom}
+                  onChange={(event) => handleExportFromChange(event.target.value)}
+                  className="bg-transparent text-right font-mono text-[16px] font-bold text-brand-primary outline-none"
+                />
+              </label>
+              <div className="h-[1px] w-[calc(100%-2rem)] mx-auto bg-border/40" />
+              <label 
+                className="flex h-[56px] items-center justify-between rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors"
+                onClick={(e) => {
+                  const input = e.currentTarget.querySelector("input");
+                  if (input && "showPicker" in input) {
+                    try {
+                      input.showPicker();
+                    } catch {}
+                  }
+                }}
+              >
+                <span className="text-[15px] font-bold text-text-primary">{tExport("endDate")}</span>
+                <input
+                  type="date"
+                  value={exportTo}
+                  onChange={(event) => handleExportToChange(event.target.value)}
+                  className="bg-transparent text-right font-mono text-[16px] font-bold text-brand-primary outline-none"
+                />
+              </label>
+            </div>
+          </section>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[12px] font-bold text-text-muted">
-                {tExport("selectMeasure")}
-              </p>
+          {/* Section 2: Measures */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between px-2">
+              <h3 className="text-[14px] font-bold text-text-secondary">
+                {tExport("selectMeasure")} <span className="text-brand-primary">({selectedExportMeasureIds.length})</span>
+              </h3>
               <Button
                 type="button"
                 onClick={toggleSelectAllMeasures}
-                variant="subtle"
+                variant="ghost-primary"
                 size="sm"
-                className="h-8 rounded-[12px] px-3 text-[11px] font-black"
               >
                 {isAllMeasuresSelected ? tExport("deselectAll") : tExport("selectAll")}
               </Button>
-            </div>
-            <div className="grid gap-1.5 sm:grid-cols-2">
+            </div>  
+
+            <div className="rounded-[24px] bg-surface p-2 flex flex-col gap-1">
               {exportMeasureOptions.map((measure) => {
                 const checked = selectedExportMeasureIds.includes(measure.id);
-
                 return (
                   <label
                     key={measure.id}
-                    className="flex items-center gap-2 rounded-[12px] bg-sub-background px-3 py-2 text-[13px] font-bold text-text-primary"
+                    className="flex h-[56px] items-center gap-3 rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors"
                   >
                     <Checkbox
                       checked={checked}
                       onChange={() => toggleExportMeasure(measure.id)}
-                      size="sm"
                     />
-                    <span className="truncate">{measure.name}</span>
+                    <span className="text-[15px] font-bold text-text-primary flex-1 truncate">{measure.name}</span>
                   </label>
                 );
               })}
             </div>
-          </div>
+          </section>
 
-          <label className="flex items-center gap-2 rounded-[12px] border-none bg-sub-background px-3 py-2 text-xs text-text-secondary">
-            <Checkbox
-              checked={splitByWeek}
-              onChange={(event) => toggleSplitByWeek(event.target.checked)}
-              size="sm"
-            />
-            <span>{tExport("splitByWeek")}</span>
-          </label>
+          {/* Section 3: Options */}
+          <section className="space-y-3">
+            <h3 className="px-2 text-[14px] font-bold text-text-secondary">추가 옵션</h3>
+            <div className="rounded-[24px] bg-surface p-1">
+              <label className="flex h-[56px] items-center justify-between rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors">
+                <span className="text-[15px] font-bold text-text-primary">{tExport("splitByWeek")}</span>
+                <Switch
+                  checked={splitByWeek}
+                  onCheckedChange={toggleSplitByWeek}
+                />
+              </label>
+            </div>
+          </section>
+        </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2">
-            <p className="text-[12px] font-medium text-text-muted">
-              {tExport("selectedMeasuresCount", { count: selectedExportMeasureIds.length })}
-            </p>
-            <Button
-              type="button"
-              onClick={() => void exportCsv()}
-              disabled={isExporting || !isExportAvailable}
-              variant="primary"
-              size="sm"
-              className="w-full sm:w-auto rounded-[12px] gap-1.5"
-            >
-              <DowinIcon name="action-download" size="14px" />
-              {isExportAvailable
-                ? isExporting
-                  ? tExport("generatingCsv")
-                  : tExport("csvDownloadAction")
-                : tExport("currentlyUnavailable")}
-            </Button>
-          </div>
+        {/* Bottom Button Area */}
+        <div className="mt-8 px-1">
+          <Button
+            type="button"
+            onClick={() => void exportCsv()}
+            disabled={isExporting || !isExportAvailable}
+            variant="primary"
+            size="lg"
+            className="w-full h-[56px] rounded-[16px] text-[16px] font-bold shadow-sm"
+          >
+            {isExportAvailable
+              ? isExporting
+                ? tExport("generatingCsv")
+                : tExport("csvDownloadAction")
+              : tExport("currentlyUnavailable")}
+          </Button>
         </div>
       </ProtectedPageContainer>
     </div>
