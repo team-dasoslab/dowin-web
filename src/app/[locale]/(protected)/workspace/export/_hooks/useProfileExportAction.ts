@@ -5,7 +5,7 @@ import {
   buildExportCsv,
   downloadCsv,
   getDayCountInclusive,
-} from "@/app/[locale]/(protected)/profile/export/_lib/export-csv";
+} from "@/app/[locale]/(protected)/workspace/export/_lib/export-csv";
 import { useToast } from "@/context/ToastContext";
 import {
   getApiErrorCode,

@@ -162,7 +162,7 @@ export default function WorkspaceSettingsPage() {
             {
               id: "past-daily-log-edit",
               icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
-              title: "지난주 기록 수정 허용",
+              title: t("allowPastDailyLogEdit"),
               rightElement: (
                 <div onClick={(e) => e.stopPropagation()}>
                   <Switch
@@ -245,6 +245,20 @@ export default function WorkspaceSettingsPage() {
           ]
         : [],
     },
+    {
+      id: "data",
+      label: t("dataSection"),
+      items: hasWorkspace
+        ? [
+            {
+              id: "export-csv",
+              icon: <DowinIcon name="action-download" className="w-4 h-4" />,
+              title: t("csvDownload"),
+              href: getWorkspacePath(workspaceId, "/workspace/export"),
+            },
+          ]
+        : [],
+    },
   ], [hasWorkspace, isWorkspaceAdmin, showBillingSurface, workspaceId, t, checkinSettings, checkinT, dashboardT, handleTogglePastDailyLogEdit, isUpdateWorkspacePending, changeWorkspaceName, deleteWorkspace, leaveWorkspace, handleToggleCheckin, isUpdateSettingsPending, handleChangeCheckinSendTime, workspace?.allowPastDailyLogEdit]);
 
   const scrollGroups = useMemo(() => [
@@ -293,6 +307,7 @@ export default function WorkspaceSettingsPage() {
             items={[
               { id: "general", label: t("workspaceManagement") },
               ...(hasWorkspace && isWorkspaceAdmin ? [{ id: "checkin", label: checkinT("settingsTitle") }] : []),
+              ...(hasWorkspace ? [{ id: "data", label: t("dataSection") }] : []),
               { id: "workspaces", label: t("workspaceList") },
             ]}
             activeId={activeSection}

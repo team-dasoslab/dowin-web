@@ -56,16 +56,15 @@ export function ProductUpdateCard({
             <span>{updateT(`tags.${update.tag}`)}</span>
           </div>
 
-          <div className="flex flex-row flex-wrap items-center gap-2 pt-0.5">
-            <Button variant="primary" asChild>
-              <Link href={update.ctaHref}>{updateT("ctaLabel")}</Link>
-            </Button>
-            <Button variant="subtle" asChild>
-              <Link href={getWorkspacePath(workspaceId, "/profile/updates")}>
-                {t("viewAllUpdates")}
-              </Link>
-            </Button>
-          </div>
+          {update.tag !== "Home" && (
+            <div className="flex flex-row flex-wrap items-center gap-2 pt-0.5">
+              <Button variant="primary" size="sm" asChild>
+                <Link href={getWorkspacePath(workspaceId, update.ctaHref)}>
+                  {updateT("ctaLabel")}
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

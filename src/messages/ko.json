@@ -582,6 +582,7 @@
     "manageMembersDesc": "워크스페이스 멤버 조회와 퇴출을 관리합니다.",
     "manageInvites": "초대코드 관리",
     "manageInvitesDesc": "초대코드 생성과 활성/비활성 상태를 관리합니다.",
+    "allowPastDailyLogEdit": "지난주 기록 수정 허용",
     "basicPlanName": "Basic",
     "pricingTitle": "플랜 안내",
     "pricingDesc": "Basic 구독 상태와 해지 방법을 확인합니다.",
@@ -590,7 +591,6 @@
     "workspaceDeleteDescFull": "멤버, 점수판, 액션 아이템, 기록을 포함한 모든 데이터를 삭제합니다.",
     "workspaceLeaveDescFull": "현재 워크스페이스에서 나가고 기록 화면으로 돌아갑니다.",
     "csvDownload": "CSV 다운로드",
-    "csvDownloadDesc": "기간/지표를 선택해 내 기록을 CSV로 저장합니다.",
     "newFeatures": "새로운 소식",
     "newFeaturesDesc": "최근 추가되거나 좋아진 기능을 한 번에 확인합니다.",
     "contactUs": "문의하기",
@@ -803,8 +803,29 @@
   },
   "ProfileExport": {
     "appUnavailableTitle": "이 화면은 앱에서 제공되지 않아요",
-    "appUnavailableDesc": "현재 앱에서는 데이터 내보내기 화면을 열 수 없습니다. 다른 설정으로 돌아가 계속 사용할 수 있어요.",
-    "appUnavailableAction": "프로필로 돌아가기"
+    "appUnavailableDesc": "현재 앱에서는 CSV 다운로드 화면을 열 수 없습니다. 다른 설정으로 돌아가 계속 사용할 수 있어요.",
+    "appUnavailableAction": "프로필로 돌아가기",
+    "exportCondition": "내보내기 조건",
+    "exportConditionDesc": "기간(최대 92일)과 선행지표를 선택해 CSV 파일로 내려받습니다.",
+    "dateRangeLimit": "최대 3개월 선택 가능",
+    "startDate": "시작일",
+    "endDate": "종료일",
+    "selectMeasure": "선행지표 선택",
+    "selectAll": "전체 선택",
+    "deselectAll": "전체 해제",
+    "selectedMeasuresCount": "선택된 지표 {count}개",
+    "splitByWeek": "주차별로 섹션 분리해서 내보내기",
+    "generatingCsv": "CSV 생성 중...",
+    "csvDownloadTitle": "CSV 다운로드",
+    "csvDownloadAction": "CSV 다운로드",
+    "currentlyUnavailable": "현재 사용 불가",
+    "noWorkspaceTitle": "소속된 워크스페이스가 없어요",
+    "noWorkspaceDesc1": "CSV를 내보내기 전에 먼저 워크스페이스를 만들거나",
+    "noWorkspaceDesc2": "초대받은 팀에 참여해주세요.",
+    "noScoreboardTitle": "아직 핵심 목표가 없어요",
+    "noScoreboardDesc1": "먼저 점수판을 만들고 선행지표를 기록하면",
+    "noScoreboardDesc2": "기간별 데이터를 CSV로 내려받을 수 있어요.",
+    "createNewScoreboard": "새 점수판 만들기"
   },
   "Pricing": {
     "header": "플랜 안내",
@@ -920,12 +941,29 @@
     "standardOnly": "STANDARD 전용",
     "tags": {
       "Dashboard": "대시보드",
+      "Home": "홈",
       "Profile": "프로필",
       "Setup": "설정",
       "Workspace": "워크스페이스",
       "Quality of Life": "편의성"
     },
     "updates": {
+      "2026-07-07-action-item-trend": {
+        "title": "액션 아이템의 전주 대비 증감을 한눈에 확인할 수 있어요",
+        "summary": "이번 주 액션 아이템이 지난주보다 얼마나 늘었거나 줄었는지 쉽게 파악할 수 있도록 대시보드에 증감 표시가 추가되었습니다."
+      },
+      "2026-06-29-workspace-past-week-edit": {
+        "title": "지난주 기록 수정 여부를 워크스페이스에서 설정할 수 있어요",
+        "summary": "팀의 운영 방식에 맞춰, 지난주 기록을 수정할 수 있는지 여부를 워크스페이스 설정에서 관리자가 직접 설정할 수 있습니다."
+      },
+      "2026-06-18-team-check-in": {
+        "title": "팀원들의 상태를 확인하는 체크인 기능이 추가되었어요",
+        "summary": "팀원들과 함께 체크인을 진행하며 서로의 상태와 진행 상황을 더 쉽게 공유해보세요."
+      },
+      "2026-06-13-dark-mode": {
+        "title": "눈이 편안한 다크모드가 추가되었어요",
+        "summary": "어두운 환경에서도 편안하게 사용할 수 있도록 다크모드를 지원합니다. 시스템 설정에 맞춰 자동으로 적용됩니다."
+      },
       "2026-04-14-personal-reminder-schedule": {
         "title": "개인 기록 리마인드 시간을 직접 정할 수 있어요",
         "summary": "프로필 알림 설정에서 내 생활 리듬에 맞는 시간으로 매일 기록 리마인드 푸시를 받을 수 있습니다."
