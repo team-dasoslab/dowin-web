@@ -76,6 +76,8 @@ yarn install
 
 `.dev.vars`의 구성은 `.env.example`과 동일합니다. `.env.example`을 복사해서 `.dev.vars`로 저장한 뒤 실제 값으로 채우면 됩니다.
 
+> **Tip**: FCM, Polar, Discord Webhook 등 외부 연동에 필요한 실제 시크릿 키 값들은 **팀 내부에서 따로 공유받아** 채워주세요.
+
 > **Polar 샌드박스 로컬 테스트 시 주의**: Polar 웹훅은 public URL로 전송되므로 `localhost`에서는 수신할 수 없습니다.
 > Cloudflare Tunnel(`cloudflared tunnel`)로 로컬 서버를 외부에 노출한 뒤, 해당 URL을 `APP_BASE_URL`에 설정하세요.
 
@@ -84,6 +86,9 @@ yarn install
 ```bash
 yarn mig:local
 ```
+
+> **Tip: 로컬 DB 초기화가 필요할 때**
+> 개발 중 로컬 데이터가 꼬여서 데이터베이스를 완전히 초기화하고 싶다면, `.wrangler/state` 폴더를 삭제한 뒤 `yarn mig:local`을 다시 실행하세요.
 
 ### 5) 개발 서버 실행
 
@@ -94,6 +99,8 @@ yarn dev
 - 앱: `http://localhost:4000`
 - 스웨거: `http://localhost:4000/api-docs`
 - Storybook: `yarn storybook` 실행 후 `http://localhost:6006`
+
+> **첫 로그인 (계정 생성) 안내**: 마이그레이션 직후 DB는 비어 있습니다. 브라우저에서 `http://localhost:4000/login` 화면으로 진입하여 **직접 회원가입을 통해 테스트 계정을 생성**하고 시작하시면 됩니다.
 
 ## 주요 명령어
 
@@ -119,12 +126,13 @@ yarn deploy            # Cloudflare 배포
 2. `yarn gen:api` 실행
 3. 라우트/도메인 코드 반영
 
-## 배포
+## 배포 및 체인지로그 (Release Please)
 
-Cloudflare Workers Builds(Git integration)는 `production` 브랜치만 자동 빌드/배포합니다.
-
+- 커밋 메시지 규칙(`feat:`, `fix:` 등)을 지켜서 `main`에 머지하면, **Release Please Action이 버전 넘버링과 `CHANGELOG.md`를 자동 관리**하는 PR을 띄워줍니다. 수동으로 체인지로그를 적을 필요가 없습니다.
+- Cloudflare Workers Builds(Git integration)는 `production` 브랜치만 자동 빌드/배포합니다.
 - `main` 브랜치는 개발 통합 브랜치입니다.
 - 실제 배포는 `main -> production` PR 머지로만 진행합니다.
+- **배포 PR 제목은 `release: YYYY-MM-DD vX.Y.Z` 형식으로 작성합니다.**
 - `production` PR은 `PR CI`와 `Production DB Migration Check`를 통과해야 머지합니다.
 - `production` 브랜치에는 직접 push하지 않고 PR로만 머지합니다.
 - `production` PR이 merge되면 `Production DB Migration` 워크플로가 자동으로 production DB migration을 적용합니다.
