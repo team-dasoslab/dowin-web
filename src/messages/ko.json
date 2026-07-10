@@ -812,6 +812,7 @@
     "selectMeasure": "선행지표 선택",
     "selectAll": "전체 선택",
     "deselectAll": "전체 해제",
+    "selectedMeasuresCount": "선택된 지표 {count}개",
     "splitByWeek": "주차별로 섹션 분리해서 내보내기",
     "generatingCsv": "CSV 생성 중...",
     "csvDownloadTitle": "CSV 다운로드",
