@@ -807,6 +807,7 @@
     "appUnavailableAction": "프로필로 돌아가기",
     "exportCondition": "내보내기 조건",
     "exportConditionDesc": "기간(최대 92일)과 선행지표를 선택해 CSV 파일로 내려받습니다.",
+    "dateRangeLimit": "최대 3개월 선택 가능",
     "startDate": "시작일",
     "endDate": "종료일",
     "selectMeasure": "선행지표 선택",

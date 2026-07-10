@@ -805,6 +805,7 @@
     "appUnavailableAction": "Back to profile",
     "exportCondition": "Export conditions",
     "exportConditionDesc": "Select a period (up to 92 days) and leading measures to download as a CSV file.",
+    "dateRangeLimit": "Up to 3 months",
     "startDate": "Start date",
     "endDate": "End date",
     "selectMeasure": "Select leading measures",
