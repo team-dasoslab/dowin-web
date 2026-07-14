@@ -132,18 +132,22 @@ Apply `gen:api` only when the API contract actually changed. If there is no cont
 
 ## Output Contract
 
-When finishing frontend work, report with this shape by default:
+When finishing frontend work, you MUST follow the Cognitive Load Mitigation rules (Scope Constraint, Intent Verification). Report with this shape by default:
 
 ```text
 stage: frontend
 status: pass|needs_revision|fail
 summary: 한두 문장 요약
+intent: 왜 이런 UI 구조나 상태 관리(State handling) 결정을 내렸는지 의도(Why) 설명
 findings:
 - ...
+focus_list:
+- [집중 리뷰 대상 파일]: 이유 (예: 복잡한 상태 관리 로직, API 연동부 등)
+- [스킵 가능 파일]: 이유 (예: 단순 CSS 변경, 보일러플레이트 등)
 failure_categories:
 - ...
-return_to: planning|backend|frontend|none
-next_step: 다음 단계 또는 검증
+return_to: planning|backend|frontend|quality-check
+next_step: 다음 단계 (quality-check)
 ```
 
 Use these frontend-oriented categories when relevant:
@@ -157,7 +161,7 @@ Use these frontend-oriented categories when relevant:
 Return rules:
 
 - `pass`
-  - UI integration, state handling, and relevant verification are ready for review
+  - UI integration, state handling, and relevant verification are ready for review. Route to `quality-check`.
 - `needs_revision`
   - frontend fixes are needed, but the task should stay in `frontend`
 - `fail`
@@ -173,4 +177,4 @@ Update docs when frontend conventions or user-facing flows change materially:
 
 ## Next Step
 
-After frontend integration is finished, run `dowin-security-check` on the final changed path before treating the work as complete.
+After frontend integration is finished, MUST run `dowin-quality-check` on the final changed path to verify the code against the O/X checklist before treating the work as complete.

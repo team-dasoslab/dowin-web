@@ -80,14 +80,18 @@ When reviewing or validating, report:
 
 ## Output Contract
 
-When finishing quality review, report with this shape by default:
+When finishing quality review, act as the "LLM-as-a-Judge" and report with this shape by default. You MUST evaluate against the O/X checklist in `docs/planning/2026.07.14-ai-work-evaluation-plan.md`:
 
 ```text
 stage: quality
 status: pass|needs_revision|fail
 summary: 한두 문장 요약
+evaluation_result: 2026.07.14-ai-work-evaluation-plan.md 기준 O/X 채점 결과 및 위반 사항
 findings:
 - ...
+focus_list:
+- [집중 리뷰 대상 파일]: 이유 (예: 핵심 보안 로직)
+- [스킵 가능 파일]: 이유 (예: 단순 보일러플레이트)
 failure_categories:
 - ...
 return_to: planning|backend|frontend|none

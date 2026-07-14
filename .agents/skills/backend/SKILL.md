@@ -190,18 +190,22 @@ The rule here is about how to split and order commits so review stays clear.
 
 ## Output Contract
 
-When finishing backend work, report with this shape by default:
+When finishing backend work, you MUST follow the Cognitive Load Mitigation rules (Scope Constraint, Intent Verification). Report with this shape by default:
 
 ```text
 stage: backend
 status: pass|needs_revision|fail
 summary: 한두 문장 요약
+intent: 왜 이런 아키텍처/로직 결정을 내렸는지 의도(Why) 설명
 findings:
 - ...
+focus_list:
+- [집중 리뷰 대상 파일]: 이유 (예: 핵심 비즈니스 로직, 권한 등)
+- [스킵 가능 파일]: 이유 (예: 테스트 보일러플레이트, 단순 타입 추가 등)
 failure_categories:
 - ...
-return_to: planning|backend|none
-next_step: 다음 단계 또는 검증
+return_to: planning|backend|frontend|quality-check
+next_step: 다음 단계 (frontend 또는 quality-check)
 ```
 
 Use these backend-oriented categories when relevant:
@@ -217,7 +221,7 @@ Use these backend-oriented categories when relevant:
 Return rules:
 
 - `pass`
-  - backend contract, implementation, and relevant verification are aligned
+  - backend contract, implementation, and relevant verification are aligned. Route to `frontend` if UI integration is needed, or `quality-check` if the task is backend-only.
 - `needs_revision`
   - the backend path is close, but fixes are needed before handoff
 - `fail`
@@ -233,4 +237,4 @@ Update the relevant docs when backend behavior or contracts changed materially:
 
 ## Next Step
 
-After backend behavior is implemented and verified, move to `dowin-frontend` to connect the user-facing flow to the finished backend path.
+After backend behavior is implemented and verified, move to `dowin-frontend` to connect the user-facing flow to the finished backend path. If the task is purely backend and requires no UI changes, move directly to `dowin-quality-check`.
