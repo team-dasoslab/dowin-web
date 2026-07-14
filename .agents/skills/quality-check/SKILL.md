@@ -80,13 +80,13 @@ When reviewing or validating, report:
 
 ## Output Contract
 
-When finishing quality review, act as the "LLM-as-a-Judge" and report with this shape by default. You MUST evaluate against the O/X checklist in `docs/planning/2026.07.14-ai-work-evaluation-plan.md`:
+When finishing quality review, act as the "LLM-as-a-Judge" and report with this shape by default. You MUST evaluate against the O/X/N/A checklist in `docs/planning/2026.07.14-ai-work-evaluation-plan.md`:
 
 ```text
 stage: quality
 status: pass|needs_revision|fail
 summary: 한두 문장 요약
-evaluation_result: 2026.07.14-ai-work-evaluation-plan.md 기준 O/X 채점 결과 및 위반 사항
+evaluation_result: 2026.07.14-ai-work-evaluation-plan.md 기준 O/X/N/A 채점 결과 및 위반 사항
 findings:
 - ...
 focus_list:
@@ -98,13 +98,7 @@ return_to: planning|backend|frontend|none
 next_step: 다음 수정 단계 또는 추가 검증
 ```
 
-Use these quality-oriented categories when relevant:
-
-- `api_contract_mismatch`
-- `missing_test`
-- `state_handling_gap`
-- `rollback_gap`
-- `doc_impl_drift`
+Use the failure categories defined in `.agents/skills/CHANGELOG.md` when reporting quality findings. Prefer the shared category names there over inventing local aliases.
 
 Return rules:
 

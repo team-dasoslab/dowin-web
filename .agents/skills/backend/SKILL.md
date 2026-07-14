@@ -42,6 +42,15 @@ If docs conflict with code, verify the implementation and trust the current code
 
 For detailed file paths and doc priorities, read `references/backend-rules.md`.
 
+## JIT Search Strategy
+
+When navigating the backend codebase with ambiguous inputs, use these rules instead of broad workspace searches:
+
+- **API Contracts:** Always start by searching the `operationId` or path in `src/api-spec/openapi.yaml`.
+- **Database Schema:** Search for table or column names in `src/db/schema.ts` and `docs/dev/common/2026.03.09-database-schema.md` first.
+- **Business Logic:** Look inside `src/domain/<domain>/services/`.
+- **Route Handlers:** Search HTTP paths in `src/app/api/`.
+
 ## Workflow
 
 ### 1. Confirm the target domain
