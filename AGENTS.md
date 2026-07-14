@@ -41,6 +41,14 @@ If documents conflict with code, verify the implementation and prefer the curren
 - Prefer explicit tradeoffs, concrete objections, and practical alternatives over polite but empty compliance.
 - In review or planning work, prioritize bugs, regressions, missing tests, and scope problems before summaries or encouragement.
 
+## AI Code Generation Constraints (Cognitive Load Mitigation)
+
+To prevent human cognitive overload and "Rubber-Stamping" during reviews, all AI agents MUST adhere to these structural constraints:
+
+- **Scope Constraint (작업 크기 강제 제한):** Do not generate massive, monolithic code blocks or refactor unrelated files. Keep changes strictly localized to the requested task. If a task requires modifying many files, break it down and ask the user for approval first.
+- **Intent Verification (의도 설명 강제):** When generating code or updating files, do not just summarize _what_ changed. You MUST explicitly explain _why_ specific architectural or logic decisions were made, allowing the human reviewer to validate your intent.
+- **Review Guidance (리뷰 집중 영역 안내):** When acting as a reviewer or handing off a completed task, you MUST highlight the "Core Changes" and explicitly list which specific files the human should focus their review on (e.g., complex business logic, security boundaries) and which can be skimmed (e.g., boilerplates, simple UI tweaks).
+
 ## Project Skills
 
 This repository contains project-local skill drafts in `.agents/skills/`.
