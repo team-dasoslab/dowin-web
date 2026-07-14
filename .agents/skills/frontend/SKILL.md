@@ -45,6 +45,15 @@ If current code and docs differ, verify the implementation and preserve establis
 For detailed file paths and doc priorities, read `references/frontend-rules.md`.
 For frontend testing scope, prioritization, mocks, and verification patterns, read `docs/dev/common/2026.06.12-frontend-test-strategy.md`.
 
+## JIT Search Strategy
+
+When navigating the frontend codebase with ambiguous inputs, use these rules instead of broad workspace searches:
+
+- **UI Components:** Do not search globally. Use `rg --files src/components/ui` for shared primitives or `rg --files 'src/app/<domain>'` to find domain-specific `_components` files.
+- **Routing & Pages:** Search within `src/app/` using `rg --files src/app` or path matching.
+- **API Integrations:** Look for `useQuery` or `useMutation` hooks in `src/app/<domain>/_hooks/` or `src/api/generated/`.
+- **User-Facing Copy:** Search for text keys in `src/messages/ko.json` or `src/messages/en.json` instead of grepping TSX files.
+
 ## Workflow
 
 ### 1. Identify the UI boundary
@@ -177,4 +186,5 @@ Update docs when frontend conventions or user-facing flows change materially:
 
 ## Next Step
 
-After frontend integration is finished, MUST run `dowin-quality-check` on the final changed path to verify the code against the O/X checklist before treating the work as complete.
+After frontend integration is finished, MUST run `dowin-quality-check` on the final changed path to verify the code against the O/X/N/A checklist before treating the work as complete.
+If the frontend change affects auth/ownership boundaries, protected actions, WebView bridge behavior, native permission flows, generated API usage for sensitive operations, or any permission-dependent UI surface, also run `dowin-security-check` before treating the work as complete.
