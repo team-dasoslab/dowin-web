@@ -167,9 +167,14 @@ export const useDashboardScoreboardQueries = ({
     ]),
   );
 
+  const currentStreak = dashboard?.currentStreak ?? 0;
+  const currentCheckinStreak = dashboard?.currentCheckinStreak ?? 0;
+
   return {
     activeLeadMeasures,
     activeScoreboard,
+    currentStreak,
+    currentCheckinStreak,
     dashboardTeamQueryKey,
     hasNoScoreboard: Boolean(dashboard) && !activeScoreboard,
     hasNoWorkspace: isWorkspace404,

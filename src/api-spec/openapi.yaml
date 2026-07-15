@@ -4875,6 +4875,12 @@ components:
       properties:
         workspace:
           $ref: "#/components/schemas/MyDashboardWorkspace"
+        currentStreak:
+          type: integer
+          nullable: true
+        currentCheckinStreak:
+          type: integer
+          nullable: true
         activeScoreboard:
           allOf:
             - $ref: "#/components/schemas/Scoreboard"
@@ -4936,6 +4942,8 @@ components:
         weeklyAchievementRate: { type: number }
         monthlyAchievementRate: { type: number }
         isWinning: { type: boolean }
+        currentStreak: { type: integer }
+        currentCheckinStreak: { type: integer }
         leadMeasures:
           type: array
           items: { $ref: "#/components/schemas/TeamDashboardMemberMeasure" }

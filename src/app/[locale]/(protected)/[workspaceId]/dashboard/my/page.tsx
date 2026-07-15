@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/Button";
 import { Logo } from "@/components/ui/Logo";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Badge } from "@/components/ui/Badge";
+import { Zap } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
 import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
 import { Link } from "@/i18n/routing";
@@ -42,6 +44,7 @@ export default function MyDashboardPage() {
   const {
     activeLeadMeasures,
     activeScoreboard,
+    currentCheckinStreak,
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
@@ -157,13 +160,28 @@ export default function MyDashboardPage() {
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
           title={
-            isProfileLoading ? (
-              <div className="h-8 w-48 animate-pulse rounded-[12px] bg-border" />
-            ) : nickname ? (
-              t("userScoreboard", { nickname })
-            ) : (
-              t("myScoreboard")
-            )
+            <div className="flex items-center gap-3">
+              {isProfileLoading ? (
+                <div className="h-8 w-48 animate-pulse rounded-[12px] bg-border" />
+              ) : (
+                <span>
+                  {nickname ? t("userScoreboard", { nickname }) : t("myScoreboard")}
+                </span>
+              )}
+
+              {currentCheckinStreak > 0 ? (
+                <Badge 
+                  variant="info"
+                  shape="pill"
+                  size="lg"
+                  className="gap-1 text-[13px] px-3 border-blue-500/10"
+                  title={t("dailyCheckinStreakTitle", { count: currentCheckinStreak })}
+                >
+                  <Zap className="w-4 h-4 fill-current" />
+                  <span>{t("dailyCheckinStreak", { count: currentCheckinStreak })}</span>
+                </Badge>
+              ) : null}
+            </div>
           }
           rightElement={
             <div className="flex flex-wrap gap-2">

@@ -2,6 +2,7 @@ import { TeamDashboardMember } from "@/api/generated/dowin.schemas";
 import { getRateVariant } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
+import { Zap } from "lucide-react";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
 
@@ -44,6 +45,19 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
               {isMe ? (
                 <Badge variant="primary" size="sm" shape="pill" className="shrink-0">
                   {tc("me")}
+                </Badge>
+              ) : null}
+
+              {member.currentCheckinStreak && member.currentCheckinStreak > 0 ? (
+                <Badge 
+                  variant="info"
+                  shape="pill"
+                  size="sm"
+                  className="gap-0.5 px-1.5 border-blue-500/10"
+                  title={t("dailyCheckinStreakTitle", { count: member.currentCheckinStreak })}
+                >
+                  <Zap className="w-3 h-3 fill-current" />
+                  <span>{member.currentCheckinStreak}</span>
                 </Badge>
               ) : null}
             </div>

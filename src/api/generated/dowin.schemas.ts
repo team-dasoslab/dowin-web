@@ -1891,6 +1891,10 @@ export type Scoreboard = ScoreboardSummary & {
 
 export interface MyDashboardResponse {
   workspace: MyDashboardWorkspace;
+  /** @nullable */
+  currentStreak?: number | null;
+  /** @nullable */
+  currentCheckinStreak?: number | null;
   activeScoreboard: Scoreboard | null;
   weeklyLogs: WeeklyLogsResponse | null;
   monthlyLogs: MonthlyLogsResponse | null;
@@ -1964,6 +1968,8 @@ export interface TeamDashboardMember {
   weeklyAchievementRate?: number;
   monthlyAchievementRate?: number;
   isWinning?: boolean;
+  currentStreak?: number;
+  currentCheckinStreak?: number;
   leadMeasures?: TeamDashboardMemberMeasure[];
 }
 

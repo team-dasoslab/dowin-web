@@ -366,6 +366,26 @@ export class WorkspaceStorage {
     });
   }
 
+  async updateMemberCheckinDates(
+    workspaceId: number,
+    userId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<void> {
+    await this.db
+      .update(workspaceMembers)
+      .set({
+        checkinStreakStartDate: startDate,
+        checkinStreakEndDate: endDate,
+      })
+      .where(
+        and(
+          eq(workspaceMembers.workspaceId, workspaceId),
+          eq(workspaceMembers.userId, userId),
+        ),
+      );
+  }
+
   async countMembers(workspaceId: number): Promise<number> {
     const [result] = await this.db
       .select({ count: sql<number>`count(*)` })

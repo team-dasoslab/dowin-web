@@ -98,6 +98,8 @@
     "recentTrend": "최근 4주 달성률",
     "viewAllUpdates": "새로운 소식",
     "monthlyBoardTitle": "월간 기록판",
+    "dailyCheckinStreak": "{count}일 연속 접속",
+    "dailyCheckinStreakTitle": "{count}일째 연속 접속 중!",
     "monthlyBoardDesc": "선택한 달 전체 기록을 주차 흐름으로 보여줍니다.",
     "noMonthlyMeasures": "선택한 달에 집계할 월간 액션 아이템이 없습니다.",
     "weekNumber": "{n}주차",

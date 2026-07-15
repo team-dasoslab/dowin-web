@@ -12,8 +12,16 @@ type WorkspaceLookupPort = {
       userId: number;
       role: "ADMIN" | "MEMBER";
       user?: { nickname?: string | null; avatarKey?: string | null } | null;
+      checkinStreakStartDate?: string | null;
+      checkinStreakEndDate?: string | null;
     }>
   >;
+  updateMemberCheckinDates?(
+    workspaceId: number,
+    userId: number,
+    startDate: string,
+    endDate: string,
+  ): Promise<void>;
   countMembers(workspaceId: number): Promise<number>;
   findSeatEntitlement?(
     workspaceId: number,
@@ -101,15 +109,31 @@ export class DashboardService {
       context.workspaceId,
     );
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
+    const earliestStartDate = scoreboards.reduce(
+      (earliest, sb) => (sb.startDate && sb.startDate < earliest ? sb.startDate : earliest),
+      normalizedWeekStart,
+    );
     const logRange = getDashboardLogRange(normalizedWeekStart);
     const lastWeekStart = addDays(normalizedWeekStart, -7);
-    const fetchStart = lastWeekStart < logRange.start ? lastWeekStart : logRange.start;
+    const fetchStartOriginal = lastWeekStart < logRange.start ? lastWeekStart : logRange.start;
+    const earliestWeekStart = getWeekStart(earliestStartDate);
+    const fetchStart = earliestWeekStart < fetchStartOriginal ? earliestWeekStart : fetchStartOriginal;
 
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       allLeadMeasureIds,
       fetchStart,
       logRange.end,
     );
+
+    const me = members.find((m) => m.userId === context.userId);
+    if (me) {
+      await processMemberCheckinStreak(
+        context.workspaceId,
+        context.userId,
+        me,
+        this.workspaceStorage,
+      );
+    }
 
     return buildTeamDashboard({
       workspace: { id: context.workspaceId, name: context.workspaceName },
@@ -167,8 +191,10 @@ export class DashboardService {
       monthWeekStarts[monthWeekStarts.length - 1] ?? normalizedMonthStart,
       6,
     );
-    const fetchStart =
+    const fetchStartOriginal =
       weeklyFetchStart < monthlyFetchStart ? weeklyFetchStart : monthlyFetchStart;
+    const scoreboardStartWeek = getWeekStart(scoreboard.startDate ?? "2000-01-01");
+    const fetchStart = scoreboardStartWeek < fetchStartOriginal ? scoreboardStartWeek : fetchStartOriginal;
     const fetchEnd = weeklyFetchEnd > monthlyFetchEnd ? weeklyFetchEnd : monthlyFetchEnd;
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       leadMeasureIds,
@@ -205,9 +231,29 @@ export class DashboardService {
       }),
       weekStart: trendWeekStart,
     }));
+    
+    const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
+    const currentStreak = calculateCurrentStreak({
+      scoreboard,
+      logsByLeadMeasure,
+      currentWeekStart: normalizedWeekStart,
+    });
+
+    const members = await this.workspaceStorage.findMembers(context.workspaceId);
+    const me = members.find((m) => m.userId === context.userId);
+    const currentCheckinStreak = me
+      ? await processMemberCheckinStreak(
+          context.workspaceId,
+          context.userId,
+          me,
+          this.workspaceStorage,
+        )
+      : 0;
 
     return {
       workspace: await this.buildWorkspacePayload(context),
+      currentStreak,
+      currentCheckinStreak,
       activeScoreboard: scoreboard,
       weeklyLogs,
       monthlyLogs,
@@ -663,6 +709,8 @@ function buildTeamDashboard({
           weeklyAchievementRate: 0,
           monthlyAchievementRate: 0,
           isWinning: false,
+          currentStreak: 0,
+          currentCheckinStreak: calculateMemberCheckinStreak(member),
           leadMeasures: [],
         };
       }
@@ -729,6 +777,11 @@ function buildTeamDashboard({
         0,
       );
       const achievementRate = total > 0 ? Math.round((achieved / total) * 100) : 0;
+      const currentStreak = calculateCurrentStreak({
+        scoreboard,
+        logsByLeadMeasure,
+        currentWeekStart: normalizedWeekStart,
+      });
       const monthlyMeasures = leadMeasures.filter(
         (leadMeasure) => leadMeasure.period === "WEEKLY" || leadMeasure.period === "MONTHLY",
       );
@@ -784,6 +837,8 @@ function buildTeamDashboard({
         weeklyAchievementRate: achievementRate,
         monthlyAchievementRate,
         isWinning: achievementRate >= 80,
+        currentStreak,
+        currentCheckinStreak: calculateMemberCheckinStreak(member),
         leadMeasures: leadMeasures.map((leadMeasure) => ({
           id: leadMeasure.id,
           name: leadMeasure.name,
@@ -1104,4 +1159,141 @@ function parseDate(date: string) {
 
 function formatDate(date: Date) {
   return date.toISOString().slice(0, 10);
+}
+
+function getCurrentKstDateString() {
+  const today = new Date();
+  const kstToday = new Date(today.getTime() + 9 * 60 * 60 * 1000);
+  return kstToday.toISOString().slice(0, 10);
+}
+
+async function processMemberCheckinStreak(
+  workspaceId: number,
+  userId: number,
+  member: { checkinStreakStartDate?: string | null; checkinStreakEndDate?: string | null },
+  workspaceStorage: WorkspaceLookupPort,
+) {
+  let startDate = member.checkinStreakStartDate;
+  let endDate = member.checkinStreakEndDate;
+  const today = getCurrentKstDateString();
+
+  let needsUpdate = false;
+
+  if (endDate === today) {
+    if (!startDate) {
+      startDate = today;
+      needsUpdate = true;
+    }
+  } else if (endDate === addDays(today, -1)) {
+    endDate = today;
+    if (!startDate) startDate = today;
+    needsUpdate = true;
+  } else {
+    startDate = today;
+    endDate = today;
+    needsUpdate = true;
+  }
+
+  if (needsUpdate && workspaceStorage.updateMemberCheckinDates) {
+    await workspaceStorage.updateMemberCheckinDates(workspaceId, userId, startDate, endDate);
+    member.checkinStreakStartDate = startDate;
+    member.checkinStreakEndDate = endDate;
+  }
+
+  return calculateMemberCheckinStreak(member);
+}
+
+function calculateMemberCheckinStreak(member: { checkinStreakStartDate?: string | null; checkinStreakEndDate?: string | null }) {
+  if (!member.checkinStreakStartDate || !member.checkinStreakEndDate) return 0;
+  
+  const today = getCurrentKstDateString();
+  if (member.checkinStreakEndDate < addDays(today, -1)) {
+    return 0; // Streak is broken as of today
+  }
+
+  const start = parseDate(member.checkinStreakStartDate);
+  const end = parseDate(member.checkinStreakEndDate);
+  return Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+}
+
+function calculateCurrentStreak({
+  scoreboard,
+  logsByLeadMeasure,
+  currentWeekStart,
+}: {
+  scoreboard: TeamScoreboard;
+  logsByLeadMeasure: Map<number, DailyLogLookup[]>;
+  currentWeekStart: string;
+}) {
+  let streak = 0;
+  const activeLeadMeasures = scoreboard.leadMeasures.filter(
+    (m) => m.status === "ACTIVE",
+  );
+
+  const checkingWeekStart = currentWeekStart;
+  const currentWeekRate = getScoreboardWeeklyRate({
+    activeLeadMeasures,
+    logsByLeadMeasure,
+    weekStart: checkingWeekStart,
+  });
+
+  if (currentWeekRate >= 80) {
+    streak += 1;
+  }
+
+  let prevWeekStart = addDays(checkingWeekStart, -7);
+  const scoreboardStartWeek = getWeekStart(
+    scoreboard.startDate ?? "2000-01-01",
+  );
+
+  while (prevWeekStart >= scoreboardStartWeek) {
+    const rate = getScoreboardWeeklyRate({
+      activeLeadMeasures,
+      logsByLeadMeasure,
+      weekStart: prevWeekStart,
+    });
+    if (rate >= 80) {
+      streak += 1;
+    } else {
+      break;
+    }
+    prevWeekStart = addDays(prevWeekStart, -7);
+  }
+
+  return streak;
+}
+
+function getScoreboardWeeklyRate({
+  activeLeadMeasures,
+  logsByLeadMeasure,
+  weekStart,
+}: {
+  activeLeadMeasures: TeamScoreboard["leadMeasures"];
+  logsByLeadMeasure: Map<number, DailyLogLookup[]>;
+  weekStart: string;
+}) {
+  const weekEnd = getWeekDates(weekStart)[6];
+  const weeklyTargetMeasures = activeLeadMeasures.filter(
+    (measure) =>
+      measure.period !== "MONTHLY" &&
+      isMeasureActiveInPeriod(measure, weekEnd),
+  );
+  if (weeklyTargetMeasures.length === 0) return 0;
+
+  const achieved = weeklyTargetMeasures.reduce((sum, measure) => {
+    const measureAchieved = (logsByLeadMeasure.get(measure.id) ?? []).filter(
+      (log) =>
+        log.logDate >= weekStart &&
+        log.logDate <= weekEnd &&
+        isLogAchieved(measure, log),
+    ).length;
+
+    return sum + Math.min(measureAchieved, measure.targetValue);
+  }, 0);
+  const total = weeklyTargetMeasures.reduce(
+    (sum, measure) => sum + measure.targetValue,
+    0,
+  );
+
+  return total > 0 ? Math.round((achieved / total) * 100) : 0;
 }
