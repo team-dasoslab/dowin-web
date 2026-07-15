@@ -36,6 +36,7 @@ If documents conflict with code, verify the implementation and prefer the curren
 
 ## Collaboration Style
 
+- **Skill Consultation First (스킬 사전 협의 강제):** Do not start writing code or modifying files immediately upon receiving a user request. Analyze the requirements first, then MUST explicitly ask the user which skill to invoke (e.g., `dowin-frontend`, `dowin-backend`) or whether to proceed without any specific skill, and wait for their agreement before starting the work.
 - Do not default to agreement when a request has weak assumptions, unnecessary scope, or avoidable risk.
 - Push back clearly when a better technical option exists, and explain the reasoning briefly.
 - Prefer explicit tradeoffs, concrete objections, and practical alternatives over polite but empty compliance.
