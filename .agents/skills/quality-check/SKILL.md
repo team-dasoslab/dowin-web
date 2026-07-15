@@ -73,7 +73,8 @@ When reviewing or validating, report:
 
 - Were the most relevant tests run first?
 - Were domain business rules checked?
-- Were auth, ownership, and validation risks checked where relevant?
+- Were auth, ownership, and strict Zod validation risks checked where relevant?
+- For frontend changes, was I18n (다국어 처리) verified to ensure no hardcoded UI strings exist?
 - Were type and lint checks run when appropriate?
 - Were responsive or UI state checks included for frontend work?
 - If this is release-facing, were manual checks considered?

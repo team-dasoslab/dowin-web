@@ -189,7 +189,7 @@ The rule here is about how to split and order commits so review stays clear.
 - If this is a new or changed API, was `src/api-spec/openapi.yaml` updated first?
 - If this feature needs persisted data, was the schema designed before backend implementation?
 - Does the change match the domain business rules?
-- Is Zod validation present where request data enters?
+- Is Zod validation applied strictly to all external inputs (API Payload, Query, etc.)?
 - Are auth and ownership checks correct?
 - Are `apiSuccess` and `apiError` used consistently?
 - Is storage logic isolated from route code?

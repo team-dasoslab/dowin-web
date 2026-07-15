@@ -132,7 +132,8 @@ Apply `gen:api` only when the API contract actually changed. If there is no cont
 - If the page mixes local form state and TanStack Query mutation logic, did you split them into domain hooks with clear responsibilities?
 - If server state changed, were related queries invalidated?
 - If query-string state is needed, did you choose between server `searchParams` props and client `useSearchParams()` intentionally, and add `Suspense` when using the client hook?
-- Are new or changed visible UI strings covered in both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded?
+- Are new or changed visible UI strings covered in both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded? (I18n 다국어 처리)
+- Is Zod validation applied strictly to all external inputs (form data, URL searchParams, etc.)?
 - Are all static assets inside `src/app` (like `opengraph-image.jpg`) optimized to be under 200KB to avoid exceeding the Cloudflare 3MB Worker limit?
 - Were the changed or affected frontend tests run with `yarn test --run <files>` or `yarn test:frontend`?
 - If API contracts changed, was `yarn gen:api` run?
