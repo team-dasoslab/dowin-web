@@ -36,6 +36,16 @@ If docs conflict with live implementation, verify the implementation and use the
 - Do not hand the full conversation to downstream work by default; pass only the task-local context needed for that stage.
 - Review gates should send work back to the nearest responsible stage instead of escalating every problem to planning.
 
+## JIT Search Strategy (Context Packets)
+
+When an ambiguous request comes in, do not perform broad repository searches. Instead, identify if the request maps to a documented **Context Packet**.
+If it does, load the specific files listed in the packet first.
+
+- **Backend API Packet:** `src/api-spec/openapi.yaml`, `docs/dev/common/2026.03.09-database-schema.md`
+- **Frontend API Packet:** `src/api-spec/openapi.yaml`, `src/api/generated/` hooks
+- **WebView Packet:** `src/lib/bridge.ts`, `src/types/bridge.ts`, app webview docs
+- **Product Update Packet:** `src/content/product-updates.ts`, `src/lib/product-updates.ts`, updates page or dashboard card when affected
+
 ## Workflow
 
 ### 1. Classify the request

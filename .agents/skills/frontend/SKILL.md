@@ -45,6 +45,15 @@ If current code and docs differ, verify the implementation and preserve establis
 For detailed file paths and doc priorities, read `references/frontend-rules.md`.
 For frontend testing scope, prioritization, mocks, and verification patterns, read `docs/dev/common/2026.06.12-frontend-test-strategy.md`.
 
+## JIT Search Strategy
+
+When navigating the frontend codebase with ambiguous inputs, use these rules instead of broad workspace searches:
+
+- **UI Components:** Do not search globally. Use `rg --files src/components/ui` for shared primitives or `rg --files 'src/app/<domain>'` to find domain-specific `_components` files.
+- **Routing & Pages:** Search within `src/app/` using `rg --files src/app` or path matching.
+- **API Integrations:** Look for `useQuery` or `useMutation` hooks in `src/app/<domain>/_hooks/` or `src/api/generated/`.
+- **User-Facing Copy:** Search for text keys in `src/messages/ko.json` or `src/messages/en.json` instead of grepping TSX files.
+
 ## Workflow
 
 ### 1. Identify the UI boundary
@@ -123,7 +132,8 @@ Apply `gen:api` only when the API contract actually changed. If there is no cont
 - If the page mixes local form state and TanStack Query mutation logic, did you split them into domain hooks with clear responsibilities?
 - If server state changed, were related queries invalidated?
 - If query-string state is needed, did you choose between server `searchParams` props and client `useSearchParams()` intentionally, and add `Suspense` when using the client hook?
-- Are new or changed visible UI strings covered in both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded?
+- Are new or changed visible UI strings covered in both `src/messages/ko.json` and `src/messages/en.json` instead of being hardcoded? (I18n 다국어 처리)
+- Is Zod validation applied strictly to all external inputs (form data, URL searchParams, etc.)?
 - Are all static assets inside `src/app` (like `opengraph-image.jpg`) optimized to be under 200KB to avoid exceeding the Cloudflare 3MB Worker limit?
 - Were the changed or affected frontend tests run with `yarn test --run <files>` or `yarn test:frontend`?
 - If API contracts changed, was `yarn gen:api` run?
@@ -132,18 +142,22 @@ Apply `gen:api` only when the API contract actually changed. If there is no cont
 
 ## Output Contract
 
-When finishing frontend work, report with this shape by default:
+When finishing frontend work, you MUST follow the Cognitive Load Mitigation rules (Scope Constraint, Intent Verification). Report with this shape by default:
 
 ```text
 stage: frontend
 status: pass|needs_revision|fail
 summary: 한두 문장 요약
+intent: 왜 이런 UI 구조나 상태 관리(State handling) 결정을 내렸는지 의도(Why) 설명
 findings:
 - ...
+focus_list:
+- [집중 리뷰 대상 파일]: 이유 (예: 복잡한 상태 관리 로직, API 연동부 등)
+- [스킵 가능 파일]: 이유 (예: 단순 CSS 변경, 보일러플레이트 등)
 failure_categories:
 - ...
-return_to: planning|backend|frontend|none
-next_step: 다음 단계 또는 검증
+return_to: planning|backend|frontend|quality-check
+next_step: 다음 단계 (quality-check)
 ```
 
 Use these frontend-oriented categories when relevant:
@@ -157,7 +171,7 @@ Use these frontend-oriented categories when relevant:
 Return rules:
 
 - `pass`
-  - UI integration, state handling, and relevant verification are ready for review
+  - UI integration, state handling, and relevant verification are ready for review. Route to `quality-check`.
 - `needs_revision`
   - frontend fixes are needed, but the task should stay in `frontend`
 - `fail`
@@ -173,4 +187,5 @@ Update docs when frontend conventions or user-facing flows change materially:
 
 ## Next Step
 
-After frontend integration is finished, run `dowin-security-check` on the final changed path before treating the work as complete.
+After frontend integration is finished, MUST run `dowin-quality-check` on the final changed path to verify the code against the O/X/N/A checklist before treating the work as complete.
+If the frontend change affects auth/ownership boundaries, protected actions, WebView bridge behavior, native permission flows, generated API usage for sensitive operations, or any permission-dependent UI surface, also run `dowin-security-check` before treating the work as complete.

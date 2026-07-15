@@ -42,6 +42,15 @@ If docs conflict with code, verify the implementation and trust the current code
 
 For detailed file paths and doc priorities, read `references/backend-rules.md`.
 
+## JIT Search Strategy
+
+When navigating the backend codebase with ambiguous inputs, use these rules instead of broad workspace searches:
+
+- **API Contracts:** Always start by searching the `operationId` or path in `src/api-spec/openapi.yaml`.
+- **Database Schema:** Search for table or column names in `src/db/schema.ts` and `docs/dev/common/2026.03.09-database-schema.md` first.
+- **Business Logic:** Look inside `src/domain/<domain>/services/`.
+- **Route Handlers:** Search HTTP paths in `src/app/api/`.
+
 ## Workflow
 
 ### 1. Confirm the target domain
@@ -180,7 +189,7 @@ The rule here is about how to split and order commits so review stays clear.
 - If this is a new or changed API, was `src/api-spec/openapi.yaml` updated first?
 - If this feature needs persisted data, was the schema designed before backend implementation?
 - Does the change match the domain business rules?
-- Is Zod validation present where request data enters?
+- Is Zod validation applied strictly to all external inputs (API Payload, Query, etc.)?
 - Are auth and ownership checks correct?
 - Are `apiSuccess` and `apiError` used consistently?
 - Is storage logic isolated from route code?
@@ -190,18 +199,22 @@ The rule here is about how to split and order commits so review stays clear.
 
 ## Output Contract
 
-When finishing backend work, report with this shape by default:
+When finishing backend work, you MUST follow the Cognitive Load Mitigation rules (Scope Constraint, Intent Verification). Report with this shape by default:
 
 ```text
 stage: backend
 status: pass|needs_revision|fail
 summary: 한두 문장 요약
+intent: 왜 이런 아키텍처/로직 결정을 내렸는지 의도(Why) 설명
 findings:
 - ...
+focus_list:
+- [집중 리뷰 대상 파일]: 이유 (예: 핵심 비즈니스 로직, 권한 등)
+- [스킵 가능 파일]: 이유 (예: 테스트 보일러플레이트, 단순 타입 추가 등)
 failure_categories:
 - ...
-return_to: planning|backend|none
-next_step: 다음 단계 또는 검증
+return_to: planning|backend|frontend|quality-check
+next_step: 다음 단계 (frontend 또는 quality-check)
 ```
 
 Use these backend-oriented categories when relevant:
@@ -217,7 +230,7 @@ Use these backend-oriented categories when relevant:
 Return rules:
 
 - `pass`
-  - backend contract, implementation, and relevant verification are aligned
+  - backend contract, implementation, and relevant verification are aligned. Route to `frontend` if UI integration is needed, or `quality-check` if the task is backend-only.
 - `needs_revision`
   - the backend path is close, but fixes are needed before handoff
 - `fail`
@@ -233,4 +246,4 @@ Update the relevant docs when backend behavior or contracts changed materially:
 
 ## Next Step
 
-After backend behavior is implemented and verified, move to `dowin-frontend` to connect the user-facing flow to the finished backend path.
+After backend behavior is implemented and verified, move to `dowin-frontend` to connect the user-facing flow to the finished backend path. If the task is purely backend and requires no UI changes, move directly to `dowin-quality-check`.

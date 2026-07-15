@@ -73,34 +73,33 @@ When reviewing or validating, report:
 
 - Were the most relevant tests run first?
 - Were domain business rules checked?
-- Were auth, ownership, and validation risks checked where relevant?
+- Were auth, ownership, and strict Zod validation risks checked where relevant?
+- For frontend changes, was I18n (다국어 처리) verified to ensure no hardcoded UI strings exist?
 - Were type and lint checks run when appropriate?
 - Were responsive or UI state checks included for frontend work?
 - If this is release-facing, were manual checks considered?
 
 ## Output Contract
 
-When finishing quality review, report with this shape by default:
+When finishing quality review, act as the "LLM-as-a-Judge" and report with this shape by default. You MUST evaluate against the O/X/N/A checklist in `docs/planning/2026.07.14-ai-work-evaluation-plan.md`:
 
 ```text
 stage: quality
 status: pass|needs_revision|fail
 summary: 한두 문장 요약
+evaluation_result: 2026.07.14-ai-work-evaluation-plan.md 기준 O/X/N/A 채점 결과 및 위반 사항
 findings:
 - ...
+focus_list:
+- [집중 리뷰 대상 파일]: 이유 (예: 핵심 보안 로직)
+- [스킵 가능 파일]: 이유 (예: 단순 보일러플레이트)
 failure_categories:
 - ...
 return_to: planning|backend|frontend|none
 next_step: 다음 수정 단계 또는 추가 검증
 ```
 
-Use these quality-oriented categories when relevant:
-
-- `api_contract_mismatch`
-- `missing_test`
-- `state_handling_gap`
-- `rollback_gap`
-- `doc_impl_drift`
+Use the failure categories defined in `.agents/skills/CHANGELOG.md` when reporting quality findings. Prefer the shared category names there over inventing local aliases.
 
 Return rules:
 

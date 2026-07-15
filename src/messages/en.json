@@ -98,6 +98,8 @@
     "recentTrend": "Last 4 Weeks Trend",
     "viewAllUpdates": "What's New",
     "monthlyBoardTitle": "Monthly Board",
+    "dailyCheckinStreak": "{count}-day access streak",
+    "dailyCheckinStreakTitle": "{count}-day consecutive access!",
     "monthlyBoardDesc": "View all records for the selected month by week.",
     "noMonthlyMeasures": "No monthly action items for this month.",
     "weekNumber": "Week {n}",
