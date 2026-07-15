@@ -708,6 +708,8 @@ export const workspaceMembers = sqliteTable(
     })
       .notNull()
       .default("PUBLIC"),
+    checkinStreakStartDate: text("checkin_streak_start_date"),
+    checkinStreakEndDate: text("checkin_streak_end_date"),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(strftime('%s', 'now'))`),
