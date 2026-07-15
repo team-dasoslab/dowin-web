@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/team-dasoslab/dowin-web/compare/v1.10.1...v1.11.0) (2026-07-15)
+
+
+### Features
+
+* 일일 연속 접속 기능 추가 ([#219](https://github.com/team-dasoslab/dowin-web/issues/219)) ([28a4d3b](https://github.com/team-dasoslab/dowin-web/commit/28a4d3b07b7be69f7cbeff4671a8830f20d04707))
+
 ## [1.10.1](https://github.com/team-dasoslab/dowin-web/compare/v1.10.0...v1.10.1) (2026-07-10)
 
 
