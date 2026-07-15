@@ -129,6 +129,8 @@ describe("DashboardService", () => {
           weeklyAchievementRate: 40,
           monthlyAchievementRate: 18,
           isWinning: false,
+          currentCheckinStreak: 0,
+          currentStreak: 0,
           leadMeasures: [
             {
               id: 31,
@@ -191,6 +193,8 @@ describe("DashboardService", () => {
           weeklyAchievementRate: 0,
           monthlyAchievementRate: 0,
           isWinning: false,
+          currentCheckinStreak: 0,
+          currentStreak: 0,
           leadMeasures: [],
         },
       ],

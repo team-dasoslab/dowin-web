@@ -27,6 +27,8 @@ export const useDashboardScoreboard = (workspaceId: string) => {
   const {
     activeLeadMeasures,
     activeScoreboard,
+    currentStreak,
+    currentCheckinStreak,
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
@@ -95,6 +97,8 @@ export const useDashboardScoreboard = (workspaceId: string) => {
   return {
     activeLeadMeasures,
     activeScoreboard,
+    currentStreak,
+    currentCheckinStreak,
     hasNoScoreboard,
     hasNoWorkspace,
     isLoading,
