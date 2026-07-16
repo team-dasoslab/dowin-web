@@ -26,6 +26,7 @@ export const leadMeasureCreateSchema = z
     targetValue: z.number().int().min(1, "목표 횟수는 1 이상이어야 합니다."),
     period: periodSchema,
     trackingMode: trackingModeSchema.default("BOOLEAN"),
+    orderIndex: z.number().int().min(0).default(0),
     dailyTargetCount: z
       .number()
       .int()
@@ -62,6 +63,7 @@ export const leadMeasureUpdateSchema = z
       .optional(),
     period: periodSchema.optional(),
     trackingMode: trackingModeSchema.optional(),
+    orderIndex: z.number().int().min(0).optional(),
     dailyTargetCount: z
       .number()
       .int()

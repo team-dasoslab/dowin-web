@@ -24,7 +24,7 @@ export function SetupSubmitButton({
       disabled={isMutating}
       className={`h-[56px] w-full flex items-center justify-center gap-3 rounded-[24px] text-[16px] font-semibold transition-transform ${
         isMutating
-          ? "cursor-not-allowed bg-sub-background text-text-muted"
+          ? "cursor-not-allowed bg-zinc-800 text-zinc-500"
           : "bg-zinc-900 text-white hover:bg-zinc-800"
       }`}
     >

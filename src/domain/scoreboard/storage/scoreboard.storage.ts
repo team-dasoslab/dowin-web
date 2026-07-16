@@ -1,5 +1,5 @@
 import { leadMeasures, scoreboards, workspaceTags } from "@/db/schema";
-import { and, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 
 export type CreateScoreboardInput = {
   userId: number;
@@ -112,6 +112,7 @@ export class ScoreboardStorage {
       ),
       with: {
         leadMeasures: {
+          orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
           with: {
             tags: {
               with: {
@@ -157,6 +158,7 @@ export class ScoreboardStorage {
       ),
       with: {
         leadMeasures: {
+          orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
           with: {
             tags: {
               with: {
@@ -207,6 +209,7 @@ export class ScoreboardStorage {
       ),
       with: {
         leadMeasures: {
+          orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
           with: {
             tags: {
               with: {

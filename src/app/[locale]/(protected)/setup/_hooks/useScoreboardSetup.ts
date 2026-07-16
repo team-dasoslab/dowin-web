@@ -187,7 +187,7 @@ export const useScoreboardSetup = () => {
       setLagMeasure(nextScoreboardPayload.lagMeasure);
       setInitialScoreboardPayload(nextScoreboardPayload);
       setMeasures(
-        nextLeadMeasures.map((leadMeasure) => {
+        nextLeadMeasures.map((leadMeasure, index) => {
           const period =
             leadMeasure.period === "MONTHLY" ? "MONTHLY" : "WEEKLY";
           const measure: MeasureInput = {
@@ -214,7 +214,7 @@ export const useScoreboardSetup = () => {
 
           return {
             ...measure,
-            initialPayload: getMeasurePayloadSnapshot(measure),
+            initialPayload: getMeasurePayloadSnapshot(measure, index),
           };
         }),
       );
@@ -270,6 +270,37 @@ export const useScoreboardSetup = () => {
 
   const addMeasureRow = () => {
     setMeasures((previous) => [...previous, createEmptyMeasure()]);
+  };
+
+  const moveMeasureRow = (index: number, direction: "up" | "down") => {
+    setMeasures((previous) => {
+      const activeMeasures = previous.filter(
+        (measure) => measure.status === "ACTIVE",
+      );
+      if (
+        (direction === "up" && index === 0) ||
+        (direction === "down" && index === activeMeasures.length - 1)
+      ) {
+        return previous;
+      }
+
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      const measure1 = activeMeasures[index];
+      const measure2 = activeMeasures[targetIndex];
+
+      const absoluteIndex1 = previous.findIndex((m) => m.id === measure1?.id);
+      const absoluteIndex2 = previous.findIndex((m) => m.id === measure2?.id);
+
+      if (absoluteIndex1 === -1 || absoluteIndex2 === -1) {
+        return previous;
+      }
+
+      const next = [...previous];
+      next[absoluteIndex1] = measure2 as MeasureInput;
+      next[absoluteIndex2] = measure1 as MeasureInput;
+
+      return next;
+    });
   };
 
   const removeMeasureRow = (id: string) => {
@@ -668,6 +699,7 @@ export const useScoreboardSetup = () => {
 
   const getMeasurePayloadSnapshot = (
     measure: MeasureInput,
+    index: number,
   ): MeasurePayloadSnapshot => ({
     name: measure.name,
     period: measure.period,
@@ -677,14 +709,15 @@ export const useScoreboardSetup = () => {
     tagIds: measure.tags
       .map((tag: { id: number }) => tag.id)
       .sort((a, b) => a - b),
+    orderIndex: index,
   });
 
-  const isExistingMeasureChanged = (measure: MeasureInput) => {
+  const isExistingMeasureChanged = (measure: MeasureInput, index: number) => {
     if (!measure.initialPayload) {
       return true;
     }
 
-    const current = getMeasurePayloadSnapshot(measure);
+    const current = getMeasurePayloadSnapshot(measure, index);
 
     return (
       current.name !== measure.initialPayload.name ||
@@ -694,8 +727,9 @@ export const useScoreboardSetup = () => {
       current.dailyTargetCount !== measure.initialPayload.dailyTargetCount ||
       current.tagIds.length !== measure.initialPayload.tagIds.length ||
       current.tagIds.some(
-        (tagId, index) => tagId !== measure.initialPayload?.tagIds[index],
-      )
+        (tagId, idx) => tagId !== measure.initialPayload?.tagIds[idx],
+      ) ||
+      current.orderIndex !== measure.initialPayload.orderIndex
     );
   };
 
@@ -761,7 +795,7 @@ export const useScoreboardSetup = () => {
         }
 
         const createdMeasureIds: number[] = [];
-        for (const measure of validMeasures) {
+        for (const [index, measure] of validMeasures.entries()) {
           const result = await createLeadMeasureMutation.mutateAsync({
             workspaceId,
             scoreboardId: createdScoreboardId,
@@ -772,6 +806,7 @@ export const useScoreboardSetup = () => {
               trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureCreateRequestTrackingMode,
               dailyTargetCount: measure.dailyTargetCount,
               tagIds: measure.tags.map((tag: { id: number }) => tag.id),
+              orderIndex: index,
             },
           });
           if (result.status === 201) {
@@ -811,7 +846,7 @@ export const useScoreboardSetup = () => {
 
         const nextExistingIds = new Set<number>();
 
-        for (const measure of validMeasures) {
+        for (const [index, measure] of validMeasures.entries()) {
           if (measure.existingId !== null) {
             if (measure.initialStatus === "ARCHIVED") {
               await reactivateLeadMeasureMutation.mutateAsync({
@@ -821,7 +856,7 @@ export const useScoreboardSetup = () => {
             }
 
             nextExistingIds.add(measure.existingId);
-            if (isExistingMeasureChanged(measure)) {
+            if (isExistingMeasureChanged(measure, index)) {
               await updateLeadMeasureMutation.mutateAsync({
                 workspaceId,
                 id: measure.existingId,
@@ -832,6 +867,7 @@ export const useScoreboardSetup = () => {
                   trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureUpdateRequestTrackingMode,
                   dailyTargetCount: measure.dailyTargetCount,
                   tagIds: measure.tags.map((tag: { id: number }) => tag.id),
+                  orderIndex: index,
                 },
               });
             }
@@ -849,6 +885,7 @@ export const useScoreboardSetup = () => {
                 trackingMode: measure.trackingMode as import("@/api/generated/dowin.schemas").LeadMeasureCreateRequestTrackingMode,
                 dailyTargetCount: measure.dailyTargetCount,
                 tagIds: measure.tags.map((tag: { id: number }) => tag.id),
+                orderIndex: index,
               },
             });
 
@@ -959,6 +996,7 @@ export const useScoreboardSetup = () => {
     reactivateMeasureRow,
     removeMeasureRow,
     restoreMeasureRow,
+    moveMeasureRow,
     setActiveTooltip,
     setGoalName,
     setLagMeasure,
