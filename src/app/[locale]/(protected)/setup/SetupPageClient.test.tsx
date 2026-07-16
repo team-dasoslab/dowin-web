@@ -210,7 +210,7 @@ describe("SetupPage", () => {
       screen.getByRole("heading", { name: "점수판 관리" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "변경사항 저장" }),
+      screen.getByRole("button", { name: "저장하기" }),
     ).toBeInTheDocument();
     expect(screen.getByText("점수판 보관")).toBeInTheDocument();
   });
@@ -223,7 +223,7 @@ describe("SetupPage", () => {
     renderWithProviders(<SetupPage />);
 
     expect(
-      screen.getByText("점수판을 생성하고 있습니다..."),
+      screen.getAllByText("점수판을 생성하고 있습니다...")[0],
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "" })).toBeDisabled();
   });
