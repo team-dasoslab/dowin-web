@@ -62,8 +62,6 @@ function renderLeadMeasuresSection(
 describe("LeadMeasuresSection", () => {
   it("renders an active measure and adds another measure row", () => {
     const { addMeasureRow } = renderLeadMeasuresSection();
-
-    expect(screen.getByText("액션 아이템 #1")).toBeInTheDocument();
     expect(screen.getByDisplayValue("잠재고객 10명에게 연락하기")).toBeInTheDocument();
     expect(screen.getAllByText("매주").length).toBeGreaterThan(0);
     expect(screen.getByText("3")).toBeInTheDocument();

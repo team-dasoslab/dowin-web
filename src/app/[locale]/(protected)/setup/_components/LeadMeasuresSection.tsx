@@ -173,10 +173,7 @@ function LeadMeasureRow({
     <div className="space-y-5 p-4 sm:space-y-6 sm:p-8">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <label className="text-sm font-bold text-text-primary">
-            {t("leadMeasureShort")} #{index + 1}
-          </label>
-          <div className="flex items-center gap-0.5 ml-2">
+          <div className="flex items-center gap-0.5">
             <Button
               type="button"
               variant="subtle"
