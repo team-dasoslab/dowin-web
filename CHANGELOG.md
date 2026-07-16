@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.0](https://github.com/team-dasoslab/dowin-web/compare/v1.11.0...v1.12.0) (2026-07-16)
+
+
+### Features
+
+* 콕 찌르기 기능 추가 ([#222](https://github.com/team-dasoslab/dowin-web/issues/222)) ([f987ec3](https://github.com/team-dasoslab/dowin-web/commit/f987ec31ef6244007113846e2c6c35a5abd063f0))
+
 ## [1.11.0](https://github.com/team-dasoslab/dowin-web/compare/v1.10.1...v1.11.0) (2026-07-15)
 
 
