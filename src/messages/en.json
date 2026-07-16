@@ -295,6 +295,8 @@
     "header": "Scoreboard Settings",
     "editTitle": "Manage Scoreboard",
     "createTitle": "Set Next Scoreboard",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
     "description": "Set a single goal and define your measures.",
     "archiving": "Archiving scoreboard...",
     "saving": "Saving changes...",

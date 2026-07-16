@@ -295,6 +295,8 @@
     "header": "점수판 설정",
     "createTitle": "새 점수판 생성하기",
     "editTitle": "점수판 관리",
+    "moveUp": "위로 이동",
+    "moveDown": "아래로 이동",
     "description": "하나의 목표를 정하고 지표를 설정하세요.",
     "archiving": "점수판을 보관하는 중입니다.",
     "saving": "점수판 변경사항을 저장하는 중입니다.",

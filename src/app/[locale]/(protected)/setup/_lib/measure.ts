@@ -27,6 +27,7 @@ export type MeasurePayloadSnapshot = {
   trackingMode: "BOOLEAN" | "COUNT";
   dailyTargetCount: number;
   tagIds: number[];
+  orderIndex: number;
 };
 
 export const MOCK_SETUP_TAGS: SetupTag[] = [

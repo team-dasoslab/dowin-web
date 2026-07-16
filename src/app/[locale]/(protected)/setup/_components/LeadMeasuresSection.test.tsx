@@ -40,6 +40,7 @@ function renderLeadMeasuresSection(
     renameTag: vi.fn(async () => true),
     restoreMeasureRow: vi.fn(),
     toggleMeasureTag: vi.fn(),
+    moveMeasureRow: vi.fn(),
   };
 
   renderWithProviders(
@@ -131,8 +132,8 @@ describe("LeadMeasuresSection", () => {
     expect(screen.getByText("일")).toBeInTheDocument();
 
     const allButtons = screen.getAllByRole("button");
-    const dailyDecrementButton = allButtons[6];
-    const dailyIncrementButton = allButtons[7];
+    const dailyDecrementButton = allButtons[8];
+    const dailyIncrementButton = allButtons[9];
 
     fireEvent.click(dailyDecrementButton);
     fireEvent.click(dailyIncrementButton);

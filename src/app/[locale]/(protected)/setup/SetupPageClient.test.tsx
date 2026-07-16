@@ -60,6 +60,7 @@ function createBaseSetupState() {
     monthlyTargetMax: 30,
     reactivateMeasureRow: vi.fn(),
     removeMeasureRow: vi.fn(),
+    moveMeasureRow: vi.fn(),
     renameTag: vi.fn(async () => true),
     restoreMeasureRow: vi.fn(),
     setActiveTooltip: vi.fn(),
