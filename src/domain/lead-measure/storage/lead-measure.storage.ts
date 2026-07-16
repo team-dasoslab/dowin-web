@@ -97,7 +97,7 @@ export class LeadMeasureStorage {
         targetValue: true,
         period: true,
       },
-      orderBy: [asc(leadMeasures.createdAt)],
+      orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
     })) as LeadMeasureForPushRecord[];
   }
 
@@ -120,7 +120,7 @@ export class LeadMeasureStorage {
           },
         },
       },
-      orderBy: [asc(leadMeasures.createdAt)],
+      orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
     })) as Array<
       LeadMeasureRecord & {
         tags?: Array<{ tag: typeof workspaceTags.$inferSelect | null }>;
@@ -143,8 +143,10 @@ export class LeadMeasureStorage {
         targetValue: true,
         period: true,
         trackingMode: true,
+        orderIndex: true,
         dailyTargetCount: true,
       },
+      orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
     })) as LeadMeasureSummaryRecord[];
   }
 

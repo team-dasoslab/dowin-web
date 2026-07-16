@@ -1,0 +1,1 @@
+ALTER TABLE `lead_measures` ADD `order_index` integer DEFAULT 0 NOT NULL;

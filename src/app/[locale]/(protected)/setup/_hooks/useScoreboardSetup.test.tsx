@@ -474,6 +474,7 @@ describe("useScoreboardSetup create mode", () => {
         tagIds: [1],
         targetValue: 3,
         trackingMode: "COUNT",
+        orderIndex: expect.any(Number),
       },
     });
     expect(trackEvent).toHaveBeenCalledWith("scoreboard_created", {
@@ -542,15 +543,19 @@ describe("useScoreboardSetup update mode", () => {
     expect(result.current.monthlyTargetMax).toBe(28);
     expect(result.current.measures).toEqual([
       expect.objectContaining({
+        id: "11",
         existingId: 11,
-        initialPayload: {
+        dailyTargetCount: 1,
+        tags: [{ id: 1, name: "영업" }],
+        initialPayload: expect.objectContaining({
           dailyTargetCount: 1,
           name: "기존 활성 액션",
           period: "WEEKLY",
           tagIds: [1],
           targetValue: 3,
           trackingMode: "BOOLEAN",
-        },
+          orderIndex: 0,
+        }),
         initialStatus: "ACTIVE",
         name: "기존 활성 액션",
         period: "WEEKLY",
@@ -559,8 +564,10 @@ describe("useScoreboardSetup update mode", () => {
         trackingMode: "BOOLEAN",
       }),
       expect.objectContaining({
+        id: "12",
         dailyTargetCount: 2,
         existingId: 12,
+        tags: [],
         initialStatus: "ARCHIVED",
         name: "기존 보관 액션",
         period: "MONTHLY",
@@ -643,6 +650,7 @@ describe("useScoreboardSetup update mode", () => {
         tagIds: [1],
         targetValue: 3,
         trackingMode: "BOOLEAN",
+        orderIndex: expect.any(Number),
       },
     });
     expect(createLeadMeasureMutateAsync).not.toHaveBeenCalled();
@@ -765,6 +773,7 @@ describe("useScoreboardSetup update mode", () => {
         tagIds: [],
         targetValue: 28,
         trackingMode: "COUNT",
+        orderIndex: expect.any(Number),
       },
     });
     expect(createLeadMeasureMutateAsync).toHaveBeenCalledWith({
@@ -777,6 +786,7 @@ describe("useScoreboardSetup update mode", () => {
         tagIds: [],
         targetValue: 4,
         trackingMode: "BOOLEAN",
+        orderIndex: expect.any(Number),
       },
     });
     expect(archiveLeadMeasureMutateAsync).toHaveBeenCalledWith({

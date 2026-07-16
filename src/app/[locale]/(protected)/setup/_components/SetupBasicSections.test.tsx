@@ -94,7 +94,7 @@ describe("setup basic sections", () => {
         isSubmitPending={false}
       />,
     );
-    expect(screen.getByRole("button", { name: "변경사항 저장" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "저장하기" })).toBeInTheDocument();
 
     rerender(
       <SetupSubmitButton

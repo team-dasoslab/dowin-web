@@ -7,6 +7,7 @@ import { SegmentedControl } from "@/components/ui/SegmentedControl";
 
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Input } from "@/components/ui/Input";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 
@@ -31,6 +32,7 @@ interface LeadMeasuresSectionProps {
   removeMeasureRow: (id: string) => void;
   restoreMeasureRow: (id: string) => void;
   toggleMeasureTag: (measureId: string, tag: SetupTag) => void;
+  moveMeasureRow: (index: number, direction: "up" | "down") => void;
 }
 
 export function LeadMeasuresSection({
@@ -44,6 +46,7 @@ export function LeadMeasuresSection({
   reactivateMeasureRow,
   removeMeasureRow,
   restoreMeasureRow,
+  moveMeasureRow,
 }: LeadMeasuresSectionProps) {
   const t = useTranslations("Setup");
   const activeMeasures = measures.filter(
@@ -77,6 +80,7 @@ export function LeadMeasuresSection({
             monthlyTargetMax={monthlyTargetMax}
             removeMeasureRow={removeMeasureRow}
             restoreMeasureRow={restoreMeasureRow}
+            moveMeasureRow={moveMeasureRow}
           />
         ))}
       </div>
@@ -117,6 +121,7 @@ function LeadMeasureRow({
   monthlyTargetMax,
   removeMeasureRow,
   restoreMeasureRow,
+  moveMeasureRow,
 }: {
   archiveMeasureRow: (id: string) => void;
   handleMeasureChange: LeadMeasuresSectionProps["handleMeasureChange"];
@@ -128,6 +133,7 @@ function LeadMeasureRow({
   monthlyTargetMax: number;
   removeMeasureRow: (id: string) => void;
   restoreMeasureRow: (id: string) => void;
+  moveMeasureRow: (index: number, direction: "up" | "down") => void;
 }) {
   // Tag states removed
 
@@ -167,9 +173,36 @@ function LeadMeasureRow({
     <div className="space-y-5 p-4 sm:space-y-6 sm:p-8">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <label className="text-sm font-bold text-text-primary">
-            {t("leadMeasureShort")} #{index + 1}
-          </label>
+          <div className="flex items-center gap-0.5">
+            <Button
+              type="button"
+              variant="subtle"
+              size="icon"
+              aria-label={t("moveUp") || "위로 이동"}
+              onClick={(e) => {
+                e.preventDefault();
+                moveMeasureRow(index, "up");
+              }}
+              disabled={index === 0 || isMutating}
+              className="h-7 w-7 rounded-[8px] text-text-muted hover:text-primary hover:bg-sub-background transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ArrowUp className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="subtle"
+              size="icon"
+              aria-label={t("moveDown") || "아래로 이동"}
+              onClick={(e) => {
+                e.preventDefault();
+                moveMeasureRow(index, "down");
+              }}
+              disabled={index === measuresCount - 1 || isMutating}
+              className="h-7 w-7 rounded-[8px] text-text-muted hover:text-primary hover:bg-sub-background transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ArrowDown className="w-3.5 h-3.5" />
+            </Button>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {canArchive ? (

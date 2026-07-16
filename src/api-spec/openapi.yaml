@@ -4474,6 +4474,7 @@ components:
         targetValue: { type: integer }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
         trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        orderIndex: { type: integer, minimum: 0, default: 0 }
         dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         status: { type: string, enum: [ACTIVE, ARCHIVED] }
         tags:
@@ -4504,6 +4505,7 @@ components:
         targetValue: { type: integer, minimum: 1 }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
         trackingMode: { type: string, enum: [BOOLEAN, COUNT], default: BOOLEAN }
+        orderIndex: { type: integer, minimum: 0, default: 0 }
         dailyTargetCount: { type: integer, minimum: 1, maximum: 20, default: 1 }
         tagIds:
           type: array
@@ -4518,6 +4520,7 @@ components:
         targetValue: { type: integer, minimum: 1 }
         period: { type: string, enum: [DAILY, WEEKLY, MONTHLY] }
         trackingMode: { type: string, enum: [BOOLEAN, COUNT] }
+        orderIndex: { type: integer, minimum: 0 }
         dailyTargetCount: { type: integer, minimum: 1, maximum: 20 }
         tagIds:
           type: array

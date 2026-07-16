@@ -1476,6 +1476,8 @@ export interface LeadMeasure {
   targetValue?: number;
   period?: LeadMeasurePeriod;
   trackingMode?: LeadMeasureTrackingMode;
+  /** @minimum 0 */
+  orderIndex?: number;
   /**
    * @minimum 1
    * @maximum 20
@@ -1520,6 +1522,8 @@ export interface LeadMeasureCreateRequest {
   targetValue: number;
   period: LeadMeasureCreateRequestPeriod;
   trackingMode?: LeadMeasureCreateRequestTrackingMode;
+  /** @minimum 0 */
+  orderIndex?: number;
   /**
    * @minimum 1
    * @maximum 20
@@ -1552,6 +1556,8 @@ export interface LeadMeasureUpdateRequest {
   targetValue?: number;
   period?: LeadMeasureUpdateRequestPeriod;
   trackingMode?: LeadMeasureUpdateRequestTrackingMode;
+  /** @minimum 0 */
+  orderIndex?: number;
   /**
    * @minimum 1
    * @maximum 20
