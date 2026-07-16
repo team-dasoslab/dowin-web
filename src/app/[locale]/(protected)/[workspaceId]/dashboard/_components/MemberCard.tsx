@@ -2,9 +2,11 @@ import { TeamDashboardMember } from "@/api/generated/dowin.schemas";
 import { getRateVariant } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/dashboard";
 import { UserAvatar } from "@/components/UserAvatar";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Zap } from "lucide-react";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
+import { useNudgeMember } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useNudgeMember";
 
 type MemberCardProps = {
   member: TeamDashboardMember;
@@ -14,6 +16,7 @@ type MemberCardProps = {
 export function MemberCard({ member, isMe = false }: MemberCardProps) {
   const t = useTranslations("Dashboard");
   const tc = useTranslations("Common");
+  const { nudgeMember, isNudging } = useNudgeMember();
 
   const weeklyAchievementRate =
     member.weeklyAchievementRate ?? member.achievementRate ?? 0;
@@ -66,6 +69,24 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
             </p>
           </div>
         </div>
+
+        {!isMe && (
+          <Button 
+            variant="outline" 
+            size="control" 
+            title={t("nudgeTitle", { name: member.nickname || tc("teamMember") })}
+            disabled={isNudging}
+            className="hover:bg-transparent"
+            onClick={() => {
+              const confirmed = window.confirm(t("nudgeConfirm", { name: member.nickname || tc("teamMember") }));
+              if (confirmed && member.userId) {
+                nudgeMember(member.userId, member.nickname || tc("teamMember"));
+              }
+            }}
+          >
+            {t("nudgeButton")}
+          </Button>
+        )}
       </div>
 
       <div className="flex items-center gap-2 text-xs text-text-muted bg-sub-background rounded-[16px] px-4 py-3">

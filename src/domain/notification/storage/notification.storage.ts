@@ -140,6 +140,18 @@ export class NotificationStorage {
     })) as DevicePushTokenWithLocaleRecord[];
   }
 
+  async findActiveTokensByUserId(
+    userId: number,
+  ): Promise<DevicePushTokenRecord[]> {
+    return this.db.query.devicePushTokens.findMany({
+      where: and(
+        eq(devicePushTokens.userId, userId),
+        eq(devicePushTokens.notificationEnabled, true),
+        isNull(devicePushTokens.disabledAt),
+      ),
+    });
+  }
+
   async findUserNotificationSettings(
     userId: number,
   ): Promise<UserNotificationSettingsRecord | null> {

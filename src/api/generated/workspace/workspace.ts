@@ -2401,4 +2401,100 @@ export const useDeleteWorkspacesIdMembersMemberId = <TError = UnauthorizedErrorR
       > => {
       return useMutation(getDeleteWorkspacesIdMembersMemberIdMutationOptions(options), queryClient);
     }
+    /**
+ * 특정 팀원에게 목표 달성 독려(콕 찌르기) 푸시 알림을 발송합니다.
+ * @summary 팀원 콕 찌르기 (Nudge)
+ */
+export type postWorkspacesIdMembersMemberIdNudgeResponse204 = {
+  data: void
+  status: 204
+}
+
+export type postWorkspacesIdMembersMemberIdNudgeResponse401 = {
+  data: UnauthorizedErrorResponse
+  status: 401
+}
+
+export type postWorkspacesIdMembersMemberIdNudgeResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postWorkspacesIdMembersMemberIdNudgeResponseSuccess = (postWorkspacesIdMembersMemberIdNudgeResponse204) & {
+  headers: Headers;
+};
+export type postWorkspacesIdMembersMemberIdNudgeResponseError = (postWorkspacesIdMembersMemberIdNudgeResponse401 | postWorkspacesIdMembersMemberIdNudgeResponse404) & {
+  headers: Headers;
+};
+
+export type postWorkspacesIdMembersMemberIdNudgeResponse = (postWorkspacesIdMembersMemberIdNudgeResponseSuccess | postWorkspacesIdMembersMemberIdNudgeResponseError)
+
+export const getPostWorkspacesIdMembersMemberIdNudgeUrl = (id: string,
+    memberId: number,) => {
+
+
+  
+
+  return `/api/workspaces/${id}/members/${memberId}/nudge`
+}
+
+export const postWorkspacesIdMembersMemberIdNudge = async (id: string,
+    memberId: number, options?: RequestInit): Promise<postWorkspacesIdMembersMemberIdNudgeResponse> => {
+  
+  return customInstance<postWorkspacesIdMembersMemberIdNudgeResponse>(getPostWorkspacesIdMembersMemberIdNudgeUrl(id,memberId),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+  
+
+
+
+export const getPostWorkspacesIdMembersMemberIdNudgeMutationOptions = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdMembersMemberIdNudge>>, TError,{id: string;memberId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdMembersMemberIdNudge>>, TError,{id: string;memberId: number}, TContext> => {
+
+const mutationKey = ['postWorkspacesIdMembersMemberIdNudge'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postWorkspacesIdMembersMemberIdNudge>>, {id: string;memberId: number}> = (props) => {
+          const {id,memberId} = props ?? {};
+
+          return  postWorkspacesIdMembersMemberIdNudge(id,memberId,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostWorkspacesIdMembersMemberIdNudgeMutationResult = NonNullable<Awaited<ReturnType<typeof postWorkspacesIdMembersMemberIdNudge>>>
+    
+    export type PostWorkspacesIdMembersMemberIdNudgeMutationError = UnauthorizedErrorResponse | ErrorResponse
+
+    /**
+ * @summary 팀원 콕 찌르기 (Nudge)
+ */
+export const usePostWorkspacesIdMembersMemberIdNudge = <TError = UnauthorizedErrorResponse | ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postWorkspacesIdMembersMemberIdNudge>>, TError,{id: string;memberId: number}, TContext>, request?: SecondParameter<typeof customInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postWorkspacesIdMembersMemberIdNudge>>,
+        TError,
+        {id: string;memberId: number},
+        TContext
+      > => {
+      return useMutation(getPostWorkspacesIdMembersMemberIdNudgeMutationOptions(options), queryClient);
+    }
     
