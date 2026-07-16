@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/team-dasoslab/dowin-web/compare/v1.12.1...v1.13.0) (2026-07-16)
+
+
+### Features
+
+* 액션 아이템 순서 설정 기능 추가 ([#227](https://github.com/team-dasoslab/dowin-web/issues/227)) ([3a576f6](https://github.com/team-dasoslab/dowin-web/commit/3a576f66f1c5e4724d27dd568d2bc21f8e6898a2))
+
 ## [1.12.1](https://github.com/team-dasoslab/dowin-web/compare/v1.12.0...v1.12.1) (2026-07-16)
 
 
