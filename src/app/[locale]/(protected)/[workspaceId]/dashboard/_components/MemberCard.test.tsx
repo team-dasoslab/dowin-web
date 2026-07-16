@@ -1,6 +1,14 @@
+
+vi.mock("@/app/[locale]/(protected)/[workspaceId]/dashboard/_hooks/useNudgeMember", () => ({
+  useNudgeMember: () => ({
+    nudgeMember: vi.fn(),
+    isNudging: false,
+  }),
+}));
+
 import { screen } from "@testing-library/react";
 import type { ComponentProps } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "@/test/render";
 
