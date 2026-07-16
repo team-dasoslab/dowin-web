@@ -973,6 +973,7 @@ export const leadMeasures = sqliteTable("lead_measures", {
   trackingMode: text("tracking_mode", { enum: ["BOOLEAN", "COUNT"] })
     .notNull()
     .default("BOOLEAN"),
+  orderIndex: integer("order_index").notNull().default(0),
   dailyTargetCount: integer("daily_target_count").notNull().default(1),
   status: text("status", { enum: ["ACTIVE", "ARCHIVED"] })
     .notNull()
