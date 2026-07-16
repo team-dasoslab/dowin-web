@@ -3,6 +3,11 @@ import { NotificationStorage } from "@/domain/notification/storage/notification.
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { sendFcmMessages } from "@/domain/notification/services/fcm";
 import { NotFoundError, ForbiddenError } from "@/lib/server/errors";
+import en from "@/messages/en.json";
+import ko from "@/messages/ko.json";
+
+const messages = { ko, en } as const;
+type Locale = keyof typeof messages;
 
 export class NudgeService {
   constructor(
@@ -47,6 +52,12 @@ export class NudgeService {
     );
     const senderNickname = senderProfile?.nickname ?? "팀원";
 
+    const targetProfile = await this.profileStorage.findProfileByUserId(
+      input.toUserId,
+    );
+    const targetLocale = (targetProfile?.locale as Locale) ?? "ko";
+    const t = messages[targetLocale] ?? messages.ko;
+
     const tokens = await this.notificationStorage.findActiveTokensByUserId(
       input.toUserId,
     );
@@ -60,13 +71,14 @@ export class NudgeService {
       return;
     }
 
-    const message = `[Dowin] ${senderNickname}님이 콕 찔렀어요!`;
+    const title = t.Notification.socialNudgeTitle;
+    const body = t.Notification.socialNudgeBody.replace("{senderName}", senderNickname);
 
     const delivery = await sendFcmMessages(
       tokens.map((t) => ({
         token: t.token,
-        title: "Dowin",
-        body: message,
+        title,
+        body,
         pushType: "social_nudge",
         campaignId: "social_nudge_v1",
       })),

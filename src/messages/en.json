@@ -1328,7 +1328,9 @@
     "dailyReminderTitle": "Dowin",
     "dailyReminderBody": "Did you record your lead measures today? Check them now!",
     "teamCheckinTitle": "Dowin",
-    "teamCheckinBody": "No log for {actionItemName} this week. Give it a go today?"
+    "teamCheckinBody": "No log for {actionItemName} this week. Give it a go today?",
+    "socialNudgeTitle": "Dowin",
+    "socialNudgeBody": "{senderName} nudged you!"
   },
   "PushNotification": {
     "unsupportedIos": "Push notifications are only supported on iOS 16.4 or later.",
