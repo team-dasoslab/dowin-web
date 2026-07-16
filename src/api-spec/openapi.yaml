@@ -68,8 +68,7 @@ paths:
               properties:
                 customId: { type: string, example: john123 }
                 nickname: { type: string, example: 존 }
-                password:
-                  { type: string, format: password, example: "newSecurePass1!" }
+                password: { type: string, format: password, example: "newSecurePass1!" }
       responses:
         "201":
           description: 회원가입 성공
@@ -149,8 +148,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    { type: string, example: "비밀번호가 변경되었습니다." }
+                  message: { type: string, example: "비밀번호가 변경되었습니다." }
         "400":
           description: 현재 비밀번호 불일치
           content:
@@ -232,13 +230,7 @@ paths:
                     type: array
                     items:
                       type: string
-                      enum:
-                        [
-                          SUPPORT_ADMIN,
-                          BILLING_ADMIN,
-                          RECOVERY_ADMIN,
-                          SYSTEM_ADMIN,
-                        ]
+                      enum: [SUPPORT_ADMIN, BILLING_ADMIN, RECOVERY_ADMIN, SYSTEM_ADMIN]
         "401":
           description: 아이디 또는 비밀번호 불일치
           content:
@@ -1158,8 +1150,7 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/WorkspaceCheckoutCompleteRequest" }
+            schema: { $ref: "#/components/schemas/WorkspaceCheckoutCompleteRequest" }
       responses:
         "201":
           description: 결제 검증 및 워크스페이스 생성 완료
@@ -1172,10 +1163,7 @@ paths:
                 }
           content:
             application/json:
-              schema:
-                {
-                  $ref: "#/components/schemas/WorkspaceCheckoutCompleteResponse",
-                }
+              schema: { $ref: "#/components/schemas/WorkspaceCheckoutCompleteResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "404":
@@ -1203,15 +1191,13 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/MarketingInviteRedeemRequest" }
+            schema: { $ref: "#/components/schemas/MarketingInviteRedeemRequest" }
       responses:
         "201":
           description: 프로모션 코드 워크스페이스 생성 성공
           content:
             application/json:
-              schema:
-                { $ref: "#/components/schemas/MarketingInviteRedeemResponse" }
+              schema: { $ref: "#/components/schemas/MarketingInviteRedeemResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "404":
@@ -1301,8 +1287,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    { type: string, example: "워크스페이스에 참가했습니다." }
+                  message: { type: string, example: "워크스페이스에 참가했습니다." }
         "404":
           description: 존재하지 않는 워크스페이스
           content:
@@ -1340,8 +1325,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    { type: string, example: "워크스페이스에 참가했습니다." }
+                  message: { type: string, example: "워크스페이스에 참가했습니다." }
         "404":
           description: 존재하지 않는 초대코드
           content:
@@ -1558,8 +1542,7 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/WorkspaceInviteCreateRequest" }
+            schema: { $ref: "#/components/schemas/WorkspaceInviteCreateRequest" }
       responses:
         "201":
           description: 생성 성공
@@ -1792,6 +1775,32 @@ paths:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
         "404":
           description: 대상 멤버를 찾을 수 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/{id}/members/{memberId}/nudge:
+    post:
+      summary: "팀원 콕 찌르기 (Nudge)"
+      description: "특정 팀원에게 목표 달성 독려(콕 찌르기) 푸시 알림을 발송합니다."
+      tags: [Workspace]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: memberId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: "푸시 알림 발송 성공"
+        "404":
+          description: "대상 멤버를 찾을 수 없음"
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ErrorResponse" }
@@ -2409,8 +2418,7 @@ paths:
           description: 조회 성공
           content:
             application/json:
-              schema:
-                { $ref: "#/components/schemas/MonthlyLogsSummaryResponse" }
+              schema: { $ref: "#/components/schemas/MonthlyLogsSummaryResponse" }
         "404":
           description: 점수판을 찾을 수 없음
           content:
@@ -2458,8 +2466,7 @@ paths:
           description: 조회 성공
           content:
             application/json:
-              schema:
-                { $ref: "#/components/schemas/AnalyticsExportDataResponse" }
+              schema: { $ref: "#/components/schemas/AnalyticsExportDataResponse" }
         "422":
           description: "잘못된 기간 또는 필터 (예: from > to, 92일 초과)"
           content:
@@ -2565,17 +2572,13 @@ paths:
         required: false
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/WorkspaceBillingCheckoutRequest" }
+            schema: { $ref: "#/components/schemas/WorkspaceBillingCheckoutRequest" }
       responses:
         "201":
           description: Basic checkout 준비 완료
           content:
             application/json:
-              schema:
-                {
-                  $ref: "#/components/schemas/WorkspaceBillingCheckoutResponse",
-                }
+              schema: { $ref: "#/components/schemas/WorkspaceBillingCheckoutResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -2615,17 +2618,13 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateRequest" }
+            schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateRequest" }
       responses:
         "200":
           description: seat 변경 요청 접수
           content:
             application/json:
-              schema:
-                {
-                  $ref: "#/components/schemas/WorkspaceBillingSeatUpdateResponse",
-                }
+              schema: { $ref: "#/components/schemas/WorkspaceBillingSeatUpdateResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -2909,8 +2908,7 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/TeamCheckinResponseCreateRequest" }
+            schema: { $ref: "#/components/schemas/TeamCheckinResponseCreateRequest" }
       responses:
         "200":
           description: 응답 저장 성공
@@ -2976,17 +2974,13 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              {
-                $ref: "#/components/schemas/TeamCheckinAdjustmentProposalCreateRequest",
-              }
+            schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalCreateRequest" }
       responses:
         "201":
           description: 생성 성공
           content:
             application/json:
-              schema:
-                { $ref: "#/components/schemas/TeamCheckinAdjustmentProposal" }
+              schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposal" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -3019,10 +3013,7 @@ paths:
           description: 수락 및 적용 성공
           content:
             application/json:
-              schema:
-                {
-                  $ref: "#/components/schemas/TeamCheckinAdjustmentProposalApplyResponse",
-                }
+              schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalApplyResponse" }
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "404":
@@ -3054,10 +3045,7 @@ paths:
         required: false
         content:
           application/json:
-            schema:
-              {
-                $ref: "#/components/schemas/TeamCheckinAdjustmentProposalDeclineRequest",
-              }
+            schema: { $ref: "#/components/schemas/TeamCheckinAdjustmentProposalDeclineRequest" }
       responses:
         "200":
           description: 거절 성공
@@ -3125,8 +3113,7 @@ paths:
           description: 조회 성공
           content:
             application/json:
-              schema:
-                { $ref: "#/components/schemas/DashboardTeamMemoListResponse" }
+              schema: { $ref: "#/components/schemas/DashboardTeamMemoListResponse" }
         "404":
           description: 워크스페이스 또는 대상 사용자를 찾을 수 없음
           content:
@@ -3152,8 +3139,7 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/DashboardTeamMemoCreateRequest" }
+            schema: { $ref: "#/components/schemas/DashboardTeamMemoCreateRequest" }
       responses:
         "201":
           description: 생성 성공
@@ -3191,8 +3177,7 @@ paths:
         required: true
         content:
           application/json:
-            schema:
-              { $ref: "#/components/schemas/DashboardTeamMemoResolveRequest" }
+            schema: { $ref: "#/components/schemas/DashboardTeamMemoResolveRequest" }
       responses:
         "200":
           description: 변경 성공
@@ -3526,14 +3511,7 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum:
-            [
-              POLAR,
-              MANUAL_GRANT,
-              PARTNER,
-              INTERNAL_TEST,
-              BETA_PROMOTIONAL_GRANT,
-            ]
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
           nullable: true
         provider:
           type: string
@@ -3594,16 +3572,7 @@ components:
     AdminBillingProviderProduct:
       type: object
       required:
-        [
-          id,
-          provider,
-          environment,
-          planCode,
-          providerProductId,
-          isActive,
-          createdAt,
-          updatedAt,
-        ]
+        [id, provider, environment, planCode, providerProductId, isActive, createdAt, updatedAt]
       properties:
         id: { type: integer }
         provider:
@@ -3628,8 +3597,7 @@ components:
 
     AdminBillingProviderProductUpsertRequest:
       type: object
-      required:
-        [provider, environment, planCode, providerProductId, changeReason]
+      required: [provider, environment, planCode, providerProductId, changeReason]
       properties:
         provider:
           type: string
@@ -3653,8 +3621,7 @@ components:
 
     AdminBillingEvent:
       type: object
-      required:
-        [id, provider, eventType, occurredAt, recordedAt, status, source]
+      required: [id, provider, eventType, occurredAt, recordedAt, status, source]
       properties:
         id: { type: integer }
         provider:
@@ -3710,14 +3677,7 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum:
-            [
-              POLAR,
-              MANUAL_GRANT,
-              PARTNER,
-              INTERNAL_TEST,
-              BETA_PROMOTIONAL_GRANT,
-            ]
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
           nullable: true
         customerKey:
           type: string
@@ -3807,14 +3767,7 @@ components:
 
     MarketingInviteRedemption:
       type: object
-      required:
-        [
-          id,
-          marketingInviteCodeId,
-          redeemedByUserId,
-          redeemedAt,
-          feedbackStatus,
-        ]
+      required: [id, marketingInviteCodeId, redeemedByUserId, redeemedAt, feedbackStatus]
       properties:
         id: { type: integer }
         marketingInviteCodeId: { type: integer }
@@ -4343,14 +4296,7 @@ components:
           enum: [NONE, ACTIVE, CANCELED, EXPIRED, REVOKED]
         entitlementSource:
           type: string
-          enum:
-            [
-              POLAR,
-              MANUAL_GRANT,
-              PARTNER,
-              INTERNAL_TEST,
-              BETA_PROMOTIONAL_GRANT,
-            ]
+          enum: [POLAR, MANUAL_GRANT, PARTNER, INTERNAL_TEST, BETA_PROMOTIONAL_GRANT]
           nullable: true
         provider:
           type: string
@@ -4864,14 +4810,7 @@ components:
     MyDashboardResponse:
       type: object
       required:
-        [
-          workspace,
-          activeScoreboard,
-          weeklyLogs,
-          monthlyLogs,
-          monthlySummary,
-          weeklyTrendPoints,
-        ]
+        [workspace, activeScoreboard, weeklyLogs, monthlyLogs, monthlySummary, weeklyTrendPoints]
       properties:
         workspace:
           $ref: "#/components/schemas/MyDashboardWorkspace"
@@ -4999,8 +4938,7 @@ components:
 
     DashboardTeamMemo:
       type: object
-      required:
-        [id, workspaceId, targetUserId, author, content, isResolved, createdAt]
+      required: [id, workspaceId, targetUserId, author, content, isResolved, createdAt]
       properties:
         id: { type: integer }
         workspaceId: { type: string }
@@ -5095,13 +5033,8 @@ components:
           required: [code, message]
           properties:
             code: { type: string, description: 머신 리더블 에러 코드 }
-            message:
-              { type: string, description: 사람이 읽을 수 있는 한국어 메시지 }
-            details:
-              {
-                type: object,
-                description: 유효성 검사 실패 시 필드별 상세 오류 (선택),
-              }
+            message: { type: string, description: 사람이 읽을 수 있는 한국어 메시지 }
+            details: { type: object, description: 유효성 검사 실패 시 필드별 상세 오류 (선택) }
 
   responses:
     UnauthorizedError:
