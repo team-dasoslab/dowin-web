@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/team-dasoslab/dowin-web/compare/v1.12.0...v1.12.1) (2026-07-16)
+
+
+### Bug Fixes
+
+* 콕 찌르기 푸시 알림 다국어 적용 ([b5d449a](https://github.com/team-dasoslab/dowin-web/commit/b5d449af5b91529ceb5187c8411226001bf9d791))
+
 ## [1.12.0](https://github.com/team-dasoslab/dowin-web/compare/v1.11.0...v1.12.0) (2026-07-16)
 
 
