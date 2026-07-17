@@ -19,8 +19,8 @@ DOWIN는 팀의 목표 실행과 주간 운영을 관리하는 서비스다. 핵
 - 일일 기록: 주간/월간 조회, 날짜별 기록 토글, 낙관적 업데이트
 - 대시보드: 개인 뷰 기간 탐색, 팀 뷰, 주간/월간 달성률, 팀 메모 레일
 - 프로필: 내 정보 조회, 닉네임 변경, 비밀번호 변경, 앱 전용 푸시 알림 토글
-- 업데이트 허브: `/updates` 인앱 새 기능 모아보기
-- export/analytics: `GET /api/analytics/export-data`와 CSV 다운로드
+- 업데이트 허브: `/updates` 인앱 업데이트 노트
+- export/analytics: `GET /api/analytics/export-data`와 데이터 내보내기
 - 알림: 매일 밤 9시 리마인드, 앱 전용 FCM 토큰 전환 진행 중
 
 아직 미완성 또는 후속 범위로 보이는 항목도 분명하다.
@@ -123,9 +123,9 @@ yarn preview
 - [`src/app/(protected)/scoreboards/page.tsx`](</src/app/(protected)/scoreboards/page.tsx>): 점수판 보관함
 - [`src/app/(protected)/profile/page.tsx`](</src/app/(protected)/profile/page.tsx>): 프로필/알림/로그아웃
 - [`src/app/(protected)/profile/avatar/page.tsx`](</src/app/(protected)/profile/avatar/page.tsx>): preset avatar 선택
-- [`src/app/(protected)/profile/members/page.tsx`](</src/app/(protected)/profile/members/page.tsx>): 관리자용 멤버 관리
-- [`src/app/(protected)/profile/export/page.tsx`](</src/app/(protected)/profile/export/page.tsx>): CSV 다운로드
-- [`src/app/(protected)/updates/page.tsx`](</src/app/(protected)/updates/page.tsx>): 새 기능 모아보기
+- [`src/app/(protected)/settings/members/page.tsx`](</src/app/(protected)/settings/members/page.tsx>): 관리자용 멤버 관리
+- [`src/app/(protected)/settings/export/page.tsx`](</src/app/(protected)/settings/export/page.tsx>): 데이터 내보내기
+- [`src/app/(protected)/updates/page.tsx`](</src/app/(protected)/updates/page.tsx>): 업데이트 노트
 - [`src/app/(protected)/workspace/new/page.tsx`](</src/app/(protected)/workspace/new/page.tsx>): 워크스페이스 생성
 
 ### API 계약/생성 코드
