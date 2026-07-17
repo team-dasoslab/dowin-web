@@ -209,7 +209,7 @@ describe("ProfilePage", () => {
       "href",
       "/workspace-1/profile/delete-account",
     );
-    expect(screen.getByRole("link", { name: /새로운 소식/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /업데이트 노트/ })).toHaveAttribute(
       "href",
       "/workspace-1/profile/updates",
     );

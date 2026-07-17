@@ -6,21 +6,6 @@ import { renderWithProviders } from "@/test/render";
 
 import { ProductUpdateCard } from "./ProductUpdateCard";
 
-vi.mock("@/i18n/routing", () => ({
-  Link: ({
-    children,
-    href,
-    ...props
-  }: {
-    children: React.ReactNode;
-    href: string;
-  }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  ),
-}));
-
 vi.mock("next/navigation", () => ({
   useParams: vi.fn(() => ({ workspaceId: "workspace-1" })),
 }));
@@ -34,8 +19,6 @@ vi.mock("@/content/product-updates", () => ({
       summary: "프로필 알림 설정에서 내 생활 리듬에 맞는 시간으로 매일 기록 리마인드 푸시를 받을 수 있습니다.",
       publishedAt: "2026.04.14",
       tag: "Profile",
-      ctaLabel: "바로 써보기",
-      ctaHref: "/profile?coachmark=personal-reminder",
       isMajor: true,
     }
   ]
@@ -62,10 +45,7 @@ describe("ProductUpdateCard", () => {
     expect(screen.getByText("프로필")).toBeInTheDocument();
     expect(screen.getByText("2026.04.14")).toBeInTheDocument();
 
-    expect(screen.getByRole("link", { name: "바로 써보기" })).toHaveAttribute(
-      "href",
-      "/workspace-1/profile?coachmark=personal-reminder",
-    );
+
   });
 
   it("calls onDismiss when the dismiss button is clicked", () => {

@@ -1,9 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
 import type { ProductUpdate } from "@/content/product-updates";
-import { Link } from "@/i18n/routing";
 
 type ProductUpdateCardProps = {
   item: ProductUpdate & {
@@ -42,20 +40,6 @@ export function ProductUpdateCard({ item }: ProductUpdateCardProps) {
             {item.publishedAt}
           </div>
         </div>
-
-        <Button
-          asChild
-          variant="subtle"
-          size="sm"
-          className="shrink-0 self-start sm:self-auto"
-        >
-          <Link
-            href={item.ctaHref}
-            className="flex items-center justify-center"
-          >
-            <span>{t("ctaLabel")}</span>
-          </Link>
-        </Button>
       </div>
     </div>
   );
