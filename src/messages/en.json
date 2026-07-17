@@ -103,7 +103,7 @@
     "monthlyAchievementRate": "Monthly Achievement",
     "monthlyAchievementRateWithMonth": "Monthly Achievement ({month})",
     "recentTrend": "Last 4 Weeks Trend",
-    "viewAllUpdates": "What's New",
+    "viewAllUpdates": "Update Notes",
     "monthlyBoardTitle": "Monthly Board",
     "dailyCheckinStreak": "{count}-day access streak",
     "dailyCheckinStreakTitle": "{count}-day consecutive access!",
@@ -605,7 +605,7 @@
     "workspaceLeaveDescFull": "Leaves the workspace and returns to the home screen.",
     "csvDownload": "CSV Download",
     "csvDownloadDesc": "Save your records as CSV by selecting period and metrics.",
-    "newFeatures": "What's New",
+    "newFeatures": "Update Notes",
     "newFeaturesDesc": "Check out recently added or improved features.",
     "contactUs": "Contact Us",
     "contactUsDesc": "Leave us any questions or feedback.",
@@ -946,7 +946,7 @@
     "loadFailedDesc": "Please try again shortly."
   },
   "ProductUpdates": {
-    "header": "What's New",
+    "header": "Update Notes",
     "recommendedBadge": "Recommended",
     "latestTitle": "Newest Features",
     "latestDesc": "Quickly browse what's new and try them out.",
