@@ -62,11 +62,11 @@ export function ProtectedContentLayout({
   const isProfilePath =
     pathname === profilePath || pathname.startsWith(`${profilePath}/`);
   const workspaceSettingsPath = workspaceId
-    ? `/${workspaceId}/workspace/settings`
-    : "/workspace/settings";
+    ? `/${workspaceId}/settings`
+    : "/settings";
   const isWorkspacePath =
     pathname === workspaceSettingsPath ||
-    pathname.startsWith(workspaceId ? `/${workspaceId}/workspace/` : "/workspace/");
+    pathname.startsWith(workspaceId ? `/${workspaceId}/settings/` : "/settings/");
   
   const isWorkspaceNewPath =
     pathname === "/workspace/new" ||

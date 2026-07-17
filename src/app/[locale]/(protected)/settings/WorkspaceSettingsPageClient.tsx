@@ -11,7 +11,7 @@ import {
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
 import { TIME_OPTIONS } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
-import { useWorkspaceSettingsActions } from "@/app/[locale]/(protected)/workspace/settings/_hooks/useWorkspaceSettingsActions";
+import { useWorkspaceSettingsActions } from "@/app/[locale]/(protected)/settings/_hooks/useWorkspaceSettingsActions";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
@@ -125,6 +125,32 @@ export default function WorkspaceSettingsPage() {
 
   const menuGroups: { id: string; label: string; items: MenuItem[] }[] = useMemo(() => [
     {
+      id: "scoreboard",
+      label: t("scoreboardSettings"),
+      items: hasWorkspace ? [
+        ...(workspaceId ? [
+          {
+            id: "manage-scoreboard",
+            icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
+            title: dashboardT("manageScoreboard"),
+            href: `/${workspaceId}/setup?mode=update`,
+          },
+          {
+            id: "scoreboard-archive",
+            icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+            title: dashboardT("scoreboardArchive"),
+            href: `/${workspaceId}/scoreboards`,
+          },
+        ] : []),
+        {
+          id: "export-csv",
+          icon: <DowinIcon name="action-download" className="w-4 h-4" />,
+          title: t("dataExport"),
+          href: getWorkspacePath(workspaceId, "/settings/export"),
+        },
+      ] : [],
+    },
+    {
       id: "general",
       label: t("workspaceManagement"),
       items: hasWorkspace
@@ -136,7 +162,7 @@ export default function WorkspaceSettingsPage() {
                   id: "billing",
                   icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
                   title: t("billingTitle"),
-                  href: getWorkspacePath(workspaceId, "/workspace/billing"),
+                  href: getWorkspacePath(workspaceId, "/settings/billing"),
                 },
               ]
               : []),
@@ -151,14 +177,15 @@ export default function WorkspaceSettingsPage() {
               id: "members",
               icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
               title: t("manageMembers"),
-              href: getWorkspacePath(workspaceId, "/workspace/members"),
+              href: getWorkspacePath(workspaceId, "/settings/members"),
             },
             {
               id: "invites",
               icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
               title: t("manageInvites"),
-              href: getWorkspacePath(workspaceId, "/workspace/invites"),
+              href: getWorkspacePath(workspaceId, "/settings/invites"),
             },
+
             {
               id: "past-daily-log-edit",
               icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
@@ -238,27 +265,14 @@ export default function WorkspaceSettingsPage() {
                     id: "checkin-report",
                     icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
                     title: dashboardT("checkinReport"),
-                    href: getWorkspacePath(workspaceId, "/workspace/report/checkin"),
+                    href: getWorkspacePath(workspaceId, "/settings/report/checkin"),
                   },
                 ]
               : []),
           ]
         : [],
     },
-    {
-      id: "data",
-      label: t("dataSection"),
-      items: hasWorkspace
-        ? [
-            {
-              id: "export-csv",
-              icon: <DowinIcon name="action-download" className="w-4 h-4" />,
-              title: t("csvDownload"),
-              href: getWorkspacePath(workspaceId, "/workspace/export"),
-            },
-          ]
-        : [],
-    },
+
   ], [hasWorkspace, isWorkspaceAdmin, showBillingSurface, workspaceId, t, checkinSettings, checkinT, dashboardT, handleTogglePastDailyLogEdit, isUpdateWorkspacePending, changeWorkspaceName, deleteWorkspace, leaveWorkspace, handleToggleCheckin, isUpdateSettingsPending, handleChangeCheckinSendTime, workspace?.allowPastDailyLogEdit]);
 
   const scrollGroups = useMemo(() => [
@@ -299,7 +313,7 @@ export default function WorkspaceSettingsPage() {
       )}
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
         <ProtectedPageHeader
-          title={dashboardT("workspaceSettings")}
+          title={dashboardT("settings")}
         />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">

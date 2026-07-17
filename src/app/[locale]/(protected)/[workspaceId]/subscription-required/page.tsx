@@ -2,7 +2,7 @@
 
 import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
 import { useSubscriptionRequiredActions } from "@/app/[locale]/(protected)/[workspaceId]/subscription-required/_hooks/useSubscriptionRequiredActions";
-import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
+import { useProfileBillingActions } from "@/app/[locale]/(protected)/settings/billing/_hooks/useProfileBillingActions";
 import { InlineSpinner } from "@/components/InlineSpinner";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";

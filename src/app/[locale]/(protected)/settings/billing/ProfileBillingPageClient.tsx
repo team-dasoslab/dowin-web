@@ -7,13 +7,13 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
-import { useSeatChangeActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useSeatChangeActions";
-import { useUpdateWorkspaceSeatsMutation } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useUpdateWorkspaceSeatsMutation";
+import { useProfileBillingActions } from "@/app/[locale]/(protected)/settings/billing/_hooks/useProfileBillingActions";
+import { useSeatChangeActions } from "@/app/[locale]/(protected)/settings/billing/_hooks/useSeatChangeActions";
+import { useUpdateWorkspaceSeatsMutation } from "@/app/[locale]/(protected)/settings/billing/_hooks/useUpdateWorkspaceSeatsMutation";
 import {
   getEntitlementSourceLabel,
   getPeriodEndLabelKey,
-} from "@/app/[locale]/(protected)/workspace/billing/_utils/billing-labels";
+} from "@/app/[locale]/(protected)/settings/billing/_utils/billing-labels";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { InfoTooltip } from "@/components/ui/InfoTooltip";

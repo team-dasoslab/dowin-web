@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useGetWorkspacesWorkspaceIdBillingMe } from "@/api/generated/billing/billing";
 import { useSubscriptionRequiredActions } from "@/app/[locale]/(protected)/[workspaceId]/subscription-required/_hooks/useSubscriptionRequiredActions";
-import { useProfileBillingActions } from "@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions";
+import { useProfileBillingActions } from "@/app/[locale]/(protected)/settings/billing/_hooks/useProfileBillingActions";
 import { useRouter } from "@/i18n/routing";
 import { renderWithProviders } from "@/test/render";
 
@@ -17,7 +17,7 @@ vi.mock("@/app/[locale]/(protected)/[workspaceId]/subscription-required/_hooks/u
   useSubscriptionRequiredActions: vi.fn(),
 }));
 
-vi.mock("@/app/[locale]/(protected)/workspace/billing/_hooks/useProfileBillingActions", () => ({
+vi.mock("@/app/[locale]/(protected)/settings/billing/_hooks/useProfileBillingActions", () => ({
   useProfileBillingActions: vi.fn(),
 }));
 

@@ -38,7 +38,7 @@ export function Sidebar() {
   const mainTabPaths = [
     "/dashboard/my",
     "/dashboard",
-    "/workspace/settings",
+    "/settings",
     "/profile",
     "/subscription-required",
   ];

@@ -7,8 +7,8 @@ export const useSidebarActions = (
 
     // 워크스페이스 하위 메뉴(billing, members, invites) 진입 시에도 '워크스페이스 설정' 메뉴가 active 되도록 예외 처리
     const isWorkspaceMenu =
-      hrefPathname.endsWith("/workspace/settings") &&
-      pathname.includes("/workspace/");
+      hrefPathname.endsWith("/settings") &&
+      pathname.includes("/settings/");
 
     return (
       pathname === hrefPathname ||
