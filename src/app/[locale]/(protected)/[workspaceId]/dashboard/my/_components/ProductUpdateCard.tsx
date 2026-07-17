@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import type { ProductUpdate } from "@/content/product-updates";
-import { Link } from "@/i18n/routing";
-import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
 
 interface ProductUpdateCardProps {
   onDismiss: () => void;
@@ -17,8 +14,6 @@ export function ProductUpdateCard({
 }: ProductUpdateCardProps) {
   const t = useTranslations("Dashboard");
   const updateT = useTranslations("ProductUpdates");
-  const params = useParams();
-  const workspaceId = params.workspaceId as string | undefined;
 
   return (
     <div className="overflow-hidden rounded-[24px] bg-surface">
@@ -55,16 +50,6 @@ export function ProductUpdateCard({
             <span className="text-zinc-300 dark:text-zinc-700">•</span>
             <span>{updateT(`tags.${update.tag}`)}</span>
           </div>
-
-          {update.tag !== "Home" && (
-            <div className="flex flex-row flex-wrap items-center gap-2 pt-0.5">
-              <Button variant="primary" size="sm" asChild>
-                <Link href={getWorkspacePath(workspaceId, update.ctaHref)}>
-                  {updateT("ctaLabel")}
-                </Link>
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </div>

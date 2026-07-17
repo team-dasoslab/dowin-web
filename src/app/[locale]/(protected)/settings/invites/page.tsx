@@ -11,8 +11,8 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
-import { useInviteActions } from "@/app/[locale]/(protected)/workspace/invites/_hooks/useInviteActions";
-import { useInviteForm } from "@/app/[locale]/(protected)/workspace/invites/_hooks/useInviteForm";
+import { useInviteActions } from "@/app/[locale]/(protected)/settings/invites/_hooks/useInviteActions";
+import { useInviteForm } from "@/app/[locale]/(protected)/settings/invites/_hooks/useInviteForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";

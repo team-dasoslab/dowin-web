@@ -229,22 +229,22 @@ describe("WorkspaceSettingsPage", () => {
     renderWithProviders(<WorkspaceSettingsPage />);
 
     expect(
-      screen.getByRole("heading", { name: "워크스페이스" }),
+      screen.getByRole("heading", { name: "설정" }),
     ).toBeInTheDocument();
     expect(screen.getAllByText("Dowin Team").length).toBeGreaterThan(0);
     expect(screen.getAllByText("워크스페이스 관리자").length).toBeGreaterThan(0);
     expect(screen.getByText("Basic")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /플랜 및 결제/ })).toHaveAttribute(
       "href",
-      "/workspace-1/workspace/billing",
+      "/workspace-1/settings/billing",
     );
     expect(screen.getByRole("link", { name: /멤버 관리/ })).toHaveAttribute(
       "href",
-      "/workspace-1/workspace/members",
+      "/workspace-1/settings/members",
     );
     expect(screen.getByRole("link", { name: /초대코드 관리/ })).toHaveAttribute(
       "href",
-      "/workspace-1/workspace/invites",
+      "/workspace-1/settings/invites",
     );
     expect(
       screen.queryByRole("link", { name: /주간 리포트/ }),

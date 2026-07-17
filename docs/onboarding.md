@@ -45,18 +45,18 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - Profile `GET /api/users/me`, `PUT /api/users/me`, `DELETE /api/users/me` 구현 완료
 - 프로필 preset avatar 선택 및 저장 완료
 - 닉네임 변경 시 DB 저장 및 프로필 재조회 완료
-- 프로필에서 워크스페이스 이름 변경, 멤버 관리 진입, CSV export 진입 가능
 - 프로필에서 서비스 탈퇴 전용 화면 진입 및 비밀번호 확인 기반 계정 삭제 가능
-- 프로필에서 MEMBER 기준 워크스페이스 탈퇴 가능
-- 프로필에서 ADMIN 기준 워크스페이스 삭제 가능
+- 설정에서 워크스페이스 이름 변경, 멤버 관리, 데이터 내보내기, 점수판 관리 및 점수판 보관함 진입 가능
+- 설정에서 MEMBER 기준 워크스페이스 탈퇴 가능
+- 설정에서 ADMIN 기준 워크스페이스 삭제 가능
 - 멤버 관리 화면에서 관리자 권한 이전 가능
-- `/updates` 새 기능 모아보기 허브 구현 완료
+- `/updates` 업데이트 노트 허브 구현 완료
 - 비로그인 사용자용 서비스 소개형 루트 랜딩 페이지(`/`)의 카피 전면 개편 완료 (B2B 지향적이고 후킹한 어조 도입, 외부 방법론 용어 의존도 축소, '시작하기'로 CTA 간결화)
 - 제품 전반 용어 기준을 `핵심 목표 / 성공 기준 / 액션 아이템 / 점수판`으로 정리 완료
 - Setup / 대시보드 / 리포트 / 랜딩 핵심 번역 카피에 위 용어 기준 1차 반영 완료
 - 랜딩 Hero 비교용 variant preview 지원 완료
   - `/{locale}?variant=1|2|3` 로 Hero 헤드라인/서브카피 비교 가능
-- Analytics export API와 프로필 CSV 다운로드 화면 구현 완료
+- Analytics export API와 프로필 데이터 내보내기 화면 구현 완료
 - 푸시 구독 토글 및 개인 기록 리마인드 시간 설정 구현 완료
 - WebView bridge 웹 타입 정리 및 `@webview-bridge/web` 연동 경로 정리 완료
 - 로그인 직후 `dashboard/my` 첫 진입 시 알림 권한 요청 트리거 추가 완료
@@ -319,18 +319,17 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - `src/app/(protected)/setup/_hooks/useScoreboardSetup.ts`
   - 점수판 설정, 선행지표 태그 생성/수정/삭제, 낙관적 업데이트 로직
 - `src/app/(protected)/profile/page.tsx`
-  - 프로필 홈, 비밀번호 변경, 워크스페이스/데이터/앱 탐색 메뉴
-  - MEMBER는 워크스페이스 탈퇴, ADMIN은 워크스페이스 삭제 가능
+  - 프로필 홈, 비밀번호 변경, 앱 탐색 메뉴
 - `src/app/(protected)/profile/avatar/page.tsx`
   - preset avatar 선택 화면
-- `src/app/(protected)/profile/members/page.tsx`
+- `src/app/(protected)/settings/members/page.tsx`
   - 관리자용 멤버 조회 / 퇴출 / 관리자 권한 이전 화면
-- `src/app/(protected)/profile/invites/page.tsx`
+- `src/app/(protected)/settings/invites/page.tsx`
   - 관리자용 초대코드 생성 / 상태관리 화면
-- `src/app/(protected)/profile/export/page.tsx`
-  - CSV export 화면
+- `src/app/(protected)/settings/export/page.tsx`
+  - 데이터 내보내기 화면
 - `src/app/(protected)/updates/page.tsx`
-  - 새 기능 모아보기 허브
+  - 업데이트 노트 허브
 - `src/app/api/users/me/route.ts`
   - 내 프로필 조회 / 닉네임 + avatar 변경 API
 - `src/components/ui/*`
@@ -485,7 +484,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 ### 6.9. Analytics / Export
 
 - `GET /api/analytics/export-data` 구현
-- 프로필의 CSV 다운로드 화면이 이 API를 사용한다
+- 설정의 데이터 내보내기 화면이 이 API를 사용한다
 - 아직 별도 analytics 대시보드 제품으로 확장되지는 않았다
 
 관련 문서:

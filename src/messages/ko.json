@@ -103,7 +103,7 @@
     "monthlyAchievementRate": "이번 달 달성률",
     "monthlyAchievementRateWithMonth": "이번 달 달성률 ({month})",
     "recentTrend": "최근 4주 달성률",
-    "viewAllUpdates": "새로운 소식",
+    "viewAllUpdates": "업데이트 노트",
     "monthlyBoardTitle": "월간 기록판",
     "dailyCheckinStreak": "{count}일 연속 접속",
     "dailyCheckinStreakTitle": "{count}일째 연속 접속 중!",
@@ -568,7 +568,9 @@
     "deleteAccountTitle": "서비스 탈퇴",
     "deleteAccountDesc": "계정과 연결된 데이터를 삭제합니다.",
     "workspaceSection": "워크스페이스",
-    "workspaceManagement": "워크스페이스 관리",
+    "workspaceManagement": "워크스페이스 설정",
+    "scoreboardSettings": "점수판 설정",
+    "dataExport": "데이터 내보내기",
     "workspaceList": "워크스페이스 목록",
     "dataSection": "데이터",
     "notificationSection": "알림 설정",
@@ -601,8 +603,8 @@
     "billingDesc": "현재 Basic 구독과 결제 관리를 확인합니다.",
     "workspaceDeleteDescFull": "멤버, 점수판, 액션 아이템, 기록을 포함한 모든 데이터를 삭제합니다.",
     "workspaceLeaveDescFull": "현재 워크스페이스에서 나가고 기록 화면으로 돌아갑니다.",
-    "csvDownload": "CSV 다운로드",
-    "newFeatures": "새로운 소식",
+    "csvDownload": "데이터 내보내기",
+    "newFeatures": "업데이트 노트",
     "newFeaturesDesc": "최근 추가되거나 좋아진 기능을 한 번에 확인합니다.",
     "contactUs": "문의하기",
     "contactUsDesc": "서비스 이용 중 궁금한 점이나 의견을 남겨주세요.",
@@ -671,8 +673,8 @@
       "rangeLimit": "조회 기간은 최대 92일까지 가능합니다.",
       "emptyMeasures": "최소 1개 이상의 액션 아이템을 선택해주세요.",
       "fetchFailed": "내보내기 데이터를 불러오지 못했습니다.",
-      "downloadStarted": "CSV 다운로드를 시작했습니다.",
-      "standardRequired": "CSV 다운로드는 Basic 구독이 활성화되어야 사용할 수 있어요."
+      "downloadStarted": "데이터 내보내기를 시작했습니다.",
+      "standardRequired": "데이터 내보내기는 Basic 구독이 활성화되어야 사용할 수 있어요."
     },
     "Notification": {
       "timeChanged": "리마인드 시간이 변경되었습니다.",
@@ -814,7 +816,7 @@
   },
   "ProfileExport": {
     "appUnavailableTitle": "이 화면은 앱에서 제공되지 않아요",
-    "appUnavailableDesc": "현재 앱에서는 CSV 다운로드 화면을 열 수 없습니다. 다른 설정으로 돌아가 계속 사용할 수 있어요.",
+    "appUnavailableDesc": "현재 앱에서는 데이터 내보내기 화면을 열 수 없습니다. 다른 설정으로 돌아가 계속 사용할 수 있어요.",
     "appUnavailableAction": "프로필로 돌아가기",
     "exportCondition": "내보내기 조건",
     "exportConditionDesc": "기간(최대 92일)과 선행지표를 선택해 CSV 파일로 내려받습니다.",
@@ -827,8 +829,8 @@
     "selectedMeasuresCount": "선택된 지표 {count}개",
     "splitByWeek": "주차별로 섹션 분리해서 내보내기",
     "generatingCsv": "CSV 생성 중...",
-    "csvDownloadTitle": "CSV 다운로드",
-    "csvDownloadAction": "CSV 다운로드",
+    "csvDownloadTitle": "데이터 내보내기",
+    "csvDownloadAction": "데이터 내보내기",
     "currentlyUnavailable": "현재 사용 불가",
     "noWorkspaceTitle": "소속된 워크스페이스가 없어요",
     "noWorkspaceDesc1": "CSV를 내보내기 전에 먼저 워크스페이스를 만들거나",
@@ -943,7 +945,7 @@
     "loadFailedDesc": "잠시 후 다시 시도해주세요."
   },
   "ProductUpdates": {
-    "header": "새로운 소식",
+    "header": "업데이트 노트",
     "recommendedBadge": "추천 기능",
     "latestTitle": "최근 추가된 기능",
     "latestDesc": "좋아진 점을 빠르게 훑고 바로 써볼 수 있게 모아뒀습니다.",
@@ -959,6 +961,10 @@
       "Quality of Life": "편의성"
     },
     "updates": {
+      "2026-07-17-team-nudge-poke": {
+        "title": "팀원에게 콕 찌르기 알림을 보낼 수 있어요",
+        "summary": "기록을 잊었거나 미루고 있는 팀원을 발견하면, 대시보드에서 콕 찔러서 리마인드 푸시 알림을 보내보세요."
+      },
       "2026-07-07-action-item-trend": {
         "title": "액션 아이템의 전주 대비 증감을 한눈에 확인할 수 있어요",
         "summary": "이번 주 액션 아이템이 지난주보다 얼마나 늘었거나 줄었는지 쉽게 파악할 수 있도록 대시보드에 증감 표시가 추가되었습니다."
