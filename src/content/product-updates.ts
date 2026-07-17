@@ -45,6 +45,18 @@ export type ProductUpdate = {
  */
 export const productUpdates = [
   {
+    id: "2026-07-17-team-nudge-poke",
+    slug: "team-nudge-poke",
+    title: "팀원을 가볍게 응원하는 콕 찌르기 기능이 추가되었어요",
+    summary:
+      "진행 상황을 잊었거나 미루고 있는 팀원에게 부담 없는 푸시 알림을 보내 가벼운 리마인드와 응원을 전해보세요.",
+    publishedAt: "2026.07.17",
+    tag: "Dashboard",
+    ctaLabel: "바로 써보기",
+    ctaHref: "/dashboard",
+    isMajor: true,
+  },
+  {
     id: "2026-07-07-action-item-trend",
     slug: "action-item-trend",
     title: "액션 아이템의 전주 대비 증감을 한눈에 확인할 수 있어요",
