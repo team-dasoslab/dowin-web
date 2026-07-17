@@ -1,6 +1,6 @@
 ---
 name: dowin-product-updates
-description: Use this skill when adding, editing, curating, or reviewing Dowin product update entries for the in-app "새 기능 모아보기" hub or dashboard update card. Trigger it for requests about new feature announcement copy, product update metadata, update ordering, 14-day NEW rules, dashboard promo card content, or maintaining the product updates TS template.
+description: Use this skill when adding, editing, curating, or reviewing Dowin product update entries for the in-app "업데이트 노트" hub or dashboard update card. Trigger it for requests about new feature announcement copy, product update metadata, update ordering, 14-day NEW rules, dashboard promo card content, or maintaining the product updates TS template.
 ---
 
 # Dowin Product Updates
@@ -24,7 +24,7 @@ Start with:
 - Treat `src/content/product-updates.ts` as the single source of truth.
 - Keep entries newest first.
 - Keep `publishedAt` in `YYYY.MM.DD`.
-- Keep `ctaLabel` as `바로 써보기` unless the user explicitly asks to change the product rule.
+
 - Use `isMajor: true` only for updates that should appear in the dashboard promo card.
 - Preserve the LLM-friendly object template and comment block so future agents can add entries consistently.
 - Do not add per-user read state in this skill.
@@ -73,5 +73,5 @@ If the task changes the update system itself, also update:
 - Is `publishedAt` correctly formatted?
 - Is the ordering still newest first?
 - Is `isMajor` intentional?
-- Is the CTA label still aligned with the product rule?
+
 - If dashboard copy changed, is the mobile card still readable?
