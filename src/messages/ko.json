@@ -103,7 +103,7 @@
     "monthlyAchievementRate": "이번 달 달성률",
     "monthlyAchievementRateWithMonth": "이번 달 달성률 ({month})",
     "recentTrend": "최근 4주 달성률",
-    "viewAllUpdates": "새로운 소식",
+    "viewAllUpdates": "업데이트 노트",
     "monthlyBoardTitle": "월간 기록판",
     "dailyCheckinStreak": "{count}일 연속 접속",
     "dailyCheckinStreakTitle": "{count}일째 연속 접속 중!",
@@ -604,7 +604,7 @@
     "workspaceDeleteDescFull": "멤버, 점수판, 액션 아이템, 기록을 포함한 모든 데이터를 삭제합니다.",
     "workspaceLeaveDescFull": "현재 워크스페이스에서 나가고 기록 화면으로 돌아갑니다.",
     "csvDownload": "CSV 다운로드",
-    "newFeatures": "새로운 소식",
+    "newFeatures": "업데이트 노트",
     "newFeaturesDesc": "최근 추가되거나 좋아진 기능을 한 번에 확인합니다.",
     "contactUs": "문의하기",
     "contactUsDesc": "서비스 이용 중 궁금한 점이나 의견을 남겨주세요.",
@@ -945,7 +945,7 @@
     "loadFailedDesc": "잠시 후 다시 시도해주세요."
   },
   "ProductUpdates": {
-    "header": "새로운 소식",
+    "header": "업데이트 노트",
     "recommendedBadge": "추천 기능",
     "latestTitle": "최근 추가된 기능",
     "latestDesc": "좋아진 점을 빠르게 훑고 바로 써볼 수 있게 모아뒀습니다.",
