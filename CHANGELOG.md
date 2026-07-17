@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.1](https://github.com/team-dasoslab/dowin-web/compare/v1.13.0...v1.13.1) (2026-07-17)
+
+
+### Bug Fixes
+
+* 워크스페이스 설정 페이지 경로 및 메뉴 구조 변경 ([e7054df](https://github.com/team-dasoslab/dowin-web/commit/e7054dfd93c63732cd6293c231add318ca78743a))
+
 ## [1.13.0](https://github.com/team-dasoslab/dowin-web/compare/v1.12.1...v1.13.0) (2026-07-16)
 
 
