@@ -11,9 +11,9 @@ import {
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { WorkspaceOverLimitBanner } from "@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner";
-import { MemberListItem } from "@/app/[locale]/(protected)/workspace/members/_components/MemberListItem";
-import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/workspace/members/_hooks/useRemoveWorkspaceMember";
-import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/workspace/members/_hooks/useTransferWorkspaceAdmin";
+import { MemberListItem } from "@/app/[locale]/(protected)/settings/members/_components/MemberListItem";
+import { useRemoveWorkspaceMember } from "@/app/[locale]/(protected)/settings/members/_hooks/useRemoveWorkspaceMember";
+import { useTransferWorkspaceAdmin } from "@/app/[locale]/(protected)/settings/members/_hooks/useTransferWorkspaceAdmin";
 import { Button } from "@/components/ui/Button";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { Logo } from "@/components/ui/Logo";

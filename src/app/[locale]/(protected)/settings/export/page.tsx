@@ -6,9 +6,9 @@ import {
   ProtectedPageContainer,
   ProtectedPageHeader,
 } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
-import { useProfileExportAction } from "@/app/[locale]/(protected)/workspace/export/_hooks/useProfileExportAction";
-import { useProfileExportData } from "@/app/[locale]/(protected)/workspace/export/_hooks/useProfileExportData";
-import { useProfileExportForm } from "@/app/[locale]/(protected)/workspace/export/_hooks/useProfileExportForm";
+import { useProfileExportAction } from "@/app/[locale]/(protected)/settings/export/_hooks/useProfileExportAction";
+import { useProfileExportData } from "@/app/[locale]/(protected)/settings/export/_hooks/useProfileExportData";
+import { useProfileExportForm } from "@/app/[locale]/(protected)/settings/export/_hooks/useProfileExportForm";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { SmartBackButton } from "@/components/ui/SmartBackButton";

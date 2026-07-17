@@ -7,7 +7,7 @@ import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { useNativeApp } from "@/context/NativeAppContext";
 import { renderWithProviders } from "@/test/render";
 
-import { useProfileBillingActions } from "../workspace/billing/_hooks/useProfileBillingActions";
+import { useProfileBillingActions } from "../settings/billing/_hooks/useProfileBillingActions";
 import { PricingPageClient } from "./PricingPageClient";
 
 vi.mock("@/api/generated/billing/billing", () => ({
@@ -22,7 +22,7 @@ vi.mock("@/context/NativeAppContext", () => ({
   useNativeApp: vi.fn(),
 }));
 
-vi.mock("../workspace/billing/_hooks/useProfileBillingActions", () => ({
+vi.mock("../settings/billing/_hooks/useProfileBillingActions", () => ({
   useProfileBillingActions: vi.fn(),
 }));
 

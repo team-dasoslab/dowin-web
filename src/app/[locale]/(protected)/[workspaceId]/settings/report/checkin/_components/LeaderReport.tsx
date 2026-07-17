@@ -3,7 +3,7 @@
 import { useGetWorkspacesWorkspaceIdReportsTeamTrend } from "@/api/generated/reports/reports";
 import { useGetWorkspacesWorkspaceIdTeamCheckinsReport } from "@/api/generated/team-checkins/team-checkins";
 import { TeamPeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamPeriodControls";
-import { useLeaderReportActions } from "@/app/[locale]/(protected)/[workspaceId]/workspace/report/checkin/_hooks/useLeaderReportActions";
+import { useLeaderReportActions } from "@/app/[locale]/(protected)/[workspaceId]/settings/report/checkin/_hooks/useLeaderReportActions";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";

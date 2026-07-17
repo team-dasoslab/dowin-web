@@ -23,11 +23,11 @@ export const getDashboardLinks = (workspaceId: string): {
     translationKey: "teamDashboard",
   },
   {
-    href: `/${workspaceId}/workspace/settings`,
+    href: `/${workspaceId}/settings`,
     iconName: "nav-settings",
     iconNameActive: "nav-settings-active",
     label: "워크스페이스",
-    translationKey: "workspaceSettings",
+    translationKey: "settings",
   },
   {
     href: `/${workspaceId}/profile`,

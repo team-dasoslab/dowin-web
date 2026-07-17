@@ -19,6 +19,6 @@ export default async function WorkspaceSettingsRedirectPage({
     return null;
   }
 
-  await redirectToDefaultWorkspacePath(session.userId, locale, "/workspace/settings");
+  await redirectToDefaultWorkspacePath(session.userId, locale, "/settings");
   return null;
 }
