@@ -962,6 +962,10 @@
       "Quality of Life": "QoL"
     },
     "updates": {
+      "2026-07-17-team-nudge-poke": {
+        "title": "You can now send a Poke notification to your teammates",
+        "summary": "If you notice a team member who has forgotten or delayed their updates, poke them from the dashboard to send a quick reminder push notification."
+      },
       "2026-07-07-action-item-trend": {
         "title": "See your action item trends at a glance",
         "summary": "We've added a trend indicator to the dashboard so you can easily see how your action items compare to last week."
