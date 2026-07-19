@@ -1,5 +1,9 @@
 import { getDb } from "@/db";
-import { githubRepositories, workspaceGithubRepositoryLinks } from "@/db/schema";
+import {
+  githubRepositories,
+  githubUserInstallations,
+  workspaceGithubRepositoryLinks,
+} from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
@@ -21,10 +25,15 @@ export function createRepositoryLinkStorage() {
           githubRepositories,
           eq(workspaceGithubRepositoryLinks.repositoryId, githubRepositories.id),
         )
+        .innerJoin(
+          githubUserInstallations,
+          eq(githubRepositories.installationId, githubUserInstallations.id),
+        )
         .where(
           and(
             eq(workspaceGithubRepositoryLinks.workspaceId, workspaceId),
             eq(workspaceGithubRepositoryLinks.status, "ACTIVE"),
+            eq(githubUserInstallations.status, "ACTIVE"),
           ),
         );
     },
