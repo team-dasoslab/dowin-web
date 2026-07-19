@@ -1753,6 +1753,10 @@ export interface WeeklyLogItem {
   lastWeekAchieved?: number | null;
   total?: number;
   achievementRate?: number;
+  /** @nullable */
+  publicId?: string | null;
+  /** @nullable */
+  githubPrLinks?: GithubPrLink[] | null;
 }
 
 export interface WeeklyLogsResponse {
@@ -1796,6 +1800,10 @@ export interface MonthlyLogItem {
   achieved?: number;
   total?: number;
   achievementRate?: number;
+  /** @nullable */
+  publicId?: string | null;
+  /** @nullable */
+  githubPrLinks?: GithubPrLink[] | null;
 }
 
 export interface PeriodSummary {
@@ -2465,7 +2473,7 @@ export const PostIntegrationsGithubInstallUrlBodyLocale = {
 } as const;
 
 export type PostIntegrationsGithubInstallUrlBody = {
-  workspaceId: string;
+  workspaceId?: string;
   locale: PostIntegrationsGithubInstallUrlBodyLocale;
 };
 

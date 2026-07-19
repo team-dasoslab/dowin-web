@@ -302,6 +302,13 @@
       "when": 1784453193706,
       "tag": "0042_gifted_mimic",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "6",
+      "when": 1784466258056,
+      "tag": "0043_perfect_diamondback",
+      "breakpoints": true
     }
   ]
 }

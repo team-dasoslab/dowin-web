@@ -1262,7 +1262,6 @@ export const githubInstallationStates = sqliteTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     workspaceId: integer("workspace_id")
-      .notNull()
       .references(() => workspaces.id, { onDelete: "cascade" }),
     locale: text("locale", { enum: ["ko", "en"] }).notNull(),
     installationId: text("installation_id"),

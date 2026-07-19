@@ -3258,7 +3258,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [workspaceId, locale]
+              required: [locale]
               properties:
                 workspaceId: { type: string }
                 locale: { type: string, enum: [ko, en] }
