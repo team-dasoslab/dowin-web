@@ -4875,6 +4875,11 @@ components:
         lastWeekAchieved: { type: integer, nullable: true }
         total: { type: integer }
         achievementRate: { type: number }
+        publicId: { type: string, nullable: true }
+        githubPrLinks:
+          type: array
+          items: { $ref: "#/components/schemas/GithubPrLink" }
+          nullable: true
 
     WeeklyLogGuide:
       type: object
@@ -4914,6 +4919,11 @@ components:
         achieved: { type: integer }
         total: { type: integer }
         achievementRate: { type: number }
+        publicId: { type: string, nullable: true }
+        githubPrLinks:
+          type: array
+          items: { $ref: "#/components/schemas/GithubPrLink" }
+          nullable: true
 
     MonthlyLogsResponse:
       type: object
