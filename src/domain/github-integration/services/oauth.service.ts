@@ -42,7 +42,7 @@ export function createOAuthService(env: GithubEnv) {
       await storage.disconnectInstallation(db, userId, installationId);
     },
 
-    async createInstallUrl(userId: number, workspaceId: number, locale: "ko" | "en") {
+    async createInstallUrl(userId: number, locale: "ko" | "en", workspaceId?: number) {
       const state = nanoid(32);
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 

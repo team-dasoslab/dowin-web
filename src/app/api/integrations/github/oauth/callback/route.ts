@@ -24,12 +24,12 @@ export async function GET(req: NextRequest) {
     const service = createOAuthService(env as unknown as GithubEnv);
     const result = await service.handleOAuthCallback(code, state);
 
-    // Redirect back to Dowin workspace settings
     const baseUrl = env.APP_BASE_URL || req.nextUrl.origin;
-    const redirectUrl = new URL(
-      `/${result.locale}/${result.workspaceId}/settings/integrations/github`,
-      baseUrl,
-    );
+    const redirectPath = result.workspaceId
+      ? `/${result.locale}/${result.workspaceId}/settings/integrations/github?status=connected`
+      : `/${result.locale}/profile?status=connected`;
+    
+    const redirectUrl = new URL(redirectPath, baseUrl);
 
     return NextResponse.redirect(redirectUrl);
   } catch (error: unknown) {

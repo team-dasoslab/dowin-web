@@ -9,7 +9,7 @@ export function createOAuthStorage() {
     async createState(db: Db, payload: {
       state: string;
       userId: number;
-      workspaceId: number;
+      workspaceId?: number;
       locale: "ko" | "en";
       expiresAt: Date;
     }) {

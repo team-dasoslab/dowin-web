@@ -9,7 +9,7 @@ import { NextRequest } from "next/server";
 import { z } from "zod";
 
 const InstallUrlSchema = z.object({
-  workspaceId: z.coerce.number().int().positive(),
+  workspaceId: z.string().optional(),
   locale: z.enum(["ko", "en"]).default("ko"),
 });
 
@@ -30,22 +30,33 @@ export async function POST(req: NextRequest) {
       return apiError("VALIDATION_ERROR", parsed.error.format());
     }
 
-    const workspaceStorage = new WorkspaceStorage(db);
-    const context = await requireWorkspaceAccess(
-      workspaceStorage,
-      parsed.data.workspaceId,
-      session.userId,
-    );
+    let resolvedWorkspaceId: number | undefined;
 
-    if (context.role !== "ADMIN") {
-      return apiError("FORBIDDEN");
+    if (parsed.data.workspaceId) {
+      const workspaceStorage = new WorkspaceStorage(db);
+      const resolved = await workspaceStorage.resolveIdByUid(parsed.data.workspaceId);
+      
+      if (!resolved) {
+        return apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+      }
+      resolvedWorkspaceId = resolved;
+
+      const context = await requireWorkspaceAccess(
+        workspaceStorage,
+        resolvedWorkspaceId,
+        session.userId,
+      );
+
+      if (context.role !== "ADMIN") {
+        return apiError("FORBIDDEN");
+      }
     }
 
     const service = createOAuthService(env as unknown as GithubEnv);
     const result = await service.createInstallUrl(
       session.userId,
-      parsed.data.workspaceId,
       parsed.data.locale,
+      resolvedWorkspaceId,
     );
 
     return apiSuccess(result);
