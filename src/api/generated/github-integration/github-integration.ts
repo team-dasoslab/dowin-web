@@ -29,6 +29,7 @@ import type {
   ErrorResponse,
   GithubIntegrationStatus,
   PostIntegrationsGithubDisconnect200,
+  PostIntegrationsGithubDisconnectBody,
   PostIntegrationsGithubInstallUrl200,
   PostIntegrationsGithubInstallUrlBody,
   PostWorkspacesWorkspaceIdIntegrationsGithubRepositories200,
@@ -285,14 +286,15 @@ export const getPostIntegrationsGithubDisconnectUrl = () => {
   return `/api/integrations/github/disconnect`
 }
 
-export const postIntegrationsGithubDisconnect = async ( options?: RequestInit): Promise<postIntegrationsGithubDisconnectResponse> => {
+export const postIntegrationsGithubDisconnect = async (postIntegrationsGithubDisconnectBody: PostIntegrationsGithubDisconnectBody, options?: RequestInit): Promise<postIntegrationsGithubDisconnectResponse> => {
   
   return customInstance<postIntegrationsGithubDisconnectResponse>(getPostIntegrationsGithubDisconnectUrl(),
   {      
     ...options,
-    method: 'POST'
-    
-    
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      postIntegrationsGithubDisconnectBody,)
   }
 );}
   
@@ -300,8 +302,8 @@ export const postIntegrationsGithubDisconnect = async ( options?: RequestInit): 
 
 
 export const getPostIntegrationsGithubDisconnectMutationOptions = <TError = UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, TError,void, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, TError,{data: PostIntegrationsGithubDisconnectBody}, TContext>, request?: SecondParameter<typeof customInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, TError,{data: PostIntegrationsGithubDisconnectBody}, TContext> => {
 
 const mutationKey = ['postIntegrationsGithubDisconnect'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -313,10 +315,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, void> = () => {
-          
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, {data: PostIntegrationsGithubDisconnectBody}> = (props) => {
+          const {data} = props ?? {};
 
-          return  postIntegrationsGithubDisconnect(requestOptions)
+          return  postIntegrationsGithubDisconnect(data,requestOptions)
         }
 
 
@@ -327,18 +329,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type PostIntegrationsGithubDisconnectMutationResult = NonNullable<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>>
-    
+    export type PostIntegrationsGithubDisconnectMutationBody = PostIntegrationsGithubDisconnectBody
     export type PostIntegrationsGithubDisconnectMutationError = UnauthorizedErrorResponse
 
     /**
  * @summary GitHub App 연결 해제
  */
 export const usePostIntegrationsGithubDisconnect = <TError = UnauthorizedErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, TError,void, TContext>, request?: SecondParameter<typeof customInstance>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>, TError,{data: PostIntegrationsGithubDisconnectBody}, TContext>, request?: SecondParameter<typeof customInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postIntegrationsGithubDisconnect>>,
         TError,
-        void,
+        {data: PostIntegrationsGithubDisconnectBody},
         TContext
       > => {
       return useMutation(getPostIntegrationsGithubDisconnectMutationOptions(options), queryClient);

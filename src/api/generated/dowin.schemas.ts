@@ -2481,6 +2481,11 @@ export type PostIntegrationsGithubInstallUrl200 = {
   url: string;
 };
 
+export type PostIntegrationsGithubDisconnectBody = {
+  /** 연결을 해제할 GitHub App Installation ID */
+  installationId: string;
+};
+
 export type PostIntegrationsGithubDisconnect200 = {
   success: boolean;
 };

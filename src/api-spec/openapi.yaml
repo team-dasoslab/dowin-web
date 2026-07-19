@@ -3285,6 +3285,17 @@ paths:
       summary: GitHub App 연결 해제
       tags: [GithubIntegration]
       security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [installationId]
+              properties:
+                installationId:
+                  type: string
+                  description: "연결을 해제할 GitHub App Installation ID"
       responses:
         "200":
           description: 연결 해제 성공
