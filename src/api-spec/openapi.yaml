@@ -3232,8 +3232,247 @@ paths:
         "401":
           $ref: "#/components/responses/UnauthorizedError"
 
+  /integrations/github:
+    get:
+      summary: GitHub 계정 및 앱 설치 목록 조회
+      tags: [GithubIntegration]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GithubIntegrationStatus"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /integrations/github/install-url:
+    post:
+      summary: GitHub App 설치 URL 생성
+      tags: [GithubIntegration]
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [workspaceId, locale]
+              properties:
+                workspaceId: { type: string }
+                locale: { type: string, enum: [ko, en] }
+      responses:
+        "200":
+          description: 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [url]
+                properties:
+                  url: { type: string }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /integrations/github/disconnect:
+    post:
+      summary: GitHub App 연결 해제
+      tags: [GithubIntegration]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200":
+          description: 연결 해제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success: { type: boolean }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+
+  /workspaces/{workspaceId}/integrations/github:
+    get:
+      summary: 워크스페이스의 GitHub Repository 연결 상태 조회
+      tags: [GithubIntegration]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkspaceGithubIntegrationStatus"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/integrations/github/repositories:
+    post:
+      summary: 워크스페이스에 GitHub Repository 연결
+      tags: [GithubIntegration]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [repositoryId]
+              properties:
+                repositoryId: { type: integer }
+      responses:
+        "200":
+          description: 연결 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success: { type: boolean }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+        "409":
+          description: 이미 다른 워크스페이스에 연결됨
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
+  /workspaces/{workspaceId}/integrations/github/repositories/{repositoryLinkId}:
+    delete:
+      summary: 워크스페이스에서 GitHub Repository 연결 해제
+      tags: [GithubIntegration]
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - name: workspaceId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: repositoryLinkId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: 연결 해제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success]
+                properties:
+                  success: { type: boolean }
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          description: 권한 없음
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorResponse" }
+
 components:
   schemas:
+    GithubUserInstallation:
+      type: object
+      required: [id, installationId, accountLogin, accountId, status]
+      properties:
+        id: { type: integer }
+        installationId: { type: string }
+        accountLogin: { type: string }
+        accountId: { type: string }
+        status: { type: string, enum: [ACTIVE, SUSPENDED, DISCONNECTED] }
+
+    GithubRepository:
+      type: object
+      required: [id, githubRepositoryId, ownerLogin, name, fullName, private]
+      properties:
+        id: { type: integer }
+        githubRepositoryId: { type: string }
+        ownerLogin: { type: string }
+        name: { type: string }
+        fullName: { type: string }
+        private: { type: boolean }
+
+    GithubIntegrationStatus:
+      type: object
+      required: [isConnected, installations, repositories]
+      properties:
+        isConnected: { type: boolean }
+        accountLogin: { type: string, nullable: true }
+        installations:
+          type: array
+          items:
+            $ref: "#/components/schemas/GithubUserInstallation"
+        repositories:
+          type: array
+          items:
+            $ref: "#/components/schemas/GithubRepository"
+
+    WorkspaceGithubRepositoryLink:
+      type: object
+      required: [id, repositoryId, repository, status, createdAt]
+      properties:
+        id: { type: integer }
+        repositoryId: { type: integer }
+        repository:
+          $ref: "#/components/schemas/GithubRepository"
+        connectedByUserId: { type: integer, nullable: true }
+        status: { type: string, enum: [ACTIVE, DISCONNECTED] }
+        createdAt: { type: string, format: date-time }
+
+    WorkspaceGithubIntegrationStatus:
+      type: object
+      required: [hasGithubAccountConnected, availableRepositories, activeLinks]
+      properties:
+        hasGithubAccountConnected: { type: boolean }
+        availableRepositories:
+          type: array
+          items:
+            $ref: "#/components/schemas/GithubRepository"
+        activeLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/WorkspaceGithubRepositoryLink"
+
+    GithubPrLink:
+      type: object
+      required: [id, githubPullRequestId, number, title, url, state, matchedDisplayKey]
+      properties:
+        id: { type: integer }
+        githubPullRequestId: { type: string }
+        number: { type: integer }
+        title: { type: string }
+        url: { type: string }
+        state: { type: string, enum: [OPEN, CLOSED, MERGED] }
+        matchedDisplayKey: { type: string }
+
     User:
       type: object
       properties:
@@ -4124,6 +4363,8 @@ components:
           type: boolean
         allowPastDailyLogEdit:
           type: boolean
+        actionItemPrefix:
+          type: string
         createdAt: { type: string, format: date-time }
 
     WorkspaceListItem:
@@ -4482,6 +4723,11 @@ components:
           items: { $ref: "#/components/schemas/LeadMeasureTag" }
         createdAt: { type: string, format: date-time }
         archivedAt: { type: string, format: date-time, nullable: true }
+        publicCode: { type: string, nullable: true }
+        githubPrLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/GithubPrLink"
 
     WeeklyAchievement:
       type: object
@@ -4781,6 +5027,7 @@ components:
           freeMemberLimit,
           isOverFreeMemberLimit,
           allowPastDailyLogEdit,
+          actionItemPrefix,
         ]
       properties:
         id: { type: string }
@@ -4801,6 +5048,8 @@ components:
           type: boolean
         allowPastDailyLogEdit:
           type: boolean
+        actionItemPrefix:
+          type: string
 
     MyDashboardTrendPoint:
       type: object
