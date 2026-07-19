@@ -1,9 +1,14 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { useGetWorkspaces, useGetWorkspacesMe, usePutWorkspacesCurrent } from "@/api/generated/workspace/workspace";
+import {
+  useGetWorkspaces,
+  useGetWorkspacesMe,
+  usePutWorkspacesCurrent,
+} from "@/api/generated/workspace/workspace";
 
 import { useGetWorkspacesWorkspaceIdTeamCheckinsSettings } from "@/api/generated/team-checkins/team-checkins";
+import { useGithubIntegration } from "@/app/[locale]/(protected)/[workspaceId]/settings/integrations/github/_hooks/useGithubIntegration";
 import {
   ProtectedPageContainer,
   ProtectedPageHeader,
@@ -24,11 +29,11 @@ import { useActiveSectionScroll } from "@/hooks/useActiveSectionScroll";
 import { Link, useRouter } from "@/i18n/routing";
 import { getApiErrorStatus } from "@/lib/client/frontend-api";
 import { getWorkspacePath } from "@/lib/client/workspace-path";
+import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 import { Bot } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
-import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
 
 interface MenuItem {
   id: string;
@@ -46,28 +51,49 @@ export default function WorkspaceSettingsPage() {
   const commonT = useTranslations("Common");
   const dashboardT = useTranslations("Dashboard");
   const checkinT = useTranslations("TeamCheckin");
+  const integrationT = useTranslations("Integration");
   const isNativeApp = useNativeApp();
   const router = useRouter();
   const workspaceId = useParams().workspaceId as string | undefined;
+
+  const { status: githubStatus } = useGithubIntegration();
+  const isSuccess =
+    githubStatus &&
+    typeof githubStatus === "object" &&
+    !("code" in githubStatus) &&
+    !("detail" in githubStatus);
+  const isGithubConnected = isSuccess
+    ? (githubStatus as import("@/api/generated/dowin.schemas").WorkspaceGithubIntegrationStatus)
+        .hasGithubAccountConnected
+    : false;
+
   const locale = useLocale();
   const { showToast } = useToast();
 
   const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
-  const { data: workspaceResponse, error: workspaceError, isLoading: isWorkspaceLoading } = useGetWorkspacesMe(
-    { query: { retry: false } }
-  );
+  const {
+    data: workspaceResponse,
+    error: workspaceError,
+    isLoading: isWorkspaceLoading,
+  } = useGetWorkspacesMe({ query: { retry: false } });
   const { data: allWorkspacesResponse } = useGetWorkspaces();
-  const { data: settingsResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(workspaceId ?? "", {
-    query: {
-      enabled: !!workspaceId,
+  const { data: settingsResponse } = useGetWorkspacesWorkspaceIdTeamCheckinsSettings(
+    workspaceId ?? "",
+    {
+      query: {
+        enabled: !!workspaceId,
+      },
     },
-  });
+  );
   const { mutate: switchWorkspace, isPending: isSwitching } = usePutWorkspacesCurrent({
     mutation: {
       onSuccess: (_, variables) => {
         const newWorkspaceId = variables.data.workspaceId;
         if (workspaceId) {
-          window.location.href = window.location.href.replace(`/${workspaceId}`, `/${newWorkspaceId}`);
+          window.location.href = window.location.href.replace(
+            `/${workspaceId}`,
+            `/${newWorkspaceId}`,
+          );
         } else {
           window.location.href = `/${locale}/${newWorkspaceId}/dashboard/my`;
         }
@@ -77,9 +103,13 @@ export default function WorkspaceSettingsPage() {
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
-  const workspace = !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+  const workspace =
+    !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaces = allWorkspacesResponse?.status === 200 ? allWorkspacesResponse.data : [];
-  const checkinSettings = settingsResponse?.status === 200 && 'enabled' in settingsResponse.data ? settingsResponse.data : null;
+  const checkinSettings =
+    settingsResponse?.status === 200 && "enabled" in settingsResponse.data
+      ? settingsResponse.data
+      : null;
 
   const {
     handleToggleCheckin,
@@ -93,17 +123,11 @@ export default function WorkspaceSettingsPage() {
   const hasWorkspace = workspace !== null;
   const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
 
-  const {
-    changeWorkspaceName,
-    deleteWorkspace,
-    isActionPending,
-    leaveWorkspace,
-    pendingAction,
-  } = useProfileActions({
-    nickname: user?.nickname ?? "",
-    workspace,
-  });
-
+  const { changeWorkspaceName, deleteWorkspace, isActionPending, leaveWorkspace, pendingAction } =
+    useProfileActions({
+      nickname: user?.nickname ?? "",
+      workspace,
+    });
 
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
 
@@ -115,7 +139,7 @@ export default function WorkspaceSettingsPage() {
   }, [hasWorkspace]);
 
   useEffect(() => {
-    if ((!isProfileLoading && !isWorkspaceLoading) && !hasWorkspace) {
+    if (!isProfileLoading && !isWorkspaceLoading && !hasWorkspace) {
       if (!wasWorkspacePresent.current) {
         showToast("error", t("noWorkspaceTitle"));
       }
@@ -123,167 +147,232 @@ export default function WorkspaceSettingsPage() {
     }
   }, [isProfileLoading, isWorkspaceLoading, hasWorkspace, router, showToast, t, workspaceId]);
 
-  const menuGroups: { id: string; label: string; items: MenuItem[] }[] = useMemo(() => [
-    {
-      id: "scoreboard",
-      label: t("scoreboardSettings"),
-      items: hasWorkspace ? [
-        ...(workspaceId ? [
-          {
-            id: "manage-scoreboard",
-            icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
-            title: dashboardT("manageScoreboard"),
-            href: `/${workspaceId}/setup?mode=update`,
-          },
-          {
-            id: "scoreboard-archive",
-            icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
-            title: dashboardT("scoreboardArchive"),
-            href: `/${workspaceId}/scoreboards`,
-          },
-        ] : []),
-        {
-          id: "export-csv",
-          icon: <DowinIcon name="action-download" className="w-4 h-4" />,
-          title: t("dataExport"),
-          href: getWorkspacePath(workspaceId, "/settings/export"),
-        },
-      ] : [],
-    },
-    {
-      id: "general",
-      label: t("workspaceManagement"),
-      items: hasWorkspace
-        ? isWorkspaceAdmin
+  const menuGroups: { id: string; label: string; items: MenuItem[] }[] = useMemo(
+    () => [
+      {
+        id: "scoreboard",
+        label: t("scoreboardSettings"),
+        items: hasWorkspace
           ? [
-            ...(showBillingSurface
-              ? [
+              ...(workspaceId
+                ? [
+                    {
+                      id: "manage-scoreboard",
+                      icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
+                      title: dashboardT("manageScoreboard"),
+                      href: `/${workspaceId}/setup?mode=update`,
+                    },
+                    {
+                      id: "scoreboard-archive",
+                      icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+                      title: dashboardT("scoreboardArchive"),
+                      href: `/${workspaceId}/scoreboards`,
+                    },
+                  ]
+                : []),
+              {
+                id: "export-csv",
+                icon: <DowinIcon name="action-download" className="w-4 h-4" />,
+                title: t("dataExport"),
+                href: getWorkspacePath(workspaceId, "/settings/export"),
+              },
+            ]
+          : [],
+      },
+      {
+        id: "general",
+        label: t("workspaceManagement"),
+        items: hasWorkspace
+          ? isWorkspaceAdmin
+            ? [
+                ...(showBillingSurface
+                  ? [
+                      {
+                        id: "billing",
+                        icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
+                        title: t("billingTitle"),
+                        href: getWorkspacePath(workspaceId, "/settings/billing"),
+                      },
+                    ]
+                  : []),
+
                 {
-                  id: "billing",
-                  icon: <DowinIcon name="domain-payment" className="w-4 h-4" />,
-                  title: t("billingTitle"),
-                  href: getWorkspacePath(workspaceId, "/settings/billing"),
+                  id: "workspace-name",
+                  icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
+                  title: t("changeWorkspaceName"),
+                  onClick: () => void changeWorkspaceName(),
+                },
+                {
+                  id: "members",
+                  icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
+                  title: t("manageMembers"),
+                  href: getWorkspacePath(workspaceId, "/settings/members"),
+                },
+                {
+                  id: "invites",
+                  icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
+                  title: t("manageInvites"),
+                  href: getWorkspacePath(workspaceId, "/settings/invites"),
+                },
+
+                {
+                  id: "past-daily-log-edit",
+                  icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
+                  title: t("allowPastDailyLogEdit"),
+                  rightElement: (
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Switch
+                        checked={workspace?.allowPastDailyLogEdit ?? false}
+                        onCheckedChange={handleTogglePastDailyLogEdit}
+                        disabled={isUpdateWorkspacePending}
+                      />
+                    </div>
+                  ),
+                },
+                {
+                  id: "workspace-delete",
+                  icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
+                  title: t("workspaceDelete"),
+                  danger: true,
+                  onClick: () => void deleteWorkspace(),
                 },
               ]
-              : []),
-
-            {
-              id: "workspace-name",
-              icon: <DowinIcon name="action-edit" className="w-4 h-4" />,
-              title: t("changeWorkspaceName"),
-              onClick: () => void changeWorkspaceName(),
-            },
-            {
-              id: "members",
-              icon: <DowinIcon name="domain-people" className="w-4 h-4" />,
-              title: t("manageMembers"),
-              href: getWorkspacePath(workspaceId, "/settings/members"),
-            },
-            {
-              id: "invites",
-              icon: <DowinIcon name="domain-ticket" className="w-4 h-4" />,
-              title: t("manageInvites"),
-              href: getWorkspacePath(workspaceId, "/settings/invites"),
-            },
-
-            {
-              id: "past-daily-log-edit",
-              icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
-              title: t("allowPastDailyLogEdit"),
-              rightElement: (
-                <div onClick={(e) => e.stopPropagation()}>
-                  <Switch
-                    checked={workspace?.allowPastDailyLogEdit ?? false}
-                    onCheckedChange={handleTogglePastDailyLogEdit}
-                    disabled={isUpdateWorkspacePending}
-                  />
-                </div>
-              ),
-            },
-            {
-              id: "workspace-delete",
-              icon: <DowinIcon name="action-delete" className="w-4 h-4" />,
-              title: t("workspaceDelete"),
-              danger: true,
-              onClick: () => void deleteWorkspace(),
-            },
-          ]
-          : [
-            {
-              id: "workspace-leave",
-              icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
-              title: t("workspaceLeave"),
-              danger: true,
-              onClick: () => void leaveWorkspace(),
-            },
-          ]
-        : [],
-    },
-    {
-      id: "checkin",
-      label: checkinT("settingsTitle"),
-      items: hasWorkspace && isWorkspaceAdmin
-        ? [
-            {
-              id: "checkin-settings-master",
-              icon: <Bot className="w-4 h-4" />,
-              title: checkinT("enableServiceLedCheckin"),
-              rightElement: (
-                <div onClick={(e) => e.stopPropagation()}>
-                  <Switch 
-                    checked={checkinSettings?.enabled ?? false} 
-                    onCheckedChange={handleToggleCheckin} 
-                    disabled={!checkinSettings || isUpdateSettingsPending}
-                  />
-                </div>
-              ),
-            },
-            ...(checkinSettings?.enabled
-              ? [
-                  {
-                    id: "checkin-send-time",
-                    icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
-                    title: checkinT("sendTime"),
-                    rightElement: (
-                      <select
-                        value={`${String(checkinSettings?.sendHour ?? 16).padStart(2, "0")}:00`}
+            : [
+                {
+                  id: "workspace-leave",
+                  icon: <DowinIcon name="auth-sign-out" className="w-4 h-4" />,
+                  title: t("workspaceLeave"),
+                  danger: true,
+                  onClick: () => void leaveWorkspace(),
+                },
+              ]
+          : [],
+      },
+      {
+        id: "checkin",
+        label: checkinT("settingsTitle"),
+        items:
+          hasWorkspace && isWorkspaceAdmin
+            ? [
+                {
+                  id: "checkin-settings-master",
+                  icon: <Bot className="w-4 h-4" />,
+                  title: checkinT("enableServiceLedCheckin"),
+                  rightElement: (
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Switch
+                        checked={checkinSettings?.enabled ?? false}
+                        onCheckedChange={handleToggleCheckin}
                         disabled={!checkinSettings || isUpdateSettingsPending}
-                        onChange={(event) => {
-                          void handleChangeCheckinSendTime(event.target.value);
-                        }}
-                        className="h-9 cursor-pointer rounded-[12px] border-none bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-border disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {TIME_OPTIONS.map((time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        ))}
-                      </select>
-                    ),
-                  },
-                  {
-                    id: "checkin-report",
-                    icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
-                    title: dashboardT("checkinReport"),
-                    href: getWorkspacePath(workspaceId, "/settings/report/checkin"),
-                  },
-                ]
-              : []),
-          ]
-        : [],
-    },
-
-  ], [hasWorkspace, isWorkspaceAdmin, showBillingSurface, workspaceId, t, checkinSettings, checkinT, dashboardT, handleTogglePastDailyLogEdit, isUpdateWorkspacePending, changeWorkspaceName, deleteWorkspace, leaveWorkspace, handleToggleCheckin, isUpdateSettingsPending, handleChangeCheckinSendTime, workspace?.allowPastDailyLogEdit]);
-
-  const scrollGroups = useMemo(() => [
-    ...menuGroups.filter(g => g.items.length > 0).map(g => ({ id: g.id })),
-    { id: "workspaces" }
-  ], [menuGroups]);
-
-  const [activeSection] = useActiveSectionScroll(
-    scrollGroups,
-    "general"
+                      />
+                    </div>
+                  ),
+                },
+                ...(checkinSettings?.enabled
+                  ? [
+                      {
+                        id: "checkin-send-time",
+                        icon: <DowinIcon name="status-timer" className="w-4 h-4" />,
+                        title: checkinT("sendTime"),
+                        rightElement: (
+                          <select
+                            value={`${String(checkinSettings?.sendHour ?? 16).padStart(2, "0")}:00`}
+                            disabled={!checkinSettings || isUpdateSettingsPending}
+                            onChange={(event) => {
+                              void handleChangeCheckinSendTime(event.target.value);
+                            }}
+                            className="h-9 cursor-pointer rounded-[12px] border-none bg-sub-background px-3 text-center text-xs font-bold text-text-primary outline-none transition-all focus:bg-border disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {TIME_OPTIONS.map((time) => (
+                              <option key={time} value={time}>
+                                {time}
+                              </option>
+                            ))}
+                          </select>
+                        ),
+                      },
+                      {
+                        id: "checkin-report",
+                        icon: <DowinIcon name="nav-report" className="w-4 h-4" />,
+                        title: dashboardT("checkinReport"),
+                        href: getWorkspacePath(workspaceId, "/settings/report/checkin"),
+                      },
+                    ]
+                  : []),
+              ]
+            : [],
+      },
+      {
+        id: "integrations",
+        label: t("integrationsSection"),
+        items:
+          hasWorkspace && isWorkspaceAdmin
+            ? [
+                {
+                  id: "github-integration",
+                  icon: (
+                    <>
+                      <img
+                        src="/logo/github-black.png"
+                        alt="GitHub"
+                        className="w-4 h-4 dark:hidden"
+                      />
+                      <img
+                        src="/logo/github-white.png"
+                        alt="GitHub"
+                        className="w-4 h-4 hidden dark:block"
+                      />
+                    </>
+                  ),
+                  title: integrationT("githubTitle"),
+                  rightElement: (
+                    <div className="flex items-center gap-2">
+                      {isGithubConnected && (
+                        <span className="text-[12px] font-bold px-2 py-0.5 rounded-[6px] bg-primary/10 text-primary">
+                          {integrationT("connectStatus")}
+                        </span>
+                      )}
+                      <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />
+                    </div>
+                  ),
+                  href: getWorkspacePath(workspaceId, "/settings/integrations/github"),
+                },
+              ]
+            : [],
+      },
+    ],
+    [
+      hasWorkspace,
+      isWorkspaceAdmin,
+      showBillingSurface,
+      workspaceId,
+      t,
+      integrationT,
+      isGithubConnected,
+      checkinSettings,
+      checkinT,
+      dashboardT,
+      handleTogglePastDailyLogEdit,
+      isUpdateWorkspacePending,
+      changeWorkspaceName,
+      deleteWorkspace,
+      leaveWorkspace,
+      handleToggleCheckin,
+      isUpdateSettingsPending,
+      handleChangeCheckinSendTime,
+      workspace?.allowPastDailyLogEdit,
+    ],
   );
+
+  const scrollGroups = useMemo(
+    () => [
+      ...menuGroups.filter((g) => g.items.length > 0).map((g) => ({ id: g.id })),
+      { id: "workspaces" },
+    ],
+    [menuGroups],
+  );
+
+  const [activeSection] = useActiveSectionScroll(scrollGroups, "general");
 
   if (isProfileLoading || isWorkspaceLoading) {
     return (
@@ -312,16 +401,17 @@ export default function WorkspaceSettingsPage() {
         />
       )}
       <ProtectedPageContainer className="space-y-6 lg:space-y-12">
-        <ProtectedPageHeader
-          title={dashboardT("settings")}
-        />
+        <ProtectedPageHeader title={dashboardT("settings")} />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           <PageSidebarNav
             items={[
-              { id: "general", label: t("workspaceManagement") },
-              ...(hasWorkspace && isWorkspaceAdmin ? [{ id: "checkin", label: checkinT("settingsTitle") }] : []),
-              ...(hasWorkspace ? [{ id: "data", label: t("dataSection") }] : []),
+              ...menuGroups
+                .filter((group) => group.items.length > 0)
+                .map((group) => ({
+                  id: group.id,
+                  label: group.label,
+                })),
               { id: "workspaces", label: t("workspaceList") },
             ]}
             activeId={activeSection}
@@ -329,7 +419,6 @@ export default function WorkspaceSettingsPage() {
 
           {/* ── 우측 메인 콘텐츠 ── */}
           <div className="w-full flex-1 space-y-8 lg:max-w-[800px] lg:space-y-12">
-
             <div className="space-y-4">
               {workspace?.isOverFreeMemberLimit && (
                 <WorkspaceOverLimitBanner
@@ -358,27 +447,25 @@ export default function WorkspaceSettingsPage() {
 
             {/* 설정 그룹들 */}
             <div className="space-y-8 pb-24 lg:space-y-16 lg:pb-[60vh]">
-              {menuGroups.filter((group) => group.items.length > 0).map((group) => (
-                <section
-                  key={group.id}
-                  id={group.id}
-                  className="space-y-5 scroll-mt-28"
-                  ref={(el) => {
-                    sectionRefs.current[group.id] = el;
-                  }}
-                >
-                  <SectionHeader title={group.label} />
-                  <div className="rounded-[24px] overflow-hidden bg-surface">
-                    {group.items.map((item) => (
-                      <MenuItemRow
-                        key={item.id}
-                        item={item}
-                        isActionPending={isActionPending}
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))}
+              {menuGroups
+                .filter((group) => group.items.length > 0)
+                .map((group) => (
+                  <section
+                    key={group.id}
+                    id={group.id}
+                    className="space-y-5 scroll-mt-28"
+                    ref={(el) => {
+                      sectionRefs.current[group.id] = el;
+                    }}
+                  >
+                    <SectionHeader title={group.label} />
+                    <div className="rounded-[24px] overflow-hidden bg-surface">
+                      {group.items.map((item) => (
+                        <MenuItemRow key={item.id} item={item} isActionPending={isActionPending} />
+                      ))}
+                    </div>
+                  </section>
+                ))}
 
               {/* 내 워크스페이스 목록 */}
               <section
@@ -406,17 +493,19 @@ export default function WorkspaceSettingsPage() {
 
                       <div className="flex-shrink-0">
                         {ws.id === workspaceId ? (
-                            <div className="flex h-10 items-center justify-center rounded-[12px] bg-primary/10 px-5 text-sm font-bold text-primary">
-                              {commonT("current")}
-                            </div>
-                          ) : (
-                            <Button
-                              type="button"
-                              disabled={isActionPending}
-                              onClick={() => void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })}
-                              variant="subtle"
-                              className="flex h-10 items-center justify-center rounded-[12px] px-5 text-sm font-bold min-h-0"
-                            >
+                          <div className="flex h-10 items-center justify-center rounded-[12px] bg-primary/10 px-5 text-sm font-bold text-primary">
+                            {commonT("current")}
+                          </div>
+                        ) : (
+                          <Button
+                            type="button"
+                            disabled={isActionPending}
+                            onClick={() =>
+                              void switchWorkspace({ data: { workspaceId: ws.id ?? "" } })
+                            }
+                            variant="subtle"
+                            className="flex h-10 items-center justify-center rounded-[12px] px-5 text-sm font-bold min-h-0"
+                          >
                             {commonT("switchWorkspace")}
                           </Button>
                         )}
@@ -453,33 +542,35 @@ export default function WorkspaceSettingsPage() {
   );
 }
 
-function MenuItemRow({
-  item,
-  isActionPending,
-}: {
-  item: MenuItem;
-  isActionPending: boolean;
-}) {
+function MenuItemRow({ item, isActionPending }: { item: MenuItem; isActionPending: boolean }) {
   const itemWrapperClassName = "";
   const Content = (
     <div className="flex w-full items-center justify-between gap-4 px-4 py-4 transition-colors sm:px-6 sm:py-5">
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-        <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${item.danger
-            ? "bg-danger/5 text-danger"
-            : "bg-sub-background text-text-muted"
+        <div
+          className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${
+            item.danger ? "bg-danger/5 text-danger" : "bg-sub-background text-text-muted"
           }`}
         >
           {item.icon}
         </div>
         <div className="text-left min-w-0">
-          <p className={`text-[14px] font-black ${item.danger ? "text-danger" : "text-text-primary"}`}>
+          <p
+            className={`text-[14px] font-black ${item.danger ? "text-danger" : "text-text-primary"}`}
+          >
             {item.title}
           </p>
-          {item.description && <p className="text-[12px] text-text-muted mt-0.5">{item.description}</p>}
+          {item.description && (
+            <p className="text-[12px] text-text-muted mt-0.5">{item.description}</p>
+          )}
         </div>
       </div>
       <div className="flex-shrink-0">
-        {item.rightElement ? item.rightElement : <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />}
+        {item.rightElement ? (
+          item.rightElement
+        ) : (
+          <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />
+        )}
       </div>
     </div>
   );
@@ -487,7 +578,12 @@ function MenuItemRow({
   if (item.onClick) {
     return (
       <div className={itemWrapperClassName}>
-        <Button disabled={isActionPending} onClick={item.onClick} variant="ghost" className="block w-full text-left justify-start items-stretch rounded-none h-auto p-0 font-normal">
+        <Button
+          disabled={isActionPending}
+          onClick={item.onClick}
+          variant="ghost"
+          className="block w-full text-left justify-start items-stretch rounded-none h-auto p-0 font-normal"
+        >
           {Content}
         </Button>
       </div>
