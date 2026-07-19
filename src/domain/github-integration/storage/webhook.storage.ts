@@ -10,7 +10,7 @@ import {
   workspaceGithubRepositoryLinks,
   workspaces,
 } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -227,6 +227,62 @@ export function createWebhookStorage() {
           target: [dailyLogs.leadMeasureId, dailyLogs.logDate],
           set: { count: sql`${dailyLogs.count} + 1` },
         });
+    },
+
+    async findInstallationsByGithubId(db: Db, githubInstallationId: string) {
+      return await db
+        .select()
+        .from(githubUserInstallations)
+        .where(eq(githubUserInstallations.installationId, githubInstallationId));
+    },
+
+    async addRepositories(
+      db: Db,
+      installationInternalId: number,
+      repositories: Array<{
+        id: number;
+        name: string;
+        full_name: string;
+        private: boolean;
+      }>,
+    ) {
+      if (repositories.length === 0) return;
+      const values = repositories.map((repo) => ({
+        installationId: installationInternalId,
+        githubRepositoryId: String(repo.id),
+        ownerLogin: repo.full_name.split("/")[0],
+        name: repo.name,
+        fullName: repo.full_name,
+        private: repo.private,
+        status: "ACTIVE" as const,
+      }));
+
+      await db
+        .insert(githubRepositories)
+        .values(values)
+        .onConflictDoUpdate({
+          target: [githubRepositories.installationId, githubRepositories.githubRepositoryId],
+          set: {
+            ownerLogin: sql`excluded.owner_login`,
+            name: sql`excluded.name`,
+            fullName: sql`excluded.full_name`,
+            private: sql`excluded.private`,
+            status: "ACTIVE",
+            updatedAt: new Date(),
+          },
+        });
+    },
+
+    async removeRepositories(db: Db, installationInternalId: number, repositoryIds: string[]) {
+      if (repositoryIds.length === 0) return;
+      await db
+        .delete(githubRepositories)
+        .where(
+          and(
+            eq(githubRepositories.installationId, installationInternalId),
+            inArray(githubRepositories.githubRepositoryId, repositoryIds),
+          ),
+        );
     },
   };
 }

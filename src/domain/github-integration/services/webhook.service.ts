@@ -23,11 +23,66 @@ type GithubPrPayload = {
   };
 };
 
+export type GithubInstallationRepositoriesPayload = {
+  action: "added" | "removed";
+  installation: { id: number };
+  repositories_added: Array<{
+    id: number;
+    name: string;
+    full_name: string;
+    private: boolean;
+  }>;
+  repositories_removed: Array<{
+    id: number;
+    name: string;
+    full_name: string;
+    private: boolean;
+  }>;
+};
+
 export function createWebhookService(env: CloudflareEnv) {
   const db = getDb(env.DB);
   const storage = createWebhookStorage();
 
   return {
+    async handleInstallationRepositoriesEvent(
+      deliveryId: string,
+      payload: GithubInstallationRepositoriesPayload,
+    ): Promise<{ processed: number; skipped: string[] }> {
+      const eventRow = await storage.createEvent(db, {
+        deliveryId,
+        eventName: "installation_repositories",
+        action: payload.action,
+        repositoryId: null,
+        installationId: String(payload.installation.id),
+        status: "RECEIVED",
+      });
+
+      const installations = await storage.findInstallationsByGithubId(
+        db,
+        String(payload.installation.id),
+      );
+
+      if (installations.length === 0) {
+        await storage.updateEventStatus(db, eventRow.id, "SKIPPED", "no_matching_installation");
+        return { processed: 0, skipped: ["no_matching_installation"] };
+      }
+
+      for (const inst of installations) {
+        if (payload.action === "added" && payload.repositories_added?.length > 0) {
+          await storage.addRepositories(db, inst.id, payload.repositories_added);
+        }
+
+        if (payload.action === "removed" && payload.repositories_removed?.length > 0) {
+          const repoIds = payload.repositories_removed.map((r) => String(r.id));
+          await storage.removeRepositories(db, inst.id, repoIds);
+        }
+      }
+
+      await storage.updateEventStatus(db, eventRow.id, "PROCESSED", null);
+      return { processed: installations.length, skipped: [] };
+    },
+
     /**
      * Handle an incoming pull_request webhook event.
      * Steps:

@@ -1,4 +1,4 @@
-import { createWebhookService } from "@/domain/github-integration/services/webhook.service";
+import { createWebhookService, type GithubInstallationRepositoriesPayload } from "@/domain/github-integration/services/webhook.service";
 import { verifyWebhookSignature } from "@/domain/github-integration/utils/webhook.utils";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest, NextResponse } from "next/server";
@@ -41,21 +41,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  // Only handle pull_request events
-  if (eventName !== "pull_request") {
+  // Only handle supported events
+  const supportedEvents = ["pull_request", "installation_repositories"];
+  if (!supportedEvents.includes(eventName)) {
     return NextResponse.json({ ok: true, skipped: `event=${eventName}` });
   }
 
-  let payload: GithubPrPayload;
+  let payload: unknown;
   try {
-    payload = JSON.parse(rawBody) as GithubPrPayload;
+    payload = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
   try {
     const service = createWebhookService(env);
-    const result = await service.handlePullRequestEvent(deliveryId, payload);
+    let result;
+
+    if (eventName === "pull_request") {
+      result = await service.handlePullRequestEvent(deliveryId, payload as GithubPrPayload);
+    } else if (eventName === "installation_repositories") {
+      result = await service.handleInstallationRepositoriesEvent(deliveryId, payload as GithubInstallationRepositoriesPayload);
+    }
+
     return NextResponse.json({ ok: true, ...result });
   } catch (error: unknown) {
     console.error("github webhook error:", error);
