@@ -4,13 +4,9 @@ import { ContactInquiryService } from "@/domain/contact/services/contact-inquiry
 import { ContactInquiryStorage } from "@/domain/contact/storage/contact-inquiry.storage";
 import { adminContactInquiryListQuerySchema } from "@/domain/contact/validation";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { requireAdminSession, requireAnyAdminRole } from "@/lib/server/admin-authz";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import {
-  requireAdminSession,
-  requireAnyAdminRole,
-} from "@/lib/server/admin-authz";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const createService = (db: ReturnType<typeof getDb>) =>
   new ContactInquiryService(
@@ -19,14 +15,9 @@ const createService = (db: ReturnType<typeof getDb>) =>
     new ContactDiscordNotifierService(),
   );
 
-export const GET = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const GET = withErrorHandler(async (request: Request, { db }) => {
   const session = await requireAdminSession(db);
-  await requireAnyAdminRole(db, session.adminUserId, [
-    "SUPPORT_ADMIN",
-    "SYSTEM_ADMIN",
-  ]);
+  await requireAnyAdminRole(db, session.adminUserId, ["SUPPORT_ADMIN", "SYSTEM_ADMIN"]);
 
   const url = new URL(request.url);
   const parsed = adminContactInquiryListQuerySchema.safeParse({
@@ -37,10 +28,7 @@ export const GET = withErrorHandler(async (request: Request) => {
   });
 
   if (!parsed.success) {
-    return await apiError(
-      "VALIDATION_ERROR",
-      parsed.error.flatten().fieldErrors,
-    );
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const result = await createService(db).listAdminInquiries(parsed.data);

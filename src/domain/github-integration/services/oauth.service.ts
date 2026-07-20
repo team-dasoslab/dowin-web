@@ -7,15 +7,7 @@ import {
   normalizePem,
 } from "../utils/webhook.utils";
 
-export type GithubEnv = CloudflareEnv & {
-  GITHUB_APP_SLUG: string;
-  GITHUB_APP_ID: string;
-  GITHUB_APP_PRIVATE_KEY: string;
-  GITHUB_APP_CLIENT_ID: string;
-  GITHUB_APP_CLIENT_SECRET: string;
-};
-
-export function createOAuthService(env: GithubEnv) {
+export function createOAuthService(env: CloudflareEnv) {
   const db = getDb(env.DB);
   const storage = createOAuthStorage();
 

@@ -10,17 +10,11 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const createService = (db: ReturnType<typeof getDb>) =>
-  new NotificationSettingsService(
-    new NotificationStorage(db),
-    new WorkspaceStorage(db),
-  );
+  new NotificationSettingsService(new NotificationStorage(db), new WorkspaceStorage(db));
 
-export const GET = withErrorHandler(async () => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const GET = withErrorHandler(async (_, { db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -30,9 +24,7 @@ export const GET = withErrorHandler(async () => {
   return apiSuccess(await createService(db).getMySettings(session.userId));
 });
 
-export const PUT = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const PUT = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {

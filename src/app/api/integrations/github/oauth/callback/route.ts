@@ -1,4 +1,4 @@
-import { createOAuthService, GithubEnv } from "@/domain/github-integration/services/oauth.service";
+import { createOAuthService } from "@/domain/github-integration/services/oauth.service";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,14 +21,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const service = createOAuthService(env as unknown as GithubEnv);
+    const service = createOAuthService(env);
     const result = await service.handleOAuthCallback(code, state);
 
     const baseUrl = env.APP_BASE_URL || req.nextUrl.origin;
     const redirectPath = result.workspaceId
       ? `/${result.locale}/${result.workspaceId}/settings/integrations/github?status=connected`
       : `/${result.locale}/profile?status=connected`;
-    
+
     const redirectUrl = new URL(redirectPath, baseUrl);
 
     return NextResponse.redirect(redirectUrl);

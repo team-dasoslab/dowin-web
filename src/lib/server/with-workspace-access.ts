@@ -27,43 +27,41 @@ export type WorkspaceRouteHandler<TParams = { workspaceId: string }> = (
 export function withWorkspaceAccess<
   TParams extends { workspaceId: string } = { workspaceId: string },
 >(handler: WorkspaceRouteHandler<TParams>) {
-  return withErrorHandler(
-    async (request: NextRequest, contextParams: { params: Promise<TParams> }) => {
-      const { env } = getCloudflareContext();
-      const db = getDb(env.DB);
-      const session = await getSessionWithRefresh(db);
+  return withErrorHandler<{ params: Promise<TParams> }>(async (request, contextParams) => {
+    const { env, db } = contextParams;
 
-      if (!session || !session.userId) {
-        return await apiError("UNAUTHORIZED");
-      }
+    const session = await getSessionWithRefresh(db);
 
-      const params = await contextParams.params;
+    if (!session || !session.userId) {
+      return await apiError("UNAUTHORIZED");
+    }
 
-      if (!params || !params.workspaceId) {
-        return await apiError("VALIDATION_ERROR", { detail: "Workspace ID is required" });
-      }
+    const params = await contextParams.params;
 
-      const workspaceStorage = new WorkspaceStorage(db);
-      const activeWorkspaceId = await workspaceStorage.resolveIdByUid(params.workspaceId);
+    if (!params || !params.workspaceId) {
+      return await apiError("VALIDATION_ERROR", { detail: "Workspace ID is required" });
+    }
 
-      if (!activeWorkspaceId) {
-        return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
-      }
+    const workspaceStorage = new WorkspaceStorage(db);
+    const activeWorkspaceId = await workspaceStorage.resolveIdByUid(params.workspaceId);
 
-      const context = await requireWorkspaceAccess(
-        workspaceStorage,
-        activeWorkspaceId,
-        session.userId,
-      );
+    if (!activeWorkspaceId) {
+      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
+    }
 
-      await assertWorkspaceOperationAllowed(
-        { id: context.workspaceId, planCode: context.entitlement.planCode },
-        workspaceStorage,
-      );
+    const context = await requireWorkspaceAccess(
+      workspaceStorage,
+      activeWorkspaceId,
+      session.userId,
+    );
 
-      return handler(request, { context, db, env, params, workspaceStorage });
-    },
-  );
+    await assertWorkspaceOperationAllowed(
+      { id: context.workspaceId, planCode: context.entitlement.planCode },
+      workspaceStorage,
+    );
+
+    return handler(request, { context, db, env, params, workspaceStorage });
+  });
 }
 
 export function withWorkspaceAdmin<

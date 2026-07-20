@@ -1,14 +1,10 @@
-import { getDb } from "@/db";
 import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 import { devicePushTokenStatusSchema } from "@/domain/notification/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
