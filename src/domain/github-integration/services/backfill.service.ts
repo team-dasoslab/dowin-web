@@ -105,11 +105,11 @@ export async function runGithubIntegrationBackfill(env: CloudflareEnv) {
   }
 
   if (publicIdInserts.length > 0) {
-    // D1 might have a limit on batch inserts, but let's assume it's small enough or use a simple loop
+    const batchStmts = publicIdInserts.map((val) => db.insert(actionItemPublicIds).values(val));
     const chunkSize = 50;
-    for (let i = 0; i < publicIdInserts.length; i += chunkSize) {
-      const chunk = publicIdInserts.slice(i, i + chunkSize);
-      await db.insert(actionItemPublicIds).values(chunk);
+    for (let i = 0; i < batchStmts.length; i += chunkSize) {
+      const chunk = batchStmts.slice(i, i + chunkSize);
+      await db.batch(chunk as unknown as Parameters<typeof db.batch>[0]);
     }
   }
 
