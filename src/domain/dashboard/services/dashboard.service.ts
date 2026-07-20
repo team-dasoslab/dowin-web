@@ -1,5 +1,4 @@
 import {
-  assertWorkspaceOperationAllowed,
   getPlanMemberLimit,
   getWorkspaceMemberCapacity,
 } from "@/domain/workspace/plan-limits";
@@ -118,10 +117,6 @@ export class DashboardService {
   ) { }
 
   async getTeamDashboard(context: WorkspaceAccessContext, weekStart?: string) {
-    await assertWorkspaceOperationAllowed(
-      { id: context.workspaceId, planCode: context.entitlement.planCode },
-      this.workspaceStorage,
-    );
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
 
     const members = await this.workspaceStorage.findMembers(context.workspaceId);
@@ -169,10 +164,6 @@ export class DashboardService {
     context: WorkspaceAccessContext,
     input: { weekStart?: string; monthStart?: string; view?: "week" | "month" },
   ) {
-    await assertWorkspaceOperationAllowed(
-      { id: context.workspaceId, planCode: context.entitlement.planCode },
-      this.workspaceStorage,
-    );
 
     const normalizedWeekStart = input.weekStart ?? getCurrentWeekStart();
     const normalizedMonthStart = normalizeMonthStart(input.monthStart ?? normalizedWeekStart);
@@ -316,10 +307,6 @@ export class DashboardService {
   }
 
   async getTeamWeeklyReport(context: WorkspaceAccessContext, weekStart?: string, weeks = 5) {
-    await assertWorkspaceOperationAllowed(
-      { id: context.workspaceId, planCode: context.entitlement.planCode },
-      this.workspaceStorage,
-    );
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     const boundedWeeks = Math.min(Math.max(weeks, 1), 12);
     const trendWeekStarts = getPreviousWeekStarts(
@@ -368,10 +355,6 @@ export class DashboardService {
   }
 
   async getTeamTrend(context: WorkspaceAccessContext, weekStart?: string, weeks = 5) {
-    await assertWorkspaceOperationAllowed(
-      { id: context.workspaceId, planCode: context.entitlement.planCode },
-      this.workspaceStorage,
-    );
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
     const boundedWeeks = Math.min(Math.max(weeks, 1), 12);
     const trendWeekStarts = getPreviousWeekStarts(

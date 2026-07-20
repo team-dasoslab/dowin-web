@@ -1,9 +1,12 @@
 import { ConflictError } from "@/lib/server/errors";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
+const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
 const mockGetPortalUrl = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -14,12 +17,22 @@ vi.mock("@/db", () => ({
   getDb: mockGetDb,
 }));
 
+vi.mock("@/lib/server/workspace-context", () => ({
+  requireWorkspaceAccess: mockRequireWorkspaceAccess,
+}));
+
+vi.mock("@/domain/workspace/plan-limits", () => ({
+  assertWorkspaceOperationAllowed: mockAssertWorkspaceOperationAllowed,
+}));
+
 vi.mock("@/lib/server/auth", () => ({
   getSessionWithRefresh: mockGetSessionWithRefresh,
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function () {
+    return { resolveIdByUid: vi.fn().mockResolvedValue(1) };
+  }),
 }));
 
 vi.mock("@/domain/billing/storage/billing.storage", () => ({
@@ -36,6 +49,15 @@ vi.mock("@/domain/billing/services/billing.service", () => ({
 
 describe("GET /api/billing/portal", () => {
   beforeEach(() => {
+    if (typeof mockRequireWorkspaceAccess !== "undefined")
+      mockRequireWorkspaceAccess.mockResolvedValue({
+        workspaceId: 1,
+        userId: 1,
+        role: "MEMBER",
+        entitlement: { planCode: "BASIC" },
+      });
+    if (typeof mockAssertWorkspaceOperationAllowed !== "undefined")
+      mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
@@ -50,7 +72,7 @@ describe("GET /api/billing/portal", () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost"), {
+    const response = await GET(new NextRequest("http://localhost"), {
       params: Promise.resolve({ workspaceId: "ws_uid" }),
     });
 
@@ -59,10 +81,17 @@ describe("GET /api/billing/portal", () => {
 
   it("portal url이 있으면 redirect한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
+    mockRequireWorkspaceAccess.mockResolvedValue({
+      workspaceId: 1,
+      userId: 1,
+      role: "MEMBER",
+      entitlement: { planCode: "BASIC" },
+    });
+    mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
     mockGetPortalUrl.mockResolvedValue("https://example.com/portal");
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost"), {
+    const response = await GET(new NextRequest("http://localhost"), {
       params: Promise.resolve({ workspaceId: "ws_uid" }),
     });
 
@@ -76,7 +105,7 @@ describe("GET /api/billing/portal", () => {
 
     const { GET } = await import("./route");
     const response = await GET(
-      new Request("http://localhost", {
+      new NextRequest("http://localhost", {
         headers: {
           accept: "application/json",
         },
@@ -99,7 +128,7 @@ describe("GET /api/billing/portal", () => {
 
     const { GET } = await import("./route");
     const response = await GET(
-      new Request("http://localhost/api/workspaces/ws_uid/billing/portal", {
+      new NextRequest("http://localhost/api/workspaces/ws_uid/billing/portal", {
         headers: {
           accept: "application/json",
         },
@@ -122,7 +151,7 @@ describe("GET /api/billing/portal", () => {
 
     const { GET } = await import("./route");
     const response = await GET(
-      new Request("http://localhost/api/workspaces/ws_uid/billing/portal", {
+      new NextRequest("http://localhost/api/workspaces/ws_uid/billing/portal", {
         headers: {
           referer: "http://localhost/ko/ws_uid/workspace/billing",
         },
@@ -142,7 +171,7 @@ describe("GET /api/billing/portal", () => {
 
     const { GET } = await import("./route");
     const response = await GET(
-      new Request("http://localhost/api/workspaces/ws_uid/billing/portal"),
+      new NextRequest("http://localhost/api/workspaces/ws_uid/billing/portal"),
       { params: Promise.resolve({ workspaceId: "ws_uid" }) },
     );
 

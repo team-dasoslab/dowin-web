@@ -7,31 +7,20 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const createService = (db: ReturnType<typeof getDb>) =>
-  new NotificationSettingsService(
-    new NotificationStorage(db),
-    new WorkspaceStorage(db),
-  );
+  new NotificationSettingsService(new NotificationStorage(db), new WorkspaceStorage(db));
 
-export const PUT = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const PUT = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
     return await apiError("UNAUTHORIZED");
   }
 
-  const parsed = userNotificationTimezoneUpdateSchema.safeParse(
-    await request.json(),
-  );
+  const parsed = userNotificationTimezoneUpdateSchema.safeParse(await request.json());
   if (!parsed.success) {
-    return await apiError(
-      "VALIDATION_ERROR",
-      parsed.error.flatten().fieldErrors,
-    );
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -44,10 +33,5 @@ export const PUT = withErrorHandler(async (request: Request) => {
     return restrictedWriteResponse;
   }
 
-  return apiSuccess(
-    await createService(db).updateMyTimezone(
-      session.userId,
-      parsed.data.timezone,
-    ),
-  );
+  return apiSuccess(await createService(db).updateMyTimezone(session.userId, parsed.data.timezone));
 });

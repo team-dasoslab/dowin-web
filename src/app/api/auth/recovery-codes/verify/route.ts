@@ -1,14 +1,10 @@
-import { getDb } from "@/db";
 import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { recoveryCodeVerifySchema } from "@/domain/auth/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { db }) => {
   const storage = new AuthStorage(db);
   const service = new AuthService(storage);
 

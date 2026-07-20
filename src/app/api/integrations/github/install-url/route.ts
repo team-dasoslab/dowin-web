@@ -1,11 +1,9 @@
-import { getDb } from "@/db";
-import { createOAuthService, GithubEnv } from "@/domain/github-integration/services/oauth.service";
+import { createOAuthService } from "@/domain/github-integration/services/oauth.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -14,9 +12,7 @@ const InstallUrlSchema = z.object({
   locale: z.enum(["ko", "en"]).default("ko"),
 });
 
-export const POST = withErrorHandler(async (req: NextRequest) => {
-  const { env } = await getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (req: NextRequest, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -51,7 +47,7 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     }
   }
 
-  const service = createOAuthService(env as unknown as GithubEnv);
+  const service = createOAuthService(env);
   const result = await service.createInstallUrl(
     session.userId,
     parsed.data.locale,

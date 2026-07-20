@@ -1,8 +1,28 @@
 import { ConflictError, ForbiddenError } from "@/lib/server/errors";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BillingService } from "./billing.service";
 
 describe("BillingService", () => {
+  const ctx: WorkspaceAccessContext = {
+    workspaceId: 1,
+    workspacePublicId: "ws_abc",
+    workspaceName: "My Workspace",
+    userId: 100,
+    role: "ADMIN",
+    membershipId: 10,
+    allowPastDailyLogEdit: false,
+    entitlement: {
+      canAccessBasicSubscription: true,
+      entitlementSource: null,
+      billingStatus: "ACTIVE",
+      planCode: "BASIC",
+    },
+  };
+  const memberCtx: WorkspaceAccessContext = {
+    ...ctx,
+    role: "MEMBER",
+  };
   beforeEach(() => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -37,7 +57,7 @@ describe("BillingService", () => {
       } as never,
     );
 
-    await expect(service.getMyBilling("ws_abc", 7)).resolves.toEqual({
+    await expect(service.getMyBilling(ctx)).resolves.toEqual({
       workspaceId: "ws_abc",
       workspaceName: "Dowin",
       planCode: "BASIC",
@@ -94,7 +114,7 @@ describe("BillingService", () => {
       } as never,
     );
 
-    await expect(service.getMyBilling("ws_abc", 7)).resolves.toMatchObject({
+    await expect(service.getMyBilling(ctx)).resolves.toMatchObject({
       purchasedSeatCount: 5,
       pendingSeatCount: null,
       pendingSeatEffectiveAt: null,
@@ -155,7 +175,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getMyBilling("ws_abc", 7)).resolves.toMatchObject({
+    await expect(service.getMyBilling(ctx)).resolves.toMatchObject({
       purchasedSeatCount: 10,
       pendingSeatCount: 5,
       pendingSeatEffectiveAt: currentPeriodEnd.toISOString(),
@@ -220,7 +240,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getMyBilling("ws_abc", 7)).resolves.toMatchObject({
+    await expect(service.getMyBilling(ctx)).resolves.toMatchObject({
       purchasedSeatCount: 20,
       pendingSeatCount: 5,
       pendingSeatEffectiveAt: currentPeriodEnd.toISOString(),
@@ -269,7 +289,7 @@ describe("BillingService", () => {
       } as never,
     );
 
-    await service.getMyBilling("ws_abc", 7);
+    await service.getMyBilling(ctx);
 
     expect(getRecentBillingRiskSummary).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -317,7 +337,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl("ws_abc", 7)).rejects.toEqual(
+    await expect(service.getPortalUrl(ctx)).rejects.toEqual(
       expect.objectContaining<Partial<ConflictError>>({
         code: "BILLING_NOT_READY",
       }),
@@ -367,9 +387,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
-      "https://polar.sh/portal",
-    );
+    await expect(service.getPortalUrl(ctx)).resolves.toBe("https://polar.sh/portal");
     expect(findSubscriptionSeatMemberId).toHaveBeenCalledWith({
       subscriptionId: "sub_123",
     });
@@ -422,9 +440,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
-      "https://polar.sh/portal",
-    );
+    await expect(service.getPortalUrl(ctx)).resolves.toBe("https://polar.sh/portal");
     expect(findSubscriptionSeatMemberId).toHaveBeenCalledWith({
       subscriptionId: "sub_123",
     });
@@ -479,9 +495,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
-      "https://polar.sh/portal",
-    );
+    await expect(service.getPortalUrl(ctx)).resolves.toBe("https://polar.sh/portal");
     expect(assignSubscriptionSeat).toHaveBeenCalledWith({
       subscriptionId: "sub_123",
       customerId: "cus_123",
@@ -530,9 +544,7 @@ describe("BillingService", () => {
       },
     );
 
-    await expect(service.getPortalUrl("ws_abc", 7)).resolves.toBe(
-      "https://polar.sh/portal",
-    );
+    await expect(service.getPortalUrl(ctx)).resolves.toBe("https://polar.sh/portal");
     expect(createCustomerSession).toHaveBeenCalledWith({
       externalCustomerId: "workspace:1",
     });
@@ -582,9 +594,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.startBasicCheckout({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.startBasicCheckout(ctx, {
         locale: "ko",
         idempotencyKey: "idem_1",
       }),
@@ -606,7 +616,7 @@ describe("BillingService", () => {
           flow: "workspace_resubscribe",
           workspaceId: "1",
           workspaceUid: "ws_abc",
-          requestedByUserId: "7",
+          requestedByUserId: "100",
           targetPlanCode: "BASIC",
           requestedSeatCount: "3",
         }),
@@ -658,9 +668,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.startBasicCheckout({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.startBasicCheckout(ctx, {
         locale: "ko",
         idempotencyKey: "idem_risk",
       }),
@@ -724,9 +732,7 @@ describe("BillingService", () => {
       },
     );
 
-    await service.startBasicCheckout({
-      workspaceUid: "ws_abc",
-      userId: 7,
+    await service.startBasicCheckout(ctx, {
       seatCount: 2,
       locale: "en",
       idempotencyKey: "idem_2",
@@ -789,9 +795,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.startBasicCheckout({
-        workspaceUid: "ws_promo",
-        userId: 7,
+      service.startBasicCheckout(ctx, {
         locale: "ko",
         idempotencyKey: "idem_promo",
       }),
@@ -859,9 +863,7 @@ describe("BillingService", () => {
       },
     );
 
-    await service.startBasicCheckout({
-      workspaceUid: "ws_manual",
-      userId: 7,
+    await service.startBasicCheckout(ctx, {
       locale: "ko",
       idempotencyKey: "idem_manual",
     });
@@ -919,9 +921,7 @@ describe("BillingService", () => {
       },
     );
 
-    await service.startBasicCheckout({
-      workspaceUid: "ws_abc",
-      userId: 7,
+    await service.startBasicCheckout(ctx, {
       seatCount: 1,
       locale: "ko",
       idempotencyKey: "idem_2",
@@ -975,9 +975,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.startBasicCheckout({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.startBasicCheckout(ctx, {
         locale: "ko",
         idempotencyKey: "idem_3",
       }),
@@ -1028,9 +1026,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.startBasicCheckout({
-        workspaceUid: "ws_revoked",
-        userId: 7,
+      service.startBasicCheckout(ctx, {
         locale: "ko",
         idempotencyKey: "idem_revoked",
       }),
@@ -1088,9 +1084,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.updateSubscriptionSeats({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.updateSubscriptionSeats(ctx, {
         seatCount: 6,
       }),
     ).resolves.toEqual({
@@ -1155,9 +1149,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.updateSubscriptionSeats({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.updateSubscriptionSeats(ctx, {
         seatCount: 4,
       }),
     ).resolves.toEqual({
@@ -1213,9 +1205,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.updateSubscriptionSeats({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.updateSubscriptionSeats(ctx, {
         seatCount: 5,
       }),
     ).resolves.toEqual({
@@ -1265,9 +1255,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.updateSubscriptionSeats({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.updateSubscriptionSeats(ctx, {
         seatCount: 3,
       }),
     ).rejects.toEqual(
@@ -1299,9 +1287,7 @@ describe("BillingService", () => {
     );
 
     await expect(
-      service.startBasicCheckout({
-        workspaceUid: "ws_abc",
-        userId: 7,
+      service.startBasicCheckout(memberCtx, {
         locale: "ko",
         idempotencyKey: "idem_4",
       }),

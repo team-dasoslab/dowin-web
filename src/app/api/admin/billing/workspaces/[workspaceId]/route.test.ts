@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -55,7 +56,7 @@ describe("GET /api/admin/billing/workspaces/[workspaceId]", () => {
     });
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("https://example.com"), {
+    const response = await GET(new NextRequest("https://example.com"), {
       params: Promise.resolve({ workspaceId: "3" }),
     });
     const body = (await response.json()) as { workspaceId: number };

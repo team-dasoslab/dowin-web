@@ -1,38 +1,13 @@
-import { getDb } from "@/db";
 import { TeamMemoService } from "@/domain/dashboard/services/team-memo.service";
 import { TeamMemoStorage } from "@/domain/dashboard/storage/team-memo.storage";
 import { dashboardTeamMemoResolveSchema } from "@/domain/dashboard/validation";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
-import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 
-
-
-export const PATCH = withErrorHandler(
-  async (
-    request: Request,
-    contextParams: { params: Promise<{ workspaceId: string; memoId: string }> },
-  ) => {
-    const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
-    const { workspaceId, memoId } = await contextParams.params;
-    const memoIdValue = Number(memoId);
+export const PATCH = withWorkspaceAccess<{ workspaceId: string; memoId: string }>(
+  async (request, { context, db, workspaceStorage, params }) => {
+    const memoIdValue = Number(params.memoId);
     const parsed = dashboardTeamMemoResolveSchema.safeParse(await request.json());
-    const workspaceStorage = new WorkspaceStorage(db);
-    const activeWorkspaceId = await workspaceStorage.resolveIdByUid(workspaceId);
-
-    if (!activeWorkspaceId) {
-      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
-    }
 
     if (!Number.isInteger(memoIdValue) || memoIdValue <= 0) {
       return await apiError("VALIDATION_ERROR", {
@@ -44,11 +19,9 @@ export const PATCH = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
-    const contextAccess = await requireWorkspaceAccess(workspaceStorage, activeWorkspaceId, session.userId);
-
     const service = new TeamMemoService(workspaceStorage, new TeamMemoStorage(db));
     const result = await service.resolveTeamMemo(
-      contextAccess,
+      context,
       memoIdValue,
       parsed.data.isResolved,
     );

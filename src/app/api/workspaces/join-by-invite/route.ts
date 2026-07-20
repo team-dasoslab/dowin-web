@@ -1,4 +1,3 @@
-import { getDb } from "@/db";
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { workspaceJoinByInviteSchema } from "@/domain/workspace/validation";
@@ -6,12 +5,9 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies } from "next/headers";
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { env, db }) => {
   const storage = new WorkspaceStorage(db);
   const service = new WorkspaceService(storage);
 

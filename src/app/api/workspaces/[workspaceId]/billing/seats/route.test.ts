@@ -1,5 +1,11 @@
 import { ConflictError } from "@/lib/server/errors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+
+const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
+const mockResolveIdByUid = vi.fn();
+
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -23,7 +29,7 @@ vi.mock("@/lib/server/restricted-test-account", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() { return { resolveIdByUid: mockResolveIdByUid }; }),
 }));
 
 vi.mock("@/domain/billing/storage/billing.storage", () => ({
@@ -42,18 +48,25 @@ vi.mock("@/domain/billing/services/billing.service", () => ({
   }),
 }));
 
+
+vi.mock("@/lib/server/workspace-context", () => ({ requireWorkspaceAccess: mockRequireWorkspaceAccess }));
+vi.mock("@/domain/workspace/plan-limits", () => ({ assertWorkspaceOperationAllowed: mockAssertWorkspaceOperationAllowed }));
+
 describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(1);
+    mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 1, userId: 1, role: "ADMIN", entitlement: { planCode: "BASIC" } });
+    mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { PATCH } = await import("./route");
-    const response = await PATCH(new Request("http://localhost"), {
+    const response = await PATCH(new NextRequest("http://localhost"), {
       params: Promise.resolve({ workspaceId: "ws_uid" }),
     });
 
@@ -65,7 +78,7 @@ describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
 
     const { PATCH } = await import("./route");
     const response = await PATCH(
-      new Request("http://localhost", {
+      new NextRequest("http://localhost", {
         method: "PATCH",
         body: JSON.stringify({ seatCount: 0 }),
       }),
@@ -89,7 +102,7 @@ describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
 
     const { PATCH } = await import("./route");
     const response = await PATCH(
-      new Request("http://localhost", {
+      new NextRequest("http://localhost", {
         method: "PATCH",
         body: JSON.stringify({ seatCount: 5 }),
       }),
@@ -109,9 +122,7 @@ describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
       pendingSeatCount: null,
       effectiveTiming: "IMMEDIATE",
     });
-    expect(mockUpdateSubscriptionSeats).toHaveBeenCalledWith({
-      workspaceUid: "ws_uid",
-      userId: 1,
+    expect(mockUpdateSubscriptionSeats).toHaveBeenCalledWith(expect.objectContaining({ workspaceId: 1 }), {
       seatCount: 5,
     });
   });
@@ -124,7 +135,7 @@ describe("PATCH /api/workspaces/[workspaceId]/billing/seats", () => {
 
     const { PATCH } = await import("./route");
     const response = await PATCH(
-      new Request("http://localhost", {
+      new NextRequest("http://localhost", {
         method: "PATCH",
         body: JSON.stringify({ seatCount: 2 }),
       }),

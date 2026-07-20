@@ -1,4 +1,3 @@
-import { getDb } from "@/db";
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { LeadMeasureService } from "@/domain/lead-measure/services/lead-measure.service";
 import {
@@ -8,34 +7,14 @@ import {
 } from "@/domain/lead-measure/validation";
 import { LeadMeasureStorage } from "@/domain/lead-measure/storage/lead-measure.storage";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 
-const createService = (db: ReturnType<typeof getDb>) =>
-  new LeadMeasureService(
-    new WorkspaceStorage(db),
-    new ScoreboardStorage(db),
-    new LeadMeasureStorage(db),
-    new DailyLogStorage(db),
-  );
-
-export const GET = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
-    const routeParams = await params;
+export const GET = withWorkspaceAccess<{ workspaceId: string, id: string }>(
+  async (request, { context, db, params }) => {
     const validatedParams = scoreboardIdParamSchema.safeParse({
-      scoreboardId: routeParams.id,
+      scoreboardId: params.id,
     });
     const query = leadMeasureStatusQuerySchema.safeParse(
       Object.fromEntries(new URL(request.url).searchParams.entries()),
@@ -48,8 +27,15 @@ const { env } = getCloudflareContext();
       });
     }
 
-    const measures = await createService(db).getLeadMeasures(workspaceId, validatedParams.data.scoreboardId,
-      session.userId,
+    const service = new LeadMeasureService(
+      new ScoreboardStorage(db),
+      new LeadMeasureStorage(db),
+      new DailyLogStorage(db),
+    );
+
+    const measures = await service.getLeadMeasures(
+      context,
+      validatedParams.data.scoreboardId,
       query.data.status,
     );
 
@@ -57,19 +43,11 @@ const { env } = getCloudflareContext();
   },
 );
 
-export const POST = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
+export const POST = withWorkspaceAccess<{ workspaceId: string, id: string }>(
+  async (request, { context, db, env, params }) => {
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
-      userId: session.userId,
+      userId: context.userId,
       env,
       intent: "general-write",
     });
@@ -77,9 +55,8 @@ const { env } = getCloudflareContext();
       return restrictedWriteResponse;
     }
 
-    const routeParams = await params;
     const validatedParams = scoreboardIdParamSchema.safeParse({
-      scoreboardId: routeParams.id,
+      scoreboardId: params.id,
     });
     if (!validatedParams.success) {
       return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
@@ -91,8 +68,15 @@ const { env } = getCloudflareContext();
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
-    const measure = await createService(db).createLeadMeasure(workspaceId, validatedParams.data.scoreboardId,
-      session.userId,
+    const service = new LeadMeasureService(
+      new ScoreboardStorage(db),
+      new LeadMeasureStorage(db),
+      new DailyLogStorage(db),
+    );
+
+    const measure = await service.createLeadMeasure(
+      context,
+      validatedParams.data.scoreboardId,
       parsed.data,
     );
 

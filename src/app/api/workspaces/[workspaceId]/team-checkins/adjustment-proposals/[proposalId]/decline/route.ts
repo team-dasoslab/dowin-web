@@ -1,17 +1,11 @@
 import { teamCheckinAdjustmentDeclineSchema } from "@/domain/team-checkin/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getTeamCheckinRouteContext } from "../../../_utils";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
+import { TeamCheckinService } from "@/domain/team-checkin/services/team-checkin.service";
+import { TeamCheckinStorage } from "@/domain/team-checkin/storage/team-checkin.storage";
 
-export const POST = withErrorHandler(
-  async (
-    request: Request,
-    { params }: { params: Promise<{ workspaceId: string; proposalId: string }> },
-  ) => {
-    const { workspaceId, proposalId } = await params;
-    const routeContext = await getTeamCheckinRouteContext(workspaceId);
-    if (!routeContext.ok) return routeContext.error;
-
+export const POST = withWorkspaceAccess<{ workspaceId: string; proposalId: string }>(
+  async (request, { context, db, params }) => {
     const parsed = teamCheckinAdjustmentDeclineSchema.safeParse(
       await request.json().catch(() => ({})),
     );
@@ -19,8 +13,9 @@ export const POST = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
+    const service = new TeamCheckinService(new TeamCheckinStorage(db));
     return apiSuccess(
-      await routeContext.service.declineProposal(routeContext.context, proposalId),
+      await service.declineProposal(context, params.proposalId),
     );
   },
 );

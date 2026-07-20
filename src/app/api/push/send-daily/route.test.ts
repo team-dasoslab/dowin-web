@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockRunDailyReminder = vi.fn();
@@ -24,7 +25,7 @@ describe("GET /api/push/send-daily", () => {
   it("Authorization이 맞지 않으면 401을 반환한다", async () => {
     const { GET } = await import("./route");
     const response = await GET(
-      new Request("http://localhost/api/push/send-daily", {
+      new NextRequest("http://localhost/api/push/send-daily", {
         headers: {
           Authorization: "Bearer wrong-secret",
         },
@@ -47,7 +48,7 @@ describe("GET /api/push/send-daily", () => {
 
     const { GET } = await import("./route");
     const response = await GET(
-      new Request("http://localhost/api/push/send-daily", {
+      new NextRequest("http://localhost/api/push/send-daily", {
         headers: {
           Authorization: "Bearer cron-secret",
         },

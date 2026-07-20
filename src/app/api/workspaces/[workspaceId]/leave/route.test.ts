@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 import { ConflictError } from "@/lib/server/errors";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
+const mockResolveWorkspaceIdByUid = vi.fn();
+const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
 const mockResolveIdByUid = vi.fn();
 const mockLeaveWorkspace = vi.fn();
 
@@ -13,6 +17,14 @@ vi.mock("@opennextjs/cloudflare", () => ({
 
 vi.mock("@/db", () => ({
   getDb: mockGetDb,
+}));
+
+vi.mock("@/lib/server/workspace-context", () => ({
+  requireWorkspaceAccess: mockRequireWorkspaceAccess,
+}));
+
+vi.mock("@/domain/workspace/plan-limits", () => ({
+  assertWorkspaceOperationAllowed: mockAssertWorkspaceOperationAllowed,
 }));
 
 vi.mock("@/lib/server/auth", () => ({
@@ -37,9 +49,12 @@ vi.mock("@/domain/workspace/services/workspace.service", () => ({
 
 describe("DELETE /api/workspaces/:id/leave", () => {
   beforeEach(() => {
+    if (typeof mockRequireWorkspaceAccess !== "undefined") mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 1, userId: 1, role: "MEMBER", entitlement: { planCode: "BASIC" } });
+    if (typeof mockAssertWorkspaceOperationAllowed !== "undefined") mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveWorkspaceIdByUid.mockResolvedValue(1);
     mockResolveIdByUid.mockResolvedValue(1);
   });
 
@@ -48,7 +63,7 @@ describe("DELETE /api/workspaces/:id/leave", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/workspaces/1/leave", {
+      new NextRequest("http://localhost/api/workspaces/1/leave", {
         method: "DELETE",
       }),
       { params: Promise.resolve({ workspaceId: "1" }) },
@@ -59,13 +74,15 @@ describe("DELETE /api/workspaces/:id/leave", () => {
 
   it("ADMIN이 바로 탈퇴하려 하면 409를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
+    mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 1, userId: 1, role: "MEMBER", entitlement: { planCode: "BASIC" } });
+    mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
     mockLeaveWorkspace.mockRejectedValue(
       new ConflictError("ADMIN_TRANSFER_REQUIRED"),
     );
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/workspaces/1/leave", {
+      new NextRequest("http://localhost/api/workspaces/1/leave", {
         method: "DELETE",
       }),
       { params: Promise.resolve({ workspaceId: "1" }) },
@@ -80,13 +97,13 @@ describe("DELETE /api/workspaces/:id/leave", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/workspaces/1/leave", {
+      new NextRequest("http://localhost/api/workspaces/1/leave", {
         method: "DELETE",
       }),
       { params: Promise.resolve({ workspaceId: "1" }) },
     );
 
     expect(response.status).toBe(204);
-    expect(mockLeaveWorkspace).toHaveBeenCalledWith(1, 1);
+    expect(mockLeaveWorkspace).toHaveBeenCalledWith(expect.objectContaining({ workspaceId: 1, userId: 1 }));
   });
 });

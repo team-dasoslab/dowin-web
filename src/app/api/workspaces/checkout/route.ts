@@ -1,5 +1,3 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { getDb } from "@/db";
 import { createPolarBillingClient } from "@/domain/billing/polar";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { WorkspaceCheckoutService } from "@/domain/workspace/services/workspace-checkout.service";
@@ -14,10 +12,7 @@ import { getLocale } from "@/lib/server/locale";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
-
+export const POST = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
   if (!session) {
     return await apiError("UNAUTHORIZED");

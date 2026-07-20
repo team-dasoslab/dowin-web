@@ -33,25 +33,6 @@ describe("DashboardService", () => {
     // 워크스페이스 없는 경우는 API 계층에서 처리하므로 생략
   });
 
-  it("Basic entitlement가 없으면 팀 대시보드를 조회할 수 없다", async () => {
-    findBillingState.mockResolvedValue(null);
-
-    await expect(
-      service.getTeamDashboard(
-        {
-          ...context,
-          entitlement: {
-            ...context.entitlement,
-            canAccessBasicSubscription: false,
-            billingStatus: "NONE",
-            planCode: "FREE",
-          },
-        },
-        "2026-03-09",
-      ),
-    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
-    expect(findMembers).not.toHaveBeenCalled();
-  });
 
   it("팀 대시보드 조회 시 멤버별 점수판 요약과 주간 로그를 반환한다", async () => {
     findMembers.mockResolvedValue([

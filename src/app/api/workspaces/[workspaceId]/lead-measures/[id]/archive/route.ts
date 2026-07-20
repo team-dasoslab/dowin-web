@@ -1,29 +1,17 @@
-import { getDb } from "@/db";
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { LeadMeasureService } from "@/domain/lead-measure/services/lead-measure.service";
 import { LeadMeasureStorage } from "@/domain/lead-measure/storage/lead-measure.storage";
 import { leadMeasureIdParamSchema } from "@/domain/lead-measure/validation";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 
-export const POST = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
+export const POST = withWorkspaceAccess<{ workspaceId: string, id: string }>(
+  async (_request, { context, db, env, params }) => {
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
-      userId: session.userId,
+      userId: context.userId,
       env,
       intent: "general-write",
     });
@@ -31,19 +19,18 @@ const { env } = getCloudflareContext();
       return restrictedWriteResponse;
     }
 
-    const validatedParams = leadMeasureIdParamSchema.safeParse(await params);
+    const validatedParams = leadMeasureIdParamSchema.safeParse(params);
     if (!validatedParams.success) {
       return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
     const service = new LeadMeasureService(
-      new WorkspaceStorage(db),
       new ScoreboardStorage(db),
       new LeadMeasureStorage(db),
       new DailyLogStorage(db),
     );
 
-    const result = await service.archiveLeadMeasure(workspaceId, validatedParams.data.id, session.userId);
+    const result = await service.archiveLeadMeasure(context, validatedParams.data.id);
     return apiSuccess(result);
   },
 );

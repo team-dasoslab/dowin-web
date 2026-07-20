@@ -4,8 +4,7 @@ import {
   NotFoundError,
   PlatformError,
 } from "@/lib/server/errors";
-import { type NullableEntitlementSource } from "@/domain/billing/types";
-import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import {
   CreateScoreboardInput,
   ScoreboardRecord,
@@ -13,26 +12,7 @@ import {
   UpdateScoreboardInput,
 } from "@/domain/scoreboard/storage/scoreboard.storage";
 
-export type WorkspaceSummary = {
-  id: number;
-  planCode?: string;
-  allowPastDailyLogEdit?: boolean;
-};
 
-export interface WorkspaceLookupPort {
-  resolveIdByUid(uid: string): Promise<number | null>;
-  findWorkspaceById(workspaceId: number): Promise<WorkspaceSummary | null>;
-  findMembership(workspaceId: number, userId: number): Promise<unknown | null>;
-  countMembers(workspaceId: number): Promise<number>;
-  findBillingState(workspaceId: number): Promise<{
-    planCode: "BASIC" | "FREE" | "STANDARD";
-    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    entitlementSource: NullableEntitlementSource;
-  } | null>;
-  findPlanLimit(
-    planCode: "BASIC" | "FREE" | "STANDARD",
-  ): Promise<{ memberLimit: number } | null>;
-}
 
 export interface ScoreboardStoragePort {
   findActiveScoreboard(
@@ -60,15 +40,12 @@ export interface ScoreboardStoragePort {
 export class ScoreboardService {
   constructor(
     private scoreboardStorage: ScoreboardStoragePort,
-    private workspaceStorage: WorkspaceLookupPort,
   ) {}
 
-  async getActiveScoreboard(workspaceUid: string, userId: number): Promise<ScoreboardWithLeadMeasures> {
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+  async getActiveScoreboard(context: WorkspaceAccessContext): Promise<ScoreboardWithLeadMeasures> {
     const scoreboard = await this.scoreboardStorage.findActiveScoreboard(
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
 
     if (!scoreboard) {
@@ -79,15 +56,12 @@ export class ScoreboardService {
   }
 
   async createScoreboard(
-    workspaceUid: string,
-    userId: number,
+    context: WorkspaceAccessContext,
     input: Omit<CreateScoreboardInput, "userId" | "workspaceId">,
   ): Promise<ScoreboardRecord> {
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
     const existing = await this.scoreboardStorage.findActiveScoreboard(
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
 
     if (existing) {
@@ -97,23 +71,17 @@ export class ScoreboardService {
     return await this.scoreboardStorage.createScoreboard({
       ...input,
       endDate: input.endDate ?? null,
-      userId,
-      workspaceId: workspace.id,
+      userId: context.userId,
+      workspaceId: context.workspaceId,
     });
   }
 
   async updateScoreboard(
-    workspaceUid: string,
+    context: WorkspaceAccessContext,
     id: number,
-    userId: number,
     input: UpdateScoreboardInput,
   ): Promise<ScoreboardRecord> {
-    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
-      workspaceUid,
-      id,
-      userId,
-    );
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+    const scoreboard = await this.getOwnedScoreboard(id, context);
 
     if (scoreboard.status === "ARCHIVED") {
       throw new PlatformScoreboardArchivedError();
@@ -122,13 +90,8 @@ export class ScoreboardService {
     return await this.scoreboardStorage.updateScoreboard(id, input);
   }
 
-  async archiveScoreboard(workspaceUid: string, id: number, userId: number): Promise<ScoreboardRecord> {
-    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
-      workspaceUid,
-      id,
-      userId,
-    );
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+  async archiveScoreboard(context: WorkspaceAccessContext, id: number): Promise<ScoreboardRecord> {
+    const scoreboard = await this.getOwnedScoreboard(id, context);
 
     if (scoreboard.status === "ARCHIVED") {
       throw new PlatformScoreboardArchivedError();
@@ -140,34 +103,26 @@ export class ScoreboardService {
     );
   }
 
-  async getHistory(workspaceUid: string, userId: number): Promise<ScoreboardRecord[]> {
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+  async getHistory(context: WorkspaceAccessContext): Promise<ScoreboardRecord[]> {
     return await this.scoreboardStorage.findArchivedScoreboards(
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
   }
 
   async reactivateScoreboard(
-    workspaceUid: string,
+    context: WorkspaceAccessContext,
     id: number,
-    userId: number,
   ): Promise<ScoreboardRecord> {
-    const { scoreboard, workspace } = await this.getOwnedScoreboardWithWorkspace(
-      workspaceUid,
-      id,
-      userId,
-    );
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+    const scoreboard = await this.getOwnedScoreboard(id, context);
 
     if (scoreboard.status === "ACTIVE") {
       throw new BadRequestError("SCOREBOARD_ALREADY_ACTIVE");
     }
 
     const existing = await this.scoreboardStorage.findActiveScoreboard(
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
 
     if (existing) {
@@ -177,45 +132,21 @@ export class ScoreboardService {
     return await this.scoreboardStorage.reactivateScoreboard(id);
   }
 
-  private async getWorkspace(workspaceUid: string, userId: number): Promise<WorkspaceSummary> {
-    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
-    if (!internalId) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    const membership = await this.workspaceStorage.findMembership(internalId, userId);
-    if (!membership) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    return workspace;
-  }
-
-  private async getOwnedScoreboardWithWorkspace(
-    workspaceUid: string,
+  private async getOwnedScoreboard(
     id: number,
-    userId: number,
-  ): Promise<{
-    scoreboard: ScoreboardWithLeadMeasures;
-    workspace: WorkspaceSummary;
-  }> {
-    const workspace = await this.getWorkspace(workspaceUid, userId);
+    context: WorkspaceAccessContext,
+  ): Promise<ScoreboardWithLeadMeasures> {
     const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       id,
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
 
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return { scoreboard, workspace };
+    return scoreboard;
   }
 }
 

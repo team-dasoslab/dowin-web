@@ -1,7 +1,24 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LeadMeasureService } from "@/domain/lead-measure/services/lead-measure.service";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("LeadMeasureService", () => {
+  const ctx: WorkspaceAccessContext = {
+    workspaceId: 1,
+    workspacePublicId: "ws_abc",
+    workspaceName: "My Workspace",
+    userId: 100,
+    role: "ADMIN",
+    membershipId: 10,
+    allowPastDailyLogEdit: false,
+    entitlement: {
+      canAccessBasicSubscription: true,
+      entitlementSource: null,
+      billingStatus: "ACTIVE",
+      planCode: "BASIC",
+    },
+  };
+
   const resolveIdByUid = vi.fn();
   const findWorkspaceById = vi.fn();
   const findMembership = vi.fn();
@@ -21,7 +38,6 @@ describe("LeadMeasureService", () => {
   const findLogsForLeadMeasures = vi.fn();
 
   const service = new LeadMeasureService(
-    { resolveIdByUid, findWorkspaceById, findMembership, countMembers, findBillingState, findPlanLimit },
     { findOwnedScoreboard },
     {
       findLeadMeasuresByScoreboard,
@@ -63,7 +79,7 @@ describe("LeadMeasureService", () => {
       { leadMeasureId: 10, logDate: "2026-04-10", value: true, count: 1 },
     ]);
 
-    const result = await service.getLeadMeasures("ws_uid", 2, 100, "active");
+    const result = await service.getLeadMeasures(ctx, 2, "active");
 
     expect(result).toEqual([
       expect.objectContaining({
@@ -71,19 +87,6 @@ describe("LeadMeasureService", () => {
         weeklyAchievement: { achieved: 5, total: 7 },
       }),
     ]);
-  });
-
-  it("Basic entitlement가 없으면 선행지표 목록을 조회할 수 없다", async () => {
-    resolveIdByUid.mockResolvedValue(1);
-    findMembership.mockResolvedValue(true);
-    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
-    findBillingState.mockResolvedValue(null);
-    findOwnedScoreboard.mockResolvedValue({ id: 2, status: "ACTIVE" });
-
-    await expect(
-      service.getLeadMeasures("ws_uid", 2, 100, "active"),
-    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
-    expect(findLeadMeasuresByScoreboard).not.toHaveBeenCalled();
   });
 
   it("ARCHIVED 점수판에는 선행지표를 추가할 수 없다", async () => {
@@ -96,7 +99,7 @@ describe("LeadMeasureService", () => {
     });
 
     await expect(
-      service.createLeadMeasure("ws_uid", 2, 100, {
+      service.createLeadMeasure(ctx, 2, {
         name: "매일 물 2L",
         targetValue: 7,
         period: "DAILY",
@@ -124,7 +127,7 @@ describe("LeadMeasureService", () => {
       tags: [{ id: 3, name: "운동" }],
     });
 
-    const result = await service.createLeadMeasure("ws_uid", 2, 100, {
+    const result = await service.createLeadMeasure(ctx, 2, {
       name: "주 3회 운동",
       targetValue: 3,
       period: "WEEKLY",
@@ -144,50 +147,6 @@ describe("LeadMeasureService", () => {
     expect(result.tags).toEqual([{ id: 3, name: "운동" }]);
   });
 
-  it("FREE 플랜 멤버 한도 초과 상태에서는 선행지표를 생성할 수 없다", async () => {
-    resolveIdByUid.mockResolvedValue(1);
-    findMembership.mockResolvedValue(true);
-    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
-    countMembers.mockResolvedValue(11);
-    findOwnedScoreboard.mockResolvedValue({
-      id: 2,
-      workspaceId: 1,
-      status: "ACTIVE",
-      startDate: "2026-03-01",
-    });
-
-    await expect(
-      service.createLeadMeasure("ws_uid", 2, 100, {
-        name: "주 3회 운동",
-        targetValue: 3,
-        period: "WEEKLY",
-      }),
-    ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
-    expect(createLeadMeasure).not.toHaveBeenCalled();
-  });
-
-  it("Basic entitlement가 없으면 선행지표를 생성할 수 없다", async () => {
-    resolveIdByUid.mockResolvedValue(1);
-    findMembership.mockResolvedValue(true);
-    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "FREE" });
-    findBillingState.mockResolvedValue(null);
-    findOwnedScoreboard.mockResolvedValue({
-      id: 2,
-      workspaceId: 1,
-      status: "ACTIVE",
-      startDate: "2026-03-01",
-    });
-
-    await expect(
-      service.createLeadMeasure("ws_uid", 2, 100, {
-        name: "주 3회 운동",
-        targetValue: 3,
-        period: "WEEKLY",
-      }),
-    ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
-    expect(createLeadMeasure).not.toHaveBeenCalled();
-  });
-
   it("다른 워크스페이스 태그를 연결하려 하면 404 에러를 던진다", async () => {
     resolveIdByUid.mockResolvedValue(1);
     findMembership.mockResolvedValue(true);
@@ -200,7 +159,7 @@ describe("LeadMeasureService", () => {
     findTagsByIdsInWorkspace.mockResolvedValue([]);
 
     await expect(
-      service.createLeadMeasure("ws_uid", 2, 100, {
+      service.createLeadMeasure(ctx, 2, {
         name: "주 3회 운동",
         targetValue: 3,
         period: "WEEKLY",
@@ -220,9 +179,9 @@ describe("LeadMeasureService", () => {
       scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
     });
 
-    await expect(
-      service.updateLeadMeasure("ws_uid", 10, 100, { name: "수정됨" }),
-    ).rejects.toThrow("LEAD_MEASURE_ARCHIVED");
+    await expect(service.updateLeadMeasure(ctx, 10, { name: "수정됨" })).rejects.toThrow(
+      "LEAD_MEASURE_ARCHIVED",
+    );
   });
 
   it("선행지표 수정 시 태그를 교체할 수 있다", async () => {
@@ -246,7 +205,7 @@ describe("LeadMeasureService", () => {
       tags: [{ id: 4, name: "건강" }],
     });
 
-    const result = await service.updateLeadMeasure("ws_uid", 10, 100, { tagIds: [4] });
+    const result = await service.updateLeadMeasure(ctx, 10, { tagIds: [4] });
 
     expect(findTagsByIdsInWorkspace).toHaveBeenCalledWith(1, [4]);
     expect(updateLeadMeasure).toHaveBeenCalledWith(10, { tagIds: [4] });
@@ -262,7 +221,7 @@ describe("LeadMeasureService", () => {
       scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
     });
 
-    await expect(service.archiveLeadMeasure("ws_uid", 10, 100)).rejects.toThrow(
+    await expect(service.archiveLeadMeasure(ctx, 10)).rejects.toThrow(
       "LEAD_MEASURE_ALREADY_ARCHIVED",
     );
     expect(archiveLeadMeasure).not.toHaveBeenCalled();
@@ -277,7 +236,7 @@ describe("LeadMeasureService", () => {
       scoreboard: { id: 2, status: "ACTIVE", startDate: "2026-03-01" },
     });
 
-    await expect(service.reactivateLeadMeasure("ws_uid", 10, 100)).rejects.toThrow(
+    await expect(service.reactivateLeadMeasure(ctx, 10)).rejects.toThrow(
       "LEAD_MEASURE_ALREADY_ACTIVE",
     );
     expect(reactivateLeadMeasure).not.toHaveBeenCalled();
@@ -298,7 +257,7 @@ describe("LeadMeasureService", () => {
       tags: [],
     });
 
-    const result = await service.reactivateLeadMeasure("ws_uid", 10, 100);
+    const result = await service.reactivateLeadMeasure(ctx, 10);
 
     expect(reactivateLeadMeasure).toHaveBeenCalledWith(10);
     expect(result).toEqual({
@@ -319,7 +278,7 @@ describe("LeadMeasureService", () => {
     });
     countLogsByLeadMeasure.mockResolvedValue(17);
 
-    const result = await service.deleteLeadMeasure("ws_uid", 10, 100);
+    const result = await service.deleteLeadMeasure(ctx, 10);
 
     expect(deleteLeadMeasure).toHaveBeenCalledWith(10);
     expect(result).toEqual({
@@ -329,7 +288,9 @@ describe("LeadMeasureService", () => {
   });
 
   it("주간 목표 횟수는 7회를 초과할 수 없다", async () => {
-    resolveIdByUid.mockResolvedValue(1); findMembership.mockResolvedValue(true); findWorkspaceById.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({
       id: 2,
       status: "ACTIVE",
@@ -337,7 +298,7 @@ describe("LeadMeasureService", () => {
     });
 
     await expect(
-      service.createLeadMeasure("ws_uid", 2, 100, {
+      service.createLeadMeasure(ctx, 2, {
         name: "주 8회 운동",
         targetValue: 8,
         period: "WEEKLY",
@@ -347,7 +308,9 @@ describe("LeadMeasureService", () => {
   });
 
   it("월간 목표 횟수는 점수판 시작월의 최대 일수를 초과할 수 없다", async () => {
-    resolveIdByUid.mockResolvedValue(1); findMembership.mockResolvedValue(true); findWorkspaceById.mockResolvedValue({ id: 1 });
+    resolveIdByUid.mockResolvedValue(1);
+    findMembership.mockResolvedValue(true);
+    findWorkspaceById.mockResolvedValue({ id: 1 });
     findOwnedScoreboard.mockResolvedValue({
       id: 2,
       status: "ACTIVE",
@@ -355,7 +318,7 @@ describe("LeadMeasureService", () => {
     });
 
     await expect(
-      service.createLeadMeasure("ws_uid", 2, 100, {
+      service.createLeadMeasure(ctx, 2, {
         name: "월 29회 회고",
         targetValue: 29,
         period: "MONTHLY",

@@ -1,10 +1,10 @@
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import {
-  assertWorkspaceOperationAllowed,
   assertWorkspaceHasMemberCapacity,
   getPlanMemberLimit,
   getWorkspaceMemberCapacity,
 } from "@/domain/workspace/plan-limits";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import {
   ConflictError,
   ForbiddenError,
@@ -251,16 +251,15 @@ export class WorkspaceService {
   }
 
   async updateWorkspace(
-    workspaceId: number,
+    context: WorkspaceAccessContext,
     data: { name: string; allowPastDailyLogEdit?: boolean },
   ): Promise<PublicWorkspace> {
-    const workspace = await this.storage.findWorkspaceById(workspaceId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
+    if (context.role !== "ADMIN") {
+      throw new ForbiddenError("FORBIDDEN");
     }
 
     const updatedWorkspace = await this.storage.updateWorkspace(
-      workspaceId,
+      context.workspaceId,
       data,
     );
     if (!updatedWorkspace) {
@@ -289,43 +288,28 @@ export class WorkspaceService {
   }
 
   async createInvite(
-    workspaceId: number,
-    createdByUserId: number,
+    context: WorkspaceAccessContext,
     maxUses: number,
   ): Promise<WorkspaceInvite> {
-    const workspace = await this.storage.findWorkspaceById(workspaceId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-    await assertWorkspaceOperationAllowed(workspace, this.storage);
-
     return await this.storage.createInvite({
-      workspaceId,
+      workspaceId: context.workspaceId,
       code: generateWorkspaceInviteCode(),
       maxUses,
-      createdByUserId,
+      createdByUserId: context.userId,
     });
   }
 
-  async listInvites(workspaceId: number): Promise<WorkspaceInvite[]> {
-    return await this.storage.listInvites(workspaceId);
+  async listInvites(context: WorkspaceAccessContext): Promise<WorkspaceInvite[]> {
+    return await this.storage.listInvites(context.workspaceId);
   }
 
   async updateInviteStatus(
-    workspaceId: number,
+    context: WorkspaceAccessContext,
     inviteId: number,
     status: "ACTIVE" | "INACTIVE",
   ): Promise<WorkspaceInvite> {
-    if (status === "ACTIVE") {
-      const workspace = await this.storage.findWorkspaceById(workspaceId);
-      if (!workspace) {
-        throw new NotFoundError("NOT_FOUND");
-      }
-      await assertWorkspaceOperationAllowed(workspace, this.storage);
-    }
-
     const updated = await this.storage.updateInviteStatus(
-      workspaceId,
+      context.workspaceId,
       inviteId,
       status,
     );
@@ -337,33 +321,20 @@ export class WorkspaceService {
     return updated;
   }
 
-  async listTags(workspaceId: number): Promise<WorkspaceTag[]> {
-    const workspace = await this.storage.findWorkspaceById(workspaceId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-    await assertWorkspaceOperationAllowed(workspace, this.storage);
-
-    return await this.storage.listTags(workspaceId);
+  async listTags(context: WorkspaceAccessContext): Promise<WorkspaceTag[]> {
+    return await this.storage.listTags(context.workspaceId);
   }
 
   async createTag(
-    workspaceId: number,
-    userId: number,
+    context: WorkspaceAccessContext,
     input: { name: string; normalizedName: string },
   ): Promise<WorkspaceTag> {
-    const workspace = await this.storage.findWorkspaceById(workspaceId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-    await assertWorkspaceOperationAllowed(workspace, this.storage);
-
     try {
       return await this.storage.createTag({
-        workspaceId,
+        workspaceId: context.workspaceId,
         name: input.name,
         normalizedName: input.normalizedName,
-        createdByUserId: userId,
+        createdByUserId: context.userId,
       });
     } catch (error) {
       if (isWorkspaceTagUniqueViolation(error)) {
@@ -374,22 +345,17 @@ export class WorkspaceService {
   }
 
   async updateTag(
-    workspaceId: number,
+    context: WorkspaceAccessContext,
     tagId: number,
     input: { name: string; normalizedName: string },
   ): Promise<WorkspaceTag> {
-    const existingTag = await this.storage.findTagById(workspaceId, tagId);
+    const existingTag = await this.storage.findTagById(context.workspaceId, tagId);
     if (!existingTag) {
       throw new NotFoundError("NOT_FOUND");
     }
-    const workspace = await this.storage.findWorkspaceById(workspaceId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
     try {
-      const updated = await this.storage.updateTag(workspaceId, tagId, input);
+      const updated = await this.storage.updateTag(context.workspaceId, tagId, input);
       if (!updated) {
         throw new NotFoundError("NOT_FOUND");
       }
@@ -402,18 +368,13 @@ export class WorkspaceService {
     }
   }
 
-  async deleteTag(workspaceId: number, tagId: number): Promise<void> {
-    const existingTag = await this.storage.findTagById(workspaceId, tagId);
+  async deleteTag(context: WorkspaceAccessContext, tagId: number): Promise<void> {
+    const existingTag = await this.storage.findTagById(context.workspaceId, tagId);
     if (!existingTag) {
       throw new NotFoundError("NOT_FOUND");
     }
-    const workspace = await this.storage.findWorkspaceById(workspaceId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-    await assertWorkspaceOperationAllowed(workspace, this.storage);
 
-    await this.storage.deleteTag(workspaceId, tagId);
+    await this.storage.deleteTag(context.workspaceId, tagId);
   }
 
   async joinWorkspaceByInvite(
@@ -484,40 +445,38 @@ export class WorkspaceService {
   }
 
   async getMembers(
-    workspaceId: number,
-    currentUserId: number,
+    context: WorkspaceAccessContext,
   ): Promise<WorkspaceMemberListItem[]> {
-    const members = await this.storage.findMembers(workspaceId);
+    const members = await this.storage.findMembers(context.workspaceId);
 
     return members.map((member) => ({
       id: member.id,
       nickname: member.user.nickname,
       avatarKey: member.user.avatarKey,
       role: member.role,
-      isMe: member.userId === currentUserId,
+      isMe: member.userId === context.userId,
       createdAt: member.createdAt,
     }));
   }
 
   async removeMember(
-    workspaceId: number,
-    actorUserId: number,
+    context: WorkspaceAccessContext,
     membershipId: number,
   ): Promise<void> {
     const targetMembership = await this.storage.findMembershipById(
-      workspaceId,
+      context.workspaceId,
       membershipId,
     );
     if (!targetMembership) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    if (actorUserId === targetMembership.userId) {
+    if (context.userId === targetMembership.userId) {
       throw new ForbiddenError("FORBIDDEN");
     }
 
     if (targetMembership.role === "ADMIN") {
-      const members = await this.storage.findMembers(workspaceId);
+      const members = await this.storage.findMembers(context.workspaceId);
       const adminCount = members.filter(
         (member) => member.role === "ADMIN",
       ).length;
@@ -527,11 +486,11 @@ export class WorkspaceService {
       }
     }
 
-    await this.storage.removeMemberById(workspaceId, membershipId);
+    await this.storage.removeMemberById(context.workspaceId, membershipId);
   }
 
-  async leaveWorkspace(workspaceId: number, userId: number): Promise<void> {
-    const membership = await this.storage.findMembership(workspaceId, userId);
+  async leaveWorkspace(context: WorkspaceAccessContext): Promise<void> {
+    const membership = await this.storage.findMembership(context.workspaceId, context.userId);
     if (!membership) {
       throw new NotFoundError("NOT_FOUND");
     }
@@ -540,44 +499,43 @@ export class WorkspaceService {
       throw new ConflictError("ADMIN_TRANSFER_REQUIRED");
     }
 
-    await this.storage.removeMemberById(workspaceId, membership.id);
+    await this.storage.removeMemberById(context.workspaceId, membership.id);
   }
 
   async transferAdmin(
-    workspaceId: number,
-    actorUserId: number,
+    context: WorkspaceAccessContext,
     targetMembershipId: number,
   ): Promise<void> {
     const targetMembership = await this.storage.findMembershipById(
-      workspaceId,
+      context.workspaceId,
       targetMembershipId,
     );
     if (!targetMembership) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    if (targetMembership.userId === actorUserId) {
+    if (targetMembership.userId === context.userId) {
       throw new ForbiddenError("FORBIDDEN");
     }
 
     await this.storage.transferAdmin(
-      workspaceId,
-      actorUserId,
+      context.workspaceId,
+      context.userId,
       targetMembership.userId,
     );
   }
 
-  async deleteWorkspace(workspaceId: number): Promise<void> {
-    const workspace = await this.storage.findWorkspaceById(workspaceId);
+  async deleteWorkspace(context: WorkspaceAccessContext): Promise<void> {
+    const workspace = await this.storage.findWorkspaceById(context.workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const billingState = await this.storage.findBillingState(workspaceId);
+    const billingState = await this.storage.findBillingState(context.workspaceId);
     if (hasBlockingPolarSubscriptionForDeletion(billingState)) {
       throw new ConflictError("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN");
     }
 
-    await this.storage.deleteWorkspace(workspaceId);
+    await this.storage.deleteWorkspace(context.workspaceId);
   }
 }

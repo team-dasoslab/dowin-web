@@ -1,4 +1,3 @@
-import { getDb } from "@/db";
 import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 import {
   devicePushTokenDisableSchema,
@@ -8,12 +7,8 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const ensureDefaultNotificationSettings = async (
-  storage: NotificationStorage,
-  userId: number,
-) => {
+const ensureDefaultNotificationSettings = async (storage: NotificationStorage, userId: number) => {
   const currentSettings = await storage.findUserNotificationSettings(userId);
 
   if (currentSettings) {
@@ -29,9 +24,7 @@ const ensureDefaultNotificationSettings = async (
   });
 };
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -69,9 +62,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   return apiSuccess({ success: true });
 });
 
-export const DELETE = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const DELETE = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {

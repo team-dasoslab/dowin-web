@@ -1,12 +1,10 @@
 import { SESSION_TTL_SECONDS } from "@/domain/auth/constants";
-import { getDb } from "@/db";
 import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
 import { loginSchema } from "@/domain/auth/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { SESSION_COOKIE_SECURE } from "@/lib/server/auth";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies } from "next/headers";
 
 const getClientIp = (request: Request) =>
@@ -14,9 +12,7 @@ const getClientIp = (request: Request) =>
   request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
   "";
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { db }) => {
   const storage = new AuthStorage(db);
   const service = new AuthService(storage);
 
@@ -42,8 +38,7 @@ export const POST = withErrorHandler(async (request: Request) => {
       path: "/",
       maxAge: SESSION_TTL_SECONDS,
     });
-    
-    // Sync DB locale to browser cookie
+
     if (user.locale) {
       cookieStore.set("NEXT_LOCALE", user.locale, {
         path: "/",
@@ -53,10 +48,7 @@ export const POST = withErrorHandler(async (request: Request) => {
 
     return apiSuccess({ user });
   } catch (error: unknown) {
-    if (
-      error instanceof Error &&
-      error.message === "아이디 또는 비밀번호가 올바르지 않습니다"
-    ) {
+    if (error instanceof Error && error.message === "아이디 또는 비밀번호가 올바르지 않습니다") {
       return await apiError("INVALID_CREDENTIALS");
     }
     throw error;

@@ -1,18 +1,32 @@
-import { PlatformError } from "@/lib/server/errors";
-import { apiError } from "@/lib/server/api-response";
-import type { NextResponse } from "next/server";
 import { serverRuntimeConfig } from "@/config/server-runtime-config";
+import { getDb } from "@/db";
+import { apiError } from "@/lib/server/api-response";
+import { PlatformError } from "@/lib/server/errors";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import type { NextRequest, NextResponse } from "next/server";
 
-type AsyncHandler<TArgs extends unknown[] = unknown[]> = (
-  ...args: TArgs
+type BaseContext = { params?: unknown; [key: string]: unknown };
+
+type ApiHandler<TCtx extends BaseContext = BaseContext> = (
+  req: NextRequest,
+  ctx: TCtx & { env: ReturnType<typeof getCloudflareContext>["env"]; db: ReturnType<typeof getDb> },
 ) => Promise<NextResponse | Response>;
 
-export function withErrorHandler<TArgs extends unknown[]>(
-  handler: AsyncHandler<TArgs>,
+export function withErrorHandler<TCtx extends BaseContext = { params?: Promise<unknown> }>(
+  handler: ApiHandler<TCtx>,
 ) {
-  return async (...args: TArgs) => {
+  return async (req?: NextRequest, ctx?: TCtx) => {
     try {
-      return await handler(...args);
+      const { env } = getCloudflareContext();
+      const db = getDb(env.DB);
+
+      const enhancedCtx = {
+        ...(ctx || ({} as unknown as TCtx)),
+        env,
+        db,
+      };
+
+      return await handler(req as NextRequest, enhancedCtx);
     } catch (error) {
       if (error instanceof PlatformError) {
         return await apiError(error.code, error.details);

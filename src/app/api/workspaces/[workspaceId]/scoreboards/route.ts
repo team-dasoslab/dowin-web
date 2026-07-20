@@ -1,64 +1,40 @@
-import { getDb } from "@/db";
 import { ScoreboardService } from "@/domain/scoreboard/services/scoreboard.service";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 import { scoreboardCreateSchema } from "@/domain/scoreboard/validation";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 
-const createService = (db: ReturnType<typeof getDb>) =>
-  new ScoreboardService(
-    new ScoreboardStorage(db),
-    new WorkspaceStorage(db),
-  );
+export const GET = withWorkspaceAccess(
+  async (_request, { context, db }) => {
+    const service = new ScoreboardService(new ScoreboardStorage(db));
+    const scoreboards = await service.getHistory(context);
+    return apiSuccess(scoreboards);
+  },
+);
 
-export const GET = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
-  const session = await getSessionWithRefresh(db);
+export const POST = withWorkspaceAccess(
+  async (request, { context, db, env }) => {
+    const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
+      db,
+      userId: context.userId,
+      env,
+      intent: "general-write",
+    });
+    if (restrictedWriteResponse) {
+      return restrictedWriteResponse;
+    }
 
-  if (!session) {
-    return await apiError("UNAUTHORIZED");
-  }
+    const body = await request.json();
+    const parsed = scoreboardCreateSchema.safeParse(body);
 
-  const scoreboards = await createService(db).getHistory(workspaceId, session.userId);
-  return apiSuccess(scoreboards);
-});
+    if (!parsed.success) {
+      return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
+    }
 
-export const POST = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
-  const session = await getSessionWithRefresh(db);
+    const service = new ScoreboardService(new ScoreboardStorage(db));
+    const scoreboard = await service.createScoreboard(context, parsed.data);
 
-  if (!session) {
-    return await apiError("UNAUTHORIZED");
-  }
-
-  const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
-    db,
-    userId: session.userId,
-    env,
-    intent: "general-write",
-  });
-  if (restrictedWriteResponse) {
-    return restrictedWriteResponse;
-  }
-
-  const body = await request.json();
-  const parsed = scoreboardCreateSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
-  }
-
-  const scoreboard = await createService(db).createScoreboard(workspaceId, session.userId,
-    parsed.data,
-  );
-
-  return apiSuccess(scoreboard, 201);
-});
+    return apiSuccess(scoreboard, 201);
+  },
+);

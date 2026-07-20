@@ -1,5 +1,11 @@
 import { ConflictError } from "@/lib/server/errors";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+
+const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
+const mockResolveIdByUid = vi.fn();
+
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -23,7 +29,7 @@ vi.mock("@/lib/server/restricted-test-account", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function MockWorkspaceStorage() { return { resolveIdByUid: mockResolveIdByUid }; }),
 }));
 
 vi.mock("@/domain/billing/storage/billing.storage", () => ({
@@ -42,18 +48,25 @@ vi.mock("@/domain/billing/services/billing.service", () => ({
   }),
 }));
 
+
+vi.mock("@/lib/server/workspace-context", () => ({ requireWorkspaceAccess: mockRequireWorkspaceAccess }));
+vi.mock("@/domain/workspace/plan-limits", () => ({ assertWorkspaceOperationAllowed: mockAssertWorkspaceOperationAllowed }));
+
 describe("POST /api/workspaces/[workspaceId]/billing/checkout", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
+    mockResolveIdByUid.mockResolvedValue(1);
+    mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 1, userId: 1, role: "ADMIN", entitlement: { planCode: "BASIC" } });
+    mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { POST } = await import("./route");
-    const response = await POST(new Request("http://localhost"), {
+    const response = await POST(new NextRequest("http://localhost"), {
       params: Promise.resolve({ workspaceId: "ws_uid" }),
     });
 
@@ -65,7 +78,7 @@ describe("POST /api/workspaces/[workspaceId]/billing/checkout", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost", {
+      new NextRequest("http://localhost", {
         method: "POST",
         body: JSON.stringify({ seatCount: 2 }),
       }),
@@ -87,7 +100,7 @@ describe("POST /api/workspaces/[workspaceId]/billing/checkout", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost", {
+      new NextRequest("http://localhost", {
         method: "POST",
         headers: { "Idempotency-Key": "idem_1" },
         body: JSON.stringify({
@@ -107,9 +120,7 @@ describe("POST /api/workspaces/[workspaceId]/billing/checkout", () => {
       checkoutUrl: "https://polar.sh/checkout",
       checkoutId: "chk_123",
     });
-    expect(mockStartBasicCheckout).toHaveBeenCalledWith({
-      workspaceUid: "ws_uid",
-      userId: 1,
+    expect(mockStartBasicCheckout).toHaveBeenCalledWith(expect.objectContaining({ workspaceId: 1 }), {
       seatCount: 3,
       locale: "ko",
       idempotencyKey: "idem_1",
@@ -125,7 +136,7 @@ describe("POST /api/workspaces/[workspaceId]/billing/checkout", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost", {
+      new NextRequest("http://localhost", {
         method: "POST",
         headers: { "Idempotency-Key": "idem_2" },
         body: JSON.stringify({}),

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -82,7 +83,7 @@ describe("GET/POST /api/contact-inquiries", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/contact-inquiries", {
+      new NextRequest("http://localhost/api/contact-inquiries", {
         method: "POST",
         body: JSON.stringify({}),
       }),
@@ -96,7 +97,7 @@ describe("GET/POST /api/contact-inquiries", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/contact-inquiries", {
+      new NextRequest("http://localhost/api/contact-inquiries", {
         method: "POST",
         body: JSON.stringify({
           category: "GENERAL",
@@ -127,7 +128,7 @@ describe("GET/POST /api/contact-inquiries", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/contact-inquiries", {
+      new NextRequest("http://localhost/api/contact-inquiries", {
         method: "POST",
         body: JSON.stringify({
           category: "GENERAL",

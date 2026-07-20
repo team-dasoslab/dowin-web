@@ -1,27 +1,12 @@
-import { getDb } from "@/db";
 import { ScoreboardService } from "@/domain/scoreboard/services/scoreboard.service";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { apiSuccess } from "@/lib/server/api-response";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 
-export const GET = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
-  const session = await getSessionWithRefresh(db);
-
-  if (!session) {
-    return await apiError("UNAUTHORIZED");
-  }
-
-  const service = new ScoreboardService(
-    new ScoreboardStorage(db),
-    new WorkspaceStorage(db),
-  );
-  const scoreboard = await service.getActiveScoreboard(workspaceId, session.userId);
-
-  return apiSuccess(scoreboard);
-});
+export const GET = withWorkspaceAccess(
+  async (_request, { context, db }) => {
+    const service = new ScoreboardService(new ScoreboardStorage(db));
+    const scoreboard = await service.getActiveScoreboard(context);
+    return apiSuccess(scoreboard);
+  },
+);

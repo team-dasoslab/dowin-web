@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -73,7 +74,7 @@ describe("POST /api/notifications/devices", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "POST",
         body: JSON.stringify({
           provider: "FCM",
@@ -96,7 +97,7 @@ describe("POST /api/notifications/devices", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "POST",
         body: JSON.stringify({
           provider: "FCM",
@@ -147,7 +148,7 @@ describe("DELETE /api/notifications/devices", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "DELETE",
         body: JSON.stringify({
           token: "token-1",
@@ -167,7 +168,7 @@ describe("DELETE /api/notifications/devices", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "DELETE",
         body: JSON.stringify({
           token: "token-1",

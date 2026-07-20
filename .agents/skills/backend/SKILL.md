@@ -26,6 +26,12 @@ If docs conflict with code, verify the implementation and trust the current code
 
 - Auth currently uses the `dowin_sid` session cookie in active code paths.
 - Route handlers should use `withErrorHandler` from `src/lib/server/with-error-handler.ts`.
+- Workspace-scoped API routes MUST use `withWorkspaceAccess` or `withWorkspaceAdmin` from `src/lib/server/with-workspace-access.ts` to automatically extract the session, validate workspace entitlement, and inject the `WorkspaceAccessContext`:
+  - Use **`withWorkspaceAdmin`** when the API Route strictly requires ADMIN role and `workspaceId` is a URL parameter (e.g. `[workspaceId]/route.ts`).
+  - Use **`withWorkspaceAccess`** when the API Route allows any workspace member and `workspaceId` is a URL parameter.
+  - **Exception:** If `workspaceId` is NOT a URL parameter but is provided in the body or query (e.g. `install-url/route.ts`), do NOT use these route wrappers. Instead, manually call `requireWorkspaceAccess` and validate `context.role` as needed.
+  - **Domain Services:** Never use these route wrappers in domain services (`*.service.ts`). Domain services must maintain their own internal `context.role !== "ADMIN"` checks for safety since they can be invoked from various contexts (cron, other APIs).
+- When writing tests for workspace-scoped routes, you MUST mock `requireWorkspaceAccess` and `assertWorkspaceOperationAllowed` (which are called internally by `withWorkspaceAccess`), and ensure `mockResolveIdByUid` is correctly provided to the `WorkspaceStorage` mock.
 - Success and error responses should use `apiSuccess` and `apiError`.
 - Input validation should use Zod.
 - DB access should stay in `src/domain/*/storage`.

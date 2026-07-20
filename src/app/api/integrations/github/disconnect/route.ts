@@ -1,9 +1,7 @@
-import { getDb } from "@/db";
-import { createOAuthService, GithubEnv } from "@/domain/github-integration/services/oauth.service";
+import { createOAuthService } from "@/domain/github-integration/services/oauth.service";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
@@ -11,9 +9,7 @@ const DisconnectSchema = z.object({
   installationId: z.string(),
 });
 
-export const POST = withErrorHandler(async (req: NextRequest) => {
-  const { env } = await getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (req: NextRequest, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -26,7 +22,7 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     return apiError("VALIDATION_ERROR", parsed.error.format());
   }
 
-  const service = createOAuthService(env as unknown as GithubEnv);
+  const service = createOAuthService(env);
   await service.disconnectInstallation(session.userId, parsed.data.installationId);
 
   return apiSuccess({ success: true });
