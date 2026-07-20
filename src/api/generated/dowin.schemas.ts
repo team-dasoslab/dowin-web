@@ -5,6 +5,86 @@
  * Dowin(가중목) 서비스 API 명세서
  * OpenAPI spec version: 0.1.0
  */
+export type GithubUserInstallationStatus = typeof GithubUserInstallationStatus[keyof typeof GithubUserInstallationStatus];
+
+
+export const GithubUserInstallationStatus = {
+  ACTIVE: 'ACTIVE',
+  SUSPENDED: 'SUSPENDED',
+  DISCONNECTED: 'DISCONNECTED',
+} as const;
+
+export interface GithubUserInstallation {
+  id: number;
+  installationId: string;
+  accountLogin: string;
+  accountId: string;
+  status: GithubUserInstallationStatus;
+}
+
+export interface GithubRepository {
+  id: number;
+  githubRepositoryId: string;
+  ownerLogin: string;
+  name: string;
+  fullName: string;
+  private: boolean;
+  isLinkedToOtherWorkspace?: boolean;
+}
+
+export interface GithubIntegrationStatus {
+  isConnected: boolean;
+  /** @nullable */
+  accountLogin?: string | null;
+  installations: GithubUserInstallation[];
+  repositories: GithubRepository[];
+}
+
+export type WorkspaceGithubRepositoryLinkStatus = typeof WorkspaceGithubRepositoryLinkStatus[keyof typeof WorkspaceGithubRepositoryLinkStatus];
+
+
+export const WorkspaceGithubRepositoryLinkStatus = {
+  ACTIVE: 'ACTIVE',
+  DISCONNECTED: 'DISCONNECTED',
+} as const;
+
+export interface WorkspaceGithubRepositoryLink {
+  id: number;
+  repositoryId: number;
+  repository: GithubRepository;
+  /** @nullable */
+  connectedByUserId?: number | null;
+  status: WorkspaceGithubRepositoryLinkStatus;
+  createdAt: string;
+}
+
+export interface WorkspaceGithubIntegrationStatus {
+  hasGithubAccountConnected: boolean;
+  availableRepositories: GithubRepository[];
+  activeLinks: WorkspaceGithubRepositoryLink[];
+}
+
+export type GithubPrLinkState = typeof GithubPrLinkState[keyof typeof GithubPrLinkState];
+
+
+export const GithubPrLinkState = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+  MERGED: 'MERGED',
+} as const;
+
+export interface GithubPrLink {
+  id: number;
+  githubPullRequestId: string;
+  number: number;
+  title: string;
+  url: string;
+  state: GithubPrLinkState;
+  matchedDisplayKey: string;
+  /** @nullable */
+  dailyLogDate?: string | null;
+}
+
 export type UserLocale = typeof UserLocale[keyof typeof UserLocale];
 
 
@@ -1090,6 +1170,7 @@ export interface Workspace {
   freeMemberLimit?: number;
   isOverFreeMemberLimit?: boolean;
   allowPastDailyLogEdit?: boolean;
+  actionItemPrefix?: string;
   createdAt?: string;
 }
 
@@ -1488,6 +1569,9 @@ export interface LeadMeasure {
   createdAt?: string;
   /** @nullable */
   archivedAt?: string | null;
+  /** @nullable */
+  publicCode?: string | null;
+  githubPrLinks?: GithubPrLink[];
 }
 
 export interface WeeklyAchievement {
@@ -1672,6 +1756,10 @@ export interface WeeklyLogItem {
   lastWeekAchieved?: number | null;
   total?: number;
   achievementRate?: number;
+  /** @nullable */
+  publicId?: string | null;
+  /** @nullable */
+  githubPrLinks?: GithubPrLink[] | null;
 }
 
 export interface WeeklyLogsResponse {
@@ -1715,6 +1803,10 @@ export interface MonthlyLogItem {
   achieved?: number;
   total?: number;
   achievementRate?: number;
+  /** @nullable */
+  publicId?: string | null;
+  /** @nullable */
+  githubPrLinks?: GithubPrLink[] | null;
 }
 
 export interface PeriodSummary {
@@ -1858,6 +1950,7 @@ export interface MyDashboardWorkspace {
   freeMemberLimit: number;
   isOverFreeMemberLimit: boolean;
   allowPastDailyLogEdit: boolean;
+  actionItemPrefix: string;
 }
 
 export interface MyDashboardTrendPoint {
@@ -2372,5 +2465,43 @@ export type PostWorkspacesWorkspaceIdTeamCheckinsAdjustmentProposalsProposalIdCa
 
 export type GetWorkspacesWorkspaceIdDashboardTeamMemosParams = {
 targetUserId: number;
+};
+
+export type PostIntegrationsGithubInstallUrlBodyLocale = typeof PostIntegrationsGithubInstallUrlBodyLocale[keyof typeof PostIntegrationsGithubInstallUrlBodyLocale];
+
+
+export const PostIntegrationsGithubInstallUrlBodyLocale = {
+  ko: 'ko',
+  en: 'en',
+} as const;
+
+export type PostIntegrationsGithubInstallUrlBody = {
+  workspaceId?: string;
+  locale: PostIntegrationsGithubInstallUrlBodyLocale;
+};
+
+export type PostIntegrationsGithubInstallUrl200 = {
+  url: string;
+};
+
+export type PostIntegrationsGithubDisconnectBody = {
+  /** 연결을 해제할 GitHub App Installation ID */
+  installationId: string;
+};
+
+export type PostIntegrationsGithubDisconnect200 = {
+  success: boolean;
+};
+
+export type PostWorkspacesWorkspaceIdIntegrationsGithubRepositoriesBody = {
+  repositoryId: number;
+};
+
+export type PostWorkspacesWorkspaceIdIntegrationsGithubRepositories200 = {
+  success: boolean;
+};
+
+export type DeleteWorkspacesWorkspaceIdIntegrationsGithubRepositoriesRepositoryLinkId200 = {
+  success: boolean;
 };
 

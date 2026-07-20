@@ -341,6 +341,7 @@ export const workspaces = sqliteTable("workspaces", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   uid: text("uid").unique(),
   name: text("name").notNull(),
+  actionItemPrefix: text("action_item_prefix").notNull().default("DOW"),
   planCode: text("plan_code", { enum: ["BASIC", "FREE", "STANDARD"] })
     .notNull()
     .default("FREE"),
@@ -370,6 +371,8 @@ export const workspacesRelations = relations(workspaces, ({ many }) => ({
   billingEvents: many(billingEvents),
   billingCheckoutEvents: many(billingCheckoutEvents),
   billingStates: many(workspaceBillingState),
+  actionItemPublicIds: many(actionItemPublicIds),
+  githubRepositoryLinks: many(workspaceGithubRepositoryLinks),
 }));
 
 export const billingProviderProducts = sqliteTable(
@@ -993,6 +996,48 @@ export const leadMeasuresRelations = relations(
     }),
     dailyLogs: many(dailyLogs),
     tags: many(leadMeasureTags),
+    publicIds: many(actionItemPublicIds),
+    githubPrLinks: many(githubPrLinks),
+  }),
+);
+
+export const actionItemPublicIds = sqliteTable(
+  "action_item_public_ids",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    leadMeasureId: integer("lead_measure_id")
+      .notNull()
+      .references(() => leadMeasures.id, { onDelete: "cascade" }),
+    displaySequence: integer("display_sequence").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("action_item_public_ids_lead_measure_unique").on(
+      table.leadMeasureId,
+    ),
+    uniqueIndex("action_item_public_ids_workspace_sequence_unique").on(
+      table.workspaceId,
+      table.displaySequence,
+    ),
+  ],
+);
+
+export const actionItemPublicIdsRelations = relations(
+  actionItemPublicIds,
+  ({ one }) => ({
+    workspace: one(workspaces, {
+      fields: [actionItemPublicIds.workspaceId],
+      references: [workspaces.id],
+    }),
+    leadMeasure: one(leadMeasures, {
+      fields: [actionItemPublicIds.leadMeasureId],
+      references: [leadMeasures.id],
+    }),
   }),
 );
 
@@ -1060,6 +1105,279 @@ export const dailyLogsRelations = relations(dailyLogs, ({ one }) => ({
     references: [leadMeasures.id],
   }),
 }));
+
+export const githubUserInstallations = sqliteTable(
+  "github_user_installations",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    installationId: text("installation_id").notNull(),
+    accountLogin: text("account_login").notNull(),
+    accountId: text("account_id").notNull(),
+    status: text("status", {
+      enum: ["ACTIVE", "SUSPENDED", "DISCONNECTED"],
+    })
+      .notNull()
+      .default("ACTIVE"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("github_user_installations_installation_unique").on(
+      table.installationId,
+    ),
+    uniqueIndex("github_user_installations_user_installation_unique").on(
+      table.userId,
+      table.installationId,
+    ),
+    index("github_user_installations_user_idx").on(table.userId),
+  ],
+);
+
+export const githubUserInstallationsRelations = relations(
+  githubUserInstallations,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [githubUserInstallations.userId],
+      references: [users.id],
+    }),
+    repositories: many(githubRepositories),
+  }),
+);
+
+export const githubRepositories = sqliteTable(
+  "github_repositories",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    installationId: integer("installation_id")
+      .notNull()
+      .references(() => githubUserInstallations.id, { onDelete: "cascade" }),
+    githubRepositoryId: text("github_repository_id").notNull(),
+    ownerLogin: text("owner_login").notNull(),
+    name: text("name").notNull(),
+    fullName: text("full_name").notNull(),
+    private: integer("private", { mode: "boolean" }).notNull().default(false),
+    status: text("status", { enum: ["ACTIVE", "REMOVED"] })
+      .notNull()
+      .default("ACTIVE"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("github_repositories_installation_repo_unique").on(
+      table.installationId,
+      table.githubRepositoryId,
+    ),
+    index("github_repositories_github_repository_idx").on(
+      table.githubRepositoryId,
+    ),
+  ],
+);
+
+export const githubRepositoriesRelations = relations(
+  githubRepositories,
+  ({ one, many }) => ({
+    installation: one(githubUserInstallations, {
+      fields: [githubRepositories.installationId],
+      references: [githubUserInstallations.id],
+    }),
+    workspaceLinks: many(workspaceGithubRepositoryLinks),
+    prLinks: many(githubPrLinks),
+  }),
+);
+
+export const workspaceGithubRepositoryLinks = sqliteTable(
+  "workspace_github_repository_links",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    repositoryId: integer("repository_id")
+      .notNull()
+      .references(() => githubRepositories.id, { onDelete: "cascade" }),
+    connectedByUserId: integer("connected_by_user_id").references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+    status: text("status", { enum: ["ACTIVE", "DISCONNECTED"] })
+      .notNull()
+      .default("ACTIVE"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("workspace_github_repository_links_workspace_repo_unique").on(
+      table.workspaceId,
+      table.repositoryId,
+    ),
+    uniqueIndex("workspace_github_repository_links_repository_unique").on(
+      table.repositoryId,
+    ),
+    index("workspace_github_repository_links_workspace_idx").on(
+      table.workspaceId,
+    ),
+  ],
+);
+
+export const workspaceGithubRepositoryLinksRelations = relations(
+  workspaceGithubRepositoryLinks,
+  ({ one, many }) => ({
+    workspace: one(workspaces, {
+      fields: [workspaceGithubRepositoryLinks.workspaceId],
+      references: [workspaces.id],
+    }),
+    repository: one(githubRepositories, {
+      fields: [workspaceGithubRepositoryLinks.repositoryId],
+      references: [githubRepositories.id],
+    }),
+    connectedByUser: one(users, {
+      fields: [workspaceGithubRepositoryLinks.connectedByUserId],
+      references: [users.id],
+    }),
+    prLinks: many(githubPrLinks),
+  }),
+);
+
+export const githubInstallationStates = sqliteTable(
+  "github_installation_states",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    state: text("state").notNull(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    workspaceId: integer("workspace_id")
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    locale: text("locale", { enum: ["ko", "en"] }).notNull(),
+    installationId: text("installation_id"),
+    setupAction: text("setup_action"),
+    status: text("status", { enum: ["PENDING", "COMPLETED", "EXPIRED"] })
+      .notNull()
+      .default("PENDING"),
+    expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    completedAt: integer("completed_at", { mode: "timestamp" }),
+  },
+  (table) => [
+    uniqueIndex("github_installation_states_state_unique").on(table.state),
+    index("github_installation_states_user_idx").on(table.userId),
+    index("github_installation_states_workspace_idx").on(table.workspaceId),
+  ],
+);
+
+export const githubInstallationStatesRelations = relations(
+  githubInstallationStates,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [githubInstallationStates.userId],
+      references: [users.id],
+    }),
+    workspace: one(workspaces, {
+      fields: [githubInstallationStates.workspaceId],
+      references: [workspaces.id],
+    }),
+  }),
+);
+
+export const githubPrLinks = sqliteTable(
+  "github_pr_links",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    workspaceId: integer("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    leadMeasureId: integer("lead_measure_id")
+      .notNull()
+      .references(() => leadMeasures.id, { onDelete: "cascade" }),
+    repositoryLinkId: integer("repository_link_id")
+      .notNull()
+      .references(() => workspaceGithubRepositoryLinks.id, {
+        onDelete: "cascade",
+      }),
+    githubPullRequestId: text("github_pull_request_id").notNull(),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    url: text("url").notNull(),
+    state: text("state", { enum: ["OPEN", "CLOSED", "MERGED"] }).notNull(),
+    matchedDisplayKey: text("matched_display_key").notNull(),
+    dailyLogDate: text("daily_log_date"),
+    dailyLogAppliedAt: integer("daily_log_applied_at", { mode: "timestamp" }),
+    lastSyncedAt: integer("last_synced_at", { mode: "timestamp" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+  },
+  (table) => [
+    uniqueIndex("github_pr_links_repo_number_measure_unique").on(
+      table.repositoryLinkId,
+      table.number,
+      table.leadMeasureId,
+    ),
+    index("github_pr_links_lead_measure_state_idx").on(
+      table.leadMeasureId,
+      table.state,
+    ),
+  ],
+);
+
+export const githubPrLinksRelations = relations(githubPrLinks, ({ one }) => ({
+  workspace: one(workspaces, {
+    fields: [githubPrLinks.workspaceId],
+    references: [workspaces.id],
+  }),
+  leadMeasure: one(leadMeasures, {
+    fields: [githubPrLinks.leadMeasureId],
+    references: [leadMeasures.id],
+  }),
+  repositoryLink: one(workspaceGithubRepositoryLinks, {
+    fields: [githubPrLinks.repositoryLinkId],
+    references: [workspaceGithubRepositoryLinks.id],
+  }),
+}));
+
+export const githubWebhookEvents = sqliteTable(
+  "github_webhook_events",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    deliveryId: text("delivery_id").notNull(),
+    eventName: text("event_name").notNull(),
+    action: text("action"),
+    repositoryId: text("repository_id"),
+    installationId: text("installation_id"),
+    status: text("status", {
+      enum: ["RECEIVED", "PROCESSED", "SKIPPED", "FAILED"],
+    }).notNull(),
+    errorCode: text("error_code"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(strftime('%s', 'now'))`),
+    processedAt: integer("processed_at", { mode: "timestamp" }),
+  },
+  (table) => [
+    uniqueIndex("github_webhook_events_delivery_unique").on(table.deliveryId),
+    index("github_webhook_events_status_idx").on(table.status),
+  ],
+);
 
 export const workspaceTeamCheckinSettings = sqliteTable(
   "workspace_team_checkin_settings",

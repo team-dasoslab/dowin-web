@@ -21,6 +21,12 @@ describe("LeadMeasureStorage", () => {
       workspaceTags: {
         findMany: vi.fn(),
       },
+      scoreboards: {
+        findFirst: vi.fn(),
+      },
+      actionItemPublicIds: {
+        findFirst: vi.fn(),
+      },
     },
     insert: (table) => {
       insert(table);

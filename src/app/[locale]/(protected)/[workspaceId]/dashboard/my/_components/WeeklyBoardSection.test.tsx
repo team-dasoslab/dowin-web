@@ -6,6 +6,10 @@ import { renderWithProviders } from "@/test/render";
 
 import { WeeklyBoardSection } from "./WeeklyBoardSection";
 
+vi.mock("@/context/ToastContext", () => ({
+  useToast: vi.fn(() => ({ toast: vi.fn() })),
+}));
+
 type WeeklyBoardSectionProps = ComponentProps<typeof WeeklyBoardSection>;
 
 const weekDates = [
@@ -18,9 +22,7 @@ const weekDates = [
   "2026-06-14",
 ];
 
-function createProps(
-  overrides: Partial<WeeklyBoardSectionProps> = {},
-): WeeklyBoardSectionProps {
+function createProps(overrides: Partial<WeeklyBoardSectionProps> = {}): WeeklyBoardSectionProps {
   const toggleLog = vi.fn();
   const onBeforeToggle = vi.fn();
 
@@ -96,9 +98,7 @@ describe("WeeklyBoardSection", () => {
   it("renders weekly lead measures and achievement summaries", () => {
     renderWeeklyBoard();
 
-    expect(
-      screen.getAllByText("잠재고객 10명에게 연락하기").length,
-    ).toBeGreaterThan(0);
+    expect(screen.getAllByText("잠재고객 10명에게 연락하기").length).toBeGreaterThan(0);
     expect(screen.getAllByText("고객 통화 횟수").length).toBeGreaterThan(0);
     expect(screen.getAllByText("1/3").length).toBeGreaterThan(0);
     expect(screen.getAllByText("1/5").length).toBeGreaterThan(0);
@@ -115,9 +115,9 @@ describe("WeeklyBoardSection", () => {
 
     expect(props.onBeforeToggle).toHaveBeenCalledTimes(1);
     expect(props.toggleLog).toHaveBeenCalledWith(1, "2026-06-10");
-    expect(
-      vi.mocked(props.onBeforeToggle).mock.invocationCallOrder[0],
-    ).toBeLessThan(vi.mocked(props.toggleLog).mock.invocationCallOrder[0]);
+    expect(vi.mocked(props.onBeforeToggle).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(props.toggleLog).mock.invocationCallOrder[0],
+    );
   });
 
   it("disables all matching boolean log controls while the log is pending", () => {

@@ -9,6 +9,7 @@ import {
 } from "@/db/schema";
 import { and, desc, eq, gt, lt, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
+import { generateWorkspacePrefix } from "@/domain/workspace/utils/workspace-prefix.util";
 
 type Db = ReturnType<typeof getDb>;
 type MarketingInviteCode = typeof marketingInviteCodes.$inferSelect;
@@ -166,11 +167,13 @@ export class MarketingInviteStorage {
     let workspaceId: number | null = null;
 
     try {
+      const actionItemPrefix = await generateWorkspacePrefix(this.db, input.workspaceName);
       const [workspace] = await this.db
         .insert(workspaces)
         .values({
           uid: generateWorkspaceUid(),
           name: input.workspaceName,
+          actionItemPrefix,
           planCode: "BASIC",
           billingCustomerExternalRef: `beta-promotion:${input.code.code}`,
           billingOwnerUserId: input.userId,

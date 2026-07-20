@@ -41,6 +41,7 @@ If documents conflict with code, verify the implementation and prefer the curren
 - Push back clearly when a better technical option exists, and explain the reasoning briefly.
 - Prefer explicit tradeoffs, concrete objections, and practical alternatives over polite but empty compliance.
 - In review or planning work, prioritize bugs, regressions, missing tests, and scope problems before summaries or encouragement.
+- **Review Before Commit:** Do not commit code autonomously without explicit user review and approval. After completing the implementation and verification (e.g., tests, quality checks), you MUST present the changes to the user and wait for their confirmation before creating a git commit.
 
 ## AI Code Generation Constraints (Cognitive Load Mitigation)
 

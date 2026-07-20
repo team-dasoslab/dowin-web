@@ -155,10 +155,11 @@ export function WeeklyTable({
                 className="rounded-[24px] bg-surface p-5"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <LeadMeasureSummary 
+                  <LeadMeasureSummary
                     name={leadMeasure.name}
                     achieved={leadMeasure.achieved}
                     lastWeekAchieved={leadMeasure.lastWeekAchieved}
+                    layout="inline"
                   />
                   <AchievementProgress
                     achievedCount={achievedCount}
@@ -303,6 +304,7 @@ export function WeeklyTable({
                             achieved={leadMeasure.achieved}
                             lastWeekAchieved={leadMeasure.lastWeekAchieved}
                             nameClassName="block text-sm font-semibold text-text-primary"
+                            layout="inline"
                           />
                         </td>
                         {weekDates.map((date) => {

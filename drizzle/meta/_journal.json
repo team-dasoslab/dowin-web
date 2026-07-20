@@ -295,6 +295,20 @@
       "when": 1784214777196,
       "tag": "0041_omniscient_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "6",
+      "when": 1784453193706,
+      "tag": "0042_gifted_mimic",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "6",
+      "when": 1784466258056,
+      "tag": "0043_perfect_diamondback",
+      "breakpoints": true
     }
   ]
 }

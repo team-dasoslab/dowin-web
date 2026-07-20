@@ -1,10 +1,7 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import {
-  useGetWorkspacesIdMembers,
-  useGetWorkspacesMe,
-} from "@/api/generated/workspace/workspace";
+import { useGetWorkspacesIdMembers, useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
   ProtectedPageContainer,
@@ -23,38 +20,37 @@ import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
-import { useTranslations } from "next-intl";
 import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
+import { useTranslations } from "next-intl";
 
 export default function ProfileMembersPage() {
   const t = useTranslations("ProfileMembers");
   const workspaceParamId = useParams().workspaceId as string | undefined;
-  const { data: profileResponse, isLoading: isProfileLoading } =
-    useGetUsersMe();
+  const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
   const {
     data: workspaceResponse,
     isLoading: isWorkspaceLoading,
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount, error) =>
-        getApiErrorStatus(error) !== 404 && failureCount < 2,
+      retry: (failureCount, error) => getApiErrorStatus(error) !== 404 && failureCount < 2,
     },
   });
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
-  const workspace =
-    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+  const workspace = workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaceId = workspace?.id ?? "";
   const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
 
-  const { data: membersResponse, isLoading: isMembersLoading } =
-    useGetWorkspacesIdMembers(workspaceId, {
+  const { data: membersResponse, isLoading: isMembersLoading } = useGetWorkspacesIdMembers(
+    workspaceId,
+    {
       query: {
         enabled: Boolean(workspaceId) && isWorkspaceAdmin,
         retry: false,
       },
-    });
+    },
+  );
 
   const { pendingDeleteMemberId, removeMember } = useRemoveWorkspaceMember({
     workspaceId,
@@ -81,9 +77,7 @@ export default function ProfileMembersPage() {
 
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const isLoading =
-    isProfileLoading ||
-    isWorkspaceLoading ||
-    (isWorkspaceAdmin && isMembersLoading);
+    isProfileLoading || isWorkspaceLoading || (isWorkspaceAdmin && isMembersLoading);
 
   if (isLoading) {
     return <MembersPageSkeleton />;
@@ -98,8 +92,7 @@ export default function ProfileMembersPage() {
   }
 
   const memberLimit = workspace.freeMemberLimit ?? 10;
-  const isAtOrOverMemberLimit =
-    workspace.isOverFreeMemberLimit || members.length >= memberLimit;
+  const isAtOrOverMemberLimit = workspace.isOverFreeMemberLimit || members.length >= memberLimit;
 
   return (
     <div className="min-h-screen">
@@ -121,15 +114,8 @@ export default function ProfileMembersPage() {
             </div>
           </div>
           <div className="flex shrink-0 items-center">
-            <Button
-              asChild
-              variant="subtle"
-              size="primary"
-              className="font-bold"
-            >
-              <Link
-                href={getWorkspacePath(workspaceParamId, "/workspace/invites")}
-              >
+            <Button asChild variant="solid-dark" size="primary" className="font-bold">
+              <Link href={getWorkspacePath(workspaceParamId, "/settings/invites")}>
                 {t("invitesCardButton")}
               </Link>
             </Button>
@@ -147,9 +133,7 @@ export default function ProfileMembersPage() {
         <div className="space-y-4 rounded-[24px] bg-surface p-5">
           <div className="flex items-center justify-between gap-3">
             <div className="space-y-1">
-              <h2 className="text-sm font-bold text-text-primary">
-                {t("currentMembersTitle")}
-              </h2>
+              <h2 className="text-sm font-bold text-text-primary">{t("currentMembersTitle")}</h2>
             </div>
             <div
               className={`flex shrink-0 items-center gap-1 rounded-full px-3.5 py-1.5 text-[13px] font-bold tracking-tight ${
@@ -159,11 +143,7 @@ export default function ProfileMembersPage() {
               }`}
             >
               <span>{members.length}</span>
-              <span
-                className={
-                  isAtOrOverMemberLimit ? "text-red-400" : "text-text-muted"
-                }
-              >
+              <span className={isAtOrOverMemberLimit ? "text-red-400" : "text-text-muted"}>
                 / {memberLimit}
               </span>
             </div>
@@ -183,9 +163,7 @@ export default function ProfileMembersPage() {
                     index={index}
                     totalCount={members.length}
                     isPendingDelete={pendingDeleteMemberId === (member.id ?? 0)}
-                    isPendingTransfer={
-                      pendingTransferMemberId === (member.id ?? 0)
-                    }
+                    isPendingTransfer={pendingTransferMemberId === (member.id ?? 0)}
                     onRemove={(memberId, memberNickname) => {
                       void removeMember(memberId, memberNickname);
                     }}
@@ -206,10 +184,7 @@ export default function ProfileMembersPage() {
 function MembersPageSkeleton() {
   return (
     <div className="min-h-screen">
-      <ProtectedPageContainer
-        isLoading
-        className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
-      >
+      <ProtectedPageContainer isLoading className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <div className="h-12 w-48 rounded-[12px] bg-border" />
         <div className="h-24 rounded-[24px] bg-border" />
         <div className="h-72 rounded-[24px] bg-border" />
@@ -228,9 +203,7 @@ function NoWorkspaceState() {
             <Logo size="24px" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-lg font-bold text-text-primary">
-              {t("noWorkspaceTitle")}
-            </h1>
+            <h1 className="text-lg font-bold text-text-primary">{t("noWorkspaceTitle")}</h1>
             <p className="text-sm text-text-muted">{t("noWorkspaceDesc")}</p>
           </div>
           <div className="flex justify-center">
@@ -253,20 +226,11 @@ function NoAccessState() {
             <DowinIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-lg font-bold text-text-primary">
-              {t("noAccessTitle")}
-            </h1>
+            <h1 className="text-lg font-bold text-text-primary">{t("noAccessTitle")}</h1>
             <p className="text-sm text-text-muted">{t("noAccessDesc")}</p>
           </div>
-          <Button
-            asChild
-            variant="outline"
-            size="primary"
-            className="w-full font-semibold"
-          >
-            <Link href={getWorkspacePath(workspaceId, "/profile")}>
-              {t("backToSettings")}
-            </Link>
+          <Button asChild variant="outline" size="primary" className="w-full font-semibold">
+            <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
           </Button>
         </div>
       </div>

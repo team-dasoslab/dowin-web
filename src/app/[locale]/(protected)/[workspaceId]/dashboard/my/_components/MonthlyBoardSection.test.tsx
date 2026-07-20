@@ -1,10 +1,14 @@
 import { screen } from "@testing-library/react";
 import type { ComponentProps } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "@/test/render";
 
 import { MonthlyBoardSection } from "./MonthlyBoardSection";
+
+vi.mock("@/context/ToastContext", () => ({
+  useToast: vi.fn(() => ({ toast: vi.fn() })),
+}));
 
 type MonthlyBoardSectionProps = ComponentProps<typeof MonthlyBoardSection>;
 

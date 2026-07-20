@@ -76,6 +76,25 @@ type DailyLogLookupPort = {
   ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean; count?: number }>>;
 };
 
+type ActionItemMetadataPort = {
+  findMetadataForLeadMeasures(
+    workspaceId: number,
+    leadMeasureIds: number[],
+  ): Promise<Array<{
+    leadMeasureId: number;
+    publicId: string | null;
+    prLinks: Array<{
+      id: number;
+      title: string;
+      url: string;
+      number: number;
+      state: "OPEN" | "CLOSED" | "MERGED";
+      matchedDisplayKey: string;
+      dailyLogDate: string | null;
+    }>;
+  }>>;
+};
+
 const DAY_LABELS = ["월", "화", "수", "목", "금", "토", "일"];
 type WorkspaceLookup = { id: number; name: string; planCode?: string };
 type WorkspaceMemberLookup = Awaited<
@@ -95,6 +114,7 @@ export class DashboardService {
     private workspaceStorage: WorkspaceLookupPort,
     private scoreboardStorage: ScoreboardLookupPort,
     private dailyLogStorage: DailyLogLookupPort,
+    private actionItemMetadataStorage?: ActionItemMetadataPort,
   ) { }
 
   async getTeamDashboard(context: WorkspaceAccessContext, weekStart?: string) {
@@ -211,6 +231,23 @@ export class DashboardService {
       monthStart: normalizedMonthStart,
       scoreboard,
     });
+    
+    // Attach metadata (publicId, prLinks) if available
+    if (this.actionItemMetadataStorage && leadMeasureIds.length > 0) {
+      const metadataList = await this.actionItemMetadataStorage.findMetadataForLeadMeasures(
+        context.workspaceId,
+        leadMeasureIds,
+      );
+      const metadataMap = new Map(
+        metadataList.map((m) => [m.leadMeasureId, m]),
+      );
+      
+      for (const lm of weeklyLogs.leadMeasures) {
+        const meta = metadataMap.get(lm.id);
+        lm.publicId = meta?.publicId ?? null;
+        lm.githubPrLinks = meta?.prLinks ?? [];
+      }
+    }
     const monthlyLogs =
       selectedView === "month"
         ? buildMyMonthlyLogs({
@@ -219,6 +256,22 @@ export class DashboardService {
           scoreboard,
         })
         : null;
+
+    if (monthlyLogs && this.actionItemMetadataStorage && leadMeasureIds.length > 0) {
+      const metadataList = await this.actionItemMetadataStorage.findMetadataForLeadMeasures(
+        context.workspaceId,
+        leadMeasureIds,
+      );
+      const metadataMap = new Map(
+        metadataList.map((m) => [m.leadMeasureId, m]),
+      );
+      
+      for (const lm of monthlyLogs.leadMeasures) {
+        const meta = metadataMap.get(lm.id);
+        lm.publicId = meta?.publicId ?? null;
+        lm.githubPrLinks = meta?.prLinks ?? [];
+      }
+    }
     const trendWeekStarts = [-21, -14, -7, 0].map((offset) =>
       addDays(normalizedWeekStart, offset),
     );
@@ -445,6 +498,16 @@ function buildMyWeeklyLogs({
               targetValue: measure.targetValue,
             })
             : null,
+          publicId: null as string | null,
+          githubPrLinks: [] as Array<{
+            id: number;
+            title: string;
+            url: string;
+            number: number;
+            state: "OPEN" | "CLOSED" | "MERGED";
+            matchedDisplayKey: string;
+            dailyLogDate: string | null;
+          }>,
         };
       }),
   };
@@ -494,6 +557,16 @@ function buildMyMonthlyLogs({
         achieved,
         total: measure.targetValue,
         achievementRate: getAchievementRate(achieved, measure.targetValue),
+        publicId: null as string | null,
+        githubPrLinks: [] as Array<{
+          id: number;
+          title: string;
+          url: string;
+          number: number;
+          state: "OPEN" | "CLOSED" | "MERGED";
+          matchedDisplayKey: string;
+          dailyLogDate: string | null;
+        }>,
       };
     });
 

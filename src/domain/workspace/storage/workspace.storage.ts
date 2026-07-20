@@ -1,5 +1,6 @@
 import { getDb } from "@/db";
 import { customAlphabet } from "nanoid";
+import { generateWorkspacePrefix } from "@/domain/workspace/utils/workspace-prefix.util";
 
 const generateUid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -105,12 +106,15 @@ export class WorkspaceStorage {
 
   async createWorkspace(name: string): Promise<Workspace> {
     const uid = generateUid();
+    const actionItemPrefix = await generateWorkspacePrefix(this.db, name);
     const [newWorkspace] = await this.db
       .insert(workspaces)
-      .values({ name, uid })
+      .values({ name, uid, actionItemPrefix })
       .returning();
     return newWorkspace;
   }
+
+
 
   async findActivePendingWorkspaceCheckoutByUserId(userId: number, now: Date) {
     return (
@@ -208,11 +212,13 @@ export class WorkspaceStorage {
     subscriptionKey: string | null;
     now: Date;
   }) {
+    const actionItemPrefix = await generateWorkspacePrefix(this.db, input.workspaceName);
     const [workspace] = await this.db
       .insert(workspaces)
       .values({
         uid: generateUid(),
         name: input.workspaceName,
+        actionItemPrefix,
         planCode: "BASIC",
         billingCustomerExternalRef: `workspace-checkout:${input.pendingUid}`,
         billingOwnerUserId: input.userId,

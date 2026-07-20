@@ -1,5 +1,5 @@
-import { leadMeasureTags, leadMeasures, scoreboards, workspaceTags } from "@/db/schema";
-import { and, asc, eq, inArray } from "drizzle-orm";
+import { actionItemPublicIds, leadMeasureTags, leadMeasures, scoreboards, workspaceTags } from "@/db/schema";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 
 export type LeadMeasureRecord = typeof leadMeasures.$inferSelect;
 export type LeadMeasureTagRecord = Pick<typeof workspaceTags.$inferSelect, "id" | "name">;
@@ -41,6 +41,12 @@ export interface LeadMeasureDbPort {
     };
     workspaceTags: {
       findMany(args: unknown): Promise<unknown>;
+    };
+    scoreboards: {
+      findFirst(args: unknown): Promise<unknown>;
+    };
+    actionItemPublicIds: {
+      findFirst(args: unknown): Promise<unknown>;
     };
   };
   insert(table: unknown): {
@@ -166,6 +172,27 @@ export class LeadMeasureStorage {
           tagId,
         })),
       );
+    }
+
+    const scoreboard = (await this.db.query.scoreboards.findFirst({
+      where: eq(scoreboards.id, input.scoreboardId),
+      columns: { workspaceId: true },
+    })) as { workspaceId: number } | undefined;
+
+    if (scoreboard) {
+      const lastSequence = (await this.db.query.actionItemPublicIds.findFirst({
+        where: eq(actionItemPublicIds.workspaceId, scoreboard.workspaceId),
+        columns: { displaySequence: true },
+        orderBy: [desc(actionItemPublicIds.displaySequence)],
+      })) as { displaySequence: number } | undefined;
+
+      const nextSequence = (lastSequence?.displaySequence ?? 0) + 1;
+
+      await this.db.insert(actionItemPublicIds).values({
+        workspaceId: scoreboard.workspaceId,
+        leadMeasureId: created.id,
+        displaySequence: nextSequence,
+      });
     }
 
     return (await this.findLeadMeasureById(created.id)) as LeadMeasureRecordWithTags;
