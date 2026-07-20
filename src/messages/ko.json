@@ -1662,6 +1662,7 @@
     "workspaceLinkDisclaimerTitle": "워크스페이스 연결 안내",
     "workspaceLinkDisclaimerDesc": "이곳에서 연결을 해제하더라도 GitHub 계정 연동 자체가 해제되지는 않습니다. 완전히 연동을 해제하려면 프로필 설정에서 진행해주세요.",
     "connectWorkspace": "연결",
-    "disconnectWorkspace": "연결 해제"
+    "disconnectWorkspace": "연결 해제",
+    "linkedToOtherWorkspace": "다른 워크스페이스에 연결됨"
   }
 }

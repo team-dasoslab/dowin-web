@@ -1662,6 +1662,7 @@
     "workspaceLinkDisclaimerTitle": "Workspace Integration Notice",
     "workspaceLinkDisclaimerDesc": "Disconnecting here does not remove the GitHub app installation from your account. To completely uninstall the app, please go to your Profile settings.",
     "connectWorkspace": "Connect",
-    "disconnectWorkspace": "Disconnect"
+    "disconnectWorkspace": "Disconnect",
+    "linkedToOtherWorkspace": "Linked to another workspace"
   }
 }

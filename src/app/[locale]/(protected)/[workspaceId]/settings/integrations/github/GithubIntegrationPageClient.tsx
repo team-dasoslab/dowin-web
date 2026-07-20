@@ -9,6 +9,7 @@ import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { ProtectedPageContainer, ProtectedPageHeader } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { ActionRow } from "@/components/ui/ActionRow";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
 import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
@@ -143,7 +144,18 @@ export default function GithubIntegrationPageClient() {
                     <ActionRow
                       key={repo.id}
                       title={repo.fullName}
-                      description={repo.private ? "Private" : "Public"}
+                      description={
+                        <>
+                          <Badge variant={repo.private ? "danger" : "ghost-primary"} size="sm">
+                            {repo.private ? "Private" : "Public"}
+                          </Badge>
+                          {repo.isLinkedToOtherWorkspace && (
+                            <Badge variant="warning" size="sm">
+                              {t("linkedToOtherWorkspace", { fallback: "다른 워크스페이스에 연결됨" })}
+                            </Badge>
+                          )}
+                        </>
+                      }
                       action={
                         isWorkspaceAdmin && (
                           isLinked ? (
@@ -166,11 +178,6 @@ export default function GithubIntegrationPageClient() {
                               >
                                 {t("connectAction", { fallback: "연결" })}
                               </Button>
-                              {repo.isLinkedToOtherWorkspace && (
-                                <span className="text-[11px] text-text-muted">
-                                  {t("linkedToOtherWorkspace", { fallback: "다른 워크스페이스에 연결됨" })}
-                                </span>
-                              )}
                             </div>
                           )
                         )
