@@ -81,6 +81,8 @@ export interface GithubPrLink {
   url: string;
   state: GithubPrLinkState;
   matchedDisplayKey: string;
+  /** @nullable */
+  dailyLogDate?: string | null;
 }
 
 export type UserLocale = typeof UserLocale[keyof typeof UserLocale];

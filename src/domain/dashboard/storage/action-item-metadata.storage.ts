@@ -40,6 +40,8 @@ export class ActionItemMetadataStorage {
         url: githubPrLinks.url,
         number: githubPrLinks.number,
         state: githubPrLinks.state,
+        dailyLogDate: githubPrLinks.dailyLogDate,
+        matchedDisplayKey: githubPrLinks.matchedDisplayKey,
       })
       .from(githubPrLinks)
       .where(

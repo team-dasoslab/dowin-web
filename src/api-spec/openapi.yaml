@@ -3484,6 +3484,7 @@ components:
         url: { type: string }
         state: { type: string, enum: [OPEN, CLOSED, MERGED] }
         matchedDisplayKey: { type: string }
+        dailyLogDate: { type: string, nullable: true }
 
     User:
       type: object

@@ -89,6 +89,8 @@ type ActionItemMetadataPort = {
       url: string;
       number: number;
       state: "OPEN" | "CLOSED" | "MERGED";
+      matchedDisplayKey: string;
+      dailyLogDate: string | null;
     }>;
   }>>;
 };
@@ -503,6 +505,8 @@ function buildMyWeeklyLogs({
             url: string;
             number: number;
             state: "OPEN" | "CLOSED" | "MERGED";
+            matchedDisplayKey: string;
+            dailyLogDate: string | null;
           }>,
         };
       }),
@@ -560,6 +564,8 @@ function buildMyMonthlyLogs({
           url: string;
           number: number;
           state: "OPEN" | "CLOSED" | "MERGED";
+          matchedDisplayKey: string;
+          dailyLogDate: string | null;
         }>,
       };
     });
