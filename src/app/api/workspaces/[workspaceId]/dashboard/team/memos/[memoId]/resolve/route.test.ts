@@ -1,14 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockResolveTeamMemo = vi.fn();
 const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
 const mockResolveIdByUid = vi.fn();
 
 vi.mock("@/lib/server/workspace-context", () => ({
   requireWorkspaceAccess: () => mockRequireWorkspaceAccess(),
+}));
+
+vi.mock("@/domain/workspace/plan-limits", () => ({
+  assertWorkspaceOperationAllowed: () => mockAssertWorkspaceOperationAllowed(),
 }));
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -45,6 +51,8 @@ vi.mock("@/domain/dashboard/storage/team-memo.storage", () => ({
 
 describe("PATCH /api/workspaces/:workspaceId/dashboard/team/memos/:memoId/resolve", () => {
   beforeEach(() => {
+    if (typeof mockRequireWorkspaceAccess !== "undefined") mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 1, userId: 1, role: "MEMBER", entitlement: { planCode: "BASIC" } });
+    if (typeof mockAssertWorkspaceOperationAllowed !== "undefined") mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
@@ -56,7 +64,7 @@ describe("PATCH /api/workspaces/:workspaceId/dashboard/team/memos/:memoId/resolv
 
     const { PATCH } = await import("./route");
     const response = await PATCH(
-      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1/resolve", {
+      new NextRequest("http://localhost/api/workspaces/7/dashboard/team/memos/1/resolve", {
         method: "PATCH",
         body: JSON.stringify({ isResolved: true }),
       }),
@@ -68,12 +76,12 @@ describe("PATCH /api/workspaces/:workspaceId/dashboard/team/memos/:memoId/resolv
 
   it("완료 상태 변경 요청을 처리한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 11 });
-    mockRequireWorkspaceAccess.mockResolvedValue({ id: 7, userId: 11, role: "MEMBER" });
+    mockRequireWorkspaceAccess.mockResolvedValue({ workspaceId: 7, userId: 11, role: "MEMBER", entitlement: { planCode: "BASIC" } });
     mockResolveTeamMemo.mockResolvedValue({ id: 1, isResolved: true });
 
     const { PATCH } = await import("./route");
     const response = await PATCH(
-      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1/resolve", {
+      new NextRequest("http://localhost/api/workspaces/7/dashboard/team/memos/1/resolve", {
         method: "PATCH",
         body: JSON.stringify({ isResolved: true }),
       }),
@@ -82,7 +90,7 @@ describe("PATCH /api/workspaces/:workspaceId/dashboard/team/memos/:memoId/resolv
 
     expect(response.status).toBe(200);
     expect(mockResolveTeamMemo).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 7 }),
+      expect.objectContaining({ workspaceId: 7 }),
       1,
       true
     );

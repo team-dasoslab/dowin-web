@@ -1,7 +1,23 @@
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("WorkspaceService", () => {
+  const ctx: WorkspaceAccessContext = {
+    workspaceId: 1,
+    workspacePublicId: "ws_abc",
+    workspaceName: "My Workspace",
+    userId: 100,
+    role: "ADMIN",
+    membershipId: 10,
+    allowPastDailyLogEdit: false,
+    entitlement: {
+      canAccessBasicSubscription: true,
+      entitlementSource: null,
+      billingStatus: "ACTIVE",
+      planCode: "BASIC",
+    },
+  };
   const mockStorage = {
     resolveIdByUid: vi.fn(),
     findWorkspaceById: vi.fn(),
@@ -212,9 +228,7 @@ describe("WorkspaceService", () => {
         ),
       );
 
-      await expect(service.createWorkspace(123, "New")).rejects.toThrow(
-        "ALREADY_IN_WORKSPACE",
-      );
+      await expect(service.createWorkspace(123, "New")).rejects.toThrow("ALREADY_IN_WORKSPACE");
     });
   });
 
@@ -251,9 +265,7 @@ describe("WorkspaceService", () => {
         ),
       );
 
-      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
-        "ALREADY_IN_WORKSPACE",
-      );
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow("ALREADY_IN_WORKSPACE");
     });
 
     it("멤버 수 제한에 도달하면 409 에러를 던진다", async () => {
@@ -264,9 +276,7 @@ describe("WorkspaceService", () => {
       });
       mockStorage.countMembers.mockResolvedValue(10);
 
-      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
-        "WORKSPACE_MEMBER_LIMIT_REACHED",
-      );
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow("WORKSPACE_MEMBER_LIMIT_REACHED");
       expect(mockStorage.addMember).not.toHaveBeenCalled();
     });
 
@@ -278,9 +288,7 @@ describe("WorkspaceService", () => {
       });
       mockStorage.findBillingState.mockResolvedValue(null);
 
-      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
-        "BASIC_SUBSCRIPTION_REQUIRED",
-      );
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
       expect(mockStorage.addMember).not.toHaveBeenCalled();
     });
 
@@ -295,9 +303,7 @@ describe("WorkspaceService", () => {
       });
       mockStorage.countMembers.mockResolvedValue(3);
 
-      await expect(service.joinWorkspace(1, 123)).rejects.toThrow(
-        "WORKSPACE_MEMBER_LIMIT_REACHED",
-      );
+      await expect(service.joinWorkspace(1, 123)).rejects.toThrow("WORKSPACE_MEMBER_LIMIT_REACHED");
       expect(mockStorage.addMember).not.toHaveBeenCalled();
     });
   });
@@ -322,7 +328,15 @@ describe("WorkspaceService", () => {
       };
       mockStorage.updateWorkspace.mockResolvedValue(updatedWorkspace);
 
-      const result = await service.updateWorkspace(1, { name: "새 이름" });
+      const result = await service.updateWorkspace(
+        {
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        { name: "새 이름" },
+      );
 
       expect(result).toEqual({
         id: "ws_1",
@@ -332,14 +346,6 @@ describe("WorkspaceService", () => {
         createdAt: expect.any(Date),
       });
       expect(mockStorage.updateWorkspace).toHaveBeenCalledWith(1, { name: "새 이름" });
-    });
-
-    it("워크스페이스가 없으면 404 에러를 던진다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue(null);
-
-      await expect(service.updateWorkspace(1, { name: "새 이름" })).rejects.toThrow(
-        "NOT_FOUND",
-      );
     });
   });
 
@@ -352,7 +358,15 @@ describe("WorkspaceService", () => {
         role: "MEMBER",
       });
 
-      await service.removeMember(1, 123, 9);
+      await service.removeMember(
+        {
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        9,
+      );
 
       expect(mockStorage.removeMemberById).toHaveBeenCalledWith(1, 9);
     });
@@ -365,13 +379,33 @@ describe("WorkspaceService", () => {
         role: "ADMIN",
       });
 
-      await expect(service.removeMember(1, 123, 9)).rejects.toThrow("FORBIDDEN");
+      await expect(
+        service.removeMember(
+          {
+            workspaceId: 1,
+            userId: 123,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          9,
+        ),
+      ).rejects.toThrow("FORBIDDEN");
     });
 
     it("대상 멤버가 없으면 404 에러를 던진다", async () => {
       mockStorage.findMembershipById.mockResolvedValue(null);
 
-      await expect(service.removeMember(1, 123, 9)).rejects.toThrow("NOT_FOUND");
+      await expect(
+        service.removeMember(
+          {
+            workspaceId: 1,
+            userId: 123,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          9,
+        ),
+      ).rejects.toThrow("NOT_FOUND");
     });
 
     it("마지막 ADMIN은 퇴출할 수 없다", async () => {
@@ -381,13 +415,19 @@ describe("WorkspaceService", () => {
         userId: 456,
         role: "ADMIN",
       });
-      mockStorage.findMembers.mockResolvedValue([
-        { userId: 456, role: "ADMIN" },
-      ]);
+      mockStorage.findMembers.mockResolvedValue([{ userId: 456, role: "ADMIN" }]);
 
-      await expect(service.removeMember(1, 123, 9)).rejects.toThrow(
-        "CANNOT_REMOVE_LAST_ADMIN",
-      );
+      await expect(
+        service.removeMember(
+          {
+            workspaceId: 1,
+            userId: 123,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          9,
+        ),
+      ).rejects.toThrow("CANNOT_REMOVE_LAST_ADMIN");
     });
   });
 
@@ -411,7 +451,15 @@ describe("WorkspaceService", () => {
         createdAt: new Date(),
       });
 
-      const invite = await service.createInvite(1, 1, 3);
+      const invite = await service.createInvite(
+        {
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        3,
+      );
       expect(invite.code).toBeDefined();
       expect(mockStorage.createInvite).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -421,37 +469,6 @@ describe("WorkspaceService", () => {
           code: expect.any(String),
         }),
       );
-    });
-
-    it("멤버 한도 초과 상태에서는 초대코드를 생성할 수 없다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({
-        id: 1,
-        name: "팀",
-        planCode: "FREE",
-      });
-      mockStorage.countMembers.mockResolvedValue(11);
-
-      await expect(service.createInvite(1, 1, 3)).rejects.toThrow(
-        "WORKSPACE_SEAT_LIMIT_EXCEEDED",
-      );
-      expect(mockStorage.createInvite).not.toHaveBeenCalled();
-    });
-
-    it("좌석 권한이 있으면 STANDARD 워크스페이스도 초과 상태에서 초대코드를 생성할 수 없다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({
-        id: 1,
-        name: "팀",
-        planCode: "STANDARD",
-      });
-      mockStorage.findSeatEntitlement.mockResolvedValue({
-        purchasedSeatCount: 3,
-      });
-      mockStorage.countMembers.mockResolvedValue(4);
-
-      await expect(service.createInvite(1, 1, 3)).rejects.toThrow(
-        "WORKSPACE_SEAT_LIMIT_EXCEEDED",
-      );
-      expect(mockStorage.createInvite).not.toHaveBeenCalled();
     });
 
     it("비활성화된 초대코드는 참가할 수 없다", async () => {
@@ -574,24 +591,15 @@ describe("WorkspaceService", () => {
       });
       mockStorage.listTags.mockResolvedValue(tags);
 
-      const result = await service.listTags(1);
+      const result = await service.listTags({
+        workspaceId: 1,
+        userId: 1,
+        role: "ADMIN",
+        entitlement: { planCode: "BASIC" },
+      } as unknown as WorkspaceAccessContext);
 
       expect(result).toEqual(tags);
       expect(mockStorage.listTags).toHaveBeenCalledWith(1);
-    });
-
-    it("Basic entitlement가 없으면 태그 목록을 조회할 수 없다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({
-        id: 1,
-        name: "팀",
-        planCode: "FREE",
-      });
-      mockStorage.findBillingState.mockResolvedValue(null);
-
-      await expect(service.listTags(1)).rejects.toThrow(
-        "BASIC_SUBSCRIPTION_REQUIRED",
-      );
-      expect(mockStorage.listTags).not.toHaveBeenCalled();
     });
 
     it("태그를 생성한다", async () => {
@@ -608,35 +616,28 @@ describe("WorkspaceService", () => {
         createdByUserId: 7,
       });
 
-      const result = await service.createTag(1, 7, {
-        name: "운동",
-        normalizedName: "운동",
-      });
-
-      expect(result.name).toBe("운동");
-      expect(mockStorage.createTag).toHaveBeenCalledWith({
-        workspaceId: 1,
-        name: "운동",
-        normalizedName: "운동",
-        createdByUserId: 7,
-      });
-    });
-
-    it("FREE 플랜 멤버 한도 초과 상태에서는 태그를 생성할 수 없다", async () => {
-      mockStorage.findWorkspaceById.mockResolvedValue({
-        id: 1,
-        name: "팀",
-        planCode: "FREE",
-      });
-      mockStorage.countMembers.mockResolvedValue(11);
-
-      await expect(
-        service.createTag(1, 7, {
+      const result = await service.createTag(
+        {
+          workspaceId: 1,
+          userId: 7,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        {
           name: "운동",
           normalizedName: "운동",
+        },
+      );
+
+      expect(result.name).toBe("운동");
+      expect(mockStorage.createTag).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workspaceId: 1,
+          name: "운동",
+          normalizedName: "운동",
+          createdByUserId: 7,
         }),
-      ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
-      expect(mockStorage.createTag).not.toHaveBeenCalled();
+      );
     });
 
     it("같은 이름의 태그가 이미 있으면 409 에러를 던진다", async () => {
@@ -646,13 +647,11 @@ describe("WorkspaceService", () => {
         planCode: "FREE",
       });
       mockStorage.createTag.mockRejectedValue(
-        new Error(
-          "UNIQUE constraint failed: workspace_tags_workspace_normalized_name_unique",
-        ),
+        new Error("UNIQUE constraint failed: workspace_tags_workspace_normalized_name_unique"),
       );
 
       await expect(
-        service.createTag(1, 7, {
+        service.createTag(ctx, {
           name: "운동",
           normalizedName: "운동",
         }),
@@ -672,7 +671,7 @@ describe("WorkspaceService", () => {
       mockStorage.createTag.mockRejectedValue(wrappedError);
 
       await expect(
-        service.createTag(1, 7, {
+        service.createTag(ctx, {
           name: "운동",
           normalizedName: "운동",
         }),
@@ -693,16 +692,26 @@ describe("WorkspaceService", () => {
         normalizedName: "깊은 일",
       });
 
-      const result = await service.updateTag(1, 10, {
-        name: "깊은 일",
-        normalizedName: "깊은 일",
-      });
+      const result = await service.updateTag(
+        {
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        10,
+        {
+          name: "깊은 일",
+          normalizedName: "깊은 일",
+        },
+      );
 
       expect(result.name).toBe("깊은 일");
-      expect(mockStorage.updateTag).toHaveBeenCalledWith(1, 10, {
-        name: "깊은 일",
-        normalizedName: "깊은 일",
-      });
+      expect(mockStorage.updateTag).toHaveBeenCalledWith(
+        1,
+        10,
+        expect.objectContaining({ name: "깊은 일", normalizedName: "깊은 일" }),
+      );
     });
 
     it("태그를 삭제한다", async () => {
@@ -713,7 +722,15 @@ describe("WorkspaceService", () => {
         normalizedName: "운동",
       });
 
-      await service.deleteTag(1, 10);
+      await service.deleteTag(
+        {
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        10,
+      );
 
       expect(mockStorage.deleteTag).toHaveBeenCalledWith(1, 10);
     });
@@ -728,7 +745,12 @@ describe("WorkspaceService", () => {
         role: "MEMBER",
       });
 
-      await service.leaveWorkspace(1, 123);
+      await service.leaveWorkspace({
+        workspaceId: 1,
+        userId: 1,
+        role: "ADMIN",
+        entitlement: { planCode: "BASIC" },
+      } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.removeMemberById).toHaveBeenCalledWith(1, 9);
     });
@@ -741,9 +763,14 @@ describe("WorkspaceService", () => {
         role: "ADMIN",
       });
 
-      await expect(service.leaveWorkspace(1, 123)).rejects.toThrow(
-        "ADMIN_TRANSFER_REQUIRED",
-      );
+      await expect(
+        service.leaveWorkspace({
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext),
+      ).rejects.toThrow("ADMIN_TRANSFER_REQUIRED");
     });
   });
 
@@ -756,9 +783,17 @@ describe("WorkspaceService", () => {
         role: "MEMBER",
       });
 
-      await service.transferAdmin(1, 123, 11);
+      await service.transferAdmin(
+        {
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        11,
+      );
 
-      expect(mockStorage.transferAdmin).toHaveBeenCalledWith(1, 123, 456);
+      expect(mockStorage.transferAdmin).toHaveBeenCalledWith(1, 1, 456);
     });
 
     it("자기 자신에게 권한을 이전할 수 없다", async () => {
@@ -769,17 +804,33 @@ describe("WorkspaceService", () => {
         role: "ADMIN",
       });
 
-      await expect(service.transferAdmin(1, 123, 11)).rejects.toThrow(
-        "FORBIDDEN",
-      );
+      await expect(
+        service.transferAdmin(
+          {
+            workspaceId: 1,
+            userId: 123,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          11,
+        ),
+      ).rejects.toThrow("FORBIDDEN");
     });
 
     it("대상 멤버가 없으면 404 에러를 던진다", async () => {
       mockStorage.findMembershipById.mockResolvedValue(null);
 
-      await expect(service.transferAdmin(1, 123, 11)).rejects.toThrow(
-        "NOT_FOUND",
-      );
+      await expect(
+        service.transferAdmin(
+          {
+            workspaceId: 1,
+            userId: 123,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          11,
+        ),
+      ).rejects.toThrow("NOT_FOUND");
     });
   });
 
@@ -792,7 +843,12 @@ describe("WorkspaceService", () => {
       });
       mockStorage.findBillingState.mockResolvedValue(null);
 
-      await service.deleteWorkspace(1);
+      await service.deleteWorkspace({
+        workspaceId: 1,
+        userId: 1,
+        role: "ADMIN",
+        entitlement: { planCode: "BASIC" },
+      } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
     });
@@ -810,9 +866,14 @@ describe("WorkspaceService", () => {
         currentPeriodEnd: null,
       });
 
-      await expect(service.deleteWorkspace(1)).rejects.toThrow(
-        "WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN",
-      );
+      await expect(
+        service.deleteWorkspace({
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext),
+      ).rejects.toThrow("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN");
       expect(mockStorage.deleteWorkspace).not.toHaveBeenCalled();
     });
 
@@ -829,7 +890,12 @@ describe("WorkspaceService", () => {
         currentPeriodEnd: new Date("2026-06-10T00:00:00.000Z"),
       });
 
-      await service.deleteWorkspace(1);
+      await service.deleteWorkspace({
+        workspaceId: 1,
+        userId: 1,
+        role: "ADMIN",
+        entitlement: { planCode: "BASIC" },
+      } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
     });
@@ -847,7 +913,12 @@ describe("WorkspaceService", () => {
         currentPeriodEnd: new Date("2026-06-01T00:00:00.000Z"),
       });
 
-      await service.deleteWorkspace(1);
+      await service.deleteWorkspace({
+        workspaceId: 1,
+        userId: 1,
+        role: "ADMIN",
+        entitlement: { planCode: "BASIC" },
+      } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
     });
@@ -855,7 +926,14 @@ describe("WorkspaceService", () => {
     it("워크스페이스가 없으면 404 에러를 던진다", async () => {
       mockStorage.findWorkspaceById.mockResolvedValue(null);
 
-      await expect(service.deleteWorkspace(1)).rejects.toThrow("NOT_FOUND");
+      await expect(
+        service.deleteWorkspace({
+          workspaceId: 1,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext),
+      ).rejects.toThrow("NOT_FOUND");
     });
   });
 });

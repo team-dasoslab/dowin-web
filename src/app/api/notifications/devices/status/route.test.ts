@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -36,7 +37,7 @@ describe("POST /api/notifications/devices/status", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices/status", {
+      new NextRequest("http://localhost/api/notifications/devices/status", {
         method: "POST",
         body: JSON.stringify({ token: "token-1" }),
         headers: {
@@ -60,7 +61,7 @@ describe("POST /api/notifications/devices/status", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices/status", {
+      new NextRequest("http://localhost/api/notifications/devices/status", {
         method: "POST",
         body: JSON.stringify({ token: "token-1" }),
         headers: {
@@ -86,7 +87,7 @@ describe("POST /api/notifications/devices/status", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices/status", {
+      new NextRequest("http://localhost/api/notifications/devices/status", {
         method: "POST",
         body: JSON.stringify({ token: "token-1" }),
         headers: {

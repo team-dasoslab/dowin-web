@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -34,7 +35,7 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
   it("요청 바디가 유효하지 않으면 422를 반환한다", async () => {
     const { PUT } = await import("./route");
     const response = await PUT(
-      new Request("http://localhost/api/auth/password/by-recovery-code", {
+      new NextRequest("http://localhost/api/auth/password/by-recovery-code", {
         method: "PUT",
         body: JSON.stringify({
           recoveryCode: "bad",
@@ -55,7 +56,7 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
 
     const { PUT } = await import("./route");
     const response = await PUT(
-      new Request("http://localhost/api/auth/password/by-recovery-code", {
+      new NextRequest("http://localhost/api/auth/password/by-recovery-code", {
         method: "PUT",
         body: JSON.stringify({
           recoveryCode: "ABCD-EFGH23",

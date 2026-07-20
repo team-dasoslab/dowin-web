@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 import { BadRequestError, ForbiddenError } from "@/lib/server/errors";
 
 const mockGetCloudflareContext = vi.fn();
@@ -58,7 +59,7 @@ describe("DELETE /api/users/me", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/users/me", {
+      new NextRequest("http://localhost/api/users/me", {
         method: "DELETE",
         body: JSON.stringify({ currentPassword: "password123" }),
         headers: {
@@ -76,7 +77,7 @@ describe("DELETE /api/users/me", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/users/me", {
+      new NextRequest("http://localhost/api/users/me", {
         method: "DELETE",
         body: JSON.stringify({ currentPassword: "wrong-password" }),
         headers: {
@@ -96,7 +97,7 @@ describe("DELETE /api/users/me", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/users/me", {
+      new NextRequest("http://localhost/api/users/me", {
         method: "DELETE",
         body: JSON.stringify({ currentPassword: "password123" }),
         headers: {
@@ -114,7 +115,7 @@ describe("DELETE /api/users/me", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/users/me", {
+      new NextRequest("http://localhost/api/users/me", {
         method: "DELETE",
         body: JSON.stringify({ currentPassword: "password123" }),
         headers: {

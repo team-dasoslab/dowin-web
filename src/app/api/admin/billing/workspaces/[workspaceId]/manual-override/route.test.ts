@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -56,7 +57,7 @@ describe("POST /api/admin/billing/workspaces/[workspaceId]/manual-override", () 
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("https://example.com", {
+      new NextRequest("https://example.com", {
         method: "POST",
         body: JSON.stringify({
           planCode: "STANDARD",
