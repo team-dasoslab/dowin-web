@@ -82,7 +82,7 @@ export default function ProfileExportPage() {
               <p className="text-[12px] font-medium text-text-muted">{tExport("dateRangeLimit")}</p>
             </div>
             <div className="flex flex-col rounded-[24px] bg-surface p-1">
-              <label 
+              <label
                 className="flex h-[56px] items-center justify-between rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors"
                 onClick={(e) => {
                   const input = e.currentTarget.querySelector("input");
@@ -93,7 +93,9 @@ export default function ProfileExportPage() {
                   }
                 }}
               >
-                <span className="text-[15px] font-bold text-text-primary">{tExport("startDate")}</span>
+                <span className="text-[15px] font-bold text-text-primary">
+                  {tExport("startDate")}
+                </span>
                 <input
                   type="date"
                   value={exportFrom}
@@ -102,7 +104,7 @@ export default function ProfileExportPage() {
                 />
               </label>
               <div className="h-[1px] w-[calc(100%-2rem)] mx-auto bg-border/40" />
-              <label 
+              <label
                 className="flex h-[56px] items-center justify-between rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors"
                 onClick={(e) => {
                   const input = e.currentTarget.querySelector("input");
@@ -113,7 +115,9 @@ export default function ProfileExportPage() {
                   }
                 }}
               >
-                <span className="text-[15px] font-bold text-text-primary">{tExport("endDate")}</span>
+                <span className="text-[15px] font-bold text-text-primary">
+                  {tExport("endDate")}
+                </span>
                 <input
                   type="date"
                   value={exportTo}
@@ -128,7 +132,8 @@ export default function ProfileExportPage() {
           <section className="space-y-3">
             <div className="flex items-center justify-between px-2">
               <h3 className="text-[14px] font-bold text-text-secondary">
-                {tExport("selectMeasure")} <span className="text-brand-primary">({selectedExportMeasureIds.length})</span>
+                {tExport("selectMeasure")}{" "}
+                <span className="text-brand-primary">({selectedExportMeasureIds.length})</span>
               </h3>
               <Button
                 type="button"
@@ -138,7 +143,7 @@ export default function ProfileExportPage() {
               >
                 {isAllMeasuresSelected ? tExport("deselectAll") : tExport("selectAll")}
               </Button>
-            </div>  
+            </div>
 
             <div className="rounded-[24px] bg-surface p-2 flex flex-col gap-1">
               {exportMeasureOptions.map((measure) => {
@@ -148,11 +153,10 @@ export default function ProfileExportPage() {
                     key={measure.id}
                     className="flex h-[56px] items-center gap-3 rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors"
                   >
-                    <Checkbox
-                      checked={checked}
-                      onChange={() => toggleExportMeasure(measure.id)}
-                    />
-                    <span className="text-[15px] font-bold text-text-primary flex-1 truncate">{measure.name}</span>
+                    <Checkbox checked={checked} onChange={() => toggleExportMeasure(measure.id)} />
+                    <span className="text-[15px] font-bold text-text-primary flex-1 truncate">
+                      {measure.name}
+                    </span>
                   </label>
                 );
               })}
@@ -164,11 +168,10 @@ export default function ProfileExportPage() {
             <h3 className="px-2 text-[14px] font-bold text-text-secondary">추가 옵션</h3>
             <div className="rounded-[24px] bg-surface p-1">
               <label className="flex h-[56px] items-center justify-between rounded-[20px] px-4 cursor-pointer hover:bg-sub-background active:bg-sub-background/80 transition-colors">
-                <span className="text-[15px] font-bold text-text-primary">{tExport("splitByWeek")}</span>
-                <Switch
-                  checked={splitByWeek}
-                  onCheckedChange={toggleSplitByWeek}
-                />
+                <span className="text-[15px] font-bold text-text-primary">
+                  {tExport("splitByWeek")}
+                </span>
+                <Switch checked={splitByWeek} onCheckedChange={toggleSplitByWeek} />
               </label>
             </div>
           </section>
@@ -180,9 +183,9 @@ export default function ProfileExportPage() {
             type="button"
             onClick={() => void exportCsv()}
             disabled={isExporting || !isExportAvailable}
-            variant="primary"
-            size="lg"
-            className="w-full h-[56px] rounded-[16px] text-[16px] font-bold shadow-sm"
+            variant="solid-dark"
+            size="hero"
+            className="shadow-sm"
           >
             {isExportAvailable
               ? isExporting
@@ -239,10 +242,7 @@ function ProfileExportHeader() {
 function ExportSkeleton() {
   return (
     <div className="min-h-screen">
-      <ProtectedPageContainer
-        isLoading
-        className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
-      >
+      <ProtectedPageContainer isLoading className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <div className="h-10 rounded-[16px] bg-border" />
         <div className="h-24 rounded-[24px] bg-border" />
         <div className="h-[420px] rounded-[24px] bg-border" />
@@ -290,12 +290,7 @@ function NoScoreboardState() {
             </>
           }
           actions={
-            <Button
-              asChild
-              variant="primary"
-              size="primary"
-              className="w-fit gap-2"
-            >
+            <Button asChild variant="primary" size="primary" className="w-fit gap-2">
               <Link href={getWorkspacePath(workspaceId, "/setup?mode=create")}>
                 {tExport("createNewScoreboard")}
               </Link>

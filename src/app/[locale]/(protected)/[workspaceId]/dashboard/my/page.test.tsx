@@ -237,6 +237,7 @@ function createBaseDashboardState(): DashboardState {
       id: "workspace-1",
       isOverFreeMemberLimit: false,
       memberCount: 2,
+      actionItemPrefix: "DOW",
     },
     workspaceError: null,
   } as unknown as DashboardState;
@@ -374,6 +375,7 @@ describe("MyDashboardPage", () => {
           planCode: "BASIC",
           role: "ADMIN",
           allowPastDailyLogEdit: false,
+          actionItemPrefix: "DOW",
         },
       }),
     );

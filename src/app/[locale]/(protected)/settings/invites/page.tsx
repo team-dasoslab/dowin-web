@@ -1,10 +1,7 @@
 "use client";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import {
-  useGetWorkspacesIdInvites,
-  useGetWorkspacesMe,
-} from "@/api/generated/workspace/workspace";
+import { useGetWorkspacesIdInvites, useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
 import { NoWorkspaceActions } from "@/app/[locale]/(protected)/_components/NoWorkspaceActions";
 import {
   ProtectedPageContainer,
@@ -26,54 +23,49 @@ import { getWorkspacePath } from "@/lib/client/workspace-path";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { useTranslations } from "next-intl";
 import { isWorkspaceAdminRole } from "@/lib/client/workspace-role";
+import { useTranslations } from "next-intl";
 
 export default function ProfileInvitesPage() {
   const t = useTranslations("ProfileInvites");
   const isNativeApp = useNativeApp();
-  const { data: profileResponse, isLoading: isProfileLoading } =
-    useGetUsersMe();
+  const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
   const {
     data: workspaceResponse,
     isLoading: isWorkspaceLoading,
     error: workspaceError,
   } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount, error) =>
-        getApiErrorStatus(error) !== 404 && failureCount < 2,
+      retry: (failureCount, error) => getApiErrorStatus(error) !== 404 && failureCount < 2,
     },
   });
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
-  const workspace =
-    workspaceResponse?.status === 200 ? workspaceResponse.data : null;
+  const workspace = workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const workspaceId = workspace?.id ?? "";
   const isWorkspaceAdmin = isWorkspaceAdminRole(workspace);
 
-  const { data: invitesResponse, isLoading: isInvitesLoading } =
-    useGetWorkspacesIdInvites(workspaceId, {
+  const { data: invitesResponse, isLoading: isInvitesLoading } = useGetWorkspacesIdInvites(
+    workspaceId,
+    {
       query: {
         enabled: Boolean(workspaceId) && isWorkspaceAdmin,
         retry: false,
       },
-    });
+    },
+  );
 
   const invites = useMemo(() => {
     if (invitesResponse?.status !== 200) {
       return [];
     }
 
-    return [...invitesResponse.data].sort(
-      (left, right) => (right.id ?? 0) - (left.id ?? 0),
-    );
+    return [...invitesResponse.data].sort((left, right) => (right.id ?? 0) - (left.id ?? 0));
   }, [invitesResponse]);
 
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const isLoading =
-    isProfileLoading ||
-    isWorkspaceLoading ||
-    (isWorkspaceAdmin && isInvitesLoading);
+    isProfileLoading || isWorkspaceLoading || (isWorkspaceAdmin && isInvitesLoading);
   const {
     formError,
     maxUsesInput,
@@ -92,9 +84,7 @@ export default function ProfileInvitesPage() {
     workspaceId,
   });
 
-  const activeInviteCount = invites.filter(
-    (invite) => invite.status === "ACTIVE",
-  ).length;
+  const activeInviteCount = invites.filter((invite) => invite.status === "ACTIVE").length;
   const isOverFreeMemberLimit = Boolean(workspace?.isOverFreeMemberLimit);
 
   const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
@@ -107,8 +97,6 @@ export default function ProfileInvitesPage() {
       return true;
     });
   }, [invites, filter]);
-
-
 
   if (isLoading) {
     return <InvitePageSkeleton />;
@@ -154,52 +142,38 @@ export default function ProfileInvitesPage() {
 
         <div className="space-y-5 rounded-[24px] bg-surface p-6">
           <div>
-            <h2 className="text-[15px] font-black text-text-primary">
-              {t("newInviteTitle")}
-            </h2>
+            <h2 className="text-[15px] font-black text-text-primary">{t("newInviteTitle")}</h2>
           </div>
 
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[12px] font-bold text-text-secondary">
-                {t("maxUsesLabel")}
-              </p>
-              <p className="text-[11px] font-medium text-text-muted">
-                {t("maxUsesLimit")}
-              </p>
+              <p className="text-[12px] font-bold text-text-secondary">{t("maxUsesLabel")}</p>
+              <p className="text-[11px] font-medium text-text-muted">{t("maxUsesLimit")}</p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
               <label className="flex h-10 min-w-0 items-center gap-2 rounded-[12px] bg-sub-background px-4 text-xs font-bold text-text-secondary transition-colors focus-within:bg-sub-background">
-                <span className="shrink-0 text-[11px]">
-                  {t("maxUsesInputLabel")}
-                </span>
+                <span className="shrink-0 text-[11px]">{t("maxUsesInputLabel")}</span>
                 <Input
                   id="max-uses"
                   type="number"
                   min={1}
                   max={999}
                   value={maxUsesInput}
-                  onChange={(event) =>
-                    handleMaxUsesInputChange(event.target.value)
-                  }
+                  onChange={(event) => handleMaxUsesInputChange(event.target.value)}
                   placeholder={t("maxUsesPlaceholder")}
                   className="h-full min-w-0 border-0 bg-transparent p-0 text-right text-sm font-semibold text-text-primary outline-none focus-visible:ring-0"
                 />
-                <span className="shrink-0 text-[11px] text-text-muted">
-                  {t("maxUsesUnit")}
-                </span>
+                <span className="shrink-0 text-[11px] text-text-muted">{t("maxUsesUnit")}</span>
               </label>
 
               <Button
                 type="button"
                 onClick={() => void handleCreateInvite(createInvite)}
                 disabled={isCreatingInvite || isOverFreeMemberLimit}
-                className={`h-10 rounded-[12px] px-5 text-sm font-bold transition-colors ${
-                  isCreatingInvite || isOverFreeMemberLimit
-                    ? "cursor-not-allowed bg-sub-background text-text-muted"
-                    : "bg-primary/10 text-primary hover:bg-primary/20"
-                }`}
+                variant="solid-dark"
+                size="primary"
+                className="transition-colors"
               >
                 {isCreatingInvite ? t("creatingButton") : t("createButton")}
               </Button>
@@ -222,14 +196,10 @@ export default function ProfileInvitesPage() {
               ))}
             </div>
 
-            {formError ? (
-              <p className="text-[11px] text-danger">{formError}</p>
-            ) : null}
+            {formError ? <p className="text-[11px] text-danger">{formError}</p> : null}
             {isOverFreeMemberLimit ? (
               <p className="text-[11px] leading-relaxed text-danger">
-                {isNativeApp
-                  ? t("overLimitInviteDisabledApp")
-                  : t("overLimitInviteDisabled")}
+                {isNativeApp ? t("overLimitInviteDisabledApp") : t("overLimitInviteDisabled")}
               </p>
             ) : null}
           </div>
@@ -238,9 +208,7 @@ export default function ProfileInvitesPage() {
         <div className="space-y-5 rounded-[24px] bg-surface p-6">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-[15px] font-black text-text-primary">
-                {t("inviteListTitle")}
-              </h2>
+              <h2 className="text-[15px] font-black text-text-primary">{t("inviteListTitle")}</h2>
             </div>
             <div className="flex shrink-0 items-center gap-1 rounded-full bg-sub-background px-3.5 py-1.5 text-[13px] font-bold tracking-tight text-text-secondary">
               <span>{activeInviteCount}</span>
@@ -329,29 +297,20 @@ export default function ProfileInvitesPage() {
                         >
                           {isCopied ? (
                             <span className="flex items-center gap-1.5">
-                              <DowinIcon name="status-checkmark" size="14px" />{" "}
-                              {t("copiedLabel")}
+                              <DowinIcon name="status-checkmark" size="14px" /> {t("copiedLabel")}
                             </span>
                           ) : (
                             <span className="flex items-center gap-1.5">
-                              <DowinIcon name="action-copy" size="14px" />{" "}
-                              {t("copyCode")}
+                              <DowinIcon name="action-copy" size="14px" /> {t("copyCode")}
                             </span>
                           )}
                         </Button>
 
                         <Switch
-                          disabled={
-                            inviteId <= 0 ||
-                            isPendingToggle ||
-                            isActivationBlocked
-                          }
+                          disabled={inviteId <= 0 || isPendingToggle || isActivationBlocked}
                           checked={isActive}
                           onCheckedChange={() =>
-                            void toggleInviteStatus(
-                              inviteId,
-                              isActive ? "INACTIVE" : "ACTIVE",
-                            )
+                            void toggleInviteStatus(inviteId, isActive ? "INACTIVE" : "ACTIVE")
                           }
                           aria-label={isActive ? t("inactive") : t("active")}
                         />
@@ -382,10 +341,7 @@ export default function ProfileInvitesPage() {
 function InvitePageSkeleton() {
   return (
     <div className="min-h-screen">
-      <ProtectedPageContainer
-        isLoading
-        className="max-w-[640px] pb-24 md:pb-10 lg:pb-12"
-      >
+      <ProtectedPageContainer isLoading className="max-w-[640px] pb-24 md:pb-10 lg:pb-12">
         <div className="h-12 w-48 rounded-[12px] bg-border" />
         <div className="h-24 rounded-[24px] bg-border" />
         <div className="h-44 rounded-[24px] bg-border" />
@@ -405,9 +361,7 @@ function NoWorkspaceState() {
             <Logo size="24px" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-lg font-bold text-text-primary">
-              {t("noWorkspaceTitle")}
-            </h1>
+            <h1 className="text-lg font-bold text-text-primary">{t("noWorkspaceTitle")}</h1>
             <p className="text-sm text-text-muted">{t("noWorkspaceDesc")}</p>
           </div>
           <div className="flex justify-center">
@@ -430,18 +384,14 @@ function NoAccessState() {
             <DowinIcon name="status-locked" size="20px" />
           </div>
           <div className="space-y-1">
-            <h1 className="text-lg font-bold text-text-primary">
-              {t("noAccessTitle")}
-            </h1>
+            <h1 className="text-lg font-bold text-text-primary">{t("noAccessTitle")}</h1>
             <p className="text-sm text-text-muted">{t("noAccessDesc")}</p>
           </div>
           <Button
             asChild
             className="w-full rounded-content border border-border bg-surface py-3 text-sm font-semibold text-text-primary"
           >
-            <Link href={getWorkspacePath(workspaceId, "/profile")}>
-              {t("backToSettings")}
-            </Link>
+            <Link href={getWorkspacePath(workspaceId, "/profile")}>{t("backToSettings")}</Link>
           </Button>
         </div>
       </div>

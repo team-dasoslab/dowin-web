@@ -4,6 +4,7 @@ import { dashboardMyQuerySchema } from "@/domain/dashboard/validation";
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { ActionItemMetadataStorage } from "@/domain/dashboard/storage/action-item-metadata.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { requireWorkspaceAccess } from "@/lib/server/workspace-context";
@@ -52,6 +53,7 @@ export const GET = withErrorHandler(
       workspaceStorage,
       new ScoreboardStorage(db),
       new DailyLogStorage(db),
+      new ActionItemMetadataStorage(db),
     );
     const result = await service.getMyDashboard(context, query.data);
 
