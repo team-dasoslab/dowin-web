@@ -1,18 +1,13 @@
 import { apiSuccess } from "@/lib/server/api-response";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getTeamCheckinRouteContext } from "../../../_utils";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
+import { TeamCheckinService } from "@/domain/team-checkin/services/team-checkin.service";
+import { TeamCheckinStorage } from "@/domain/team-checkin/storage/team-checkin.storage";
 
-export const POST = withErrorHandler(
-  async (
-    _request: Request,
-    { params }: { params: Promise<{ workspaceId: string; proposalId: string }> },
-  ) => {
-    const { workspaceId, proposalId } = await params;
-    const routeContext = await getTeamCheckinRouteContext(workspaceId);
-    if (!routeContext.ok) return routeContext.error;
-
+export const POST = withWorkspaceAccess<{ workspaceId: string; proposalId: string }>(
+  async (_request, { context, db, params }) => {
+    const service = new TeamCheckinService(new TeamCheckinStorage(db));
     return apiSuccess(
-      await routeContext.service.acceptProposal(routeContext.context, proposalId),
+      await service.acceptProposal(context, params.proposalId),
     );
   },
 );

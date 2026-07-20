@@ -1,27 +1,15 @@
-import { getDb } from "@/db";
 import { ScoreboardService } from "@/domain/scoreboard/services/scoreboard.service";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
 import { scoreboardIdParamSchema } from "@/domain/scoreboard/validation";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 
-export const POST = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
+export const POST = withWorkspaceAccess<{ workspaceId: string, id: string }>(
+  async (_request, { context, db, env, params }) => {
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
-      userId: session.userId,
+      userId: context.userId,
       env,
       intent: "general-write",
     });
@@ -29,18 +17,13 @@ const { env } = getCloudflareContext();
       return restrictedWriteResponse;
     }
 
-    const validatedParams = scoreboardIdParamSchema.safeParse(await params);
+    const validatedParams = scoreboardIdParamSchema.safeParse(params);
     if (!validatedParams.success) {
       return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    const service = new ScoreboardService(
-      new ScoreboardStorage(db),
-      new WorkspaceStorage(db),
-    );
-    const scoreboard = await service.reactivateScoreboard(workspaceId, validatedParams.data.id,
-      session.userId,
-    );
+    const service = new ScoreboardService(new ScoreboardStorage(db));
+    const scoreboard = await service.reactivateScoreboard(context, validatedParams.data.id);
 
     return apiSuccess(scoreboard);
   },

@@ -1,4 +1,3 @@
-import { getDb } from "@/db";
 import { DailyLogService } from "@/domain/daily-log/services/daily-log.service";
 import { DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import {
@@ -7,35 +6,16 @@ import {
 } from "@/domain/daily-log/validation";
 import { LeadMeasureStorage } from "@/domain/lead-measure/storage/lead-measure.storage";
 import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 import { NextResponse } from "next/server";
 
-const createService = (db: ReturnType<typeof getDb>) =>
-  new DailyLogService(
-    new WorkspaceStorage(db),
-    new ScoreboardStorage(db),
-    new LeadMeasureStorage(db),
-    new DailyLogStorage(db),
-  );
-
-export const PUT = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string, date: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
+export const PUT = withWorkspaceAccess<{ workspaceId: string, id: string, date: string }>(
+  async (request, { context, db, env, params }) => {
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
-      userId: session.userId,
+      userId: context.userId,
       env,
       intent: "daily-log-upsert",
     });
@@ -43,10 +23,9 @@ const { env } = getCloudflareContext();
       return restrictedWriteResponse;
     }
 
-    const routeParams = await params;
     const validatedParams = dailyLogDateParamSchema.safeParse({
-      leadMeasureId: routeParams.id,
-      date: routeParams.date,
+      leadMeasureId: params.id,
+      date: params.date,
     });
     if (!validatedParams.success) {
       return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
@@ -57,8 +36,15 @@ const { env } = getCloudflareContext();
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
-    const result = await createService(db).upsertLog(workspaceId, validatedParams.data.leadMeasureId,
-      session.userId,
+    const service = new DailyLogService(
+      new ScoreboardStorage(db),
+      new LeadMeasureStorage(db),
+      new DailyLogStorage(db),
+    );
+
+    const result = await service.upsertLog(
+      context,
+      validatedParams.data.leadMeasureId,
       validatedParams.data.date,
       parsed.data,
     );
@@ -66,19 +52,11 @@ const { env } = getCloudflareContext();
   },
 );
 
-export const DELETE = withErrorHandler(async (request: Request, { params }: { params: Promise<{ workspaceId: string, id: string, date: string }> }) => {
-  const { workspaceId } = await params;
-const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
+export const DELETE = withWorkspaceAccess<{ workspaceId: string, id: string, date: string }>(
+  async (_request, { context, db, env, params }) => {
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
-      userId: session.userId,
+      userId: context.userId,
       env,
       intent: "general-write",
     });
@@ -86,17 +64,23 @@ const { env } = getCloudflareContext();
       return restrictedWriteResponse;
     }
 
-    const routeParams = await params;
     const validatedParams = dailyLogDateParamSchema.safeParse({
-      leadMeasureId: routeParams.id,
-      date: routeParams.date,
+      leadMeasureId: params.id,
+      date: params.date,
     });
     if (!validatedParams.success) {
       return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
     }
 
-    await createService(db).deleteLog(workspaceId, validatedParams.data.leadMeasureId,
-      session.userId,
+    const service = new DailyLogService(
+      new ScoreboardStorage(db),
+      new LeadMeasureStorage(db),
+      new DailyLogStorage(db),
+    );
+
+    await service.deleteLog(
+      context,
+      validatedParams.data.leadMeasureId,
       validatedParams.data.date,
     );
 
