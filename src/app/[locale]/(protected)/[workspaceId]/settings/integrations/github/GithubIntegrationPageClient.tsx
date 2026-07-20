@@ -6,7 +6,10 @@ import {
   type WorkspaceGithubRepositoryLink,
 } from "@/api/generated/dowin.schemas";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
-import { ProtectedPageContainer, ProtectedPageHeader } from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
+import {
+  ProtectedPageContainer,
+  ProtectedPageHeader,
+} from "@/app/[locale]/(protected)/_components/ProtectedPageShell";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { ActionRow } from "@/components/ui/ActionRow";
 import { Badge } from "@/components/ui/Badge";
@@ -136,9 +139,7 @@ export default function GithubIntegrationPageClient() {
                   const linkRecord = activeLinks.find(
                     (link: WorkspaceGithubRepositoryLink) => link.repositoryId === repo.id,
                   );
-                  const hasLinkedRepo = linkedRepoIds.size > 0;
-                  const disableLink =
-                    isPending || (hasLinkedRepo && !isLinked) || repo.isLinkedToOtherWorkspace;
+                  const disableLink = isPending || repo.isLinkedToOtherWorkspace;
 
                   return (
                     <ActionRow
@@ -151,36 +152,37 @@ export default function GithubIntegrationPageClient() {
                           </Badge>
                           {repo.isLinkedToOtherWorkspace && (
                             <Badge variant="warning" size="sm">
-                              {t("linkedToOtherWorkspace", { fallback: "다른 워크스페이스에 연결됨" })}
+                              {t("linkedToOtherWorkspace", {
+                                fallback: "다른 워크스페이스에 연결됨",
+                              })}
                             </Badge>
                           )}
                         </>
                       }
                       action={
-                        isWorkspaceAdmin && (
-                          isLinked ? (
+                        isWorkspaceAdmin &&
+                        (isLinked ? (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleUnlinkRepository(linkRecord!.id)}
+                            disabled={isPending}
+                          >
+                            {t("disconnect", { fallback: "연결 해제" })}
+                          </Button>
+                        ) : (
+                          <div className="flex flex-col items-end gap-1">
                             <Button
-                              variant="danger"
+                              variant="solid-dark"
                               size="sm"
-                              onClick={() => handleUnlinkRepository(linkRecord!.id)}
-                              disabled={isPending}
+                              onClick={() => handleLinkRepository(repo.id)}
+                              disabled={disableLink}
+                              className="font-bold"
                             >
-                              {t("disconnect", { fallback: "연결 해제" })}
+                              {t("connectAction", { fallback: "연결" })}
                             </Button>
-                          ) : (
-                            <div className="flex flex-col items-end gap-1">
-                              <Button
-                                variant="solid-dark"
-                                size="sm"
-                                onClick={() => handleLinkRepository(repo.id)}
-                                disabled={disableLink}
-                                className="font-bold"
-                              >
-                                {t("connectAction", { fallback: "연결" })}
-                              </Button>
-                            </div>
-                          )
-                        )
+                          </div>
+                        ))
                       }
                       className="rounded-[16px]"
                     />
