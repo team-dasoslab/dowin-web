@@ -48,7 +48,6 @@ export const DialogTrigger = ({ children, asChild }: { children: React.ReactNode
 
 export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
   overlayClassName?: string;
-  hideCloseButton?: boolean;
 }
 
 export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
