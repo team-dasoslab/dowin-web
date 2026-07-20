@@ -1,9 +1,5 @@
 import { getDb } from "@/db";
 import {
-  BASIC_OPERATIONAL_BILLING_STATUSES,
-  BASIC_OPERATIONAL_PLAN_CODES,
-} from "@/domain/billing/entitlement-policy";
-import {
   basicUsageEvents,
   dailyLogs,
   devicePushTokens,
@@ -14,29 +10,28 @@ import {
   teamCheckinDeliveries,
   teamCheckinResponses,
   userNotificationSettings,
-  workspaceBillingState,
   users,
+  workspaceBillingState,
   workspaceMembers,
   workspaceTeamCheckinSettings,
   workspaces,
 } from "@/db/schema";
+import {
+  BASIC_OPERATIONAL_BILLING_STATUSES,
+  BASIC_OPERATIONAL_PLAN_CODES,
+} from "@/domain/billing/entitlement-policy";
 import { and, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
-export type TeamCheckinSettingsRecord =
-  typeof workspaceTeamCheckinSettings.$inferSelect;
-export type TeamCheckinDeliveryRecord =
-  typeof teamCheckinDeliveries.$inferSelect;
-export type TeamCheckinResponseRecord =
-  typeof teamCheckinResponses.$inferSelect;
+export type TeamCheckinSettingsRecord = typeof workspaceTeamCheckinSettings.$inferSelect;
+export type TeamCheckinDeliveryRecord = typeof teamCheckinDeliveries.$inferSelect;
+export type TeamCheckinResponseRecord = typeof teamCheckinResponses.$inferSelect;
 export type TeamCheckinAdjustmentProposalRecord =
   typeof teamCheckinAdjustmentProposals.$inferSelect;
-export type TeamCheckinAdjustmentActionType =
-  TeamCheckinAdjustmentProposalRecord["actionType"];
+export type TeamCheckinAdjustmentActionType = TeamCheckinAdjustmentProposalRecord["actionType"];
 export type TeamCheckinResponseType = TeamCheckinResponseRecord["responseType"];
-export type TeamCheckinDeliveryReasonCode =
-  TeamCheckinDeliveryRecord["reasonCode"];
+export type TeamCheckinDeliveryReasonCode = TeamCheckinDeliveryRecord["reasonCode"];
 
 export type TeamCheckinCandidate = {
   workspaceId: number;
@@ -71,9 +66,7 @@ export type TeamCheckinReportRow = TeamCheckinDeliveryRecord & {
 export class TeamCheckinStorage {
   constructor(private db: Db) {}
 
-  async findSettings(
-    workspaceId: number,
-  ): Promise<TeamCheckinSettingsRecord | null> {
+  async findSettings(workspaceId: number): Promise<TeamCheckinSettingsRecord | null> {
     return (
       (await this.db.query.workspaceTeamCheckinSettings.findFirst({
         where: eq(workspaceTeamCheckinSettings.workspaceId, workspaceId),
@@ -119,16 +112,10 @@ export class TeamCheckinStorage {
         workspace: workspaces,
       })
       .from(workspaceTeamCheckinSettings)
-      .innerJoin(
-        workspaces,
-        eq(workspaceTeamCheckinSettings.workspaceId, workspaces.id),
-      )
+      .innerJoin(workspaces, eq(workspaceTeamCheckinSettings.workspaceId, workspaces.id))
       .innerJoin(
         workspaceBillingState,
-        eq(
-          workspaceTeamCheckinSettings.workspaceId,
-          workspaceBillingState.workspaceId,
-        ),
+        eq(workspaceTeamCheckinSettings.workspaceId, workspaceBillingState.workspaceId),
       )
       .where(
         workspaceId
@@ -137,17 +124,13 @@ export class TeamCheckinStorage {
               eq(workspaceTeamCheckinSettings.workspaceId, workspaceId),
               isNull(workspaces.deletedAt),
               inArray(workspaceBillingState.planCode, BASIC_OPERATIONAL_PLAN_CODES),
-              inArray(workspaceBillingState.billingStatus, [
-                ...BASIC_OPERATIONAL_BILLING_STATUSES,
-              ]),
+              inArray(workspaceBillingState.billingStatus, [...BASIC_OPERATIONAL_BILLING_STATUSES]),
             )
           : and(
               eq(workspaceTeamCheckinSettings.enabled, true),
               isNull(workspaces.deletedAt),
               inArray(workspaceBillingState.planCode, BASIC_OPERATIONAL_PLAN_CODES),
-              inArray(workspaceBillingState.billingStatus, [
-                ...BASIC_OPERATIONAL_BILLING_STATUSES,
-              ]),
+              inArray(workspaceBillingState.billingStatus, [...BASIC_OPERATIONAL_BILLING_STATUSES]),
             ),
       );
   }
@@ -176,10 +159,7 @@ export class TeamCheckinStorage {
         userNotificationSettings,
         eq(userNotificationSettings.userId, workspaceMembers.userId),
       )
-      .innerJoin(
-        workspaces,
-        eq(workspaceMembers.workspaceId, workspaces.id),
-      )
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
       .innerJoin(
         scoreboards,
         and(
@@ -190,10 +170,7 @@ export class TeamCheckinStorage {
       )
       .innerJoin(
         leadMeasures,
-        and(
-          eq(leadMeasures.scoreboardId, scoreboards.id),
-          eq(leadMeasures.status, "ACTIVE"),
-        ),
+        and(eq(leadMeasures.scoreboardId, scoreboards.id), eq(leadMeasures.status, "ACTIVE")),
       )
       .where(and(eq(workspaceMembers.workspaceId, workspaceId), isNull(workspaces.deletedAt)));
 
@@ -205,11 +182,7 @@ export class TeamCheckinStorage {
       }));
   }
 
-  async findLogsForCandidates(
-    leadMeasureIds: number[],
-    from: string,
-    to: string,
-  ) {
+  async findLogsForCandidates(leadMeasureIds: number[], from: string, to: string) {
     if (leadMeasureIds.length === 0) {
       return [];
     }
@@ -253,10 +226,7 @@ export class TeamCheckinStorage {
         response: teamCheckinResponses,
       })
       .from(teamCheckinDeliveries)
-      .leftJoin(
-        teamCheckinResponses,
-        eq(teamCheckinResponses.deliveryId, teamCheckinDeliveries.id),
-      )
+      .leftJoin(teamCheckinResponses, eq(teamCheckinResponses.deliveryId, teamCheckinDeliveries.id))
       .where(
         and(
           eq(teamCheckinDeliveries.workspaceId, workspaceId),
@@ -317,10 +287,7 @@ export class TeamCheckinStorage {
     input: typeof teamCheckinDeliveries.$inferInsert,
   ): Promise<TeamCheckinDeliveryRecord | null> {
     try {
-      const [record] = await this.db
-        .insert(teamCheckinDeliveries)
-        .values(input)
-        .returning();
+      const [record] = await this.db.insert(teamCheckinDeliveries).values(input).returning();
       return record;
     } catch {
       return null;
@@ -393,10 +360,7 @@ export class TeamCheckinStorage {
   async createResponse(
     input: typeof teamCheckinResponses.$inferInsert,
   ): Promise<TeamCheckinResponseRecord> {
-    const [record] = await this.db
-      .insert(teamCheckinResponses)
-      .values(input)
-      .returning();
+    const [record] = await this.db.insert(teamCheckinResponses).values(input).returning();
 
     return record;
   }
@@ -414,10 +378,7 @@ export class TeamCheckinStorage {
         leadMeasure: leadMeasures,
       })
       .from(teamCheckinDeliveries)
-      .leftJoin(
-        teamCheckinResponses,
-        eq(teamCheckinResponses.deliveryId, teamCheckinDeliveries.id),
-      )
+      .leftJoin(teamCheckinResponses, eq(teamCheckinResponses.deliveryId, teamCheckinDeliveries.id))
       .innerJoin(leadMeasures, eq(teamCheckinDeliveries.leadMeasureId, leadMeasures.id))
       .where(
         and(
@@ -435,16 +396,10 @@ export class TeamCheckinStorage {
         sourceDeliveryUid: teamCheckinDeliveries.uid,
       })
       .from(teamCheckinAdjustmentProposals)
-      .innerJoin(
-        leadMeasures,
-        eq(teamCheckinAdjustmentProposals.leadMeasureId, leadMeasures.id),
-      )
+      .innerJoin(leadMeasures, eq(teamCheckinAdjustmentProposals.leadMeasureId, leadMeasures.id))
       .innerJoin(
         teamCheckinDeliveries,
-        eq(
-          teamCheckinAdjustmentProposals.sourceDeliveryId,
-          teamCheckinDeliveries.id,
-        ),
+        eq(teamCheckinAdjustmentProposals.sourceDeliveryId, teamCheckinDeliveries.id),
       )
       .where(
         and(
@@ -473,10 +428,8 @@ export class TeamCheckinStorage {
 
     return [...deliveryItems, ...proposalItems]
       .sort((a, b) => {
-        const aDate =
-          a.type === "CHECKIN" ? a.delivery.createdAt : a.proposal.createdAt;
-        const bDate =
-          b.type === "CHECKIN" ? b.delivery.createdAt : b.proposal.createdAt;
+        const aDate = a.type === "CHECKIN" ? a.delivery.createdAt : a.proposal.createdAt;
+        const bDate = b.type === "CHECKIN" ? b.delivery.createdAt : b.proposal.createdAt;
         return bDate.getTime() - aDate.getTime();
       })
       .slice(0, input.limit);
@@ -501,10 +454,7 @@ export class TeamCheckinStorage {
         proposal: teamCheckinAdjustmentProposals,
       })
       .from(teamCheckinDeliveries)
-      .leftJoin(
-        teamCheckinResponses,
-        eq(teamCheckinResponses.deliveryId, teamCheckinDeliveries.id),
-      )
+      .leftJoin(teamCheckinResponses, eq(teamCheckinResponses.deliveryId, teamCheckinDeliveries.id))
       .innerJoin(users, eq(teamCheckinDeliveries.memberUserId, users.id))
       .innerJoin(leadMeasures, eq(teamCheckinDeliveries.leadMeasureId, leadMeasures.id))
       .leftJoin(
@@ -517,8 +467,8 @@ export class TeamCheckinStorage {
         workspaceMembers,
         and(
           eq(workspaceMembers.workspaceId, workspaceId),
-          eq(workspaceMembers.userId, teamCheckinDeliveries.memberUserId)
-        )
+          eq(workspaceMembers.userId, teamCheckinDeliveries.memberUserId),
+        ),
       ) as typeof baseQuery;
     }
 
@@ -549,28 +499,22 @@ export class TeamCheckinStorage {
     }));
   }
 
-  async findAchievedLogsAfter(input: {
-    leadMeasureId: number;
+  async findLogsByLeadMeasuresAndDateRange(input: {
+    leadMeasureIds: number[];
     from: Date;
     to: Date;
-    trackingMode: "BOOLEAN" | "COUNT";
-    dailyTargetCount: number;
   }) {
+    if (input.leadMeasureIds.length === 0) return [];
+
     const fromDate = input.from.toISOString().slice(0, 10);
     const toDate = input.to.toISOString().slice(0, 10);
-    const logs = await this.db.query.dailyLogs.findMany({
+    return await this.db.query.dailyLogs.findMany({
       where: and(
-        eq(dailyLogs.leadMeasureId, input.leadMeasureId),
+        inArray(dailyLogs.leadMeasureId, input.leadMeasureIds),
         gte(dailyLogs.logDate, fromDate),
         lte(dailyLogs.logDate, toDate),
       ),
     });
-
-    return logs.filter((log) =>
-      input.trackingMode === "COUNT"
-        ? log.count >= input.dailyTargetCount
-        : log.value,
-    );
   }
 
   async findResponseByUid(workspaceId: number, uid: string) {
@@ -587,10 +531,7 @@ export class TeamCheckinStorage {
       )
       .innerJoin(leadMeasures, eq(teamCheckinDeliveries.leadMeasureId, leadMeasures.id))
       .where(
-        and(
-          eq(teamCheckinResponses.workspaceId, workspaceId),
-          eq(teamCheckinResponses.uid, uid),
-        ),
+        and(eq(teamCheckinResponses.workspaceId, workspaceId), eq(teamCheckinResponses.uid, uid)),
       )
       .limit(1);
 
@@ -619,9 +560,7 @@ export class TeamCheckinStorage {
     );
   }
 
-  async createProposal(
-    input: typeof teamCheckinAdjustmentProposals.$inferInsert,
-  ) {
+  async createProposal(input: typeof teamCheckinAdjustmentProposals.$inferInsert) {
     const [proposal] = await this.db
       .insert(teamCheckinAdjustmentProposals)
       .values(input)
@@ -663,12 +602,7 @@ export class TeamCheckinStorage {
       .select({ leadMeasure: leadMeasures, scoreboard: scoreboards })
       .from(leadMeasures)
       .innerJoin(scoreboards, eq(leadMeasures.scoreboardId, scoreboards.id))
-      .where(
-        and(
-          eq(leadMeasures.id, leadMeasureId),
-          eq(scoreboards.workspaceId, workspaceId),
-        ),
-      )
+      .where(and(eq(leadMeasures.id, leadMeasureId), eq(scoreboards.workspaceId, workspaceId)))
       .limit(1);
 
     return rows[0] ?? null;

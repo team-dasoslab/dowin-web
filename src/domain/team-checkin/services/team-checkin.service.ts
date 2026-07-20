@@ -1,30 +1,22 @@
-import { customAlphabet } from "nanoid";
 import { serverRuntimeConfig } from "@/config/server-runtime-config";
-import {
-  DEFAULT_LOCALE,
-  isSupportedLocale,
-  type Locale,
-} from "@/i18n/detect-locale";
-import {
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "@/lib/server/errors";
-import {
-  TeamCheckinAdjustmentProposalCreateInput,
-  TeamCheckinResponseInput,
-  TeamCheckinRunInput,
-  TeamCheckinSettingsInput,
-} from "@/domain/team-checkin/validation";
 import {
   TeamCheckinCandidate,
   TeamCheckinReportRow,
   TeamCheckinSettingsRecord,
   TeamCheckinStorage,
 } from "@/domain/team-checkin/storage/team-checkin.storage";
+import {
+  TeamCheckinAdjustmentProposalCreateInput,
+  TeamCheckinResponseInput,
+  TeamCheckinRunInput,
+  TeamCheckinSettingsInput,
+} from "@/domain/team-checkin/validation";
+import { DEFAULT_LOCALE, isSupportedLocale, type Locale } from "@/i18n/detect-locale";
+import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import en from "@/messages/en.json";
 import ko from "@/messages/ko.json";
+import { customAlphabet } from "nanoid";
 
 const messages = { ko, en } as const;
 
@@ -70,8 +62,7 @@ export class TeamCheckinService {
     options: TeamCheckinServiceOptions = {},
   ) {
     this.leadMeasureAgeGateEnabled =
-      options.leadMeasureAgeGateEnabled ??
-      serverRuntimeConfig.teamCheckinLeadMeasureAgeGateEnabled;
+      options.leadMeasureAgeGateEnabled ?? serverRuntimeConfig.teamCheckinLeadMeasureAgeGateEnabled;
   }
 
   async getSettings(context: WorkspaceAccessContext) {
@@ -79,10 +70,7 @@ export class TeamCheckinService {
     return this.normalizeSettings(await this.storage.findSettings(context.workspaceId));
   }
 
-  async updateSettings(
-    context: WorkspaceAccessContext,
-    input: TeamCheckinSettingsInput,
-  ) {
+  async updateSettings(context: WorkspaceAccessContext, input: TeamCheckinSettingsInput) {
     await this.assertAdmin(context);
     await this.assertBasic(context);
 
@@ -165,10 +153,7 @@ export class TeamCheckinService {
     input: TeamCheckinResponseInput,
   ) {
     await this.assertBasic(context);
-    const delivery = await this.storage.findDeliveryByUid(
-      context.workspaceId,
-      deliveryUid,
-    );
+    const delivery = await this.storage.findDeliveryByUid(context.workspaceId, deliveryUid);
     if (!delivery || delivery.memberUserId !== context.userId) {
       throw new NotFoundError("TEAM_CHECKIN_NOT_FOUND");
     }
@@ -209,12 +194,30 @@ export class TeamCheckinService {
     await this.assertAdmin(context);
     await this.assertBasic(context);
     const rows = await this.storage.findReportRows(context.workspaceId, weekStart, activeOnly);
-    const rowsWithFollowup = await Promise.all(
-      rows.map(async (row) => ({
-        row,
-        resumedWithin24h: await this.hasResumedWithin24h(row),
-      })),
+    const respondedRowsWithMeasure = rows.filter((row) => row.response && row.leadMeasure);
+    const leadMeasureIds = Array.from(
+      new Set(respondedRowsWithMeasure.map((r) => r.leadMeasureId)),
     );
+
+    let allLogs: Awaited<
+      ReturnType<typeof TeamCheckinStorage.prototype.findLogsByLeadMeasuresAndDateRange>
+    > = [];
+    if (leadMeasureIds.length > 0) {
+      const fromDate = new Date(weekStart);
+      const toDate = new Date(weekStart);
+      toDate.setDate(toDate.getDate() + 14); // Cover up to 2 weeks for 24h followups
+
+      allLogs = await this.storage.findLogsByLeadMeasuresAndDateRange({
+        leadMeasureIds,
+        from: fromDate,
+        to: toDate,
+      });
+    }
+
+    const rowsWithFollowup = rows.map((row) => ({
+      row,
+      resumedWithin24h: this.hasResumedWithin24h(row, allLogs),
+    }));
     const sentRows = rows;
     const respondedRows = rows.filter((row) => row.response);
     const adjustmentRows = rows.filter(
@@ -224,9 +227,7 @@ export class TeamCheckinService {
     );
     const attentionRows = adjustmentRows.filter((row) => !row.proposal);
     const proposalRows = rows.filter((row) => row.proposal);
-    const acceptedProposalRows = proposalRows.filter(
-      (row) => row.proposal?.status === "ACCEPTED",
-    );
+    const acceptedProposalRows = proposalRows.filter((row) => row.proposal?.status === "ACCEPTED");
 
     await this.storage.recordUsageEvent({
       workspaceId: context.workspaceId,
@@ -245,44 +246,37 @@ export class TeamCheckinService {
         recipientCount: new Set(sentRows.map((row) => row.memberUserId)).size,
         respondedCount: respondedRows.length,
         oneTapResponseRate: getRate(respondedRows.length, sentRows.length),
-        resumedWithin24hCount: rowsWithFollowup.filter(
-          (item) => item.resumedWithin24h,
-        ).length,
+        resumedWithin24hCount: rowsWithFollowup.filter((item) => item.resumedWithin24h).length,
         resumedWithin24hRate: getRate(
           rowsWithFollowup.filter((item) => item.resumedWithin24h).length,
           respondedRows.length,
         ),
         adjustmentSignalCount: attentionRows.length,
-        proposalAcceptanceRate: getRate(
-          acceptedProposalRows.length,
-          proposalRows.length,
-        ),
+        proposalAcceptanceRate: getRate(acceptedProposalRows.length, proposalRows.length),
       },
-      attentionItems: adjustmentRows
-        .map((row) => ({
-          responseId: row.response?.uid ?? null,
-          checkinId: row.uid,
-          memberUserId: row.memberUserId,
-          memberNickname: row.member?.nickname ?? "이름 없음",
-          leadMeasureId: row.leadMeasureId,
-          leadMeasureName: row.leadMeasure?.name ?? "",
-          signalType: row.response?.responseType ?? null,
-          note: row.response?.note ?? null,
-          createdAt: row.response?.createdAt.toISOString() ?? row.createdAt.toISOString(),
-          openProposalId:
-            row.proposal?.status === "PROPOSED" ? row.proposal.uid : null,
-          isResolved: !!row.proposal,
-          resolvedAt: row.proposal?.createdAt.toISOString() ?? null,
-          resolvedProposal: row.proposal
-            ? {
-                actionType: row.proposal.actionType,
-                leaderNote: row.proposal.leaderNote,
-                payloadJson: row.proposal.payloadJson,
-                status: row.proposal.status,
-                createdAt: row.proposal.createdAt.toISOString(),
-              }
-            : null,
-        })),
+      attentionItems: adjustmentRows.map((row) => ({
+        responseId: row.response?.uid ?? null,
+        checkinId: row.uid,
+        memberUserId: row.memberUserId,
+        memberNickname: row.member?.nickname ?? "이름 없음",
+        leadMeasureId: row.leadMeasureId,
+        leadMeasureName: row.leadMeasure?.name ?? "",
+        signalType: row.response?.responseType ?? null,
+        note: row.response?.note ?? null,
+        createdAt: row.response?.createdAt.toISOString() ?? row.createdAt.toISOString(),
+        openProposalId: row.proposal?.status === "PROPOSED" ? row.proposal.uid : null,
+        isResolved: !!row.proposal,
+        resolvedAt: row.proposal?.createdAt.toISOString() ?? null,
+        resolvedProposal: row.proposal
+          ? {
+              actionType: row.proposal.actionType,
+              leaderNote: row.proposal.leaderNote,
+              payloadJson: row.proposal.payloadJson,
+              status: row.proposal.status,
+              createdAt: row.proposal.createdAt.toISOString(),
+            }
+          : null,
+      })),
       activity: rows.slice(0, 20).map((row) => ({
         type: row.response ? "CHECKIN_RESPONDED" : "CHECKIN_SENT",
         checkinId: row.uid,
@@ -315,11 +309,7 @@ export class TeamCheckinService {
     if (await this.storage.findOpenProposalForResponse(source.response.id)) {
       throw new ConflictError("TEAM_CHECKIN_PROPOSAL_ALREADY_OPEN");
     }
-    if (
-      await this.storage.findOpenProposalForLeadMeasure(
-        source.delivery.leadMeasureId,
-      )
-    ) {
+    if (await this.storage.findOpenProposalForLeadMeasure(source.delivery.leadMeasureId)) {
       throw new ConflictError("TEAM_CHECKIN_PROPOSAL_ALREADY_OPEN");
     }
     if (source.leadMeasure.period !== "WEEKLY") {
@@ -463,10 +453,7 @@ export class TeamCheckinService {
   async cancelProposal(context: WorkspaceAccessContext, proposalUid: string) {
     await this.assertAdmin(context);
     await this.assertBasic(context);
-    const proposal = await this.storage.findProposalByUid(
-      context.workspaceId,
-      proposalUid,
-    );
+    const proposal = await this.storage.findProposalByUid(context.workspaceId, proposalUid);
     if (!proposal) {
       throw new NotFoundError("TEAM_CHECKIN_PROPOSAL_NOT_FOUND");
     }
@@ -501,8 +488,7 @@ export class TeamCheckinService {
 
     for (const { settings, workspace } of settingsRows) {
       const candidates = (await this.storage.findCandidates(workspace.id)).filter(
-        (candidate) =>
-          settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
+        (candidate) => settings.includeAdminAsMember || candidate.memberRole !== "ADMIN",
       );
       const candidateContexts = candidates
         .filter((candidate) => candidate.period === "WEEKLY")
@@ -522,15 +508,9 @@ export class TeamCheckinService {
         })
         .filter(({ candidate, timezone, weekRange }) => {
           if (!this.leadMeasureAgeGateEnabled) return true;
-          return wasCreatedBeforeLocalWeek(
-            candidate,
-            timezone,
-            weekRange.weekStart,
-          );
+          return wasCreatedBeforeLocalWeek(candidate, timezone, weekRange.weekStart);
         });
-      const logRange = getCombinedLogRange(
-        candidateContexts.map((context) => context.weekRange),
-      );
+      const logRange = getCombinedLogRange(candidateContexts.map((context) => context.weekRange));
       const logs = await this.storage.findLogsForCandidates(
         candidateContexts.map(({ candidate }) => candidate.leadMeasureId),
         logRange.from,
@@ -540,25 +520,18 @@ export class TeamCheckinService {
       const deliveryRange = getCombinedDeliveryRange(
         candidateContexts.map((context) => context.dayRange),
       );
-      const existingToday =
-        await this.storage.findDeliveriesWithResponsesForWorkspaceOnDate(
-          workspace.id,
-          deliveryRange.start,
-          deliveryRange.end,
-        );
+      const existingToday = await this.storage.findDeliveriesWithResponsesForWorkspaceOnDate(
+        workspace.id,
+        deliveryRange.start,
+        deliveryRange.end,
+      );
       const createdDuringRun: Array<{
         memberUserId: number;
         leadMeasureId: number;
         createdAt: Date;
       }> = [];
 
-      for (const {
-        candidate,
-        localHour,
-        localDay,
-        weekRange,
-        dayRange,
-      } of candidateContexts) {
+      for (const { candidate, localHour, localDay, weekRange, dayRange } of candidateContexts) {
         if (localHour !== normalizeSendHour(settings.sendHour)) continue;
 
         const reasonCode = getReasonCode(
@@ -572,11 +545,8 @@ export class TeamCheckinService {
         candidateCount += 1;
 
         const workspaceDeliveryCount =
-          existingToday.filter((row) =>
-            isWithinRange(row.delivery.createdAt, dayRange),
-          ).length +
-          createdDuringRun.filter((row) => isWithinRange(row.createdAt, dayRange))
-            .length;
+          existingToday.filter((row) => isWithinRange(row.delivery.createdAt, dayRange)).length +
+          createdDuringRun.filter((row) => isWithinRange(row.createdAt, dayRange)).length;
         if (workspaceDeliveryCount >= settings.dailyWorkspaceLimit) {
           skippedCount += 1;
           continue;
@@ -589,8 +559,7 @@ export class TeamCheckinService {
           ).length +
           createdDuringRun.filter(
             (row) =>
-              row.memberUserId === candidate.memberUserId &&
-              isWithinRange(row.createdAt, dayRange),
+              row.memberUserId === candidate.memberUserId && isWithinRange(row.createdAt, dayRange),
           ).length;
         if (memberCount >= settings.dailyMemberLimit) {
           skippedCount += 1;
@@ -602,9 +571,7 @@ export class TeamCheckinService {
             row.delivery.leadMeasureId === candidate.leadMeasureId &&
             isWithinRange(row.delivery.createdAt, dayRange) &&
             row.response &&
-            ["SNOOZE_TODAY", "BLOCKED", "ADJUSTMENT_REQUESTED"].includes(
-              row.response.responseType,
-            ),
+            ["SNOOZE_TODAY", "BLOCKED", "ADJUSTMENT_REQUESTED"].includes(row.response.responseType),
         );
         if (isSuppressedToday) {
           skippedCount += 1;
@@ -635,15 +602,9 @@ export class TeamCheckinService {
         });
         createdDeliveryCount += 1;
 
-        const tokens = await this.storage.findActiveDeviceTokens(
-          candidate.memberUserId,
-        );
+        const tokens = await this.storage.findActiveDeviceTokens(candidate.memberUserId);
         if (tokens.length === 0) {
-          await this.storage.markDeliverySkipped(
-            delivery.id,
-            "NO_ACTIVE_DEVICE_TOKEN",
-            now,
-          );
+          await this.storage.markDeliverySkipped(delivery.id, "NO_ACTIVE_DEVICE_TOKEN", now);
           skippedCount += 1;
           continue;
         }
@@ -724,14 +685,8 @@ export class TeamCheckinService {
     }
   }
 
-  private async getOpenProposalForMember(
-    context: WorkspaceAccessContext,
-    proposalUid: string,
-  ) {
-    const proposal = await this.storage.findProposalByUid(
-      context.workspaceId,
-      proposalUid,
-    );
+  private async getOpenProposalForMember(context: WorkspaceAccessContext, proposalUid: string) {
+    const proposal = await this.storage.findProposalByUid(context.workspaceId, proposalUid);
     if (!proposal || proposal.memberUserId !== context.userId) {
       throw new NotFoundError("TEAM_CHECKIN_PROPOSAL_NOT_FOUND");
     }
@@ -743,10 +698,7 @@ export class TeamCheckinService {
 
   private async applyProposal(
     proposal: Awaited<ReturnType<TeamCheckinStorage["findProposalByUid"]>>,
-  ): Promise<
-    | { ok: true; result: Record<string, unknown> }
-    | { ok: false; errorCode: string }
-  > {
+  ): Promise<{ ok: true; result: Record<string, unknown> } | { ok: false; errorCode: string }> {
     if (!proposal) return { ok: false, errorCode: "PROPOSAL_NOT_FOUND" };
     const target = await this.storage.findLeadMeasureForWorkspace(
       proposal.leadMeasureId,
@@ -777,9 +729,7 @@ export class TeamCheckinService {
         : { ok: false, errorCode: "UPDATE_FAILED" };
     }
     if (proposal.actionType === "ARCHIVE_ACTION_ITEM") {
-      const archived = await this.storage.archiveLeadMeasure(
-        proposal.leadMeasureId,
-      );
+      const archived = await this.storage.archiveLeadMeasure(proposal.leadMeasureId);
       return archived
         ? {
             ok: true,
@@ -811,9 +761,7 @@ export class TeamCheckinService {
     };
   }
 
-  private serializeProposal(
-    proposal: Awaited<ReturnType<TeamCheckinStorage["createProposal"]>>,
-  ) {
+  private serializeProposal(proposal: Awaited<ReturnType<TeamCheckinStorage["createProposal"]>>) {
     return {
       id: proposal.uid,
       actionType: proposal.actionType,
@@ -825,16 +773,30 @@ export class TeamCheckinService {
     };
   }
 
-  private async hasResumedWithin24h(row: TeamCheckinReportRow) {
+  private hasResumedWithin24h(
+    row: TeamCheckinReportRow,
+    preloadedLogs: Awaited<
+      ReturnType<typeof TeamCheckinStorage.prototype.findLogsByLeadMeasuresAndDateRange>
+    >,
+  ) {
     if (!row.response || !row.leadMeasure) return false;
-    const logs = await this.storage.findAchievedLogsAfter({
-      leadMeasureId: row.leadMeasureId,
-      from: row.response.createdAt,
-      to: new Date(row.response.createdAt.getTime() + 24 * 60 * 60 * 1000),
-      trackingMode: row.leadMeasure.trackingMode,
-      dailyTargetCount: row.leadMeasure.dailyTargetCount,
-    });
-    return logs.length > 0;
+
+    const fromDateStr = row.response.createdAt.toISOString().slice(0, 10);
+    const toDate = new Date(row.response.createdAt.getTime() + 24 * 60 * 60 * 1000);
+    const toDateStr = toDate.toISOString().slice(0, 10);
+
+    const logs = preloadedLogs.filter(
+      (log) =>
+        log.leadMeasureId === row.leadMeasureId &&
+        log.logDate >= fromDateStr &&
+        log.logDate <= toDateStr,
+    );
+
+    return logs.some((log) =>
+      row.leadMeasure!.trackingMode === "COUNT"
+        ? log.count >= row.leadMeasure!.dailyTargetCount
+        : log.value,
+    );
   }
 }
 
@@ -865,10 +827,7 @@ function wasCreatedBeforeLocalWeek(
   timezone: string,
   weekStart: string,
 ) {
-  const createdLocalDate = getLocalDateTimeParts(
-    candidate.leadMeasureCreatedAt,
-    timezone,
-  ).date;
+  const createdLocalDate = getLocalDateTimeParts(candidate.leadMeasureCreatedAt, timezone).date;
   return createdLocalDate < weekStart;
 }
 
@@ -881,17 +840,13 @@ function getReasonCode(
     triggerNoWeeklyLogEnabled: boolean;
   },
 ) {
-  const achievedCount = logsForMeasure.filter(
-    (log) => {
-      if (log.logDate < weekRange.weekStart || log.logDate > weekRange.weekEnd) {
-        return false;
-      }
+  const achievedCount = logsForMeasure.filter((log) => {
+    if (log.logDate < weekRange.weekStart || log.logDate > weekRange.weekEnd) {
+      return false;
+    }
 
-      return candidate.trackingMode === "COUNT"
-        ? log.count >= candidate.dailyTargetCount
-        : log.value;
-    },
-  ).length;
+    return candidate.trackingMode === "COUNT" ? log.count >= candidate.dailyTargetCount : log.value;
+  }).length;
 
   if (
     settings.triggerNoWeeklyLogEnabled &&
@@ -918,10 +873,7 @@ function buildPushMessage(candidate: TeamCheckinCandidate) {
 
   return {
     title: t.teamCheckinTitle,
-    body: t.teamCheckinBody.replace(
-      "{actionItemName}",
-      candidate.leadMeasureName,
-    ),
+    body: t.teamCheckinBody.replace("{actionItemName}", candidate.leadMeasureName),
   };
 }
 
@@ -973,9 +925,7 @@ function getLocalDayRange(now: Date, timezone: string) {
   };
 }
 
-function getCombinedLogRange(
-  ranges: Array<{ weekStart: string; weekEnd: string }>,
-) {
+function getCombinedLogRange(ranges: Array<{ weekStart: string; weekEnd: string }>) {
   if (ranges.length === 0) {
     return { from: "9999-12-31", to: "0000-01-01" };
   }
@@ -999,14 +949,8 @@ function getCombinedDeliveryRange(ranges: Array<{ start: Date; end: Date }>) {
   }
 
   return {
-    start: ranges.reduce(
-      (min, range) => (range.start < min ? range.start : min),
-      ranges[0].start,
-    ),
-    end: ranges.reduce(
-      (max, range) => (range.end > max ? range.end : max),
-      ranges[0].end,
-    ),
+    start: ranges.reduce((min, range) => (range.start < min ? range.start : min), ranges[0].start),
+    end: ranges.reduce((max, range) => (range.end > max ? range.end : max), ranges[0].end),
   };
 }
 
