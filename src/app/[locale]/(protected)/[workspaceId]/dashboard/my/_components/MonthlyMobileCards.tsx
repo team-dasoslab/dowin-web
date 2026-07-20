@@ -1,4 +1,5 @@
 import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
+import { DailyPrLinksPopover } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/DailyPrLinksPopover";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
@@ -10,9 +11,7 @@ type MonthlyLeadMeasure = NonNullable<
 >[number];
 
 type MonthlyMobileCardsProps = {
-  activeLeadMeasures: ReturnType<
-    typeof useDashboardScoreboard
-  >["activeLeadMeasures"];
+  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
   monthWeeks: ReturnType<typeof getMonthCalendarWeeks>;
   monthLabel?: string;
   monthlyLeadMeasures: MonthlyLeadMeasure[];
@@ -22,10 +21,7 @@ type MonthlyMobileCardsProps = {
 type MonthlyMobileWeekCardProps = {
   monthLabel?: string;
   monthlyLeadMeasures: MonthlyLeadMeasure[];
-  tagsByMeasureId: Map<
-    number | null,
-    Array<{ id?: number | null; name?: string | null }>
-  >;
+  tagsByMeasureId: Map<number | null, Array<{ id?: number | null; name?: string | null }>>;
   createdAtById: Map<number | null, Date | string | null>;
   today: string;
   weekDatesInMonth: ReturnType<typeof getMonthCalendarWeeks>[number];
@@ -34,19 +30,10 @@ type MonthlyMobileWeekCardProps = {
 };
 
 export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
-  const {
-    activeLeadMeasures,
-    monthLabel,
-    monthWeeks,
-    monthlyLeadMeasures,
-    today,
-  } = props;
+  const { activeLeadMeasures, monthLabel, monthWeeks, monthlyLeadMeasures, today } = props;
   const t = useTranslations("Dashboard");
   const tagsByMeasureId = new Map(
-    activeLeadMeasures.map((leadMeasure) => [
-      leadMeasure.id ?? null,
-      leadMeasure.tags ?? [],
-    ]),
+    activeLeadMeasures.map((leadMeasure) => [leadMeasure.id ?? null, leadMeasure.tags ?? []]),
   );
   const createdAtById = new Map(
     activeLeadMeasures.map((leadMeasure) => [
@@ -54,15 +41,7 @@ export function MonthlyMobileCards(props: MonthlyMobileCardsProps) {
       leadMeasure.createdAt ?? null,
     ]),
   );
-  const localizedDays = [
-    t("mon"),
-    t("tue"),
-    t("wed"),
-    t("thu"),
-    t("fri"),
-    t("sat"),
-    t("sun"),
-  ];
+  const localizedDays = [t("mon"), t("tue"), t("wed"), t("thu"), t("fri"), t("sat"), t("sun")];
 
   return (
     <div className="space-y-3 md:hidden">
@@ -98,10 +77,10 @@ function MonthlyMobileWeekCard({
   const weekFilteredMeasures = monthlyLeadMeasures.filter((leadMeasure) => {
     const createdAt = createdAtById.get(leadMeasure.id ?? null);
     if (!createdAt) return true;
-    
+
     const weekEnd = weekDatesInMonth.filter((d): d is string => d !== null).at(-1);
     if (!weekEnd) return true;
-    
+
     const d = new Date(createdAt);
     if (isNaN(d.getTime())) {
       return (createdAt as string).split("T")[0] <= weekEnd;
@@ -109,7 +88,7 @@ function MonthlyMobileWeekCard({
     const kstMs = d.getTime() + 9 * 60 * 60 * 1000;
     const kstDate = new Date(kstMs);
     const createdAtDate = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
-    
+
     return createdAtDate <= weekEnd;
   });
 
@@ -199,15 +178,15 @@ function MonthlyMobileMeasureCard({
     <div className="rounded-[24px] bg-surface p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <LeadMeasureSummary name={leadMeasure.name} tags={tags} />
+          <LeadMeasureSummary
+            name={leadMeasure.name}
+            tags={tags}
+            publicId={leadMeasure.publicId}
+          />
         </div>
         <AchievementProgress
           achievedCount={visibleAchievedCount}
-          periodLabel={
-            leadMeasure.period === "WEEKLY"
-              ? t("weeklyLabel")
-              : t("monthlyLabel")
-          }
+          periodLabel={leadMeasure.period === "WEEKLY" ? t("weeklyLabel") : t("monthlyLabel")}
           targetValue={targetValue}
         />
       </div>
@@ -222,6 +201,7 @@ function MonthlyMobileMeasureCard({
             trackingMode={(leadMeasure as { trackingMode?: string }).trackingMode}
             dailyTargetCount={(leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ?? 1}
             value={date ? (leadMeasure.logs?.[date] ?? null) : null}
+            prLinks={date ? (leadMeasure.githubPrLinks?.filter((pr) => pr.dailyLogDate === date) ?? []) : []}
           />
         ))}
       </div>
@@ -229,7 +209,7 @@ function MonthlyMobileMeasureCard({
   );
 }
 
-import type { DailyLogCell } from "@/api/generated/dowin.schemas";
+import type { DailyLogCell, GithubPrLink } from "@/api/generated/dowin.schemas";
 
 type MonthlyMobileMeasureDayProps = {
   date: string | null;
@@ -238,6 +218,7 @@ type MonthlyMobileMeasureDayProps = {
   trackingMode?: string;
   dailyTargetCount?: number;
   value: DailyLogCell | null;
+  prLinks?: GithubPrLink[];
 };
 
 function MonthlyMobileMeasureDay({
@@ -247,18 +228,15 @@ function MonthlyMobileMeasureDay({
   trackingMode,
   dailyTargetCount = 1,
   value,
+  prLinks = [],
 }: MonthlyMobileMeasureDayProps) {
   const isToday = date === today;
   const isCount = trackingMode === "COUNT";
   const count = value?.count ?? 0;
 
   return (
-    <div className="space-y-1 text-center">
-      <p
-        className={`text-[11px] font-bold ${
-          isToday ? "text-primary" : "text-text-muted"
-        }`}
-      >
+    <div className="space-y-1 text-center relative">
+      <p className={`text-[11px] font-bold ${isToday ? "text-primary" : "text-text-muted"}`}>
         {dayLabel}
       </p>
       {isCount ? (
@@ -291,11 +269,10 @@ function MonthlyMobileMeasureDay({
                   : "bg-sub-background text-text-muted"
           }`}
         >
-          {value?.achieved ? (
-            <DowinIcon name="action-checkmark" size="14px" />
-          ) : null}
+          {value?.achieved ? <DowinIcon name="action-checkmark" size="14px" /> : null}
         </span>
       )}
+      {date && <DailyPrLinksPopover prLinks={prLinks} />}
     </div>
   );
 }

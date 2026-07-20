@@ -4,6 +4,7 @@ import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]
 import { getMonthCalendarWeeks } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_lib/week";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { useTranslations } from "next-intl";
+import { DailyPrLinksPopover } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/DailyPrLinksPopover";
 
 interface MonthlyBoardSectionProps {
   activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
@@ -26,10 +27,7 @@ export function MonthlyBoardSection({
 }: MonthlyBoardSectionProps) {
   const t = useTranslations("Dashboard");
   const tagsByMeasureId = new Map(
-    activeLeadMeasures.map((leadMeasure) => [
-      leadMeasure.id ?? null,
-      leadMeasure.tags ?? [],
-    ]),
+    activeLeadMeasures.map((leadMeasure) => [leadMeasure.id ?? null, leadMeasure.tags ?? []]),
   );
   const createdAtById = new Map(
     activeLeadMeasures.map((leadMeasure) => [
@@ -37,20 +35,10 @@ export function MonthlyBoardSection({
       leadMeasure.createdAt ?? null,
     ]),
   );
-  const localizedDays = [
-    t("mon"),
-    t("tue"),
-    t("wed"),
-    t("thu"),
-    t("fri"),
-    t("sat"),
-    t("sun"),
-  ];
+  const localizedDays = [t("mon"), t("tue"), t("wed"), t("thu"), t("fri"), t("sat"), t("sun")];
 
   return (
     <div className="space-y-4">
-
-
       {isLoading ? (
         <div className="flex flex-col gap-4">
           <div className="h-[200px] w-full animate-pulse rounded-[24px] bg-border" />
@@ -75,10 +63,10 @@ export function MonthlyBoardSection({
               const weekFilteredMeasures = monthlyLeadMeasures.filter((leadMeasure) => {
                 const createdAt = createdAtById.get(leadMeasure.id ?? null);
                 if (!createdAt) return true;
-                
+
                 const weekEnd = weekDatesInMonth.filter((d): d is string => d !== null).at(-1);
                 if (!weekEnd) return true;
-                
+
                 const d = new Date(createdAt);
                 if (isNaN(d.getTime())) {
                   return (createdAt as string).split("T")[0] <= weekEnd;
@@ -86,7 +74,7 @@ export function MonthlyBoardSection({
                 const kstMs = d.getTime() + 9 * 60 * 60 * 1000;
                 const kstDate = new Date(kstMs);
                 const createdAtDate = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
-                
+
                 return createdAtDate <= weekEnd;
               });
 
@@ -120,30 +108,73 @@ export function MonthlyBoardSection({
               }
 
               return (
-              <div
-                key={`${monthLabel}-week-${weekIndex + 1}`}
-                className="overflow-hidden rounded-[24px] bg-surface"
-              >
-                <div className="border-b border-border bg-surface px-6 py-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[14px] font-black text-text-primary">
-                      {t("weekNumber", { n: weekIndex + 1 })}
-                    </p>
-                    <p className="text-[12px] font-mono font-medium text-text-muted">
-                      {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
-                      {" – "}
-                      {weekDatesInMonth
-                        .filter((date): date is string => date !== null)
-                        .at(-1)
-                        ?.slice(5)
-                        .replace("-", ".")}
-                    </p>
+                <div
+                  key={`${monthLabel}-week-${weekIndex + 1}`}
+                  className="overflow-hidden rounded-[24px] bg-surface"
+                >
+                  <div className="border-b border-border bg-surface px-6 py-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[14px] font-black text-text-primary">
+                        {t("weekNumber", { n: weekIndex + 1 })}
+                      </p>
+                      <p className="text-[12px] font-mono font-medium text-text-muted">
+                        {weekDatesInMonth.find(Boolean)?.slice(5).replace("-", ".")}
+                        {" – "}
+                        {weekDatesInMonth
+                          .filter((date): date is string => date !== null)
+                          .at(-1)
+                          ?.slice(5)
+                          .replace("-", ".")}
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <div className="overflow-x-auto">
-                  <div className="min-w-[600px]">
-                    <div className="border-b border-border bg-surface">
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[600px]">
+                      <div className="border-b border-border bg-surface">
+                        <table className="w-full table-fixed text-xs">
+                          <colgroup>
+                            <col className="w-[34%]" />
+                            {localizedDays.map((day) => (
+                              <col key={day} className="w-[8%]" />
+                            ))}
+                            <col className="w-[10%]" />
+                            <col className="w-[16%]" />
+                          </colgroup>
+                          <thead>
+                            <tr>
+                              <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                                {t("leadMeasureHead")}
+                              </th>
+                              {localizedDays.map((label, dayIndex) => {
+                                const date = weekDatesInMonth[dayIndex];
+                                const isToday = date === today;
+
+                                return (
+                                  <th
+                                    key={`${weekIndex}-${label}`}
+                                    className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
+                                      isToday ? "text-primary" : "text-text-muted"
+                                    }`}
+                                  >
+                                    <div>{label}</div>
+                                    <div className="mt-0.5 text-[10px] font-mono normal-case tracking-normal">
+                                      {date ? date.slice(8, 10) : ""}
+                                    </div>
+                                  </th>
+                                );
+                              })}
+                              <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                                {t("period")}
+                              </th>
+                              <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
+                                {t("achievement")}
+                              </th>
+                            </tr>
+                          </thead>
+                        </table>
+                      </div>
+
                       <table className="w-full table-fixed text-xs">
                         <colgroup>
                           <col className="w-[34%]" />
@@ -153,187 +184,137 @@ export function MonthlyBoardSection({
                           <col className="w-[10%]" />
                           <col className="w-[16%]" />
                         </colgroup>
-                        <thead>
-                          <tr>
-                            <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-widest text-text-muted">
-                              {t("leadMeasureHead")}
-                            </th>
-                            {localizedDays.map((label, dayIndex) => {
-                              const date = weekDatesInMonth[dayIndex];
-                              const isToday = date === today;
-
-                              return (
-                                <th
-                                  key={`${weekIndex}-${label}`}
-                                  className={`py-3 text-center text-[11px] font-bold uppercase tracking-widest ${
-                                    isToday ? "text-primary" : "text-text-muted"
-                                  }`}
-                                >
-                                  <div>{label}</div>
-                                  <div className="mt-0.5 text-[10px] font-mono normal-case tracking-normal">
-                                    {date ? date.slice(8, 10) : ""}
-                                  </div>
-                                </th>
-                              );
-                            })}
-                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
-                              {t("period")}
-                            </th>
-                            <th className="px-3 py-3 text-center text-[11px] font-bold uppercase tracking-widest text-text-muted">
-                              {t("achievement")}
-                            </th>
-                          </tr>
-                        </thead>
-                      </table>
-                    </div>
-
-                    <table className="w-full table-fixed text-xs">
-                      <colgroup>
-                        <col className="w-[34%]" />
-                        {localizedDays.map((day) => (
-                          <col key={day} className="w-[8%]" />
-                        ))}
-                        <col className="w-[10%]" />
-                        <col className="w-[16%]" />
-                      </colgroup>
-                      <tbody className="divide-y divide-border">
-                        {weekFilteredMeasures.map((leadMeasure) => {
-                          const targetValue = leadMeasure.targetValue ?? 0;
-                          const tags =
-                            tagsByMeasureId.get(leadMeasure.id ?? null) ?? [];
-                          const visibleAchievedCount = weekDatesInMonth.reduce(
-                            (count, date) => {
+                        <tbody className="divide-y divide-border">
+                          {weekFilteredMeasures.map((leadMeasure) => {
+                            const targetValue = leadMeasure.targetValue ?? 0;
+                            const tags = tagsByMeasureId.get(leadMeasure.id ?? null) ?? [];
+                            const visibleAchievedCount = weekDatesInMonth.reduce((count, date) => {
                               if (!date) {
                                 return count;
                               }
 
-                              return leadMeasure.logs?.[date]?.achieved
-                                ? count + 1
-                                : count;
-                            },
-                            0,
-                          );
-                          const rate =
-                            targetValue > 0
-                              ? Math.round(
-                                  (visibleAchievedCount / targetValue) * 100,
-                                )
-                              : 0;
+                              return leadMeasure.logs?.[date]?.achieved ? count + 1 : count;
+                            }, 0);
+                            const rate =
+                              targetValue > 0
+                                ? Math.round((visibleAchievedCount / targetValue) * 100)
+                                : 0;
 
-                          return (
-                            <tr
-                              key={`${weekIndex}-${leadMeasure.id}`}
-                              className="bg-surface"
-                            >
-                              <td className="px-5 py-4">
-                                <LeadMeasureSummary
-                                  name={leadMeasure.name}
-                                  tags={tags}
-                                />
-                              </td>
-
-                              {weekDatesInMonth.map((date, dayIndex) => {
-                                const value = date
-                                  ? (leadMeasure.logs?.[date] ?? null)
-                                  : null;
-                                const isToday = date === today;
-
-                                return (
-                                  <td
-                                    key={`${weekIndex}-${leadMeasure.id}-${localizedDays[dayIndex]}`}
-                                    className="py-3 text-center"
-                                  >
-                                  {(() => {
-                                    const typedLead = leadMeasure as { trackingMode?: string; dailyTargetCount?: number };
-                                    const trackingMode = typedLead.trackingMode;
-                                    const dailyTargetCount = typedLead.dailyTargetCount ?? 1;
-                                    const isCount = trackingMode === "COUNT";
-                                    const count = value?.count ?? 0;
-                                    
-                                    if (isCount) {
-                                      return (
-                                        <span
-                                          className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
-                                            value?.achieved
-                                              ? "bg-primary text-white"
-                                              : count > 0
-                                                ? "bg-primary/15 text-primary"
-                                                : date === null
-                                                  ? "bg-transparent text-transparent"
-                                                  : isToday
-                                                    ? "bg-primary/5 text-primary"
-                                                    : "bg-sub-background text-text-muted"
-                                          }`}
-                                        >
-                                          <span className="text-[10px] font-bold tracking-tighter leading-none">
-                                            {count > 0 ? `${count}/${dailyTargetCount}` : ""}
-                                          </span>
-                                        </span>
-                                      );
-                                    }
-
-                                    return (
-                                      <span
-                                        className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-colors ${
-                                          value?.achieved
-                                            ? "bg-primary text-white"
-                                            : date === null
-                                              ? "bg-transparent text-transparent"
-                                              : isToday
-                                                ? "bg-primary/5 text-primary"
-                                                : "bg-sub-background text-text-muted"
-                                        }`}
-                                      >
-                                        {value?.achieved ? (
-                                          <DowinIcon name="action-checkmark" size="14px" />
-                                        ) : null}
-                                      </span>
-                                    );
-                                  })()}
+                            return (
+                              <tr key={`${weekIndex}-${leadMeasure.id}`} className="bg-surface">
+                                <td className="px-5 py-4">
+                                  <LeadMeasureSummary
+                                    name={leadMeasure.name}
+                                    tags={tags}
+                                    publicId={leadMeasure.publicId}
+                                  />
                                 </td>
-                                );
-                              })}
 
-                              <td className="px-3 py-4 text-center text-[12px] font-medium text-text-muted">
-                                {leadMeasure.period === "WEEKLY"
-                                  ? t("weeklyLabel")
-                                  : t("monthlyLabel")}
-                              </td>
-                              <td className="px-3 py-4 text-center">
-                                <div className="flex flex-col items-center gap-1.5">
-                                  <div className="h-1.5 w-12 overflow-hidden rounded-full bg-border">
-                                    <div
-                                      className={`h-full rounded-full transition-all duration-500 ${
-                                        rate >= 100
-                                          ? "bg-green-500"
-                                          : "bg-primary"
+                                {weekDatesInMonth.map((date, dayIndex) => {
+                                  const value = date ? (leadMeasure.logs?.[date] ?? null) : null;
+                                  const isToday = date === today;
+                                  const prLinksForDate = date ? (leadMeasure.githubPrLinks?.filter((pr) => pr.dailyLogDate === date) ?? []) : [];
+
+                                  return (
+                                    <td
+                                      key={`${weekIndex}-${leadMeasure.id}-${localizedDays[dayIndex]}`}
+                                      className="py-3 text-center relative"
+                                    >
+                                      <div className="flex h-full flex-col items-center justify-between gap-1.5">
+                                        <div className="flex h-[24px] w-full items-center justify-center">
+                                          {date && <DailyPrLinksPopover prLinks={prLinksForDate} />}
+                                        </div>
+                                        {(() => {
+                                          const typedLead = leadMeasure as {
+                                            trackingMode?: string;
+                                            dailyTargetCount?: number;
+                                          };
+                                          const trackingMode = typedLead.trackingMode;
+                                          const dailyTargetCount = typedLead.dailyTargetCount ?? 1;
+                                          const isCount = trackingMode === "COUNT";
+                                          const count = value?.count ?? 0;
+
+                                          if (isCount) {
+                                            return (
+                                              <span
+                                                className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-all ${
+                                                  value?.achieved
+                                                    ? "bg-primary text-white"
+                                                    : count > 0
+                                                      ? "bg-primary/15 text-primary"
+                                                      : date === null
+                                                        ? "bg-transparent text-transparent"
+                                                        : isToday
+                                                          ? "bg-primary/5 text-primary"
+                                                          : "bg-sub-background text-text-muted"
+                                                }`}
+                                              >
+                                                <span className="text-[10px] font-bold tracking-tighter leading-none">
+                                                  {count > 0 ? `${count}/${dailyTargetCount}` : ""}
+                                                </span>
+                                              </span>
+                                            );
+                                          }
+
+                                          return (
+                                            <span
+                                              className={`mx-auto flex aspect-square h-9 w-9 items-center justify-center !rounded-[12px] p-0 transition-colors ${
+                                                value?.achieved
+                                                  ? "bg-primary text-white"
+                                                  : date === null
+                                                    ? "bg-transparent text-transparent"
+                                                    : isToday
+                                                      ? "bg-primary/5 text-primary"
+                                                      : "bg-sub-background text-text-muted"
+                                              }`}
+                                            >
+                                              {value?.achieved ? (
+                                                <DowinIcon name="action-checkmark" size="14px" />
+                                              ) : null}
+                                            </span>
+                                          );
+                                        })()}
+                                      </div>
+                                    </td>
+                                  );
+                                })}
+
+                                <td className="px-3 py-4 text-center text-[12px] font-medium text-text-muted">
+                                  {leadMeasure.period === "WEEKLY"
+                                    ? t("weeklyLabel")
+                                    : t("monthlyLabel")}
+                                </td>
+                                <td className="px-3 py-4 text-center">
+                                  <div className="flex flex-col items-center gap-1.5">
+                                    <div className="h-1.5 w-12 overflow-hidden rounded-full bg-border">
+                                      <div
+                                        className={`h-full rounded-full transition-all duration-500 ${
+                                          rate >= 100 ? "bg-green-500" : "bg-primary"
+                                        }`}
+                                        style={{
+                                          width: `${Math.min(rate, 100)}%`,
+                                        }}
+                                      />
+                                    </div>
+                                    <span
+                                      className={`font-mono text-[11px] font-black ${
+                                        rate >= 100 ? "text-green-600" : "text-text-muted"
                                       }`}
-                                      style={{
-                                        width: `${Math.min(rate, 100)}%`,
-                                      }}
-                                    />
+                                    >
+                                      {visibleAchievedCount}/{targetValue}
+                                    </span>
                                   </div>
-                                  <span
-                                    className={`font-mono text-[11px] font-black ${
-                                      rate >= 100
-                                        ? "text-green-600"
-                                        : "text-text-muted"
-                                    }`}
-                                  >
-                                    {visibleAchievedCount}/{targetValue}
-                                  </span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
           </div>
         </>
       )}
