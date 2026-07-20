@@ -1,40 +1,14 @@
-import { getDb } from "@/db";
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { workspaceParamsSchema } from "@/domain/workspace/validation";
-import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
-import { requireWorkspaceAdminInWorkspace } from "@/lib/server/authz";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { apiSuccess } from "@/lib/server/api-response";
+import { withWorkspaceAdmin } from "@/lib/server/with-workspace-access";
 
-export const GET = withErrorHandler(
-  async (
-    _request: Request,
-    { params }: { params: Promise<{ workspaceId: string }> },
-  ) => {
-    const { workspaceId } = await params;
-    const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
+export const GET = withWorkspaceAdmin<{ workspaceId: string }>(
+  async (_request, { context, db }) => {
     const storage = new WorkspaceStorage(db);
     const service = new WorkspaceService(storage);
-    const session = await getSessionWithRefresh(db);
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
 
-    const validatedParams = workspaceParamsSchema.safeParse({ workspaceId });
-    if (!validatedParams.success) {
-      return await apiError("VALIDATION_ERROR", validatedParams.error.flatten().fieldErrors);
-    }
-
-    const resolvedId = await storage.resolveIdByUid(validatedParams.data.workspaceId);
-    if (!resolvedId) {
-      return await apiError("NOT_FOUND", { detail: "워크스페이스를 찾을 수 없습니다." });
-    }
-
-    await requireWorkspaceAdminInWorkspace(db, resolvedId, session.userId);
-    const members = await service.getMembers(resolvedId, session.userId);
+    const members = await service.getMembers(context);
     return apiSuccess(members);
   },
 );

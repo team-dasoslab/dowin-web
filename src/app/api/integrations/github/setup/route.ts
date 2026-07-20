@@ -1,4 +1,4 @@
-import { createOAuthService, GithubEnv } from "@/domain/github-integration/services/oauth.service";
+import { createOAuthService } from "@/domain/github-integration/services/oauth.service";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const service = createOAuthService(env as unknown as GithubEnv);
+    const service = createOAuthService(env);
     const redirectUrl = await service.handleSetupCallback(state, installationId, setupAction);
 
     return NextResponse.redirect(redirectUrl);

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -85,7 +86,7 @@ describe("/api/admin/billing/provider-products", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("https://example.com/api/admin/billing/provider-products", {
+      new NextRequest("https://example.com/api/admin/billing/provider-products", {
         method: "POST",
         body: JSON.stringify({
           provider: "POLAR",

@@ -1,5 +1,8 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSession = vi.fn();
@@ -23,6 +26,14 @@ vi.mock("@/db", () => ({
   getDb: mockGetDb,
 }));
 
+vi.mock("@/lib/server/workspace-context", () => ({
+  requireWorkspaceAccess: mockRequireWorkspaceAccess,
+}));
+
+vi.mock("@/domain/workspace/plan-limits", () => ({
+  assertWorkspaceOperationAllowed: mockAssertWorkspaceOperationAllowed,
+}));
+
 vi.mock("@/lib/server/auth", () => ({
   getSessionWithRefresh: mockGetSession,
 }));
@@ -32,7 +43,9 @@ vi.mock("@/lib/server/restricted-test-account", () => ({
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
-  WorkspaceStorage: vi.fn(),
+  WorkspaceStorage: vi.fn(function () {
+    return { resolveIdByUid: vi.fn().mockResolvedValue(1) };
+  }),
 }));
 
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
@@ -45,6 +58,15 @@ vi.mock("@/domain/workspace/services/workspace.service", () => ({
 
 describe("POST /api/workspaces/join-by-invite", () => {
   beforeEach(() => {
+    if (typeof mockRequireWorkspaceAccess !== "undefined")
+      mockRequireWorkspaceAccess.mockResolvedValue({
+        workspaceId: 1,
+        userId: 1,
+        role: "MEMBER",
+        entitlement: { planCode: "BASIC" },
+      });
+    if (typeof mockAssertWorkspaceOperationAllowed !== "undefined")
+      mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
@@ -56,7 +78,7 @@ describe("POST /api/workspaces/join-by-invite", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/workspaces/join-by-invite", {
+      new NextRequest("http://localhost/api/workspaces/join-by-invite", {
         method: "POST",
         body: JSON.stringify({ code: "ABCD123456" }),
         headers: {
@@ -77,7 +99,7 @@ describe("POST /api/workspaces/join-by-invite", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/workspaces/join-by-invite", {
+      new NextRequest("http://localhost/api/workspaces/join-by-invite", {
         method: "POST",
         body: JSON.stringify({ code: "ABCD123456" }),
         headers: {

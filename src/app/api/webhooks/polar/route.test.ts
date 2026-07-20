@@ -1,5 +1,6 @@
 import { createHmac } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -48,7 +49,7 @@ describe("POST /api/webhooks/polar", () => {
     const timestamp = String(Math.floor(Date.now() / 1000));
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/webhooks/polar", {
+      new NextRequest("http://localhost/api/webhooks/polar", {
         method: "POST",
         body: JSON.stringify({ type: "subscription.active", timestamp: "", data: {} }),
         headers: {
@@ -82,7 +83,7 @@ describe("POST /api/webhooks/polar", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/webhooks/polar", {
+      new NextRequest("http://localhost/api/webhooks/polar", {
         method: "POST",
         body,
         headers: {

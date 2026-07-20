@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ScoreboardService,
   ScoreboardStoragePort,
-  WorkspaceLookupPort,
 } from "@/domain/scoreboard/services/scoreboard.service";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("ScoreboardService", () => {
   const findActiveScoreboard = vi.fn();
@@ -30,19 +30,7 @@ describe("ScoreboardService", () => {
     findArchivedScoreboards,
   };
 
-  const mockWorkspaceStorage: WorkspaceLookupPort = {
-    resolveIdByUid,
-    findWorkspaceById,
-    findMembership,
-    countMembers,
-    findBillingState,
-    findPlanLimit,
-  };
-
-  const service = new ScoreboardService(
-    mockScoreboardStorage,
-    mockWorkspaceStorage,
-  );
+  const service = new ScoreboardService(mockScoreboardStorage);
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -65,25 +53,15 @@ describe("ScoreboardService", () => {
         status: "ACTIVE",
       });
 
-      const result = await service.getActiveScoreboard("ws_uid", 1);
+      const result = await service.getActiveScoreboard({
+        workspaceId: 3,
+        userId: 1,
+        role: "ADMIN",
+        entitlement: { planCode: "BASIC" },
+      } as unknown as WorkspaceAccessContext);
 
       expect(result).toEqual({ id: 10, status: "ACTIVE" });
-      expect(mockScoreboardStorage.findActiveScoreboard).toHaveBeenCalledWith(
-        1,
-        3,
-      );
-    });
-
-    it("Basic entitlement가 없으면 활성 점수판을 조회할 수 없다", async () => {
-      resolveIdByUid.mockResolvedValue(3);
-      findMembership.mockResolvedValue(true);
-      findWorkspaceById.mockResolvedValue({ id: 3, planCode: "FREE" });
-      findBillingState.mockResolvedValue(null);
-
-      await expect(service.getActiveScoreboard("ws_uid", 1)).rejects.toThrow(
-        "BASIC_SUBSCRIPTION_REQUIRED",
-      );
-      expect(findActiveScoreboard).not.toHaveBeenCalled();
+      expect(mockScoreboardStorage.findActiveScoreboard).toHaveBeenCalledWith(1, 3);
     });
 
     it("활성 점수판이 없으면 404 에러를 던진다", async () => {
@@ -92,7 +70,14 @@ describe("ScoreboardService", () => {
       findWorkspaceById.mockResolvedValue({ id: 3 });
       findActiveScoreboard.mockResolvedValue(null);
 
-      await expect(service.getActiveScoreboard("ws_uid", 1)).rejects.toThrow("NOT_FOUND");
+      await expect(
+        service.getActiveScoreboard({
+          workspaceId: 3,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext),
+      ).rejects.toThrow("NOT_FOUND");
     });
   });
 
@@ -111,7 +96,15 @@ describe("ScoreboardService", () => {
       findActiveScoreboard.mockResolvedValue(null);
       createScoreboard.mockResolvedValue({ id: 10 });
 
-      const result = await service.createScoreboard("ws_uid", 1, payload);
+      const result = await service.createScoreboard(
+        {
+          workspaceId: 3,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        payload,
+      );
 
       expect(result).toEqual({ id: 10 });
       expect(createScoreboard).toHaveBeenCalledWith({
@@ -121,23 +114,6 @@ describe("ScoreboardService", () => {
       });
     });
 
-    it("Basic entitlement가 없으면 새 점수판을 생성할 수 없다", async () => {
-      resolveIdByUid.mockResolvedValue(3);
-      findMembership.mockResolvedValue(true);
-      findWorkspaceById.mockResolvedValue({ id: 3, planCode: "FREE" });
-      findBillingState.mockResolvedValue(null);
-
-      await expect(
-        service.createScoreboard("ws_uid", 1, {
-          goalName: "체중을 감량한다",
-          lagMeasure: "80kg에서 75kg까지 달성",
-          startDate: "2026-03-15",
-          endDate: null,
-        }),
-      ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
-      expect(createScoreboard).not.toHaveBeenCalled();
-    });
-
     it("이미 활성 점수판이 있으면 409 에러를 던진다", async () => {
       resolveIdByUid.mockResolvedValue(3);
       findMembership.mockResolvedValue(true);
@@ -145,30 +121,21 @@ describe("ScoreboardService", () => {
       findActiveScoreboard.mockResolvedValue({ id: 10 });
 
       await expect(
-        service.createScoreboard("ws_uid", 1, {
-          goalName: "체중을 감량한다",
-          lagMeasure: "80kg에서 75kg까지 달성",
-          startDate: "2026-03-15",
-          endDate: null,
-        }),
+        service.createScoreboard(
+          {
+            workspaceId: 3,
+            userId: 1,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          {
+            goalName: "체중을 감량한다",
+            lagMeasure: "80kg에서 75kg까지 달성",
+            startDate: "2026-03-15",
+            endDate: null,
+          },
+        ),
       ).rejects.toThrow("ACTIVE_SCOREBOARD_EXISTS");
-    });
-
-    it("FREE 플랜 멤버 한도 초과 상태에서는 새 점수판을 생성할 수 없다", async () => {
-      resolveIdByUid.mockResolvedValue(3);
-      findMembership.mockResolvedValue(true);
-      findWorkspaceById.mockResolvedValue({ id: 3, planCode: "FREE" });
-      countMembers.mockResolvedValue(11);
-
-      await expect(
-        service.createScoreboard("ws_uid", 1, {
-          goalName: "체중을 감량한다",
-          lagMeasure: "80kg에서 75kg까지 달성",
-          startDate: "2026-03-15",
-          endDate: null,
-        }),
-      ).rejects.toThrow("WORKSPACE_SEAT_LIMIT_EXCEEDED");
-      expect(createScoreboard).not.toHaveBeenCalled();
     });
   });
 
@@ -186,9 +153,18 @@ describe("ScoreboardService", () => {
         goalName: "독서 습관을 만든다",
       });
 
-      const result = await service.updateScoreboard("ws_uid", 10, 1, {
-        goalName: "독서 습관을 만든다",
-      });
+      const result = await service.updateScoreboard(
+        {
+          workspaceId: 3,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        10,
+        {
+          goalName: "독서 습관을 만든다",
+        },
+      );
 
       expect(result).toEqual({
         id: 10,
@@ -197,9 +173,6 @@ describe("ScoreboardService", () => {
       expect(updateScoreboard).toHaveBeenCalledWith(10, {
         goalName: "독서 습관을 만든다",
       });
-      expect(resolveIdByUid).toHaveBeenCalledTimes(1);
-      expect(findMembership).toHaveBeenCalledTimes(1);
-      expect(findWorkspaceById).toHaveBeenCalledTimes(1);
     });
 
     it("ARCHIVED 점수판 수정 시 403 에러를 던진다", async () => {
@@ -212,7 +185,16 @@ describe("ScoreboardService", () => {
       });
 
       await expect(
-        service.updateScoreboard("ws_uid", 10, 1, { goalName: "독서 습관을 만든다" }),
+        service.updateScoreboard(
+          {
+            workspaceId: 3,
+            userId: 1,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          10,
+          { goalName: "독서 습관을 만든다" },
+        ),
       ).rejects.toThrow("SCOREBOARD_ARCHIVED");
     });
   });
@@ -231,16 +213,21 @@ describe("ScoreboardService", () => {
         status: "ARCHIVED",
       });
 
-      const result = await service.archiveScoreboard("ws_uid", 10, 1);
+      const result = await service.archiveScoreboard(
+        {
+          workspaceId: 3,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        10,
+      );
 
       expect(result).toEqual({ id: 10, status: "ARCHIVED" });
       expect(archiveScoreboard).toHaveBeenCalledWith(
         10,
         expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
       );
-      expect(resolveIdByUid).toHaveBeenCalledTimes(1);
-      expect(findMembership).toHaveBeenCalledTimes(1);
-      expect(findWorkspaceById).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -249,11 +236,14 @@ describe("ScoreboardService", () => {
       resolveIdByUid.mockResolvedValue(3);
       findMembership.mockResolvedValue(true);
       findWorkspaceById.mockResolvedValue({ id: 3 });
-      findArchivedScoreboards.mockResolvedValue([
-        { id: 1, status: "ARCHIVED" },
-      ]);
+      findArchivedScoreboards.mockResolvedValue([{ id: 1, status: "ARCHIVED" }]);
 
-      const result = await service.getHistory("ws_uid", 1);
+      const result = await service.getHistory({
+        workspaceId: 3,
+        userId: 1,
+        role: "ADMIN",
+        entitlement: { planCode: "BASIC" },
+      } as unknown as WorkspaceAccessContext);
 
       expect(result).toEqual([{ id: 1, status: "ARCHIVED" }]);
       expect(findArchivedScoreboards).toHaveBeenCalledWith(1, 3);
@@ -275,14 +265,19 @@ describe("ScoreboardService", () => {
         status: "ACTIVE",
       });
 
-      const result = await service.reactivateScoreboard("ws_uid", 10, 1);
+      const result = await service.reactivateScoreboard(
+        {
+          workspaceId: 3,
+          userId: 1,
+          role: "ADMIN",
+          entitlement: { planCode: "BASIC" },
+        } as unknown as WorkspaceAccessContext,
+        10,
+      );
 
       expect(result).toEqual({ id: 10, status: "ACTIVE" });
       expect(findActiveScoreboard).toHaveBeenCalledWith(1, 3);
       expect(reactivateScoreboard).toHaveBeenCalledWith(10);
-      expect(resolveIdByUid).toHaveBeenCalledTimes(1);
-      expect(findMembership).toHaveBeenCalledTimes(1);
-      expect(findWorkspaceById).toHaveBeenCalledTimes(1);
     });
 
     it("이미 ACTIVE 점수판이면 400 에러를 던진다", async () => {
@@ -294,9 +289,17 @@ describe("ScoreboardService", () => {
         status: "ACTIVE",
       });
 
-      await expect(service.reactivateScoreboard("ws_uid", 10, 1)).rejects.toThrow(
-        "SCOREBOARD_ALREADY_ACTIVE",
-      );
+      await expect(
+        service.reactivateScoreboard(
+          {
+            workspaceId: 3,
+            userId: 1,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          10,
+        ),
+      ).rejects.toThrow("SCOREBOARD_ALREADY_ACTIVE");
     });
 
     it("다른 활성 점수판이 있으면 409 에러를 던진다", async () => {
@@ -312,9 +315,17 @@ describe("ScoreboardService", () => {
         status: "ACTIVE",
       });
 
-      await expect(service.reactivateScoreboard("ws_uid", 10, 1)).rejects.toThrow(
-        "ACTIVE_SCOREBOARD_EXISTS",
-      );
+      await expect(
+        service.reactivateScoreboard(
+          {
+            workspaceId: 3,
+            userId: 1,
+            role: "ADMIN",
+            entitlement: { planCode: "BASIC" },
+          } as unknown as WorkspaceAccessContext,
+          10,
+        ),
+      ).rejects.toThrow("ACTIVE_SCOREBOARD_EXISTS");
     });
   });
 });

@@ -1,13 +1,10 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { getDb } from "@/db";
-import { PolarWebhookService } from "@/domain/billing/services/polar-webhook.service";
 import { verifyPolarWebhookSignature } from "@/domain/billing/polar-webhook";
+import { PolarWebhookService } from "@/domain/billing/services/polar-webhook.service";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 
-export const POST = withErrorHandler(async (request: Request) => {
+export const POST = withErrorHandler(async (request: Request, { env, db }) => {
   const body = await request.text();
-  const { env } = getCloudflareContext();
 
   const verified = verifyPolarWebhookSignature({
     body,
@@ -19,7 +16,6 @@ export const POST = withErrorHandler(async (request: Request) => {
     return new Response(null, { status: 403 });
   }
 
-  const db = getDb(env.DB);
   const service = new PolarWebhookService(new BillingStorage(db));
 
   await service.handleWebhook({

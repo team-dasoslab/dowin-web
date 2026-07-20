@@ -1,14 +1,11 @@
 import { teamCheckinAdjustmentProposalCreateSchema } from "@/domain/team-checkin/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getTeamCheckinRouteContext } from "../_utils";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
+import { TeamCheckinService } from "@/domain/team-checkin/services/team-checkin.service";
+import { TeamCheckinStorage } from "@/domain/team-checkin/storage/team-checkin.storage";
 
-export const POST = withErrorHandler(
-  async (request: Request, { params }: { params: Promise<{ workspaceId: string }> }) => {
-    const { workspaceId } = await params;
-    const routeContext = await getTeamCheckinRouteContext(workspaceId);
-    if (!routeContext.ok) return routeContext.error;
-
+export const POST = withWorkspaceAccess(
+  async (request, { context, db }) => {
     const parsed = teamCheckinAdjustmentProposalCreateSchema.safeParse(
       await request.json(),
     );
@@ -16,9 +13,10 @@ export const POST = withErrorHandler(
       return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
     }
 
+    const service = new TeamCheckinService(new TeamCheckinStorage(db));
     return apiSuccess(
-      await routeContext.service.createAdjustmentProposal(
-        routeContext.context,
+      await service.createAdjustmentProposal(
+        context,
         parsed.data,
       ),
       201,

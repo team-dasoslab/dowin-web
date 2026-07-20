@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -48,7 +49,7 @@ describe("GET /api/contact-inquiries/[id]", () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost/api/contact-inquiries/7"), {
+    const response = await GET(new NextRequest("http://localhost/api/contact-inquiries/7"), {
       params: Promise.resolve({ id: "7" }),
     });
 
@@ -59,7 +60,7 @@ describe("GET /api/contact-inquiries/[id]", () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 11 });
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost/api/contact-inquiries/not-number"), {
+    const response = await GET(new NextRequest("http://localhost/api/contact-inquiries/not-number"), {
       params: Promise.resolve({ id: "abc" }),
     });
 
@@ -71,7 +72,7 @@ describe("GET /api/contact-inquiries/[id]", () => {
     mockGetMyInquiry.mockResolvedValue({ id: 7 });
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost/api/contact-inquiries/7"), {
+    const response = await GET(new NextRequest("http://localhost/api/contact-inquiries/7"), {
       params: Promise.resolve({ id: "7" }),
     });
 
