@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.1](https://github.com/team-dasoslab/dowin-web/compare/v1.14.0...v1.14.1) (2026-07-20)
+
+
+### Bug Fixes
+
+* 다국어 누락 ([8a01118](https://github.com/team-dasoslab/dowin-web/commit/8a011180a47b5a88360c039dded4c25bd181931e))
+* 버튼 비활성화 조건 수정 ([8a3bee1](https://github.com/team-dasoslab/dowin-web/commit/8a3bee1ba2979d39d7b15c64f6aa4f149dd553a7))
+
 ## [1.14.0](https://github.com/team-dasoslab/dowin-web/compare/v1.13.1...v1.14.0) (2026-07-20)
 
 
