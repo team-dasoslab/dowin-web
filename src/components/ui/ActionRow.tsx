@@ -4,7 +4,7 @@ import React from "react";
 
 interface ActionRowProps {
   title: string;
-  description?: string;
+  description?: React.ReactNode;
   action?: React.ReactNode;
   className?: string;
 }
@@ -20,7 +20,7 @@ export function ActionRow({
       <div>
         <p className="text-[15px] font-bold text-text-primary">{title}</p>
         {description && (
-          <p className="mt-0.5 text-[13px] text-text-muted">{description}</p>
+          <div className="mt-1 flex items-center gap-2 text-[13px] text-text-muted">{description}</div>
         )}
       </div>
       {action && <div className="shrink-0 sm:ml-4">{action}</div>}
