@@ -17,6 +17,7 @@ import {
   useNotificationSettings,
 } from "@/app/[locale]/(protected)/profile/_hooks/useNotificationSettings";
 import { useProfileActions } from "@/app/[locale]/(protected)/profile/_hooks/useProfileActions";
+import { useProfileGithubIntegration } from "@/app/[locale]/(protected)/profile/_hooks/useProfileGithubIntegration";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { PageSidebarNav } from "@/components/PageSidebarNav";
 import { Button } from "@/components/ui/Button";
@@ -52,40 +53,37 @@ export default function ProfilePage() {
   const workspaceId = useParams().workspaceId as string | undefined;
   const { showToast } = useToast();
   const hasHandledMissingUserRef = useRef(false);
-  const { data: profileResponse, isLoading: isProfileLoading } =
-    useGetUsersMe();
-  const { data: workspaceResponse, error: workspaceError } = useGetWorkspacesMe(
-    {
-      query: {
-        retry: false,
-      },
+  const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe();
+  const { data: workspaceResponse, error: workspaceError } = useGetWorkspacesMe({
+    query: {
+      retry: false,
     },
-  );
+  });
 
   const user = profileResponse?.status === 200 ? profileResponse.data : null;
   const hasNoWorkspace = getApiErrorStatus(workspaceError) === 404;
   const workspace =
-    !hasNoWorkspace && workspaceResponse?.status === 200
-      ? workspaceResponse.data
-      : null;
+    !hasNoWorkspace && workspaceResponse?.status === 200 ? workspaceResponse.data : null;
   const [isCoachmarkRunning, setIsCoachmarkRunning] = useState(false);
   const nickname = user?.nickname ?? t("defaultNickname");
   const customId = user?.customId ?? "";
   const avatarKey = user?.avatarKey ?? null;
   const isNativeApp = useNativeApp();
   const [isPushSubscribed, setIsPushSubscribed] = useState(false);
+  const { dailySettings, isDailyLoading, isUpdatingDaily, refreshSettings, updateDailySettings } =
+    useNotificationSettings();
+  const { changeNickname, isActionPending, logout, pendingAction } = useProfileActions({
+    nickname,
+    workspace,
+  });
   const {
-    dailySettings,
-    isDailyLoading,
-    isUpdatingDaily,
-    refreshSettings,
-    updateDailySettings,
-  } = useNotificationSettings();
-  const { changeNickname, isActionPending, logout, pendingAction } =
-    useProfileActions({
-      nickname,
-      workspace,
-    });
+    status: githubStatus,
+    isGettingUrl,
+    isDisconnecting,
+    handleInstallUrl,
+    handleDisconnectAccount,
+  } = useProfileGithubIntegration();
+  const isGithubConnected = githubStatus?.isConnected ?? false;
 
   useEffect(() => {
     if (isProfileLoading || user || hasHandledMissingUserRef.current) {
@@ -162,6 +160,84 @@ export default function ProfilePage() {
       ],
     },
 
+    {
+      id: "integrations",
+      label: t("integrationsSection", { fallback: "연동" }),
+      items: [
+        {
+          id: "github",
+          icon: (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo/github-black.png" alt="GitHub" className="w-4 h-4 dark:hidden" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo/github-white.png"
+                alt="GitHub"
+                className="w-4 h-4 hidden dark:block"
+              />
+            </>
+          ),
+          title: isGithubConnected
+            ? t("githubConnectedTitle", { fallback: "GitHub 계정 연동 완료" })
+            : t("githubIntegrationTitle", { fallback: "GitHub 계정 연동" }),
+          rightElement: isGithubConnected ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="font-bold"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (
+                  window.confirm(
+                    t("githubDisconnectConfirm", {
+                      fallback:
+                        "Dowin에서 연동을 해제하더라도 GitHub에서 직접 앱을 해제해야 완전히 연결이 끊어집니다. 연동을 해제하시겠습니까?\n(확인 시 GitHub 설정 페이지가 새 창으로 열립니다.)",
+                    }),
+                  )
+                ) {
+                  const activeInstallation = githubStatus?.installations?.find(
+                    (
+                      i:
+                        | import("@/api/generated/dowin.schemas").GithubUserInstallation
+                        | { status: string; installationId: string },
+                    ) => i.status === "ACTIVE",
+                  );
+                  if (!activeInstallation?.installationId) return;
+
+                  const newWindow = window.open("about:blank", "_blank");
+                  void handleDisconnectAccount(activeInstallation.installationId)
+                    .then(() => {
+                      if (newWindow) {
+                        newWindow.location.href = "https://github.com/settings/installations";
+                      } else {
+                        window.open("https://github.com/settings/installations", "_blank");
+                      }
+                    })
+                    .catch(() => {
+                      if (newWindow) newWindow.close();
+                    });
+                }
+              }}
+            >
+              {t("disconnect", { fallback: "연동 해제" })}
+            </Button>
+          ) : (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="font-bold"
+              onClick={(e) => {
+                e.stopPropagation();
+                void handleInstallUrl();
+              }}
+            >
+              {t("connect", { fallback: "연동하기" })}
+            </Button>
+          ),
+        },
+      ],
+    },
     {
       id: "data",
       label: t("dataSection"),
@@ -252,10 +328,7 @@ export default function ProfilePage() {
     },
   ];
 
-  const [activeSection] = useActiveSectionScroll(
-    menuGroups,
-    "general",
-  );
+  const [activeSection] = useActiveSectionScroll(menuGroups, "general");
 
   useEffect(() => {
     const currentUrl = new URL(window.location.href);
@@ -267,11 +340,7 @@ export default function ProfilePage() {
 
     setIsCoachmarkRunning(true);
     currentUrl.searchParams.delete("coachmark");
-    window.history.replaceState(
-      {},
-      "",
-      currentUrl.pathname + currentUrl.search,
-    );
+    window.history.replaceState({}, "", currentUrl.pathname + currentUrl.search);
   }, []);
 
   if (isProfileLoading) {
@@ -284,10 +353,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen">
-      <ProfileCoachmark
-        isRunning={isCoachmarkRunning}
-        setIsRunning={setIsCoachmarkRunning}
-      />
+      <ProfileCoachmark isRunning={isCoachmarkRunning} setIsRunning={setIsCoachmarkRunning} />
       {isActionPending && (
         <LoadingOverlay
           message={
@@ -299,11 +365,17 @@ export default function ProfilePage() {
           }
         />
       )}
-      <ProtectedPageContainer className="space-y-6 lg:space-y-12">
-        <ProtectedPageHeader
-          title={t("title")}
-          description={t("description")}
+      {(isGettingUrl || isDisconnecting) && (
+        <LoadingOverlay
+          message={
+            isGettingUrl
+              ? t("loadingGithubUrl", { fallback: "GitHub 연결 준비 중..." })
+              : t("disconnectingGithub", { fallback: "GitHub 연결 해제 중..." })
+          }
         />
+      )}
+      <ProtectedPageContainer className="space-y-6 lg:space-y-12">
+        <ProtectedPageHeader title={t("title")} description={t("description")} />
 
         <div className="flex flex-col gap-6 lg:flex-row lg:gap-12 items-start">
           <PageSidebarNav
@@ -326,12 +398,8 @@ export default function ProfilePage() {
                   className="flex-shrink-0"
                 />
                 <div className="min-w-0">
-                  <h2 className="text-xl font-bold text-text-primary tracking-tight">
-                    {nickname}
-                  </h2>
-                  <p className="text-sm font-medium text-text-secondary mt-1">
-                    @{customId}
-                  </p>
+                  <h2 className="text-xl font-bold text-text-primary tracking-tight">{nickname}</h2>
+                  <p className="text-sm font-medium text-text-secondary mt-1">@{customId}</p>
                 </div>
               </div>
             </div>
@@ -353,11 +421,7 @@ export default function ProfilePage() {
 
                     <div className="rounded-[24px] overflow-hidden bg-surface">
                       {group.items.map((item) => (
-                        <MenuItemRow
-                          key={item.id}
-                          item={item}
-                          isActionPending={isActionPending}
-                        />
+                        <MenuItemRow key={item.id} item={item} isActionPending={isActionPending} />
                       ))}
                     </div>
                   </section>
@@ -370,13 +434,7 @@ export default function ProfilePage() {
   );
 }
 
-function MenuItemRow({
-  item,
-  isActionPending,
-}: {
-  item: MenuItem;
-  isActionPending: boolean;
-}) {
+function MenuItemRow({ item, isActionPending }: { item: MenuItem; isActionPending: boolean }) {
   const itemWrapperClassName = "";
 
   const Content = (
@@ -384,18 +442,14 @@ function MenuItemRow({
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <div
           className={`w-9 h-9 rounded-[12px] flex items-center justify-center flex-shrink-0 ${
-            item.danger
-              ? "bg-danger/5 text-danger"
-              : "bg-sub-background text-text-muted"
+            item.danger ? "bg-danger/5 text-danger" : "bg-sub-background text-text-muted"
           }`}
         >
           {item.icon}
         </div>
         <div className="text-left min-w-0">
           <div
-            className={`text-[14px] font-bold ${
-              item.danger ? "text-danger" : "text-text-primary"
-            }`}
+            className={`text-[14px] font-bold ${item.danger ? "text-danger" : "text-text-primary"}`}
           >
             {item.title}
           </div>
@@ -405,10 +459,7 @@ function MenuItemRow({
         {item.rightElement ? (
           item.rightElement
         ) : (
-          <DowinIcon
-            name="nav-chevron-right"
-            className="w-4 h-4 text-text-muted/50"
-          />
+          <DowinIcon name="nav-chevron-right" className="w-4 h-4 text-text-muted/50" />
         )}
       </div>
     </div>
@@ -432,19 +483,14 @@ function MenuItemRow({
   if (item.href) {
     return (
       <div className={itemWrapperClassName}>
-        <Link
-          href={item.href}
-          className="block w-full transition-colors hover:bg-sub-background"
-        >
+        <Link href={item.href} className="block w-full transition-colors hover:bg-sub-background">
           {Content}
         </Link>
       </div>
     );
   }
 
-  return (
-    <div className={`w-full bg-surface ${itemWrapperClassName}`}>{Content}</div>
-  );
+  return <div className={`w-full bg-surface ${itemWrapperClassName}`}>{Content}</div>;
 }
 
 function ProfileSkeleton() {

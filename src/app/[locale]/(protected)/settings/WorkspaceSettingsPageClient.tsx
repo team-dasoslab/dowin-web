@@ -312,11 +312,13 @@ export default function WorkspaceSettingsPage() {
                   id: "github-integration",
                   icon: (
                     <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src="/logo/github-black.png"
                         alt="GitHub"
                         className="w-4 h-4 dark:hidden"
                       />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src="/logo/github-white.png"
                         alt="GitHub"
