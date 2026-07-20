@@ -222,10 +222,10 @@ export function createWebhookStorage() {
     async incrementCountDailyLog(db: Db, leadMeasureId: number, logDate: string) {
       await db
         .insert(dailyLogs)
-        .values({ leadMeasureId, logDate, value: false, count: 1 })
+        .values({ leadMeasureId, logDate, value: true, count: 1 })
         .onConflictDoUpdate({
           target: [dailyLogs.leadMeasureId, dailyLogs.logDate],
-          set: { count: sql`${dailyLogs.count} + 1` },
+          set: { count: sql`${dailyLogs.count} + 1`, value: true },
         });
     },
 
