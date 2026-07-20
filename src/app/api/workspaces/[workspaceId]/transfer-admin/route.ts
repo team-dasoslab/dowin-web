@@ -1,18 +1,12 @@
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import {
-  workspaceTransferAdminSchema,
-} from "@/domain/workspace/validation";
+import { workspaceTransferAdminSchema } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
+import { withWorkspaceAdmin } from "@/lib/server/with-workspace-access";
 
-export const POST = withWorkspaceAccess<{ workspaceId: string }>(
+export const POST = withWorkspaceAdmin<{ workspaceId: string }>(
   async (request, { context, db, env }) => {
-    if (context.role !== "ADMIN") {
-      return await apiError("FORBIDDEN", { detail: "Workspace admin role required." });
-    }
-
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
       userId: context.userId,
@@ -33,10 +27,7 @@ export const POST = withWorkspaceAccess<{ workspaceId: string }>(
     const storage = new WorkspaceStorage(db);
     const service = new WorkspaceService(storage);
 
-    await service.transferAdmin(
-      context,
-      parsedBody.data.memberId,
-    );
+    await service.transferAdmin(context, parsedBody.data.memberId);
 
     return apiSuccess({ message: "관리자 권한을 이전했습니다." });
   },

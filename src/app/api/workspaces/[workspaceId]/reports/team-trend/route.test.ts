@@ -139,6 +139,12 @@ describe("GET /api/reports/team-trend", () => {
 
   it("query가 유효하지 않으면 422를 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
+    mockRequireWorkspaceAccess.mockResolvedValue({
+      workspaceId: 1,
+      userId: 1,
+      role: "ADMIN",
+      entitlement: { planCode: "BASIC" },
+    });
 
     const { GET } = await import("./route");
     const response = await GET(

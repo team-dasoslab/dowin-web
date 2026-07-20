@@ -1,14 +1,10 @@
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
+import { apiSuccess } from "@/lib/server/api-response";
+import { withWorkspaceAdmin } from "@/lib/server/with-workspace-access";
 
-export const GET = withWorkspaceAccess<{ workspaceId: string }>(
+export const GET = withWorkspaceAdmin<{ workspaceId: string }>(
   async (_request, { context, db }) => {
-    if (context.role !== "ADMIN") {
-      return await apiError("FORBIDDEN", { detail: "Workspace admin role required." });
-    }
-
     const storage = new WorkspaceStorage(db);
     const service = new WorkspaceService(storage);
 

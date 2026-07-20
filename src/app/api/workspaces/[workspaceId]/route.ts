@@ -1,19 +1,13 @@
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import {
-  workspaceUpdateSchema,
-} from "@/domain/workspace/validation";
+import { workspaceUpdateSchema } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
+import { withWorkspaceAdmin } from "@/lib/server/with-workspace-access";
 import { NextResponse } from "next/server";
 
-export const PUT = withWorkspaceAccess<{ workspaceId: string }>(
+export const PUT = withWorkspaceAdmin<{ workspaceId: string }>(
   async (request, { context, db, env }) => {
-    if (context.role !== "ADMIN") {
-      return await apiError("FORBIDDEN", { detail: "Workspace admin role required." });
-    }
-
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
       userId: context.userId,
@@ -34,21 +28,14 @@ export const PUT = withWorkspaceAccess<{ workspaceId: string }>(
     const storage = new WorkspaceStorage(db);
     const service = new WorkspaceService(storage);
 
-    const workspace = await service.updateWorkspace(
-      context,
-      parsedBody.data,
-    );
+    const workspace = await service.updateWorkspace(context, parsedBody.data);
 
     return apiSuccess(workspace);
   },
 );
 
-export const DELETE = withWorkspaceAccess<{ workspaceId: string }>(
+export const DELETE = withWorkspaceAdmin<{ workspaceId: string }>(
   async (_request, { context, db, env }) => {
-    if (context.role !== "ADMIN") {
-      return await apiError("FORBIDDEN", { detail: "Workspace admin role required." });
-    }
-
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
       userId: context.userId,

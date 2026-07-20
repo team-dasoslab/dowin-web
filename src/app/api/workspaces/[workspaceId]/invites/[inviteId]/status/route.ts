@@ -6,14 +6,10 @@ import {
 } from "@/domain/workspace/validation";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
-import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
+import { withWorkspaceAdmin } from "@/lib/server/with-workspace-access";
 
-export const PATCH = withWorkspaceAccess<{ workspaceId: string; inviteId: string }>(
+export const PATCH = withWorkspaceAdmin<{ workspaceId: string; inviteId: string }>(
   async (request, { context, db, env, params }) => {
-    if (context.role !== "ADMIN") {
-      return await apiError("FORBIDDEN", { detail: "Workspace admin role required." });
-    }
-
     const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
       db,
       userId: context.userId,

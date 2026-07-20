@@ -1,12 +1,15 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
-import { getSessionWithRefresh } from "@/lib/server/auth";
-import { requireWorkspaceAccess, type WorkspaceAccessContext } from "@/lib/server/workspace-context";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { apiError } from "@/lib/server/api-response";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
-import type { NextResponse, NextRequest } from "next/server";
+import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { apiError } from "@/lib/server/api-response";
+import { getSessionWithRefresh } from "@/lib/server/auth";
+import { withErrorHandler } from "@/lib/server/with-error-handler";
+import {
+  requireWorkspaceAccess,
+  type WorkspaceAccessContext,
+} from "@/lib/server/workspace-context";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import type { NextRequest, NextResponse } from "next/server";
 
 export type WorkspaceRouteContext<TParams = { workspaceId: string }> = {
   context: WorkspaceAccessContext;
@@ -18,12 +21,12 @@ export type WorkspaceRouteContext<TParams = { workspaceId: string }> = {
 
 export type WorkspaceRouteHandler<TParams = { workspaceId: string }> = (
   req: NextRequest,
-  ctx: WorkspaceRouteContext<TParams>
+  ctx: WorkspaceRouteContext<TParams>,
 ) => Promise<NextResponse | Response>;
 
-export function withWorkspaceAccess<TParams extends { workspaceId: string } = { workspaceId: string }>(
-  handler: WorkspaceRouteHandler<TParams>
-) {
+export function withWorkspaceAccess<
+  TParams extends { workspaceId: string } = { workspaceId: string },
+>(handler: WorkspaceRouteHandler<TParams>) {
   return withErrorHandler(
     async (request: NextRequest, contextParams: { params: Promise<TParams> }) => {
       const { env } = getCloudflareContext();
@@ -35,7 +38,7 @@ export function withWorkspaceAccess<TParams extends { workspaceId: string } = { 
       }
 
       const params = await contextParams.params;
-      
+
       if (!params || !params.workspaceId) {
         return await apiError("VALIDATION_ERROR", { detail: "Workspace ID is required" });
       }
@@ -53,13 +56,23 @@ export function withWorkspaceAccess<TParams extends { workspaceId: string } = { 
         session.userId,
       );
 
-      // 도메인 서비스 내부의 중복 검사를 방지하기 위해 여기서 한 번만 검증합니다.
       await assertWorkspaceOperationAllowed(
         { id: context.workspaceId, planCode: context.entitlement.planCode },
-        workspaceStorage
+        workspaceStorage,
       );
 
       return handler(request, { context, db, env, params, workspaceStorage });
-    }
+    },
   );
+}
+
+export function withWorkspaceAdmin<
+  TParams extends { workspaceId: string } = { workspaceId: string },
+>(handler: WorkspaceRouteHandler<TParams>) {
+  return withWorkspaceAccess<TParams>(async (req, ctx) => {
+    if (ctx.context.role !== "ADMIN") {
+      return await apiError("FORBIDDEN", { detail: "Workspace admin role required." });
+    }
+    return handler(req, ctx);
+  });
 }
