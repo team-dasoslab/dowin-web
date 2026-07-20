@@ -100,7 +100,7 @@ export default function SubscriptionRequiredPage() {
                 size="hero"
                 className="w-full"
               >
-                <Link href={getWorkspacePath(workspaceId, "/workspace/billing")}>
+                <Link href={getWorkspacePath(workspaceId, "/settings/billing")}>
                   <CreditCard className="size-5" />
                   {t("billingAction")}
                 </Link>

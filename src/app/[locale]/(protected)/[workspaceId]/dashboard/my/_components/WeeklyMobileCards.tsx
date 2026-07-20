@@ -2,6 +2,8 @@
 
 import { type WeeklyLogGuide } from "@/api/generated/dowin.schemas";
 import { AchievementProgress } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/AchievementProgress";
+import { type GithubPrLink } from "@/api/generated/dowin.schemas";
+import { DailyPrLinksPopover } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/DailyPrLinksPopover";
 import { LeadMeasureSummary } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/LeadMeasureSummary";
 import { useDashboardScoreboard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboard";
 import { useWeeklyMobileCardDayActions } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useWeeklyMobileCardDayActions";
@@ -14,9 +16,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export type WeeklyMobileCardsProps = {
-  activeLeadMeasures: ReturnType<
-    typeof useDashboardScoreboard
-  >["activeLeadMeasures"];
+  activeLeadMeasures: ReturnType<typeof useDashboardScoreboard>["activeLeadMeasures"];
   onBeforeToggle: () => void;
   pendingLogKeys: ReturnType<typeof useDashboardScoreboard>["pendingLogKeys"];
   today: string;
@@ -40,21 +40,9 @@ type WeeklyMobileCardProps = {
 };
 
 export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
-  const {
-    activeLeadMeasures,
-    weeklyById,
-    allowPastDailyLogEdit = false,
-  } = props;
+  const { activeLeadMeasures, weeklyById, allowPastDailyLogEdit = false } = props;
   const t = useTranslations("Dashboard");
-  const localizedDays = [
-    t("mon"),
-    t("tue"),
-    t("wed"),
-    t("thu"),
-    t("fri"),
-    t("sat"),
-    t("sun"),
-  ];
+  const localizedDays = [t("mon"), t("tue"), t("wed"), t("thu"), t("fri"), t("sat"), t("sun")];
 
   return (
     <div className="space-y-3 md:hidden">
@@ -68,6 +56,7 @@ export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
           localizedDays={localizedDays}
         />
       ))}
+      <DailyPrLinksPopover prLinks={activeLeadMeasures.flatMap(lm => weeklyById.get(toNumberId(lm.id))?.githubPrLinks ?? [])} />
     </div>
   );
 }
@@ -107,15 +96,12 @@ function WeeklyMobileCard({
             onGuideClose={() => setIsGuideOpen(false)}
             onGuideToggle={() => setIsGuideOpen((open) => !open)}
             tags={leadMeasure.tags ?? []}
+            publicId={weekly?.publicId}
           />
         </div>
         <AchievementProgress
           achievedCount={achievedCount}
-          periodLabel={
-            leadMeasure.period === "MONTHLY"
-              ? t("monthlyLabel")
-              : t("weeklyLabel")
-          }
+          periodLabel={leadMeasure.period === "MONTHLY" ? t("monthlyLabel") : t("weeklyLabel")}
           targetValue={targetValue}
         />
       </div>
@@ -133,16 +119,10 @@ function WeeklyMobileCard({
             today={today}
             toggleLog={toggleLog}
             allowPastDailyLogEdit={allowPastDailyLogEdit}
-            trackingMode={
-              (leadMeasure as { trackingMode?: string }).trackingMode
-            }
-            dailyTargetCount={
-              (leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ??
-              1
-            }
-            value={
-              weekly?.logs?.[date] === undefined ? null : weekly.logs[date]
-            }
+            trackingMode={(leadMeasure as { trackingMode?: string }).trackingMode}
+            dailyTargetCount={(leadMeasure as { dailyTargetCount?: number }).dailyTargetCount ?? 1}
+            value={weekly?.logs?.[date] === undefined ? null : weekly.logs[date]}
+            prLinks={weekly?.githubPrLinks?.filter(pr => pr.dailyLogDate === date) ?? []}
           />
         ))}
       </div>
@@ -163,6 +143,7 @@ type WeeklyMobileCardDayProps = {
   trackingMode?: string;
   dailyTargetCount?: number;
   value: import("@/api/generated/dowin.schemas").DailyLogCell | null;
+  prLinks?: GithubPrLink[];
 };
 
 function WeeklyMobileCardDay({
@@ -178,11 +159,11 @@ function WeeklyMobileCardDay({
   trackingMode,
   dailyTargetCount = 1,
   value,
+  prLinks = [],
 }: WeeklyMobileCardDayProps) {
   const isToday = date === today;
   const isEditable = isEditableDailyLogDate(date, today, allowPastDailyLogEdit);
-  const currentLogKey =
-    leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
+  const currentLogKey = leadMeasureId === null ? null : `${leadMeasureId}:${date}`;
   const isPending = currentLogKey !== null && pendingLogKeys.has(currentLogKey);
   const isCount = trackingMode === "COUNT";
   const t = useTranslations("Dashboard");
@@ -194,19 +175,11 @@ function WeeklyMobileCardDay({
   const [openPopover, setOpenPopover] = useState(false);
   const [localCount, setLocalCount] = useState(count || 0);
 
-  const { handleCountSave } = useWeeklyMobileCardDayActions(
-    leadMeasureId,
-    date,
-    toggleLog,
-  );
+  const { handleCountSave } = useWeeklyMobileCardDayActions(leadMeasureId, date, toggleLog);
 
   return (
     <div className="text-center relative">
-      <p
-        className={`mb-1.5 text-[11px] font-bold ${
-          isToday ? "text-primary" : "text-text-muted"
-        }`}
-      >
+      <p className={`mb-1.5 text-[11px] font-bold ${isToday ? "text-primary" : "text-text-muted"}`}>
         {dayLabel}
       </p>
       {isCount ? (
@@ -242,7 +215,6 @@ function WeeklyMobileCardDay({
             <DialogContent
               className="bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] p-6 w-[320px] animate-in zoom-in-95 fade-in duration-200"
               overlayClassName="bg-black/20"
-              hideCloseButton
             >
               <Button
                 aria-label={t("closeDailyCount")}
@@ -279,9 +251,7 @@ function WeeklyMobileCardDay({
                     type="number"
                     min="0"
                     value={localCount}
-                    onChange={(e) =>
-                      setLocalCount(parseInt(e.target.value, 10) || 0)
-                    }
+                    onChange={(e) => setLocalCount(parseInt(e.target.value, 10) || 0)}
                     className="w-32 text-5xl font-black text-primary text-center bg-sub-background rounded-[16px] border-none outline-none focus:ring-2 focus:ring-primary/20 transition-all py-3"
                     placeholder="0"
                   />
@@ -337,20 +307,15 @@ function WeeklyMobileCardDay({
               void toggleLog(leadMeasureId, date);
             }
           }}
-          variant={
-            isAchieved ? "primary" : isToday ? "primary-ghost" : "secondary"
-          }
+          variant={isAchieved ? "primary" : isToday ? "primary-ghost" : "secondary"}
           className="flex aspect-square w-full items-center justify-center !rounded-[12px] p-0"
         >
           {isAchieved ? (
-            <DowinIcon
-              name="action-checkmark"
-              size="14px"
-              className="mx-auto"
-            />
+            <DowinIcon name="action-checkmark" size="14px" className="mx-auto" />
           ) : null}
         </Button>
       )}
+      <DailyPrLinksPopover prLinks={prLinks} />
     </div>
   );
 }
