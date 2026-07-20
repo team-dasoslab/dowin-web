@@ -234,7 +234,7 @@ describe("ProfileMembersPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "초대코드 관리" })).toHaveAttribute(
       "href",
-      "/workspace-1/workspace/invites",
+      "/workspace-1/settings/invites",
     );
     expect(screen.getByText("현재 멤버")).toBeInTheDocument();
     expect(screen.getByText(/\/\s*10/)).toBeInTheDocument();

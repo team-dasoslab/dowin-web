@@ -128,7 +128,7 @@ export default function ProfileMembersPage() {
               className="font-bold"
             >
               <Link
-                href={getWorkspacePath(workspaceParamId, "/workspace/invites")}
+                href={getWorkspacePath(workspaceParamId, "/settings/invites")}
               >
                 {t("invitesCardButton")}
               </Link>
