@@ -3430,6 +3430,7 @@ components:
         name: { type: string }
         fullName: { type: string }
         private: { type: boolean }
+        isLinkedToOtherWorkspace: { type: boolean }
 
     GithubIntegrationStatus:
       type: object

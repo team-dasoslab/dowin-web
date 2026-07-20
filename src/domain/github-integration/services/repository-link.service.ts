@@ -1,4 +1,5 @@
 import { getDb } from "@/db";
+import { ConflictError, NotFoundError } from "@/lib/server/errors";
 import { createOAuthStorage } from "../storage/oauth.storage";
 import { createRepositoryLinkStorage } from "../storage/repository-link.storage";
 
@@ -15,13 +16,28 @@ export function createRepositoryLinkService(env: CloudflareEnv) {
       const hasGithubAccountConnected = activeInstallations.length > 0;
 
       // 2. Fetch available repositories from those installations
-      const availableRepositories = [];
+      let availableRepositories = [];
       for (const inst of activeInstallations) {
         const repos = await oauthStorage.getRepositoriesByInstallationId(db, inst.id);
         availableRepositories.push(...repos);
       }
 
-      // 3. Fetch active links for the workspace
+      // 3. Fetch active links for all these repositories
+      const activeLinksForRepos = await linkStorage.getActiveLinksByRepositoryIds(
+        db,
+        availableRepositories.map((r) => r.id),
+      );
+
+      // 4. Annotate repositories with isLinkedToOtherWorkspace
+      availableRepositories = availableRepositories.map((repo) => {
+        const link = activeLinksForRepos.find((l) => l.repositoryId === repo.id);
+        return {
+          ...repo,
+          isLinkedToOtherWorkspace: link ? link.workspaceId !== workspaceId : false,
+        };
+      });
+
+      // 5. Fetch active links for the current workspace
       const activeLinks = await linkStorage.getActiveLinksByWorkspaceId(db, workspaceId);
 
       return {
@@ -46,13 +62,13 @@ export function createRepositoryLinkService(env: CloudflareEnv) {
       }
 
       if (!repoAvailable) {
-        throw new Error("Repository not found or access denied");
+        throw new NotFoundError("NOT_FOUND", "Repository not found or access denied");
       }
 
       // Check if it's already linked to ANOTHER workspace
       const existingLink = await linkStorage.getActiveLinkByRepositoryId(db, repositoryId);
       if (existingLink && existingLink.workspaceId !== workspaceId) {
-        throw new Error("Repository is already linked to another workspace");
+        throw new ConflictError("REPO_ALREADY_LINKED");
       }
 
       // Upsert link
@@ -66,7 +82,7 @@ export function createRepositoryLinkService(env: CloudflareEnv) {
     async disconnectRepository(workspaceId: number, linkId: number) {
       const result = await linkStorage.disconnectRepositoryLink(db, workspaceId, linkId);
       if (!result) {
-        throw new Error("Link not found");
+        throw new NotFoundError("NOT_FOUND", "Link not found");
       }
       return result;
     },

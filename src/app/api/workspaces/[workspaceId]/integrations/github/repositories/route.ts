@@ -54,21 +54,12 @@ export const POST = withErrorHandler(
 
     const service = createRepositoryLinkService(env as unknown as CloudflareEnv);
 
-    try {
-      await service.linkRepository(
-        resolvedId,
-        session.userId,
-        parsedBody.data.repositoryId,
-      );
+    await service.linkRepository(
+      resolvedId,
+      session.userId,
+      parsedBody.data.repositoryId,
+    );
 
-      return apiSuccess({ success: true });
-    } catch (error: unknown) {
-      console.error("github repository link error:", error);
-      // Need to distinguish if repository is not found or already linked elsewhere
-      if ((error as Error).message.includes("not found")) {
-        return apiError("NOT_FOUND", (error as Error).message);
-      }
-      return apiError("VALIDATION_ERROR", (error as Error).message);
-    }
+    return apiSuccess({ success: true });
   },
 );

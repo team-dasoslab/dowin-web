@@ -4,7 +4,7 @@ import {
   githubUserInstallations,
   workspaceGithubRepositoryLinks,
 } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -49,6 +49,20 @@ export function createRepositoryLinkStorage() {
           ),
         );
       return result || null;
+    },
+
+    async getActiveLinksByRepositoryIds(db: Db, repositoryIds: number[]) {
+      if (repositoryIds.length === 0) return [];
+
+      return await db
+        .select()
+        .from(workspaceGithubRepositoryLinks)
+        .where(
+          and(
+            inArray(workspaceGithubRepositoryLinks.repositoryId, repositoryIds),
+            eq(workspaceGithubRepositoryLinks.status, "ACTIVE"),
+          ),
+        );
     },
 
     async upsertRepositoryLink(

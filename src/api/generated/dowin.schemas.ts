@@ -29,6 +29,7 @@ export interface GithubRepository {
   name: string;
   fullName: string;
   private: boolean;
+  isLinkedToOtherWorkspace?: boolean;
 }
 
 export interface GithubIntegrationStatus {

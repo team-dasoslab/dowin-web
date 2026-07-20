@@ -51,19 +51,11 @@ export const DELETE = withErrorHandler(
 
     const service = createRepositoryLinkService(env as unknown as CloudflareEnv);
 
-    try {
-      await service.disconnectRepository(
-        resolvedId,
-        parsedParams.data.repositoryLinkId,
-      );
+    await service.disconnectRepository(
+      resolvedId,
+      parsedParams.data.repositoryLinkId,
+    );
 
-      return apiSuccess({ success: true });
-    } catch (error: unknown) {
-      console.error("github repository unlink error:", error);
-      if ((error as Error).message.includes("not found")) {
-        return apiError("NOT_FOUND", (error as Error).message);
-      }
-      return apiError("INTERNAL_ERROR", (error as Error).message);
-    }
+    return apiSuccess({ success: true });
   },
 );
