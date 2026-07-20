@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.2](https://github.com/team-dasoslab/dowin-web/compare/v1.14.1...v1.14.2) (2026-07-20)
+
+
+### Bug Fixes
+
+* 백필 스크립트 D1 다중 삽입시 db.batch 청킹 적용 ([a144f1a](https://github.com/team-dasoslab/dowin-web/commit/a144f1add22bbe55ac0c813aaee01d1ef1213209))
+
 ## [1.14.1](https://github.com/team-dasoslab/dowin-web/compare/v1.14.0...v1.14.1) (2026-07-20)
 
 
