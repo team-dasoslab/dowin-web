@@ -37,6 +37,7 @@
   "Dashboard": {
     "close": "Close",
     "linkedPrs": "Linked PRs",
+    "openInNewTabHint": "Click to open in a new tab",
     "teamStatus": "Team Dashboard",
     "myDashboard": "Home",
     "executionBoard": "Scoreboard",

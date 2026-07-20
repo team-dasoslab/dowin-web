@@ -158,7 +158,7 @@ export default function GithubIntegrationPageClient() {
                           ) : (
                             <div className="flex flex-col items-end gap-1">
                               <Button
-                                variant="outline"
+                                variant="solid-dark"
                                 size="sm"
                                 onClick={() => handleLinkRepository(repo.id)}
                                 disabled={disableLink}

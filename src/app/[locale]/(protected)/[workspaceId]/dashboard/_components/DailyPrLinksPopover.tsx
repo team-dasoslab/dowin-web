@@ -64,10 +64,15 @@ export function DailyPrLinksPopover({ prLinks }: DailyPrLinksPopoverProps) {
             </svg>
           </Button>
           <div className="flex flex-col gap-4 mt-2" onClick={(e) => e.stopPropagation()}>
-            <h4 className="text-[16px] font-bold text-text-primary text-center">
-              {t("linkedPrs", { fallback: "연동된 PR 목록" })}
-            </h4>
-            <div className="flex flex-wrap gap-1.5 justify-center">
+            <div className="flex flex-col gap-1 items-center">
+              <h4 className="text-[16px] font-bold text-text-primary text-center">
+                {t("linkedPrs", { fallback: "연동된 PR 목록" })}
+              </h4>
+              <p className="text-xs text-text-muted">
+                {t("openInNewTabHint", { fallback: "클릭 시 새 탭에서 열립니다" })}
+              </p>
+            </div>
+            <div className="flex flex-col gap-2">
               {prLinks.map((pr) => (
                 <GithubPrBadge key={pr.id} pr={pr} />
               ))}

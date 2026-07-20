@@ -37,6 +37,7 @@
   "Dashboard": {
     "close": "닫기",
     "linkedPrs": "연동된 PR 목록",
+    "openInNewTabHint": "클릭 시 새 탭에서 열립니다",
     "teamStatus": "팀 대시보드",
     "myDashboard": "홈",
     "executionBoard": "점수판",

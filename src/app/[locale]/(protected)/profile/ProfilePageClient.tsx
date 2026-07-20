@@ -224,7 +224,7 @@ export default function ProfilePage() {
             </Button>
           ) : (
             <Button
-              variant="secondary"
+              variant="solid-dark"
               size="sm"
               className="font-bold"
               onClick={(e) => {

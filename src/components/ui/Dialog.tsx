@@ -64,7 +64,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
     if (!mounted || !open) return null;
 
     return createPortal(
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-[200] flex items-center justify-center">
         <div 
           className={cn(
             "fixed inset-0 bg-black/55 backdrop-blur-[1px] animate-in fade-in duration-200",
@@ -75,7 +75,7 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
         <div
           ref={ref}
           className={cn(
-            "relative z-50 flex flex-col w-full max-w-lg bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] animate-in zoom-in-95 fade-in duration-200",
+            "relative z-[200] flex flex-col w-full max-w-lg bg-surface rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.08)] animate-in zoom-in-95 fade-in duration-200",
             className
           )}
           {...props}

@@ -1,21 +1,22 @@
 import { type GithubPrLink } from "@/api/generated/dowin.schemas";
 import { GitMerge, GitPullRequest, GitPullRequestClosed } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { badgeVariants } from "@/components/ui/Badge";
 
 export function GithubPrBadge({ pr }: { pr: GithubPrLink }) {
   const t = useTranslations("Dashboard");
 
   let Icon = GitPullRequest;
-  let colorClass = "text-success bg-success/10 border-success/20";
+  let variant: "success" | "primary" | "danger" = "success";
   let stateText = t("prStateOpen");
 
   if (pr.state === "MERGED") {
     Icon = GitMerge;
-    colorClass = "text-purple-500 bg-purple-500/10 border-purple-500/20";
+    variant = "primary"; // primary is purple in Dowin
     stateText = t("prStateMerged");
   } else if (pr.state === "CLOSED") {
     Icon = GitPullRequestClosed;
-    colorClass = "text-danger bg-danger/10 border-danger/20";
+    variant = "danger";
     stateText = t("prStateClosed");
   }
 
@@ -24,7 +25,7 @@ export function GithubPrBadge({ pr }: { pr: GithubPrLink }) {
       href={pr.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-bold transition-opacity hover:opacity-80 ${colorClass}`}
+      className={badgeVariants({ variant, shape: "pill", className: "flex items-center gap-1 w-fit transition-opacity hover:opacity-80" })}
       onClick={(e) => e.stopPropagation()}
       title={stateText}
     >
