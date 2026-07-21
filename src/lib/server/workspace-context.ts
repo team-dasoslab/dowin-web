@@ -29,6 +29,9 @@ type WorkspaceStoragePort = {
       billingStatus: BillingStatus;
       entitlementSource: NullableEntitlementSource;
     } | null;
+    seatEntitlement: { purchasedSeatCount: number } | null;
+    planLimit: { memberLimit: number } | null;
+    memberCount: number;
   } | null>;
 };
 
@@ -46,6 +49,10 @@ export type WorkspaceAccessContext = {
     billingStatus: BillingStatus;
     planCode: BillingPlanCode;
   };
+  capacity: {
+    hasAvailableMemberSlot: boolean;
+    isOverLimit: boolean;
+  };
 };
 
 export async function requireWorkspaceAccess(
@@ -59,7 +66,7 @@ export async function requireWorkspaceAccess(
     throw new NotFoundError("NOT_FOUND", { detail: "Workspace or membership not found" });
   }
 
-  const { workspace, member, billingState } = result;
+  const { workspace, member, billingState, seatEntitlement, planLimit, memberCount } = result;
   if (!workspace.uid) {
     throw new Error(`WORKSPACE_UID_MISSING:${workspace.id}`);
   }
@@ -74,6 +81,8 @@ export async function requireWorkspaceAccess(
     billingStatus,
   });
 
+  const memberLimit = seatEntitlement?.purchasedSeatCount ?? planLimit?.memberLimit ?? null;
+
   return {
     workspaceId: workspace.id,
     workspacePublicId: workspace.uid,
@@ -87,6 +96,10 @@ export async function requireWorkspaceAccess(
       entitlementSource,
       billingStatus,
       planCode,
+    },
+    capacity: {
+      hasAvailableMemberSlot: memberLimit === null || memberCount < memberLimit,
+      isOverLimit: memberLimit !== null && memberCount > memberLimit,
     },
   };
 }
