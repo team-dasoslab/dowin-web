@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.5](https://github.com/team-dasoslab/dowin-web/compare/v1.14.4...v1.14.5) (2026-07-21)
+
+
+### Bug Fixes
+
+* CSP 정책 완화 ([f1c4043](https://github.com/team-dasoslab/dowin-web/commit/f1c40438782a082e47c77a499d060f71930d57fb))
+
 ## [1.14.4](https://github.com/team-dasoslab/dowin-web/compare/v1.14.3...v1.14.4) (2026-07-21)
 
 
