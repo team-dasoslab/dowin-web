@@ -17,6 +17,10 @@ describe("DailyLogService", () => {
       billingStatus: "ACTIVE",
       planCode: "BASIC",
     },
+    capacity: {
+      hasAvailableMemberSlot: true,
+      isOverLimit: false,
+    },
   };
 
   const oldCreatedAt = new Date("2026-02-20T00:00:00.000Z");

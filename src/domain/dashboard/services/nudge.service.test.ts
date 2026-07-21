@@ -28,6 +28,10 @@ describe("NudgeService", () => {
       billingStatus: "ACTIVE",
       planCode: "BASIC",
     },
+    capacity: {
+      hasAvailableMemberSlot: true,
+      isOverLimit: false,
+    },
   };
   let profileStorage: Mocked<ProfileStorage>;
   let notificationStorage: Mocked<NotificationStorage>;

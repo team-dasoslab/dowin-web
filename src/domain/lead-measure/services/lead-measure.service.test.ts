@@ -17,6 +17,10 @@ describe("LeadMeasureService", () => {
       billingStatus: "ACTIVE",
       planCode: "BASIC",
     },
+    capacity: {
+      hasAvailableMemberSlot: true,
+      isOverLimit: false,
+    },
   };
 
   const resolveIdByUid = vi.fn();

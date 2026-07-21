@@ -38,6 +38,10 @@ describe("TeamMemoService", () => {
       billingStatus: "ACTIVE" as const,
       planCode: "BASIC" as const,
     },
+    capacity: {
+      hasAvailableMemberSlot: true,
+      isOverLimit: false,
+    },
   } satisfies WorkspaceAccessContext;
 
   it("대상 사용자 메모 목록을 반환한다", async () => {

@@ -55,10 +55,7 @@ export function withWorkspaceAccess<
       session.userId,
     );
 
-    await assertWorkspaceOperationAllowed(
-      { id: context.workspaceId, planCode: context.entitlement.planCode },
-      workspaceStorage,
-    );
+    await assertWorkspaceOperationAllowed(context);
 
     return handler(request, { context, db, env, params, workspaceStorage });
   });

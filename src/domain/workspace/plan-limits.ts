@@ -4,6 +4,8 @@ import {
   type NullableEntitlementSource,
 } from "@/domain/billing/types";
 import { CapacityPolicy, getPlanMemberLimitFromStorage } from "@/domain/workspace/capacity-policy";
+import { ForbiddenError } from "@/lib/server/errors";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type WorkspacePlanSummary = {
   id: number;
@@ -36,10 +38,14 @@ export async function getWorkspaceMemberCapacity(
 }
 
 export async function assertWorkspaceOperationAllowed(
-  workspace: WorkspacePlanSummary,
-  storage: MemberCountPort,
+  context: WorkspaceAccessContext,
 ) {
-  await new CapacityPolicy(storage).assertWorkspaceUsageAllowed(workspace);
+  if (!context.entitlement.canAccessBasicSubscription) {
+    throw new ForbiddenError("BASIC_SUBSCRIPTION_REQUIRED");
+  }
+  if (context.capacity.isOverLimit) {
+    throw new ForbiddenError("WORKSPACE_SEAT_LIMIT_EXCEEDED");
+  }
 }
 
 export async function assertWorkspaceHasMemberCapacity(
