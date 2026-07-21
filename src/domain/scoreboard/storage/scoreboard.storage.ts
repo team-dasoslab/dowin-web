@@ -1,3 +1,4 @@
+import type { DowinDatabase } from "@/db";
 import { leadMeasures, scoreboards, workspaceTags } from "@/db/schema";
 import { and, asc, desc, eq } from "drizzle-orm";
 
@@ -11,10 +12,7 @@ export type CreateScoreboardInput = {
 };
 
 export type UpdateScoreboardInput = Partial<
-  Pick<
-    CreateScoreboardInput,
-    "goalName" | "lagMeasure" | "startDate" | "endDate"
-  >
+  Pick<CreateScoreboardInput, "goalName" | "lagMeasure" | "startDate" | "endDate">
 >;
 
 export type ScoreboardRecord = typeof scoreboards.$inferSelect;
@@ -27,29 +25,8 @@ export type ScoreboardWithLeadMeasures = ScoreboardRecord & {
   leadMeasures: LeadMeasureRecordWithTags[];
 };
 
-export interface ScoreboardDbPort {
-  query: {
-    scoreboards: {
-      findFirst(args: unknown): Promise<unknown>;
-      findMany(args: unknown): Promise<unknown>;
-    };
-  };
-  insert(table: unknown): {
-    values(input: unknown): {
-      returning(): Promise<unknown>;
-    };
-  };
-  update(table: unknown): {
-    set(input: unknown): {
-      where(condition: unknown): {
-        returning(): Promise<unknown>;
-      };
-    };
-  };
-}
-
 export class ScoreboardStorage {
-  constructor(private db: ScoreboardDbPort) {}
+  constructor(private db: DowinDatabase) {}
 
   private mapLeadMeasureRecord(
     raw: LeadMeasureRecord & {
@@ -77,9 +54,7 @@ export class ScoreboardStorage {
   ): ScoreboardWithLeadMeasures {
     return {
       ...raw,
-      leadMeasures: raw.leadMeasures.map((leadMeasure) =>
-        this.mapLeadMeasureRecord(leadMeasure),
-      ),
+      leadMeasures: raw.leadMeasures.map((leadMeasure) => this.mapLeadMeasureRecord(leadMeasure)),
     };
   }
 
@@ -95,9 +70,7 @@ export class ScoreboardStorage {
         createdAt: true,
       },
       orderBy: [desc(scoreboards.createdAt)],
-    })) as Array<
-      Pick<ScoreboardRecord, "id" | "userId" | "goalName" | "createdAt">
-    >;
+    })) as Array<Pick<ScoreboardRecord, "id" | "userId" | "goalName" | "createdAt">>;
   }
 
   async findActiveScoreboard(
@@ -135,9 +108,7 @@ export class ScoreboardStorage {
     return row ? this.mapScoreboardWithLeadMeasures(row) : undefined;
   }
 
-  async createScoreboard(
-    input: CreateScoreboardInput,
-  ): Promise<ScoreboardRecord> {
+  async createScoreboard(input: CreateScoreboardInput): Promise<ScoreboardRecord> {
     const [created] = (await this.db
       .insert(scoreboards)
       .values(input)
@@ -203,10 +174,7 @@ export class ScoreboardStorage {
     workspaceId: number,
   ): Promise<ScoreboardWithLeadMeasures[]> {
     const rows = (await this.db.query.scoreboards.findMany({
-      where: and(
-        eq(scoreboards.workspaceId, workspaceId),
-        eq(scoreboards.status, "ACTIVE"),
-      ),
+      where: and(eq(scoreboards.workspaceId, workspaceId), eq(scoreboards.status, "ACTIVE")),
       with: {
         leadMeasures: {
           orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
@@ -233,10 +201,7 @@ export class ScoreboardStorage {
     return rows.map((row) => this.mapScoreboardWithLeadMeasures(row));
   }
 
-  async updateScoreboard(
-    id: number,
-    input: UpdateScoreboardInput,
-  ): Promise<ScoreboardRecord> {
+  async updateScoreboard(id: number, input: UpdateScoreboardInput): Promise<ScoreboardRecord> {
     const [updated] = (await this.db
       .update(scoreboards)
       .set(input)
@@ -246,10 +211,7 @@ export class ScoreboardStorage {
     return updated;
   }
 
-  async archiveScoreboard(
-    id: number,
-    endDate: string,
-  ): Promise<ScoreboardRecord> {
+  async archiveScoreboard(id: number, endDate: string): Promise<ScoreboardRecord> {
     const [archived] = (await this.db
       .update(scoreboards)
       .set({ status: "ARCHIVED", endDate })
@@ -269,10 +231,7 @@ export class ScoreboardStorage {
     return reactivated;
   }
 
-  async findArchivedScoreboards(
-    userId: number,
-    workspaceId: number,
-  ): Promise<ScoreboardRecord[]> {
+  async findArchivedScoreboards(userId: number, workspaceId: number): Promise<ScoreboardRecord[]> {
     return (await this.db.query.scoreboards.findMany({
       where: and(
         eq(scoreboards.userId, userId),
