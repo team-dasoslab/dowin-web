@@ -39,7 +39,6 @@ import {
   type Translate,
 } from "./_utils/docs-utils";
 
-export const dynamic = "force-dynamic";
 
 const SECTION_IDS = [
   "all",
