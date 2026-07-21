@@ -1,18 +1,21 @@
 import {
-  BadRequestError,
-  ForbiddenError,
-  NotFoundError,
-} from "@/lib/server/errors";
+  addDays,
+  formatDateLocal,
+  getCurrentWeekStart,
+  getMonthDates,
+  getWeekDates,
+  getWeekStart,
+  getWeekStartsInMonth,
+  normalizeMonthStart,
+} from "@/domain/common/date.utils";
+import { DailyLogRecord, DailyLogStorage } from "@/domain/daily-log/storage/daily-log.storage";
 import {
   LeadMeasureRecord,
   LeadMeasureRecordWithTags,
   LeadMeasureSummaryRecord,
   LeadMeasureTagRecord,
 } from "@/domain/lead-measure/storage/lead-measure.storage";
-import {
-  DailyLogRecord,
-  DailyLogStorage,
-} from "@/domain/daily-log/storage/daily-log.storage";
+import { BadRequestError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type ScoreboardStoragePort = {
@@ -30,8 +33,8 @@ type LeadMeasureStoragePort = {
     workspaceId: number,
   ): Promise<
     | (LeadMeasureRecord & {
-      scoreboard: { id: number; status: "ACTIVE" | "ARCHIVED" };
-    })
+        scoreboard: { id: number; status: "ACTIVE" | "ARCHIVED" };
+      })
     | undefined
   >;
   findLeadMeasuresByScoreboard(
@@ -48,9 +51,7 @@ type DailyLogStoragePort = Pick<
   "upsertLog" | "deleteLog" | "findLogsForLeadMeasures"
 >;
 
-type DailyLogUpsertInput =
-  | { value: true }
-  | { count: number };
+type DailyLogUpsertInput = { value: true } | { count: number };
 
 type DailyLogCell = {
   value: boolean;
@@ -67,7 +68,7 @@ export class DailyLogService {
     private scoreboardStorage: ScoreboardStoragePort,
     private leadMeasureStorage: LeadMeasureStoragePort,
     private dailyLogStorage: DailyLogStoragePort,
-  ) { }
+  ) {}
 
   async upsertLog(
     context: WorkspaceAccessContext,
@@ -83,12 +84,7 @@ export class DailyLogService {
     }
 
     const count = getValidatedUpsertCount(measure, input);
-    const record = await this.dailyLogStorage.upsertLog(
-      leadMeasureId,
-      date,
-      true,
-      count,
-    );
+    const record = await this.dailyLogStorage.upsertLog(leadMeasureId, date, true, count);
 
     return {
       ...record,
@@ -96,7 +92,11 @@ export class DailyLogService {
     };
   }
 
-  async deleteLog(context: WorkspaceAccessContext, leadMeasureId: number, date: string): Promise<void> {
+  async deleteLog(
+    context: WorkspaceAccessContext,
+    leadMeasureId: number,
+    date: string,
+  ): Promise<void> {
     await this.getOwnedLeadMeasure(leadMeasureId, context);
     assertPastWeekLogEditable(date, context.allowPastDailyLogEdit);
     await this.dailyLogStorage.deleteLog(leadMeasureId, date);
@@ -138,10 +138,9 @@ export class DailyLogService {
     const weekEnd = weekDates[6];
     const previousWeekStart = addDays(normalizedWeekStart, -7);
     const shouldIncludeGuide = normalizedWeekStart === getCurrentWeekStart();
-    const measures = (await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
-      scoreboardId,
-      "active",
-    )).filter((measure) => isMeasureActiveInPeriod(measure, weekEnd));
+    const measures = (
+      await this.leadMeasureStorage.findLeadMeasuresByScoreboard(scoreboardId, "active")
+    ).filter((measure) => isMeasureActiveInPeriod(measure, weekEnd));
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
       previousWeekStart,
@@ -174,10 +173,7 @@ export class DailyLogService {
             continue;
           }
 
-          if (
-            log.logDate >= previousWeekStart &&
-            log.logDate < normalizedWeekStart
-          ) {
+          if (log.logDate >= previousWeekStart && log.logDate < normalizedWeekStart) {
             previousAchieved += 1;
           }
         }
@@ -196,13 +192,13 @@ export class DailyLogService {
           achievementRate: getAchievementRate(achieved, measure.targetValue),
           guide: shouldIncludeGuide
             ? getWeeklyGuide({
-              createdAt: measure.createdAt,
-              currentAchieved: achieved,
-              period: measure.period,
-              previousAchieved,
-              previousWeekStart,
-              targetValue: measure.targetValue,
-            })
+                createdAt: measure.createdAt,
+                currentAchieved: achieved,
+                period: measure.period,
+                previousAchieved,
+                previousWeekStart,
+                targetValue: measure.targetValue,
+              })
             : null,
         };
       }),
@@ -252,15 +248,14 @@ export class DailyLogService {
     const fetchEnd = addDays(weekStarts[weekStarts.length - 1] ?? normalizedMonthStart, 6);
 
     const measures = (
-      await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
-        scoreboardId,
-        "active",
-      )
+      await this.leadMeasureStorage.findLeadMeasuresByScoreboard(scoreboardId, "active")
     ).filter(
       (
         measure,
       ): measure is LeadMeasureRecordWithTags & { period: "DAILY" | "WEEKLY" | "MONTHLY" } =>
-        (measure.period === "DAILY" || measure.period === "WEEKLY" || measure.period === "MONTHLY") &&
+        (measure.period === "DAILY" ||
+          measure.period === "WEEKLY" ||
+          measure.period === "MONTHLY") &&
         isMeasureActiveInPeriod(measure, monthEnd),
     );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
@@ -282,8 +277,7 @@ export class DailyLogService {
       const weeklySummaryAchievedByWeek = new Map<string, number>();
 
       for (const log of measureLogs) {
-        const isInMonth =
-          log.logDate >= normalizedMonthStart && log.logDate <= monthEnd;
+        const isInMonth = log.logDate >= normalizedMonthStart && log.logDate <= monthEnd;
 
         if (isInMonth) {
           logMap[log.logDate] = getLogCell(measure, log);
@@ -319,10 +313,7 @@ export class DailyLogService {
         totalAchieved += effectiveWeekStarts.reduce(
           (weekAccumulator, weekStart) =>
             weekAccumulator +
-            Math.min(
-              weeklySummaryAchievedByWeek.get(weekStart) ?? 0,
-              measure.targetValue,
-            ),
+            Math.min(weeklySummaryAchievedByWeek.get(weekStart) ?? 0, measure.targetValue),
           0,
         );
       }
@@ -350,17 +341,12 @@ export class DailyLogService {
       return accumulator + measure.targetValue * effectiveWeekStarts.length;
     }, 0);
     const summaryRate =
-      totalTarget > 0
-        ? Number(((totalAchieved / totalTarget) * 100).toFixed(1))
-        : 0;
+      totalTarget > 0 ? Number(((totalAchieved / totalTarget) * 100).toFixed(1)) : 0;
 
     return {
       monthStart: normalizedMonthStart,
       monthEnd,
-      monthLabel: `${normalizedMonthStart.slice(0, 4)}.${normalizedMonthStart.slice(
-        5,
-        7,
-      )}`,
+      monthLabel: `${normalizedMonthStart.slice(0, 4)}.${normalizedMonthStart.slice(5, 7)}`,
       summary: {
         achieved: totalAchieved,
         total: totalTarget,
@@ -396,16 +382,13 @@ export class DailyLogService {
     const monthEnd = monthDates[monthDates.length - 1];
     const weekStarts = getWeekStartsInMonth(monthDates);
     const fetchStart = weekStarts[0] ?? normalizedMonthStart;
-    const fetchEnd = addDays(
-      weekStarts[weekStarts.length - 1] ?? normalizedMonthStart,
-      6,
-    );
+    const fetchEnd = addDays(weekStarts[weekStarts.length - 1] ?? normalizedMonthStart, 6);
 
     const measures = (
-      await this.leadMeasureStorage.findActiveLeadMeasureSummariesByScoreboard(
-        scoreboardId,
-      )
-    ).filter((measure) => isMonthlySummaryMeasure(measure) && isMeasureActiveInPeriod(measure, monthEnd));
+      await this.leadMeasureStorage.findActiveLeadMeasureSummariesByScoreboard(scoreboardId)
+    ).filter(
+      (measure) => isMonthlySummaryMeasure(measure) && isMeasureActiveInPeriod(measure, monthEnd),
+    );
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       measures.map((measure) => measure.id),
       fetchStart,
@@ -435,10 +418,7 @@ export class DailyLogService {
     return scoreboard;
   }
 
-  private async getOwnedLeadMeasure(
-    leadMeasureId: number,
-    context: WorkspaceAccessContext,
-  ) {
+  private async getOwnedLeadMeasure(leadMeasureId: number, context: WorkspaceAccessContext) {
     const measure = await this.leadMeasureStorage.findOwnedLeadMeasure(
       leadMeasureId,
       context.userId,
@@ -468,7 +448,12 @@ function calculateMonthlySummary({
   weekStarts,
 }: {
   logs: DailyLogRecord[];
-  measures: Array<Pick<LeadMeasureSummaryRecord, "id" | "period" | "targetValue" | "trackingMode" | "dailyTargetCount" | "status" | "createdAt">>;
+  measures: Array<
+    Pick<
+      LeadMeasureSummaryRecord,
+      "id" | "period" | "targetValue" | "trackingMode" | "dailyTargetCount" | "status" | "createdAt"
+    >
+  >;
   monthEnd: string;
   monthStart: string;
   weekStarts: string[];
@@ -480,11 +465,7 @@ function calculateMonthlySummary({
 
     if (measure.period === "MONTHLY") {
       const monthlyCount = measureLogs.reduce((count, log) => {
-        if (
-          log.logDate >= monthStart &&
-          log.logDate <= monthEnd &&
-          isLogAchieved(measure, log)
-        ) {
+        if (log.logDate >= monthStart && log.logDate <= monthEnd && isLogAchieved(measure, log)) {
           return count + 1;
         }
 
@@ -513,8 +494,7 @@ function calculateMonthlySummary({
       total +
       effectiveWeekStarts.reduce(
         (weekTotal, weekStart) =>
-          weekTotal +
-          Math.min(weeklyCounts.get(weekStart) ?? 0, measure.targetValue),
+          weekTotal + Math.min(weeklyCounts.get(weekStart) ?? 0, measure.targetValue),
         0,
       )
     );
@@ -527,8 +507,7 @@ function calculateMonthlySummary({
     const effectiveWeekStarts = getEffectiveWeekStarts(measure, weekStarts);
     return accumulator + measure.targetValue * effectiveWeekStarts.length;
   }, 0);
-  const achievementRate =
-    total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
+  const achievementRate = total > 0 ? Number(((achieved / total) * 100).toFixed(1)) : 0;
 
   return {
     achieved,
@@ -545,11 +524,7 @@ function isMonthlySummaryMeasure(
   trackingMode: "BOOLEAN" | "COUNT";
   dailyTargetCount: number;
 } {
-  return (
-    measure.period === "DAILY" ||
-    measure.period === "WEEKLY" ||
-    measure.period === "MONTHLY"
-  );
+  return measure.period === "DAILY" || measure.period === "WEEKLY" || measure.period === "MONTHLY";
 }
 
 function getValidatedUpsertCount(
@@ -606,15 +581,11 @@ function isLogAchieved(
   return (log.count ?? 1) >= getDailyTargetCount(measure);
 }
 
-function getTrackingMode(
-  measure: Pick<LeadMeasureRecord, "trackingMode">,
-): "BOOLEAN" | "COUNT" {
+function getTrackingMode(measure: Pick<LeadMeasureRecord, "trackingMode">): "BOOLEAN" | "COUNT" {
   return measure.trackingMode ?? "BOOLEAN";
 }
 
-function getDailyTargetCount(
-  measure: Pick<LeadMeasureRecord, "dailyTargetCount">,
-) {
+function getDailyTargetCount(measure: Pick<LeadMeasureRecord, "dailyTargetCount">) {
   return measure.dailyTargetCount ?? 1;
 }
 
@@ -639,7 +610,10 @@ function getEffectiveWeekStarts(measure: { createdAt?: Date | null }, weekStarts
   return weekStarts.filter((ws) => ws >= createdWeekStart);
 }
 
-function isMeasureActiveInPeriod(measure: { status: string; createdAt?: Date | null }, periodEnd: string) {
+function isMeasureActiveInPeriod(
+  measure: { status: string; createdAt?: Date | null },
+  periodEnd: string,
+) {
   if (measure.status !== "ACTIVE") return false;
   if (measure.createdAt && formatDateLocal(measure.createdAt) > periodEnd) return false;
   return true;
@@ -675,8 +649,7 @@ function getWeeklyGuide({
   if (currentAchieved === 0 && previousAchieved === 0) {
     return {
       kind: "change" as const,
-      description:
-        "2주 연속 기록이 없어요. 이 선행지표는 다른 행동으로 바꿔보세요.",
+      description: "2주 연속 기록이 없어요. 이 선행지표는 다른 행동으로 바꿔보세요.",
     };
   }
 
@@ -686,104 +659,11 @@ function getWeeklyGuide({
   if (currentRate < 50 && previousRate < 50) {
     return {
       kind: "adjust" as const,
-      description:
-        "2주 연속 50% 미만이에요. 이 선행지표는 횟수를 조금 낮춰보세요.",
+      description: "2주 연속 50% 미만이에요. 이 선행지표는 횟수를 조금 낮춰보세요.",
     };
   }
 
   return null;
-}
-
-function getCurrentWeekStart() {
-  return getWeekStart(getTodayInKst());
-}
-
-function getWeekDates(weekStart: string) {
-  const base = new Date(weekStart);
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(base);
-    date.setDate(base.getDate() + index);
-    return formatDateLocal(date);
-  });
-}
-
-function addDays(dateString: string, amount: number) {
-  const date = new Date(dateString);
-  date.setDate(date.getDate() + amount);
-  return formatDateLocal(date);
-}
-
-function getCurrentMonthStart() {
-  const today = new Date();
-  return `${today.getFullYear()}-${pad2(today.getMonth() + 1)}-01`;
-}
-
-function normalizeMonthStart(monthStart?: string) {
-  if (!monthStart) {
-    return getCurrentMonthStart();
-  }
-
-  const [yearRaw, monthRaw] = monthStart.split("-");
-  const year = Number(yearRaw);
-  const month = Number(monthRaw);
-
-  if (
-    Number.isInteger(year) &&
-    Number.isInteger(month) &&
-    month >= 1 &&
-    month <= 12
-  ) {
-    return `${year}-${pad2(month)}-01`;
-  }
-
-  return getCurrentMonthStart();
-}
-
-function getMonthDates(monthStart: string) {
-  const [yearRaw, monthRaw] = monthStart.split("-");
-  const year = Number(yearRaw);
-  const month = Number(monthRaw);
-  const daysInMonth = new Date(year, month, 0).getDate();
-
-  return Array.from({ length: daysInMonth }, (_, index) => {
-    const date = new Date(year, month - 1, index + 1);
-    return formatDateLocal(date);
-  });
-}
-
-function getWeekStart(dateString: string) {
-  const [yearRaw, monthRaw, dayRaw] = dateString.split("-");
-  const year = Number(yearRaw);
-  const month = Number(monthRaw);
-  const day = Number(dayRaw);
-  const date = new Date(year, month - 1, day);
-  const weekDay = date.getDay();
-  const diff = date.getDate() - weekDay + (weekDay === 0 ? -6 : 1);
-  return formatDateLocal(new Date(year, month - 1, diff));
-}
-
-function getWeekStartsInMonth(monthDates: string[]) {
-  const weekStarts = Array.from(new Set(monthDates.map((date) => getWeekStart(date))));
-  if (monthDates.length === 0) return weekStarts;
-  const monthStart = monthDates[0];
-  const monthEnd = monthDates[monthDates.length - 1];
-
-  return weekStarts.filter((ws) => {
-    const [year, month, day] = ws.split("-").map(Number);
-    const thursday = new Date(year, month - 1, day + 3);
-    const thursdayStr = formatDateLocal(thursday);
-    return thursdayStr >= monthStart && thursdayStr <= monthEnd;
-  });
-}
-
-function pad2(value: number) {
-  return String(value).padStart(2, "0");
-}
-
-function formatDateLocal(date: Date) {
-  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(
-    date.getDate(),
-  )}`;
 }
 
 function assertPastWeekLogEditable(date: string, allowPastEdit: boolean = false) {
@@ -793,11 +673,4 @@ function assertPastWeekLogEditable(date: string, allowPastEdit: boolean = false)
   if (date < getCurrentWeekStart()) {
     throw new ForbiddenError("PAST_WEEK_LOG_EDIT_NOT_ALLOWED");
   }
-}
-
-function getTodayInKst(referenceDate: Date = new Date()) {
-  const kstDate = new Date(referenceDate.getTime() + 9 * 60 * 60 * 1000);
-  return `${kstDate.getUTCFullYear()}-${pad2(kstDate.getUTCMonth() + 1)}-${pad2(
-    kstDate.getUTCDate(),
-  )}`;
 }
