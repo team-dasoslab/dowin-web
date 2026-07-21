@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -59,6 +59,7 @@ describe("GET /api/admin/billing/workspaces", () => {
     const { GET } = await import("./route");
     const response = await GET(
       new NextRequest("https://example.com/api/admin/billing/workspaces?workspaceName=Dowin"),
+      { params: Promise.resolve({}) },
     );
     const body = (await response.json()) as Array<{ workspaceId: number }>;
 

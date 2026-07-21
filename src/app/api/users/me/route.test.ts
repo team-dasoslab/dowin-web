@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { BadRequestError, ForbiddenError } from "@/lib/server/errors";
+import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -17,9 +17,7 @@ vi.mock("@/db", () => ({
 }));
 
 vi.mock("@/lib/server/auth", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/server/auth")>(
-    "@/lib/server/auth",
-  );
+  const actual = await vi.importActual<typeof import("@/lib/server/auth")>("@/lib/server/auth");
 
   return {
     ...actual,
@@ -66,6 +64,7 @@ describe("DELETE /api/users/me", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(401);
@@ -84,6 +83,7 @@ describe("DELETE /api/users/me", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(400);
@@ -104,6 +104,7 @@ describe("DELETE /api/users/me", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(403);
@@ -122,6 +123,7 @@ describe("DELETE /api/users/me", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(204);

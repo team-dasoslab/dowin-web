@@ -80,7 +80,9 @@ describe("/api/workspaces", () => {
     ]);
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(new NextRequest("http://localhost/api/workspaces"), {
+      params: Promise.resolve({}),
+    });
     const body = await response.json();
 
     expect(response.status).toBe(200);
@@ -102,6 +104,7 @@ describe("/api/workspaces", () => {
         method: "POST",
         body: JSON.stringify({ name: "새 워크스페이스" }),
       }),
+      { params: Promise.resolve({}) },
     );
     const body = (await response.json()) as {
       error: {

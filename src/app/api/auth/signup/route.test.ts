@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -55,6 +55,7 @@ describe("POST /api/auth/signup", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -85,15 +86,11 @@ describe("POST /api/auth/signup", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(201);
-    expect(mockSignup).toHaveBeenCalledWith(
-      "john123",
-      "존",
-      "newSecurePass1!",
-      "ko",
-    );
+    expect(mockSignup).toHaveBeenCalledWith("john123", "존", "newSecurePass1!", "ko");
     expect(mockCookieSet).toHaveBeenCalledTimes(1);
     await expect(response.json()).resolves.toEqual({
       user: {

@@ -12,21 +12,24 @@ type ApiHandler<TCtx extends BaseContext = BaseContext> = (
   ctx: TCtx & { env: ReturnType<typeof getCloudflareContext>["env"]; db: ReturnType<typeof getDb> },
 ) => Promise<NextResponse | Response>;
 
-export function withErrorHandler<TCtx extends BaseContext = { params?: Promise<unknown> }>(
+type TArgs<TCtx> = [req: NextRequest, ctx: TCtx];
+
+export function withErrorHandler<TCtx extends BaseContext = { params: Promise<unknown> }>(
   handler: ApiHandler<TCtx>,
 ) {
-  return async (req?: NextRequest, ctx?: TCtx) => {
+  return async (...args: TArgs<TCtx>) => {
+    const [req, ctx] = args;
     try {
       const { env } = getCloudflareContext();
       const db = getDb(env.DB);
 
       const enhancedCtx = {
-        ...(ctx || ({} as unknown as TCtx)),
+        ...(ctx || ({} as TCtx)),
         env,
         db,
       };
 
-      if (req && ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+      if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
         const origin = req.headers.get("origin");
         const referer = req.headers.get("referer");
         const host = req.headers.get("host") || req.nextUrl.host;

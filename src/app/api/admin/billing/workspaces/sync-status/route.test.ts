@@ -1,5 +1,5 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockRequireAdminSession = vi.fn();
@@ -51,7 +51,12 @@ describe("POST /api/admin/billing/workspaces/sync-status", () => {
     });
 
     const { POST } = await import("./route");
-    const response = await POST();
+    const response = await POST(
+      new NextRequest("https://example.com/api/admin/billing/workspaces/sync-status", {
+        method: "POST",
+      }),
+      { params: Promise.resolve({}) },
+    );
     const body = (await response.json()) as {
       syncedCount: number;
       workspaceIds: number[];
