@@ -1,23 +1,20 @@
-import { ForbiddenError, NotFoundError } from "@/lib/server/errors";
+import { type BillingPlanCode } from "@/domain/billing/types";
 import { TeamMemoRecord } from "@/domain/dashboard/storage/team-memo.storage";
+import { type WorkspaceRole } from "@/domain/workspace/types";
+import { ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type WorkspacePort = {
   findMembership(
     workspaceId: number,
     userId: number,
-  ): Promise<{ userId: number; role: "ADMIN" | "MEMBER" } | null>;
+  ): Promise<{ userId: number; role: WorkspaceRole } | null>;
   countMembers(workspaceId: number): Promise<number>;
-  findPlanLimit(
-    planCode: "BASIC" | "FREE" | "STANDARD",
-  ): Promise<{ memberLimit: number } | null>;
+  findPlanLimit(planCode: BillingPlanCode): Promise<{ memberLimit: number } | null>;
 };
 
 type TeamMemoPort = {
-  listByWorkspaceAndTarget(
-    workspaceId: number,
-    targetUserId: number,
-  ): Promise<TeamMemoRecord[]>;
+  listByWorkspaceAndTarget(workspaceId: number, targetUserId: number): Promise<TeamMemoRecord[]>;
   create(input: {
     workspaceId: number;
     targetUserId: number;
@@ -72,11 +69,7 @@ export class TeamMemoService {
     return toTeamMemoDto(memo, context.workspacePublicId);
   }
 
-  async resolveTeamMemo(
-    context: WorkspaceAccessContext,
-    memoId: number,
-    isResolved: boolean,
-  ) {
+  async resolveTeamMemo(context: WorkspaceAccessContext, memoId: number, isResolved: boolean) {
     this.assertBasicEntitlementActive(context);
     const memo = await this.teamMemoStorage.findById(memoId);
 
@@ -121,10 +114,7 @@ export class TeamMemoService {
   }
 
   private async requireWorkspaceMember(workspaceId: number, userId: number) {
-    const membership = await this.workspaceStorage.findMembership(
-      workspaceId,
-      userId,
-    );
+    const membership = await this.workspaceStorage.findMembership(workspaceId, userId);
 
     if (!membership) {
       throw new NotFoundError("NOT_FOUND");

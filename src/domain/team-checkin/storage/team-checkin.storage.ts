@@ -1,3 +1,4 @@
+import { type WorkspaceRole } from "@/domain/workspace/types";
 import { getDb } from "@/db";
 import {
   basicUsageEvents,
@@ -37,7 +38,7 @@ export type TeamCheckinCandidate = {
   workspaceId: number;
   workspaceUid: string;
   memberUserId: number;
-  memberRole: "ADMIN" | "MEMBER";
+  memberRole: WorkspaceRole;
   userLocale: string | null;
   timezone: string | null;
   scoreboardId: number;

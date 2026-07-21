@@ -1,4 +1,8 @@
-import { type NullableEntitlementSource } from "@/domain/billing/types";
+import {
+  type BillingPlanCode,
+  type BillingStatus,
+  type NullableEntitlementSource,
+} from "@/domain/billing/types";
 import {
   addDays,
   getCurrentWeekStart,
@@ -9,13 +13,14 @@ import {
   normalizeMonthStart,
 } from "@/domain/common/date.utils";
 import { getPlanMemberLimit, getWorkspaceMemberCapacity } from "@/domain/workspace/plan-limits";
+import { type WorkspaceRole } from "@/domain/workspace/types";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<
     Array<{
       userId: number;
-      role: "ADMIN" | "MEMBER";
+      role: WorkspaceRole;
       user?: { nickname?: string | null; avatarKey?: string | null } | null;
       checkinStreakStartDate?: string | null;
       checkinStreakEndDate?: string | null;
@@ -30,11 +35,11 @@ type WorkspaceLookupPort = {
   countMembers(workspaceId: number): Promise<number>;
   findSeatEntitlement?(workspaceId: number): Promise<{ purchasedSeatCount: number } | null>;
   findBillingState(workspaceId: number): Promise<{
-    planCode: "BASIC" | "FREE" | "STANDARD";
-    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    planCode: BillingPlanCode;
+    billingStatus: BillingStatus;
     entitlementSource: NullableEntitlementSource;
   } | null>;
-  findPlanLimit(planCode: "BASIC" | "FREE" | "STANDARD"): Promise<{ memberLimit: number } | null>;
+  findPlanLimit(planCode: BillingPlanCode): Promise<{ memberLimit: number } | null>;
 };
 
 type TeamScoreboard = {
