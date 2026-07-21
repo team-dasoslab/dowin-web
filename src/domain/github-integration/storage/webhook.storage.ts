@@ -129,6 +129,28 @@ export function createWebhookStorage() {
     },
 
     /**
+     * Find active action items by workspace + displaySequences.
+     */
+    async findActionItemsByDisplayKeys(db: Db, workspaceId: number, displaySequences: number[]) {
+      if (displaySequences.length === 0) return [];
+      return await db
+        .select({
+          leadMeasureId: actionItemPublicIds.leadMeasureId,
+          displaySequence: actionItemPublicIds.displaySequence,
+          trackingMode: leadMeasures.trackingMode,
+        })
+        .from(actionItemPublicIds)
+        .innerJoin(leadMeasures, eq(actionItemPublicIds.leadMeasureId, leadMeasures.id))
+        .where(
+          and(
+            eq(actionItemPublicIds.workspaceId, workspaceId),
+            inArray(actionItemPublicIds.displaySequence, displaySequences),
+            eq(leadMeasures.status, "ACTIVE"),
+          ),
+        );
+    },
+
+    /**
      * Upsert a PR link (idempotent by repositoryLinkId + number + leadMeasureId).
      */
     async upsertPrLink(
@@ -205,6 +227,29 @@ export function createWebhookStorage() {
         )
         .limit(1);
       return result ?? null;
+    },
+
+    async getPrLinksByKeys(
+      db: Db,
+      repositoryLinkId: number,
+      prNumber: number,
+      leadMeasureIds: number[],
+    ) {
+      if (leadMeasureIds.length === 0) return [];
+      return await db
+        .select({
+          id: githubPrLinks.id,
+          dailyLogAppliedAt: githubPrLinks.dailyLogAppliedAt,
+          leadMeasureId: githubPrLinks.leadMeasureId,
+        })
+        .from(githubPrLinks)
+        .where(
+          and(
+            eq(githubPrLinks.repositoryLinkId, repositoryLinkId),
+            eq(githubPrLinks.number, prNumber),
+            inArray(githubPrLinks.leadMeasureId, leadMeasureIds),
+          ),
+        );
     },
 
     /** BOOLEAN action item → set value=true, count=1 for the date. */

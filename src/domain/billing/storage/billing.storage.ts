@@ -1,18 +1,22 @@
-import { nanoid } from "nanoid";
 import { getDb } from "@/db";
 import {
   billingEvents,
   billingProviderProducts,
   billingRetentionRecords,
-  workspaceBillingState,
-  workspaceSeatEntitlements,
-  workspaceMembers,
-  workspaces,
   marketingInviteCodes,
   marketingInviteRedemptions,
+  workspaceBillingState,
+  workspaceMembers,
+  workspaces,
+  workspaceSeatEntitlements,
 } from "@/db/schema";
-import { type NullableEntitlementSource } from "@/domain/billing/types";
+import {
+  type BillingPlanCode,
+  type BillingStatus,
+  type NullableEntitlementSource,
+} from "@/domain/billing/types";
 import { and, asc, desc, eq, gte, inArray, like, or, sql } from "drizzle-orm";
+import { nanoid } from "nanoid";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -41,7 +45,7 @@ export class BillingStorage {
       .from(marketingInviteRedemptions)
       .innerJoin(
         marketingInviteCodes,
-        eq(marketingInviteRedemptions.marketingInviteCodeId, marketingInviteCodes.id)
+        eq(marketingInviteRedemptions.marketingInviteCodeId, marketingInviteCodes.id),
       )
       .where(eq(marketingInviteRedemptions.workspaceId, workspaceId))
       .orderBy(desc(marketingInviteRedemptions.redeemedAt))
@@ -96,10 +100,7 @@ export class BillingStorage {
 
   async listProviderProducts() {
     return await this.db.query.billingProviderProducts.findMany({
-      orderBy: [
-        asc(billingProviderProducts.environment),
-        asc(billingProviderProducts.planCode),
-      ],
+      orderBy: [asc(billingProviderProducts.environment), asc(billingProviderProducts.planCode)],
     });
   }
 
@@ -157,16 +158,12 @@ export class BillingStorage {
             eq(workspaceBillingState.billingOwnerUserId, input.billingOwnerUserId),
           )
         : null,
-    ].filter((condition): condition is NonNullable<typeof condition> =>
-      Boolean(condition),
-    );
+    ].filter((condition): condition is NonNullable<typeof condition> => Boolean(condition));
 
     const [result] = await this.db
       .select({
-        recentRefundCount:
-          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'order.refunded' then 1 else 0 end), 0)`,
-        recentRevokedCount:
-          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
+        recentRefundCount: sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'order.refunded' then 1 else 0 end), 0)`,
+        recentRevokedCount: sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
       })
       .from(billingEvents)
       .leftJoin(workspaces, eq(billingEvents.workspaceId, workspaces.id))
@@ -190,19 +187,14 @@ export class BillingStorage {
 
   async getRecentBillingRiskSummaries(workspaceIds: number[], since: Date) {
     if (workspaceIds.length === 0) {
-      return new Map<
-        number,
-        { recentRefundCount: number; recentRevokedCount: number }
-      >();
+      return new Map<number, { recentRefundCount: number; recentRevokedCount: number }>();
     }
 
     const results = await this.db
       .select({
         workspaceId: billingEvents.workspaceId,
-        recentRefundCount:
-          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'order.refunded' then 1 else 0 end), 0)`,
-        recentRevokedCount:
-          sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
+        recentRefundCount: sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'order.refunded' then 1 else 0 end), 0)`,
+        recentRevokedCount: sql<number>`coalesce(sum(case when ${billingEvents.eventType} = 'subscription.revoked' and ${billingEvents.failureReason} = 'RISK_REVIEW_SIGNAL' then 1 else 0 end), 0)`,
       })
       .from(billingEvents)
       .where(
@@ -225,10 +217,7 @@ export class BillingStorage {
     );
   }
 
-  async searchAdminBillingWorkspaces(filters?: {
-    workspaceId?: number;
-    workspaceName?: string;
-  }) {
+  async searchAdminBillingWorkspaces(filters?: { workspaceId?: number; workspaceName?: string }) {
     const conditions = [];
 
     if (filters?.workspaceId) {
@@ -242,16 +231,15 @@ export class BillingStorage {
       .select({
         workspaceId: workspaces.id,
         workspaceName: workspaces.name,
-        planCode: sql<"BASIC" | "FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
-        billingStatus:
-          sql<
-            "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
-          >`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
+        planCode: sql<BillingPlanCode>`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        billingStatus: sql<BillingStatus>`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
         entitlementSource: workspaceBillingState.entitlementSource,
         provider: workspaceBillingState.provider,
         currentPeriodEnd: workspaceBillingState.currentPeriodEnd,
         cancelAtPeriodEnd: sql<boolean>`coalesce(${workspaceBillingState.cancelAtPeriodEnd}, false)`,
-        billingOwnerUserId: sql<number | null>`coalesce(${workspaceBillingState.billingOwnerUserId}, ${workspaces.billingOwnerUserId})`,
+        billingOwnerUserId: sql<
+          number | null
+        >`coalesce(${workspaceBillingState.billingOwnerUserId}, ${workspaces.billingOwnerUserId})`,
         customerKey: workspaceBillingState.customerKey,
         subscriptionKey: workspaceBillingState.subscriptionKey,
         billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
@@ -260,14 +248,8 @@ export class BillingStorage {
         purchasedSeatCount: workspaceSeatEntitlements.purchasedSeatCount,
       })
       .from(workspaces)
-      .leftJoin(
-        workspaceBillingState,
-        eq(workspaces.id, workspaceBillingState.workspaceId),
-      )
-      .leftJoin(
-        workspaceSeatEntitlements,
-        eq(workspaces.id, workspaceSeatEntitlements.workspaceId),
-      )
+      .leftJoin(workspaceBillingState, eq(workspaces.id, workspaceBillingState.workspaceId))
+      .leftJoin(workspaceSeatEntitlements, eq(workspaces.id, workspaceSeatEntitlements.workspaceId))
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(desc(workspaces.id));
   }
@@ -277,16 +259,15 @@ export class BillingStorage {
       .select({
         workspaceId: workspaces.id,
         workspaceName: workspaces.name,
-        planCode: sql<"BASIC" | "FREE" | "STANDARD">`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
-        billingStatus:
-          sql<
-            "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED"
-          >`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
+        planCode: sql<BillingPlanCode>`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`,
+        billingStatus: sql<BillingStatus>`coalesce(${workspaceBillingState.billingStatus}, 'NONE')`,
         entitlementSource: workspaceBillingState.entitlementSource,
         provider: workspaceBillingState.provider,
         currentPeriodEnd: workspaceBillingState.currentPeriodEnd,
         cancelAtPeriodEnd: sql<boolean>`coalesce(${workspaceBillingState.cancelAtPeriodEnd}, false)`,
-        billingOwnerUserId: sql<number | null>`coalesce(${workspaceBillingState.billingOwnerUserId}, ${workspaces.billingOwnerUserId})`,
+        billingOwnerUserId: sql<
+          number | null
+        >`coalesce(${workspaceBillingState.billingOwnerUserId}, ${workspaces.billingOwnerUserId})`,
         customerKey: workspaceBillingState.customerKey,
         subscriptionKey: workspaceBillingState.subscriptionKey,
         billingCustomerExternalRef: workspaces.billingCustomerExternalRef,
@@ -295,14 +276,8 @@ export class BillingStorage {
         purchasedSeatCount: workspaceSeatEntitlements.purchasedSeatCount,
       })
       .from(workspaces)
-      .leftJoin(
-        workspaceBillingState,
-        eq(workspaces.id, workspaceBillingState.workspaceId),
-      )
-      .leftJoin(
-        workspaceSeatEntitlements,
-        eq(workspaces.id, workspaceSeatEntitlements.workspaceId),
-      )
+      .leftJoin(workspaceBillingState, eq(workspaces.id, workspaceBillingState.workspaceId))
+      .leftJoin(workspaceSeatEntitlements, eq(workspaces.id, workspaceSeatEntitlements.workspaceId))
       .where(eq(workspaces.id, workspaceId));
 
     return workspace ?? null;
@@ -357,7 +332,7 @@ export class BillingStorage {
     workspaceUidSnapshot?: string | null;
     workspaceNameSnapshot?: string | null;
     billingOwnerUserIdSnapshot?: number | null;
-    planCode: "BASIC" | "FREE" | "STANDARD";
+    planCode: BillingPlanCode;
     seatCount?: number | null;
     currency?: string | null;
     amount?: number | null;
@@ -424,8 +399,7 @@ export class BillingStorage {
         privacyPolicyVersion: input.privacyPolicyVersion ?? null,
         billingPolicyVersion: input.billingPolicyVersion ?? null,
         checkoutNoticeVersion: input.checkoutNoticeVersion ?? null,
-        autoRenewalNoticeAcceptedAt:
-          input.autoRenewalNoticeAcceptedAt ?? null,
+        autoRenewalNoticeAcceptedAt: input.autoRenewalNoticeAcceptedAt ?? null,
         ipCountry: input.ipCountry ?? null,
         billingCountry: input.billingCountry ?? null,
         taxEvidenceSource: input.taxEvidenceSource ?? null,
@@ -456,8 +430,8 @@ export class BillingStorage {
       "billingEventId"
     >;
     projection?: {
-      billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-      planCode: "BASIC" | "FREE" | "STANDARD";
+      billingStatus: BillingStatus;
+      planCode: BillingPlanCode;
       entitlementSource: NullableEntitlementSource;
       customerKey: string | null;
       subscriptionKey: string | null;
@@ -505,8 +479,7 @@ export class BillingStorage {
           workspaceIdSnapshot: input.retention.workspaceIdSnapshot,
           workspaceUidSnapshot: input.retention.workspaceUidSnapshot ?? null,
           workspaceNameSnapshot: input.retention.workspaceNameSnapshot ?? null,
-          billingOwnerUserIdSnapshot:
-            input.retention.billingOwnerUserIdSnapshot ?? null,
+          billingOwnerUserIdSnapshot: input.retention.billingOwnerUserIdSnapshot ?? null,
           planCode: input.retention.planCode,
           seatCount: input.retention.seatCount ?? null,
           currency: input.retention.currency ?? null,
@@ -530,8 +503,7 @@ export class BillingStorage {
           privacyPolicyVersion: input.retention.privacyPolicyVersion ?? null,
           billingPolicyVersion: input.retention.billingPolicyVersion ?? null,
           checkoutNoticeVersion: input.retention.checkoutNoticeVersion ?? null,
-          autoRenewalNoticeAcceptedAt:
-            input.retention.autoRenewalNoticeAcceptedAt ?? null,
+          autoRenewalNoticeAcceptedAt: input.retention.autoRenewalNoticeAcceptedAt ?? null,
           ipCountry: input.retention.ipCountry ?? null,
           billingCountry: input.retention.billingCountry ?? null,
           taxEvidenceSource: input.retention.taxEvidenceSource ?? null,
@@ -549,9 +521,7 @@ export class BillingStorage {
         .insert(workspaceBillingState)
         .values({
           workspaceId: input.event.workspaceId,
-          provider: this.resolveProviderFromEntitlementSource(
-            input.projection.entitlementSource,
-          ),
+          provider: this.resolveProviderFromEntitlementSource(input.projection.entitlementSource),
           billingStatus: input.projection.billingStatus,
           planCode: input.projection.planCode,
           entitlementSource: input.projection.entitlementSource,
@@ -567,9 +537,7 @@ export class BillingStorage {
         .onConflictDoUpdate({
           target: workspaceBillingState.workspaceId,
           set: {
-            provider: this.resolveProviderFromEntitlementSource(
-              input.projection.entitlementSource,
-            ),
+            provider: this.resolveProviderFromEntitlementSource(input.projection.entitlementSource),
             billingStatus: input.projection.billingStatus,
             planCode: input.projection.planCode,
             entitlementSource: input.projection.entitlementSource,
@@ -608,8 +576,7 @@ export class BillingStorage {
         .update(workspaces)
         .set({
           planCode: input.projection.planCode,
-          billingCustomerExternalRef:
-            input.projection.workspaceBillingCustomerExternalRef,
+          billingCustomerExternalRef: input.projection.workspaceBillingCustomerExternalRef,
           billingOwnerUserId: input.projection.workspaceBillingOwnerUserId,
         })
         .where(eq(workspaces.id, input.event.workspaceId));
@@ -620,8 +587,8 @@ export class BillingStorage {
 
   async upsertWorkspaceBillingState(input: {
     workspaceId: number;
-    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingStatus: BillingStatus;
+    planCode: BillingPlanCode;
     entitlementSource: NullableEntitlementSource;
     customerKey: string | null;
     subscriptionKey: string | null;
@@ -635,9 +602,7 @@ export class BillingStorage {
       .insert(workspaceBillingState)
       .values({
         workspaceId: input.workspaceId,
-        provider: this.resolveProviderFromEntitlementSource(
-          input.entitlementSource,
-        ),
+        provider: this.resolveProviderFromEntitlementSource(input.entitlementSource),
         billingStatus: input.billingStatus,
         planCode: input.planCode,
         entitlementSource: input.entitlementSource,
@@ -653,9 +618,7 @@ export class BillingStorage {
       .onConflictDoUpdate({
         target: workspaceBillingState.workspaceId,
         set: {
-          provider: this.resolveProviderFromEntitlementSource(
-            input.entitlementSource,
-          ),
+          provider: this.resolveProviderFromEntitlementSource(input.entitlementSource),
           billingStatus: input.billingStatus,
           planCode: input.planCode,
           entitlementSource: input.entitlementSource,
@@ -706,7 +669,7 @@ export class BillingStorage {
 
   async updateWorkspaceBillingProjection(input: {
     workspaceId: number;
-    planCode: "BASIC" | "FREE" | "STANDARD";
+    planCode: BillingPlanCode;
     billingCustomerExternalRef: string | null;
     billingOwnerUserId: number | null;
   }) {

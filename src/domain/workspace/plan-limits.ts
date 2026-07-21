@@ -1,29 +1,24 @@
 import {
-  CapacityPolicy,
-  getPlanMemberLimitFromStorage,
-} from "@/domain/workspace/capacity-policy";
-import { type NullableEntitlementSource } from "@/domain/billing/types";
+  type BillingPlanCode,
+  type BillingStatus,
+  type NullableEntitlementSource,
+} from "@/domain/billing/types";
+import { CapacityPolicy, getPlanMemberLimitFromStorage } from "@/domain/workspace/capacity-policy";
 
 type WorkspacePlanSummary = {
   id: number;
-  planCode?: "BASIC" | "FREE" | "STANDARD" | string | null;
+  planCode?: BillingPlanCode | string | null;
 };
 
 type MemberCountPort = {
   countMembers(workspaceId: number): Promise<number>;
-  findSeatEntitlement?(
-    workspaceId: number,
-  ): Promise<{ purchasedSeatCount: number } | null>;
-  findBillingState(
-    workspaceId: number,
-  ): Promise<{
-    planCode: "BASIC" | "FREE" | "STANDARD";
-    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  findSeatEntitlement?(workspaceId: number): Promise<{ purchasedSeatCount: number } | null>;
+  findBillingState(workspaceId: number): Promise<{
+    planCode: BillingPlanCode;
+    billingStatus: BillingStatus;
     entitlementSource: NullableEntitlementSource;
   } | null>;
-  findPlanLimit(
-    planCode: "BASIC" | "FREE" | "STANDARD",
-  ): Promise<{ memberLimit: number } | null>;
+  findPlanLimit(planCode: BillingPlanCode): Promise<{ memberLimit: number } | null>;
 };
 
 export async function getPlanMemberLimit(

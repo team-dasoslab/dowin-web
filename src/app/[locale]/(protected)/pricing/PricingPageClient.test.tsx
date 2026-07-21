@@ -1,3 +1,4 @@
+import { type BillingStatus } from "@/domain/billing/types";
 import { fireEvent, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -49,7 +50,7 @@ vi.mock("next/navigation", () => ({
 const openPortal = vi.fn();
 
 type BillingOverrides = Partial<{
-  billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  billingStatus: BillingStatus;
   canManageBilling: boolean;
   currentPeriodEnd: string | null;
   entitlementSource:

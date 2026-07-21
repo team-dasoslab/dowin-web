@@ -1,3 +1,4 @@
+import { type BillingPlanCode } from "@/domain/billing/types";
 export const PRODUCT_UPDATE_TAGS = [
   "Dashboard",
   "Home",
@@ -19,7 +20,7 @@ export type ProductUpdate = {
   ctaLabel: "바로 써보기";
   ctaHref: string;
   isMajor: boolean;
-  plan?: "BASIC" | "FREE" | "STANDARD";
+  plan?: BillingPlanCode;
 };
 
 /**

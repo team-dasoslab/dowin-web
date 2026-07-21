@@ -1,22 +1,25 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DowinDatabase } from "@/db";
 import { LeadMeasureStorage } from "@/domain/lead-measure/storage/lead-measure.storage";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("LeadMeasureStorage", () => {
   const findMany = vi.fn();
   const findFirst = vi.fn();
-  const insert = vi.fn();
-  const values = vi.fn();
   const returning = vi.fn();
-  const update = vi.fn();
-  const set = vi.fn();
-  const where = vi.fn();
-  const deleteFn = vi.fn();
+  const where = vi.fn().mockReturnValue({ returning });
+  const set = vi.fn().mockReturnValue({ where });
+  const update = vi.fn().mockReturnValue({ set });
+  const values = vi.fn().mockReturnValue({ returning });
+  const insert = vi.fn().mockReturnValue({ values });
 
-  const storage = new LeadMeasureStorage({
+  const deleteWhere = vi.fn();
+  const deleteFn = vi.fn().mockReturnValue({ where: deleteWhere });
+
+  const mockDb = {
     query: {
       leadMeasures: {
-        findMany: (args) => findMany(args),
-        findFirst: (args) => findFirst(args),
+        findMany,
+        findFirst,
       },
       workspaceTags: {
         findMany: vi.fn(),
@@ -28,42 +31,11 @@ describe("LeadMeasureStorage", () => {
         findFirst: vi.fn(),
       },
     },
-    insert: (table) => {
-      insert(table);
-      return {
-        values: (input) => {
-          values(input);
-          return {
-            returning: () => returning(),
-          };
-        },
-      };
-    },
-    update: (table) => {
-      update(table);
-      return {
-        set: (input) => {
-          set(input);
-          return {
-            where: (condition) => {
-              where(condition);
-              return {
-                returning: () => returning(),
-              };
-            },
-          };
-        },
-      };
-    },
-    delete: (table) => {
-      deleteFn(table);
-      return {
-        where: async (condition) => {
-          where(condition);
-        },
-      };
-    },
-  });
+    insert,
+    update,
+    delete: deleteFn,
+  } as unknown as DowinDatabase;
+  const storage = new LeadMeasureStorage(mockDb);
 
   beforeEach(() => {
     vi.clearAllMocks();

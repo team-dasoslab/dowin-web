@@ -20,7 +20,7 @@ export const POST = withWorkspaceAdmin(async (req, { context, params, env }) => 
     return apiError("VALIDATION_ERROR", parsedBody.error.format());
   }
 
-  const service = createRepositoryLinkService(env as unknown as CloudflareEnv);
+  const service = createRepositoryLinkService(env);
 
   await service.linkRepository(context.workspaceId, context.userId, parsedBody.data.repositoryId);
 

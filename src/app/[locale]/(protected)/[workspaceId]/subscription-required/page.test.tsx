@@ -1,3 +1,4 @@
+import { type BillingPlanCode, type BillingStatus } from "@/domain/billing/types";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -50,10 +51,10 @@ const startBasicCheckout = vi.fn();
 const openPortal = vi.fn();
 
 type BillingOverrides = Partial<{
-  billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  billingStatus: BillingStatus;
   canManageBilling: boolean;
   entitlementSource: "MANUAL" | "NONE" | "POLAR";
-  planCode: "BASIC" | "FREE" | "STANDARD";
+  planCode: BillingPlanCode;
   requiresManualReview: boolean;
 }>;
 

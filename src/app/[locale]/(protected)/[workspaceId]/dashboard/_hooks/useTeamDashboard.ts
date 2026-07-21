@@ -1,5 +1,6 @@
 "use client";
 
+import type { getWorkspacesWorkspaceIdDashboardTeamResponse } from "@/api/generated/dashboard/dashboard";
 import { useGetWorkspacesWorkspaceIdDashboardTeam } from "@/api/generated/dashboard/dashboard";
 import { TeamDashboardResponse } from "@/api/generated/dowin.schemas";
 import { useGetWorkspacesMe } from "@/api/generated/workspace/workspace";
@@ -27,17 +28,17 @@ const getWeekDatesFromStart = (weekStart?: string) => {
   });
 };
 
-export const useTeamDashboard = (workspaceId: string) => {
+export const useTeamDashboard = (
+  workspaceId: string,
+  initialTeamDashboard?: getWorkspacesWorkspaceIdDashboardTeamResponse,
+) => {
   const today = getTodayInKst();
   const [selectedDate, setSelectedDateState] = useState(today);
   const selectedWeekStart = getWeekDates(selectedDate)[0] ?? today;
   const currentWeekStart = getWeekDates(today)[0] ?? today;
-  const {
-    error: workspaceError,
-  } = useGetWorkspacesMe({
+  const { error: workspaceError } = useGetWorkspacesMe({
     query: {
-      retry: (failureCount, error) =>
-        getApiErrorStatus(error) !== 404 && failureCount < 2,
+      retry: (failureCount, error) => getApiErrorStatus(error) !== 404 && failureCount < 2,
     },
   });
   const { data, isLoading, isFetching, error } = useGetWorkspacesWorkspaceIdDashboardTeam(
@@ -45,14 +46,13 @@ export const useTeamDashboard = (workspaceId: string) => {
     selectedWeekStart ? { weekStart: selectedWeekStart } : undefined,
     {
       query: {
+        initialData: initialTeamDashboard,
         retry: (failureCount, queryError) =>
-          ![403, 404].includes(getApiErrorStatus(queryError) ?? 0) &&
-          failureCount < 2,
+          ![403, 404].includes(getApiErrorStatus(queryError) ?? 0) && failureCount < 2,
       },
     },
   );
-  const [lastDashboard, setLastDashboard] =
-    useState<TeamDashboardResponse | null>(null);
+  const [lastDashboard, setLastDashboard] = useState<TeamDashboardResponse | null>(null);
 
   useEffect(() => {
     if (data?.status === 200) {
@@ -60,8 +60,7 @@ export const useTeamDashboard = (workspaceId: string) => {
     }
   }, [data]);
 
-  const dashboard: TeamDashboardResponse | null =
-    data?.status === 200 ? data.data : lastDashboard;
+  const dashboard: TeamDashboardResponse | null = data?.status === 200 ? data.data : lastDashboard;
   const weekDates = getWeekDatesFromStart(dashboard?.weekStart ?? selectedWeekStart);
   const weekLabel =
     weekDates.length === 7

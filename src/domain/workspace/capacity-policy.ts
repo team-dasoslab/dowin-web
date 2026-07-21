@@ -4,11 +4,11 @@ import {
   type BillingPlanCode,
   type BillingStatus,
 } from "@/domain/billing/entitlement-policy";
-import { type NullableEntitlementSource } from "@/domain/billing/types";
+import {  type NullableEntitlementSource  } from "@/domain/billing/types";
 
 type WorkspacePlanSummary = {
   id: number;
-  planCode?: "BASIC" | "FREE" | "STANDARD" | string | null;
+  planCode?: BillingPlanCode | string | null;
 };
 
 type WorkspaceBillingState = {
@@ -24,7 +24,7 @@ type MemberCapacityPort = {
   ): Promise<{ purchasedSeatCount: number } | null>;
   findBillingState(workspaceId: number): Promise<WorkspaceBillingState | null>;
   findPlanLimit(
-    planCode: "BASIC" | "FREE" | "STANDARD",
+    planCode: BillingPlanCode,
   ): Promise<{ memberLimit: number } | null>;
 };
 

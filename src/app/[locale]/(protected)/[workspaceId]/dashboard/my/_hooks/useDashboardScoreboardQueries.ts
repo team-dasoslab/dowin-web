@@ -5,14 +5,15 @@ import {
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey,
   getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey,
 } from "@/api/generated/daily-log/daily-log";
+import type { getWorkspacesWorkspaceIdDashboardMyResponse } from "@/api/generated/dashboard/dashboard";
 import {
   getGetWorkspacesWorkspaceIdDashboardMyQueryKey,
   getGetWorkspacesWorkspaceIdDashboardTeamQueryKey,
   useGetWorkspacesWorkspaceIdDashboardMy,
 } from "@/api/generated/dashboard/dashboard";
 import {
-  GetWorkspacesWorkspaceIdDashboardTeamParams,
   GetWorkspacesWorkspaceIdDashboardMyParams,
+  GetWorkspacesWorkspaceIdDashboardTeamParams,
   GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams,
   GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams,
   GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyParams,
@@ -27,6 +28,7 @@ type UseDashboardScoreboardQueriesParams = {
   selectedWeekStart: string;
   selectedView: "week" | "month";
   weekDates: string[];
+  initialDashboard?: getWorkspacesWorkspaceIdDashboardMyResponse;
 };
 
 export const useDashboardScoreboardQueries = ({
@@ -36,6 +38,7 @@ export const useDashboardScoreboardQueries = ({
   selectedWeekStart,
   selectedView,
   weekDates,
+  initialDashboard,
 }: UseDashboardScoreboardQueriesParams) => {
   const myDashboardParams: GetWorkspacesWorkspaceIdDashboardMyParams = {
     monthStart: selectedMonthStart,
@@ -49,14 +52,12 @@ export const useDashboardScoreboardQueries = ({
     error: dashboardError,
   } = useGetWorkspacesWorkspaceIdDashboardMy(workspaceId, myDashboardParams, {
     query: {
+      initialData: initialDashboard,
       retry: (failureCount: number, error: unknown) =>
-        getApiErrorStatus(error) !== 403 &&
-        getApiErrorStatus(error) !== 404 &&
-        failureCount < 1,
+        getApiErrorStatus(error) !== 403 && getApiErrorStatus(error) !== 404 && failureCount < 1,
     },
   });
-  const dashboard =
-    myDashboardResponse?.status === 200 ? myDashboardResponse.data : null;
+  const dashboard = myDashboardResponse?.status === 200 ? myDashboardResponse.data : null;
 
   const activeScoreboard = dashboard?.activeScoreboard ?? null;
   const scoreboardId = toNumberId(activeScoreboard?.id);
@@ -66,33 +67,34 @@ export const useDashboardScoreboardQueries = ({
   const monthlyLogsParams: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyParams = {
     monthStart: selectedMonthStart,
   };
-  const monthlySummaryParams: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams = {
-    monthStart: selectedMonthStart,
-  };
+  const monthlySummaryParams: GetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryParams =
+    {
+      monthStart: selectedMonthStart,
+    };
 
   const weeklyLogsQueryKey =
     scoreboardId !== null
       ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsWeeklyQueryKey(
-        workspaceId,
-        scoreboardId,
-        weeklyLogsParams,
-      )
+          workspaceId,
+          scoreboardId,
+          weeklyLogsParams,
+        )
       : null;
   const monthlyLogsQueryKey =
     scoreboardId !== null
       ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlyQueryKey(
-        workspaceId,
-        scoreboardId,
-        monthlyLogsParams,
-      )
+          workspaceId,
+          scoreboardId,
+          monthlyLogsParams,
+        )
       : null;
   const monthlySummaryQueryKey =
     scoreboardId !== null
       ? getGetWorkspacesWorkspaceIdScoreboardsScoreboardIdLogsMonthlySummaryQueryKey(
-        workspaceId,
-        scoreboardId,
-        monthlySummaryParams,
-      )
+          workspaceId,
+          scoreboardId,
+          monthlySummaryParams,
+        )
       : null;
   const dashboardTeamQueryKey = getGetWorkspacesWorkspaceIdDashboardTeamQueryKey(
     workspaceId,
@@ -109,57 +111,47 @@ export const useDashboardScoreboardQueries = ({
   const workspace = dashboard?.workspace ?? null;
 
   const weeklyLeadMeasures = dashboard?.weeklyLogs?.leadMeasures ?? [];
-  const monthlySummary =
-    dashboard?.monthlyLogs?.summary ?? dashboard?.monthlySummary?.summary;
-  const monthLabel =
-    dashboard?.monthlyLogs?.monthLabel ?? dashboard?.monthlySummary?.monthLabel;
-  const periodEnd = selectedView === "month" ? (dashboard?.monthlyLogs?.monthEnd ?? dashboard?.monthlySummary?.monthEnd ?? weekDates[6]) : weekDates[6];
-  const activeLeadMeasures = (activeScoreboard?.leadMeasures ?? []).filter(
-    (leadMeasure) => {
-      if (leadMeasure.status !== "ACTIVE") return false;
-      if (!leadMeasure.createdAt) return true;
-      const d = new Date(leadMeasure.createdAt);
-      if (isNaN(d.getTime())) return leadMeasure.createdAt.split("T")[0] <= periodEnd;
-      const kstMs = d.getTime() + 9 * 60 * 60 * 1000;
-      const kstDate = new Date(kstMs);
-      const createdAtDate = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
-      return createdAtDate <= periodEnd;
-    }
-  );
+  const monthlySummary = dashboard?.monthlyLogs?.summary ?? dashboard?.monthlySummary?.summary;
+  const monthLabel = dashboard?.monthlyLogs?.monthLabel ?? dashboard?.monthlySummary?.monthLabel;
+  const periodEnd =
+    selectedView === "month"
+      ? (dashboard?.monthlyLogs?.monthEnd ?? dashboard?.monthlySummary?.monthEnd ?? weekDates[6])
+      : weekDates[6];
+  const activeLeadMeasures = (activeScoreboard?.leadMeasures ?? []).filter((leadMeasure) => {
+    if (leadMeasure.status !== "ACTIVE") return false;
+    if (!leadMeasure.createdAt) return true;
+    const d = new Date(leadMeasure.createdAt);
+    if (isNaN(d.getTime())) return leadMeasure.createdAt.split("T")[0] <= periodEnd;
+    const kstMs = d.getTime() + 9 * 60 * 60 * 1000;
+    const kstDate = new Date(kstMs);
+    const createdAtDate = `${kstDate.getUTCFullYear()}-${String(kstDate.getUTCMonth() + 1).padStart(2, "0")}-${String(kstDate.getUTCDate()).padStart(2, "0")}`;
+    return createdAtDate <= periodEnd;
+  });
   const weeklyTargetMeasures = activeLeadMeasures.filter(
     (leadMeasure) => leadMeasure.period !== "MONTHLY",
   );
   const weeklyById = new Map(
-    weeklyLeadMeasures.map((leadMeasure) => [
-      toNumberId(leadMeasure.id),
-      leadMeasure,
-    ]),
+    weeklyLeadMeasures.map((leadMeasure) => [toNumberId(leadMeasure.id), leadMeasure]),
   );
 
-  const weeklyAchieved = weeklyTargetMeasures.reduce(
-    (accumulator, leadMeasure) => {
-      const weekly = weeklyById.get(toNumberId(leadMeasure.id));
-      const targetValue = leadMeasure.targetValue ?? 0;
-      return accumulator + Math.min(weekly?.achieved ?? 0, targetValue);
-    },
-    0,
-  );
+  const weeklyAchieved = weeklyTargetMeasures.reduce((accumulator, leadMeasure) => {
+    const weekly = weeklyById.get(toNumberId(leadMeasure.id));
+    const targetValue = leadMeasure.targetValue ?? 0;
+    return accumulator + Math.min(weekly?.achieved ?? 0, targetValue);
+  }, 0);
   const weeklyTotalTarget = weeklyTargetMeasures.reduce(
     (accumulator, leadMeasure) => accumulator + (leadMeasure.targetValue ?? 0),
     0,
   );
   const weeklyOverallRate =
-    weeklyTotalTarget > 0
-      ? Math.round((weeklyAchieved / weeklyTotalTarget) * 100)
-      : 0;
+    weeklyTotalTarget > 0 ? Math.round((weeklyAchieved / weeklyTotalTarget) * 100) : 0;
   const monthlyOverallRate = Math.round(monthlySummary?.achievementRate ?? 0);
   const monthlyLeadMeasures = dashboard?.monthlyLogs?.leadMeasures ?? [];
   const weekLabel =
     weekDates.length === 7
       ? `${weekDates[0].slice(5).replace("-", ".")} – ${weekDates[6].slice(5).replace("-", ".")}`
       : "";
-  const weeklyTrendPoints: WeeklyTrendPoint[] =
-    dashboard?.weeklyTrendPoints ?? [];
+  const weeklyTrendPoints: WeeklyTrendPoint[] = dashboard?.weeklyTrendPoints ?? [];
   const weeklyGuideById = new Map(
     weeklyLeadMeasures.map((leadMeasure) => [
       toNumberId(leadMeasure.id),

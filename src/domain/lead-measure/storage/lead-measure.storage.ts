@@ -1,4 +1,11 @@
-import { actionItemPublicIds, leadMeasureTags, leadMeasures, scoreboards, workspaceTags } from "@/db/schema";
+import type { DowinDatabase } from "@/db";
+import {
+  actionItemPublicIds,
+  leadMeasureTags,
+  leadMeasures,
+  scoreboards,
+  workspaceTags,
+} from "@/db/schema";
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 
 export type LeadMeasureRecord = typeof leadMeasures.$inferSelect;
@@ -29,45 +36,10 @@ export type CreateLeadMeasureInput = {
   tagIds?: number[];
 };
 
-export type UpdateLeadMeasureInput = Partial<
-  Omit<CreateLeadMeasureInput, "scoreboardId">
->;
-
-export interface LeadMeasureDbPort {
-  query: {
-    leadMeasures: {
-      findMany(args: unknown): Promise<unknown>;
-      findFirst(args: unknown): Promise<unknown>;
-    };
-    workspaceTags: {
-      findMany(args: unknown): Promise<unknown>;
-    };
-    scoreboards: {
-      findFirst(args: unknown): Promise<unknown>;
-    };
-    actionItemPublicIds: {
-      findFirst(args: unknown): Promise<unknown>;
-    };
-  };
-  insert(table: unknown): {
-    values(input: unknown): {
-      returning(): Promise<unknown>;
-    };
-  };
-  update(table: unknown): {
-    set(input: unknown): {
-      where(condition: unknown): {
-        returning(): Promise<unknown>;
-      };
-    };
-  };
-  delete(table: unknown): {
-    where(condition: unknown): Promise<unknown>;
-  };
-}
+export type UpdateLeadMeasureInput = Partial<Omit<CreateLeadMeasureInput, "scoreboardId">>;
 
 export class LeadMeasureStorage {
-  constructor(private db: LeadMeasureDbPort) {}
+  constructor(private db: DowinDatabase) {}
 
   private mapLeadMeasureRecord(
     raw: LeadMeasureRecord & {
@@ -114,10 +86,7 @@ export class LeadMeasureStorage {
     const rows = (await this.db.query.leadMeasures.findMany({
       where:
         status === "active"
-          ? and(
-              eq(leadMeasures.scoreboardId, scoreboardId),
-              eq(leadMeasures.status, "ACTIVE"),
-            )
+          ? and(eq(leadMeasures.scoreboardId, scoreboardId), eq(leadMeasures.status, "ACTIVE"))
           : eq(leadMeasures.scoreboardId, scoreboardId),
       with: {
         tags: {
@@ -140,10 +109,7 @@ export class LeadMeasureStorage {
     scoreboardId: number,
   ): Promise<LeadMeasureSummaryRecord[]> {
     return (await this.db.query.leadMeasures.findMany({
-      where: and(
-        eq(leadMeasures.scoreboardId, scoreboardId),
-        eq(leadMeasures.status, "ACTIVE"),
-      ),
+      where: and(eq(leadMeasures.scoreboardId, scoreboardId), eq(leadMeasures.status, "ACTIVE")),
       columns: {
         id: true,
         targetValue: true,
@@ -151,14 +117,14 @@ export class LeadMeasureStorage {
         trackingMode: true,
         orderIndex: true,
         dailyTargetCount: true,
+        status: true,
+        createdAt: true,
       },
       orderBy: [asc(leadMeasures.orderIndex), asc(leadMeasures.createdAt)],
     })) as LeadMeasureSummaryRecord[];
   }
 
-  async createLeadMeasure(
-    input: CreateLeadMeasureInput,
-  ): Promise<LeadMeasureRecordWithTags> {
+  async createLeadMeasure(input: CreateLeadMeasureInput): Promise<LeadMeasureRecordWithTags> {
     const { tagIds = [], ...measureInput } = input;
     const [created] = (await this.db
       .insert(leadMeasures)
@@ -206,12 +172,7 @@ export class LeadMeasureStorage {
     const row = (await this.db.query.leadMeasures.findFirst({
       where: eq(leadMeasures.id, id),
       with: {
-        scoreboard: {
-          where: and(
-            eq(scoreboards.userId, userId),
-            eq(scoreboards.workspaceId, workspaceId),
-          ),
-        },
+        scoreboard: true,
         tags: {
           with: {
             tag: true,
@@ -225,7 +186,12 @@ export class LeadMeasureStorage {
         })
       | undefined;
 
-    if (!row) {
+    if (
+      !row ||
+      !row.scoreboard ||
+      row.scoreboard.userId !== userId ||
+      row.scoreboard.workspaceId !== workspaceId
+    ) {
       return undefined;
     }
 
@@ -240,10 +206,10 @@ export class LeadMeasureStorage {
 
     if (Object.keys(measureInput).length > 0) {
       await this.db
-      .update(leadMeasures)
-      .set(measureInput)
-      .where(eq(leadMeasures.id, id))
-      .returning();
+        .update(leadMeasures)
+        .set(measureInput)
+        .where(eq(leadMeasures.id, id))
+        .returning();
     }
 
     if (tagIds) {
@@ -300,10 +266,7 @@ export class LeadMeasureStorage {
     }
 
     return (await this.db.query.workspaceTags.findMany({
-      where: and(
-        eq(workspaceTags.workspaceId, workspaceId),
-        inArray(workspaceTags.id, tagIds),
-      ),
+      where: and(eq(workspaceTags.workspaceId, workspaceId), inArray(workspaceTags.id, tagIds)),
       columns: {
         id: true,
         name: true,

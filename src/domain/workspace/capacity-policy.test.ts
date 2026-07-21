@@ -1,15 +1,19 @@
-import { describe, expect, it, vi } from "vitest";
+import {
+  type BillingPlanCode,
+  type BillingStatus,
+  type NullableEntitlementSource,
+} from "@/domain/billing/types";
 import { CapacityPolicy } from "@/domain/workspace/capacity-policy";
-import { type NullableEntitlementSource } from "@/domain/billing/types";
 import { ConflictError, ForbiddenError } from "@/lib/server/errors";
+import { describe, expect, it, vi } from "vitest";
 
 function createPolicy(input: {
   memberCount: number;
   memberLimit: number | null;
   purchasedSeatCount?: number | null;
   billingState?: {
-    planCode: "BASIC" | "FREE" | "STANDARD";
-    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+    planCode: BillingPlanCode;
+    billingStatus: BillingStatus;
     entitlementSource: NullableEntitlementSource;
   } | null;
 }) {
@@ -24,14 +28,16 @@ function createPolicy(input: {
           }
         : input.billingState,
     ),
-    findPlanLimit: vi.fn().mockResolvedValue(
-      input.memberLimit === null ? null : { memberLimit: input.memberLimit },
-    ),
-    findSeatEntitlement: vi.fn().mockResolvedValue(
-      input.purchasedSeatCount === undefined || input.purchasedSeatCount === null
-        ? null
-        : { purchasedSeatCount: input.purchasedSeatCount },
-    ),
+    findPlanLimit: vi
+      .fn()
+      .mockResolvedValue(input.memberLimit === null ? null : { memberLimit: input.memberLimit }),
+    findSeatEntitlement: vi
+      .fn()
+      .mockResolvedValue(
+        input.purchasedSeatCount === undefined || input.purchasedSeatCount === null
+          ? null
+          : { purchasedSeatCount: input.purchasedSeatCount },
+      ),
   };
 
   return { policy: new CapacityPolicy(storage), storage };
@@ -49,17 +55,15 @@ describe("CapacityPolicy", () => {
   it("현재 멤버 수가 limit 미만이면 멤버 추가를 허용한다", async () => {
     const { policy } = createPolicy({ memberCount: 9, memberLimit: 10 });
 
-    await expect(
-      policy.assertCanAddMember({ id: 1, planCode: "FREE" }),
-    ).resolves.toBeUndefined();
+    await expect(policy.assertCanAddMember({ id: 1, planCode: "FREE" })).resolves.toBeUndefined();
   });
 
   it("현재 멤버 수가 limit에 도달하면 멤버 추가를 차단한다", async () => {
     const { policy } = createPolicy({ memberCount: 10, memberLimit: 10 });
 
-    await expect(
-      policy.assertCanAddMember({ id: 1, planCode: "FREE" }),
-    ).rejects.toBeInstanceOf(ConflictError);
+    await expect(policy.assertCanAddMember({ id: 1, planCode: "FREE" })).rejects.toBeInstanceOf(
+      ConflictError,
+    );
   });
 
   it("Basic entitlement가 없으면 멤버 추가를 차단한다", async () => {
@@ -69,9 +73,9 @@ describe("CapacityPolicy", () => {
       billingState: null,
     });
 
-    await expect(
-      policy.assertCanAddMember({ id: 1, planCode: "FREE" }),
-    ).rejects.toMatchObject({ code: "BASIC_SUBSCRIPTION_REQUIRED" });
+    await expect(policy.assertCanAddMember({ id: 1, planCode: "FREE" })).rejects.toMatchObject({
+      code: "BASIC_SUBSCRIPTION_REQUIRED",
+    });
   });
 
   it("BASIC workspace는 구매 seat 수를 멤버 한도로 사용한다", async () => {
@@ -81,9 +85,9 @@ describe("CapacityPolicy", () => {
       purchasedSeatCount: 5,
     });
 
-    await expect(
-      policy.assertCanAddMember({ id: 1, planCode: "BASIC" }),
-    ).rejects.toBeInstanceOf(ConflictError);
+    await expect(policy.assertCanAddMember({ id: 1, planCode: "BASIC" })).rejects.toBeInstanceOf(
+      ConflictError,
+    );
     expect(storage.findSeatEntitlement).toHaveBeenCalledWith(1);
     expect(storage.findPlanLimit).not.toHaveBeenCalled();
   });

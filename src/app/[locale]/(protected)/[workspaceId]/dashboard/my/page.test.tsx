@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "@/test/render";
 
-import MyDashboardPage from "./page";
-import { useDashboardScoreboard } from "./_hooks/useDashboardScoreboard";
-import { useMyDashboardPageState } from "./_hooks/useMyDashboardPageState";
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { useToast } from "@/context/ToastContext";
+import { DashboardMyClient } from "./_components/DashboardMyClient";
+import { useDashboardScoreboard } from "./_hooks/useDashboardScoreboard";
+import { useMyDashboardPageState } from "./_hooks/useMyDashboardPageState";
 
 vi.mock("@/api/generated/profile/profile", () => ({
   useGetUsersMe: vi.fn(),
@@ -18,14 +18,7 @@ vi.mock("@/context/ToastContext", () => ({
 }));
 
 vi.mock("@/i18n/routing", () => ({
-  Link: ({
-    children,
-    href,
-    ...props
-  }: {
-    children: React.ReactNode;
-    href: string;
-  }) => (
+  Link: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -156,9 +149,7 @@ vi.mock("./_components/ProductUpdateCard", () => ({
 }));
 
 vi.mock("@/app/[locale]/(protected)/_components/WorkspaceOverLimitBanner", () => ({
-  WorkspaceOverLimitBanner: () => (
-    <section data-testid="workspace-over-limit">over limit</section>
-  ),
+  WorkspaceOverLimitBanner: () => <section data-testid="workspace-over-limit">over limit</section>,
 }));
 
 const showToast = vi.fn();
@@ -250,7 +241,7 @@ function createDashboardState(overrides: Partial<DashboardState> = {}) {
   } as DashboardState;
 }
 
-describe("MyDashboardPage", () => {
+describe("DashboardMyClient", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useToast).mockReturnValue({ showToast });
@@ -275,15 +266,13 @@ describe("MyDashboardPage", () => {
   });
 
   it("renders the loading dashboard skeleton", () => {
-    vi.mocked(useDashboardScoreboard).mockReturnValue(
-      createDashboardState({ isLoading: true }),
+    vi.mocked(useDashboardScoreboard).mockReturnValue(createDashboardState({ isLoading: true }));
+
+    const { container } = renderWithProviders(
+      <DashboardMyClient initialProfile={undefined} initialDashboard={undefined} />,
     );
 
-    const { container } = renderWithProviders(<MyDashboardPage />);
-
-    expect(container.querySelectorAll(".bg-border").length).toBeGreaterThan(
-      0,
-    );
+    expect(container.querySelectorAll(".bg-border").length).toBeGreaterThan(0);
     expect(screen.queryByTestId("weekly-board")).not.toBeInTheDocument();
   });
 
@@ -292,7 +281,9 @@ describe("MyDashboardPage", () => {
       createDashboardState({ hasNoWorkspace: true }),
     );
 
-    renderWithProviders(<MyDashboardPage />);
+    renderWithProviders(
+      <DashboardMyClient initialProfile={undefined} initialDashboard={undefined} />,
+    );
 
     expect(screen.getByText("아직 워크스페이스가 없습니다")).toBeInTheDocument();
   });
@@ -305,34 +296,37 @@ describe("MyDashboardPage", () => {
       }),
     );
 
-    renderWithProviders(<MyDashboardPage />);
+    renderWithProviders(
+      <DashboardMyClient initialProfile={undefined} initialDashboard={undefined} />,
+    );
 
-    expect(
-      screen.getByText("아직 활성화된 점수판이 없습니다"),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "새 점수판 만들기" }))
-      .toHaveAttribute("href", "/workspace-1/setup?mode=create");
+    expect(screen.getByText("아직 활성화된 점수판이 없습니다")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "새 점수판 만들기" })).toHaveAttribute(
+      "href",
+      "/workspace-1/setup?mode=create",
+    );
   });
 
   it("renders the weekly dashboard and wires primary controls", () => {
-    renderWithProviders(<MyDashboardPage />);
-
-    expect(screen.getByRole("heading", { name: "혜빈님의 홈" }))
-      .toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "점수판 보관함" }))
-      .toHaveAttribute("href", "/workspace-1/scoreboards");
-    expect(screen.getByRole("link", { name: "점수판 관리" }))
-      .toHaveAttribute("href", "/workspace-1/setup?mode=update");
-    expect(screen.getByTestId("scoreboard-overview")).toHaveTextContent(
-      "weekly:33 monthly:80",
+    renderWithProviders(
+      <DashboardMyClient initialProfile={undefined} initialDashboard={undefined} />,
     );
+
+    expect(screen.getByRole("heading", { name: "혜빈님의 홈" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "점수판 보관함" })).toHaveAttribute(
+      "href",
+      "/workspace-1/scoreboards",
+    );
+    expect(screen.getByRole("link", { name: "점수판 관리" })).toHaveAttribute(
+      "href",
+      "/workspace-1/setup?mode=update",
+    );
+    expect(screen.getByTestId("scoreboard-overview")).toHaveTextContent("weekly:33 monthly:80");
     expect(screen.getByTestId("weekly-board")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "월간" }));
     fireEvent.click(screen.getByRole("button", { name: "previous period" }));
-    fireEvent.click(
-      screen.getByRole("button", { name: "잠재고객 10명에게 연락하기" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "잠재고객 10명에게 연락하기" }));
 
     expect(setSelectedView).toHaveBeenCalledWith("month");
     expect(movePeriod).toHaveBeenCalledWith(-1);
@@ -345,7 +339,9 @@ describe("MyDashboardPage", () => {
       createDashboardState({ selectedView: "month" }),
     );
 
-    renderWithProviders(<MyDashboardPage />);
+    renderWithProviders(
+      <DashboardMyClient initialProfile={undefined} initialDashboard={undefined} />,
+    );
 
     expect(screen.getByTestId("monthly-board")).toBeInTheDocument();
     expect(screen.getByText("월간 회고 작성하기")).toBeInTheDocument();
@@ -356,11 +352,11 @@ describe("MyDashboardPage", () => {
       createDashboardState({ activeLeadMeasures: [] }),
     );
 
-    renderWithProviders(<MyDashboardPage />);
+    renderWithProviders(
+      <DashboardMyClient initialProfile={undefined} initialDashboard={undefined} />,
+    );
 
-    expect(
-      screen.getByText("활성화된 액션 아이템이 없습니다."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("활성화된 액션 아이템이 없습니다.")).toBeInTheDocument();
   });
 
   it("renders over-limit and product update states", () => {
@@ -387,12 +383,12 @@ describe("MyDashboardPage", () => {
       markCelebrationPending,
     } as unknown as ReturnType<typeof useMyDashboardPageState>);
 
-    renderWithProviders(<MyDashboardPage />);
+    renderWithProviders(
+      <DashboardMyClient initialProfile={undefined} initialDashboard={undefined} />,
+    );
 
     expect(screen.getByTestId("workspace-over-limit")).toBeInTheDocument();
-    expect(screen.getByTestId("product-update")).toHaveTextContent(
-      "새 기능 안내",
-    );
+    expect(screen.getByTestId("product-update")).toHaveTextContent("새 기능 안내");
 
     fireEvent.click(screen.getByRole("button", { name: "dismiss update" }));
     expect(handleDismissProductUpdate).toHaveBeenCalledTimes(1);

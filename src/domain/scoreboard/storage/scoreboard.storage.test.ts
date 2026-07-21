@@ -1,52 +1,28 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DowinDatabase } from "@/db";
 import { scoreboards } from "@/db/schema";
-import { ScoreboardDbPort, ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
+import { ScoreboardStorage } from "@/domain/scoreboard/storage/scoreboard.storage";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("ScoreboardStorage", () => {
   const findFirst = vi.fn();
   const findMany = vi.fn();
-  const insert = vi.fn().mockReturnThis();
-  const values = vi.fn().mockReturnThis();
   const returning = vi.fn();
-  const update = vi.fn().mockReturnThis();
-  const set = vi.fn().mockReturnThis();
-  const where = vi.fn().mockReturnThis();
+  const where = vi.fn().mockReturnValue({ returning });
+  const set = vi.fn().mockReturnValue({ where });
+  const update = vi.fn().mockReturnValue({ set });
+  const values = vi.fn().mockReturnValue({ returning });
+  const insert = vi.fn().mockReturnValue({ values });
 
-  const mockDb: ScoreboardDbPort = {
+  const mockDb = {
     query: {
       scoreboards: {
-        findFirst: (args) => findFirst(args),
-        findMany: (args) => findMany(args),
+        findFirst,
+        findMany,
       },
     },
-    insert: (table) => {
-      insert(table);
-      return {
-        values: (input) => {
-          values(input);
-          return {
-            returning: () => returning(),
-          };
-        },
-      };
-    },
-    update: (table) => {
-      update(table);
-      return {
-        set: (input) => {
-          set(input);
-          return {
-            where: (condition) => {
-              where(condition);
-              return {
-                returning: () => returning(),
-              };
-            },
-          };
-        },
-      };
-    },
-  };
+    insert,
+    update,
+  } as unknown as DowinDatabase;
 
   const storage = new ScoreboardStorage(mockDb);
 

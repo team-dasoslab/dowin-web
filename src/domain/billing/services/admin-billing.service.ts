@@ -1,18 +1,15 @@
+import { AuditLogStorage } from "@/domain/audit/storage/audit-log.storage";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import {
+  type BillingPlanCode,
+  type BillingStatus,
   type EntitlementSource,
   type NullableEntitlementSource,
 } from "@/domain/billing/types";
-import { AuditLogStorage } from "@/domain/audit/storage/audit-log.storage";
 import { NotFoundError } from "@/lib/server/errors";
 
-type BillingState =
-  | "NONE"
-  | "ACTIVE"
-  | "CANCELED"
-  | "EXPIRED"
-  | "REVOKED";
-type PlanCode = "BASIC" | "FREE" | "STANDARD";
+type BillingState = BillingStatus;
+type PlanCode = BillingPlanCode;
 
 type BillingPort = Pick<
   BillingStorage,
@@ -32,8 +29,10 @@ type AuditLogPort = Pick<AuditLogStorage, "create">;
 
 const BILLING_RISK_REVIEW_THRESHOLD = 2;
 const BILLING_RISK_LOOKBACK_DAYS = 30;
-const MANUAL_EXPIRABLE_ENTITLEMENT_SOURCES: readonly NullableEntitlementSource[] =
-  ["BETA_PROMOTIONAL_GRANT", "MANUAL_GRANT"];
+const MANUAL_EXPIRABLE_ENTITLEMENT_SOURCES: readonly NullableEntitlementSource[] = [
+  "BETA_PROMOTIONAL_GRANT",
+  "MANUAL_GRANT",
+];
 
 type AdminBillingWorkspaceBase = {
   workspaceId: number;
@@ -151,24 +150,19 @@ export class AdminBillingService {
     workspaceId?: number;
     workspaceName?: string;
   }): Promise<AdminBillingWorkspaceSummary[]> {
-    const workspaces =
-      await this.billingStorage.searchAdminBillingWorkspaces(filters);
+    const workspaces = await this.billingStorage.searchAdminBillingWorkspaces(filters);
     return this.attachRiskSummary(workspaces);
   }
 
-  async getWorkspaceDetail(
-    workspaceId: number,
-  ): Promise<AdminBillingWorkspaceDetail> {
-    const workspace =
-      await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
+  async getWorkspaceDetail(workspaceId: number): Promise<AdminBillingWorkspaceDetail> {
+    const workspace = await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
 
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
     const [summary] = await this.attachRiskSummary([workspace]);
-    const events =
-      await this.billingStorage.listBillingEventsForWorkspace(workspaceId);
+    const events = await this.billingStorage.listBillingEventsForWorkspace(workspaceId);
 
     return {
       ...summary,
@@ -203,11 +197,7 @@ export class AdminBillingService {
     );
 
     for (const workspace of expiredWorkspaces) {
-      await this.syncWorkspaceBillingStatus(
-        adminUserId,
-        workspace.workspaceId,
-        now,
-      );
+      await this.syncWorkspaceBillingStatus(adminUserId, workspace.workspaceId, now);
     }
 
     return {
@@ -221,8 +211,7 @@ export class AdminBillingService {
     workspaceId: number,
     occurredAt = new Date(),
   ): Promise<AdminBillingWorkspaceDetail> {
-    const existing =
-      await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
+    const existing = await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
 
     if (!existing) {
       throw new NotFoundError("NOT_FOUND");
@@ -326,27 +315,24 @@ export class AdminBillingService {
       changeReason: string;
     },
   ): Promise<AdminBillingWorkspaceDetail> {
-    const existing =
-      await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
+    const existing = await this.billingStorage.findWorkspaceBillingAdminDetail(workspaceId);
 
     if (!existing) {
       throw new NotFoundError("NOT_FOUND");
     }
 
     const occurredAt = new Date();
-    const currentPeriodEnd = input.currentPeriodEnd
-      ? new Date(input.currentPeriodEnd)
-      : null;
+    const currentPeriodEnd = input.currentPeriodEnd ? new Date(input.currentPeriodEnd) : null;
     const nextEntitlementSource =
       input.entitlementSource !== undefined
         ? input.entitlementSource
         : input.planCode === "BASIC" || input.planCode === "STANDARD"
           ? ("MANUAL_GRANT" as EntitlementSource)
-          : existing.entitlementSource ?? null;
+          : (existing.entitlementSource ?? null);
     const nextBillingOwnerUserId =
       input.billingOwnerUserId !== undefined
         ? input.billingOwnerUserId
-        : existing.billingOwnerUserId ?? null;
+        : (existing.billingOwnerUserId ?? null);
     const shouldExpireImmediately = isExpiredManualEntitlement({
       billingStatus: input.billingStatus,
       entitlementSource: nextEntitlementSource,
@@ -354,9 +340,7 @@ export class AdminBillingService {
       now: occurredAt,
     });
     const nextPlanCode = shouldExpireImmediately ? "FREE" : input.planCode;
-    const nextBillingStatus = shouldExpireImmediately
-      ? "EXPIRED"
-      : input.billingStatus;
+    const nextBillingStatus = shouldExpireImmediately ? "EXPIRED" : input.billingStatus;
     const shouldApplySeatEntitlement =
       nextPlanCode === "BASIC" &&
       (nextBillingStatus === "ACTIVE" || nextBillingStatus === "CANCELED");
@@ -486,8 +470,7 @@ function toAdminBillingWorkspaceSummary(
     recentRevokedCount: number;
   },
 ): AdminBillingWorkspaceSummary {
-  const totalRiskEvents =
-    riskSummary.recentRefundCount + riskSummary.recentRevokedCount;
+  const totalRiskEvents = riskSummary.recentRefundCount + riskSummary.recentRevokedCount;
 
   return {
     workspaceId: workspace.workspaceId,
@@ -562,9 +545,7 @@ function normalizeNullableText(value: string | null | undefined) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function snapshotBillingState(
-  workspace: BillingWorkspaceDetailResult,
-): Record<string, unknown> {
+function snapshotBillingState(workspace: BillingWorkspaceDetailResult): Record<string, unknown> {
   return {
     planCode: workspace.planCode,
     billingStatus: workspace.billingStatus,

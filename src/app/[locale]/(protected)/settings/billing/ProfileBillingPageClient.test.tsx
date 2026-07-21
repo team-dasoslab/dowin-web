@@ -1,3 +1,4 @@
+import { type BillingStatus } from "@/domain/billing/types";
 import { fireEvent, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -53,7 +54,7 @@ const updateSeats = vi.fn();
 const refetch = vi.fn();
 
 type BillingOverrides = Partial<{
-  billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  billingStatus: BillingStatus;
   canManageBilling: boolean;
   currentPeriodEnd: string | null;
   entitlementSource:

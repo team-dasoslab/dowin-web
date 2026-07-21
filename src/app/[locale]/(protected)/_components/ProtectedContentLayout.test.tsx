@@ -1,3 +1,4 @@
+import { type BillingPlanCode, type BillingStatus } from "@/domain/billing/types";
 import { screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -40,8 +41,8 @@ vi.mock("next/navigation", () => ({
 
 function mockBilling(
   overrides: {
-    billingStatus?: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    planCode?: "BASIC" | "FREE" | "STANDARD";
+    billingStatus?: BillingStatus;
+    planCode?: BillingPlanCode;
     requiresManualReview?: boolean;
   } = {},
 ) {

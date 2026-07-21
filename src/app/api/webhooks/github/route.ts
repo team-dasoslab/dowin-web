@@ -1,7 +1,11 @@
-import { createWebhookService, type GithubInstallationRepositoriesPayload } from "@/domain/github-integration/services/webhook.service";
+import {
+  createWebhookService,
+  type GithubInstallationRepositoriesPayload,
+} from "@/domain/github-integration/services/webhook.service";
 import { verifyWebhookSignature } from "@/domain/github-integration/utils/webhook.utils";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+
+import { withErrorHandler } from "@/lib/server/with-error-handler";
 
 type GithubPrPayload = {
   action: string;
@@ -20,9 +24,7 @@ type GithubPrPayload = {
   installation: { id: number };
 };
 
-export async function POST(req: NextRequest) {
-  const { env } = await getCloudflareContext();
-
+export const POST = withErrorHandler(async (req, { env }) => {
   const deliveryId = req.headers.get("X-GitHub-Delivery");
   const eventName = req.headers.get("X-GitHub-Event");
   const signatureHeader = req.headers.get("X-Hub-Signature-256");
@@ -54,23 +56,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  try {
-    const service = createWebhookService(env);
-    let result;
+  const service = createWebhookService(env);
+  let result;
 
-    if (eventName === "pull_request") {
+  switch (eventName) {
+    case "pull_request":
       result = await service.handlePullRequestEvent(deliveryId, payload as GithubPrPayload);
-    } else if (eventName === "installation_repositories") {
-      result = await service.handleInstallationRepositoriesEvent(deliveryId, payload as GithubInstallationRepositoriesPayload);
-    }
-
-    return NextResponse.json({ ok: true, ...result });
-  } catch (error: unknown) {
-    console.error("github webhook error:", error);
-    // Return 200 to prevent GitHub from retrying for permanent errors
-    return NextResponse.json({
-      ok: false,
-      error: (error as Error).message,
-    });
+      break;
+    case "installation_repositories":
+      result = await service.handleInstallationRepositoriesEvent(
+        deliveryId,
+        payload as GithubInstallationRepositoriesPayload,
+      );
+      break;
   }
-}
+
+  return NextResponse.json({ ok: true, ...result });
+});

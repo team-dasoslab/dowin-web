@@ -1,3 +1,5 @@
+import { type BillingPlanCode } from "@/domain/billing/types";
+import { type WorkspaceRole } from "@/domain/workspace/types";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import {
   assertWorkspaceHasMemberCapacity,
@@ -18,7 +20,7 @@ type Workspace = NonNullable<
 type PublicWorkspace = {
   id: string;
   name: string;
-  planCode: "BASIC" | "FREE" | "STANDARD";
+  planCode: BillingPlanCode;
   allowPastDailyLogEdit: boolean;
   createdAt: Date;
 };
@@ -26,13 +28,13 @@ type WorkspaceWithPlanLimits = PublicWorkspace & {
   freeMemberLimit: number;
   isOverFreeMemberLimit: boolean;
   memberCount: number;
-  role: "ADMIN" | "MEMBER";
+  role: WorkspaceRole;
 };
 type WorkspaceListItem = {
   id: string;
   name: string;
-  planCode: "BASIC" | "FREE" | "STANDARD";
-  role: "ADMIN" | "MEMBER";
+  planCode: BillingPlanCode;
+  role: WorkspaceRole;
   isCurrent: boolean;
   allowPastDailyLogEdit: boolean;
   createdAt: Date;
@@ -41,7 +43,7 @@ type WorkspaceMemberListItem = {
   id: number;
   nickname: string;
   avatarKey: string | null;
-  role: "ADMIN" | "MEMBER";
+  role: WorkspaceRole;
   isMe: boolean;
   createdAt: Date;
 };
