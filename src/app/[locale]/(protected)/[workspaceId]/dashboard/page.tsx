@@ -14,7 +14,6 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { DashboardTeamClient } from "./_components/DashboardTeamClient";
 import { getTodayInKst, getWeekDates } from "./my/_lib/week";
 
-export const dynamic = "force-dynamic";
 
 export default async function DashboardPage({
   params,

@@ -17,6 +17,10 @@ describe("WorkspaceService", () => {
       billingStatus: "ACTIVE",
       planCode: "BASIC",
     },
+    capacity: {
+      hasAvailableMemberSlot: true,
+      isOverLimit: false,
+    },
   };
   const mockStorage = {
     resolveIdByUid: vi.fn(),

@@ -9,7 +9,6 @@ import { DashboardMyClient } from "./_components/DashboardMyClient";
 import { isDashboardView } from "./_lib/dashboard-scoreboard";
 import { getMonthStart, getTodayInKst, getWeekDates, isValidDateString } from "./_lib/week";
 
-export const dynamic = "force-dynamic";
 
 export default async function MyDashboardPage({
   params,

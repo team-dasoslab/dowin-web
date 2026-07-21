@@ -42,6 +42,9 @@ export class WorkspaceStorage {
         workspace: workspaces,
         member: workspaceMembers,
         billingState: workspaceBillingState,
+        seatEntitlement: workspaceSeatEntitlements,
+        planLimit: billingPlanLimits,
+        memberCount: sql<number>`(SELECT COUNT(*) FROM workspace_members WHERE workspace_members.workspace_id = ${workspaces.id})`.mapWith(Number),
       })
       .from(workspaces)
       .innerJoin(
@@ -49,6 +52,14 @@ export class WorkspaceStorage {
         and(eq(workspaces.id, workspaceMembers.workspaceId), eq(workspaceMembers.userId, userId)),
       )
       .leftJoin(workspaceBillingState, eq(workspaces.id, workspaceBillingState.workspaceId))
+      .leftJoin(workspaceSeatEntitlements, eq(workspaces.id, workspaceSeatEntitlements.workspaceId))
+      .leftJoin(
+        billingPlanLimits,
+        eq(
+          billingPlanLimits.planCode,
+          sql`coalesce(${workspaceBillingState.planCode}, ${workspaces.planCode})`
+        )
+      )
       .where(and(eq(workspaces.id, workspaceId), isNull(workspaces.deletedAt)))
       .limit(1);
 

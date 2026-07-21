@@ -17,6 +17,10 @@ const adminContext: WorkspaceAccessContext = {
     billingStatus: "ACTIVE",
     planCode: "BASIC",
   },
+  capacity: {
+    hasAvailableMemberSlot: true,
+    isOverLimit: false,
+  },
 };
 
 const memberContext: WorkspaceAccessContext = {

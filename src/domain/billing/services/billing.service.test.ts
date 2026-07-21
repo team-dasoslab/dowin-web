@@ -18,6 +18,10 @@ describe("BillingService", () => {
       billingStatus: "ACTIVE",
       planCode: "BASIC",
     },
+    capacity: {
+      hasAvailableMemberSlot: true,
+      isOverLimit: false,
+    },
   };
   const memberCtx: WorkspaceAccessContext = {
     ...ctx,
