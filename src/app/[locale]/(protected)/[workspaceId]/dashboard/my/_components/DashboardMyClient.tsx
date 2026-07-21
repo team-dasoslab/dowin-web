@@ -162,10 +162,10 @@ export function DashboardMyClient({ initialProfile, initialDashboard }: Dashboar
 
               {currentCheckinStreak > 0 ? (
                 <Badge
-                  variant="info"
+                  variant="primary"
                   shape="pill"
                   size="lg"
-                  className="gap-1 text-[13px] px-3 border-blue-500/10"
+                  className="gap-1 text-[13px] px-3 border-primary/10"
                   title={t("dailyCheckinStreakTitle", { count: currentCheckinStreak })}
                 >
                   <Zap className="w-4 h-4 fill-current" />
