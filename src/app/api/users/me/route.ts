@@ -1,29 +1,18 @@
 import { getDb } from "@/db";
 import { ProfileService } from "@/domain/profile/services/profile.service";
 import { ProfileStorage } from "@/domain/profile/storage/profile.storage";
-import {
-  profileDeleteSchema,
-  profileUpdateSchema,
-} from "@/domain/profile/validation";
-import { apiError, apiSuccess } from "@/lib/server/api-response";
-import {
-  getSession,
-  getSessionWithRefresh,
-  SESSION_COOKIE,
-} from "@/lib/server/auth";
+import { profileDeleteSchema, profileUpdateSchema } from "@/domain/profile/validation";
 import { isSupportedLocale } from "@/i18n/detect-locale";
+import { apiError, apiSuccess } from "@/lib/server/api-response";
+import { getSession, getSessionWithRefresh, SESSION_COOKIE } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-const createService = (db: ReturnType<typeof getDb>) =>
-  new ProfileService(new ProfileStorage(db));
+const createService = (db: ReturnType<typeof getDb>) => new ProfileService(new ProfileStorage(db));
 
-export const GET = withErrorHandler(async () => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const GET = withErrorHandler(async (_, { db }) => {
   const session = await getSession(db);
 
   if (!session) {
@@ -35,9 +24,7 @@ export const GET = withErrorHandler(async () => {
   return response;
 });
 
-export const PUT = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const PUT = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -47,29 +34,20 @@ export const PUT = withErrorHandler(async (request: Request) => {
   const parsed = profileUpdateSchema.safeParse(await request.json());
 
   if (!parsed.success) {
-    return await apiError(
-      "VALIDATION_ERROR",
-      parsed.error.flatten().fieldErrors,
-    );
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
     db,
     userId: session.userId,
     env,
-    intent:
-      parsed.data.nickname === undefined
-        ? "profile-avatar-update"
-        : "general-write",
+    intent: parsed.data.nickname === undefined ? "profile-avatar-update" : "general-write",
   });
   if (restrictedWriteResponse) {
     return restrictedWriteResponse;
   }
 
-  const profile = await createService(db).updateProfile(
-    session.userId,
-    parsed.data,
-  );
+  const profile = await createService(db).updateProfile(session.userId, parsed.data);
 
   if (profile?.locale && isSupportedLocale(profile.locale)) {
     const cookieStore = await cookies();
@@ -82,9 +60,8 @@ export const PUT = withErrorHandler(async (request: Request) => {
   return apiSuccess(profile);
 });
 
-export const DELETE = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const DELETE = withErrorHandler(async (request: Request, ctx) => {
+  const { env, db } = ctx;
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -94,10 +71,7 @@ export const DELETE = withErrorHandler(async (request: Request) => {
   const parsed = profileDeleteSchema.safeParse(await request.json());
 
   if (!parsed.success) {
-    return await apiError(
-      "VALIDATION_ERROR",
-      parsed.error.flatten().fieldErrors,
-    );
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const restrictedWriteResponse = await guardRestrictedTestAccountWrite({
@@ -110,10 +84,7 @@ export const DELETE = withErrorHandler(async (request: Request) => {
     return restrictedWriteResponse;
   }
 
-  await createService(db).deleteMyAccount(
-    session.userId,
-    parsed.data.currentPassword,
-  );
+  await createService(db).deleteMyAccount(session.userId, parsed.data.currentPassword);
 
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE);

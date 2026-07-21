@@ -1,24 +1,61 @@
-import { PlatformError } from "@/lib/server/errors";
-import { apiError } from "@/lib/server/api-response";
-import type { NextResponse } from "next/server";
 import { serverRuntimeConfig } from "@/config/server-runtime-config";
+import { getDb } from "@/db";
+import { apiError } from "@/lib/server/api-response";
+import { PlatformError } from "@/lib/server/errors";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import type { NextRequest, NextResponse } from "next/server";
 
-type AsyncHandler<TArgs extends unknown[] = unknown[]> = (
-  ...args: TArgs
+type BaseContext = { params?: unknown; [key: string]: unknown };
+
+type ApiHandler<TCtx extends BaseContext = BaseContext> = (
+  req: NextRequest,
+  ctx: TCtx & { env: ReturnType<typeof getCloudflareContext>["env"]; db: ReturnType<typeof getDb> },
 ) => Promise<NextResponse | Response>;
 
-export function withErrorHandler<TArgs extends unknown[]>(
-  handler: AsyncHandler<TArgs>,
+type TArgs<TCtx> = [req: NextRequest, ctx: TCtx];
+
+export function withErrorHandler<TCtx extends BaseContext = { params: Promise<unknown> }>(
+  handler: ApiHandler<TCtx>,
 ) {
-  return async (...args: TArgs) => {
+  return async (...args: TArgs<TCtx>) => {
+    const [req, ctx] = args;
     try {
-      return await handler(...args);
+      const { env } = getCloudflareContext();
+      const db = getDb(env.DB);
+
+      const enhancedCtx = {
+        ...(ctx || ({} as TCtx)),
+        env,
+        db,
+      };
+
+      if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+        const origin = req.headers.get("origin");
+        const referer = req.headers.get("referer");
+        const host = req.headers.get("host") || req.nextUrl.host;
+        const sourceUrl = origin || referer;
+
+        // Allow explicit app clients
+        const isApp = req.headers.get("x-dowin-client") === "app";
+
+        if (!isApp && sourceUrl && host) {
+          try {
+            const sourceOrigin = new URL(sourceUrl).host;
+            if (sourceOrigin !== host) {
+              return await apiError("FORBIDDEN", "CSRF Check Failed: Origin mismatch");
+            }
+          } catch {
+            // Invalid URL format in origin/referer
+            return await apiError("FORBIDDEN", "CSRF Check Failed: Invalid origin format");
+          }
+        }
+      }
+
+      return await handler(req as NextRequest, enhancedCtx);
     } catch (error) {
       if (error instanceof PlatformError) {
         return await apiError(error.code, error.details);
       }
-
-      console.error("[Unhandled Error]", error);
 
       if (serverRuntimeConfig.logsDiscordWebhookUrl) {
         try {

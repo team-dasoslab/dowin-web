@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { createHmac } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -26,9 +27,7 @@ vi.mock("@/domain/billing/services/polar-webhook.service", () => ({
 }));
 
 function sign(body: string, secret: string, webhookId: string, timestamp: string) {
-  return createHmac("sha256", secret)
-    .update(`${webhookId}.${timestamp}.${body}`)
-    .digest("base64");
+  return createHmac("sha256", secret).update(`${webhookId}.${timestamp}.${body}`).digest("base64");
 }
 
 describe("POST /api/webhooks/polar", () => {
@@ -48,7 +47,7 @@ describe("POST /api/webhooks/polar", () => {
     const timestamp = String(Math.floor(Date.now() / 1000));
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/webhooks/polar", {
+      new NextRequest("http://localhost/api/webhooks/polar", {
         method: "POST",
         body: JSON.stringify({ type: "subscription.active", timestamp: "", data: {} }),
         headers: {
@@ -57,6 +56,7 @@ describe("POST /api/webhooks/polar", () => {
           "webhook-signature": "v1,invalid",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(403);
@@ -73,16 +73,11 @@ describe("POST /api/webhooks/polar", () => {
     });
     const webhookId = "msg_123";
     const timestamp = String(Math.floor(Date.now() / 1000));
-    const signature = sign(
-      body,
-      "polar_whs_test_secret",
-      webhookId,
-      timestamp,
-    );
+    const signature = sign(body, "polar_whs_test_secret", webhookId, timestamp);
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/webhooks/polar", {
+      new NextRequest("http://localhost/api/webhooks/polar", {
         method: "POST",
         body,
         headers: {
@@ -91,6 +86,7 @@ describe("POST /api/webhooks/polar", () => {
           "webhook-signature": `v1,${signature}`,
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);

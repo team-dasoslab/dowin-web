@@ -1,5 +1,3 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { getDb } from "@/db";
 import { AuditLogStorage } from "@/domain/audit/storage/audit-log.storage";
 import { MarketingInviteService } from "@/domain/marketing-invite/services/marketing-invite.service";
 import { MarketingInviteStorage } from "@/domain/marketing-invite/storage/marketing-invite.storage";
@@ -9,9 +7,7 @@ import { getSessionWithRefresh } from "@/lib/server/auth";
 import { guardRestrictedTestAccountWrite } from "@/lib/server/restricted-test-account";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
   if (!session) {
     return await apiError("UNAUTHORIZED");

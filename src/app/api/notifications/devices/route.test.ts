@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -73,7 +74,7 @@ describe("POST /api/notifications/devices", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "POST",
         body: JSON.stringify({
           provider: "FCM",
@@ -85,6 +86,7 @@ describe("POST /api/notifications/devices", () => {
           "Content-Type": "application/json",
         },
       }) as never,
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(401);
@@ -96,7 +98,7 @@ describe("POST /api/notifications/devices", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "POST",
         body: JSON.stringify({
           provider: "FCM",
@@ -109,6 +111,7 @@ describe("POST /api/notifications/devices", () => {
           "Content-Type": "application/json",
         },
       }) as never,
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);
@@ -147,7 +150,7 @@ describe("DELETE /api/notifications/devices", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "DELETE",
         body: JSON.stringify({
           token: "token-1",
@@ -156,6 +159,7 @@ describe("DELETE /api/notifications/devices", () => {
           "Content-Type": "application/json",
         },
       }) as never,
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(401);
@@ -167,7 +171,7 @@ describe("DELETE /api/notifications/devices", () => {
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/notifications/devices", {
+      new NextRequest("http://localhost/api/notifications/devices", {
         method: "DELETE",
         body: JSON.stringify({
           token: "token-1",
@@ -176,6 +180,7 @@ describe("DELETE /api/notifications/devices", () => {
           "Content-Type": "application/json",
         },
       }) as never,
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);

@@ -1,6 +1,5 @@
 import { BadRequestError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
-import { ScoreboardStoragePort, WorkspaceLookupPort } from "@/domain/scoreboard/services/scoreboard.service";
-import { assertWorkspaceOperationAllowed } from "@/domain/workspace/plan-limits";
+import { ScoreboardStoragePort } from "@/domain/scoreboard/services/scoreboard.service";
 import {
   CreateLeadMeasureInput,
   LeadMeasureRecordWithTags,
@@ -9,6 +8,7 @@ import {
   LeadMeasureWithScoreboard,
   UpdateLeadMeasureInput,
 } from "@/domain/lead-measure/storage/lead-measure.storage";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type DailyLogSummaryPort = {
   countLogsByLeadMeasure(leadMeasureId: number): Promise<number>;
@@ -33,21 +33,17 @@ type LeadMeasureStoragePort = Pick<
 
 export class LeadMeasureService {
   constructor(
-    private workspaceStorage: WorkspaceLookupPort,
     private scoreboardStorage: Pick<ScoreboardStoragePort, "findOwnedScoreboard">,
     private leadMeasureStorage: LeadMeasureStoragePort,
     private dailyLogStorage: DailyLogSummaryPort,
   ) {}
 
   async getLeadMeasures(
-    workspaceUid: string,
+    context: WorkspaceAccessContext,
     scoreboardId: number,
-    userId: number,
     status: "active" | "all",
   ): Promise<Array<LeadMeasureRecordWithTags & { weeklyAchievement: { achieved: number; total: number } }>> {
-    await this.getOwnedScoreboard(workspaceUid, scoreboardId, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+    await this.getOwnedScoreboard(scoreboardId, context);
     const measures = await this.leadMeasureStorage.findLeadMeasuresByScoreboard(
       scoreboardId,
       status,
@@ -70,14 +66,11 @@ export class LeadMeasureService {
   }
 
   async createLeadMeasure(
-    workspaceUid: string,
+    context: WorkspaceAccessContext,
     scoreboardId: number,
-    userId: number,
     input: Omit<CreateLeadMeasureInput, "scoreboardId">,
   ): Promise<LeadMeasureRecordWithTags> {
-    const scoreboard = await this.getOwnedScoreboard(workspaceUid, scoreboardId, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+    const scoreboard = await this.getOwnedScoreboard(scoreboardId, context);
 
     if (scoreboard.status === "ARCHIVED") {
       throw new ForbiddenError("SCOREBOARD_ARCHIVED");
@@ -86,7 +79,7 @@ export class LeadMeasureService {
     const normalizedInput = normalizeLeadMeasureInput(input);
     validateTargetValue(normalizedInput.targetValue, normalizedInput.period, scoreboard.startDate);
     validateDailyTargetCount(normalizedInput.dailyTargetCount);
-    await this.assertWorkspaceTagOwnership(scoreboard.workspaceId, input.tagIds ?? []);
+    await this.assertWorkspaceTagOwnership(context.workspaceId, input.tagIds ?? []);
 
     return await this.leadMeasureStorage.createLeadMeasure({
       ...normalizedInput,
@@ -95,14 +88,11 @@ export class LeadMeasureService {
   }
 
   async updateLeadMeasure(
-    workspaceUid: string,
+    context: WorkspaceAccessContext,
     id: number,
-    userId: number,
     input: UpdateLeadMeasureInput,
   ): Promise<LeadMeasureRecordWithTags> {
-    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+    const measure = await this.getOwnedLeadMeasure(id, context);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -118,7 +108,7 @@ export class LeadMeasureService {
       normalizedInput.dailyTargetCount ?? measure.dailyTargetCount,
     );
     await this.assertWorkspaceTagOwnership(
-      measure.scoreboard.workspaceId,
+      context.workspaceId,
       input.tagIds ?? [],
       input.tagIds !== undefined,
     );
@@ -126,10 +116,8 @@ export class LeadMeasureService {
     return await this.leadMeasureStorage.updateLeadMeasure(id, normalizedInput);
   }
 
-  async archiveLeadMeasure(workspaceUid: string, id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
-    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+  async archiveLeadMeasure(context: WorkspaceAccessContext, id: number): Promise<LeadMeasureRecordWithTags> {
+    const measure = await this.getOwnedLeadMeasure(id, context);
 
     if (measure.status === "ARCHIVED") {
       throw new BadRequestError("LEAD_MEASURE_ALREADY_ARCHIVED");
@@ -138,10 +126,8 @@ export class LeadMeasureService {
     return await this.leadMeasureStorage.archiveLeadMeasure(id);
   }
 
-  async reactivateLeadMeasure(workspaceUid: string, id: number, userId: number): Promise<LeadMeasureRecordWithTags> {
-    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+  async reactivateLeadMeasure(context: WorkspaceAccessContext, id: number): Promise<LeadMeasureRecordWithTags> {
+    const measure = await this.getOwnedLeadMeasure(id, context);
 
     if (measure.status === "ACTIVE") {
       throw new BadRequestError("LEAD_MEASURE_ALREADY_ACTIVE");
@@ -151,13 +137,10 @@ export class LeadMeasureService {
   }
 
   async deleteLeadMeasure(
-    workspaceUid: string,
+    context: WorkspaceAccessContext,
     id: number,
-    userId: number,
   ): Promise<{ warning: string; deleted: boolean }> {
-    const measure = await this.getOwnedLeadMeasure(workspaceUid, id, userId);
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-    await assertWorkspaceOperationAllowed(workspace, this.workspaceStorage);
+    const measure = await this.getOwnedLeadMeasure(id, context);
 
     if (measure.status === "ARCHIVED") {
       throw new ForbiddenError("LEAD_MEASURE_ARCHIVED");
@@ -172,13 +155,11 @@ export class LeadMeasureService {
     };
   }
 
-  private async getOwnedScoreboard(workspaceUid: string, scoreboardId: number, userId: number) {
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-
+  private async getOwnedScoreboard(scoreboardId: number, context: WorkspaceAccessContext) {
     const scoreboard = await this.scoreboardStorage.findOwnedScoreboard(
       scoreboardId,
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
     if (!scoreboard) {
       throw new NotFoundError("NOT_FOUND");
@@ -187,36 +168,14 @@ export class LeadMeasureService {
     return scoreboard;
   }
 
-  private async getWorkspace(workspaceUid: string, userId: number) {
-    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
-    if (!internalId) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    const membership = await this.workspaceStorage.findMembership(internalId, userId);
-    if (!membership) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
-    if (!workspace) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    return workspace;
-  }
-
   private async getOwnedLeadMeasure(
-    workspaceUid: string,
     id: number,
-    userId: number,
+    context: WorkspaceAccessContext,
   ): Promise<LeadMeasureWithScoreboard> {
-    const workspace = await this.getWorkspace(workspaceUid, userId);
-
     const measure = await this.leadMeasureStorage.findOwnedLeadMeasure(
       id,
-      userId,
-      workspace.id,
+      context.userId,
+      context.workspaceId,
     );
     if (!measure || !measure.scoreboard) {
       throw new NotFoundError("NOT_FOUND");

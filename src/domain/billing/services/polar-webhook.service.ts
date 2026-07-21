@@ -1,7 +1,11 @@
-import { z } from "zod";
 import { stringifyNormalizedPolarPayload } from "@/domain/billing/polar-payload-normalizer";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
-import { type EntitlementSource } from "@/domain/billing/types";
+import {
+  type BillingPlanCode,
+  type BillingStatus,
+  type EntitlementSource,
+} from "@/domain/billing/types";
+import { z } from "zod";
 
 type BillingPort = Pick<
   BillingStorage,
@@ -20,8 +24,8 @@ const polarWebhookEnvelopeSchema = z.object({
 type WebhookEnvelope = z.infer<typeof polarWebhookEnvelopeSchema>;
 
 type BillingProjection = {
-  billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-  planCode: "BASIC" | "FREE" | "STANDARD";
+  billingStatus: BillingStatus;
+  planCode: BillingPlanCode;
   entitlementSource: EntitlementSource;
   customerKey: string | null;
   customerExternalRef: string | null;
@@ -53,10 +57,7 @@ function getRiskReviewFailureReason(input: {
   return null;
 }
 
-function getBillingEventStatus(
-  eventType: string,
-  projection: BillingProjection | null,
-) {
+function getBillingEventStatus(eventType: string, projection: BillingProjection | null) {
   if (projection || eventType === "order.refunded") {
     return "ACCEPTED";
   }
@@ -104,9 +105,7 @@ function asNumber(value: unknown): number | null {
 
 function asPositiveInteger(value: unknown): number | null {
   const number = asNumber(value);
-  return number !== null && Number.isInteger(number) && number > 0
-    ? number
-    : null;
+  return number !== null && Number.isInteger(number) && number > 0 ? number : null;
 }
 
 function addYears(date: Date, years: number): Date {
@@ -115,10 +114,7 @@ function addYears(date: Date, years: number): Date {
   return next;
 }
 
-function pickMetadataWithAny(
-  keys: string[],
-  ...values: unknown[]
-): Record<string, unknown> | null {
+function pickMetadataWithAny(keys: string[], ...values: unknown[]): Record<string, unknown> | null {
   for (const value of values) {
     const metadata = asRecord(value);
     if (metadata && keys.some((key) => metadata[key] !== undefined)) {
@@ -150,9 +146,7 @@ function getActiveSubscription(payload: WebhookEnvelope) {
   return asRecord(activeSubscriptions[0]);
 }
 
-function pickWorkspaceCheckoutExternalRef(
-  payload: WebhookEnvelope,
-): string | null {
+function pickWorkspaceCheckoutExternalRef(payload: WebhookEnvelope): string | null {
   const metadata = pickMetadataWithAny(
     ["workspaceCheckoutId"],
     payload.data.metadata,
@@ -170,11 +164,7 @@ function pickCustomerExternalRef(payload: WebhookEnvelope): string | null {
   }
 
   if (payload.type === "customer.state_changed") {
-    return (
-      asString(payload.data.external_id) ??
-      asString(payload.data.externalId) ??
-      null
-    );
+    return asString(payload.data.external_id) ?? asString(payload.data.externalId) ?? null;
   }
 
   const customer = asRecord(payload.data.customer);
@@ -195,11 +185,7 @@ function pickBillingOwnerUserId(
     payload.data.metadata,
     subscription?.metadata,
   );
-  return (
-    asNumber(metadata?.adminUserId) ??
-    asNumber(metadata?.requestedByUserId) ??
-    null
-  );
+  return asNumber(metadata?.adminUserId) ?? asNumber(metadata?.requestedByUserId) ?? null;
 }
 
 function pickPaidPlanCode(
@@ -232,16 +218,11 @@ function pickPurchasedSeatCount(
   );
 }
 
-function asPlanCode(value: unknown): "BASIC" | "FREE" | "STANDARD" | null {
-  return value === "BASIC" || value === "FREE" || value === "STANDARD"
-    ? value
-    : null;
+function asPlanCode(value: unknown): BillingPlanCode | null {
+  return value === "BASIC" || value === "FREE" || value === "STANDARD" ? value : null;
 }
 
-function pickFirstString(
-  source: Record<string, unknown>,
-  keys: string[],
-): string | null {
+function pickFirstString(source: Record<string, unknown>, keys: string[]): string | null {
   for (const key of keys) {
     const value = asString(source[key]);
     if (value) {
@@ -260,7 +241,7 @@ function createRetentionRecordInput(input: {
     id: number;
     uid?: string | null;
     name?: string | null;
-    planCode: "BASIC" | "FREE" | "STANDARD";
+    planCode: BillingPlanCode;
     billingOwnerUserId?: number | null;
   };
   occurredAt: Date;
@@ -301,19 +282,16 @@ function createRetentionRecordInput(input: {
     workspaceUidSnapshot: input.workspace.uid ?? null,
     workspaceNameSnapshot: input.workspace.name ?? null,
     billingOwnerUserIdSnapshot:
-      input.projection?.billingOwnerUserId ??
-      input.workspace.billingOwnerUserId ??
-      null,
+      input.projection?.billingOwnerUserId ?? input.workspace.billingOwnerUserId ?? null,
     planCode:
       asPlanCode(metadata?.targetPlanCode) ??
       (input.workspace.planCode === "BASIC" || input.workspace.planCode === "STANDARD"
         ? input.workspace.planCode
-        : input.projection?.planCode ?? "FREE"),
+        : (input.projection?.planCode ?? "FREE")),
     seatCount:
       pickPurchasedSeatCount(input.payload, activeSubscription) ??
       pickPurchasedSeatCount(input.payload) ??
-      (input.projection?.purchasedSeatCount &&
-      input.projection.purchasedSeatCount > 0
+      (input.projection?.purchasedSeatCount && input.projection.purchasedSeatCount > 0
         ? input.projection.purchasedSeatCount
         : null) ??
       null,
@@ -322,14 +300,9 @@ function createRetentionRecordInput(input: {
       asNumber(input.payload.data.amount) ??
       asNumber(input.payload.data.total_amount) ??
       asNumber(input.payload.data.totalAmount),
-    taxAmount:
-      asNumber(input.payload.data.tax_amount) ??
-      asNumber(input.payload.data.taxAmount),
+    taxAmount: asNumber(input.payload.data.tax_amount) ?? asNumber(input.payload.data.taxAmount),
     taxRate: pickFirstString(input.payload.data, ["tax_rate", "taxRate"]),
-    taxJurisdiction: pickFirstString(input.payload.data, [
-      "tax_jurisdiction",
-      "taxJurisdiction",
-    ]),
+    taxJurisdiction: pickFirstString(input.payload.data, ["tax_jurisdiction", "taxJurisdiction"]),
     customerKey:
       input.projection?.customerKey ??
       asString(input.payload.data.customer_id) ??
@@ -343,19 +316,10 @@ function createRetentionRecordInput(input: {
       asString(subscription?.id) ??
       asString(input.payload.data.id) ??
       null,
-    checkoutId: pickFirstString(input.payload.data, [
-      "checkout_id",
-      "checkoutId",
-    ]),
+    checkoutId: pickFirstString(input.payload.data, ["checkout_id", "checkoutId"]),
     orderId: pickFirstString(input.payload.data, ["order_id", "orderId"]),
-    invoiceId: pickFirstString(input.payload.data, [
-      "invoice_id",
-      "invoiceId",
-    ]),
-    paymentId: pickFirstString(input.payload.data, [
-      "payment_id",
-      "paymentId",
-    ]),
+    invoiceId: pickFirstString(input.payload.data, ["invoice_id", "invoiceId"]),
+    paymentId: pickFirstString(input.payload.data, ["payment_id", "paymentId"]),
     receiptUrl: pickFirstString(input.payload.data, [
       "receipt_url",
       "receiptUrl",
@@ -364,14 +328,9 @@ function createRetentionRecordInput(input: {
     ]),
     currentPeriodStart,
     currentPeriodEnd,
-    paidAt:
-      asDate(input.payload.data.paid_at) ?? asDate(input.payload.data.paidAt),
-    refundedAt:
-      asDate(input.payload.data.refunded_at) ??
-      asDate(input.payload.data.refundedAt),
-    canceledAt:
-      asDate(input.payload.data.canceled_at) ??
-      asDate(input.payload.data.canceledAt),
+    paidAt: asDate(input.payload.data.paid_at) ?? asDate(input.payload.data.paidAt),
+    refundedAt: asDate(input.payload.data.refunded_at) ?? asDate(input.payload.data.refundedAt),
+    canceledAt: asDate(input.payload.data.canceled_at) ?? asDate(input.payload.data.canceledAt),
     termsVersion: asString(metadata?.termsVersion),
     privacyPolicyVersion: asString(metadata?.privacyPolicyVersion),
     billingPolicyVersion: asString(metadata?.billingPolicyVersion),
@@ -381,13 +340,9 @@ function createRetentionRecordInput(input: {
   };
 }
 
-function resolveProjection(
-  payload: WebhookEnvelope,
-  now: Date,
-): BillingProjection | null {
+function resolveProjection(payload: WebhookEnvelope, now: Date): BillingProjection | null {
   const customer = asRecord(payload.data.customer);
-  const customerKey =
-    asString(payload.data.customer_id) ?? asString(customer?.id) ?? null;
+  const customerKey = asString(payload.data.customer_id) ?? asString(customer?.id) ?? null;
   const customerExternalRef = pickCustomerExternalRef(payload);
 
   if (payload.type === "customer.state_changed") {
@@ -410,17 +365,11 @@ function resolveProjection(
     }
 
     const currentPeriodEnd = asDate(activeSubscription.current_period_end);
-    const cancelAtPeriodEnd =
-      asBoolean(activeSubscription.cancel_at_period_end) ?? false;
-    const billingOwnerUserId = pickBillingOwnerUserId(
-      payload,
-      activeSubscription,
-    );
+    const cancelAtPeriodEnd = asBoolean(activeSubscription.cancel_at_period_end) ?? false;
+    const billingOwnerUserId = pickBillingOwnerUserId(payload, activeSubscription);
     const paidPlanCode = pickPaidPlanCode(payload, activeSubscription);
     const purchasedSeatCount =
-      paidPlanCode === "BASIC"
-        ? pickPurchasedSeatCount(payload, activeSubscription)
-        : null;
+      paidPlanCode === "BASIC" ? pickPurchasedSeatCount(payload, activeSubscription) : null;
 
     return {
       billingStatus:
@@ -430,9 +379,7 @@ function resolveProjection(
             ? "CANCELED"
             : "ACTIVE",
       planCode:
-        cancelAtPeriodEnd && currentPeriodEnd && currentPeriodEnd <= now
-          ? "FREE"
-          : paidPlanCode,
+        cancelAtPeriodEnd && currentPeriodEnd && currentPeriodEnd <= now ? "FREE" : paidPlanCode,
       entitlementSource: "POLAR",
       customerKey: asString(payload.data.id),
       customerExternalRef,
@@ -450,8 +397,7 @@ function resolveProjection(
     asString(payload.data.subscription_id) ?? asString(payload.data.id) ?? null;
   const billingOwnerUserId = pickBillingOwnerUserId(payload);
   const paidPlanCode = pickPaidPlanCode(payload);
-  const purchasedSeatCount =
-    paidPlanCode === "BASIC" ? pickPurchasedSeatCount(payload) : null;
+  const purchasedSeatCount = paidPlanCode === "BASIC" ? pickPurchasedSeatCount(payload) : null;
 
   switch (payload.type) {
     case "subscription.active":
@@ -469,10 +415,8 @@ function resolveProjection(
       };
     case "subscription.canceled":
       return {
-        billingStatus:
-          currentPeriodEnd && currentPeriodEnd <= now ? "EXPIRED" : "CANCELED",
-        planCode:
-          currentPeriodEnd && currentPeriodEnd <= now ? "FREE" : paidPlanCode,
+        billingStatus: currentPeriodEnd && currentPeriodEnd <= now ? "EXPIRED" : "CANCELED",
+        planCode: currentPeriodEnd && currentPeriodEnd <= now ? "FREE" : paidPlanCode,
         entitlementSource: "POLAR",
         customerKey,
         customerExternalRef,
@@ -612,11 +556,7 @@ function resolveProjection(
 export class PolarWebhookService {
   constructor(private billingStorage: BillingPort) {}
 
-  async handleWebhook(input: {
-    providerEventId: string;
-    payloadJson: string;
-    now?: Date;
-  }) {
+  async handleWebhook(input: { providerEventId: string; payloadJson: string; now?: Date }) {
     let parsedPayload: unknown;
 
     try {
@@ -632,22 +572,18 @@ export class PolarWebhookService {
     }
 
     const payload = parsedEnvelope.data;
-    const existingEvent =
-      await this.billingStorage.findBillingEventByProviderEventId(
-        input.providerEventId,
-      );
+    const existingEvent = await this.billingStorage.findBillingEventByProviderEventId(
+      input.providerEventId,
+    );
 
     if (existingEvent) {
       return { status: "ignored" as const };
     }
 
     const customerExternalRef = pickCustomerExternalRef(payload);
-    const workspaceIdFromExternalRef =
-      parseWorkspaceIdFromExternalRef(customerExternalRef);
+    const workspaceIdFromExternalRef = parseWorkspaceIdFromExternalRef(customerExternalRef);
     const workspaceCheckoutExternalRef = pickWorkspaceCheckoutExternalRef(payload);
-    const workspaceIdFromMetadata = asNumber(
-      asRecord(payload.data.metadata)?.workspaceId,
-    );
+    const workspaceIdFromMetadata = asNumber(asRecord(payload.data.metadata)?.workspaceId);
     const workspace =
       (workspaceIdFromMetadata
         ? await this.billingStorage.findWorkspaceById(workspaceIdFromMetadata)
@@ -656,14 +592,10 @@ export class PolarWebhookService {
         ? await this.billingStorage.findWorkspaceById(workspaceIdFromExternalRef)
         : null) ??
       (workspaceCheckoutExternalRef
-        ? await this.billingStorage.findWorkspaceByCustomerExternalRef(
-            workspaceCheckoutExternalRef,
-          )
+        ? await this.billingStorage.findWorkspaceByCustomerExternalRef(workspaceCheckoutExternalRef)
         : null) ??
       (customerExternalRef
-        ? await this.billingStorage.findWorkspaceByCustomerExternalRef(
-            customerExternalRef,
-          )
+        ? await this.billingStorage.findWorkspaceByCustomerExternalRef(customerExternalRef)
         : null);
 
     if (!workspace) {
@@ -687,9 +619,7 @@ export class PolarWebhookService {
 
     const nextPurchasedSeatCount =
       projection?.purchasedSeatCount ??
-      (projection?.planCode === "FREE" && workspace.planCode === "BASIC"
-        ? 0
-        : null);
+      (projection?.planCode === "FREE" && workspace.planCode === "BASIC" ? 0 : null);
 
     const event = await this.billingStorage.recordPolarWebhookBillingEvent({
       event: {
@@ -729,9 +659,7 @@ export class PolarWebhookService {
               projection.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
             lastEventOccurredAt: occurredAt,
             workspaceBillingCustomerExternalRef:
-              projection.customerExternalRef ??
-              workspace.billingCustomerExternalRef ??
-              null,
+              projection.customerExternalRef ?? workspace.billingCustomerExternalRef ?? null,
             workspaceBillingOwnerUserId:
               projection.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
             purchasedSeatCount: nextPurchasedSeatCount,

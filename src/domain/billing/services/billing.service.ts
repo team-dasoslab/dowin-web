@@ -4,13 +4,14 @@ import {
   isPolarRecoverableError,
 } from "@/domain/billing/polar";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
-import { type NullableEntitlementSource } from "@/domain/billing/types";
-import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import {
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "@/lib/server/errors";
+  type BillingPlanCode,
+  type BillingStatus,
+  type NullableEntitlementSource,
+} from "@/domain/billing/types";
+import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
+import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
@@ -34,8 +35,8 @@ const BASIC_CHECKOUT_MAX_SEATS = 999;
 export type BillingOverview = {
   workspaceId: string;
   workspaceName: string;
-  planCode: "BASIC" | "FREE" | "STANDARD";
-  billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+  planCode: BillingPlanCode;
+  billingStatus: BillingStatus;
   entitlementSource: NullableEntitlementSource;
   provider: "POLAR" | null;
   currentPeriodEnd: string | null;
@@ -97,54 +98,31 @@ export class BillingService {
     private polarClient: PolarBillingClient | null = null,
   ) {}
 
-  private async getWorkspace(workspaceUid: string, userId: number) {
-    const internalId = await this.workspaceStorage.resolveIdByUid(workspaceUid);
-    if (!internalId) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    const membership = await this.workspaceStorage.findMembership(
-      internalId,
-      userId,
-    );
-    if (!membership) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    const workspace = await this.workspaceStorage.findWorkspaceById(internalId);
+  async getMyBilling(context: WorkspaceAccessContext): Promise<BillingOverview> {
+    const workspace = await this.workspaceStorage.findWorkspaceById(context.workspaceId);
     if (!workspace) {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    return { workspace, membership };
-  }
-
-  async getMyBilling(
-    workspaceUid: string,
-    userId: number,
-  ): Promise<BillingOverview> {
-    const { workspace, membership } = await this.getWorkspace(
-      workspaceUid,
-      userId,
-    );
-    const billingState = await this.billingStorage.findWorkspaceBillingState(
-      workspace.id,
-    );
-    const [riskSummary, seatEntitlement, usedSeatCount, pendingSeatUpdate, promotionalDurationDays] =
-      await Promise.all([
+    const billingState = await this.billingStorage.findWorkspaceBillingState(context.workspaceId);
+    const [
+      riskSummary,
+      seatEntitlement,
+      usedSeatCount,
+      pendingSeatUpdate,
+      promotionalDurationDays,
+    ] = await Promise.all([
       this.getBillingRiskSummary({
-        workspaceId: workspace.id,
+        workspaceId: context.workspaceId,
         customerKey: billingState?.customerKey ?? null,
         customerExternalRef: workspace.billingCustomerExternalRef ?? null,
         billingOwnerUserId:
-          billingState?.billingOwnerUserId ??
-          workspace.billingOwnerUserId ??
-          null,
+          billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
       }),
-      this.workspaceStorage.findSeatEntitlement(workspace.id),
-      this.workspaceStorage.countMembers(workspace.id),
+      this.workspaceStorage.findSeatEntitlement(context.workspaceId),
+      this.workspaceStorage.countMembers(context.workspaceId),
       this.getPendingSeatUpdate(billingState),
-      billingState?.entitlementSource === "BETA_PROMOTIONAL_GRANT" 
+      billingState?.entitlementSource === "BETA_PROMOTIONAL_GRANT"
         ? this.billingStorage.findLatestPromotionalGrantDuration(workspace.id)
         : null,
     ]);
@@ -181,20 +159,17 @@ export class BillingService {
       purchasedSeatCount,
       pendingSeatCount: pendingSeatUpdate?.pendingSeats ?? null,
       pendingSeatEffectiveAt:
-        pendingSeatUpdate?.pendingSeats !== null &&
-        pendingSeatUpdate?.pendingSeats !== undefined
+        pendingSeatUpdate?.pendingSeats !== null && pendingSeatUpdate?.pendingSeats !== undefined
           ? (billingState?.currentPeriodEnd?.toISOString() ?? null)
           : null,
       usedSeatCount,
-      canManageBilling: membership?.role === "ADMIN",
+      canManageBilling: context.role === "ADMIN",
       promotionalDurationDays: promotionalDurationDays ?? null,
     };
   }
 
   private async getPendingSeatUpdate(
-    billingState: Awaited<
-      ReturnType<BillingPort["findWorkspaceBillingState"]>
-    >,
+    billingState: Awaited<ReturnType<BillingPort["findWorkspaceBillingState"]>>,
   ) {
     if (
       !this.polarClient ||
@@ -233,31 +208,22 @@ export class BillingService {
     return projectedSeatCount;
   }
 
-  async getPortalUrl(workspaceUid: string, userId: number): Promise<string> {
-    const { workspace, membership } = await this.getWorkspace(
-      workspaceUid,
-      userId,
-    );
-    const billingState = workspace
-      ? await this.billingStorage.findWorkspaceBillingState(workspace.id)
-      : null;
-
-    if (!workspace || !membership) {
-      throw new NotFoundError("NOT_FOUND");
-    }
-
-    if (membership.role !== "ADMIN") {
+  async getPortalUrl(context: WorkspaceAccessContext): Promise<string> {
+    if (context.role !== "ADMIN") {
       throw new ForbiddenError("FORBIDDEN");
     }
 
+    const workspace = await this.workspaceStorage.findWorkspaceById(context.workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+    const billingState = await this.billingStorage.findWorkspaceBillingState(context.workspaceId);
+
     if (!this.polarClient) {
       console.error("[billing.portal] Polar client is not configured", {
-        workspaceUid,
-        workspaceId: workspace.id,
-        userId,
-        hasBillingCustomerExternalRef: Boolean(
-          workspace.billingCustomerExternalRef,
-        ),
+        workspaceId: context.workspaceId,
+        userId: context.userId,
+        hasBillingCustomerExternalRef: Boolean(workspace.billingCustomerExternalRef),
         billingStatus: billingState?.billingStatus ?? "NONE",
         entitlementSource: billingState?.entitlementSource ?? null,
       });
@@ -265,16 +231,12 @@ export class BillingService {
     }
 
     if (billingState && billingState.entitlementSource !== "POLAR") {
-      console.warn(
-        "[billing.portal] non-Polar entitlement cannot open portal",
-        {
-          workspaceUid,
-          workspaceId: workspace.id,
-          userId,
-          billingStatus: billingState.billingStatus,
-          entitlementSource: billingState.entitlementSource,
-        },
-      );
+      console.warn("[billing.portal] non-Polar entitlement cannot open portal", {
+        workspaceId: context.workspaceId,
+        userId: context.userId,
+        billingStatus: billingState.billingStatus,
+        entitlementSource: billingState.entitlementSource,
+      });
       throw new ConflictError("BILLING_NOT_READY");
     }
 
@@ -291,10 +253,9 @@ export class BillingService {
         subscriptionKey && customerKey
           ? await (async () => {
               polarOperation = "customer_seats.list";
-              const existingMemberId =
-                await polarClient.findSubscriptionSeatMemberId({
-                  subscriptionId: subscriptionKey,
-                });
+              const existingMemberId = await polarClient.findSubscriptionSeatMemberId({
+                subscriptionId: subscriptionKey,
+              });
               if (existingMemberId) {
                 return existingMemberId;
               }
@@ -312,36 +273,28 @@ export class BillingService {
             ...(memberId ? { memberId } : {}),
           }
         : {
-            externalCustomerId:
-              workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
+            externalCustomerId: workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
           };
 
-      const { customerPortalUrl } =
-        await (async () => {
-          polarOperation = "customer_sessions.create";
-          return polarClient.createCustomerSession(customerSessionInput);
-        })();
+      const { customerPortalUrl } = await (async () => {
+        polarOperation = "customer_sessions.create";
+        return polarClient.createCustomerSession(customerSessionInput);
+      })();
       return customerPortalUrl;
     } catch (error) {
       if (isPolarRecoverableError(error)) {
         const polarError = getPolarApiErrorInfo(error);
-        console.error(
-          "[billing.portal] Polar portal request failed",
-          {
-            workspaceUid,
-            workspaceId: workspace.id,
-            userId,
-            polarOperation,
-            billingStatus: billingState?.billingStatus ?? "NONE",
-            entitlementSource: billingState?.entitlementSource ?? null,
-            hasCustomerKey: Boolean(billingState?.customerKey),
-            hasBillingCustomerExternalRef: Boolean(
-              workspace.billingCustomerExternalRef,
-            ),
-            polarStatus: polarError?.status ?? null,
-            polarBody: polarError ? truncateForLog(polarError.body) : null,
-          },
-        );
+        console.error("[billing.portal] Polar portal request failed", {
+          workspaceId: context.workspaceId,
+          userId: context.userId,
+          polarOperation,
+          billingStatus: billingState?.billingStatus ?? "NONE",
+          entitlementSource: billingState?.entitlementSource ?? null,
+          hasCustomerKey: Boolean(billingState?.customerKey),
+          hasBillingCustomerExternalRef: Boolean(workspace.billingCustomerExternalRef),
+          polarStatus: polarError?.status ?? null,
+          polarBody: polarError ? truncateForLog(polarError.body) : null,
+        });
         throw new ConflictError("BILLING_NOT_READY");
       }
 
@@ -349,36 +302,32 @@ export class BillingService {
     }
   }
 
-  async startBasicCheckout(input: {
-    workspaceUid: string;
-    userId: number;
-    seatCount?: number;
-    locale: "ko" | "en";
-    idempotencyKey: string;
-    returnPath?: string;
-  }): Promise<{ checkoutUrl: string; checkoutId: string | null }> {
-    const { workspace, membership } = await this.getWorkspace(
-      input.workspaceUid,
-      input.userId,
-    );
-
-    if (membership.role !== "ADMIN") {
+  async startBasicCheckout(
+    context: WorkspaceAccessContext,
+    input: {
+      seatCount?: number;
+      locale: "ko" | "en";
+      idempotencyKey: string;
+      returnPath?: string;
+    },
+  ): Promise<{ checkoutUrl: string; checkoutId: string | null }> {
+    if (context.role !== "ADMIN") {
       throw new ForbiddenError("FORBIDDEN");
     }
 
-    const billingState = await this.billingStorage.findWorkspaceBillingState(
-      workspace.id,
-    );
+    const workspace = await this.workspaceStorage.findWorkspaceById(context.workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const billingState = await this.billingStorage.findWorkspaceBillingState(context.workspaceId);
     const billingStatus = billingState?.billingStatus ?? "NONE";
 
     const riskSummary = await this.getBillingRiskSummary({
       workspaceId: workspace.id,
       customerKey: billingState?.customerKey ?? null,
       customerExternalRef: workspace.billingCustomerExternalRef ?? null,
-      billingOwnerUserId:
-        billingState?.billingOwnerUserId ??
-        workspace.billingOwnerUserId ??
-        null,
+      billingOwnerUserId: billingState?.billingOwnerUserId ?? workspace.billingOwnerUserId ?? null,
     });
     if (riskSummary.requiresManualReview) {
       throw new ConflictError("BILLING_REVIEW_REQUIRED");
@@ -413,8 +362,7 @@ export class BillingService {
     try {
       return await this.polarClient.createCheckoutSession({
         productId: product.providerProductId,
-        externalCustomerId:
-          workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
+        externalCustomerId: workspace.billingCustomerExternalRef ?? `workspace:${workspace.id}`,
         idempotencyKey: input.idempotencyKey,
         locale: input.locale,
         seats: seatCount,
@@ -426,7 +374,7 @@ export class BillingService {
           flow: "workspace_resubscribe",
           workspaceId: String(workspace.id),
           workspaceUid: getWorkspacePublicId(workspace),
-          requestedByUserId: String(input.userId),
+          requestedByUserId: String(context.userId),
           targetPlanCode: "BASIC",
           requestedSeatCount: String(seatCount),
         },
@@ -435,14 +383,11 @@ export class BillingService {
       if (isPolarRecoverableError(error)) {
         const polarError = getPolarApiErrorInfo(error);
         console.error("[billing.checkout] Polar checkout request failed", {
-          workspaceUid: input.workspaceUid,
-          workspaceId: workspace.id,
-          userId: input.userId,
+          workspaceId: context.workspaceId,
+          userId: context.userId,
           billingStatus,
           entitlementSource: billingState?.entitlementSource ?? null,
-          hasBillingCustomerExternalRef: Boolean(
-            workspace.billingCustomerExternalRef,
-          ),
+          hasBillingCustomerExternalRef: Boolean(workspace.billingCustomerExternalRef),
           polarStatus: polarError?.status ?? null,
           polarBody: polarError ? truncateForLog(polarError.body) : null,
         });
@@ -453,28 +398,27 @@ export class BillingService {
     }
   }
 
-  async updateSubscriptionSeats(input: {
-    workspaceUid: string;
-    userId: number;
-    seatCount: number;
-  }): Promise<{
+  async updateSubscriptionSeats(
+    context: WorkspaceAccessContext,
+    input: {
+      seatCount: number;
+    },
+  ): Promise<{
     seatCount: number;
     appliedSeatCount: number | null;
     pendingSeatCount: number | null;
     effectiveTiming: "IMMEDIATE" | "NEXT_PERIOD" | "UNCHANGED";
   }> {
-    const { workspace, membership } = await this.getWorkspace(
-      input.workspaceUid,
-      input.userId,
-    );
-
-    if (membership.role !== "ADMIN") {
+    if (context.role !== "ADMIN") {
       throw new ForbiddenError("FORBIDDEN");
     }
 
-    const billingState = await this.billingStorage.findWorkspaceBillingState(
-      workspace.id,
-    );
+    const workspace = await this.workspaceStorage.findWorkspaceById(context.workspaceId);
+    if (!workspace) {
+      throw new NotFoundError("NOT_FOUND");
+    }
+
+    const billingState = await this.billingStorage.findWorkspaceBillingState(context.workspaceId);
 
     if (
       !billingState ||
@@ -495,9 +439,7 @@ export class BillingService {
       throw new ConflictError("BILLING_SEAT_COUNT_BELOW_MEMBER_COUNT");
     }
 
-    const seatEntitlement = await this.workspaceStorage.findSeatEntitlement(
-      workspace.id,
-    );
+    const seatEntitlement = await this.workspaceStorage.findSeatEntitlement(workspace.id);
     const currentSeatCount = seatEntitlement?.purchasedSeatCount ?? null;
 
     if (!currentSeatCount) {
@@ -523,9 +465,7 @@ export class BillingService {
         prorationBehavior,
       });
       const appliedSeatCount =
-        typeof result.seats === "number" &&
-        Number.isInteger(result.seats) &&
-        result.seats > 0
+        typeof result.seats === "number" && Number.isInteger(result.seats) && result.seats > 0
           ? result.seats
           : null;
 
@@ -552,9 +492,7 @@ export class BillingService {
     }
   }
 
-  private async getBillingRiskSummary(
-    scope: BillingRiskScope,
-  ): Promise<BillingRiskSummary> {
+  private async getBillingRiskSummary(scope: BillingRiskScope): Promise<BillingRiskSummary> {
     const { recentRefundCount, recentRevokedCount } =
       await this.billingStorage.getRecentBillingRiskSummary({
         ...scope,

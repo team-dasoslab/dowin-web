@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -34,7 +35,7 @@ describe("POST /api/auth/recovery-codes/verify", () => {
   it("요청 바디가 유효하지 않으면 422를 반환한다", async () => {
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/auth/recovery-codes/verify", {
+      new NextRequest("http://localhost/api/auth/recovery-codes/verify", {
         method: "POST",
         body: JSON.stringify({
           recoveryCode: "bad",
@@ -43,6 +44,7 @@ describe("POST /api/auth/recovery-codes/verify", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -57,7 +59,7 @@ describe("POST /api/auth/recovery-codes/verify", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/auth/recovery-codes/verify", {
+      new NextRequest("http://localhost/api/auth/recovery-codes/verify", {
         method: "POST",
         body: JSON.stringify({
           recoveryCode: "ABCD-EFGH23",
@@ -66,6 +68,7 @@ describe("POST /api/auth/recovery-codes/verify", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);

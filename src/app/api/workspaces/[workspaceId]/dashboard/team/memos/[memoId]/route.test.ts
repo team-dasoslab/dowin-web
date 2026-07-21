@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -5,10 +6,15 @@ const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
 const mockDeleteTeamMemo = vi.fn();
 const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
 const mockResolveIdByUid = vi.fn();
 
 vi.mock("@/lib/server/workspace-context", () => ({
   requireWorkspaceAccess: () => mockRequireWorkspaceAccess(),
+}));
+
+vi.mock("@/domain/workspace/plan-limits", () => ({
+  assertWorkspaceOperationAllowed: () => mockAssertWorkspaceOperationAllowed(),
 }));
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -45,6 +51,15 @@ vi.mock("@/domain/dashboard/storage/team-memo.storage", () => ({
 
 describe("DELETE /api/workspaces/:workspaceId/dashboard/team/memos/:memoId", () => {
   beforeEach(() => {
+    if (typeof mockRequireWorkspaceAccess !== "undefined")
+      mockRequireWorkspaceAccess.mockResolvedValue({
+        workspaceId: 1,
+        userId: 1,
+        role: "MEMBER",
+        entitlement: { planCode: "BASIC" },
+      });
+    if (typeof mockAssertWorkspaceOperationAllowed !== "undefined")
+      mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
     vi.clearAllMocks();
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
@@ -56,7 +71,7 @@ describe("DELETE /api/workspaces/:workspaceId/dashboard/team/memos/:memoId", () 
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1", {
+      new NextRequest("http://localhost/api/workspaces/7/dashboard/team/memos/1", {
         method: "DELETE",
       }),
       { params: Promise.resolve({ workspaceId: "7", memoId: "1" }) },
@@ -67,20 +82,22 @@ describe("DELETE /api/workspaces/:workspaceId/dashboard/team/memos/:memoId", () 
 
   it("삭제 요청을 처리한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 11 });
-    mockRequireWorkspaceAccess.mockResolvedValue({ id: 7, userId: 11, role: "MEMBER" });
+    mockRequireWorkspaceAccess.mockResolvedValue({
+      workspaceId: 7,
+      userId: 11,
+      role: "MEMBER",
+      entitlement: { planCode: "BASIC" },
+    });
 
     const { DELETE } = await import("./route");
     const response = await DELETE(
-      new Request("http://localhost/api/workspaces/7/dashboard/team/memos/1", {
+      new NextRequest("http://localhost/api/workspaces/7/dashboard/team/memos/1", {
         method: "DELETE",
       }),
       { params: Promise.resolve({ workspaceId: "7", memoId: "1" }) },
     );
 
     expect(response.status).toBe(204);
-    expect(mockDeleteTeamMemo).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 7 }),
-      1
-    );
+    expect(mockDeleteTeamMemo).toHaveBeenCalledWith(expect.objectContaining({ workspaceId: 7 }), 1);
   });
 });

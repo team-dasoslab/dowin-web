@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -34,7 +35,7 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
   it("요청 바디가 유효하지 않으면 422를 반환한다", async () => {
     const { PUT } = await import("./route");
     const response = await PUT(
-      new Request("http://localhost/api/auth/password/by-recovery-code", {
+      new NextRequest("http://localhost/api/auth/password/by-recovery-code", {
         method: "PUT",
         body: JSON.stringify({
           recoveryCode: "bad",
@@ -44,6 +45,7 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -55,7 +57,7 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
 
     const { PUT } = await import("./route");
     const response = await PUT(
-      new Request("http://localhost/api/auth/password/by-recovery-code", {
+      new NextRequest("http://localhost/api/auth/password/by-recovery-code", {
         method: "PUT",
         body: JSON.stringify({
           recoveryCode: "ABCD-EFGH23",
@@ -65,13 +67,11 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);
-    expect(mockResetPasswordByRecoveryCode).toHaveBeenCalledWith(
-      "ABCDEFGH23",
-      "newSecurePass1!",
-    );
+    expect(mockResetPasswordByRecoveryCode).toHaveBeenCalledWith("ABCDEFGH23", "newSecurePass1!");
     await expect(response.json()).resolves.toEqual({
       message: "비밀번호가 변경되었습니다.",
     });

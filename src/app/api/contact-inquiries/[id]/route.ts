@@ -1,14 +1,12 @@
 import { getDb } from "@/db";
-import { ContactInquiryService } from "@/domain/contact/services/contact-inquiry.service";
 import { ContactDiscordNotifierService } from "@/domain/contact/services/contact-discord-notifier.service";
+import { ContactInquiryService } from "@/domain/contact/services/contact-inquiry.service";
 import { ContactInquiryStorage } from "@/domain/contact/storage/contact-inquiry.storage";
 import { contactInquiryIdParamsSchema } from "@/domain/contact/validation";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-
 const createService = (db: ReturnType<typeof getDb>) =>
   new ContactInquiryService(
     new WorkspaceStorage(db),
@@ -16,30 +14,21 @@ const createService = (db: ReturnType<typeof getDb>) =>
     new ContactDiscordNotifierService(),
   );
 
-export const GET = withErrorHandler(
-  async (
-    _request: Request,
-    context: { params: Promise<{ id: string }> },
-  ) => {
-    const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
+export const GET = withErrorHandler(async (_request: Request, ctx) => {
+  const { db } = ctx;
+  const session = await getSessionWithRefresh(db);
 
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
+  if (!session) {
+    return await apiError("UNAUTHORIZED");
+  }
 
-    const params = contactInquiryIdParamsSchema.safeParse(await context.params);
+  const params = contactInquiryIdParamsSchema.safeParse(await ctx.params);
 
-    if (!params.success) {
-      return await apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
-    }
+  if (!params.success) {
+    return await apiError("VALIDATION_ERROR", params.error.flatten().fieldErrors);
+  }
 
-    const result = await createService(db).getMyInquiry(
-      session.userId,
-      params.data.id,
-    );
+  const result = await createService(db).getMyInquiry(session.userId, params.data.id);
 
-    return apiSuccess(result);
-  },
-);
+  return apiSuccess(result);
+});

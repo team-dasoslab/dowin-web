@@ -1,7 +1,8 @@
 import { NotificationStorage } from "@/domain/notification/storage/notification.storage";
 import { ProfileStorage } from "@/domain/profile/storage/profile.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
-import { describe, expect, it, vi, beforeEach, Mocked } from "vitest";
+import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { beforeEach, describe, expect, it, Mocked, vi } from "vitest";
 import { NudgeService } from "./nudge.service";
 
 vi.mock("@/domain/notification/services/fcm", () => ({
@@ -13,6 +14,21 @@ vi.mock("@/domain/notification/services/fcm", () => ({
 }));
 
 describe("NudgeService", () => {
+  const ctx: WorkspaceAccessContext = {
+    workspaceId: 1,
+    workspacePublicId: "ws_abc",
+    workspaceName: "My Workspace",
+    userId: 100,
+    role: "ADMIN",
+    membershipId: 10,
+    allowPastDailyLogEdit: false,
+    entitlement: {
+      canAccessBasicSubscription: true,
+      entitlementSource: null,
+      billingStatus: "ACTIVE",
+      planCode: "BASIC",
+    },
+  };
   let profileStorage: Mocked<ProfileStorage>;
   let notificationStorage: Mocked<NotificationStorage>;
   let workspaceStorage: Mocked<WorkspaceStorage>;
@@ -38,11 +54,7 @@ describe("NudgeService", () => {
       findMembership: vi.fn(),
     } as unknown as Mocked<WorkspaceStorage>;
 
-    service = new NudgeService(
-      profileStorage,
-      notificationStorage,
-      workspaceStorage,
-    );
+    service = new NudgeService(profileStorage, notificationStorage, workspaceStorage);
   });
 
   it("should send a nudge successfully", async () => {
@@ -57,11 +69,7 @@ describe("NudgeService", () => {
       { token: "test-token" } as never,
     ]);
 
-    await service.sendNudge({
-      workspaceUid: "ws-1",
-      fromUserId: 1,
-      toUserId: 2,
-    }, mockEnv);
+    await service.sendNudge({ ...ctx, userId: 1 }, { toUserId: 2 }, mockEnv);
 
     expect(profileStorage.findProfileByUserId).toHaveBeenCalledWith(1);
     expect(notificationStorage.findActiveTokensByUserId).toHaveBeenCalledWith(2);
@@ -77,11 +85,7 @@ describe("NudgeService", () => {
 
     notificationStorage.findActiveTokensByUserId.mockResolvedValue([]);
 
-    await service.sendNudge({
-      workspaceUid: "ws-1",
-      fromUserId: 1,
-      toUserId: 2,
-    }, mockEnv);
+    await service.sendNudge({ ...ctx, userId: 1 }, { toUserId: 2 }, mockEnv);
 
     expect(notificationStorage.findActiveTokensByUserId).toHaveBeenCalledWith(2);
   });

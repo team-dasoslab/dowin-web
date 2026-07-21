@@ -1,4 +1,3 @@
-import { getDb } from "@/db";
 import { SESSION_TTL_SECONDS } from "@/domain/auth/constants";
 import { AuthService } from "@/domain/auth/services/auth.service";
 import { AuthStorage } from "@/domain/auth/storage/auth.storage";
@@ -7,12 +6,9 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { SESSION_COOKIE_SECURE } from "@/lib/server/auth";
 import { getLocale } from "@/lib/server/locale";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { cookies } from "next/headers";
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { db }) => {
   const storage = new AuthStorage(db);
   const service = new AuthService(storage);
 
@@ -20,10 +16,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const parsed = signupSchema.safeParse(body);
 
   if (!parsed.success) {
-    return await apiError(
-      "VALIDATION_ERROR",
-      parsed.error.flatten().fieldErrors,
-    );
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const locale = await getLocale();

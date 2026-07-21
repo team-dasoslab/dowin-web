@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -36,13 +37,14 @@ describe("POST /api/notifications/devices/status", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices/status", {
+      new NextRequest("http://localhost/api/notifications/devices/status", {
         method: "POST",
         body: JSON.stringify({ token: "token-1" }),
         headers: {
           "Content-Type": "application/json",
         },
       }) as never,
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(401);
@@ -60,13 +62,14 @@ describe("POST /api/notifications/devices/status", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices/status", {
+      new NextRequest("http://localhost/api/notifications/devices/status", {
         method: "POST",
         body: JSON.stringify({ token: "token-1" }),
         headers: {
           "Content-Type": "application/json",
         },
       }) as never,
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);
@@ -86,13 +89,14 @@ describe("POST /api/notifications/devices/status", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/notifications/devices/status", {
+      new NextRequest("http://localhost/api/notifications/devices/status", {
         method: "POST",
         body: JSON.stringify({ token: "token-1" }),
         headers: {
           "Content-Type": "application/json",
         },
       }) as never,
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);

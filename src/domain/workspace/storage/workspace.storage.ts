@@ -1,23 +1,25 @@
 import { getDb } from "@/db";
-import { customAlphabet } from "nanoid";
-import { generateWorkspacePrefix } from "@/domain/workspace/utils/workspace-prefix.util";
-
-const generateUid = customAlphabet(
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-  12
-);
 import {
   billingPlanLimits,
   pendingWorkspaceCheckouts,
   users,
+  workspaceBillingState,
   workspaceInvites,
   workspaceMembers,
   workspaceSeatEntitlements,
   workspaceTags,
   workspaces,
-  workspaceBillingState,
 } from "@/db/schema";
+import { type BillingPlanCode } from "@/domain/billing/types";
+import { type WorkspaceRole } from "@/domain/workspace/types";
+import { generateWorkspacePrefix } from "@/domain/workspace/utils/workspace-prefix.util";
 import { and, desc, eq, gt, inArray, isNull, lt, sql } from "drizzle-orm";
+import { customAlphabet } from "nanoid";
+
+const generateUid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  12,
+);
 
 type Db = ReturnType<typeof getDb>;
 type Workspace = typeof workspaces.$inferSelect;
@@ -44,15 +46,9 @@ export class WorkspaceStorage {
       .from(workspaces)
       .innerJoin(
         workspaceMembers,
-        and(
-          eq(workspaces.id, workspaceMembers.workspaceId),
-          eq(workspaceMembers.userId, userId),
-        ),
+        and(eq(workspaces.id, workspaceMembers.workspaceId), eq(workspaceMembers.userId, userId)),
       )
-      .leftJoin(
-        workspaceBillingState,
-        eq(workspaces.id, workspaceBillingState.workspaceId),
-      )
+      .leftJoin(workspaceBillingState, eq(workspaces.id, workspaceBillingState.workspaceId))
       .where(and(eq(workspaces.id, workspaceId), isNull(workspaces.deletedAt)))
       .limit(1);
 
@@ -65,10 +61,7 @@ export class WorkspaceStorage {
       .from(workspaces)
       .innerJoin(
         workspaceMembers,
-        and(
-          eq(workspaces.id, workspaceMembers.workspaceId),
-          eq(workspaceMembers.userId, userId),
-        ),
+        and(eq(workspaces.id, workspaceMembers.workspaceId), eq(workspaceMembers.userId, userId)),
       )
       .where(and(eq(workspaces.uid, uid), isNull(workspaces.deletedAt)))
       .limit(1);
@@ -114,17 +107,12 @@ export class WorkspaceStorage {
     return newWorkspace;
   }
 
-
-
   async findActivePendingWorkspaceCheckoutByUserId(userId: number, now: Date) {
     return (
       (await this.db.query.pendingWorkspaceCheckouts.findFirst({
         where: and(
           eq(pendingWorkspaceCheckouts.userId, userId),
-          inArray(pendingWorkspaceCheckouts.status, [
-            "PENDING",
-            "CHECKOUT_CREATED",
-          ]),
+          inArray(pendingWorkspaceCheckouts.status, ["PENDING", "CHECKOUT_CREATED"]),
           gt(pendingWorkspaceCheckouts.expiresAt, now),
         ),
         orderBy: [desc(pendingWorkspaceCheckouts.createdAt)],
@@ -160,10 +148,7 @@ export class WorkspaceStorage {
     providerProductId: string;
     expiresAt: Date;
   }) {
-    const [created] = await this.db
-      .insert(pendingWorkspaceCheckouts)
-      .values(input)
-      .returning();
+    const [created] = await this.db.insert(pendingWorkspaceCheckouts).values(input).returning();
 
     return created;
   }
@@ -213,59 +198,62 @@ export class WorkspaceStorage {
     now: Date;
   }) {
     const actionItemPrefix = await generateWorkspacePrefix(this.db, input.workspaceName);
-    const [workspace] = await this.db
-      .insert(workspaces)
-      .values({
-        uid: generateUid(),
-        name: input.workspaceName,
-        actionItemPrefix,
+
+    return await this.db.transaction(async (tx) => {
+      const [workspace] = await tx
+        .insert(workspaces)
+        .values({
+          uid: generateUid(),
+          name: input.workspaceName,
+          actionItemPrefix,
+          planCode: "BASIC",
+          billingCustomerExternalRef: `workspace-checkout:${input.pendingUid}`,
+          billingOwnerUserId: input.userId,
+        })
+        .returning();
+
+      await tx.insert(workspaceMembers).values({
+        workspaceId: workspace.id,
+        userId: input.userId,
+        role: "ADMIN",
+      });
+
+      await tx.insert(workspaceBillingState).values({
+        workspaceId: workspace.id,
+        provider: "POLAR",
+        billingStatus: "ACTIVE",
         planCode: "BASIC",
-        billingCustomerExternalRef: `workspace-checkout:${input.pendingUid}`,
+        entitlementSource: "POLAR",
+        customerKey: input.customerKey,
+        subscriptionKey: input.subscriptionKey,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
         billingOwnerUserId: input.userId,
-      })
-      .returning();
-
-    await this.db.insert(workspaceMembers).values({
-      workspaceId: workspace.id,
-      userId: input.userId,
-      role: "ADMIN",
-    });
-
-    await this.db.insert(workspaceBillingState).values({
-      workspaceId: workspace.id,
-      provider: "POLAR",
-      billingStatus: "ACTIVE",
-      planCode: "BASIC",
-      entitlementSource: "POLAR",
-      customerKey: input.customerKey,
-      subscriptionKey: input.subscriptionKey,
-      currentPeriodEnd: null,
-      cancelAtPeriodEnd: false,
-      billingOwnerUserId: input.userId,
-      lastEventId: null,
-      lastEventOccurredAt: input.now,
-      updatedAt: input.now,
-    });
-
-    await this.db.insert(workspaceSeatEntitlements).values({
-      workspaceId: workspace.id,
-      planCode: "BASIC",
-      purchasedSeatCount: input.purchasedSeatCount,
-      seatSource: "POLAR",
-      updatedAt: input.now,
-    });
-
-    await this.db
-      .update(pendingWorkspaceCheckouts)
-      .set({
-        status: "COMPLETED",
-        completedWorkspaceId: workspace.id,
-        completedAt: input.now,
+        lastEventId: null,
+        lastEventOccurredAt: input.now,
         updatedAt: input.now,
-      })
-      .where(eq(pendingWorkspaceCheckouts.id, input.pendingId));
+      });
 
-    return workspace;
+      await tx.insert(workspaceSeatEntitlements).values({
+        workspaceId: workspace.id,
+        planCode: "BASIC",
+        purchasedSeatCount: input.purchasedSeatCount,
+        seatSource: "POLAR",
+        updatedAt: input.now,
+      });
+
+      await tx
+        .update(pendingWorkspaceCheckouts)
+        .set({
+          status: "COMPLETED",
+          completedWorkspaceId: workspace.id,
+          completedAt: input.now,
+          updatedAt: input.now,
+        })
+        .where(eq(pendingWorkspaceCheckouts.id, input.pendingId));
+
+      return workspace;
+    });
   }
 
   async updateWorkspace(
@@ -281,11 +269,7 @@ export class WorkspaceStorage {
     return updatedWorkspace ?? null;
   }
 
-  async addMember(
-    workspaceId: number,
-    userId: number,
-    role: "ADMIN" | "MEMBER",
-  ): Promise<void> {
+  async addMember(workspaceId: number, userId: number, role: WorkspaceRole): Promise<void> {
     await this.db.insert(workspaceMembers).values({
       workspaceId,
       userId,
@@ -293,9 +277,7 @@ export class WorkspaceStorage {
     });
   }
 
-  async findMembershipByUserId(
-    userId: number,
-  ): Promise<WorkspaceMember | null> {
+  async findMembershipByUserId(userId: number): Promise<WorkspaceMember | null> {
     const result = await this.db
       .select({ member: workspaceMembers })
       .from(workspaceMembers)
@@ -307,9 +289,7 @@ export class WorkspaceStorage {
     return result[0]?.member ?? null;
   }
 
-  async listUserWorkspaces(
-    userId: number,
-  ): Promise<WorkspaceMembershipWithWorkspace[]> {
+  async listUserWorkspaces(userId: number): Promise<WorkspaceMembershipWithWorkspace[]> {
     const rows = await this.db
       .select({ member: workspaceMembers, workspace: workspaces })
       .from(workspaceMembers)
@@ -343,10 +323,7 @@ export class WorkspaceStorage {
     return result[0]?.member ?? null;
   }
 
-  async findMembership(
-    workspaceId: number,
-    userId: number,
-  ): Promise<WorkspaceMember | null> {
+  async findMembership(workspaceId: number, userId: number): Promise<WorkspaceMember | null> {
     const result = await this.db
       .select({ member: workspaceMembers })
       .from(workspaceMembers)
@@ -385,10 +362,7 @@ export class WorkspaceStorage {
         checkinStreakEndDate: endDate,
       })
       .where(
-        and(
-          eq(workspaceMembers.workspaceId, workspaceId),
-          eq(workspaceMembers.userId, userId),
-        ),
+        and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, userId)),
       );
   }
 
@@ -401,7 +375,7 @@ export class WorkspaceStorage {
     return Number(result?.count ?? 0);
   }
 
-  async findPlanLimit(planCode: "BASIC" | "FREE" | "STANDARD") {
+  async findPlanLimit(planCode: BillingPlanCode) {
     return (
       (await this.db.query.billingPlanLimits.findFirst({
         where: eq(billingPlanLimits.planCode, planCode),
@@ -425,33 +399,20 @@ export class WorkspaceStorage {
     );
   }
 
-  async removeMemberById(
-    workspaceId: number,
-    membershipId: number,
-  ): Promise<void> {
+  async removeMemberById(workspaceId: number, membershipId: number): Promise<void> {
     await this.db
       .delete(workspaceMembers)
       .where(
-        and(
-          eq(workspaceMembers.workspaceId, workspaceId),
-          eq(workspaceMembers.id, membershipId),
-        ),
+        and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.id, membershipId)),
       );
   }
 
-  async updateMemberRole(
-    workspaceId: number,
-    userId: number,
-    role: "ADMIN" | "MEMBER",
-  ): Promise<void> {
+  async updateMemberRole(workspaceId: number, userId: number, role: WorkspaceRole): Promise<void> {
     await this.db
       .update(workspaceMembers)
       .set({ role })
       .where(
-        and(
-          eq(workspaceMembers.workspaceId, workspaceId),
-          eq(workspaceMembers.userId, userId),
-        ),
+        and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, userId)),
       );
   }
 
@@ -477,10 +438,7 @@ export class WorkspaceStorage {
     maxUses: number;
     createdByUserId: number;
   }): Promise<WorkspaceInvite> {
-    const [invite] = await this.db
-      .insert(workspaceInvites)
-      .values(input)
-      .returning();
+    const [invite] = await this.db.insert(workspaceInvites).values(input).returning();
     return invite;
   }
 
@@ -492,10 +450,7 @@ export class WorkspaceStorage {
     );
   }
 
-  async findInviteById(
-    workspaceId: number,
-    inviteId: number,
-  ): Promise<WorkspaceInvite | null> {
+  async findInviteById(workspaceId: number, inviteId: number): Promise<WorkspaceInvite | null> {
     return (
       (await this.db.query.workspaceInvites.findFirst({
         where: and(
@@ -520,33 +475,21 @@ export class WorkspaceStorage {
     });
   }
 
-  async findTagById(
-    workspaceId: number,
-    tagId: number,
-  ): Promise<WorkspaceTag | null> {
+  async findTagById(workspaceId: number, tagId: number): Promise<WorkspaceTag | null> {
     return (
       (await this.db.query.workspaceTags.findFirst({
-        where: and(
-          eq(workspaceTags.workspaceId, workspaceId),
-          eq(workspaceTags.id, tagId),
-        ),
+        where: and(eq(workspaceTags.workspaceId, workspaceId), eq(workspaceTags.id, tagId)),
       })) ?? null
     );
   }
 
-  async findTagsByIds(
-    workspaceId: number,
-    tagIds: number[],
-  ): Promise<WorkspaceTag[]> {
+  async findTagsByIds(workspaceId: number, tagIds: number[]): Promise<WorkspaceTag[]> {
     if (tagIds.length === 0) {
       return [];
     }
 
     return await this.db.query.workspaceTags.findMany({
-      where: and(
-        eq(workspaceTags.workspaceId, workspaceId),
-        inArray(workspaceTags.id, tagIds),
-      ),
+      where: and(eq(workspaceTags.workspaceId, workspaceId), inArray(workspaceTags.id, tagIds)),
     });
   }
 
@@ -568,12 +511,7 @@ export class WorkspaceStorage {
     const [tag] = await this.db
       .update(workspaceTags)
       .set(input)
-      .where(
-        and(
-          eq(workspaceTags.workspaceId, workspaceId),
-          eq(workspaceTags.id, tagId),
-        ),
-      )
+      .where(and(eq(workspaceTags.workspaceId, workspaceId), eq(workspaceTags.id, tagId)))
       .returning();
 
     return tag ?? null;
@@ -582,12 +520,7 @@ export class WorkspaceStorage {
   async deleteTag(workspaceId: number, tagId: number): Promise<void> {
     await this.db
       .delete(workspaceTags)
-      .where(
-        and(
-          eq(workspaceTags.workspaceId, workspaceId),
-          eq(workspaceTags.id, tagId),
-        ),
-      );
+      .where(and(eq(workspaceTags.workspaceId, workspaceId), eq(workspaceTags.id, tagId)));
   }
 
   async updateInviteStatus(
@@ -598,12 +531,7 @@ export class WorkspaceStorage {
     const [invite] = await this.db
       .update(workspaceInvites)
       .set({ status })
-      .where(
-        and(
-          eq(workspaceInvites.workspaceId, workspaceId),
-          eq(workspaceInvites.id, inviteId),
-        ),
-      )
+      .where(and(eq(workspaceInvites.workspaceId, workspaceId), eq(workspaceInvites.id, inviteId)))
       .returning();
 
     return invite ?? null;
@@ -616,49 +544,34 @@ export class WorkspaceStorage {
   }): Promise<boolean> {
     const { inviteId, workspaceId, userId } = input;
 
-    const [updatedInvite] = await this.db
-      .update(workspaceInvites)
-      .set({
-        usedCount: sql`${workspaceInvites.usedCount} + 1`,
-      })
-      .where(
-        and(
-          eq(workspaceInvites.id, inviteId),
-          eq(workspaceInvites.workspaceId, workspaceId),
-          eq(workspaceInvites.status, "ACTIVE"),
-          lt(workspaceInvites.usedCount, workspaceInvites.maxUses),
-        ),
-      )
-      .returning({
-        id: workspaceInvites.id,
-      });
-
-    if (!updatedInvite) {
-      return false;
-    }
-
-    try {
-      await this.db.insert(workspaceMembers).values({
-        workspaceId,
-        userId,
-        role: "MEMBER",
-      });
-      return true;
-    } catch (error) {
-      // Restore invite usage count when member insert fails after increment.
-      await this.db
+    return await this.db.transaction(async (tx) => {
+      const [updatedInvite] = await tx
         .update(workspaceInvites)
         .set({
-          usedCount: sql`${workspaceInvites.usedCount} - 1`,
+          usedCount: sql`${workspaceInvites.usedCount} + 1`,
         })
         .where(
           and(
             eq(workspaceInvites.id, inviteId),
             eq(workspaceInvites.workspaceId, workspaceId),
-            gt(workspaceInvites.usedCount, 0),
+            eq(workspaceInvites.status, "ACTIVE"),
+            lt(workspaceInvites.usedCount, workspaceInvites.maxUses),
           ),
-        );
-      throw error;
-    }
+        )
+        .returning({
+          id: workspaceInvites.id,
+        });
+
+      if (!updatedInvite) {
+        return false;
+      }
+
+      await tx.insert(workspaceMembers).values({
+        workspaceId,
+        userId,
+        role: "MEMBER",
+      });
+      return true;
+    });
   }
 }

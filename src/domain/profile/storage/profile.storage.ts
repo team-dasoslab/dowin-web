@@ -1,3 +1,4 @@
+import { type WorkspaceRole } from "@/domain/workspace/types";
 import {
   users,
   workspaceBillingState,
@@ -13,7 +14,7 @@ export type ProfileRecord = {
   nickname: string;
   avatarKey: string | null;
   locale: string;
-  role: "ADMIN" | "MEMBER" | null;
+  role: WorkspaceRole | null;
   workspaceId: number | null;
   workspaceName: string | null;
   createdAt: Date;
@@ -31,7 +32,7 @@ export type ProfileDeletionContext = {
   membership: {
     id: number;
     workspaceId: number;
-    role: "ADMIN" | "MEMBER";
+    role: WorkspaceRole;
   } | null;
 };
 

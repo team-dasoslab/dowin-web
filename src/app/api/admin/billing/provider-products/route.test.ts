@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -62,15 +63,15 @@ describe("/api/admin/billing/provider-products", () => {
     ]);
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(
+      new NextRequest("https://example.com/api/admin/billing/provider-products"),
+      { params: Promise.resolve({}) },
+    );
     const body = (await response.json()) as Array<{ providerProductId: string }>;
 
     expect(response.status).toBe(200);
     expect(body[0]?.providerProductId).toBe("prod_basic_live");
-    expect(mockRequireAnyAdminRole).toHaveBeenCalledWith({}, 1, [
-      "SUPPORT_ADMIN",
-      "SYSTEM_ADMIN",
-    ]);
+    expect(mockRequireAnyAdminRole).toHaveBeenCalledWith({}, 1, ["SUPPORT_ADMIN", "SYSTEM_ADMIN"]);
   });
 
   it("provider product 매핑을 upsert한다", async () => {
@@ -85,7 +86,7 @@ describe("/api/admin/billing/provider-products", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("https://example.com/api/admin/billing/provider-products", {
+      new NextRequest("https://example.com/api/admin/billing/provider-products", {
         method: "POST",
         body: JSON.stringify({
           provider: "POLAR",
@@ -99,6 +100,7 @@ describe("/api/admin/billing/provider-products", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);

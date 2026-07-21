@@ -1,20 +1,13 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { getDb } from "@/db";
 import { createPolarBillingClient } from "@/domain/billing/polar";
 import { BillingService } from "@/domain/billing/services/billing.service";
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { apiError, apiSuccess } from "@/lib/server/api-response";
-import { getSessionWithRefresh } from "@/lib/server/auth";
 import { PlatformError } from "@/lib/server/errors";
-import { withErrorHandler } from "@/lib/server/with-error-handler";
+import { withWorkspaceAccess } from "@/lib/server/with-workspace-access";
 import { NextResponse } from "next/server";
 
-function buildPortalFailureRedirectUrl(
-  request: Request,
-  workspaceId: string,
-  code: string,
-) {
+function buildPortalFailureRedirectUrl(request: Request, workspaceId: string, code: string) {
   const requestUrl = new URL(request.url);
   const fallbackUrl = new URL(`/${workspaceId}/workspace/billing`, requestUrl);
   const referer = request.headers.get("referer");
@@ -40,20 +33,8 @@ function wantsJsonResponse(request: Request): boolean {
   return request.headers.get("accept")?.includes("application/json") ?? false;
 }
 
-export const GET = withErrorHandler(
-  async (
-    request: Request,
-    { params }: { params: Promise<{ workspaceId: string }> },
-  ) => {
-    const { workspaceId } = await params;
-    const { env } = getCloudflareContext();
-    const db = getDb(env.DB);
-    const session = await getSessionWithRefresh(db);
-
-    if (!session) {
-      return await apiError("UNAUTHORIZED");
-    }
-
+export const GET = withWorkspaceAccess<{ workspaceId: string }>(
+  async (request, { context, db, env, params }) => {
     const returnJson = wantsJsonResponse(request);
     const service = new BillingService(
       new WorkspaceStorage(db),
@@ -62,7 +43,7 @@ export const GET = withErrorHandler(
     );
 
     try {
-      const portalUrl = await service.getPortalUrl(workspaceId, session.userId);
+      const portalUrl = await service.getPortalUrl(context);
       if (returnJson) {
         return apiSuccess({ portalUrl });
       }
@@ -75,13 +56,13 @@ export const GET = withErrorHandler(
         }
 
         console.warn("[billing.portal] redirecting after portal failure", {
-          workspaceId,
-          userId: session.userId,
+          workspaceId: context.workspaceId,
+          userId: context.userId,
           code: error.code,
           statusCode: error.statusCode,
         });
         return NextResponse.redirect(
-          buildPortalFailureRedirectUrl(request, workspaceId, error.code),
+          buildPortalFailureRedirectUrl(request, params.workspaceId, error.code),
         );
       }
 

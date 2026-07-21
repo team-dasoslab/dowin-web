@@ -9,8 +9,6 @@ import { apiError, apiSuccess } from "@/lib/server/api-response";
 import { getSessionWithRefresh } from "@/lib/server/auth";
 import { getLocale } from "@/lib/server/locale";
 import { withErrorHandler } from "@/lib/server/with-error-handler";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-
 const createService = (db: ReturnType<typeof getDb>) =>
   new ContactInquiryService(
     new WorkspaceStorage(db),
@@ -18,9 +16,7 @@ const createService = (db: ReturnType<typeof getDb>) =>
     new ContactDiscordNotifierService(),
   );
 
-export const GET = withErrorHandler(async () => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const GET = withErrorHandler(async (_, { db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -32,9 +28,7 @@ export const GET = withErrorHandler(async () => {
   return apiSuccess(result);
 });
 
-export const POST = withErrorHandler(async (request: Request) => {
-  const { env } = getCloudflareContext();
-  const db = getDb(env.DB);
+export const POST = withErrorHandler(async (request: Request, { env, db }) => {
   const session = await getSessionWithRefresh(db);
 
   if (!session) {
@@ -44,10 +38,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const parsed = contactInquiryCreateSchema.safeParse(await request.json());
 
   if (!parsed.success) {
-    return await apiError(
-      "VALIDATION_ERROR",
-      parsed.error.flatten().fieldErrors,
-    );
+    return await apiError("VALIDATION_ERROR", parsed.error.flatten().fieldErrors);
   }
 
   const locale = await getLocale();
@@ -58,9 +49,7 @@ export const POST = withErrorHandler(async (request: Request) => {
       locale,
     },
     {
-      webhookUrl:
-        env.CONTACT_DISCORD_WEBHOOK_URL ??
-        serverRuntimeConfig.contactDiscordWebhookUrl,
+      webhookUrl: env.CONTACT_DISCORD_WEBHOOK_URL ?? serverRuntimeConfig.contactDiscordWebhookUrl,
     },
   );
 

@@ -1,11 +1,14 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ForbiddenError } from "@/lib/server/errors";
+
+const mockRequireWorkspaceAccess = vi.fn();
+const mockAssertWorkspaceOperationAllowed = vi.fn();
+const mockResolveIdByUid = vi.fn();
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
-const mockRequireWorkspaceAdminInWorkspace = vi.fn();
-const mockResolveIdByUid = vi.fn();
+
 const mockGetMembers = vi.fn();
 
 vi.mock("@opennextjs/cloudflare", () => ({
@@ -23,21 +26,26 @@ vi.mock("@/lib/server/auth", () => ({
 vi.mock("@/domain/workspace/services/workspace.service", () => ({
   WorkspaceService: vi.fn(function MockWorkspaceService() {
     return {
-    getMembers: mockGetMembers,
+      getMembers: mockGetMembers,
     };
   }),
 }));
 
 vi.mock("@/domain/workspace/storage/workspace.storage", () => ({
   WorkspaceStorage: vi.fn(function MockWorkspaceStorage() {
+    return { resolveIdByUid: mockResolveIdByUid };
+    //
     return {
       resolveIdByUid: mockResolveIdByUid,
     };
   }),
 }));
 
-vi.mock("@/lib/server/authz", () => ({
-  requireWorkspaceAdminInWorkspace: mockRequireWorkspaceAdminInWorkspace,
+vi.mock("@/lib/server/workspace-context", () => ({
+  requireWorkspaceAccess: mockRequireWorkspaceAccess,
+}));
+vi.mock("@/domain/workspace/plan-limits", () => ({
+  assertWorkspaceOperationAllowed: mockAssertWorkspaceOperationAllowed,
 }));
 
 describe("GET /api/workspaces/:id/members", () => {
@@ -46,13 +54,21 @@ describe("GET /api/workspaces/:id/members", () => {
     mockGetCloudflareContext.mockReturnValue({ env: { DB: {} } });
     mockGetDb.mockReturnValue({});
     mockResolveIdByUid.mockResolvedValue(1);
+    mockRequireWorkspaceAccess.mockResolvedValue({
+      workspaceId: 1,
+      userId: 1,
+      role: "ADMIN",
+      entitlement: { planCode: "BASIC" },
+    });
+    mockAssertWorkspaceOperationAllowed.mockResolvedValue(undefined);
+    mockResolveIdByUid.mockResolvedValue(1);
   });
 
   it("세션이 없으면 401을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost/api/workspaces/1/members"), {
+    const response = await GET(new NextRequest("http://localhost/api/workspaces/1/members"), {
       params: Promise.resolve({ workspaceId: "1" }),
     });
 
@@ -61,12 +77,15 @@ describe("GET /api/workspaces/:id/members", () => {
 
   it("해당 워크스페이스 ADMIN이 아니면 403을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
-    mockRequireWorkspaceAdminInWorkspace.mockRejectedValue(
-      new ForbiddenError("FORBIDDEN"),
-    );
+    mockRequireWorkspaceAccess.mockResolvedValue({
+      workspaceId: 1,
+      userId: 1,
+      role: "MEMBER",
+      entitlement: { planCode: "BASIC" },
+    });
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost/api/workspaces/1/members"), {
+    const response = await GET(new NextRequest("http://localhost/api/workspaces/1/members"), {
       params: Promise.resolve({ workspaceId: "1" }),
     });
 
@@ -76,19 +95,15 @@ describe("GET /api/workspaces/:id/members", () => {
 
   it("해당 워크스페이스 ADMIN이면 목록을 반환한다", async () => {
     mockGetSessionWithRefresh.mockResolvedValue({ userId: 1 });
-    mockRequireWorkspaceAdminInWorkspace.mockResolvedValue({
-      id: 1,
-      userId: 1,
-      role: "ADMIN",
-    });
+
     mockGetMembers.mockResolvedValue([{ userId: 1, nickname: "관리자" }]);
 
     const { GET } = await import("./route");
-    const response = await GET(new Request("http://localhost/api/workspaces/1/members"), {
+    const response = await GET(new NextRequest("http://localhost/api/workspaces/1/members"), {
       params: Promise.resolve({ workspaceId: "1" }),
     });
 
     expect(response.status).toBe(200);
-    expect(mockGetMembers).toHaveBeenCalledWith(1, 1);
+    expect(mockGetMembers).toHaveBeenCalledWith(expect.objectContaining({ workspaceId: 1 }));
   });
 });

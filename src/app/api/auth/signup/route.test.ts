@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
@@ -43,7 +44,7 @@ describe("POST /api/auth/signup", () => {
   it("요청 바디가 유효하지 않으면 422를 반환한다", async () => {
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/auth/signup", {
+      new NextRequest("http://localhost/api/auth/signup", {
         method: "POST",
         body: JSON.stringify({
           customId: "ab",
@@ -54,6 +55,7 @@ describe("POST /api/auth/signup", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -73,7 +75,7 @@ describe("POST /api/auth/signup", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/auth/signup", {
+      new NextRequest("http://localhost/api/auth/signup", {
         method: "POST",
         body: JSON.stringify({
           customId: "john123",
@@ -84,15 +86,11 @@ describe("POST /api/auth/signup", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(201);
-    expect(mockSignup).toHaveBeenCalledWith(
-      "john123",
-      "존",
-      "newSecurePass1!",
-      "ko",
-    );
+    expect(mockSignup).toHaveBeenCalledWith("john123", "존", "newSecurePass1!", "ko");
     expect(mockCookieSet).toHaveBeenCalledTimes(1);
     await expect(response.json()).resolves.toEqual({
       user: {
