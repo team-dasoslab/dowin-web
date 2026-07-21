@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -62,7 +62,9 @@ describe("GET/POST /api/contact-inquiries", () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(new NextRequest("http://localhost/api/contact-inquiries"), {
+      params: Promise.resolve({}),
+    });
 
     expect(response.status).toBe(401);
   });
@@ -72,7 +74,9 @@ describe("GET/POST /api/contact-inquiries", () => {
     mockListMyInquiries.mockResolvedValue([{ id: 7 }]);
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(new NextRequest("http://localhost/api/contact-inquiries"), {
+      params: Promise.resolve({}),
+    });
 
     expect(response.status).toBe(200);
     expect(mockListMyInquiries).toHaveBeenCalledWith(11);
@@ -87,6 +91,7 @@ describe("GET/POST /api/contact-inquiries", () => {
         method: "POST",
         body: JSON.stringify({}),
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(401);
@@ -107,6 +112,7 @@ describe("GET/POST /api/contact-inquiries", () => {
           privacyConsent: false,
         }),
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -138,6 +144,7 @@ describe("GET/POST /api/contact-inquiries", () => {
           privacyConsent: true,
         }),
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(201);

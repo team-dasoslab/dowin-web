@@ -87,6 +87,7 @@ describe("POST /api/workspaces/join", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(401);
@@ -106,6 +107,7 @@ describe("POST /api/workspaces/join", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);

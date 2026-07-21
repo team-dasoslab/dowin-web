@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -45,6 +45,7 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -66,13 +67,11 @@ describe("PUT /api/auth/password/by-recovery-code", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);
-    expect(mockResetPasswordByRecoveryCode).toHaveBeenCalledWith(
-      "ABCDEFGH23",
-      "newSecurePass1!",
-    );
+    expect(mockResetPasswordByRecoveryCode).toHaveBeenCalledWith("ABCDEFGH23", "newSecurePass1!");
     await expect(response.json()).resolves.toEqual({
       message: "비밀번호가 변경되었습니다.",
     });

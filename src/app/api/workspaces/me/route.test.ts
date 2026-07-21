@@ -1,5 +1,5 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
 const mockGetSessionWithRefresh = vi.fn();
@@ -69,7 +69,9 @@ describe("GET /api/workspaces/me", () => {
     mockGetSessionWithRefresh.mockResolvedValue(null);
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(new NextRequest("http://localhost/api/workspaces/me"), {
+      params: Promise.resolve({}),
+    });
 
     expect(response.status).toBe(401);
     expect(mockGetMyWorkspace).not.toHaveBeenCalled();
@@ -89,7 +91,9 @@ describe("GET /api/workspaces/me", () => {
     });
 
     const { GET } = await import("./route");
-    const response = await GET();
+    const response = await GET(new NextRequest("http://localhost/api/workspaces/me"), {
+      params: Promise.resolve({}),
+    });
     const body = await response.json();
 
     expect(response.status).toBe(200);

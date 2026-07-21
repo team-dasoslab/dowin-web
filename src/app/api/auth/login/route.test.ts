@@ -1,6 +1,6 @@
 import { TooManyRequestsError } from "@/lib/server/errors";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -58,6 +58,7 @@ describe("POST /api/auth/login", () => {
           password: "",
         }),
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -80,6 +81,7 @@ describe("POST /api/auth/login", () => {
           password: "password123",
         }),
       }),
+      { params: Promise.resolve({}) },
     );
 
     const body = (await response.json()) as {

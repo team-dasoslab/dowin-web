@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockGetCloudflareContext = vi.fn();
 const mockGetDb = vi.fn();
@@ -44,6 +44,7 @@ describe("POST /api/auth/recovery-codes/verify", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(422);
@@ -67,6 +68,7 @@ describe("POST /api/auth/recovery-codes/verify", () => {
           "Content-Type": "application/json",
         },
       }),
+      { params: Promise.resolve({}) },
     );
 
     expect(response.status).toBe(200);
