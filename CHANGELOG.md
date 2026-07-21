@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.4](https://github.com/team-dasoslab/dowin-web/compare/v1.14.3...v1.14.4) (2026-07-21)
+
+
+### Bug Fixes
+
+* 자원 조작 API에 CSRF Origin 검증 로직 추가 ([85d535e](https://github.com/team-dasoslab/dowin-web/commit/85d535e70367c218e337d8c69de7caeb1cf01892))
+
 ## [1.14.3](https://github.com/team-dasoslab/dowin-web/compare/v1.14.2...v1.14.3) (2026-07-21)
 
 
