@@ -10,6 +10,8 @@
     "today": "Today",
     "loading": "Loading...",
     "errorOccurred": "An error occurred.",
+    "errorDesc": "A temporary error occurred. Please try again later.",
+    "retry": "Try again",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "error": "Error occurred.",
