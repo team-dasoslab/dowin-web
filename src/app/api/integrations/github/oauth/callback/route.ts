@@ -1,9 +1,8 @@
 import { createOAuthService } from "@/domain/github-integration/services/oauth.service";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { NextRequest, NextResponse } from "next/server";
+import { withErrorHandler } from "@/lib/server/with-error-handler";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const { env } = await getCloudflareContext();
+export const GET = withErrorHandler(async (req, { env }) => {
   const searchParams = req.nextUrl.searchParams;
 
   const code = searchParams.get("code");
@@ -36,4 +35,4 @@ export async function GET(req: NextRequest) {
     console.error("github oauth callback error:", error);
     return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
-}
+});
