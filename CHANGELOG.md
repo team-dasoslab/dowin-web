@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.14.6](https://github.com/team-dasoslab/dowin-web/compare/v1.14.5...v1.14.6) (2026-07-21)
+
+
+### Bug Fixes
+
+* **ui:** protected route 에러 및 로딩 화면 추가 ([b2a4e24](https://github.com/team-dasoslab/dowin-web/commit/b2a4e243e485249096e6ddcdb54ecd686542b15e))
+
+
+### Performance Improvements
+
+* enable cloudflare workers smart placement ([933bcdf](https://github.com/team-dasoslab/dowin-web/commit/933bcdfddf71ee6f51f06f286f75d072f8ed1711))
+* **workspace:** resolve N+1 query issue in access middleware ([54bac0b](https://github.com/team-dasoslab/dowin-web/commit/54bac0bafd18f7a79065bae53402666ffbbb4ef2))
+
 ## [1.14.5](https://github.com/team-dasoslab/dowin-web/compare/v1.14.4...v1.14.5) (2026-07-21)
 
 
