@@ -1,5 +1,6 @@
 "use client";
 
+import type { getWorkspacesWorkspaceIdDashboardMyResponse } from "@/api/generated/dashboard/dashboard";
 import { useDashboardLogMutation } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardLogMutation";
 import { useDashboardPeriodState } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardPeriodState";
 import { useDashboardScoreboardQueries } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_hooks/useDashboardScoreboardQueries";
@@ -7,7 +8,10 @@ import { DashboardView } from "@/app/[locale]/(protected)/[workspaceId]/dashboar
 import { useToast } from "@/context/ToastContext";
 import { useTransition } from "react";
 
-export const useDashboardScoreboard = (workspaceId: string) => {
+export const useDashboardScoreboard = (
+  workspaceId: string,
+  initialDashboard?: getWorkspacesWorkspaceIdDashboardMyResponse,
+) => {
   const { showToast } = useToast();
   const [isPending, startTransition] = useTransition();
   const {
@@ -61,6 +65,7 @@ export const useDashboardScoreboard = (workspaceId: string) => {
     selectedWeekStart,
     selectedView,
     weekDates,
+    initialDashboard,
   });
 
   const handleMovePeriod = (direction: -1 | 1) => {

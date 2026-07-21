@@ -1,11 +1,11 @@
 import { fireEvent, screen } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
 import { trackEvent } from "@/lib/client/gtag";
 import { renderWithProviders } from "@/test/render";
 
-import DashboardPage from "./page";
+import { DashboardTeamClient } from "./_components/DashboardTeamClient";
 import { useScoreboardImageExport } from "./_hooks/useScoreboardImageExport";
 import { useTeamDashboard } from "./_hooks/useTeamDashboard";
 
@@ -14,14 +14,7 @@ vi.mock("@/api/generated/profile/profile", () => ({
 }));
 
 vi.mock("@/i18n/routing", () => ({
-  Link: ({
-    children,
-    href,
-    ...props
-  }: {
-    children: React.ReactNode;
-    href: string;
-  }) => (
+  Link: ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
     <a href={href} {...props}>
       {children}
     </a>
@@ -75,13 +68,7 @@ vi.mock("./_components/TeamPeriodControls", () => ({
 }));
 
 vi.mock("./_components/MemberCard", () => ({
-  MemberCard: ({
-    isMe,
-    member,
-  }: {
-    isMe?: boolean;
-    member: { nickname?: string | null };
-  }) => (
+  MemberCard: ({ isMe, member }: { isMe?: boolean; member: { nickname?: string | null } }) => (
     <section data-testid="member-card">
       {member.nickname}
       {isMe ? ":me" : ""}
@@ -108,8 +95,7 @@ vi.mock("./_components/WeeklyTable", () => ({
     weekDates: string[];
   }) => (
     <section data-testid="weekly-table">
-      {member.nickname}:{weekDates[0]}:{memoMode ?? "closed"}:
-      {currentUserRole ?? "none"}
+      {member.nickname}:{weekDates[0]}:{memoMode ?? "closed"}:{currentUserRole ?? "none"}
       {isMe ? ":me" : ""}
       <button type="button" onClick={onToggleCompose}>
         compose {member.nickname}
@@ -134,9 +120,7 @@ const saveImage = vi.fn();
 
 type TeamDashboardState = ReturnType<typeof useTeamDashboard>;
 
-function createDashboardState(
-  overrides: Partial<TeamDashboardState> = {},
-): TeamDashboardState {
+function createDashboardState(overrides: Partial<TeamDashboardState> = {}): TeamDashboardState {
   return {
     dashboard: {
       members: [
@@ -191,7 +175,7 @@ function mockDashboardState(overrides: Partial<TeamDashboardState> = {}) {
   vi.mocked(useTeamDashboard).mockReturnValue(createDashboardState(overrides));
 }
 
-describe("DashboardPage", () => {
+describe("DashboardTeamClient", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockDashboardState();
@@ -219,7 +203,9 @@ describe("DashboardPage", () => {
       isLoading: true,
     });
 
-    const { container } = renderWithProviders(<DashboardPage />);
+    const { container } = renderWithProviders(
+      <DashboardTeamClient initialProfile={undefined} initialTeamDashboard={undefined} />,
+    );
 
     expect(container.querySelector(".animate-pulse")).toBeInTheDocument();
   });
@@ -230,7 +216,9 @@ describe("DashboardPage", () => {
       hasNoWorkspace: true,
     });
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(
+      <DashboardTeamClient initialProfile={undefined} initialTeamDashboard={undefined} />,
+    );
 
     expect(screen.getByText("아직 워크스페이스가 없습니다")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "새 워크스페이스 만들기" })).toHaveAttribute(
@@ -258,11 +246,11 @@ describe("DashboardPage", () => {
       },
     });
 
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(
+      <DashboardTeamClient initialProfile={undefined} initialTeamDashboard={undefined} />,
+    );
 
-    expect(
-      screen.getByText("아직 활성화된 점수판이 없습니다"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("아직 활성화된 점수판이 없습니다")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "새 점수판 만들기" })).toHaveAttribute(
       "href",
       "/workspace-1/setup?mode=create",
@@ -270,12 +258,12 @@ describe("DashboardPage", () => {
   });
 
   it("renders summary cards, weekly tables, and period controls for active members", () => {
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(
+      <DashboardTeamClient initialProfile={undefined} initialTeamDashboard={undefined} />,
+    );
 
     expect(screen.getByText("팀 대시보드")).toBeInTheDocument();
-    expect(screen.getByTestId("team-period-controls")).toHaveTextContent(
-      "06.08 – 06.14",
-    );
+    expect(screen.getByTestId("team-period-controls")).toHaveTextContent("06.08 – 06.14");
     expect(screen.getAllByTestId("member-card")).toHaveLength(3);
     expect(screen.getAllByTestId("weekly-table")).toHaveLength(2);
     expect(screen.getByText("홍길동:me")).toBeInTheDocument();
@@ -288,7 +276,9 @@ describe("DashboardPage", () => {
   });
 
   it("passes period control actions through to the dashboard hook", () => {
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(
+      <DashboardTeamClient initialProfile={undefined} initialTeamDashboard={undefined} />,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "previous period" }));
     fireEvent.click(screen.getByRole("button", { name: "next period" }));
@@ -302,7 +292,9 @@ describe("DashboardPage", () => {
   });
 
   it("toggles memo mode for a weekly table", () => {
-    renderWithProviders(<DashboardPage />);
+    renderWithProviders(
+      <DashboardTeamClient initialProfile={undefined} initialTeamDashboard={undefined} />,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: "compose 홍길동" }));
 
