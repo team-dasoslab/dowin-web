@@ -26,13 +26,33 @@ export function withErrorHandler<TCtx extends BaseContext = { params?: Promise<u
         db,
       };
 
+      if (req && ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) {
+        const origin = req.headers.get("origin");
+        const referer = req.headers.get("referer");
+        const host = req.headers.get("host") || req.nextUrl.host;
+        const sourceUrl = origin || referer;
+
+        // Allow explicit app clients
+        const isApp = req.headers.get("x-dowin-client") === "app";
+
+        if (!isApp && sourceUrl && host) {
+          try {
+            const sourceOrigin = new URL(sourceUrl).host;
+            if (sourceOrigin !== host) {
+              return await apiError("FORBIDDEN", "CSRF Check Failed: Origin mismatch");
+            }
+          } catch {
+            // Invalid URL format in origin/referer
+            return await apiError("FORBIDDEN", "CSRF Check Failed: Invalid origin format");
+          }
+        }
+      }
+
       return await handler(req as NextRequest, enhancedCtx);
     } catch (error) {
       if (error instanceof PlatformError) {
         return await apiError(error.code, error.details);
       }
-
-      console.error("[Unhandled Error]", error);
 
       if (serverRuntimeConfig.logsDiscordWebhookUrl) {
         try {
