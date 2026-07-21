@@ -9,7 +9,7 @@ export const GET = withWorkspaceAdmin(async (_, { context, params, env }) => {
     return apiError("VALIDATION_ERROR", parsedParams.error.format());
   }
 
-  const service = createRepositoryLinkService(env as unknown as CloudflareEnv);
+  const service = createRepositoryLinkService(env);
   const status = await service.getWorkspaceIntegrationStatus(context.workspaceId, context.userId);
 
   return apiSuccess(status);
