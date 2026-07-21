@@ -53,10 +53,10 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
 
               {member.currentCheckinStreak && member.currentCheckinStreak > 0 ? (
                 <Badge 
-                  variant="info"
+                  variant="primary"
                   shape="pill"
                   size="sm"
-                  className="gap-0.5 px-1.5 border-blue-500/10"
+                  className="gap-0.5 px-1.5 border-primary/10"
                   title={t("dailyCheckinStreakTitle", { count: member.currentCheckinStreak })}
                 >
                   <Zap className="w-3 h-3 fill-current" />
