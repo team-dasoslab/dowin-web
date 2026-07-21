@@ -150,28 +150,32 @@ export function createWebhookService(env: CloudflareEnv) {
       const mergedAt = pr.merged_at ? new Date(pr.merged_at) : null;
       const dailyLogDate = isMerged ? toKstDateString(mergedAt ?? new Date()) : null;
 
+      // Pre-fetch all matching action items
+      const uniqueSequences = Array.from(new Set(matching.map((c) => c.sequence)));
+      const actionItems = await storage.findActionItemsByDisplayKeys(
+        db,
+        workspaceId,
+        uniqueSequences,
+      );
+      const actionItemMap = new Map(actionItems.map((a) => [a.displaySequence, a]));
+
+      // Pre-fetch all existing PR links for these action items
+      const leadMeasureIds = actionItems.map((a) => a.leadMeasureId);
+      const existingLinks = await storage.getPrLinksByKeys(db, linkId, pr.number, leadMeasureIds);
+      const existingLinkMap = new Map(existingLinks.map((l) => [l.leadMeasureId, l]));
+
       let processedCount = 0;
       const skipped: string[] = [];
 
       for (const candidate of matching) {
-        // Deduplicate within the same event
-        const actionItem = await storage.findActionItemByDisplayKey(
-          db,
-          workspaceId,
-          candidate.sequence,
-        );
+        const actionItem = actionItemMap.get(candidate.sequence);
 
         if (!actionItem) {
           skipped.push(`${candidate.raw}:not_found`);
           continue;
         }
 
-        const existingLink = await storage.getPrLinkByKey(
-          db,
-          linkId,
-          pr.number,
-          actionItem.leadMeasureId,
-        );
+        const existingLink = existingLinkMap.get(actionItem.leadMeasureId);
 
         // Skip daily log if already applied for this PR+action item combination
         const alreadyApplied = existingLink?.dailyLogAppliedAt != null;

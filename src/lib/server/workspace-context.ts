@@ -1,24 +1,32 @@
-import { NotFoundError } from "@/lib/server/errors";
 import { hasBasicOperationalEntitlement } from "@/domain/billing/entitlement-policy";
-import { type NullableEntitlementSource } from "@/domain/billing/types";
+import {
+  type BillingPlanCode,
+  type BillingStatus,
+  type NullableEntitlementSource,
+} from "@/domain/billing/types";
+import { type WorkspaceRole } from "@/domain/workspace/types";
+import { NotFoundError } from "@/lib/server/errors";
 
 type WorkspaceStoragePort = {
-  getAccessContextData(workspaceId: number, userId: number): Promise<{
+  getAccessContextData(
+    workspaceId: number,
+    userId: number,
+  ): Promise<{
     workspace: {
       id: number;
       uid: string | null;
       name: string;
-      planCode: "BASIC" | "FREE" | "STANDARD";
+      planCode: BillingPlanCode;
       allowPastDailyLogEdit?: boolean | null;
     };
     member: {
       id: number;
       userId: number;
-      role: "ADMIN" | "MEMBER";
+      role: WorkspaceRole;
     };
     billingState: {
-      planCode: "BASIC" | "FREE" | "STANDARD";
-      billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
+      planCode: BillingPlanCode;
+      billingStatus: BillingStatus;
       entitlementSource: NullableEntitlementSource;
     } | null;
   } | null>;
@@ -29,14 +37,14 @@ export type WorkspaceAccessContext = {
   workspacePublicId: string;
   workspaceName: string;
   userId: number;
-  role: "ADMIN" | "MEMBER";
+  role: WorkspaceRole;
   membershipId: number;
   allowPastDailyLogEdit: boolean;
   entitlement: {
     canAccessBasicSubscription: boolean;
     entitlementSource: NullableEntitlementSource;
-    billingStatus: "NONE" | "ACTIVE" | "CANCELED" | "EXPIRED" | "REVOKED";
-    planCode: "BASIC" | "FREE" | "STANDARD";
+    billingStatus: BillingStatus;
+    planCode: BillingPlanCode;
   };
 };
 

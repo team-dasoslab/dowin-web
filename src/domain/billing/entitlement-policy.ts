@@ -1,10 +1,5 @@
-export type BillingPlanCode = "BASIC" | "FREE" | "STANDARD";
-export type BillingStatus =
-  | "NONE"
-  | "ACTIVE"
-  | "CANCELED"
-  | "EXPIRED"
-  | "REVOKED";
+import { type BillingPlanCode, type BillingStatus } from "./types";
+export type { BillingPlanCode, BillingStatus };
 
 export type BasicEntitlementBillingState = {
   planCode: BillingPlanCode;

@@ -15,7 +15,7 @@ export const DELETE = withWorkspaceAdmin<{ workspaceId: string; repositoryLinkId
       return apiError("VALIDATION_ERROR", parsedParams.error.format());
     }
 
-    const service = createRepositoryLinkService(env as unknown as CloudflareEnv);
+    const service = createRepositoryLinkService(env);
 
     await service.disconnectRepository(context.workspaceId, parsedParams.data.repositoryLinkId);
 
