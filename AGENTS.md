@@ -50,6 +50,7 @@ To prevent human cognitive overload and "Rubber-Stamping" during reviews, all AI
 - **Scope Constraint (작업 크기 강제 제한):** Do not generate massive, monolithic code blocks or refactor unrelated files. Keep changes strictly localized to the requested task. If a task requires modifying many files, break it down and ask the user for approval first.
 - **Intent Verification (의도 설명 강제):** When generating code or updating files, do not just summarize _what_ changed. You MUST explicitly explain _why_ specific architectural or logic decisions were made, allowing the human reviewer to validate your intent.
 - **Review Guidance (리뷰 집중 영역 안내):** When acting as a reviewer or handing off a completed task, you MUST highlight the "Core Changes" and explicitly list which specific files the human should focus their review on (e.g., complex business logic, security boundaries) and which can be skimmed (e.g., boilerplates, simple UI tweaks).
+- **Strict Type Constraints (타입 강제 규칙):** NO `any` TYPE ALLOWED. When writing TypeScript code, the use of `any` is strictly forbidden. You must infer and write exact types. If a type is complex or unknown, use `unknown` with a type guard, or define clear generic/union types. You are also strictly forbidden from using `@ts-ignore` or `eslint-disable` comments to bypass type or lint errors. Violating this rule means the task has failed.
 
 ## Project Skills
 
