@@ -32,10 +32,12 @@ export default async function MyDashboardPage({
   const selectedMonthStart = getMonthStart(rawDate);
 
   const profileService = createProfileService(db);
-  const initialProfile = await profileService.getMyProfile(session.userId);
-
   const workspaceStorage = createWorkspaceStorage(db);
-  const activeWorkspaceId = await workspaceStorage.resolveIdByUid(workspaceId);
+
+  const [initialProfile, activeWorkspaceId] = await Promise.all([
+    profileService.getMyProfile(session.userId),
+    workspaceStorage.resolveIdByUid(workspaceId),
+  ]);
 
   let initialDashboard;
   if (activeWorkspaceId) {
