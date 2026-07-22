@@ -57,6 +57,7 @@ describe("DashboardService", () => {
         userId: 11,
         goalName: "러닝 루틴 만들기",
         lagMeasure: "주 5회 달리기",
+        startDate: "2025-01-01",
         status: "ACTIVE",
         leadMeasures: [
           {
@@ -241,6 +242,11 @@ describe("DashboardService", () => {
 
     expect(findActiveScoreboard).toHaveBeenCalledWith(11, 3);
     expect(findLogsForLeadMeasures).toHaveBeenCalledTimes(1);
+    expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
+      [31, 32],
+      "2026-06-01",
+      "2026-06-28",
+    );
     expect(result.workspace).toMatchObject({
       id: "workspace-3",
       memberCount: 2,

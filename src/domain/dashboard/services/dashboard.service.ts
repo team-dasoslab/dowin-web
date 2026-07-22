@@ -3,6 +3,7 @@ import {
   type BillingStatus,
   type NullableEntitlementSource,
 } from "@/domain/billing/types";
+import { type githubPrLinks } from "@/db/schema";
 import {
   addDays,
   getCurrentWeekStart,
@@ -79,6 +80,17 @@ type DailyLogLookupPort = {
   ): Promise<Array<{ leadMeasureId: number; logDate: string; value: boolean; count?: number }>>;
 };
 
+type GithubPrLinkState = (typeof githubPrLinks.$inferSelect)["state"];
+type ActionItemPrLink = {
+  id: number;
+  title: string;
+  url: string;
+  number: number;
+  state: GithubPrLinkState;
+  matchedDisplayKey: string;
+  dailyLogDate: string | null;
+};
+
 type ActionItemMetadataPort = {
   findMetadataForLeadMeasures(
     workspaceId: number,
@@ -87,15 +99,7 @@ type ActionItemMetadataPort = {
     Array<{
       leadMeasureId: number;
       publicId: string | null;
-      prLinks: Array<{
-        id: number;
-        title: string;
-        url: string;
-        number: number;
-        state: "OPEN" | "CLOSED" | "MERGED";
-        matchedDisplayKey: string;
-        dailyLogDate: string | null;
-      }>;
+      prLinks: ActionItemPrLink[];
     }>
   >;
 };
@@ -107,6 +111,15 @@ type DailyLogCell = {
   value: boolean;
   count: number;
   achieved: boolean;
+};
+type LogsByLeadMeasure = Map<number, DailyLogLookup[]>;
+type ActionItemMetadata = Awaited<
+  ReturnType<ActionItemMetadataPort["findMetadataForLeadMeasures"]>
+>[number];
+type ActionItemMetadataTarget = {
+  id: number;
+  publicId: string | null;
+  githubPrLinks: ActionItemMetadata["prLinks"];
 };
 
 export class DashboardService {
@@ -125,16 +138,9 @@ export class DashboardService {
       context.workspaceId,
     );
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
-    const earliestStartDate = scoreboards.reduce(
-      (earliest, sb) => (sb.startDate && sb.startDate < earliest ? sb.startDate : earliest),
-      normalizedWeekStart,
-    );
     const logRange = getDashboardLogRange(normalizedWeekStart);
     const lastWeekStart = addDays(normalizedWeekStart, -7);
-    const fetchStartOriginal = lastWeekStart < logRange.start ? lastWeekStart : logRange.start;
-    const earliestWeekStart = getWeekStart(earliestStartDate);
-    const fetchStart =
-      earliestWeekStart < fetchStartOriginal ? earliestWeekStart : fetchStartOriginal;
+    const fetchStart = lastWeekStart < logRange.start ? lastWeekStart : logRange.start;
 
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       allLeadMeasureIds,
@@ -159,6 +165,7 @@ export class DashboardService {
       members,
       scoreboards,
       logs,
+      earliestFetchedWeekStart: fetchStart,
     });
   }
 
@@ -203,80 +210,63 @@ export class DashboardService {
       monthWeekStarts[monthWeekStarts.length - 1] ?? normalizedMonthStart,
       6,
     );
-    const fetchStartOriginal =
-      weeklyFetchStart < monthlyFetchStart ? weeklyFetchStart : monthlyFetchStart;
-    const scoreboardStartWeek = getWeekStart(scoreboard.startDate ?? "2000-01-01");
     const fetchStart =
-      scoreboardStartWeek < fetchStartOriginal ? scoreboardStartWeek : fetchStartOriginal;
+      weeklyFetchStart < monthlyFetchStart ? weeklyFetchStart : monthlyFetchStart;
     const fetchEnd = weeklyFetchEnd > monthlyFetchEnd ? weeklyFetchEnd : monthlyFetchEnd;
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
       leadMeasureIds,
       fetchStart,
       fetchEnd,
     );
+    const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
     const weeklyLogs = buildMyWeeklyLogs({
-      logs,
+      logsByLeadMeasure,
       scoreboard,
       weekStart: normalizedWeekStart,
     });
     const monthlySummary = buildMyMonthlySummary({
-      logs,
+      logsByLeadMeasure,
       monthStart: normalizedMonthStart,
       scoreboard,
     });
 
-    // Attach metadata (publicId, prLinks) if available
+    let metadataMap: Map<number, ActionItemMetadata> | null = null;
     if (this.actionItemMetadataStorage && leadMeasureIds.length > 0) {
       const metadataList = await this.actionItemMetadataStorage.findMetadataForLeadMeasures(
         context.workspaceId,
         leadMeasureIds,
       );
-      const metadataMap = new Map(metadataList.map((m) => [m.leadMeasureId, m]));
-
-      for (const lm of weeklyLogs.leadMeasures) {
-        const meta = metadataMap.get(lm.id);
-        lm.publicId = meta?.publicId ?? null;
-        lm.githubPrLinks = meta?.prLinks ?? [];
-      }
+      metadataMap = new Map(metadataList.map((metadata) => [metadata.leadMeasureId, metadata]));
+      attachActionItemMetadata(weeklyLogs.leadMeasures, metadataMap);
     }
     const monthlyLogs =
       selectedView === "month"
         ? buildMyMonthlyLogs({
-            logs,
+            logsByLeadMeasure,
             monthStart: normalizedMonthStart,
             scoreboard,
           })
         : null;
 
-    if (monthlyLogs && this.actionItemMetadataStorage && leadMeasureIds.length > 0) {
-      const metadataList = await this.actionItemMetadataStorage.findMetadataForLeadMeasures(
-        context.workspaceId,
-        leadMeasureIds,
-      );
-      const metadataMap = new Map(metadataList.map((m) => [m.leadMeasureId, m]));
-
-      for (const lm of monthlyLogs.leadMeasures) {
-        const meta = metadataMap.get(lm.id);
-        lm.publicId = meta?.publicId ?? null;
-        lm.githubPrLinks = meta?.prLinks ?? [];
-      }
+    if (monthlyLogs && metadataMap) {
+      attachActionItemMetadata(monthlyLogs.leadMeasures, metadataMap);
     }
     const trendWeekStarts = [-21, -14, -7, 0].map((offset) => addDays(normalizedWeekStart, offset));
     const weeklyTrendPoints = trendWeekStarts.map((trendWeekStart) => ({
       label: trendWeekStart.slice(5).replace("-", "."),
       rate: getMyWeeklyRate({
         activeLeadMeasures,
-        logs,
+        logsByLeadMeasure,
         weekStart: trendWeekStart,
       }),
       weekStart: trendWeekStart,
     }));
 
-    const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
     const currentStreak = calculateCurrentStreak({
       scoreboard,
       logsByLeadMeasure,
       currentWeekStart: normalizedWeekStart,
+      earliestFetchedWeekStart: fetchStart,
     });
 
     const members = await this.workspaceStorage.findMembers(context.workspaceId);
@@ -329,6 +319,10 @@ export class DashboardService {
       members,
       scoreboards,
       logs,
+      earliestFetchedWeekStart:
+        earliestWeekStart < currentDashboardLogRange.start
+          ? earliestWeekStart
+          : currentDashboardLogRange.start,
     });
     const trends = trendWeekStarts.map((trendWeekStart) =>
       buildWeeklyTrend({
@@ -396,18 +390,17 @@ export class DashboardService {
 }
 
 function buildMyWeeklyLogs({
-  logs,
+  logsByLeadMeasure,
   scoreboard,
   weekStart,
 }: {
-  logs: DailyLogLookup[];
+  logsByLeadMeasure: LogsByLeadMeasure;
   scoreboard: TeamScoreboard;
   weekStart: string;
 }) {
   const weekDates = getWeekDates(weekStart);
   const weekEnd = weekDates[6];
   const previousWeekStart = addDays(weekStart, -7);
-  const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
   const shouldIncludeGuide = weekStart === getCurrentWeekStart();
 
   return {
@@ -466,32 +459,23 @@ function buildMyWeeklyLogs({
               })
             : null,
           publicId: null as string | null,
-          githubPrLinks: [] as Array<{
-            id: number;
-            title: string;
-            url: string;
-            number: number;
-            state: "OPEN" | "CLOSED" | "MERGED";
-            matchedDisplayKey: string;
-            dailyLogDate: string | null;
-          }>,
+          githubPrLinks: [] as ActionItemPrLink[],
         };
       }),
   };
 }
 
 function buildMyMonthlyLogs({
-  logs,
+  logsByLeadMeasure,
   monthStart,
   scoreboard,
 }: {
-  logs: DailyLogLookup[];
+  logsByLeadMeasure: LogsByLeadMeasure;
   monthStart: string;
   scoreboard: TeamScoreboard;
 }) {
   const monthDates = getMonthDates(monthStart);
   const monthEnd = monthDates[monthDates.length - 1];
-  const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
   const leadMeasures = scoreboard.leadMeasures
     .filter((measure) => isMeasureActiveInPeriod(measure, monthEnd))
     .map((measure) => {
@@ -525,15 +509,7 @@ function buildMyMonthlyLogs({
         total: measure.targetValue,
         achievementRate: getAchievementRate(achieved, measure.targetValue),
         publicId: null as string | null,
-        githubPrLinks: [] as Array<{
-          id: number;
-          title: string;
-          url: string;
-          number: number;
-          state: "OPEN" | "CLOSED" | "MERGED";
-          matchedDisplayKey: string;
-          dailyLogDate: string | null;
-        }>,
+        githubPrLinks: [] as ActionItemMetadata["prLinks"],
       };
     });
 
@@ -542,7 +518,7 @@ function buildMyMonthlyLogs({
     monthEnd,
     monthLabel: getMonthLabel(monthStart),
     summary: calculateMyMonthlySummary({
-      logs,
+      logsByLeadMeasure,
       measures: scoreboard.leadMeasures.filter((measure) =>
         isMeasureActiveInPeriod(measure, monthEnd),
       ),
@@ -555,11 +531,11 @@ function buildMyMonthlyLogs({
 }
 
 function buildMyMonthlySummary({
-  logs,
+  logsByLeadMeasure,
   monthStart,
   scoreboard,
 }: {
-  logs: DailyLogLookup[];
+  logsByLeadMeasure: LogsByLeadMeasure;
   monthStart: string;
   scoreboard: TeamScoreboard;
 }) {
@@ -571,7 +547,7 @@ function buildMyMonthlySummary({
     monthEnd,
     monthLabel: getMonthLabel(monthStart),
     summary: calculateMyMonthlySummary({
-      logs,
+      logsByLeadMeasure,
       measures: scoreboard.leadMeasures.filter((measure) =>
         isMeasureActiveInPeriod(measure, monthEnd),
       ),
@@ -583,19 +559,18 @@ function buildMyMonthlySummary({
 }
 
 function calculateMyMonthlySummary({
-  logs,
+  logsByLeadMeasure,
   measures,
   monthEnd,
   monthStart,
   weekStarts,
 }: {
-  logs: DailyLogLookup[];
+  logsByLeadMeasure: LogsByLeadMeasure;
   measures: TeamScoreboard["leadMeasures"];
   monthEnd: string;
   monthStart: string;
   weekStarts: string[];
 }) {
-  const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
   const weekStartSet = new Set(weekStarts);
   const achieved = measures.reduce((total, measure) => {
     const measureLogs = logsByLeadMeasure.get(measure.id) ?? [];
@@ -656,15 +631,14 @@ function calculateMyMonthlySummary({
 
 function getMyWeeklyRate({
   activeLeadMeasures,
-  logs,
+  logsByLeadMeasure,
   weekStart,
 }: {
   activeLeadMeasures: TeamScoreboard["leadMeasures"];
-  logs: DailyLogLookup[];
+  logsByLeadMeasure: LogsByLeadMeasure;
   weekStart: string;
 }) {
   const weekEnd = getWeekDates(weekStart)[6];
-  const logsByLeadMeasure = buildLogsByLeadMeasure(logs);
   const weeklyTargetMeasures = activeLeadMeasures.filter(
     (measure) => measure.period !== "MONTHLY" && isMeasureActiveInPeriod(measure, weekEnd),
   );
@@ -687,6 +661,7 @@ function buildTeamDashboard({
   members,
   scoreboards,
   logs,
+  earliestFetchedWeekStart,
 }: {
   workspace: WorkspaceLookup;
   userId: number;
@@ -694,6 +669,7 @@ function buildTeamDashboard({
   members: WorkspaceMemberLookup[];
   scoreboards: TeamScoreboard[];
   logs: DailyLogLookup[];
+  earliestFetchedWeekStart: string;
 }) {
   const weekDates = getWeekDates(normalizedWeekStart);
   const weekEnd = weekDates[6];
@@ -802,6 +778,7 @@ function buildTeamDashboard({
         scoreboard,
         logsByLeadMeasure,
         currentWeekStart: normalizedWeekStart,
+        earliestFetchedWeekStart,
       });
       const monthlyMeasures = leadMeasures.filter(
         (leadMeasure) => leadMeasure.period === "WEEKLY" || leadMeasure.period === "MONTHLY",
@@ -938,13 +915,26 @@ function buildLogsByLeadMeasure(logs: DailyLogLookup[]) {
   const logsByLeadMeasure = new Map<number, DailyLogLookup[]>();
 
   for (const log of logs) {
-    logsByLeadMeasure.set(log.leadMeasureId, [
-      ...(logsByLeadMeasure.get(log.leadMeasureId) ?? []),
-      log,
-    ]);
+    const measureLogs = logsByLeadMeasure.get(log.leadMeasureId);
+    if (measureLogs) {
+      measureLogs.push(log);
+    } else {
+      logsByLeadMeasure.set(log.leadMeasureId, [log]);
+    }
   }
 
   return logsByLeadMeasure;
+}
+
+function attachActionItemMetadata(
+  leadMeasures: ActionItemMetadataTarget[],
+  metadataMap: Map<number, ActionItemMetadata>,
+) {
+  for (const leadMeasure of leadMeasures) {
+    const metadata = metadataMap.get(leadMeasure.id);
+    leadMeasure.publicId = metadata?.publicId ?? null;
+    leadMeasure.githubPrLinks = metadata?.prLinks ?? [];
+  }
 }
 
 function getLogCell(
@@ -1164,10 +1154,12 @@ function calculateCurrentStreak({
   scoreboard,
   logsByLeadMeasure,
   currentWeekStart,
+  earliestFetchedWeekStart,
 }: {
   scoreboard: TeamScoreboard;
   logsByLeadMeasure: Map<number, DailyLogLookup[]>;
   currentWeekStart: string;
+  earliestFetchedWeekStart: string;
 }) {
   let streak = 0;
   const activeLeadMeasures = scoreboard.leadMeasures.filter((m) => m.status === "ACTIVE");
@@ -1185,8 +1177,10 @@ function calculateCurrentStreak({
 
   let prevWeekStart = addDays(checkingWeekStart, -7);
   const scoreboardStartWeek = getWeekStart(scoreboard.startDate ?? "2000-01-01");
+  const lowerBoundWeekStart =
+    scoreboardStartWeek > earliestFetchedWeekStart ? scoreboardStartWeek : earliestFetchedWeekStart;
 
-  while (prevWeekStart >= scoreboardStartWeek) {
+  while (prevWeekStart >= lowerBoundWeekStart) {
     const rate = getScoreboardWeeklyRate({
       activeLeadMeasures,
       logsByLeadMeasure,
