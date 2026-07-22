@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.14.8](https://github.com/team-dasoslab/dowin-web/compare/v1.14.7...v1.14.8) (2026-07-22)
+
+
+### Bug Fixes
+
+* dashboard worker cpu limit ([#249](https://github.com/team-dasoslab/dowin-web/issues/249)) ([64663fb](https://github.com/team-dasoslab/dowin-web/commit/64663fb4cd49d6416162ca9b17b5becca54f165a))
+
+## [1.14.7](https://github.com/team-dasoslab/dowin-web/compare/v1.14.6...v1.14.7) (2026-07-22)
+
+
+### Bug Fixes
+
+* Vitest에서 E2E 테스트 제외 ([37f4d73](https://github.com/team-dasoslab/dowin-web/commit/37f4d73a60bf28ef6911ccde893dce67f07c1ad5))
+
 ## [1.14.6](https://github.com/team-dasoslab/dowin-web/compare/v1.14.5...v1.14.6) (2026-07-21)
 
 

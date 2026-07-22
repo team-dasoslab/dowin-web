@@ -1,6 +1,6 @@
 # Dowin Operations Docs
 
-최종 확인일: 2026-05-21
+최종 확인일: 2026-07-23
 
 이 폴더는 Dowin 운영 준비와 장애 대응에 직접 쓰는 문서를 모아둔 곳이다.  
 `common`이 공통 설계/규약 문서라면, `operations`는 실제 운영 사고에서 바로 펼쳐보는 실행 문서에 가깝다.
@@ -17,6 +17,8 @@
 8. [Partial Data Recovery Guide](/docs/dev/operations/2026.04.20-partial-data-recovery-guide.md)
 9. [Admin User Bootstrap Runbook](/docs/dev/operations/2026.05.01-admin-user-bootstrap-runbook.md)
 10. [Cloudflare WAF Scanner Path Blocklist](/docs/dev/operations/2026.05.21-cloudflare-waf-scanner-path-blocklist.md)
+11. [Incident Note Template](/docs/dev/operations/templates/incident-note-template.md)
+12. [Dashboard Worker CPU Limit Incident Note](/docs/dev/operations/2026.07.23-dashboard-worker-cpu-limit-incident-note.md)
 
 ## 2. 문서 역할
 
@@ -34,6 +36,10 @@
   - 운영 콘솔 첫 계정을 로컬 D1에 수동 bootstrap하는 절차
 - [2026.05.21-cloudflare-waf-scanner-path-blocklist.md](/docs/dev/operations/2026.05.21-cloudflare-waf-scanner-path-blocklist.md)
   - Cloudflare WAF custom rule에서 `matches` 없이 스캐너가 자주 때리는 고신뢰 path를 차단하는 기준
+- [templates/incident-note-template.md](/docs/dev/operations/templates/incident-note-template.md)
+  - 운영 사고의 영향, 원인, 대응, 검증, 후속 액션을 일관되게 기록하기 위한 기본 템플릿
+- [2026.07.23-dashboard-worker-cpu-limit-incident-note.md](/docs/dev/operations/2026.07.23-dashboard-worker-cpu-limit-incident-note.md)
+  - Cloudflare Workers CPU limit이 dashboard 집계 경로에서 발생한 건의 실제 대응 기록과 재발 방지 기준
 
 ## 3. 운영 중 기본 원칙
 

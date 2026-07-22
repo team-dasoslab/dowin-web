@@ -3,7 +3,6 @@
 import type { getWorkspacesWorkspaceIdDashboardMyResponse } from "@/api/generated/dashboard/dashboard";
 import type { getUsersMeResponse } from "@/api/generated/profile/profile";
 import { useGetUsersMe } from "@/api/generated/profile/profile";
-import { TeamMemberCheckIn } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberCheckIn";
 import { MonthlyBoardSection } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/MonthlyBoardSection";
 import { PeriodControls } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/PeriodControls";
 import { ProductUpdateCard } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/my/_components/ProductUpdateCard";
@@ -37,6 +36,15 @@ import { Zap } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
+import dynamic from "next/dynamic";
+
+const TeamMemberCheckIn = dynamic(
+  () =>
+    import(
+      "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/TeamMemberCheckIn"
+    ).then((mod) => mod.TeamMemberCheckIn),
+  { ssr: false },
+);
 
 export type DashboardMyClientProps = {
   initialProfile: getUsersMeResponse | undefined;
