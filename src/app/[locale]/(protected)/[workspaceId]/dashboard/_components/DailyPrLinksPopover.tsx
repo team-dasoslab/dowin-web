@@ -2,11 +2,8 @@
 
 import { type GithubPrLink } from "@/api/generated/dowin.schemas";
 import { GithubPrBadge } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_components/GithubPrBadge";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/Dialog";
-import { GitPullRequest } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/Dialog";
+import { GitPullRequest, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
@@ -28,12 +25,10 @@ export function DailyPrLinksPopover({ prLinks }: DailyPrLinksPopoverProps) {
           e.stopPropagation();
           setOpen(true);
         }}
-        className="mx-auto flex w-fit items-center justify-center gap-1 rounded-[6px] bg-sub-background px-1.5 py-0.5 transition-colors hover:bg-border/60"
+        className="mx-auto flex w-fit items-center justify-center gap-1 ounded-[6px] bg-sub-background px-1.5 py-0.5 transition-colors hover:bg-border/60 rounded-md"
       >
-        <GitPullRequest className="h-3 w-3 text-text-muted" />
-        <span className="text-[10px] font-bold text-text-secondary">
-          {prLinks.length}
-        </span>
+        <GitPullRequest className="h-3.5 w-3.5 text-text-muted" />
+        <span className="text-[10px] font-bold text-text-muted">{prLinks.length}</span>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -48,20 +43,7 @@ export function DailyPrLinksPopover({ prLinks }: DailyPrLinksPopoverProps) {
             className="absolute top-3 right-3 rounded-full bg-transparent hover:bg-sub-background"
             onClick={() => setOpen(false)}
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-text-muted"
-            >
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
+            <X className="w-5 h-5 text-text-muted" />
           </Button>
           <div className="flex flex-col gap-4 mt-2" onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col gap-1 items-center">
@@ -83,4 +65,3 @@ export function DailyPrLinksPopover({ prLinks }: DailyPrLinksPopoverProps) {
     </>
   );
 }
-

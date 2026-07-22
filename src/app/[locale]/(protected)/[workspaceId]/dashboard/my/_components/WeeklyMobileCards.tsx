@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent } from "@/components/ui/Dialog";
 import { DowinIcon } from "@/components/ui/DowinIcon";
 import { toNumberId } from "@/lib/client/frontend-api";
+import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -56,7 +57,6 @@ export function WeeklyMobileCards(props: WeeklyMobileCardsProps) {
           localizedDays={localizedDays}
         />
       ))}
-      <DailyPrLinksPopover prLinks={activeLeadMeasures.flatMap(lm => weeklyById.get(toNumberId(lm.id))?.githubPrLinks ?? [])} />
     </div>
   );
 }
@@ -178,8 +178,8 @@ function WeeklyMobileCardDay({
   const { handleCountSave } = useWeeklyMobileCardDayActions(leadMeasureId, date, toggleLog);
 
   return (
-    <div className="text-center relative">
-      <p className={`mb-1.5 text-[11px] font-bold ${isToday ? "text-primary" : "text-text-muted"}`}>
+    <div className="relative flex flex-col items-center gap-1.5 text-center">
+      <p className={`text-[11px] font-bold ${isToday ? "text-primary" : "text-text-muted"}`}>
         {dayLabel}
       </p>
       {isCount ? (
@@ -223,20 +223,7 @@ function WeeklyMobileCardDay({
                 className="absolute top-3 right-3 rounded-full bg-transparent hover:bg-sub-background"
                 onClick={() => setOpenPopover(false)}
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-text-muted"
-                >
-                  <path d="M18 6 6 18" />
-                  <path d="m6 6 12 12" />
-                </svg>
+                <X className="w-5 h-5 text-text-muted" />
               </Button>
               <h3 className="text-lg font-bold text-center text-text-primary mb-1 pr-6 pl-6">
                 {t("dailyCountTitle")}
