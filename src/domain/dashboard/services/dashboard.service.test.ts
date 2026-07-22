@@ -57,6 +57,7 @@ describe("DashboardService", () => {
         userId: 11,
         goalName: "러닝 루틴 만들기",
         lagMeasure: "주 5회 달리기",
+        startDate: "2025-01-01",
         status: "ACTIVE",
         leadMeasures: [
           {
@@ -241,6 +242,11 @@ describe("DashboardService", () => {
 
     expect(findActiveScoreboard).toHaveBeenCalledWith(11, 3);
     expect(findLogsForLeadMeasures).toHaveBeenCalledTimes(1);
+    expect(findLogsForLeadMeasures).toHaveBeenCalledWith(
+      [31, 32],
+      "2026-06-01",
+      "2026-06-28",
+    );
     expect(result.workspace).toMatchObject({
       id: "workspace-3",
       memberCount: 2,
@@ -497,6 +503,65 @@ describe("DashboardService", () => {
         ]),
       }),
     ]);
+  });
+
+  it("팀 대시보드는 COUNT 지표를 일일 목표 횟수 이상인 날만 달성으로 집계한다", async () => {
+    findMembers.mockResolvedValue([
+      {
+        id: 100,
+        workspaceId: 3,
+        userId: 11,
+        role: "ADMIN",
+        user: { nickname: "지훈", avatarKey: "smile.blue" },
+      },
+    ]);
+    findActiveScoreboardsByWorkspace.mockResolvedValue([
+      {
+        id: 21,
+        userId: 11,
+        goalName: "루틴 만들기",
+        lagMeasure: "주간 실행",
+        status: "ACTIVE",
+        leadMeasures: [
+          {
+            id: 31,
+            name: "집중 세션",
+            targetValue: 2,
+            period: "WEEKLY",
+            trackingMode: "COUNT",
+            dailyTargetCount: 3,
+            status: "ACTIVE",
+            tags: [],
+          },
+        ],
+      },
+    ]);
+    findLogsForLeadMeasures.mockResolvedValue([
+      { leadMeasureId: 31, logDate: "2026-03-09", value: true, count: 2 },
+      { leadMeasureId: 31, logDate: "2026-03-10", value: true, count: 3 },
+      { leadMeasureId: 31, logDate: "2026-03-11", value: false, count: 3 },
+    ]);
+
+    const result = await service.getTeamDashboard(context, "2026-03-09");
+
+    expect(result.members[0]).toEqual(
+      expect.objectContaining({
+        achieved: 1,
+        total: 2,
+        weeklyAchievementRate: 50,
+        leadMeasures: [
+          expect.objectContaining({
+            id: 31,
+            achieved: 1,
+            logs: expect.objectContaining({
+              "2026-03-09": { value: true, count: 2, achieved: false },
+              "2026-03-10": { value: true, count: 3, achieved: true },
+              "2026-03-11": { value: false, count: 0, achieved: false },
+            }),
+          }),
+        ],
+      }),
+    );
   });
 
   it("팀 대시보드 멤버 목록은 로그인 사용자를 최상단에 배치한다", async () => {
