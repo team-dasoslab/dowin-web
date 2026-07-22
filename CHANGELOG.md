@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.7](https://github.com/team-dasoslab/dowin-web/compare/v1.14.6...v1.14.7) (2026-07-22)
+
+
+### Bug Fixes
+
+* Vitest에서 E2E 테스트 제외 ([37f4d73](https://github.com/team-dasoslab/dowin-web/commit/37f4d73a60bf28ef6911ccde893dce67f07c1ad5))
+
 ## [1.14.6](https://github.com/team-dasoslab/dowin-web/compare/v1.14.5...v1.14.6) (2026-07-21)
 
 
