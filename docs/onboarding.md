@@ -552,6 +552,7 @@ yarn storybook
 yarn test --run
 yarn test:frontend
 yarn test:backend
+yarn test:e2e
 yarn gen:api
 yarn mig:local
 ```
