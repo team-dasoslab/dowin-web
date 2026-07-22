@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import withBundleAnalyzer from "@next/bundle-analyzer";
+
+const withBundle = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -8,6 +13,10 @@ const nextConfig: NextConfig = {
   // Silence Turbopack vs Webpack conflict in Next.js 16
   // devIndicators: false,
   turbopack: {},
+  experimental: {
+    optimizePackageImports: ["lucide-react", "recharts", "@radix-ui/react-slot"],
+  },
+  serverExternalPackages: ["drizzle-orm", "bcryptjs"],
   async headers() {
     return [
       {
@@ -44,7 +53,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withBundle(withNextIntl(nextConfig));
 
 // Enable calling `getCloudflareContext()` in `next dev`.
 // See https://opennext.js.org/cloudflare/bindings#local-access-to-bindings.
