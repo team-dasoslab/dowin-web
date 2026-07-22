@@ -29,6 +29,7 @@
     "perf:api": "node scripts/perf-api.mjs",
     "perf:log:tail": "tail -f tmp/perf-api.ndjson",
     "db:studio": "npx drizzle-kit studio",
+    "analyze": "ANALYZE=true yarn build",
     "prepare": "husky"
   },
   "dependencies": {
@@ -62,6 +63,7 @@
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
     "@eslint/eslintrc": "^3",
+    "@next/bundle-analyzer": "^16.2.11",
     "@storybook/addon-a11y": "^10.2.19",
     "@storybook/addon-docs": "^10.2.19",
     "@storybook/addon-onboarding": "^10.2.19",
