@@ -76,6 +76,11 @@ export const useProfileActions = ({
       return;
     }
 
+    if (next.trim().length > 10) {
+      showToast("error", "닉네임은 10자 이하여야 합니다.");
+      return;
+    }
+
     try {
       setPendingAction("nickname");
       const response = await updateNicknameMutation.mutateAsync({
@@ -105,6 +110,11 @@ export const useProfileActions = ({
     const next = prompt(t("promptWorkspaceName"), workspace.name ?? "")?.trim();
 
     if (!next || next === workspace.name) {
+      return;
+    }
+
+    if (next.length > 20) {
+      showToast("error", "워크스페이스 이름은 20자 이하여야 합니다.");
       return;
     }
 

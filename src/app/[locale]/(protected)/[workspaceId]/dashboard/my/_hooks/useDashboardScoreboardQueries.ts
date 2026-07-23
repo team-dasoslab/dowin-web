@@ -53,8 +53,10 @@ export const useDashboardScoreboardQueries = ({
   } = useGetWorkspacesWorkspaceIdDashboardMy(workspaceId, myDashboardParams, {
     query: {
       initialData: initialDashboard,
+      refetchOnMount: initialDashboard ? false : undefined,
       retry: (failureCount: number, error: unknown) =>
         getApiErrorStatus(error) !== 403 && getApiErrorStatus(error) !== 404 && failureCount < 1,
+      staleTime: initialDashboard ? 30 * 1000 : 0,
     },
   });
   const dashboard = myDashboardResponse?.status === 200 ? myDashboardResponse.data : null;
