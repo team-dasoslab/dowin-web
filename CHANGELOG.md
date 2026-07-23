@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.14.9](https://github.com/team-dasoslab/dowin-web/compare/v1.14.8...v1.14.9) (2026-07-23)
+
+
+### Bug Fixes
+
+* 닉네임 및 워크스페이스 이름 max length 제한 적용 ([c4b97f1](https://github.com/team-dasoslab/dowin-web/commit/c4b97f1771516c0ca8802e0c5fca10de1441e76f))
+* 대시보드 초기 조회 중복 호출 방지 ([0bb94c7](https://github.com/team-dasoslab/dowin-web/commit/0bb94c724d456a6456598ca1957ca46295bb7627))
+
 ## [1.14.8](https://github.com/team-dasoslab/dowin-web/compare/v1.14.7...v1.14.8) (2026-07-22)
 
 
