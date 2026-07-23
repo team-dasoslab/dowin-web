@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useParams } from "next/navigation";
 
 import { useGetUsersMe } from "@/api/generated/profile/profile";
@@ -64,12 +65,12 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="fixed inset-x-0 top-4 z-[110] hidden lg:flex justify-center px-4 md:px-6 pointer-events-none">
-        <div className="flex h-[64px] items-center justify-between w-full max-w-[1200px] rounded-full bg-surface/95 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.08)] border border-border/80 px-4 md:px-6 gap-8 pointer-events-auto">
-          <div className="flex-shrink-0 w-[200px]">
+      <aside className="fixed inset-x-0 top-0 z-[110] hidden lg:flex justify-center h-[68px] bg-surface border-b border-border/40">
+        <div className="relative flex h-full items-center w-full max-w-[1200px] px-4 md:px-10 lg:px-12">
+          <div className="flex-shrink-0 flex items-center h-full z-10">
             {/* Workspace Pill */}
             {isProfileLoading ? (
-              <div className="flex h-10 w-full animate-pulse items-center rounded-[12px] bg-border transition-all px-4" />
+              <div className="flex h-11 w-[200px] animate-pulse items-center rounded-2xl bg-border transition-all px-4" />
             ) : workspaceName ? (
               <WorkspaceSwitcher isCollapsed={false} />
             ) : (
@@ -77,22 +78,25 @@ export function Sidebar() {
                 {!isNativeApp && (
                   <Link
                     href="/workspace/new"
-                    className="flex h-10 flex-1 items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4"
+                    className="flex h-11 flex-1 items-center rounded-2xl border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4 hover:bg-primary/10"
                   >
                     <DowinIcon name="action-add-active" size="16px" />
-                    <span className="truncate text-[13px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
+                    <span className="truncate text-[14px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
                       {commonT("createWorkspace")}
                     </span>
                   </Link>
                 )}
                 <Link
                   href="/workspace/join"
-                  className={cn("flex h-10 items-center rounded-button border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4", isNativeApp ? "w-full" : "w-10 px-0 justify-center flex-shrink-0")}
+                  className={cn(
+                    "flex h-11 items-center rounded-2xl border border-dashed border-primary/40 bg-primary/5 text-primary transition-all justify-start gap-3 px-4 hover:bg-primary/10",
+                    isNativeApp ? "w-full" : "w-11 px-0 justify-center flex-shrink-0"
+                  )}
                   title={commonT("joinWorkspace")}
                 >
                   <DowinIcon name="action-enter" size="16px" />
                   {isNativeApp && (
-                    <span className="truncate text-[13px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
+                    <span className="truncate text-[14px] font-bold whitespace-nowrap transition-all duration-300 w-auto opacity-100">
                       {commonT("joinWorkspace")}
                     </span>
                   )}
@@ -101,9 +105,9 @@ export function Sidebar() {
             )}
           </div>
 
-          {/* Navigation Links */}
-          <div className="flex-1 flex items-center justify-center overflow-x-auto scrollbar-none h-full">
-            <nav className="flex items-center justify-center gap-1 p-1">
+          {/* Navigation Links - Centered Absolutely */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <nav className="flex items-center justify-center gap-1.5 pointer-events-auto">
               {filteredLinks.map(({ href, translationKey }) => {
                 const isActive = getIsActive(href);
 
@@ -112,10 +116,10 @@ export function Sidebar() {
                     key={href}
                     href={href}
                     className={cn(
-                      "flex items-center justify-center px-5 py-2 min-w-fit whitespace-nowrap rounded-[12px] transition-all text-[14px] font-bold",
+                      "flex items-center justify-center min-w-fit whitespace-nowrap transition-all text-[15px] px-5 py-2.5 rounded-2xl",
                       isActive
-                        ? "bg-sub-background text-text-primary"
-                        : "text-text-muted hover:text-text-primary hover:bg-sub-background",
+                        ? "bg-sub-background text-text-primary font-extrabold"
+                        : "text-text-muted hover:text-text-primary hover:bg-sub-background/50 font-bold"
                     )}
                   >
                     <span>{t(translationKey)}</span>
@@ -124,14 +128,12 @@ export function Sidebar() {
               })}
             </nav>
           </div>
-
-          <div className="w-[200px] flex-shrink-0" />
         </div>
       </aside>
 
       {isMainTab && (
-        <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-border bg-surface px-1 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 lg:hidden">
-          <div className="mx-auto grid max-w-[520px] grid-cols-4 gap-1">
+        <nav className="fixed inset-x-0 bottom-0 z-[100] border-t border-border/30 bg-surface px-2 pb-[calc(0.5rem+var(--safe-area-inset-bottom,0px))] pt-2 lg:hidden shadow-[0_-4px_24px_rgba(0,0,0,0.02)]">
+          <div className="mx-auto grid max-w-[520px] grid-cols-4 gap-1.5">
             {filteredLinks.map(
               ({ href, iconName, iconNameActive, translationKey }) => {
                 const isActive = getIsActive(href);
@@ -142,16 +144,19 @@ export function Sidebar() {
                     key={href}
                     href={href}
                     className={cn(
-                      "flex min-w-0 flex-col items-center justify-center gap-1 rounded-button px-1 py-2 transition-colors",
-                      isActive ? "text-text-primary" : "text-text-muted",
+                      "flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 transition-all duration-300",
+                      isActive ? "text-text-primary bg-sub-background" : "text-text-muted hover:bg-sub-background/30",
                     )}
                   >
                     <DowinIcon
                       name={isActive ? iconNameActive : iconName}
                       size="20px"
-                      className={cn("transition-all", isActive && "scale-105")}
+                      className={cn("transition-all duration-300", isActive && "scale-105")}
                     />
-                    <span className="max-w-full truncate text-[10px] font-bold leading-none">
+                    <span className={cn(
+                      "max-w-full truncate text-[11px] leading-none transition-all",
+                      isActive ? "font-bold" : "font-medium"
+                    )}>
                       {label}
                     </span>
                   </Link>
