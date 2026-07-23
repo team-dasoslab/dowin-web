@@ -7,7 +7,11 @@ const workspaceTagNameSchema = z
   .max(16, "태그 이름은 16자 이하여야 합니다.");
 
 export const workspaceCreateSchema = z.object({
-  name: z.string().min(1, "워크스페이스 이름을 입력해주세요."),
+  name: z
+    .string()
+    .trim()
+    .min(1, "워크스페이스 이름을 입력해주세요.")
+    .max(20, "워크스페이스 이름은 20자 이하여야 합니다."),
 });
 
 export const workspaceCheckoutHeaderSchema = z.object({
@@ -19,7 +23,7 @@ export const workspaceCheckoutSchema = z.object({
     .string()
     .trim()
     .min(1, "워크스페이스 이름을 입력해주세요.")
-    .max(100, "워크스페이스 이름은 100자 이하여야 합니다."),
+    .max(20, "워크스페이스 이름은 20자 이하여야 합니다."),
   seatCount: z
     .number()
     .int("좌석 수는 정수여야 합니다.")
@@ -33,7 +37,11 @@ export const workspaceCheckoutCompleteSchema = z.object({
 });
 
 export const workspaceUpdateSchema = z.object({
-  name: z.string().min(1, "워크스페이스 이름을 입력해주세요."),
+  name: z
+    .string()
+    .trim()
+    .min(1, "워크스페이스 이름을 입력해주세요.")
+    .max(20, "워크스페이스 이름은 20자 이하여야 합니다."),
   allowPastDailyLogEdit: z.boolean().optional(),
 });
 

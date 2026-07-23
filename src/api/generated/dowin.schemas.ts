@@ -95,6 +95,7 @@ export const UserLocale = {
 
 export interface User {
   id?: number;
+  /** @maxLength 10 */
   nickname?: string;
   isFirstLogin?: boolean;
   locale?: UserLocale;
@@ -405,6 +406,7 @@ export interface TeamCheckinAdjustmentProposalApplyResponse {
 
 export interface RecoveryAccount {
   customId: string;
+  /** @maxLength 10 */
   nickname: string;
 }
 
@@ -917,55 +919,6 @@ export interface MarketingInviteRedeemResponse {
 /**
  * @nullable
  */
-export type UserProfileAvatarKey = typeof UserProfileAvatarKey[keyof typeof UserProfileAvatarKey] | null;
-
-
-export const UserProfileAvatarKey = {
-  smileblue: 'smile.blue',
-  smilegreen: 'smile.green',
-  smilemint: 'smile.mint',
-  smileorange: 'smile.orange',
-  smilepink: 'smile.pink',
-  smilepurple: 'smile.purple',
-  smilered: 'smile.red',
-  smileyellow: 'smile.yellow',
-  smile2blue: 'smile2.blue',
-  smile2green: 'smile2.green',
-  smile2mint: 'smile2.mint',
-  smile2orange: 'smile2.orange',
-  smile2pink: 'smile2.pink',
-  smile2purple: 'smile2.purple',
-  smile2red: 'smile2.red',
-  smile2yellow: 'smile2.yellow',
-  smile3blue: 'smile3.blue',
-  smile3green: 'smile3.green',
-  smile3mint: 'smile3.mint',
-  smile3orange: 'smile3.orange',
-  smile3pink: 'smile3.pink',
-  smile3purple: 'smile3.purple',
-  smile3red: 'smile3.red',
-  smile3yellow: 'smile3.yellow',
-  surpriseblue: 'surprise.blue',
-  surprisegreen: 'surprise.green',
-  surprisemint: 'surprise.mint',
-  surpriseorange: 'surprise.orange',
-  surprisepink: 'surprise.pink',
-  surprisepurple: 'surprise.purple',
-  surprisered: 'surprise.red',
-  surpriseyellow: 'surprise.yellow',
-  surprise2blue: 'surprise2.blue',
-  surprise2green: 'surprise2.green',
-  surprise2mint: 'surprise2.mint',
-  surprise2orange: 'surprise2.orange',
-  surprise2pink: 'surprise2.pink',
-  surprise2purple: 'surprise2.purple',
-  surprise2red: 'surprise2.red',
-  surprise2yellow: 'surprise2.yellow',
-} as const;
-
-/**
- * @nullable
- */
 export type UserProfileRole = typeof UserProfileRole[keyof typeof UserProfileRole] | null;
 
 
@@ -985,9 +938,10 @@ export const UserProfileLocale = {
 export interface UserProfile {
   id?: number;
   customId?: string;
+  /** @maxLength 10 */
   nickname?: string;
   /** @nullable */
-  avatarKey?: UserProfileAvatarKey;
+  avatarKey?: string | null;
   /** @nullable */
   role?: UserProfileRole;
   /** @nullable */
@@ -997,55 +951,6 @@ export interface UserProfile {
   locale?: UserProfileLocale;
   createdAt?: string;
 }
-
-/**
- * @nullable
- */
-export type UserProfileUpdateRequestAvatarKey = typeof UserProfileUpdateRequestAvatarKey[keyof typeof UserProfileUpdateRequestAvatarKey] | null;
-
-
-export const UserProfileUpdateRequestAvatarKey = {
-  smileblue: 'smile.blue',
-  smilegreen: 'smile.green',
-  smilemint: 'smile.mint',
-  smileorange: 'smile.orange',
-  smilepink: 'smile.pink',
-  smilepurple: 'smile.purple',
-  smilered: 'smile.red',
-  smileyellow: 'smile.yellow',
-  smile2blue: 'smile2.blue',
-  smile2green: 'smile2.green',
-  smile2mint: 'smile2.mint',
-  smile2orange: 'smile2.orange',
-  smile2pink: 'smile2.pink',
-  smile2purple: 'smile2.purple',
-  smile2red: 'smile2.red',
-  smile2yellow: 'smile2.yellow',
-  smile3blue: 'smile3.blue',
-  smile3green: 'smile3.green',
-  smile3mint: 'smile3.mint',
-  smile3orange: 'smile3.orange',
-  smile3pink: 'smile3.pink',
-  smile3purple: 'smile3.purple',
-  smile3red: 'smile3.red',
-  smile3yellow: 'smile3.yellow',
-  surpriseblue: 'surprise.blue',
-  surprisegreen: 'surprise.green',
-  surprisemint: 'surprise.mint',
-  surpriseorange: 'surprise.orange',
-  surprisepink: 'surprise.pink',
-  surprisepurple: 'surprise.purple',
-  surprisered: 'surprise.red',
-  surpriseyellow: 'surprise.yellow',
-  surprise2blue: 'surprise2.blue',
-  surprise2green: 'surprise2.green',
-  surprise2mint: 'surprise2.mint',
-  surprise2orange: 'surprise2.orange',
-  surprise2pink: 'surprise2.pink',
-  surprise2purple: 'surprise2.purple',
-  surprise2red: 'surprise2.red',
-  surprise2yellow: 'surprise2.yellow',
-} as const;
 
 export type UserProfileUpdateRequestLocale = typeof UserProfileUpdateRequestLocale[keyof typeof UserProfileUpdateRequestLocale];
 
@@ -1062,7 +967,7 @@ export interface UserProfileUpdateRequest {
    */
   nickname?: string;
   /** @nullable */
-  avatarKey?: UserProfileUpdateRequestAvatarKey;
+  avatarKey?: string | null;
   locale?: UserProfileUpdateRequestLocale;
 }
 
@@ -1161,6 +1066,7 @@ export const WorkspaceRole = {
 
 export interface Workspace {
   id?: string;
+  /** @maxLength 20 */
   name?: string;
   planCode?: WorkspacePlanCode;
   role?: WorkspaceRole;
@@ -1460,6 +1366,7 @@ export const WorkspaceMemberRole = {
 
 export interface WorkspaceMember {
   id?: number;
+  /** @maxLength 10 */
   nickname?: string;
   /** @nullable */
   avatarKey?: string | null;
@@ -1512,6 +1419,7 @@ export interface WorkspaceJoinByInviteRequest {
 }
 
 export interface WorkspaceUpdateRequest {
+  /** @maxLength 20 */
   name: string;
 }
 
@@ -1941,6 +1849,7 @@ export const MyDashboardWorkspaceRole = {
 
 export interface MyDashboardWorkspace {
   id: string;
+  /** @maxLength 20 */
   name: string;
   planCode: MyDashboardWorkspacePlanCode;
   role: MyDashboardWorkspaceRole;
@@ -2050,6 +1959,7 @@ export const TeamDashboardMemberRole = {
 
 export interface TeamDashboardMember {
   userId?: number;
+  /** @maxLength 10 */
   nickname?: string;
   /** @nullable */
   avatarKey?: string | null;
@@ -2101,6 +2011,7 @@ export interface TeamTrendResponse {
 
 export interface DashboardTeamMemoAuthor {
   userId: number;
+  /** @maxLength 10 */
   nickname: string;
   /** @nullable */
   avatarKey?: string | null;

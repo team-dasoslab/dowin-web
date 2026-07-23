@@ -9,7 +9,7 @@ export const profileUpdateSchema = z
       .string()
       .trim()
       .min(2, "닉네임은 2자 이상이어야 합니다.")
-      .max(20, "닉네임은 20자 이하여야 합니다.")
+      .max(10, "닉네임은 10자 이하여야 합니다.")
       .regex(NICKNAME_REGEX, "닉네임에는 특수문자를 사용할 수 없습니다.")
       .optional(),
     avatarKey: z.enum(PROFILE_AVATAR_KEYS).nullable().optional(),
