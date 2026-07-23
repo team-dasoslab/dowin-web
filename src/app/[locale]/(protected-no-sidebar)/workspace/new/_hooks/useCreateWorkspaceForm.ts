@@ -38,6 +38,11 @@ export const useCreateWorkspaceForm = () => {
       setError("워크스페이스 이름을 입력해주세요.");
       return null;
     }
+    
+    if (trimmedName.length > 20) {
+      setError("워크스페이스 이름은 20자 이하여야 합니다.");
+      return null;
+    }
 
     setError("");
     return trimmedName;
