@@ -65,46 +65,39 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
 
   if (isMeLoading && !activeWorkspace) {
     return (
-      <div
-        className={cn(
-          "flex h-10 w-[200px] animate-pulse items-center rounded-[12px] bg-border transition-all",
-          "px-4",
-        )}
-      />
+      <div className="flex h-11 w-[200px] animate-pulse items-center rounded-2xl bg-border transition-all px-4" />
     );
   }
 
   if (!activeWorkspace) {
-    return null; // Handle empty state outside or let Sidebar render empty
+    return null;
   }
 
   return (
-    <div className="relative w-[200px] -ml-2" ref={containerRef}>
+    <div className="relative w-full min-w-[200px]" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
         className={cn(
-          "flex h-10 w-fit items-center gap-1.5 rounded-[12px] transition-all px-3",
-          isOpen
-            ? "bg-sub-background"
-            : "bg-transparent hover:bg-sub-background/80",
+          "flex h-11 w-fit items-center gap-2 transition-all px-4 rounded-2xl bg-sub-background hover:bg-sub-background/80",
+          isOpen && "bg-sub-background shadow-inner"
         )}
       >
-        <span className="truncate text-[16px] font-bold text-text-primary whitespace-nowrap transition-all duration-300 pt-[2px]">
+        <span className="truncate text-[16px] font-extrabold text-text-primary whitespace-nowrap transition-all duration-300 pt-[2px]">
           {activeWorkspace.name}
         </span>
         <DowinIcon
           name="nav-chevron-down"
           size="16px"
           className={cn(
-            "text-text-muted shrink-0 transition-transform duration-200",
-            isOpen && "rotate-180",
+            "shrink-0 transition-transform duration-200 text-text-muted",
+            isOpen && "rotate-180"
           )}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-full rounded-[20px] border border-border bg-surface p-2 z-50">
+        <div className="absolute top-full left-0 mt-2 w-[240px] rounded-2xl border border-border bg-surface p-2 z-50 shadow-lg">
           {workspaces.map((ws) => (
             <button
               key={ws.id}
@@ -116,10 +109,10 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
                 }
               }}
               className={cn(
-                "flex w-full items-center rounded-[12px] px-3 py-3 text-[15px] transition-colors hover:bg-sub-background",
+                "flex w-full items-center rounded-xl px-4 py-3.5 text-[15px] transition-colors hover:bg-sub-background",
                 ws.id === activeWorkspace.id
-                  ? "font-bold text-text-primary bg-sub-background/50"
-                  : "font-medium text-text-secondary",
+                  ? "font-extrabold text-text-primary bg-sub-background/50"
+                  : "font-bold text-text-secondary"
               )}
             >
               <span className="truncate">{ws.name}</span>
@@ -130,18 +123,18 @@ export function WorkspaceSwitcher({}: WorkspaceSwitcherProps) {
             <Link
               href="/workspace/new"
               onClick={() => setIsOpen(false)}
-              className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-sub-background text-text-secondary font-bold gap-2"
+              className="flex w-full items-center rounded-xl px-4 py-3.5 text-[15px] transition-colors hover:bg-sub-background text-text-secondary font-bold gap-2"
             >
-              <DowinIcon name="action-add-active" size="14px" />
+              <DowinIcon name="action-add-active" size="16px" />
               <span>{commonT("createWorkspace")}</span>
             </Link>
           )}
           <Link
             href="/workspace/join"
             onClick={() => setIsOpen(false)}
-            className="flex w-full items-center rounded-[12px] px-3 py-3 text-[14px] transition-colors hover:bg-sub-background text-text-secondary font-bold gap-2"
+            className="flex w-full items-center rounded-xl px-4 py-3.5 text-[15px] transition-colors hover:bg-sub-background text-text-secondary font-bold gap-2"
           >
-            <DowinIcon name="action-enter" size="14px" />
+            <DowinIcon name="action-enter" size="16px" />
             <span>{commonT("joinWorkspace")}</span>
           </Link>
         </div>
