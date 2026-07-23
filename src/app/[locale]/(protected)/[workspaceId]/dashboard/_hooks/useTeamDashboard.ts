@@ -47,8 +47,10 @@ export const useTeamDashboard = (
     {
       query: {
         initialData: initialTeamDashboard,
+        refetchOnMount: initialTeamDashboard ? false : undefined,
         retry: (failureCount, queryError) =>
           ![403, 404].includes(getApiErrorStatus(queryError) ?? 0) && failureCount < 2,
+        staleTime: initialTeamDashboard ? 30 * 1000 : 0,
       },
     },
   );
