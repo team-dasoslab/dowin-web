@@ -248,9 +248,10 @@ export class WorkspaceCheckoutService {
       }
     }
 
-    const fallbackSubscription =
-      await this.polarClient?.findSubscriptionByCheckoutId({ checkoutId });
-    const checkout = await this.getVerifiedCheckout(checkoutId);
+    const [fallbackSubscription, checkout] = await Promise.all([
+      this.polarClient?.findSubscriptionByCheckoutId({ checkoutId }),
+      this.getVerifiedCheckout(checkoutId),
+    ]);
 
     if (fallbackSubscription && isWorkspaceSetupCheckout(checkout, pendingUid)) {
       return {

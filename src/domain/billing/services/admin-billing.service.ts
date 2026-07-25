@@ -162,8 +162,10 @@ export class AdminBillingService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const [summary] = await this.attachRiskSummary([workspace]);
-    const events = await this.billingStorage.listBillingEventsForWorkspace(workspaceId);
+    const [[summary], events] = await Promise.all([
+      this.attachRiskSummary([workspace]),
+      this.billingStorage.listBillingEventsForWorkspace(workspaceId),
+    ]);
 
     return {
       ...summary,
