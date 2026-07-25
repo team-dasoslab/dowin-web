@@ -1,6 +1,7 @@
 import { TeamMemoService } from "@/domain/dashboard/services/team-memo.service";
 import { WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("TeamMemoService", () => {
   const findMembership = vi.fn();
@@ -36,7 +37,7 @@ describe("TeamMemoService", () => {
       canAccessBasicSubscription: true,
       entitlementSource: "POLAR" as const,
       billingStatus: "ACTIVE" as const,
-      planCode: "BASIC" as const,
+      planCode: BILLING_PLAN.BASIC,
     },
     capacity: {
       hasAvailableMemberSlot: true,
@@ -95,7 +96,7 @@ describe("TeamMemoService", () => {
         canAccessBasicSubscription: false,
         entitlementSource: null,
         billingStatus: "NONE" as const,
-        planCode: "FREE" as const,
+        planCode: BILLING_PLAN.FREE,
       },
     } satisfies WorkspaceAccessContext;
 
@@ -148,7 +149,7 @@ describe("TeamMemoService", () => {
         canAccessBasicSubscription: false,
         entitlementSource: null,
         billingStatus: "NONE" as const,
-        planCode: "FREE" as const,
+        planCode: BILLING_PLAN.FREE,
       },
     } satisfies WorkspaceAccessContext;
 

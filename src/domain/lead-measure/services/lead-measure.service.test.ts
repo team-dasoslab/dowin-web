@@ -1,6 +1,7 @@
 import { LeadMeasureService } from "@/domain/lead-measure/services/lead-measure.service";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("LeadMeasureService", () => {
   const ctx: WorkspaceAccessContext = {
@@ -15,7 +16,7 @@ describe("LeadMeasureService", () => {
       canAccessBasicSubscription: true,
       entitlementSource: null,
       billingStatus: "ACTIVE",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
     },
     capacity: {
       hasAvailableMemberSlot: true,
@@ -60,12 +61,12 @@ describe("LeadMeasureService", () => {
     vi.clearAllMocks();
     countMembers.mockResolvedValue(1);
     findBillingState.mockResolvedValue({
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "POLAR",
     });
     findPlanLimit.mockResolvedValue({ memberLimit: 10 });
-    findWorkspaceById.mockResolvedValue({ id: 1, planCode: "BASIC" });
+    findWorkspaceById.mockResolvedValue({ id: 1, planCode: BILLING_PLAN.BASIC });
   });
 
   it("점수판의 활성 선행지표 목록을 주간 달성 수와 함께 반환한다", async () => {

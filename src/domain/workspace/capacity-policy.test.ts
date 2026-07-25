@@ -6,6 +6,7 @@ import {
 import { CapacityPolicy } from "@/domain/workspace/capacity-policy";
 import { ConflictError, ForbiddenError } from "@/lib/server/errors";
 import { describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 function createPolicy(input: {
   memberCount: number;
@@ -22,7 +23,7 @@ function createPolicy(input: {
     findBillingState: vi.fn().mockResolvedValue(
       input.billingState === undefined
         ? {
-            planCode: "BASIC",
+            planCode: BILLING_PLAN.BASIC,
             billingStatus: "ACTIVE",
             entitlementSource: "POLAR",
           }
@@ -48,20 +49,20 @@ describe("CapacityPolicy", () => {
     const { policy } = createPolicy({ memberCount: 100, memberLimit: null });
 
     await expect(
-      policy.assertCanAddMember({ id: 1, planCode: "STANDARD" }),
+      policy.assertCanAddMember({ id: 1, planCode: BILLING_PLAN.STANDARD }),
     ).resolves.toBeUndefined();
   });
 
   it("현재 멤버 수가 limit 미만이면 멤버 추가를 허용한다", async () => {
     const { policy } = createPolicy({ memberCount: 9, memberLimit: 10 });
 
-    await expect(policy.assertCanAddMember({ id: 1, planCode: "FREE" })).resolves.toBeUndefined();
+    await expect(policy.assertCanAddMember({ id: 1, planCode: BILLING_PLAN.FREE })).resolves.toBeUndefined();
   });
 
   it("현재 멤버 수가 limit에 도달하면 멤버 추가를 차단한다", async () => {
     const { policy } = createPolicy({ memberCount: 10, memberLimit: 10 });
 
-    await expect(policy.assertCanAddMember({ id: 1, planCode: "FREE" })).rejects.toBeInstanceOf(
+    await expect(policy.assertCanAddMember({ id: 1, planCode: BILLING_PLAN.FREE })).rejects.toBeInstanceOf(
       ConflictError,
     );
   });
@@ -73,7 +74,7 @@ describe("CapacityPolicy", () => {
       billingState: null,
     });
 
-    await expect(policy.assertCanAddMember({ id: 1, planCode: "FREE" })).rejects.toMatchObject({
+    await expect(policy.assertCanAddMember({ id: 1, planCode: BILLING_PLAN.FREE })).rejects.toMatchObject({
       code: "BASIC_SUBSCRIPTION_REQUIRED",
     });
   });
@@ -85,7 +86,7 @@ describe("CapacityPolicy", () => {
       purchasedSeatCount: 5,
     });
 
-    await expect(policy.assertCanAddMember({ id: 1, planCode: "BASIC" })).rejects.toBeInstanceOf(
+    await expect(policy.assertCanAddMember({ id: 1, planCode: BILLING_PLAN.BASIC })).rejects.toBeInstanceOf(
       ConflictError,
     );
     expect(storage.findSeatEntitlement).toHaveBeenCalledWith(1);
@@ -96,7 +97,7 @@ describe("CapacityPolicy", () => {
     const { policy } = createPolicy({ memberCount: 11, memberLimit: 10 });
 
     await expect(
-      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "FREE" }),
+      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: BILLING_PLAN.FREE }),
     ).rejects.toBeInstanceOf(ForbiddenError);
   });
 
@@ -108,7 +109,7 @@ describe("CapacityPolicy", () => {
     });
 
     await expect(
-      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "FREE" }),
+      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: BILLING_PLAN.FREE }),
     ).rejects.toMatchObject({ code: "BASIC_SUBSCRIPTION_REQUIRED" });
   });
 
@@ -120,7 +121,7 @@ describe("CapacityPolicy", () => {
     });
 
     await expect(
-      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "BASIC" }),
+      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: BILLING_PLAN.BASIC }),
     ).rejects.toBeInstanceOf(ForbiddenError);
     expect(storage.findSeatEntitlement).toHaveBeenCalledWith(1);
   });
@@ -129,7 +130,7 @@ describe("CapacityPolicy", () => {
     const { policy, storage } = createPolicy({ memberCount: 31, memberLimit: 30 });
 
     await expect(
-      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: "STANDARD" }),
+      policy.assertWorkspaceUsageAllowed({ id: 1, planCode: BILLING_PLAN.STANDARD }),
     ).rejects.toBeInstanceOf(ForbiddenError);
     expect(storage.countMembers).toHaveBeenCalledWith(1);
   });

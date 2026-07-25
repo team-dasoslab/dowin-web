@@ -4,6 +4,7 @@ import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { beforeEach, describe, expect, it, Mocked, vi } from "vitest";
 import { NudgeService } from "./nudge.service";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 vi.mock("@/domain/notification/services/fcm", () => ({
   sendFcmMessages: vi.fn().mockResolvedValue({
@@ -26,7 +27,7 @@ describe("NudgeService", () => {
       canAccessBasicSubscription: true,
       entitlementSource: null,
       billingStatus: "ACTIVE",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
     },
     capacity: {
       hasAvailableMemberSlot: true,

@@ -1,5 +1,6 @@
 import { runBillingRevocation } from "@/domain/billing/services/run-billing-revocation";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 const mockDb = {
   select: vi.fn().mockReturnThis(),
@@ -43,9 +44,9 @@ describe("runBillingRevocation", () => {
     expect(mockDb.update).toHaveBeenCalledTimes(4);
     expect(mockDb.set).toHaveBeenCalledWith({
       billingStatus: "EXPIRED",
-      planCode: "FREE",
+      planCode: BILLING_PLAN.FREE,
     });
-    expect(mockDb.set).toHaveBeenCalledWith({ planCode: "FREE" });
+    expect(mockDb.set).toHaveBeenCalledWith({ planCode: BILLING_PLAN.FREE });
     
     // batch가 한 번 호출되었는지 확인
     expect(mockDb.batch).toHaveBeenCalledTimes(1);

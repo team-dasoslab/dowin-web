@@ -7,6 +7,7 @@ import {
   type NullableEntitlementSource,
 } from "@/domain/billing/types";
 import { NotFoundError } from "@/lib/server/errors";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type BillingState = BillingStatus;
 type PlanCode = BillingPlanCode;
@@ -161,8 +162,10 @@ export class AdminBillingService {
       throw new NotFoundError("NOT_FOUND");
     }
 
-    const [summary] = await this.attachRiskSummary([workspace]);
-    const events = await this.billingStorage.listBillingEventsForWorkspace(workspaceId);
+    const [[summary], events] = await Promise.all([
+      this.attachRiskSummary([workspace]),
+      this.billingStorage.listBillingEventsForWorkspace(workspaceId),
+    ]);
 
     return {
       ...summary,
@@ -229,7 +232,7 @@ export class AdminBillingService {
     }
 
     const nextState = {
-      planCode: "FREE" as const,
+      planCode: BILLING_PLAN.FREE,
       billingStatus: "EXPIRED" as const,
       entitlementSource: existing.entitlementSource ?? null,
       customerKey: existing.customerKey ?? null,
@@ -326,7 +329,7 @@ export class AdminBillingService {
     const nextEntitlementSource =
       input.entitlementSource !== undefined
         ? input.entitlementSource
-        : input.planCode === "BASIC" || input.planCode === "STANDARD"
+        : input.planCode === BILLING_PLAN.BASIC || input.planCode === BILLING_PLAN.STANDARD
           ? ("MANUAL_GRANT" as EntitlementSource)
           : (existing.entitlementSource ?? null);
     const nextBillingOwnerUserId =
@@ -339,10 +342,10 @@ export class AdminBillingService {
       currentPeriodEnd,
       now: occurredAt,
     });
-    const nextPlanCode = shouldExpireImmediately ? "FREE" : input.planCode;
+    const nextPlanCode = shouldExpireImmediately ? BILLING_PLAN.FREE : input.planCode;
     const nextBillingStatus = shouldExpireImmediately ? "EXPIRED" : input.billingStatus;
     const shouldApplySeatEntitlement =
-      nextPlanCode === "BASIC" &&
+      nextPlanCode === BILLING_PLAN.BASIC &&
       (nextBillingStatus === "ACTIVE" || nextBillingStatus === "CANCELED");
     const memberCount = shouldApplySeatEntitlement
       ? await this.billingStorage.countWorkspaceMembers(workspaceId)

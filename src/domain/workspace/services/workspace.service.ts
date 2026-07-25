@@ -13,6 +13,7 @@ import {
   NotFoundError,
 } from "@/lib/server/errors";
 import { customAlphabet } from "nanoid";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type Workspace = NonNullable<
   Awaited<ReturnType<WorkspaceStorage["findUserWorkspace"]>>
@@ -224,7 +225,7 @@ export class WorkspaceService {
       this.storage,
     );
     const fallbackFreeMemberLimit = await getPlanMemberLimit(
-      "FREE",
+      BILLING_PLAN.FREE,
       this.storage,
     );
     const memberLimit =

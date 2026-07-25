@@ -16,6 +16,7 @@ import {
 import { getPlanMemberLimit, getWorkspaceMemberCapacity } from "@/domain/workspace/plan-limits";
 import { type WorkspaceRole } from "@/domain/workspace/types";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<
@@ -140,10 +141,10 @@ export class DashboardService {
   async getTeamDashboard(context: WorkspaceAccessContext, weekStart?: string) {
     const normalizedWeekStart = weekStart ?? getCurrentWeekStart();
 
-    const members = await this.workspaceStorage.findMembers(context.workspaceId);
-    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
-      context.workspaceId,
-    );
+    const [members, scoreboards] = await Promise.all([
+      this.workspaceStorage.findMembers(context.workspaceId),
+      this.scoreboardStorage.findActiveScoreboardsByWorkspace(context.workspaceId),
+    ]);
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
     const logRange = getDashboardLogRange(normalizedWeekStart);
     const lastWeekStart = addDays(normalizedWeekStart, -7);
@@ -284,7 +285,10 @@ export class DashboardService {
       earliestFetchedWeekStart: fetchStart,
     });
 
-    const members = await this.workspaceStorage.findMembers(context.workspaceId);
+    const [members, workspacePayload] = await Promise.all([
+      this.workspaceStorage.findMembers(context.workspaceId),
+      this.buildWorkspacePayload(context),
+    ]);
     const me = members.find((m) => m.userId === context.userId);
     const currentCheckinStreak = me
       ? await processMemberCheckinStreak(
@@ -296,7 +300,7 @@ export class DashboardService {
       : 0;
 
     return {
-      workspace: await this.buildWorkspacePayload(context),
+      workspace: workspacePayload,
       currentStreak,
       currentCheckinStreak,
       activeScoreboard: scoreboard,
@@ -313,10 +317,10 @@ export class DashboardService {
     const trendWeekStarts = getPreviousWeekStarts(normalizedWeekStart, boundedWeeks);
     const earliestWeekStart = trendWeekStarts[0] ?? normalizedWeekStart;
 
-    const members = await this.workspaceStorage.findMembers(context.workspaceId);
-    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
-      context.workspaceId,
-    );
+    const [members, scoreboards] = await Promise.all([
+      this.workspaceStorage.findMembers(context.workspaceId),
+      this.scoreboardStorage.findActiveScoreboardsByWorkspace(context.workspaceId),
+    ]);
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
     const currentDashboardLogRange = getDashboardLogRange(normalizedWeekStart);
     const trendEnd = getWeekDates(normalizedWeekStart)[6];
@@ -364,10 +368,10 @@ export class DashboardService {
     const trendWeekStarts = getPreviousWeekStarts(normalizedWeekStart, boundedWeeks);
     const earliestWeekStart = trendWeekStarts[0] ?? normalizedWeekStart;
 
-    const members = await this.workspaceStorage.findMembers(context.workspaceId);
-    const scoreboards = await this.scoreboardStorage.findActiveScoreboardsByWorkspace(
-      context.workspaceId,
-    );
+    const [members, scoreboards] = await Promise.all([
+      this.workspaceStorage.findMembers(context.workspaceId),
+      this.scoreboardStorage.findActiveScoreboardsByWorkspace(context.workspaceId),
+    ]);
     const allLeadMeasureIds = getActiveLeadMeasureIds(scoreboards);
     const trendEnd = getWeekDates(normalizedWeekStart)[6];
     const logs = await this.dailyLogStorage.findLogsForLeadMeasures(
@@ -396,7 +400,7 @@ export class DashboardService {
       { id: context.workspaceId, planCode: context.entitlement.planCode },
       this.workspaceStorage,
     );
-    const fallbackFreeMemberLimit = await getPlanMemberLimit("FREE", this.workspaceStorage);
+    const fallbackFreeMemberLimit = await getPlanMemberLimit(BILLING_PLAN.FREE, this.workspaceStorage);
     const memberLimit = memberCapacity.memberLimit ?? fallbackFreeMemberLimit ?? 10;
 
     return {

@@ -17,6 +17,7 @@ import {
 } from "@/domain/billing/types";
 import { and, asc, desc, eq, gte, inArray, like, or, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -557,7 +558,7 @@ export class BillingStorage {
           .insert(workspaceSeatEntitlements)
           .values({
             workspaceId: input.event.workspaceId,
-            planCode: "BASIC",
+            planCode: BILLING_PLAN.BASIC,
             purchasedSeatCount: input.projection.purchasedSeatCount ?? 0,
             seatSource: "POLAR",
             updatedAt: new Date(),
@@ -643,7 +644,7 @@ export class BillingStorage {
       .insert(workspaceSeatEntitlements)
       .values({
         workspaceId: input.workspaceId,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         purchasedSeatCount: input.purchasedSeatCount,
         seatSource: input.seatSource,
         updatedAt: new Date(),
