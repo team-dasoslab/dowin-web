@@ -1,6 +1,7 @@
 import { getDb } from "@/db";
 import { workspaceBillingState, workspaces } from "@/db/schema";
 import { and, eq, inArray, lt } from "drizzle-orm";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 export const runBillingRevocation = async (env: CloudflareEnv) => {
   const db = getDb(env.DB);
@@ -28,14 +29,14 @@ export const runBillingRevocation = async (env: CloudflareEnv) => {
     batchStmts.push(
       db
         .update(workspaceBillingState)
-        .set({ billingStatus: "EXPIRED", planCode: "FREE" })
+        .set({ billingStatus: "EXPIRED", planCode: BILLING_PLAN.FREE })
         .where(eq(workspaceBillingState.workspaceId, state.workspaceId)),
     );
 
     batchStmts.push(
       db
         .update(workspaces)
-        .set({ planCode: "FREE" })
+        .set({ planCode: BILLING_PLAN.FREE })
         .where(eq(workspaces.id, state.workspaceId)),
     );
   }

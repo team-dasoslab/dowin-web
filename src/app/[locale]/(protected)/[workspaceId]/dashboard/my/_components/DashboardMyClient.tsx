@@ -91,7 +91,9 @@ export function DashboardMyClient({ initialProfile, initialDashboard }: Dashboar
   const { data: profileResponse, isLoading: isProfileLoading } = useGetUsersMe({
     query: {
       initialData: initialProfile,
+      refetchOnMount: initialProfile ? false : undefined,
       retry: false,
+      staleTime: initialProfile ? 30 * 1000 : 0,
     },
   });
   const nickname = profileResponse?.status === 200 ? (profileResponse.data.nickname ?? null) : null;

@@ -2,6 +2,7 @@ import { ConflictError, ForbiddenError } from "@/lib/server/errors";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BillingService } from "./billing.service";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("BillingService", () => {
   const ctx: WorkspaceAccessContext = {
@@ -16,7 +17,7 @@ describe("BillingService", () => {
       canAccessBasicSubscription: true,
       entitlementSource: null,
       billingStatus: "ACTIVE",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
     },
     capacity: {
       hasAvailableMemberSlot: true,
@@ -44,7 +45,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
@@ -64,7 +65,7 @@ describe("BillingService", () => {
     await expect(service.getMyBilling(ctx)).resolves.toEqual({
       workspaceId: "ws_abc",
       workspaceName: "Dowin",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "NONE",
       entitlementSource: null,
       provider: null,
@@ -91,7 +92,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
@@ -103,7 +104,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           provider: "POLAR",
@@ -140,7 +141,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
@@ -152,7 +153,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           provider: "POLAR",
@@ -204,7 +205,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({
           role: "ADMIN",
@@ -216,7 +217,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           provider: "POLAR",
@@ -268,7 +269,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: "workspace:1",
           billingOwnerUserId: 7,
         }),
@@ -280,7 +281,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           provider: "POLAR",
@@ -314,7 +315,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: null,
         }),
         findMembership: vi.fn().mockResolvedValue({
@@ -362,7 +363,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: "workspace:1",
         }),
         findMembership: vi.fn().mockResolvedValue({
@@ -373,7 +374,7 @@ describe("BillingService", () => {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
           entitlementSource: "POLAR",
           customerKey: "cus_123",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           subscriptionKey: "sub_123",
         }),
         getRecentBillingRiskSummary: vi.fn(),
@@ -415,7 +416,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: "workspace:1",
         }),
         findMembership: vi.fn().mockResolvedValue({
@@ -427,7 +428,7 @@ describe("BillingService", () => {
           entitlementSource: "POLAR",
           customerKey: "cus_123",
           subscriptionKey: "sub_123",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         getRecentBillingRiskSummary: vi.fn(),
       } as never,
@@ -468,7 +469,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: "workspace:1",
           billingOwnerUserId: 9,
         }),
@@ -481,7 +482,7 @@ describe("BillingService", () => {
           entitlementSource: "POLAR",
           customerKey: "cus_123",
           subscriptionKey: "sub_123",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingOwnerUserId: 7,
         }),
         getRecentBillingRiskSummary: vi.fn(),
@@ -521,7 +522,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: "workspace:1",
         }),
         findMembership: vi.fn().mockResolvedValue({
@@ -566,7 +567,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
           billingCustomerExternalRef: null,
         }),
         findMembership: vi.fn().mockResolvedValue({
@@ -621,7 +622,7 @@ describe("BillingService", () => {
           workspaceId: "1",
           workspaceUid: "ws_abc",
           requestedByUserId: "100",
-          targetPlanCode: "BASIC",
+          targetPlanCode: BILLING_PLAN.BASIC,
           requestedSeatCount: "3",
         }),
       }),
@@ -641,7 +642,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
           billingCustomerExternalRef: "workspace:1",
           billingOwnerUserId: 7,
         }),
@@ -704,7 +705,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
           billingCustomerExternalRef: "workspace-checkout:pending_1",
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
@@ -764,7 +765,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_promo",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
           billingCustomerExternalRef: null,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
@@ -815,7 +816,7 @@ describe("BillingService", () => {
         metadata: expect.objectContaining({
           flow: "workspace_resubscribe",
           workspaceUid: "ws_promo",
-          targetPlanCode: "BASIC",
+          targetPlanCode: BILLING_PLAN.BASIC,
         }),
       }),
     );
@@ -833,7 +834,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_manual",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
           billingCustomerExternalRef: null,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
@@ -895,7 +896,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
           billingCustomerExternalRef: null,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
@@ -949,7 +950,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(1),
@@ -1000,7 +1001,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_revoked",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(1),
@@ -1056,7 +1057,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(4),
@@ -1066,7 +1067,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           subscriptionKey: "sub_123",
@@ -1122,7 +1123,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(3),
@@ -1132,7 +1133,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           subscriptionKey: "sub_123",
@@ -1178,7 +1179,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(3),
@@ -1188,7 +1189,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           subscriptionKey: "sub_123",
@@ -1230,7 +1231,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "ADMIN" }),
         countMembers: vi.fn().mockResolvedValue(4),
@@ -1238,7 +1239,7 @@ describe("BillingService", () => {
       } as never,
       {
         findWorkspaceBillingState: vi.fn().mockResolvedValue({
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingStatus: "ACTIVE",
           entitlementSource: "POLAR",
           subscriptionKey: "sub_123",
@@ -1278,7 +1279,7 @@ describe("BillingService", () => {
           id: 1,
           uid: "ws_abc",
           name: "Dowin",
-          planCode: "FREE",
+          planCode: BILLING_PLAN.FREE,
         }),
         findMembership: vi.fn().mockResolvedValue({ role: "MEMBER" }),
         countMembers: vi.fn(),

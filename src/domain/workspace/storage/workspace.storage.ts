@@ -15,6 +15,7 @@ import { type WorkspaceRole } from "@/domain/workspace/types";
 import { generateWorkspacePrefix } from "@/domain/workspace/utils/workspace-prefix.util";
 import { and, desc, eq, gt, inArray, isNull, lt, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 const generateUid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -217,7 +218,7 @@ export class WorkspaceStorage {
           uid: generateUid(),
           name: input.workspaceName,
           actionItemPrefix,
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: `workspace-checkout:${input.pendingUid}`,
           billingOwnerUserId: input.userId,
         })
@@ -233,7 +234,7 @@ export class WorkspaceStorage {
         workspaceId: workspace.id,
         provider: "POLAR",
         billingStatus: "ACTIVE",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         entitlementSource: "POLAR",
         customerKey: input.customerKey,
         subscriptionKey: input.subscriptionKey,
@@ -247,7 +248,7 @@ export class WorkspaceStorage {
 
       await tx.insert(workspaceSeatEntitlements).values({
         workspaceId: workspace.id,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         purchasedSeatCount: input.purchasedSeatCount,
         seatSource: "POLAR",
         updatedAt: input.now,

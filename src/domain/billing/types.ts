@@ -9,7 +9,17 @@ export const entitlementSourceValues = [
 export type EntitlementSource = (typeof entitlementSourceValues)[number];
 export type NullableEntitlementSource = EntitlementSource | null;
 
-export const billingPlanCodeValues = ["BASIC", "FREE", "STANDARD"] as const;
+export const BILLING_PLAN = {
+  BASIC: "BASIC",
+  FREE: "FREE",
+  STANDARD: "STANDARD",
+} as const;
+
+export const billingPlanCodeValues = [
+  BILLING_PLAN.BASIC,
+  BILLING_PLAN.FREE,
+  BILLING_PLAN.STANDARD,
+] as const;
 export type BillingPlanCode = (typeof billingPlanCodeValues)[number];
 
 export const billingStatusValues = ["NONE", "ACTIVE", "CANCELED", "EXPIRED", "REVOKED"] as const;

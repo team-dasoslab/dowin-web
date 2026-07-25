@@ -10,6 +10,7 @@ import {
 import { and, desc, eq, gt, lt, sql } from "drizzle-orm";
 import { customAlphabet } from "nanoid";
 import { generateWorkspacePrefix } from "@/domain/workspace/utils/workspace-prefix.util";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type Db = ReturnType<typeof getDb>;
 type MarketingInviteCode = typeof marketingInviteCodes.$inferSelect;
@@ -174,7 +175,7 @@ export class MarketingInviteStorage {
           uid: generateWorkspaceUid(),
           name: input.workspaceName,
           actionItemPrefix,
-          planCode: "BASIC",
+          planCode: BILLING_PLAN.BASIC,
           billingCustomerExternalRef: `beta-promotion:${input.code.code}`,
           billingOwnerUserId: input.userId,
         })
@@ -199,7 +200,7 @@ export class MarketingInviteStorage {
         workspaceId: workspace.id,
         provider: null,
         billingStatus: "ACTIVE",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         entitlementSource: "BETA_PROMOTIONAL_GRANT",
         customerKey: null,
         subscriptionKey: null,
@@ -213,7 +214,7 @@ export class MarketingInviteStorage {
 
       await this.db.insert(workspaceSeatEntitlements).values({
         workspaceId: workspace.id,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         purchasedSeatCount: input.code.grantedSeatCount,
         seatSource: "BETA_PROMOTIONAL_GRANT",
         updatedAt: input.now,

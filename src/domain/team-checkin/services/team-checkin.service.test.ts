@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { TeamCheckinService } from "@/domain/team-checkin/services/team-checkin.service";
 import { TeamCheckinStorage } from "@/domain/team-checkin/storage/team-checkin.storage";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 const adminContext: WorkspaceAccessContext = {
   workspaceId: 1,
@@ -15,7 +16,7 @@ const adminContext: WorkspaceAccessContext = {
     canAccessBasicSubscription: true,
     entitlementSource: "POLAR",
     billingStatus: "ACTIVE",
-    planCode: "BASIC",
+    planCode: BILLING_PLAN.BASIC,
   },
   capacity: {
     hasAvailableMemberSlot: true,

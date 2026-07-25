@@ -6,6 +6,7 @@ import {
 import { BillingStorage } from "@/domain/billing/storage/billing.storage";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 const WORKSPACE_CHECKOUT_EXPIRES_MS = 30 * 60 * 1000;
 const WORKSPACE_CHECKOUT_VERIFY_RETRY_COUNT = 3;
@@ -80,7 +81,7 @@ export class WorkspaceCheckoutService {
     const product = await this.billingStorage.findActiveProviderProduct({
       provider: "POLAR",
       environment: this.polarClient.environment,
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
     });
 
     if (!product) {
@@ -95,7 +96,7 @@ export class WorkspaceCheckoutService {
       locale: input.locale,
       workspaceName: input.workspaceName,
       requestedSeatCount: input.seatCount,
-      targetPlanCode: "BASIC",
+      targetPlanCode: BILLING_PLAN.BASIC,
       provider: "POLAR",
       providerProductId: product.providerProductId,
       expiresAt: new Date(now.getTime() + WORKSPACE_CHECKOUT_EXPIRES_MS),
@@ -116,7 +117,7 @@ export class WorkspaceCheckoutService {
           flow: "workspace_setup",
           workspaceCheckoutId: pending.uid,
           userId: String(input.userId),
-          targetPlanCode: "BASIC",
+          targetPlanCode: BILLING_PLAN.BASIC,
           requestedSeatCount: String(input.seatCount),
         },
       });
@@ -247,9 +248,10 @@ export class WorkspaceCheckoutService {
       }
     }
 
-    const fallbackSubscription =
-      await this.polarClient?.findSubscriptionByCheckoutId({ checkoutId });
-    const checkout = await this.getVerifiedCheckout(checkoutId);
+    const [fallbackSubscription, checkout] = await Promise.all([
+      this.polarClient?.findSubscriptionByCheckoutId({ checkoutId }),
+      this.getVerifiedCheckout(checkoutId),
+    ]);
 
     if (fallbackSubscription && isWorkspaceSetupCheckout(checkout, pendingUid)) {
       return {

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DashboardService } from "@/domain/dashboard/services/dashboard.service";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("DashboardService", () => {
   const findMembers = vi.fn();
@@ -16,13 +17,13 @@ describe("DashboardService", () => {
     { findLogsForLeadMeasures },
   );
 
-  const context: Parameters<typeof service.getTeamDashboard>[0] = { workspaceId: 3, workspacePublicId: "workspace-3", workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getTeamDashboard>[0];
+  const context: Parameters<typeof service.getTeamDashboard>[0] = { workspaceId: 3, workspacePublicId: "workspace-3", workspaceName: "러닝 크루", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: BILLING_PLAN.STANDARD } } as unknown as Parameters<typeof service.getTeamDashboard>[0];
 
   beforeEach(() => {
     vi.clearAllMocks();
     countMembers.mockResolvedValue(2);
     findBillingState.mockResolvedValue({
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "POLAR",
     });

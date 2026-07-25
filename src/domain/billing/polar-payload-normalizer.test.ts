@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 import {
   normalizePolarBillingEventPayload,
   sanitizePolarLogBody,
@@ -18,7 +19,7 @@ describe("normalizePolarBillingEventPayload", () => {
         metadata: {
           workspaceId: "3",
           requestedSeatCount: "5",
-          targetPlanCode: "BASIC",
+          targetPlanCode: BILLING_PLAN.BASIC,
           internalDebugNote: "drop me",
           token: "drop-token",
         },
@@ -51,7 +52,7 @@ describe("normalizePolarBillingEventPayload", () => {
         metadata: {
           workspaceId: "3",
           requestedSeatCount: "5",
-          targetPlanCode: "BASIC",
+          targetPlanCode: BILLING_PLAN.BASIC,
         },
         customer: {
           id: "cus_1",
