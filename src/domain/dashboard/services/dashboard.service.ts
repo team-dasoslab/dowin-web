@@ -16,6 +16,7 @@ import {
 import { getPlanMemberLimit, getWorkspaceMemberCapacity } from "@/domain/workspace/plan-limits";
 import { type WorkspaceRole } from "@/domain/workspace/types";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type WorkspaceLookupPort = {
   findMembers(workspaceId: number): Promise<
@@ -399,7 +400,7 @@ export class DashboardService {
       { id: context.workspaceId, planCode: context.entitlement.planCode },
       this.workspaceStorage,
     );
-    const fallbackFreeMemberLimit = await getPlanMemberLimit("FREE", this.workspaceStorage);
+    const fallbackFreeMemberLimit = await getPlanMemberLimit(BILLING_PLAN.FREE, this.workspaceStorage);
     const memberLimit = memberCapacity.memberLimit ?? fallbackFreeMemberLimit ?? 10;
 
     return {

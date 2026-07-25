@@ -5,6 +5,7 @@ import {
   type BillingStatus,
 } from "@/domain/billing/entitlement-policy";
 import {  type NullableEntitlementSource  } from "@/domain/billing/types";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type WorkspacePlanSummary = {
   id: number;
@@ -42,7 +43,7 @@ export async function getPlanMemberLimitFromStorage(
   planCode: string | null | undefined,
   storage: Pick<MemberCapacityPort, "findPlanLimit">,
 ): Promise<number | null> {
-  if (planCode !== "BASIC" && planCode !== "FREE" && planCode !== "STANDARD") {
+  if (planCode !== BILLING_PLAN.BASIC && planCode !== BILLING_PLAN.FREE && planCode !== BILLING_PLAN.STANDARD) {
     return null;
   }
 

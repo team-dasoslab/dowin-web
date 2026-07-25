@@ -12,6 +12,7 @@ import {
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { ConflictError, ForbiddenError, NotFoundError } from "@/lib/server/errors";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 type WorkspacePort = Pick<
   WorkspaceStorage,
@@ -348,7 +349,7 @@ export class BillingService {
     const product = await this.billingStorage.findActiveProviderProduct({
       provider: "POLAR",
       environment: this.polarClient.environment,
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
     });
 
     if (!product) {
@@ -375,7 +376,7 @@ export class BillingService {
           workspaceId: String(workspace.id),
           workspaceUid: getWorkspacePublicId(workspace),
           requestedByUserId: String(context.userId),
-          targetPlanCode: "BASIC",
+          targetPlanCode: BILLING_PLAN.BASIC,
           requestedSeatCount: String(seatCount),
         },
       });
@@ -422,7 +423,7 @@ export class BillingService {
 
     if (
       !billingState ||
-      billingState.planCode !== "BASIC" ||
+      billingState.planCode !== BILLING_PLAN.BASIC ||
       billingState.billingStatus !== "ACTIVE" ||
       billingState.entitlementSource !== "POLAR" ||
       !billingState.subscriptionKey
