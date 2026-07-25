@@ -1,5 +1,6 @@
 import { AnalyticsService } from "@/domain/analytics/services/analytics.service";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("AnalyticsService", () => {
     const findActiveScoreboard = vi.fn();
@@ -21,13 +22,13 @@ describe("AnalyticsService", () => {
     findActiveScoreboard.mockResolvedValue(undefined);
 
     await expect(
-      service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getExportData>[0], { from: "2026-03-01", to: "2026-03-31" }),
+      service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: BILLING_PLAN.STANDARD } } as unknown as Parameters<typeof service.getExportData>[0], { from: "2026-03-01", to: "2026-03-31" }),
     ).rejects.toThrow("NOT_FOUND");
   });
 
   it("Basic 구독이 활성 상태가 아니면 export 데이터를 조회할 수 없다", async () => {
     await expect(
-      service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: false, entitlementSource: null, billingStatus: "NONE", planCode: "FREE" } } as unknown as Parameters<typeof service.getExportData>[0], { from: "2026-03-01", to: "2026-03-31" }),
+      service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: false, entitlementSource: null, billingStatus: "NONE", planCode: BILLING_PLAN.FREE } } as unknown as Parameters<typeof service.getExportData>[0], { from: "2026-03-01", to: "2026-03-31" }),
     ).rejects.toThrow("BASIC_SUBSCRIPTION_REQUIRED");
   });
 
@@ -82,7 +83,7 @@ describe("AnalyticsService", () => {
       { leadMeasureId: 3, logDate: "2026-03-06", value: true },
     ]);
 
-    const result = await service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getExportData>[0], {
+    const result = await service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: BILLING_PLAN.STANDARD } } as unknown as Parameters<typeof service.getExportData>[0], {
       from: "2026-03-01",
       to: "2026-03-10",
     });
@@ -170,7 +171,7 @@ describe("AnalyticsService", () => {
     });
     findLogsForLeadMeasures.mockResolvedValue([]);
 
-    const result = await service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: "STANDARD" } } as unknown as Parameters<typeof service.getExportData>[0], {
+    const result = await service.getExportData({ workspaceId: 3, workspaceName: "WS", userId: 11, role: "ADMIN", membershipId: 1, entitlement: { canAccessBasicSubscription: true, entitlementSource: null, billingStatus: "ACTIVE", planCode: BILLING_PLAN.STANDARD } } as unknown as Parameters<typeof service.getExportData>[0], {
       from: "2026-03-01",
       to: "2026-03-02",
       leadMeasureIds: [2],

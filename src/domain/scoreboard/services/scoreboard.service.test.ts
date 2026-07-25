@@ -4,6 +4,7 @@ import {
 } from "@/domain/scoreboard/services/scoreboard.service";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("ScoreboardService", () => {
   const findActiveScoreboard = vi.fn();
@@ -36,7 +37,7 @@ describe("ScoreboardService", () => {
     vi.clearAllMocks();
     countMembers.mockResolvedValue(1);
     findBillingState.mockResolvedValue({
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "POLAR",
     });
@@ -57,7 +58,7 @@ describe("ScoreboardService", () => {
         workspaceId: 3,
         userId: 1,
         role: "ADMIN",
-        entitlement: { planCode: "BASIC" },
+        entitlement: { planCode: BILLING_PLAN.BASIC },
       } as unknown as WorkspaceAccessContext);
 
       expect(result).toEqual({ id: 10, status: "ACTIVE" });
@@ -75,7 +76,7 @@ describe("ScoreboardService", () => {
           workspaceId: 3,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext),
       ).rejects.toThrow("NOT_FOUND");
     });
@@ -101,7 +102,7 @@ describe("ScoreboardService", () => {
           workspaceId: 3,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         payload,
       );
@@ -126,7 +127,7 @@ describe("ScoreboardService", () => {
             workspaceId: 3,
             userId: 1,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           {
             goalName: "체중을 감량한다",
@@ -158,7 +159,7 @@ describe("ScoreboardService", () => {
           workspaceId: 3,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         10,
         {
@@ -190,7 +191,7 @@ describe("ScoreboardService", () => {
             workspaceId: 3,
             userId: 1,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           10,
           { goalName: "독서 습관을 만든다" },
@@ -218,7 +219,7 @@ describe("ScoreboardService", () => {
           workspaceId: 3,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         10,
       );
@@ -242,7 +243,7 @@ describe("ScoreboardService", () => {
         workspaceId: 3,
         userId: 1,
         role: "ADMIN",
-        entitlement: { planCode: "BASIC" },
+        entitlement: { planCode: BILLING_PLAN.BASIC },
       } as unknown as WorkspaceAccessContext);
 
       expect(result).toEqual([{ id: 1, status: "ARCHIVED" }]);
@@ -270,7 +271,7 @@ describe("ScoreboardService", () => {
           workspaceId: 3,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         10,
       );
@@ -295,7 +296,7 @@ describe("ScoreboardService", () => {
             workspaceId: 3,
             userId: 1,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           10,
         ),
@@ -321,7 +322,7 @@ describe("ScoreboardService", () => {
             workspaceId: 3,
             userId: 1,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           10,
         ),
