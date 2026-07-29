@@ -62,7 +62,9 @@ export function DashboardTeamClient({
   const { data: profileResponse } = useGetUsersMe({
     query: {
       initialData: initialProfile,
+      refetchOnMount: initialProfile ? false : undefined,
       retry: false,
+      staleTime: initialProfile ? 30 * 1000 : 0,
     },
   });
   const [activeMemoState, setActiveMemoState] = useState<ActiveMemoState>(null);

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { PolarWebhookService } from "./polar-webhook.service";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 function createBillingStorageMock(
   overrides: Record<string, unknown> = {},
@@ -108,7 +109,7 @@ describe("PolarWebhookService", () => {
     const findBillingEventByProviderEventId = vi.fn().mockResolvedValue(null);
     const findWorkspaceById = vi.fn().mockResolvedValue({
       id: 3,
-      planCode: "FREE",
+      planCode: BILLING_PLAN.FREE,
       billingCustomerExternalRef: null,
       billingOwnerUserId: null,
     });
@@ -138,7 +139,7 @@ describe("PolarWebhookService", () => {
           metadata: {
             workspaceId: "3",
             adminUserId: "9",
-            targetPlanCode: "STANDARD",
+            targetPlanCode: BILLING_PLAN.STANDARD,
           },
           customer: {
             external_id: "workspace:3",
@@ -162,14 +163,14 @@ describe("PolarWebhookService", () => {
       expect.objectContaining({
         workspaceId: 3,
         billingStatus: "ACTIVE",
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         entitlementSource: "POLAR",
         billingOwnerUserId: 9,
       }),
     );
     expect(updateWorkspaceBillingProjection).toHaveBeenCalledWith({
       workspaceId: 3,
-      planCode: "STANDARD",
+      planCode: BILLING_PLAN.STANDARD,
       billingCustomerExternalRef: "workspace:3",
       billingOwnerUserId: 9,
     });
@@ -180,7 +181,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 13,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingCustomerExternalRef: "workspace-checkout:pending_13",
         billingOwnerUserId: 21,
       }),
@@ -200,7 +201,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: false,
           seats: 5,
           metadata: {
-            targetPlanCode: "BASIC",
+            targetPlanCode: BILLING_PLAN.BASIC,
             workspaceId: "13",
             requestedByUserId: "21",
           },
@@ -225,7 +226,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 14,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingCustomerExternalRef: "workspace-checkout:pending_14",
         billingOwnerUserId: 22,
       }),
@@ -245,7 +246,7 @@ describe("PolarWebhookService", () => {
           current_period_end: "2026-06-28T00:00:00.000Z",
           cancel_at_period_end: false,
           metadata: {
-            targetPlanCode: "BASIC",
+            targetPlanCode: BILLING_PLAN.BASIC,
             workspaceId: "14",
             requestedSeatCount: "7",
           },
@@ -265,7 +266,7 @@ describe("PolarWebhookService", () => {
     expect(appendBillingRetentionRecord).toHaveBeenCalledWith(
       expect.objectContaining({
         eventType: "subscription.revoked",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         seatCount: 7,
       }),
     );
@@ -299,7 +300,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 3,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingCustomerExternalRef: null,
         billingOwnerUserId: 9,
       }),
@@ -318,7 +319,7 @@ describe("PolarWebhookService", () => {
           current_period_end: "2026-07-09T00:00:00.000Z",
           metadata: {
             workspaceId: "3",
-            targetPlanCode: "BASIC",
+            targetPlanCode: BILLING_PLAN.BASIC,
           },
         },
       }),
@@ -338,7 +339,7 @@ describe("PolarWebhookService", () => {
         id: 3,
         uid: "ws_3",
         name: "Ops",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingCustomerExternalRef: null,
         billingOwnerUserId: 9,
       }),
@@ -358,7 +359,7 @@ describe("PolarWebhookService", () => {
           seats: 5,
           metadata: {
             workspaceId: "3",
-            targetPlanCode: "BASIC",
+            targetPlanCode: BILLING_PLAN.BASIC,
             requestedSeatCount: "5",
             internalNote: "drop me",
           },
@@ -388,7 +389,7 @@ describe("PolarWebhookService", () => {
         seats: 5,
         metadata: {
           workspaceId: "3",
-          targetPlanCode: "BASIC",
+          targetPlanCode: BILLING_PLAN.BASIC,
           requestedSeatCount: "5",
         },
         customer: {
@@ -410,7 +411,7 @@ describe("PolarWebhookService", () => {
         workspaceUidSnapshot: "ws_3",
         workspaceNameSnapshot: "Ops",
         billingOwnerUserIdSnapshot: 9,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         seatCount: 5,
         customerKey: "cus_1",
         subscriptionKey: "sub_1",
@@ -427,7 +428,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 5,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingCustomerExternalRef: "workspace:5",
         billingOwnerUserId: 8,
       }),
@@ -460,13 +461,13 @@ describe("PolarWebhookService", () => {
       expect.objectContaining({
         workspaceId: 5,
         billingStatus: "EXPIRED",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         entitlementSource: "POLAR",
       }),
     );
     expect(updateWorkspaceBillingProjection).toHaveBeenCalledWith({
       workspaceId: 5,
-      planCode: "FREE",
+      planCode: BILLING_PLAN.FREE,
       billingCustomerExternalRef: "workspace:5",
       billingOwnerUserId: 8,
     });
@@ -475,7 +476,7 @@ describe("PolarWebhookService", () => {
   it("customer.state_changed가 구독 metadata의 BASIC 플랜을 반영한다", async () => {
     const findWorkspaceByCustomerExternalRef = vi.fn().mockResolvedValue({
       id: 13,
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingCustomerExternalRef: "workspace-checkout:pending_13",
       billingOwnerUserId: 21,
     });
@@ -485,7 +486,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 13,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingCustomerExternalRef: "workspace-checkout:pending_13",
         billingOwnerUserId: 21,
       }),
@@ -511,7 +512,7 @@ describe("PolarWebhookService", () => {
               current_period_end: "2026-06-28T00:00:00.000Z",
               cancel_at_period_end: true,
               metadata: {
-                targetPlanCode: "BASIC",
+                targetPlanCode: BILLING_PLAN.BASIC,
                 requestedSeatCount: "10",
                 requestedByUserId: "21",
                 workspaceCheckoutId: "pending_13",
@@ -530,13 +531,13 @@ describe("PolarWebhookService", () => {
       expect.objectContaining({
         workspaceId: 13,
         billingStatus: "CANCELED",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingOwnerUserId: 21,
       }),
     );
     expect(updateWorkspaceBillingProjection).toHaveBeenCalledWith({
       workspaceId: 13,
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingCustomerExternalRef: "workspace-checkout:pending_13",
       billingOwnerUserId: 21,
     });
@@ -554,7 +555,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 6,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingCustomerExternalRef: "workspace:6",
         billingOwnerUserId: 10,
       }),
@@ -593,7 +594,7 @@ describe("PolarWebhookService", () => {
       expect.objectContaining({
         workspaceId: 6,
         billingStatus: "EXPIRED",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         entitlementSource: "POLAR",
       }),
     );
@@ -606,7 +607,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 7,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingCustomerExternalRef: "workspace:7",
         billingOwnerUserId: 4,
       }),
@@ -626,7 +627,7 @@ describe("PolarWebhookService", () => {
           current_period_end: "2026-04-21T00:00:00.000Z",
           metadata: {
             workspaceId: "7",
-            targetPlanCode: "STANDARD",
+            targetPlanCode: BILLING_PLAN.STANDARD,
           },
           customer: {
             external_id: "workspace:7",
@@ -646,7 +647,7 @@ describe("PolarWebhookService", () => {
       expect.objectContaining({
         workspaceId: 7,
         billingStatus: "EXPIRED",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         entitlementSource: "POLAR",
       }),
     );
@@ -659,7 +660,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 8,
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingCustomerExternalRef: "workspace:8",
         billingOwnerUserId: 12,
       }),
@@ -680,7 +681,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: false,
           metadata: {
             workspaceId: "8",
-            targetPlanCode: "STANDARD",
+            targetPlanCode: BILLING_PLAN.STANDARD,
           },
           customer: {
             external_id: "workspace:8",
@@ -694,7 +695,7 @@ describe("PolarWebhookService", () => {
       expect.objectContaining({
         workspaceId: 8,
         billingStatus: "ACTIVE",
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         entitlementSource: "POLAR",
         cancelAtPeriodEnd: false,
       }),
@@ -708,7 +709,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 9,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingCustomerExternalRef: "workspace:9",
         billingOwnerUserId: 13,
       }),
@@ -730,7 +731,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: false,
           metadata: {
             workspaceId: "9",
-            targetPlanCode: "STANDARD",
+            targetPlanCode: BILLING_PLAN.STANDARD,
           },
           customer: {
             external_id: "workspace:9",
@@ -744,7 +745,7 @@ describe("PolarWebhookService", () => {
       expect.objectContaining({
         workspaceId: 9,
         billingStatus: "ACTIVE",
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         entitlementSource: "POLAR",
       }),
     );
@@ -755,7 +756,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 10,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingCustomerExternalRef: "workspace:10",
         billingOwnerUserId: 14,
       }),
@@ -776,7 +777,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: true,
           metadata: {
             workspaceId: "10",
-            targetPlanCode: "STANDARD",
+            targetPlanCode: BILLING_PLAN.STANDARD,
           },
           customer: {
             external_id: "workspace:10",
@@ -799,7 +800,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 11,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingCustomerExternalRef: "workspace:11",
         billingOwnerUserId: 15,
       }),
@@ -820,7 +821,7 @@ describe("PolarWebhookService", () => {
           cancel_at_period_end: false,
           metadata: {
             workspaceId: "11",
-            targetPlanCode: "STANDARD",
+            targetPlanCode: BILLING_PLAN.STANDARD,
           },
           customer: {
             external_id: "workspace:11",
@@ -844,7 +845,7 @@ describe("PolarWebhookService", () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findWorkspaceById: vi.fn().mockResolvedValue({
         id: 12,
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingCustomerExternalRef: "workspace:12",
         billingOwnerUserId: 16,
       }),

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.10](https://github.com/team-dasoslab/dowin-web/compare/v1.14.9...v1.14.10) (2026-07-25)
+
+
+### Performance Improvements
+
+* 대시보드 및 백엔드 쿼리 병렬화 및 프론트 중복 호출 제거 ([#254](https://github.com/team-dasoslab/dowin-web/issues/254)) ([7594a22](https://github.com/team-dasoslab/dowin-web/commit/7594a22e78603ec94f044c655f2f9993381a5b14))
+
 ## [1.14.9](https://github.com/team-dasoslab/dowin-web/compare/v1.14.8...v1.14.9) (2026-07-23)
 
 

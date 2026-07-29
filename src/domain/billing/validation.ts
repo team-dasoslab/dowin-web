@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { entitlementSourceValues } from "@/domain/billing/types";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 export const entitlementSourceSchema = z.enum(entitlementSourceValues);
 
@@ -51,7 +52,7 @@ export const adminBillingWorkspaceParamsSchema = z.object({
 export const adminBillingProviderProductUpsertSchema = z.object({
   provider: z.enum(["POLAR"]),
   environment: z.enum(["sandbox", "production"]),
-  planCode: z.enum(["BASIC", "STANDARD"]),
+  planCode: z.enum([BILLING_PLAN.BASIC, BILLING_PLAN.STANDARD]),
   providerProductId: z
     .string()
     .trim()
@@ -67,7 +68,7 @@ export const adminBillingProviderProductUpsertSchema = z.object({
 
 export const adminBillingManualOverrideSchema = z
   .object({
-    planCode: z.enum(["BASIC", "FREE", "STANDARD"]),
+    planCode: z.enum([BILLING_PLAN.BASIC, BILLING_PLAN.FREE, BILLING_PLAN.STANDARD]),
     billingStatus: z.enum([
       "NONE",
       "ACTIVE",
@@ -106,9 +107,9 @@ export const adminBillingManualOverrideSchema = z
   })
   .superRefine((value, context) => {
     const validCombo =
-      (value.planCode === "FREE" &&
+      (value.planCode === BILLING_PLAN.FREE &&
         ["NONE", "EXPIRED", "REVOKED"].includes(value.billingStatus)) ||
-      (["BASIC", "STANDARD"].includes(value.planCode) &&
+      ((value.planCode === BILLING_PLAN.BASIC || value.planCode === BILLING_PLAN.STANDARD) &&
         ["ACTIVE", "CANCELED"].includes(value.billingStatus));
 
     if (!validCombo) {
@@ -121,7 +122,7 @@ export const adminBillingManualOverrideSchema = z
     }
 
     if (
-      value.planCode === "FREE" &&
+      value.planCode === BILLING_PLAN.FREE &&
       value.entitlementSource &&
       value.entitlementSource !== "POLAR"
     ) {

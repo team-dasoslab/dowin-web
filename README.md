@@ -49,13 +49,14 @@ Dowin은 개인/팀의 목표 실행과 주간 운영을 관리하는 서비스�
 
 ### 1) 사전 준비
 
-- Node.js 18+
-- Yarn 4 (`corepack enable` 권장)
-- Cloudflare 계정 (배포 또는 D1 원격 작업 시)
+- Node.js 22
+- Yarn 4
+- mise
 
 ### 2) 설치
 
 ```bash
+mise install
 yarn install
 ```
 

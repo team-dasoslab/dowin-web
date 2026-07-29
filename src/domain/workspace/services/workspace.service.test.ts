@@ -1,6 +1,7 @@
 import { WorkspaceService } from "@/domain/workspace/services/workspace.service";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("WorkspaceService", () => {
   const ctx: WorkspaceAccessContext = {
@@ -15,7 +16,7 @@ describe("WorkspaceService", () => {
       canAccessBasicSubscription: true,
       entitlementSource: null,
       billingStatus: "ACTIVE",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
     },
     capacity: {
       hasAvailableMemberSlot: true,
@@ -63,7 +64,7 @@ describe("WorkspaceService", () => {
     mockStorage.findPlanLimit.mockResolvedValue({ memberLimit: 10 });
     mockStorage.findMembership.mockResolvedValue({ role: "ADMIN" });
     mockStorage.findBillingState.mockResolvedValue({
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "POLAR",
     });
@@ -77,7 +78,7 @@ describe("WorkspaceService", () => {
         id: 1,
         uid: "ws_1",
         name: "Workspace",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingCustomerExternalRef: "workspace-checkout:pending_1",
         billingOwnerUserId: 123,
         createdAt,
@@ -89,7 +90,7 @@ describe("WorkspaceService", () => {
       expect(result).toEqual({
         id: "ws_1",
         name: "Workspace",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         createdAt,
         freeMemberLimit: 10,
         isOverFreeMemberLimit: false,
@@ -101,7 +102,7 @@ describe("WorkspaceService", () => {
     });
 
     it("FREE 플랜 멤버 한도 초과 상태를 함께 반환한다", async () => {
-      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: "FREE" };
+      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: BILLING_PLAN.FREE };
       mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
       mockStorage.countMembers.mockResolvedValue(11);
 
@@ -110,7 +111,7 @@ describe("WorkspaceService", () => {
       expect(result).toEqual({
         id: "ws_1",
         name: "Workspace",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         freeMemberLimit: 10,
         isOverFreeMemberLimit: true,
         memberCount: 11,
@@ -119,7 +120,7 @@ describe("WorkspaceService", () => {
     });
 
     it("좌석 권한이 있으면 purchasedSeatCount 기준으로 초과 상태를 반환한다", async () => {
-      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: "STANDARD" };
+      const mockWorkspace = { id: 1, uid: "ws_1", name: "Workspace", planCode: BILLING_PLAN.STANDARD };
       mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
       mockStorage.findSeatEntitlement.mockResolvedValue({
         purchasedSeatCount: 5,
@@ -131,7 +132,7 @@ describe("WorkspaceService", () => {
       expect(result).toEqual({
         id: "ws_1",
         name: "Workspace",
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         freeMemberLimit: 5,
         isOverFreeMemberLimit: true,
         memberCount: 6,
@@ -144,7 +145,7 @@ describe("WorkspaceService", () => {
         id: 1,
         uid: "ws_1",
         name: "Workspace",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       };
       mockStorage.findUserWorkspace.mockResolvedValue(mockWorkspace);
       mockStorage.findMembership.mockResolvedValue({ role: "MEMBER" });
@@ -171,7 +172,7 @@ describe("WorkspaceService", () => {
             id: 3,
             uid: "ws_ops",
             name: "운영팀",
-            planCode: "STANDARD",
+            planCode: BILLING_PLAN.STANDARD,
             createdAt: new Date("2026-05-01T00:00:00.000Z"),
           },
         },
@@ -181,7 +182,7 @@ describe("WorkspaceService", () => {
             id: 7,
             uid: "ws_personal",
             name: "개인",
-            planCode: "FREE",
+            planCode: BILLING_PLAN.FREE,
             createdAt: new Date("2026-04-01T00:00:00.000Z"),
           },
         },
@@ -206,7 +207,7 @@ describe("WorkspaceService", () => {
 
   describe("createWorkspace", () => {
     it("새 워크스페이스를 생성하고 생성자를 ADMIN으로 추가한다", async () => {
-      const mockWorkspace = { id: 1, uid: "ws_new", name: "New", planCode: "FREE" };
+      const mockWorkspace = { id: 1, uid: "ws_new", name: "New", planCode: BILLING_PLAN.FREE };
       mockStorage.createWorkspace.mockResolvedValue(mockWorkspace);
 
       const result = await service.createWorkspace(123, "New");
@@ -214,7 +215,7 @@ describe("WorkspaceService", () => {
       expect(result).toEqual({
         id: "ws_new",
         name: "New",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       expect(mockStorage.createWorkspace).toHaveBeenCalledWith("New");
       expect(mockStorage.addMember).toHaveBeenCalledWith(1, 123, "ADMIN");
@@ -224,7 +225,7 @@ describe("WorkspaceService", () => {
       mockStorage.createWorkspace.mockResolvedValue({
         id: 1,
         name: "New",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.addMember.mockRejectedValue(
         new Error(
@@ -241,7 +242,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMember.mockResolvedValue(undefined);
@@ -260,7 +261,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMember.mockRejectedValue(
@@ -276,7 +277,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.countMembers.mockResolvedValue(10);
 
@@ -288,7 +289,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.findBillingState.mockResolvedValue(null);
 
@@ -300,7 +301,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
       });
       mockStorage.findSeatEntitlement.mockResolvedValue({
         purchasedSeatCount: 3,
@@ -318,7 +319,7 @@ describe("WorkspaceService", () => {
         id: 1,
         uid: "ws_1",
         name: "기존 이름",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         createdAt: new Date("2026-03-18T00:00:00.000Z"),
       } as unknown as NonNullable<Awaited<ReturnType<typeof mockStorage.findWorkspaceById>>>);
 
@@ -326,7 +327,7 @@ describe("WorkspaceService", () => {
         id: 1,
         uid: "ws_1",
         name: "새 이름",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         allowPastDailyLogEdit: false,
         createdAt: new Date("2026-03-18T00:00:00.000Z"),
       };
@@ -337,7 +338,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         { name: "새 이름" },
       );
@@ -345,7 +346,7 @@ describe("WorkspaceService", () => {
       expect(result).toEqual({
         id: "ws_1",
         name: "새 이름",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         allowPastDailyLogEdit: false,
         createdAt: expect.any(Date),
       });
@@ -367,7 +368,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         9,
       );
@@ -389,7 +390,7 @@ describe("WorkspaceService", () => {
             workspaceId: 1,
             userId: 123,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           9,
         ),
@@ -405,7 +406,7 @@ describe("WorkspaceService", () => {
             workspaceId: 1,
             userId: 123,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           9,
         ),
@@ -427,7 +428,7 @@ describe("WorkspaceService", () => {
             workspaceId: 1,
             userId: 123,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           9,
         ),
@@ -440,7 +441,7 @@ describe("WorkspaceService", () => {
       const workspace = {
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         createdAt: new Date(),
       };
       mockStorage.findWorkspaceById.mockResolvedValue(workspace);
@@ -460,7 +461,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         3,
       );
@@ -518,7 +519,7 @@ describe("WorkspaceService", () => {
         id: 1,
         uid: "ws_team",
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMemberByInvite.mockResolvedValue(true);
@@ -545,7 +546,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.countMembers.mockResolvedValue(9);
       mockStorage.addMemberByInvite.mockRejectedValue(
@@ -571,7 +572,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.countMembers.mockResolvedValue(10);
 
@@ -591,7 +592,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
       });
       mockStorage.listTags.mockResolvedValue(tags);
 
@@ -599,7 +600,7 @@ describe("WorkspaceService", () => {
         workspaceId: 1,
         userId: 1,
         role: "ADMIN",
-        entitlement: { planCode: "BASIC" },
+        entitlement: { planCode: BILLING_PLAN.BASIC },
       } as unknown as WorkspaceAccessContext);
 
       expect(result).toEqual(tags);
@@ -610,7 +611,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.createTag.mockResolvedValue({
         id: 10,
@@ -625,7 +626,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 7,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         {
           name: "운동",
@@ -648,7 +649,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.createTag.mockRejectedValue(
         new Error("UNIQUE constraint failed: workspace_tags_workspace_normalized_name_unique"),
@@ -666,7 +667,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       const wrappedError = new Error("Failed query");
       wrappedError.cause = new Error(
@@ -701,7 +702,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         10,
         {
@@ -731,7 +732,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         10,
       );
@@ -753,7 +754,7 @@ describe("WorkspaceService", () => {
         workspaceId: 1,
         userId: 1,
         role: "ADMIN",
-        entitlement: { planCode: "BASIC" },
+        entitlement: { planCode: BILLING_PLAN.BASIC },
       } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.removeMemberById).toHaveBeenCalledWith(1, 9);
@@ -772,7 +773,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext),
       ).rejects.toThrow("ADMIN_TRANSFER_REQUIRED");
     });
@@ -792,7 +793,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext,
         11,
       );
@@ -814,7 +815,7 @@ describe("WorkspaceService", () => {
             workspaceId: 1,
             userId: 123,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           11,
         ),
@@ -830,7 +831,7 @@ describe("WorkspaceService", () => {
             workspaceId: 1,
             userId: 123,
             role: "ADMIN",
-            entitlement: { planCode: "BASIC" },
+            entitlement: { planCode: BILLING_PLAN.BASIC },
           } as unknown as WorkspaceAccessContext,
           11,
         ),
@@ -843,7 +844,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       });
       mockStorage.findBillingState.mockResolvedValue(null);
 
@@ -851,7 +852,7 @@ describe("WorkspaceService", () => {
         workspaceId: 1,
         userId: 1,
         role: "ADMIN",
-        entitlement: { planCode: "BASIC" },
+        entitlement: { planCode: BILLING_PLAN.BASIC },
       } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
@@ -861,7 +862,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
       });
       mockStorage.findBillingState.mockResolvedValue({
         provider: "POLAR",
@@ -875,7 +876,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext),
       ).rejects.toThrow("WORKSPACE_ACTIVE_SUBSCRIPTION_DELETE_FORBIDDEN");
       expect(mockStorage.deleteWorkspace).not.toHaveBeenCalled();
@@ -885,7 +886,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
       });
       mockStorage.findBillingState.mockResolvedValue({
         provider: "POLAR",
@@ -898,7 +899,7 @@ describe("WorkspaceService", () => {
         workspaceId: 1,
         userId: 1,
         role: "ADMIN",
-        entitlement: { planCode: "BASIC" },
+        entitlement: { planCode: BILLING_PLAN.BASIC },
       } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
@@ -908,7 +909,7 @@ describe("WorkspaceService", () => {
       mockStorage.findWorkspaceById.mockResolvedValue({
         id: 1,
         name: "팀",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
       });
       mockStorage.findBillingState.mockResolvedValue({
         provider: "POLAR",
@@ -921,7 +922,7 @@ describe("WorkspaceService", () => {
         workspaceId: 1,
         userId: 1,
         role: "ADMIN",
-        entitlement: { planCode: "BASIC" },
+        entitlement: { planCode: BILLING_PLAN.BASIC },
       } as unknown as WorkspaceAccessContext);
 
       expect(mockStorage.deleteWorkspace).toHaveBeenCalledWith(1);
@@ -935,7 +936,7 @@ describe("WorkspaceService", () => {
           workspaceId: 1,
           userId: 1,
           role: "ADMIN",
-          entitlement: { planCode: "BASIC" },
+          entitlement: { planCode: BILLING_PLAN.BASIC },
         } as unknown as WorkspaceAccessContext),
       ).rejects.toThrow("NOT_FOUND");
     });

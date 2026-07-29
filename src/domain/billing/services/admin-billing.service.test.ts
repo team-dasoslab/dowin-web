@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { AdminBillingService } from "./admin-billing.service";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("AdminBillingService", () => {
   it("운영자가 Polar product 매핑을 upsert하면 audit log를 남긴다", async () => {
@@ -7,7 +8,7 @@ describe("AdminBillingService", () => {
       id: 9,
       provider: "POLAR",
       environment: "production",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       providerProductId: "prod_basic_live",
       isActive: true,
       createdAt: new Date("2026-05-28T00:00:00.000Z"),
@@ -34,7 +35,7 @@ describe("AdminBillingService", () => {
     const result = await service.upsertProviderProduct(1, {
       provider: "POLAR",
       environment: "production",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       providerProductId: "prod_basic_live",
       isActive: true,
       changeReason: "Basic product ID 등록",
@@ -43,7 +44,7 @@ describe("AdminBillingService", () => {
     expect(upsertProviderProduct).toHaveBeenCalledWith({
       provider: "POLAR",
       environment: "production",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       providerProductId: "prod_basic_live",
       isActive: true,
     });
@@ -60,7 +61,7 @@ describe("AdminBillingService", () => {
       id: 9,
       provider: "POLAR",
       environment: "production",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       providerProductId: "prod_basic_live",
       isActive: true,
       createdAt: "2026-05-28T00:00:00.000Z",
@@ -77,7 +78,7 @@ describe("AdminBillingService", () => {
           {
             workspaceId: 3,
             workspaceName: "Dowin",
-            planCode: "STANDARD",
+            planCode: BILLING_PLAN.STANDARD,
             billingStatus: "ACTIVE",
             entitlementSource: "POLAR",
             provider: "POLAR",
@@ -128,7 +129,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingStatus: "NONE",
         entitlementSource: null,
         provider: null,
@@ -144,7 +145,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingStatus: "ACTIVE",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -194,7 +195,7 @@ describe("AdminBillingService", () => {
     );
 
     const result = await service.applyManualOverride(1, 3, {
-      planCode: "STANDARD",
+      planCode: BILLING_PLAN.STANDARD,
       billingStatus: "ACTIVE",
       entitlementSource: "MANUAL_GRANT",
       customerKey: "cus_123",
@@ -214,7 +215,7 @@ describe("AdminBillingService", () => {
     expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
       expect.objectContaining({
         workspaceId: 3,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingStatus: "ACTIVE",
         entitlementSource: "MANUAL_GRANT",
       }),
@@ -230,7 +231,7 @@ describe("AdminBillingService", () => {
     expect(result).toEqual(
       expect.objectContaining({
         workspaceId: 3,
-        planCode: "STANDARD",
+        planCode: BILLING_PLAN.STANDARD,
         billingStatus: "ACTIVE",
         entitlementSource: "MANUAL_GRANT",
         events: [
@@ -253,7 +254,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingStatus: "NONE",
         entitlementSource: null,
         provider: null,
@@ -270,7 +271,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingStatus: "ACTIVE",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -303,7 +304,7 @@ describe("AdminBillingService", () => {
     );
 
     await service.applyManualOverride(1, 3, {
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "MANUAL_GRANT",
       purchasedSeatCount: 5,
@@ -327,7 +328,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingStatus: "ACTIVE",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -344,7 +345,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingStatus: "EXPIRED",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -381,7 +382,7 @@ describe("AdminBillingService", () => {
     );
 
     const result = await service.applyManualOverride(1, 3, {
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "MANUAL_GRANT",
       currentPeriodEnd: "2026-06-22T00:00:00.000Z",
@@ -392,7 +393,7 @@ describe("AdminBillingService", () => {
     expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
       expect.objectContaining({
         workspaceId: 3,
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingStatus: "EXPIRED",
         entitlementSource: "MANUAL_GRANT",
       }),
@@ -400,7 +401,7 @@ describe("AdminBillingService", () => {
     expect(updateWorkspaceBillingProjection).toHaveBeenCalledWith(
       expect.objectContaining({
         workspaceId: 3,
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       }),
     );
     expect(upsertWorkspaceSeatEntitlement).not.toHaveBeenCalled();
@@ -416,7 +417,7 @@ describe("AdminBillingService", () => {
     );
     expect(result).toEqual(
       expect.objectContaining({
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingStatus: "EXPIRED",
         entitlementSource: "MANUAL_GRANT",
       }),
@@ -432,7 +433,7 @@ describe("AdminBillingService", () => {
       {
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingStatus: "CANCELED",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -449,7 +450,7 @@ describe("AdminBillingService", () => {
       {
         workspaceId: 4,
         workspaceName: "Future",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingStatus: "ACTIVE",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -469,7 +470,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "BASIC",
+        planCode: BILLING_PLAN.BASIC,
         billingStatus: "CANCELED",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -486,7 +487,7 @@ describe("AdminBillingService", () => {
       .mockResolvedValueOnce({
         workspaceId: 3,
         workspaceName: "Dowin",
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingStatus: "EXPIRED",
         entitlementSource: "MANUAL_GRANT",
         provider: null,
@@ -532,7 +533,7 @@ describe("AdminBillingService", () => {
     expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
       expect.objectContaining({
         workspaceId: 3,
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
         billingStatus: "EXPIRED",
         entitlementSource: "MANUAL_GRANT",
       }),
@@ -540,7 +541,7 @@ describe("AdminBillingService", () => {
     expect(updateWorkspaceBillingProjection).toHaveBeenCalledWith(
       expect.objectContaining({
         workspaceId: 3,
-        planCode: "FREE",
+        planCode: BILLING_PLAN.FREE,
       }),
     );
     expect(createAuditLog).toHaveBeenCalledWith(
@@ -564,7 +565,7 @@ describe("AdminBillingService", () => {
           {
             workspaceId: 3,
             workspaceName: "Dowin",
-            planCode: "BASIC",
+            planCode: BILLING_PLAN.BASIC,
             billingStatus: "ACTIVE",
             entitlementSource: "MANUAL_GRANT",
             provider: null,
@@ -610,7 +611,7 @@ describe("AdminBillingService", () => {
           .mockResolvedValueOnce({
             workspaceId: 3,
             workspaceName: "Dowin",
-            planCode: "FREE",
+            planCode: BILLING_PLAN.FREE,
             billingStatus: "NONE",
             entitlementSource: null,
             provider: null,
@@ -627,7 +628,7 @@ describe("AdminBillingService", () => {
           .mockResolvedValueOnce({
             workspaceId: 3,
             workspaceName: "Dowin",
-            planCode: "BASIC",
+            planCode: BILLING_PLAN.BASIC,
             billingStatus: "ACTIVE",
             entitlementSource: "MANUAL_GRANT",
             provider: null,
@@ -653,7 +654,7 @@ describe("AdminBillingService", () => {
     );
 
     await service.applyManualOverride(1, 3, {
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "MANUAL_GRANT",
       purchasedSeatCount: 1,

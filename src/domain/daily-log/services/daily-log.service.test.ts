@@ -1,6 +1,7 @@
 import { DailyLogService } from "@/domain/daily-log/services/daily-log.service";
 import { type WorkspaceAccessContext } from "@/lib/server/workspace-context";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 describe("DailyLogService", () => {
   const ctx: WorkspaceAccessContext = {
@@ -15,7 +16,7 @@ describe("DailyLogService", () => {
       canAccessBasicSubscription: true,
       entitlementSource: null,
       billingStatus: "ACTIVE",
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
     },
     capacity: {
       hasAvailableMemberSlot: true,
@@ -52,7 +53,7 @@ describe("DailyLogService", () => {
     vi.clearAllMocks();
     countMembers.mockResolvedValue(1);
     findBillingState.mockResolvedValue({
-      planCode: "BASIC",
+      planCode: BILLING_PLAN.BASIC,
       billingStatus: "ACTIVE",
       entitlementSource: "POLAR",
     });

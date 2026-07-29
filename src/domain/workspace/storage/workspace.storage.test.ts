@@ -1,6 +1,7 @@
 import { workspaceMembers, workspaceTags, workspaces } from "@/db/schema";
 import { WorkspaceStorage } from "@/domain/workspace/storage/workspace.storage";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BILLING_PLAN } from "@/domain/billing/types";
 
 vi.mock("@/lib/server/active-workspace", () => ({
   getActiveWorkspaceIdFromCookies: vi.fn(),
@@ -86,7 +87,7 @@ describe("WorkspaceStorage", () => {
 
   describe("findUserWorkspace", () => {
     it("사용자가 소속된 워크스페이스 정보를 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "Test Workspace", planCode: "FREE" };
+      const mockWorkspace = { id: 1, name: "Test Workspace", planCode: BILLING_PLAN.FREE };
       mockDb.orderBy.mockReturnThis();
       mockDb.limit.mockResolvedValue([{ workspace: mockWorkspace }]);
 
@@ -100,7 +101,7 @@ describe("WorkspaceStorage", () => {
 
   describe("findWorkspaceById", () => {
     it("워크스페이스 id로 조회한다", async () => {
-      const mockWorkspace = { id: 1, name: "Test Workspace", planCode: "FREE" };
+      const mockWorkspace = { id: 1, name: "Test Workspace", planCode: BILLING_PLAN.FREE };
       mockDb.query.workspaces.findFirst.mockResolvedValue(mockWorkspace);
 
       const result = await storage.findWorkspaceById(1);
@@ -112,7 +113,7 @@ describe("WorkspaceStorage", () => {
 
   describe("createWorkspace", () => {
     it("새 워크스페이스를 생성하고 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "New Workspace", planCode: "FREE" };
+      const mockWorkspace = { id: 1, name: "New Workspace", planCode: BILLING_PLAN.FREE };
       mockDb.returning.mockResolvedValue([mockWorkspace]);
 
       const result = await storage.createWorkspace("New Workspace");
@@ -137,7 +138,7 @@ describe("WorkspaceStorage", () => {
 
   describe("updateWorkspace", () => {
     it("워크스페이스 정보를 수정하고 반환한다", async () => {
-      const mockWorkspace = { id: 1, name: "새 이름", planCode: "FREE" };
+      const mockWorkspace = { id: 1, name: "새 이름", planCode: BILLING_PLAN.FREE };
       mockDb.returning.mockResolvedValue([mockWorkspace]);
 
       const result = await storage.updateWorkspace(1, { name: "새 이름" });
@@ -200,7 +201,7 @@ describe("WorkspaceStorage", () => {
           workspaceId: 3,
           userId: 123,
           role: "ADMIN",
-          workspace: { id: 3, name: "운영팀", planCode: "STANDARD" },
+          workspace: { id: 3, name: "운영팀", planCode: BILLING_PLAN.STANDARD },
         },
       ];
       mockDb.orderBy.mockResolvedValue([
@@ -211,7 +212,7 @@ describe("WorkspaceStorage", () => {
             userId: 123,
             role: "ADMIN",
           },
-          workspace: { id: 3, name: "운영팀", planCode: "STANDARD" },
+          workspace: { id: 3, name: "운영팀", planCode: BILLING_PLAN.STANDARD },
         },
       ]);
 
