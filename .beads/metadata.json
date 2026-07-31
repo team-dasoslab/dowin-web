@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "dowin_web",
+  "project_id": "390cd795-b032-4b75-8ab5-b56a9ca090e5"
+}
