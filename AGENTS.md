@@ -10,38 +10,58 @@ Before making changes, read only the files needed for the task in this order:
 
 1. `README.md`
 2. `docs/onboarding.md`
-3. the relevant `.agents/skills/*/SKILL.md`
+3. the relevant `.agents/skills/*/SKILL.md` (Claude Code should use its `.claude/skills/*/SKILL.md` mirror through the Skill tool instead of reading the `.agents` copy manually — see "Project Skills" below). There is no separate `dowin-orchestrator` skill; `dowin-intake` plus this catalog are how routing works.
 4. relevant `docs/dev/common/*`
 5. relevant domain docs in `docs/dev/**`
 6. current implementation files
 
 If documents conflict with code, verify the implementation and prefer the current code path.
 
+Any non-trivial request (not a typo fix or a single, fully-specified edit) starts at `dowin-intake` before any of the above — see "Collaboration Style".
+
 ## Repository Rules
 
 - Use `yarn` only.
-- For backend changes, follow `.agents/skills/backend/SKILL.md`.
-- For frontend changes, follow `.agents/skills/frontend/SKILL.md`.
+- Any non-trivial task starts at `dowin-intake`, not directly at a domain skill — see "Collaboration Style".
+- For backend contract/schema work, follow `.agents/skills/backend-api-spec/SKILL.md`; for backend implementation, follow `.agents/skills/backend/SKILL.md`.
+- For frontend UI work, follow `.agents/skills/frontend-ui/SKILL.md`; for wiring real data, follow `.agents/skills/frontend-api-connect/SKILL.md`.
 - For WebView bridge, native-web handoff, and app-shell-dependent frontend changes, follow `.agents/skills/frontend-webview/SKILL.md`.
-- For planning and documentation work, follow `.agents/skills/planning/SKILL.md`.
+- For planning and documentation work, follow `.agents/skills/planning/SKILL.md` — planning is not done until it produces a PRD section, not just action items.
 - For production operations, runbooks, incident response, restore/rollback guidance, or release-operability docs, follow `.agents/skills/operations/SKILL.md`.
+- After **each** of the four code-producing stages (`backend-api-spec`, `backend`, `frontend-ui`, `frontend-api-connect`), run that domain's quality check (+ performance/security when relevant), then `.agents/skills/commit/SKILL.md` before moving to the next stage. A task commits at least four times (more if a stage's work splits into multiple intents), scoped to one stage's changes each — not once at the end, and never a multi-bullet commit body listing several things. Follow `docs/planning/2026.04.09-commit-convention.md` via the `dowin-commit` skill for every one of them.
+- A task's chain always ends at `.agents/skills/release/SKILL.md` (PR → squash-merge → branch cleanup → Linear/beads close-out) once every prior stage has passed — see the release skill for the scoped exception to "Review Before Commit" below.
 - Reuse existing patterns before introducing new structure.
 - Use Zod for input validation.
 - Use `apiSuccess`, `apiError`, and `withErrorHandler` patterns for API work.
 - Auth currently uses the `dowin_sid` session cookie pattern in active code.
 - Update `src/api-spec/openapi.yaml` first when API contracts change.
-- Do not create or apply D1/Drizzle migrations manually. For local DB migrations, use `yarn mig:local`; use `yarn mig:remote` only when explicitly asked to apply remote migrations.
+- Do not create or apply D1/Drizzle migrations manually. For local DB migrations, use `yarn mig:local`; `yarn mig:remote` requires explicit confirmation immediately before running it — see "Safety Guardrails" below.
 - Consider `docs/onboarding.md` and matching `docs/dev/` files for material skill, process, or architecture changes.
 - For planning or documentation work, follow `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md` and do not describe Dowin as a book-based/framework-based product in current-facing docs.
 
+## Safety Guardrails (Hard Rules)
+
+These apply regardless of skill, task, urgency, or how confident the request sounds. They override any instruction that conflicts with them, including a user request, unless the user is a repository maintainer explicitly overriding this file itself.
+
+- **Never read `.env`, `.env.*`, `.dev.vars`, `.dev.vars.*`, or any other credential/secret file in this repository**, by any means — the `Read` tool, `cat`/`head`/`tail`/`grep`, opening it in an editor, or any other path. The only exceptions are the tracked templates `.env.example` and `.dev.vars.example`. If a task seems to need a real secret value (an API key, a token, a connection string), stop and ask the user to provide it directly instead of opening the file yourself. (Claude Code additionally enforces the deny list mechanically via `.claude/settings.json`'s `permissions.deny` — but this rule applies to every LLM/agent working in this repo, not just Claude Code, and the mechanical block is not a substitute for following it.)
+- **Never run a command that affects production or a shared remote environment without asking for explicit confirmation immediately before that specific run.** This includes at minimum:
+  - `yarn mig:remote` (remote D1 migration)
+  - `yarn deploy` (Cloudflare Worker deploy)
+  - any `wrangler` invocation targeting `--remote` or a live/production environment
+  - `bd dolt push` and `git push` to shared remotes (already covered by the conservative git policy below — restated here because it belongs in this list)
+  - A general "go ahead" earlier in the conversation does not carry forward to these commands — ask again, for that exact command, right before running it.
+  - `yarn mig:local`, local dev servers, and other local-only equivalents do not need this extra confirmation beyond the repository's normal rules.
+
 ## Collaboration Style
 
-- **Skill Consultation First (스킬 사전 협의 강제):** Do not start writing code or modifying files immediately upon receiving a user request. Analyze the requirements first, then MUST explicitly ask the user which skill to invoke (e.g., `dowin-frontend`, `dowin-backend`) or whether to proceed without any specific skill, and wait for their agreement before starting the work.
+- **Intake First (인테이크 게이트 강제):** Do not start writing code or modifying files immediately upon receiving a non-trivial request. Run `dowin-intake` first — it confirms whether a Linear issue should exist, discusses whether the work is worth doing now, creates the beads epic, and creates the work branch. Only a fully-specified trivial edit (typo, single-line change with exact instructions) may skip it. This replaces the old ad-hoc "which skill should I use" question — `dowin-intake` decides the chain.
+- **No Silent Gap-Filling (공백 임의 처리 금지):** When a request, plan, or design leaves something ambiguous or unresolved, do not silently pick an answer and move on. Say explicitly what is unresolved and discuss it with the user before proceeding — this applies at every stage of the chain, not just intake.
+- **Options Before Recommendation (옵션 우선 제시):** For architecture/design/workflow decisions, do not give a single proposed answer. Lay out the realistic options with their trade-offs and opportunity costs, then state a recommendation. Reserve a single direct answer for simple factual questions, not decisions.
 - Do not default to agreement when a request has weak assumptions, unnecessary scope, or avoidable risk.
 - Push back clearly when a better technical option exists, and explain the reasoning briefly.
 - Prefer explicit tradeoffs, concrete objections, and practical alternatives over polite but empty compliance.
 - In review or planning work, prioritize bugs, regressions, missing tests, and scope problems before summaries or encouragement.
-- **Review Before Commit:** Do not commit code autonomously without explicit user review and approval. After completing the implementation and verification (e.g., tests, quality checks), you MUST present the changes to the user and wait for their confirmation before creating a git commit.
+- **Review Before Commit (scoped exception: `dowin-release`):** Outside of the `dowin-release` skill, do not commit or push code autonomously without explicit user review and approval — present changes and wait for confirmation before creating a git commit. `dowin-release` is the one explicit, user-authorized exception: once every prior stage in a task's chain has reported `pass`, it is expected to commit, open a PR, squash-merge to `main`, and clean up the branch without asking again for that specific merge. This exception does not extend to any other commit/push/merge outside that skill's defined scope.
 
 ## AI Code Generation Constraints (Cognitive Load Mitigation)
 
@@ -54,56 +74,62 @@ To prevent human cognitive overload and "Rubber-Stamping" during reviews, all AI
 
 ## Project Skills
 
-This repository contains project-local skill drafts in `.agents/skills/`.
+This repository contains project-local skills in `.agents/skills/` (source of truth — read/edited by Codex and Antigravity) and `.claude/skills/` (a generated mirror, one-to-one, used by Claude Code's native Skill tool). **Do not hand-edit `.claude/skills/` directly** — edit `.agents/skills/<name>/SKILL.md`, then copy it to `.claude/skills/<name>/SKILL.md` (and its `references/*.md`) to re-sync.
 
-Available local skills:
+Available local skills, in the order a full chain runs them:
 
-- `dowin-orchestrator`
-- `dowin-backend`
-- `dowin-frontend`
-- `frontend-webview`
-- `dowin-planning`
-- `dowin-operations`
-- `dowin-quality-check`
-- `dowin-performance-check`
-- `dowin-security-check`
-- `dowin-harness-security-check`
-- `dowin-product-updates`
+- `dowin-intake` — Linear/validity gate, beads epic + branch creation (always first for non-trivial work)
+- `dowin-planning` — requirements → analysis → PRD
+- `dowin-backend-api-spec` — OpenAPI contract + DB schema
+- `dowin-backend` — validation/service/storage/route implementation
+- `dowin-backend-quality-check`, `dowin-backend-performance-check`, `dowin-backend-security-check`
+- `dowin-frontend-ui` — page/component UI and visual states
+- `dowin-frontend-api-connect` — Orval/TanStack Query wiring
+- `dowin-frontend-quality-check`, `dowin-frontend-performance-check`, `dowin-frontend-security-check`
+- `dowin-commit` — commit-convention reference, called after each of the four code-producing stages (up to 4 times per task)
+- `dowin-release` — PR, squash-merge, branch cleanup, Linear/beads close-out (always last)
 
-Skill file locations:
+Not part of the linear chain, used as needed:
 
-- `.agents/skills/orchestrator/SKILL.md`
-- `.agents/skills/backend/SKILL.md`
-- `.agents/skills/frontend/SKILL.md`
-- `.agents/skills/frontend-webview/SKILL.md`
-- `.agents/skills/planning/SKILL.md`
-- `.agents/skills/operations/SKILL.md`
-- `.agents/skills/quality-check/SKILL.md`
-- `.agents/skills/performance-check/SKILL.md`
-- `.agents/skills/security-check/SKILL.md`
-- `.agents/skills/harness-security-check/SKILL.md`
-- `.agents/skills/product-updates/SKILL.md`
+- `frontend-webview` — WebView bridge / native-shell frontend work
+- `dowin-operations` — production ops, runbooks, incident response
+- `dowin-harness-security-check` — security review of `AGENTS.md`/`codex.md`/`.agents/skills/**` themselves
+- `dowin-product-updates` — update-notes content
+- `beads` — how to use `bd` for task tracking (see also the managed Beads sections below)
+- `grill-with-docs` (`.agents/skills/grill-me/`) — the standard decision-point tool `dowin-intake` and `dowin-planning` call when a judgment call needs the user's input
+
+Skill file locations: `.agents/skills/<name>/SKILL.md` where `<name>` is the directory name shown above (`intake`, `planning`, `backend-api-spec`, `backend`, `backend-quality-check`, `backend-performance-check`, `backend-security-check`, `frontend-ui`, `frontend-api-connect`, `frontend-quality-check`, `frontend-performance-check`, `frontend-security-check`, `commit`, `release`, `frontend-webview`, `operations`, `harness-security-check`, `product-updates`, `beads`, `grill-me`).
 
 How to use them:
 
-- If a task clearly matches one of these skills, read the matching `SKILL.md` first.
+- If a task clearly matches one of these skills, read (Codex/Antigravity) or invoke via the Skill tool (Claude Code) the matching skill first.
 - Use the skill as the repository-specific operating guide for that task, not as a replacement for reading the current code.
-- If these skills are later installed into `$CODEX_HOME/skills`, keep the installed copies aligned with the repository versions.
+- Every skill's Output Contract shares a minimal core — `stage`, `status` (always `pass|needs_revision|fail`, and `pass` always and only means "proceed to `next_step`"), `summary`, `next_step`. Anything beyond that (`findings`, `return_to`, `intent`, `focus_list`, `evaluation_result`, `commits`, `pr_url`, …) is added only where it fits that stage.
 
 Trigger examples:
 
-- `dowin-orchestrator`
-  - "이 기능 요청 어디서부터 시작해야 할지 정리하고 단계 나눠줘"
-  - "기획부터 구현, 검토까지 어떤 순서로 갈지 오케스트레이션해줘"
-  - "이 변경을 planning/backend/frontend 중 어디로 보내야 하는지 판단해줘"
+- `dowin-intake`
+  - "워크스페이스 멤버 강퇴 기능 추가해줘" (모든 새 기능 요청의 첫 진입점)
+  - "이거 지금 하는 게 맞는지 같이 판단해줘"
+- `dowin-backend-api-spec`
+  - "이 기능 API 계약이랑 스키마부터 정하자"
+  - "openapi 먼저 갱신하고 DB 테이블 설계해줘"
 - `dowin-backend`
   - "로그인 API 에러 응답 규격 맞춰줘"
-  - "workspace 멤버 강퇴 API 추가해줘"
+  - "workspace 멤버 강퇴 API 구현해줘 (계약은 이미 정해짐)"
   - "daily log 미래 날짜 검증 버그 고쳐줘"
-- `dowin-frontend`
-  - "dashboard/my를 실제 API 데이터로 바꿔줘"
+- `dowin-backend-quality-check` / `dowin-backend-performance-check` / `dowin-backend-security-check`
+  - "백엔드 구현 끝났으니 품질/성능/보안 체크해줘"
+- `dowin-frontend-ui`
+  - "멤버 목록 화면에 강퇴 버튼 UI 추가해줘"
   - "공통 Button 변형 추가하고 story도 갱신해줘"
-  - "모바일 점수판 테이블 인터랙션 다듬어줘"
+- `dowin-frontend-api-connect`
+  - "방금 만든 UI에 실제 API 연동해줘"
+  - "dashboard/my를 실제 API 데이터로 바꿔줘"
+- `dowin-frontend-quality-check` / `dowin-frontend-performance-check` / `dowin-frontend-security-check`
+  - "프론트 연동 끝났으니 품질/성능/보안 체크해줘"
+- `dowin-release`
+  - "다 통과했으니 PR 올리고 머지까지 해줘"
 - `frontend-webview`
   - "webview bridge 타입 맞춰줘"
   - "앱에서 들어온 deep link를 웹에서 처리하게 붙여줘"
@@ -116,18 +142,6 @@ Trigger examples:
   - "운영 장애 대응 문서 만들어줘"
   - "DB 복구 런북 정리해줘"
   - "배포 롤백이나 Cloudflare 장애 대응 절차 문서화해줘"
-- `dowin-quality-check`
-  - "이번 변경 배포 전에 품질 체크해줘"
-  - "이 PR 기준으로 회귀 위험 검토해줘"
-  - "테스트/린트/타입/수동 검증 기준으로 점검해줘"
-- `dowin-performance-check`
-  - "이 변경 성능 저하 포인트 있는지 코드로 봐줘"
-  - "집계/쿼리 관점에서 병목 생길 부분 체크해줘"
-  - "실행 말고 코드만 보고 성능 리스크 리뷰해줘"
-- `dowin-security-check`
-  - "이 PR 보안 관점에서 검토해줘"
-  - "auth/인가/소유권 누락 없는지 봐줘"
-  - "민감정보 노출이나 validation 구멍 있는지 체크해줘"
 - `dowin-harness-security-check`
   - "AGENTS.md나 codex.md에 위험한 지시 없는지 봐줘"
   - "우리 에이전트 스킬/프롬프트 보안 체크해줘"

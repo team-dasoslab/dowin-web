@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Frontend Quality Check"
+  short_description: "Dowin frontend-only quality gate"
+  default_prompt: "Use $dowin-frontend-quality-check to verify a Dowin frontend change's state handling, i18n, and mobile behavior."
+
+policy:
+  allow_implicit_invocation: true
