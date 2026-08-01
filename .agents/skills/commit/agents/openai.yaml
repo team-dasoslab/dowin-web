@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Commit"
+  short_description: "Dowin commit-convention reference and per-stage commit gate"
+  default_prompt: "Use $dowin-commit before running git commit at the end of a backend/frontend stage, to keep the message consistent with docs/planning/2026.04.09-commit-convention.md."
+
+policy:
+  allow_implicit_invocation: true
