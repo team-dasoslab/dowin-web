@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Backend API Spec"
+  short_description: "Dowin OpenAPI contract and DB schema design stage"
+  default_prompt: "Use $dowin-backend-api-spec to fix the OpenAPI contract and DB schema for a Dowin backend change before implementation."
+
+policy:
+  allow_implicit_invocation: true

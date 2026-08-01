@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Backend Security Check"
+  short_description: "Dowin backend-only security review"
+  default_prompt: "Use $dowin-backend-security-check to review a Dowin backend change for auth/authorization/ownership/validation risk."
+
+policy:
+  allow_implicit_invocation: true

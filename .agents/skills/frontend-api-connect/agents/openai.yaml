@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Frontend API Connect"
+  short_description: "Dowin Orval/TanStack Query wiring stage"
+  default_prompt: "Use $dowin-frontend-api-connect to wire real server data (Orval hooks, TanStack Query, mutations, invalidation) into UI built by dowin-frontend-ui."
+
+policy:
+  allow_implicit_invocation: true

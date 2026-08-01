@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Frontend Security Check"
+  short_description: "Dowin frontend-only security review"
+  default_prompt: "Use $dowin-frontend-security-check to review a Dowin frontend change for protected-action and role-exposure risk."
+
+policy:
+  allow_implicit_invocation: true
