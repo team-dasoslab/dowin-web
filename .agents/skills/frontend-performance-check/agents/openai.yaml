@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Frontend Performance Check"
+  short_description: "Dowin frontend-only static performance review"
+  default_prompt: "Use $dowin-frontend-performance-check to statically review a Dowin frontend change for render/fetch/bundle cost risk."
+
+policy:
+  allow_implicit_invocation: true

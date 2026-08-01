@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions.
+description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation inline as decisions crystallise. Use when user wants to stress-test a plan against their project's language and documented decisions. Also the standard decision-point tool called by dowin-intake (validity/timing) and dowin-planning (requirements/analysis) whenever a judgment call needs the user's input instead of an assumption.
 ---
 
 <what-to-do>
@@ -17,31 +17,27 @@ If a question can be answered by exploring the codebase or the project's explici
 
 ## Domain awareness
 
-During codebase exploration, always cross-reference with the rules in `AGENTS.md` and any documents under `docs/`.
+During codebase exploration, always cross-reference with the rules in `AGENTS.md`, `codex.md`, and documents under `docs/`.
 
 ### File structure
 
-This repository follows a strict documentation layout:
+This repository (dowin-web, Next.js) follows this documentation layout:
 
 ```
 /
-├── AGENTS.md                         ← Project rules and principles
-├── README.md                         ← Base onboarding/setup info
+├── AGENTS.md                              ← Project rules and principles (Claude Code / general)
+├── codex.md                               ← Codex-specific operating plan and routing table
+├── README.md                              ← Base onboarding/setup info
 ├── docs/
-│   ├── onboarding.md                 ← Maintenance and onboarding docs
-│   └── yyyy.mm.dd-name.md            ← Specific architecture/planning decisions
-└── src/                              ← Source code for Expo and native app
+│   ├── onboarding.md                      ← Maintenance and onboarding docs
+│   ├── planning/yyyy.mm.dd-name.md        ← Feature/architecture planning docs, incl. PRDs
+│   └── dev/**/yyyy.mm.dd-name.md          ← Common conventions and per-domain implementation docs
+├── .agents/skills/<name>/SKILL.md         ← Codex/Antigravity-facing skill definitions (source of truth)
+├── .claude/skills/<name>/SKILL.md         ← Claude Code skill mirror (generated from .agents/skills)
+└── src/                                   ← Next.js application source
 ```
 
-Create files lazily — only when you have something to write. When adding or modifying docs under `docs/` (except `onboarding.md`), ensure the filename follows the `yyyy.mm.dd-name.md` convention and includes the required YAML frontmatter:
-
-```yaml
----
-title: 
-createdAt: 2026-04-14 00:20:00
-updatedAt: 
----
-```
+Create files lazily — only when you have something to write. When adding or modifying docs under `docs/planning/` or `docs/dev/` (except `onboarding.md`), follow the `yyyy.mm.dd-name.md` filename convention and keep the existing YAML frontmatter style used in that directory (see neighboring files for the exact fields — this repository's convention differs by directory, so check a sibling file rather than assuming a fixed schema).
 
 ## During the session
 

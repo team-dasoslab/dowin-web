@@ -35,7 +35,9 @@ For detailed file paths and planning priorities, read `references/planning-rules
 
 ## Workflow
 
-### 1. Frame the planning target
+Planning moves through three stages: requirements → analysis → PRD. Do not skip straight to a PRD without the first two.
+
+### 1. 요구사항 정리 (Requirements)
 
 Define:
 
@@ -44,39 +46,38 @@ Define:
 - whether this is MVP or Post-MVP
 - which domains are affected
 
-### 2. Reuse the existing planning structure
+When the requirement itself is fuzzy, do not resolve it yourself — call the `grill-with-docs` skill (`.agents/skills/grill-me/SKILL.md`) to interview the user one question at a time, each with a recommended answer, grounded in `AGENTS.md` and existing docs.
 
-Use the repository's existing planning sections where applicable:
+### 2. 분석 (Analysis)
 
-- background and context
-- priority and rationale
-- expected impact
-- action items
-- cost and estimation
-- success and failure criteria
+Cross-check the requirement against:
 
-### 3. Ground plans in the current product
-
-Cross-check against:
-
-- existing domain docs
-- current implementation state
+- existing domain docs and current implementation state
 - shared constraints such as auth, workspace, scoreboard, and dashboard rules
+- alternatives that might already cover the need
 
-### 4. Produce implementation-ready output
+Use the repository's existing planning sections where applicable (background/context, priority/rationale, expected impact, cost/estimation). When a judgment call comes up here (scope trade-off, MVP boundary, alternative approach), call `grill-with-docs` again rather than deciding it silently.
 
-A good planning update should leave behind:
+### 3. PRD 작성 (Produce the PRD)
 
-- clear scope
-- affected files or domains
-- concrete next actions
-- open questions only where truly unresolved
+The planning doc is not done until it contains a PRD section covering:
+
+- 배경 및 문제 정의
+- 요구사항 (기능/비기능)
+- 범위 (MVP vs Post-MVP)
+- 영향 도메인/파일
+- 성공/실패 기준
+- 오픈 이슈 (진짜 미해결인 것만 — 채워 넣지 말 것)
+- 다음 단계로 넘길 action item (`dowin-backend-api-spec`/`dowin-frontend-ui`가 그대로 쓸 수 있는 수준으로 구체적으로)
+
+This PRD lives inside the primary planning document for the feature (`docs/planning/<date>-<feature>.md`) as a dedicated section, not a separate file — keep the repository's "extend the primary planning document" convention.
 
 ## Planning Checklist
 
 - Did the document extend an existing planning thread when possible?
 - Is the frontmatter present and valid?
 - Does the plan distinguish MVP from Post-MVP?
+- **Is there an actual PRD section (배경/요구사항/범위/영향 도메인/성공 기준/오픈 이슈/action item)?**
 - Are action items concrete enough for engineering work?
 - Does the plan align with existing domain rules and current Dowin product language?
 - Should `docs/onboarding.md` also be updated?
@@ -106,11 +107,11 @@ Use these planning-oriented categories when relevant:
 Return rules:
 
 - `pass`
-  - scope, boundaries, and next actions are clear enough for implementation
+  - a PRD section exists and scope, boundaries, and next actions are clear enough for implementation
 - `needs_revision`
-  - planning is directionally correct, but scope or success criteria need tightening
+  - planning is directionally correct, but scope, success criteria, or the PRD itself needs tightening
 - `fail`
-  - planning is not usable yet and should stay in `planning`
+  - planning is not usable yet (including: no PRD written) and should stay in `planning`
 
 ## When To Escalate To Engineering Docs
 

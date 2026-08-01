@@ -25,7 +25,7 @@ If docs and active files disagree, verify the active files and use that as the s
 - Prioritize secret exposure, permission overreach, risky automation, unsafe shell guidance, and misleading prompts that could normalize destructive actions.
 - Review the actual trigger files and prompt text rather than assuming behavior from summaries.
 - Prefer narrow approvals, explicit justification, and least-privilege defaults.
-- If the concern is about auth, authorization, ownership, or Zod validation in app code, use `dowin-security-check` instead.
+- If the concern is about auth, authorization, ownership, or Zod validation in app code, use `dowin-backend-security-check` or `dowin-frontend-security-check` instead.
 
 For detailed checks and reporting rules, read `references/harness-security-rules.md`.
 
@@ -73,11 +73,32 @@ When reporting, prioritize:
 ## Harness Security Checklist
 
 - Are secrets or private endpoints absent from prompt/config files?
+- Does `AGENTS.md`/`codex.md` still explicitly forbid reading `.env*`/`.dev.vars*` (Safety Guardrails), and does `.claude/settings.json`'s `permissions.deny` still mechanically block them for Claude Code?
+- Does `AGENTS.md`/`codex.md` still require fresh, explicit confirmation immediately before any production/remote-affecting command (`yarn mig:remote`, `yarn deploy`, `wrangler --remote`, shared-remote `git push`/`bd dolt push`)?
 - Do instructions avoid broad auto-approval or overly permissive execution guidance?
 - Are destructive commands gated clearly and narrowly?
 - Do skills distinguish app-code security review from harness/config security review?
 - Do referenced workflows prefer least privilege and explicit verification?
 - Did the review inspect the real files that agents load?
+
+## Output Contract
+
+```text
+stage: harness-security
+status: pass|needs_revision|fail
+summary: 한두 문장 요약
+findings:
+- ...
+failure_categories:
+- ...
+next_step: 다음 단계 또는 완료
+```
+
+Return rules:
+
+- `pass` — 하네스 변경에 막을 만한 보안 이슈 없음
+- `needs_revision` — 구체적인 수정이 필요함 (해당 스킬/문서 파일로 돌아가 수정)
+- `fail` — 위험도가 높아 이대로 진행하면 안 됨 — 무엇이 위험한지 구체적으로 보고
 
 ## Next Step
 

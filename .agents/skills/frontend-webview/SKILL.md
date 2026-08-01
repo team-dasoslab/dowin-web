@@ -44,7 +44,7 @@ Classify the task first:
 - safe-area or status-bar UI sync update
 - WebView doc sync only
 
-If the task is ordinary frontend work without bridge/native shell coupling, use `dowin-frontend` instead.
+If the task is ordinary frontend work without bridge/native shell coupling, use `dowin-frontend-ui`/`dowin-frontend-api-connect` instead.
 
 ### 2. Confirm the contract before coding
 
@@ -109,7 +109,7 @@ findings:
 - ...
 failure_categories:
 - ...
-return_to: planning|frontend|none
+return_to: planning|frontend-ui|frontend-api-connect|none
 next_step: 다음 단계 또는 검증
 ```
 
@@ -123,4 +123,4 @@ Use these categories when relevant:
 
 ## Next Step
 
-After WebView-related implementation or docs are updated, run `dowin-security-check` for app-code changes or `dowin-harness-security-check` if the task changed skill or harness files.
+After WebView-related implementation or docs are updated, run `dowin-frontend-security-check` for app-code changes or `dowin-harness-security-check` if the task changed skill or harness files.

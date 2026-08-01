@@ -23,9 +23,9 @@
 - Prefer ownership filtering in queries rather than fetch-then-check patterns.
 - Use Drizzle or bound parameters only.
 - For new features that need persisted data, design the DB schema before backend implementation.
-- Do not create or apply D1/Drizzle migrations manually. Use `yarn mig:local` for local schema migration work; use `yarn mig:remote` only when explicitly asked to apply remote migrations.
+- Do not create or apply D1/Drizzle migrations manually. Use `yarn mig:local` for local schema migration work; `yarn mig:remote` requires explicit confirmation immediately before running it (Safety Guardrails in `AGENTS.md`), every time, regardless of prior instruction.
 - Do not run `drizzle-kit generate`, `drizzle-kit push`, or `wrangler d1 migrations apply` directly unless the repository instructions are changed.
-- For query-heavy or aggregation-heavy backend changes, run `dowin-performance-check` before considering the work complete.
+- For query-heavy or aggregation-heavy backend changes, run `dowin-backend-performance-check` before considering the work complete.
 
 ## Verification Defaults
 

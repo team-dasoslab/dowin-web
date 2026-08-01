@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Frontend UI"
+  short_description: "Dowin page/component UI and visual-state stage"
+  default_prompt: "Use $dowin-frontend-ui to build or change Dowin page/component UI and visual states before API wiring."
+
+policy:
+  allow_implicit_invocation: true

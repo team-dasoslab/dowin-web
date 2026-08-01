@@ -7,7 +7,7 @@ description: Use this skill when adding or changing Dowin backend APIs, route ha
 
 ## Overview
 
-Use this skill for backend work in `src/app/api`, `src/domain`, `src/lib`, and related DB-backed logic.
+Use this skill for backend work in `src/app/api`, `src/domain`, `src/lib`, and related DB-backed logic. This skill assumes `dowin-backend-api-spec` has already fixed the OpenAPI contract and, if needed, the DB schema — it does not redo that step.
 
 Read only the files needed for the current task.
 
@@ -15,10 +15,8 @@ Start with:
 
 1. `references/backend-rules.md`
 2. the matching domain doc
-3. `docs/dev/common/2026.03.09-database-schema.md` when the task adds a new feature or changes persisted data
-4. the current implementation
-5. `.agents/skills/performance-check/SKILL.md` when the task changes heavy reads, aggregation, loops, or query volume
-6. related common docs only when needed
+3. the current implementation
+4. related common docs only when needed
 
 If docs conflict with code, verify the implementation and trust the current code path.
 
@@ -41,9 +39,9 @@ If docs conflict with code, verify the implementation and trust the current code
 - Keep backend date storage and API-facing canonical date values in UTC unless a domain doc explicitly says otherwise.
 - Schema or persisted-data changes must use repository migration scripts, not manual SQL application, ad-hoc Drizzle commands, or direct Wrangler migration commands.
   - Local schema migration flow: `yarn mig:local`
-  - Remote apply flow when explicitly needed: `yarn mig:remote`
+  - Remote apply flow: `yarn mig:remote` — production-affecting; get explicit confirmation immediately before running it, every time (see `AGENTS.md` Safety Guardrails)
   - Do not run `drizzle-kit generate`, `drizzle-kit push`, or `wrangler d1 migrations apply` directly unless the repository instructions are changed
-- Backend changes that add heavy aggregation, repeated scans, or broader DB reads should include `dowin-performance-check` before completion.
+- Backend changes that add heavy aggregation, repeated scans, or broader DB reads should include `dowin-backend-performance-check` before completion.
 - When creating commits, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `feat|fix|docs|chore|refactor|style` with the format `<type>: <변경 요약>`.
 
 For detailed file paths and doc priorities, read `references/backend-rules.md`.
@@ -52,8 +50,8 @@ For detailed file paths and doc priorities, read `references/backend-rules.md`.
 
 When navigating the backend codebase with ambiguous inputs, use these rules instead of broad workspace searches:
 
-- **API Contracts:** Always start by searching the `operationId` or path in `src/api-spec/openapi.yaml`.
-- **Database Schema:** Search for table or column names in `src/db/schema.ts` and `docs/dev/common/2026.03.09-database-schema.md` first.
+- **API Contracts:** the contract is already fixed by `dowin-backend-api-spec`; search `operationId` or path in `src/api-spec/openapi.yaml` to confirm what to implement, not to design it.
+- **Database Schema:** already fixed by `dowin-backend-api-spec`; search table/column names in `src/db/schema.ts` for implementation reference.
 - **Business Logic:** Look inside `src/domain/<domain>/services/`.
 - **Route Handlers:** Search HTTP paths in `src/app/api/`.
 
@@ -61,41 +59,9 @@ When navigating the backend codebase with ambiguous inputs, use these rules inst
 
 ### 1. Confirm the target domain
 
-Open the matching domain doc and extract business rules, error cases, auth rules, and validation rules. Also inspect existing code in the same domain before changing structure.
+Open the matching domain doc and extract business rules, error cases, auth rules, and validation rules. Also inspect existing code in the same domain before changing structure. The API contract and DB schema (if any) are already fixed by `dowin-backend-api-spec` — verify they match what you're about to implement rather than redesigning them here.
 
-If the task adds or changes an API, update `src/api-spec/openapi.yaml` first so the contract is explicit before implementation.
-
-If the task is a new feature and needs new persisted data or changed relational rules, design the schema before backend implementation. That means reviewing `docs/dev/common/2026.03.09-database-schema.md`, `src/db/schema.ts`, related storage code, and the needed constraints before writing route/service code.
-
-### 2. Design schema first when the feature needs it
-
-For a new feature with new tables, columns, relations, or constraints, prefer this order:
-
-1. domain rules
-2. API contract when relevant
-3. DB schema design
-4. validation
-5. service
-6. storage
-7. route handler
-
-Schema design here includes:
-
-- table and column shape
-- nullable vs required fields
-- unique constraints and indexes
-- foreign keys and cascade behavior
-- ownership and workspace boundaries implied by the data model
-
-If the schema changes, reflect it in `src/db/schema.ts` first and then use:
-
-```bash
-yarn mig:local
-```
-
-Do not manually create or apply migration files with direct SQL/Drizzle/Wrangler commands. Use `yarn mig:remote` only when the task explicitly requires applying the migration remotely.
-
-### 3. Start with tests when the change is backend behavior
+### 2. Start with tests when the change is backend behavior
 
 Follow Red -> Green -> Refactor when feasible.
 
@@ -109,26 +75,24 @@ Follow Red -> Green -> Refactor when feasible.
   - cookie/header handling
   - file upload, streaming, redirects, or route-only integration behavior
 
-### 4. Implement in the existing layers
+### 3. Implement in the existing layers
 
-Preferred flow:
+Preferred flow (contract and schema are already fixed):
 
-1. OpenAPI contract
-2. DB schema when needed
-3. validation
-4. service
-5. storage
-6. route handler
-7. shared lib helpers only if needed
+1. validation
+2. service
+3. storage
+4. route handler
+5. shared lib helpers only if needed
 
-### 5. Keep repository conventions
+### 4. Keep repository conventions
 
 - preserve Korean error messages and existing error codes
 - match the documented response shapes
 - use session-cookie auth checks consistently
 - keep ownership checks in query conditions where possible
 
-### 6. Run verification
+### 5. Run verification
 
 Use the smallest useful verification set first, then broaden:
 
@@ -140,25 +104,7 @@ yarn lint
 yarn eslint <changed-files>
 ```
 
-If the task changes API contracts, also update:
-
-```bash
-yarn gen:api
-```
-
-If the task changes the DB schema, use:
-
-```bash
-yarn mig:local
-```
-
-If browser-based Storybook verification matters, run separately:
-
-```bash
-yarn test:storybook --run
-```
-
-### 7. Check performance when the path is sensitive
+### 6. Check performance when the path is sensitive
 
 If the backend change affects expensive reads or server-side computation, do not stop at correctness only. Review the changed path in code and check for:
 
@@ -167,7 +113,7 @@ If the backend change affects expensive reads or server-side computation, do not
 - avoidable per-member or per-measure nested loops in aggregation code
 - unnecessary data loading when only part of the shape is needed
 
-Start with `dowin-performance-check` when the path is sensitive.
+Start with `dowin-backend-performance-check` when the path is sensitive.
 
 Typical triggers:
 
@@ -176,15 +122,13 @@ Typical triggers:
 - new list endpoints over workspace-wide data
 - schema changes that can alter query cost or index needs
 
-### 8. Commit order
+### 7. Commit order
 
 When backend work is committed in multiple steps, keep the repository commit format above and prefer this order:
 
-1. API spec
-2. schema
-3. tests
-4. implementation
-5. docs
+1. tests
+2. implementation
+3. docs
 
 This does not change the implementation workflow above.
 You should still design and write tests before or alongside implementation when the behavior change warrants it.
@@ -192,8 +136,7 @@ The rule here is about how to split and order commits so review stays clear.
 
 ## Backend Checklist
 
-- If this is a new or changed API, was `src/api-spec/openapi.yaml` updated first?
-- If this feature needs persisted data, was the schema designed before backend implementation?
+- Does the implementation match the contract and schema `dowin-backend-api-spec` already fixed (not redesign them)?
 - Does the change match the domain business rules?
 - Is Zod validation applied strictly to all external inputs (API Payload, Query, etc.)?
 - Are auth and ownership checks correct?
@@ -219,8 +162,8 @@ focus_list:
 - [스킵 가능 파일]: 이유 (예: 테스트 보일러플레이트, 단순 타입 추가 등)
 failure_categories:
 - ...
-return_to: planning|backend|frontend|quality-check
-next_step: 다음 단계 (frontend 또는 quality-check)
+return_to: planning|backend-api-spec|backend|frontend-ui|backend-quality-check
+next_step: dowin-backend-quality-check → dowin-commit → dowin-frontend-ui (또는 backend-only면 dowin-release)
 ```
 
 Use these backend-oriented categories when relevant:
@@ -236,11 +179,11 @@ Use these backend-oriented categories when relevant:
 Return rules:
 
 - `pass`
-  - backend contract, implementation, and relevant verification are aligned. Route to `frontend` if UI integration is needed, or `quality-check` if the task is backend-only.
+  - implementation and relevant verification are aligned with the contract/schema. Route to `dowin-backend-quality-check` next.
 - `needs_revision`
   - the backend path is close, but fixes are needed before handoff
 - `fail`
-  - the current approach should not move forward; return to `planning` when scope or contract is wrong, otherwise return to `backend`
+  - the current approach should not move forward; return to `backend-api-spec` when the contract/schema itself is wrong, `planning` when the scope is wrong, otherwise return to `backend`
 
 ## When To Update Docs
 
@@ -252,4 +195,4 @@ Update the relevant docs when backend behavior or contracts changed materially:
 
 ## Next Step
 
-After backend behavior is implemented and verified, move to `dowin-frontend` to connect the user-facing flow to the finished backend path. If the task is purely backend and requires no UI changes, move directly to `dowin-quality-check`.
+After backend behavior is implemented and verified, run `dowin-backend-quality-check` (and `dowin-backend-performance-check`/`dowin-backend-security-check` when relevant) scoped to this stage's changes. Once those pass, run `dowin-commit` to commit this stage's changes only (this is the second of four commit checkpoints in the chain), then move to `dowin-frontend-ui` to connect the user-facing flow. If the task is purely backend and requires no UI changes, move to `dowin-release` after this commit.
