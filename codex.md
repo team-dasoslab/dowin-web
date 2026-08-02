@@ -9,6 +9,27 @@ Claude Code에 익숙한 흐름을 최대한 유지하되, 이 저장소의 실�
 
 ---
 
+## 1.5. 안전 규칙 (Hard Rules) — 절대 예외 없음
+
+- **`.env`, `.env.*`, `.dev.vars`, `.dev.vars.*` 등 시크릿/자격증명 파일은 절대 읽지 않는다.** `cat`/`head`/`tail`/`grep`, 에디터로 열기 등 어떤 방식으로도 금지. 예외는 저장소에 커밋된 템플릿 `.env.example`/`.dev.vars.example`뿐이다. 실제 시크릿 값이 필요해 보이면 파일을 열지 말고 사용자에게 직접 값을 요청한다. (Claude Code는 `.claude/settings.json`의 `permissions.deny`로 이걸 기계적으로도 막아두었지만, Codex/Antigravity에는 그런 기계적 차단이 없으므로 이 프로세 규칙이 유일한 방어선이다.)
+- **프로덕션/공유 원격 환경에 영향을 주는 명령은 실행 직전에 매번 명시적 확인을 받는다.** 최소한 아래를 포함한다:
+  - `yarn mig:remote` (원격 D1 마이그레이션)
+  - `yarn deploy` (Cloudflare Worker 배포)
+  - `--remote` 또는 라이브 환경을 대상으로 하는 모든 `wrangler` 명령
+  - 공유 원격으로의 `bd dolt push`, `git push`
+  - 대화 앞부분의 일반적인 "진행해도 돼" 승인은 이 명령들에는 이어지지 않는다 — 그 명령을 실행하기 직전에 다시 확인받는다.
+  - `yarn mig:local`, 로컬 개발 서버 등 로컬 전용 작업은 이 추가 확인이 필요 없다.
+
+---
+
+## 1.6. 공백 임의 처리 금지 (No Silent Gap-Filling) — 절대 예외 없음
+
+요구사항, 기획, 설계, API 계약 중 애매하거나 확정되지 않은 부분, 또는 유효한 구현 방식이 두 가지 이상 존재하는 지점(예: 오프셋 vs 커서 페이지네이션, 필터/정렬 방식, 캐시/무효화 전략, 에러 처리 형태, UI 인터랙션 패턴)을 발견하면, Codex 스스로 하나를 골라서 조용히 진행하지 않는다. 무엇이 미확정 상태인지 명시적으로 말하고, 진행 전에 사용자와 논의한다.
+
+이 규칙은 인테이크·기획 단계뿐 아니라 체인의 모든 단계에 적용된다 — `backend-api-spec`, `backend`, `frontend-ui`, `frontend-api-connect` 구현 시점의 설계 갈림길도 포함한다. 각 스킬은 이를 체크리스트 항목(`undecided_design_point`)으로 명시하고 있으며, 미확정 설계 지점은 다른 체크리스트 실패 항목과 동일하게 취급한다 — Codex 자신의 판단으로 해소하지 않는다.
+
+---
+
 ## 2. 문서 우선순위
 
 Codex는 아래 순서로 사실상 Source of Truth를 판단한다.
@@ -65,10 +86,11 @@ Codex는 아래 순서로 사실상 Source of Truth를 판단한다.
 - 새 문서를 파편적으로 늘리지 않고, 가능하면 기존 핵심 문서를 갱신한다.
 - 문서 상단 frontmatter를 유지한다.
 - 기획 완료 전 개발로 성급히 넘어가지 않는다.
+- **요구사항 정리 → 분석 → PRD 작성까지 끝나야 완료로 본다.** PRD 없이 backend-api-spec/frontend-ui로 넘어가지 않는다.
 
 #### 프론트엔드
 
-- `.agents/skills/frontend/SKILL.md`를 따른다.
+- UI는 `.agents/skills/frontend-ui/SKILL.md`, 데이터 연동은 `.agents/skills/frontend-api-connect/SKILL.md`를 따른다.
 - `src/components/ui` 공통 컴포넌트를 우선 사용한다.
 - `Button` 안에 `Link`를 넣을 때는 `asChild`를 사용한다.
 - React 19 기준으로 `forwardRef`를 새로 도입하지 않는다.
@@ -78,7 +100,7 @@ Codex는 아래 순서로 사실상 Source of Truth를 판단한다.
 
 #### 백엔드
 
-- `.agents/skills/backend/SKILL.md`를 따른다.
+- 계약/스키마는 `.agents/skills/backend-api-spec/SKILL.md`, 구현은 `.agents/skills/backend/SKILL.md`를 따른다.
 - 기본 순서는 Red -> Green -> Refactor다.
 - Route Handler는 실제 구현 파일인 `src/lib/with-error-handler.ts` 패턴을 사용한다.
 - 입력 검증은 Zod로 처리한다.
@@ -114,7 +136,7 @@ yarn tsc --noEmit
 - 개발 서버는 `yarn dev`
 - UI 확인은 `yarn storybook`
 - API 타입 생성은 `yarn gen:api`
-- D1 스키마 반영은 `yarn mig:local`, 원격은 `yarn mig:remote`
+- D1 스키마 반영은 `yarn mig:local`. 원격은 `yarn mig:remote` — §1.5 안전 규칙에 따라 실행 직전 매번 명시적 확인 필요
 - D1/Drizzle migration은 수동 생성/수동 적용하지 않는다. `drizzle-kit generate`, `drizzle-kit push`, `wrangler d1 migrations apply` 직접 실행 대신 저장소 스크립트를 사용한다.
 
 ### Phase 2. Codex 명령 규칙 고정
@@ -215,7 +237,7 @@ API 스펙 변경:
 DB 변경:
 
 - `yarn mig:local` 기준으로 migration 생성/적용 가능 여부 확인
-- 원격 migration은 명시 요청이 있을 때만 `yarn mig:remote` 사용
+- 원격 migration(`yarn mig:remote`)은 §1.5 안전 규칙에 따라 실행 직전 매번 명시적 확인을 받은 뒤에만 사용
 - 스키마와 Storage 레이어 정합성 확인
 
 ---
@@ -247,24 +269,37 @@ Claude Code처럼 포괄적으로 요청해도 되지만, Codex에는 아래 형
 
 ### 어떤 요청이 어떤 스킬을 타는가
 
-- `dowin-backend`
-  - API 추가, 인증/세션 수정, 서비스/스토리지 수정, 백엔드 버그 수정
-- `dowin-frontend`
-  - 페이지 UI 변경, Orval 연동, Query invalidation, 공통 UI/Storybook 작업
+체인은 항상 `dowin-intake`에서 시작해 `dowin-release`로 끝난다 (오타 수정 같은 완전히 명시된 trivial 변경은 예외). 별도 오케스트레이터 스킬은 없다 — 라우팅은 `dowin-intake`가 담당한다.
+
+- `dowin-intake`
+  - 새 기능/모호한 요청의 첫 진입점. Linear 이슈 확인, 타당성/타이밍 논의, beads epic 생성, 작업 브랜치 생성
 - `dowin-planning`
-  - 기획 문서 작성, 범위 조정, 온보딩 문서 정리, 구현 전 액션 아이템 정리
-- `dowin-quality-check`
-  - 테스트 실행, 품질 게이트 점검, 회귀 위험 검토, 배포 전 검증
-- `dowin-security-check`
-  - 앱 코드의 auth, 인가, ownership, validation 보안 검토
+  - 요구사항 정리 → 분석 → PRD 작성. PRD 없이는 다음 단계로 못 넘어감
+- `dowin-backend-api-spec`
+  - OpenAPI 계약 확정 + DB 스키마 설계 (구현 전에 반드시 먼저)
+- `dowin-backend`
+  - 계약/스키마가 이미 고정된 상태에서 validation/service/storage/route 구현, 백엔드 버그 수정
+- `dowin-backend-quality-check` / `dowin-backend-performance-check` / `dowin-backend-security-check`
+  - 백엔드 구현 직후 실행. 성능은 aggregation/쿼리 폭이 민감할 때, 보안은 auth/인가/ownership이 걸릴 때
+- `dowin-frontend-ui`
+  - 페이지/컴포넌트 UI, 시각 상태(loading/empty/error), Storybook — 실제 데이터 연동 전
+- `dowin-frontend-api-connect`
+  - Orval 훅, TanStack Query, invalidation/toast/rollback 연동
+- `dowin-frontend-quality-check` / `dowin-frontend-performance-check` / `dowin-frontend-security-check`
+  - 프론트 연동 직후 실행. 성능은 payload/렌더/번들 크기가 민감할 때, 보안은 보호된 액션이 노출될 때
+- `dowin-commit`
+  - `backend-api-spec`, `backend`, `frontend-ui`, `frontend-api-connect` 네 스테이지가 각각 자신의 quality(+performance/security) 체크를 통과한 직후 호출. 한 작업당 커밋이 최소 4번 발생하며(한 스테이지 안에 여러 의도가 섞이면 그만큼 더 쪼갠다), 마지막에 한 번에 몰아서 커밋하지 않는다. 커밋 메시지에 여러 항목을 나열하는 대신 그 각각을 별도 커밋으로 쪼갠다. `docs/planning/2026.04.09-commit-convention.md`를 매번 참조한다.
+- `dowin-release`
+  - 모든 선행 단계가 pass일 때만: PR 생성(템플릿 준수) → squash merge → main으로 복귀/pull → 브랜치 삭제 → Linear/beads 종료
 - `dowin-harness-security-check`
   - AGENTS.md, codex.md, 로컬 스킬/프롬프트의 하네스 보안 검토
 
 검증 규칙:
 
-- 일반 기능 변경은 `dowin-quality-check`를 기본으로 본다.
-- 앱 코드의 auth/인가/ownership/validation이 바뀌면 `dowin-security-check`를 추가한다.
-- `AGENTS.md`, `codex.md`, `.agents/skills/**` 같은 하네스 파일이 바뀌면 완료 전에 `dowin-harness-security-check`를 추가한다.
+- 일반 기능 변경은 해당 도메인의 `*-quality-check`를 기본으로 본다.
+- 앱 코드의 auth/인가/ownership/validation이 바뀌면 해당 도메인의 `*-security-check`를 추가한다.
+- `AGENTS.md`, `codex.md`, `.agents/skills/**`, `.claude/skills/**` 같은 하네스 파일이 바뀌면 완료 전에 `dowin-harness-security-check`를 추가한다.
+- `dowin-release`는 모든 관련 quality/performance/security 게이트가 `pass`이기 전에는 실행하지 않는다.
 
 ---
 

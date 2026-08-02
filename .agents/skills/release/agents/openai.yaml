@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Release"
+  short_description: "Dowin PR/squash-merge/cleanup/close-out stage"
+  default_prompt: "Use $dowin-release to open a PR, squash-merge to main, clean up the branch, and close Linear/beads tracking once every prior stage has passed."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Intake"
+  short_description: "Dowin Linear/validity gate before planning"
+  default_prompt: "Use $dowin-intake to confirm the Linear issue and validity/timing of a Dowin request before entering the planning/implementation chain."
+
+policy:
+  allow_implicit_invocation: true

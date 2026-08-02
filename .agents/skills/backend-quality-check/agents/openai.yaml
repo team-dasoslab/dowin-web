@@ -1,0 +1,7 @@
+interface:
+  display_name: "Dowin Backend Quality Check"
+  short_description: "Dowin backend-only quality gate"
+  default_prompt: "Use $dowin-backend-quality-check to verify a Dowin backend change's business rules, auth/ownership safety, and regression risk."
+
+policy:
+  allow_implicit_invocation: true

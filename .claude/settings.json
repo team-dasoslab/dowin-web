@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(./.dev.vars)",
+      "Read(./.dev.vars.*)",
+      "Read(**/.dev.vars)",
+      "Read(**/.dev.vars.*)",
+      "Bash(cat .env*)",
+      "Bash(cat .dev.vars*)",
+      "Bash(cat *.env)",
+      "Bash(head .env*)",
+      "Bash(head .dev.vars*)",
+      "Bash(tail .env*)",
+      "Bash(tail .dev.vars*)"
+    ],
+    "allow": [
+      "Read(./.env.example)",
+      "Read(./.dev.vars.example)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "bd prime --hook-json",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ]
+  }
+}

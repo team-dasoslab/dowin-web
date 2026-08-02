@@ -5,6 +5,7 @@ import { TeamDashboardMember } from "@/api/generated/dowin.schemas";
 import { getSafeImageFilename } from "@/app/[locale]/(protected)/[workspaceId]/dashboard/_lib/scoreboard-image";
 import { useToast } from "@/context/ToastContext";
 import { useTranslations } from "next-intl";
+import { isNativeApp, share } from "@/lib/bridge";
 
 type UseScoreboardImageExportInput = {
   member: TeamDashboardMember | null;
@@ -27,7 +28,7 @@ export function useScoreboardImageExport({
 
   useEffect(() => {
     const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
-    setIsShareSupported(typeof navigator !== "undefined" && !!navigator.share && isTouchDevice);
+    setIsShareSupported(isNativeApp() || (typeof navigator !== "undefined" && !!navigator.share && isTouchDevice));
   }, []);
 
   const saveImage = async () => {
@@ -53,6 +54,13 @@ export function useScoreboardImageExport({
         nickname: member.nickname,
         weekStart,
       });
+
+      if (isNativeApp()) {
+        await share({ url: dataUrl });
+        showToast("success", t("scoreboardImageSaved"));
+        onSuccess?.();
+        return;
+      }
 
       // iOS/Mobile: Try Web Share API first so it can be saved to Photos or shared
       try {
