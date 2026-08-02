@@ -56,7 +56,11 @@ export function useScoreboardImageExport({
       });
 
       if (isNativeApp()) {
-        await share({ url: dataUrl });
+        await share({ 
+          url: dataUrl,
+          title: t("scoreboardImageTitle"),
+          message: ""
+        });
         showToast("success", t("scoreboardImageSaved"));
         onSuccess?.();
         return;
