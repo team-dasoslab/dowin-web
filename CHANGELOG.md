@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.11](https://github.com/team-dasoslab/dowin-web/compare/v1.14.10...v1.14.11) (2026-08-02)
+
+
+### Bug Fixes
+
+* 모바일 앱 환경 점수판 이미지 공유하기 버그 수정 ([#258](https://github.com/team-dasoslab/dowin-web/issues/258)) ([bf98b1d](https://github.com/team-dasoslab/dowin-web/commit/bf98b1dad556542bf04dba36975ef2ccece29acf))
+
 ## [1.14.10](https://github.com/team-dasoslab/dowin-web/compare/v1.14.9...v1.14.10) (2026-07-25)
 
 
