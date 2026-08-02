@@ -33,6 +33,8 @@ Open the matching domain doc and extract business rules, error cases, auth rules
 
 Update `src/api-spec/openapi.yaml` first so the contract is explicit before any implementation. Cover request/response shapes, error responses, and auth requirements.
 
+If any point in the contract has more than one valid design (e.g. offset vs. cursor pagination, filter/sort semantics, response envelope shape, error code granularity) and nothing in the request, domain doc, or existing codebase convention already settles it, stop and ask the user before writing it into `openapi.yaml`. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+
 ### 3. Design the schema when the feature needs it
 
 For a new feature with new tables, columns, relations, or constraints:
@@ -61,6 +63,7 @@ yarn gen:api
 
 - Was `src/api-spec/openapi.yaml` updated before any implementation?
 - If persisted data is involved, was the schema designed (table/column/constraint/index/ownership) before implementation?
+- Did every contract/schema point with more than one valid design get decided by the user instead of picked silently?
 - Was `yarn mig:local` used instead of manual migration commands?
 - Was `yarn gen:api` run after a contract change?
 
@@ -83,6 +86,7 @@ Use these categories when relevant:
 - `api_contract_mismatch`
 - `schema_design_gap`
 - `doc_impl_drift`
+- `undecided_design_point`
 
 Return rules:
 
