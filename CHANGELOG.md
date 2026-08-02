@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.14.12](https://github.com/team-dasoslab/dowin-web/compare/v1.14.11...v1.14.12) (2026-08-02)
+
+
+### Bug Fixes
+
+* 네이티브 앱 공유 시 Base64 문자열 노출 방지 ([5a8efe4](https://github.com/team-dasoslab/dowin-web/commit/5a8efe4bf5bd8afcac126f428a3e1ea238e5a6a2))
+
 ## [1.14.11](https://github.com/team-dasoslab/dowin-web/compare/v1.14.10...v1.14.11) (2026-08-02)
 
 
