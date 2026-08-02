@@ -37,6 +37,8 @@ Decide whether the change belongs in `src/components/ui` (shared primitives) or 
 
 ### 2. Implement with the existing visual language
 
+If a visual/interaction point has more than one valid approach (e.g. modal vs. inline expansion, how an empty/error state is presented, confirmation-before-destructive-action pattern) and nothing already settles it, stop and ask the user before implementing it. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+
 - preserve the current Dowin aesthetic and utility patterns
 - keep loading, empty, error, and success states explicit (placeholder/mock data is fine at this stage — real wiring comes next in `dowin-frontend-api-connect`)
 - prefer keeping skeleton/empty/similar fallback UIs as page-local helpers in the same file instead of splitting into separate top-level files too early
@@ -74,6 +76,7 @@ yarn test:storybook --run
 - Are all static assets inside `src/app` optimized under 200KB?
 - Was mobile layout considered?
 - If shared UI changed, was Storybook updated?
+- Did every visual/interaction point with more than one valid approach get decided by the user instead of picked silently?
 
 ## Output Contract
 
@@ -93,7 +96,7 @@ return_to: planning|backend-api-spec|frontend-ui
 next_step: dowin-frontend-quality-check → dowin-commit → dowin-frontend-api-connect
 ```
 
-Use these categories when relevant: `state_handling_gap`, `missing_test`, `doc_impl_drift`.
+Use these categories when relevant: `state_handling_gap`, `missing_test`, `doc_impl_drift`, `undecided_design_point`.
 
 Return rules:
 

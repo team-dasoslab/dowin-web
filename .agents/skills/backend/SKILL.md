@@ -85,6 +85,8 @@ Preferred flow (contract and schema are already fixed):
 4. route handler
 5. shared lib helpers only if needed
 
+If an implementation point below the already-fixed contract/schema still has more than one valid approach (e.g. retry/backoff behavior, ordering guarantees, edge-case handling not spelled out in the domain doc) and nothing already settles it, stop and ask the user before implementing it. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+
 ### 4. Keep repository conventions
 
 - preserve Korean error messages and existing error codes
@@ -143,6 +145,7 @@ The rule here is about how to split and order commits so review stays clear.
 - Are `apiSuccess` and `apiError` used consistently?
 - Is storage logic isolated from route code?
 - Are prepared statements or Drizzle-safe bindings used?
+- Did every implementation point with more than one valid approach get decided by the user instead of picked silently?
 - If the changed path is aggregation-heavy or query-heavy, was a performance review done?
 - Did `yarn test --run <changed-test-file>` or `yarn test:backend`, `yarn tsc --noEmit`, and `yarn lint` run for the backend change?
 
@@ -175,6 +178,7 @@ Use these backend-oriented categories when relevant:
 - `auth_gap`
 - `ownership_gap`
 - `doc_impl_drift`
+- `undecided_design_point`
 
 Return rules:
 

@@ -42,6 +42,8 @@ If contracts changed, regenerate the client first.
 
 ### 2. Wire hooks into the UI
 
+If a data-fetching/state-handling point has more than one valid approach (e.g. optimistic update vs. wait-for-response, cache/invalidation strategy, retry behavior on mutation failure) and nothing already settles it, stop and ask the user before implementing it. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+
 - move mutation wiring, invalidation, toast calls, and navigation effects into domain hooks (`use...Mutation`)
 - move form state and validation into `use...Form` hooks
 - keep forms and buttons disabled during pending submissions when needed
@@ -76,6 +78,7 @@ yarn test --run
 - Is Zod validation applied strictly to all external inputs (form data, URL searchParams)?
 - Were changed/affected frontend tests run?
 - If API contracts changed, was `yarn gen:api` run?
+- Did every data-fetching/state-handling point with more than one valid approach get decided by the user instead of picked silently?
 
 ## Output Contract
 
@@ -95,7 +98,7 @@ return_to: planning|backend-api-spec|frontend-ui|frontend-api-connect
 next_step: dowin-frontend-quality-check → dowin-commit → dowin-release
 ```
 
-Use these categories when relevant: `api_contract_mismatch`, `state_handling_gap`, `rollback_gap`, `missing_test`, `doc_impl_drift`.
+Use these categories when relevant: `api_contract_mismatch`, `state_handling_gap`, `rollback_gap`, `missing_test`, `doc_impl_drift`, `undecided_design_point`.
 
 Return rules:
 
