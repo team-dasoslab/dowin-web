@@ -20,8 +20,8 @@ If docs conflict with code, verify the implementation and trust the current code
 
 ## JIT Search Strategy
 
-- **API Contracts:** search the `operationId` or path in `src/api-spec/openapi.yaml` first.
-- **Database Schema:** search table/column names in `src/db/schema.ts` and `docs/dev/common/2026.03.09-database-schema.md` first.
+- **API Contracts:** search the `operationId` or path in `src/api-spec/openapi.yaml` first. (Not code — codegraph doesn't index YAML.)
+- **Database Schema:** `codegraph_explore` the table/column name first — falls back to `src/db/schema.ts` and `docs/dev/common/2026.03.09-database-schema.md` if not yet defined.
 
 ## Workflow
 
