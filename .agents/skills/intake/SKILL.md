@@ -55,6 +55,8 @@ bd create --title="<짧은 제목>" --type=epic --priority=<0-4> --notes="linear
 
 Each downstream stage that actually runs creates its own child issue under this epic (`bd create ... --parent=<epic-id>`), claims it on entry, and closes it when that stage's Output Contract reports `pass`. This is what lets progress survive a session reset or a switch between Claude Code, Codex, or another LLM — `bd show <epic-id>` shows exactly which stages are done.
 
+**CRITICAL SANDBOX RULE**: If `bd create` fails due to sandbox blocks, permission errors, or environment issues, **YOU MUST STOP** and ask the user to execute the command for you. Do not silently skip it and proceed to branch creation or implementation.
+
 If the work does not proceed (held or rejected), do not create a beads issue — record the discussion outcome in the conversation only.
 
 ### 5. Create and switch to the work branch
