@@ -48,12 +48,15 @@ For detailed file paths and doc priorities, read `references/backend-rules.md`.
 
 ## JIT Search Strategy
 
-When navigating the backend codebase with ambiguous inputs, use these rules instead of broad workspace searches:
+When navigating the backend codebase with ambiguous inputs, call `codegraph_explore`
+first for anything that's code — it returns source plus callers/callees in one call.
+Use the path-based rules below only for the one non-code target (`openapi.yaml`) or
+when a symbol doesn't exist yet (new code, so codegraph has nothing to return).
 
-- **API Contracts:** the contract is already fixed by `dowin-backend-api-spec`; search `operationId` or path in `src/api-spec/openapi.yaml` to confirm what to implement, not to design it.
-- **Database Schema:** already fixed by `dowin-backend-api-spec`; search table/column names in `src/db/schema.ts` for implementation reference.
-- **Business Logic:** Look inside `src/domain/<domain>/services/`.
-- **Route Handlers:** Search HTTP paths in `src/app/api/`.
+- **API Contracts:** the contract is already fixed by `dowin-backend-api-spec`; search `operationId` or path in `src/api-spec/openapi.yaml` to confirm what to implement, not to design it. (Not code — codegraph doesn't index YAML.)
+- **Database Schema:** already fixed by `dowin-backend-api-spec`; `codegraph_explore` the table/column name — falls back to `src/db/schema.ts` if new.
+- **Business Logic:** `codegraph_explore` the domain/service name — falls back to browsing `src/domain/<domain>/services/` if it doesn't exist yet.
+- **Route Handlers:** `codegraph_explore` the HTTP path or handler name — falls back to `src/app/api/` if new.
 
 ## Workflow
 

@@ -70,7 +70,9 @@ _Add your build and test commands here_
 
 ## Architecture Overview
 
-_Add a brief overview of your project architecture_
+This repository is indexed by CodeGraph (`.codegraph/`). Prefer `codegraph_explore`
+over grep/Read to locate or understand code — see `AGENTS.md`'s "Code Navigation"
+section for the full rule and per-skill fallback list.
 
 ## Conventions & Patterns
 
