@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.0](https://github.com/team-dasoslab/dowin-web/compare/v1.14.12...v1.15.0) (2026-08-04)
+
+
+### Features
+
+* 랜딩페이지 메타데이터/구조화데이터 적용 및 FAQ 개선 ([#263](https://github.com/team-dasoslab/dowin-web/issues/263)) ([dca7741](https://github.com/team-dasoslab/dowin-web/commit/dca7741e46efe5377e5f5376d1643e7c03470bea))
+
 ## [1.14.12](https://github.com/team-dasoslab/dowin-web/compare/v1.14.11...v1.14.12) (2026-08-02)
 
 
