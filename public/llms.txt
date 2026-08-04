@@ -1,0 +1,19 @@
+# Dowin
+
+> Dowin is a goal-execution service for individuals and teams: focus on one most important goal, define numeric success criteria, break it into weekly action items, and track execution on a shared scoreboard. Pricing starts at ₩1,000 per person, per month. Operated by Dasoslab (Republic of Korea).
+
+## Product
+
+- [Home (Korean)](https://dowin.app/ko): Product overview, problem/solution framing, execution loop, pricing, and FAQ.
+- [Home (English)](https://dowin.app/en): English version of the above.
+
+## Legal
+
+- [Privacy Policy](https://dowin.app/ko/privacy): What personal data Dowin collects, why, and how long it is retained.
+- [Terms of Service](https://dowin.app/ko/terms): Terms governing use of the Dowin service.
+- [Billing & Refund Policy](https://dowin.app/ko/billing-policy): Pricing, billing cycle, cancellation, and refund rules for the Basic plan.
+
+## Notes
+
+- Everything under Dowin except the pages above requires an authenticated session (dashboards, scoreboards, workspace settings) and is not meant to be indexed or cited.
+- Last reviewed: 2026-08-04. Re-check quarterly or after a landing-page content change.
