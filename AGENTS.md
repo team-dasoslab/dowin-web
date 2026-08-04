@@ -21,13 +21,23 @@ Any non-trivial request (not a typo fix or a single, fully-specified edit) start
 
 ## Code Navigation
 
-This repository is indexed by CodeGraph (`.codegraph/` at the repo root). Before
-grepping, globbing, or reading files to locate or understand code, call
-`codegraph_explore` (MCP tool `codegraph`, or `codegraph explore "<question>"` in a
-shell for Codex/Antigravity) with the symbol name, file, or a natural-language
-question — one call returns verbatim source plus caller/callee relationships,
-including dynamic-dispatch hops grep can't follow. Treat its output as an
-already-performed Read; don't re-read a file it already returned.
+This repository is indexed by CodeGraph (`.codegraph/` at the repo root).
+**`codegraph_explore` is mandatory, not a preference: it MUST be the first move
+for any question about locating or understanding code** — a symbol, a file, a
+flow, a bug, "where/what is X" — call it (MCP tool `codegraph`, or
+`codegraph explore "<question>"` in a shell for Codex/Antigravity) with the
+symbol name, file, or a natural-language question before touching `grep`,
+`find`, `glob`, or `Read` for that purpose. One call returns verbatim source
+plus caller/callee relationships, including dynamic-dispatch hops grep can't
+follow. Treat its output as an already-performed Read; don't re-read a file it
+already returned.
+
+**Reaching for `grep`/`find`/`Read`/a fresh sub-agent as the first move on
+something CodeGraph indexes is a rule violation, not a style choice** — it
+redoes work the index already did, misses the dynamic-dispatch edges grep
+can't see, and costs more tokens for a worse answer. This applies mid-task too:
+if you're about to grep out of habit while already deep in an edit, stop and
+run `codegraph_explore` instead.
 
 Fall back to path-based search only for what CodeGraph doesn't index — non-code
 contracts (`src/api-spec/openapi.yaml`), markdown docs, config files — or to
