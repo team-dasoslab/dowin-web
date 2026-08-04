@@ -1,7 +1,31 @@
 {
   "Metadata": {
     "title": "Dowin",
-    "description": "Focus on your most important goals."
+    "description": "Focus on your most important goals.",
+    "home": {
+      "title": "Dowin — Goal Execution for Teams and Individuals",
+      "description": "Focus on one most important goal, track success criteria, and check weekly execution on a scoreboard. Team goal management starting at ₩1,000 per person, per month."
+    },
+    "login": {
+      "title": "Log in",
+      "description": "Log in to Dowin and check this week's goal execution."
+    },
+    "accountRecovery": {
+      "title": "Account Recovery",
+      "description": "Verify your account with a recovery code and reset your password."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How Dowin collects, uses, and retains personal information."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "description": "The basic terms and conditions for using the Dowin service."
+    },
+    "billingPolicy": {
+      "title": "Billing & Refund Policy",
+      "description": "Pricing, billing cycle, cancellation, and refund terms for Dowin Basic."
+    }
   },
   "Common": {
     "serviceName": "Dowin",
@@ -1253,6 +1277,18 @@
       "feature2": "Personalized daily action tracking and reminders",
       "feature3": "Real-time team execution scoreboard and dashboard",
       "cta": "Get started right now"
+    },
+    "Faq": {
+      "eyebrow": "FAQ",
+      "title": "Answers before you get started",
+      "item1Question": "What is Dowin?",
+      "item1Answer": "Dowin is a goal-execution service for individuals and teams to focus on one most important goal and track weekly execution on a scoreboard.",
+      "item2Question": "How much does it cost?",
+      "item2Answer": "Dowin starts at ₩1,000 per person per month, and you only pay for your actual team size. All core features including unlimited core goals and a real-time team scoreboard are included.",
+      "item3Question": "What are the benefits of adopting Dowin for a team?",
+      "item3Answer": "You can see at a glance on the dashboard what key actions each team member is executing this week. The entire team's execution status is shared transparently without the need for separate progress meetings.",
+      "item4Question": "How is Dowin different from other goal-tracking tools?",
+      "item4Answer": "Dowin doesn't focus on logging every single task. Instead, it focuses on setting 'one wildly important goal' and creating a specific execution loop to achieve it. You can channel all your energy entirely into the core actions that directly drive this week's goal."
     },
     "FinalCta": {
       "title": "Shall we focus on\nwhat matters most?",
