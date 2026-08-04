@@ -13,11 +13,39 @@ Before making changes, read only the files needed for the task in this order:
 3. the relevant `.agents/skills/*/SKILL.md` (Claude Code should use its `.claude/skills/*/SKILL.md` mirror through the Skill tool instead of reading the `.agents` copy manually — see "Project Skills" below). There is no separate `dowin-orchestrator` skill; `dowin-intake` plus this catalog are how routing works.
 4. relevant `docs/dev/common/*`
 5. relevant domain docs in `docs/dev/**`
-6. current implementation files
+6. current implementation files (prefer `codegraph_explore` — see "Code Navigation" below)
 
 If documents conflict with code, verify the implementation and prefer the current code path.
 
 Any non-trivial request (not a typo fix or a single, fully-specified edit) starts at `dowin-intake` before any of the above — see "Collaboration Style".
+
+## Code Navigation
+
+This repository is indexed by CodeGraph (`.codegraph/` at the repo root).
+**`codegraph_explore` is mandatory, not a preference: it MUST be the first move
+for any question about locating or understanding code** — a symbol, a file, a
+flow, a bug, "where/what is X" — call it (MCP tool `codegraph`, or
+`codegraph explore "<question>"` in a shell for Codex/Antigravity) with the
+symbol name, file, or a natural-language question before touching `grep`,
+`find`, `glob`, or `Read` for that purpose. One call returns verbatim source
+plus caller/callee relationships, including dynamic-dispatch hops grep can't
+follow. Treat its output as an already-performed Read; don't re-read a file it
+already returned.
+
+**Reaching for `grep`/`find`/`Read`/a fresh sub-agent as the first move on
+something CodeGraph indexes is a rule violation, not a style choice** — it
+redoes work the index already did, misses the dynamic-dispatch edges grep
+can't see, and costs more tokens for a worse answer. This applies mid-task too:
+if you're about to grep out of habit while already deep in an edit, stop and
+run `codegraph_explore` instead.
+
+Fall back to path-based search only for what CodeGraph doesn't index — non-code
+contracts (`src/api-spec/openapi.yaml`), markdown docs, config files — or to
+re-verify a contract/schema an earlier stage already fixed. Each skill's "JIT
+Search Strategy" section states which of its targets are code (use
+`codegraph_explore`) vs. non-code (use the listed path).
+
+If `.codegraph/` doesn't exist, skip this section.
 
 ## Repository Rules
 

@@ -30,7 +30,7 @@ If contracts changed, regenerate the client first.
 
 ## JIT Search Strategy
 
-- **API Integrations:** look for `useQuery`/`useMutation` hooks in `src/app/<domain>/_hooks/` or `src/api/generated/`.
+- **API Integrations:** `codegraph_explore` the hook or query-key name first — it surfaces the hook plus its current consumers in one call. Falls back to browsing `src/app/<domain>/_hooks/` or `src/api/generated/` when the hook doesn't exist yet (new wiring).
 
 ## Workflow
 

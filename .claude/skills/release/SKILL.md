@@ -77,6 +77,8 @@ Use `-d` (safe delete), not `-D` — if it refuses because the branch has unmerg
 - Close the Linear issue tied to this task (via Linear MCP if available in this session; otherwise tell the user which issue to close manually — do not silently skip this).
 - `bd close <epic-id> --reason="merged: <PR URL>"`
 
+**CRITICAL SANDBOX RULE**: If `bd close` or `gh pr create` fails due to sandbox blocks, permission errors, or environment issues, **YOU MUST STOP** and ask the user to execute the commands for you. Do not silently skip them.
+
 ## Output Contract
 
 ```text
