@@ -4,6 +4,7 @@ import { Footer } from "@/app/_components/Footer";
 import { LandingHeader } from "@/app/_components/LandingHeader";
 import { Button } from "@/components/ui/Button";
 import { FadeIn } from "@/components/ui/FadeIn";
+import { EXTERNAL_LINKS } from "@/config/links";
 import { Link } from "@/i18n/routing";
 import { 
   Check, 
@@ -12,12 +13,22 @@ import {
   ClipboardCheck,
   MessageSquareWarning,
   Flag,
-  BarChart3
+  BarChart3,
+  ChevronDown
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-export function RootLandingPage() {
+interface RootLandingPageProps {
+  origin: string;
+}
+
+export function RootLandingPage({ origin }: RootLandingPageProps) {
   const t = useTranslations("Landing");
+
+  const faqItems = [1, 2, 3, 4].map((i) => ({
+    question: t(`Faq.item${i}Question` as Parameters<typeof t>[0]),
+    answer: t(`Faq.item${i}Answer` as Parameters<typeof t>[0]),
+  }));
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -26,50 +37,33 @@ export function RootLandingPage() {
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web Application",
     description: t("Hero.description") || "가장 중요한 목표에 집중하세요.",
-    url: "https://dowin.app",
+    url: origin,
     author: {
       "@type": "Organization",
       name: "Dasoslab",
     },
   };
 
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Dasoslab",
+    url: origin,
+    logo: `${origin}/favicon-512x512.png`,
+    sameAs: [EXTERNAL_LINKS.APP_STORE, EXTERNAL_LINKS.PLAY_STORE],
+  };
+
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: t("Problem.item1Title"),
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: t("Problem.item1Body"),
-        },
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
       },
-      {
-        "@type": "Question",
-        name: t("Problem.item2Title"),
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: t("Problem.item2Body"),
-        },
-      },
-      {
-        "@type": "Question",
-        name: t("Problem.item3Title"),
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: t("Problem.item3Body"),
-        },
-      },
-      {
-        "@type": "Question",
-        name: t("Solution.item1Title"),
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: t("Solution.item1Body"),
-        },
-      },
-    ],
+    })),
   };
 
   return (
@@ -77,6 +71,10 @@ export function RootLandingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
       />
       <script
         type="application/ld+json"
@@ -341,6 +339,42 @@ export function RootLandingPage() {
               </Button>
             </div>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="bg-white px-6 py-40 md:px-10 md:py-56">
+        <div className="mx-auto max-w-[800px]">
+          <div className="text-center mb-20 md:mb-24">
+            <FadeIn>
+              <p className="mb-6 text-[15px] font-bold tracking-widest text-primary bg-primary/10 px-5 py-2 rounded-full inline-block">
+                {t("Faq.eyebrow")}
+              </p>
+            </FadeIn>
+            <FadeIn delay={0.1}>
+              <h2 className="whitespace-pre-line break-keep text-[36px] font-black leading-[1.25] tracking-tighter text-text-primary md:text-[48px]">
+                {t("Faq.title")}
+              </h2>
+            </FadeIn>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {faqItems.map((item, i) => (
+              <FadeIn key={item.question} delay={0.05 * i}>
+                <details className="group rounded-3xl bg-zinc-50 [&_summary::-webkit-details-marker]:hidden overflow-hidden transition-colors hover:bg-zinc-100/80">
+                  <summary className="flex w-full cursor-pointer list-none items-center justify-between gap-6 p-8 md:p-10 outline-none focus-visible:bg-zinc-100/80">
+                    <span className="break-keep text-[18px] font-bold leading-[1.4] text-text-primary md:text-[20px]">
+                      {item.question}
+                    </span>
+                    <ChevronDown className="h-6 w-6 shrink-0 text-primary transition-transform duration-300 group-open:rotate-180" strokeWidth={2.5} />
+                  </summary>
+                  <p className="px-8 pb-8 md:px-10 md:pb-10 pt-0 break-keep text-[16px] font-medium leading-[1.7] text-zinc-700 md:text-[17px]">
+                    {item.answer}
+                  </p>
+                </details>
+              </FadeIn>
+            ))}
+          </div>
         </div>
       </section>
 
