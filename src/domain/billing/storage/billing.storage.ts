@@ -11,13 +11,13 @@ import {
   workspaceSeatEntitlements,
 } from "@/db/schema";
 import {
+  BILLING_PLAN,
   type BillingPlanCode,
   type BillingStatus,
   type NullableEntitlementSource,
 } from "@/domain/billing/types";
-import { and, asc, desc, eq, gte, inArray, like, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, like, lt, or, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { BILLING_PLAN } from "@/domain/billing/types";
 
 type Db = ReturnType<typeof getDb>;
 
@@ -28,6 +28,17 @@ export class BillingStorage {
     entitlementSource: NullableEntitlementSource,
   ): "POLAR" | null {
     return entitlementSource === "POLAR" ? "POLAR" : null;
+  }
+
+  private notStaleWorkspaceBillingState(input: { lastEventOccurredAt: Date; lastEventId: number }) {
+    return or(
+      isNull(workspaceBillingState.lastEventOccurredAt),
+      lt(workspaceBillingState.lastEventOccurredAt, input.lastEventOccurredAt),
+      and(
+        eq(workspaceBillingState.lastEventOccurredAt, input.lastEventOccurredAt),
+        lt(workspaceBillingState.lastEventId, input.lastEventId),
+      ),
+    );
   }
 
   async findWorkspaceBillingState(workspaceId: number) {
@@ -551,6 +562,10 @@ export class BillingStorage {
             lastEventOccurredAt: input.projection.lastEventOccurredAt,
             updatedAt: new Date(),
           },
+          where: this.notStaleWorkspaceBillingState({
+            lastEventOccurredAt: input.projection.lastEventOccurredAt,
+            lastEventId: event.id,
+          }),
         });
 
       if (input.projection.purchasedSeatCount !== undefined) {
@@ -632,6 +647,10 @@ export class BillingStorage {
           lastEventOccurredAt: input.lastEventOccurredAt,
           updatedAt: new Date(),
         },
+        where: this.notStaleWorkspaceBillingState({
+          lastEventOccurredAt: input.lastEventOccurredAt,
+          lastEventId: input.lastEventId,
+        }),
       });
   }
 

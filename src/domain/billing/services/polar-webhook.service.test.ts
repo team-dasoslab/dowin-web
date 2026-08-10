@@ -886,6 +886,204 @@ describe("PolarWebhookService", () => {
     expect(upsertWorkspaceBillingState).not.toHaveBeenCalled();
   });
 
+  describe("lastEventOccurredAt 버전 시각 계산 (순서 역전 방지 가드용)", () => {
+    it("subscription.active는 envelope timestamp 대신 data.modified_at을 사용한다", async () => {
+      const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+      const service = new PolarWebhookService(createBillingStorageMock({
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 30,
+          planCode: BILLING_PLAN.FREE,
+          billingCustomerExternalRef: null,
+          billingOwnerUserId: null,
+        }),
+        appendBillingEvent: vi.fn().mockResolvedValue({ id: 101 }),
+        upsertWorkspaceBillingState,
+      }));
+
+      await service.handleWebhook({
+        providerEventId: "msg_version_subscription_active",
+        payloadJson: JSON.stringify({
+          type: "subscription.active",
+          // envelope timestamp는 실제 리소스 갱신 시각보다 늦게(발송 지연) 찍혔다고 가정한다.
+          timestamp: "2026-04-21T00:10:00.000Z",
+          data: {
+            id: "sub_30",
+            customer_id: "cus_30",
+            modified_at: "2026-04-21T00:00:00.000Z",
+            current_period_end: "2026-05-21T00:00:00.000Z",
+            cancel_at_period_end: false,
+            metadata: { workspaceId: "30" },
+          },
+        }),
+        now: new Date("2026-04-21T00:10:00.000Z"),
+      });
+
+      expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastEventOccurredAt: new Date("2026-04-21T00:00:00.000Z"),
+        }),
+      );
+    });
+
+    it("data.modified_at이 없으면 envelope timestamp로 폴백한다", async () => {
+      const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+      const service = new PolarWebhookService(createBillingStorageMock({
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 31,
+          planCode: BILLING_PLAN.FREE,
+          billingCustomerExternalRef: null,
+          billingOwnerUserId: null,
+        }),
+        appendBillingEvent: vi.fn().mockResolvedValue({ id: 102 }),
+        upsertWorkspaceBillingState,
+      }));
+
+      await service.handleWebhook({
+        providerEventId: "msg_version_fallback",
+        payloadJson: JSON.stringify({
+          type: "subscription.active",
+          timestamp: "2026-04-21T00:10:00.000Z",
+          data: {
+            id: "sub_31",
+            customer_id: "cus_31",
+            current_period_end: "2026-05-21T00:00:00.000Z",
+            cancel_at_period_end: false,
+            metadata: { workspaceId: "31" },
+          },
+        }),
+        now: new Date("2026-04-21T00:10:00.000Z"),
+      });
+
+      expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastEventOccurredAt: new Date("2026-04-21T00:10:00.000Z"),
+        }),
+      );
+    });
+
+    it("전액 order.refunded도 order 리소스의 modified_at을 사용한다", async () => {
+      const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+      const service = new PolarWebhookService(createBillingStorageMock({
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 32,
+          planCode: BILLING_PLAN.BASIC,
+          billingCustomerExternalRef: "workspace:32",
+          billingOwnerUserId: 16,
+        }),
+        appendBillingEvent: vi.fn().mockResolvedValue({ id: 103 }),
+        upsertWorkspaceBillingState,
+        updateWorkspaceBillingProjection: vi.fn(),
+      }));
+
+      await service.handleWebhook({
+        providerEventId: "msg_version_full_refund",
+        payloadJson: JSON.stringify({
+          type: "order.refunded",
+          timestamp: "2026-04-21T09:05:00.000Z",
+          data: {
+            id: "ord_32",
+            customer_id: "cus_32",
+            subscription_id: "sub_32",
+            modified_at: "2026-04-21T09:00:00.000Z",
+            refunded_amount: 29000,
+            total_amount: 29000,
+            metadata: { workspaceId: "32" },
+            customer: { external_id: "workspace:32" },
+          },
+        }),
+        now: new Date("2026-04-21T09:05:00.000Z"),
+      });
+
+      expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          billingStatus: "REVOKED",
+          lastEventOccurredAt: new Date("2026-04-21T09:00:00.000Z"),
+        }),
+      );
+    });
+
+    it("customer.state_changed는 customer 자체가 아니라 활성 구독의 modified_at을 우선한다", async () => {
+      const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+      const service = new PolarWebhookService(createBillingStorageMock({
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 33,
+          planCode: BILLING_PLAN.FREE,
+          billingCustomerExternalRef: "workspace:33",
+          billingOwnerUserId: 8,
+        }),
+        appendBillingEvent: vi.fn().mockResolvedValue({ id: 104 }),
+        upsertWorkspaceBillingState,
+        updateWorkspaceBillingProjection: vi.fn(),
+      }));
+
+      await service.handleWebhook({
+        providerEventId: "msg_version_customer_state",
+        payloadJson: JSON.stringify({
+          type: "customer.state_changed",
+          timestamp: "2026-04-21T10:20:00.000Z",
+          data: {
+            id: "cus_33",
+            external_id: "workspace:33",
+            // customer 자체의 modified_at은 활성 구독 갱신보다 오래됐다고 가정한다.
+            modified_at: "2026-04-21T09:00:00.000Z",
+            active_subscriptions: [
+              {
+                id: "sub_33",
+                modified_at: "2026-04-21T10:00:00.000Z",
+                current_period_end: "2026-05-21T00:00:00.000Z",
+                cancel_at_period_end: false,
+              },
+            ],
+          },
+        }),
+        now: new Date("2026-04-21T10:20:00.000Z"),
+      });
+
+      expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          lastEventOccurredAt: new Date("2026-04-21T10:00:00.000Z"),
+        }),
+      );
+    });
+
+    it("customer.state_changed에 활성 구독이 없으면 customer 자체의 modified_at을 사용한다", async () => {
+      const upsertWorkspaceBillingState = vi.fn().mockResolvedValue(undefined);
+      const service = new PolarWebhookService(createBillingStorageMock({
+        findWorkspaceById: vi.fn().mockResolvedValue({
+          id: 34,
+          planCode: BILLING_PLAN.STANDARD,
+          billingCustomerExternalRef: "workspace:34",
+          billingOwnerUserId: 8,
+        }),
+        appendBillingEvent: vi.fn().mockResolvedValue({ id: 105 }),
+        upsertWorkspaceBillingState,
+        updateWorkspaceBillingProjection: vi.fn(),
+      }));
+
+      await service.handleWebhook({
+        providerEventId: "msg_version_customer_state_no_sub",
+        payloadJson: JSON.stringify({
+          type: "customer.state_changed",
+          timestamp: "2026-04-21T10:20:00.000Z",
+          data: {
+            id: "cus_34",
+            external_id: "workspace:34",
+            modified_at: "2026-04-21T10:15:00.000Z",
+            active_subscriptions: [],
+          },
+        }),
+        now: new Date("2026-04-21T10:20:00.000Z"),
+      });
+
+      expect(upsertWorkspaceBillingState).toHaveBeenCalledWith(
+        expect.objectContaining({
+          billingStatus: "EXPIRED",
+          lastEventOccurredAt: new Date("2026-04-21T10:15:00.000Z"),
+        }),
+      );
+    });
+  });
+
   it("signed payload가 JSON이 아니면 무시한다", async () => {
     const service = new PolarWebhookService(createBillingStorageMock({
       findBillingEventByProviderEventId: vi.fn(),
