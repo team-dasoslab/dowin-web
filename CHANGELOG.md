@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.15.1](https://github.com/team-dasoslab/dowin-web/compare/v1.15.0...v1.15.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* 지연 도착한 웹훅이 최신 결제 상태를 덮어쓰지 않게 방지 ([#266](https://github.com/team-dasoslab/dowin-web/issues/266)) ([c039a62](https://github.com/team-dasoslab/dowin-web/commit/c039a620784b462e5ec2e0a305474714a8f49009))
+
 ## [1.15.0](https://github.com/team-dasoslab/dowin-web/compare/v1.14.12...v1.15.0) (2026-08-04)
 
 
