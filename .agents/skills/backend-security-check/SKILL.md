@@ -18,11 +18,21 @@ Start with:
 
 ## Workflow
 
-### 1. Define the scope
+### 1. 서브에이전트에게 채점 위임 (fresh-context evaluator)
+
+같은 대화 컨텍스트에서 방금 자기가 만든 코드를 스스로 채점하면 후하게 나오는 경향이 있다 (self-grading bias). 보안 리뷰는 특히 이 편향의 비용이 커서, 구현 대화를 본 적 없는 새 서브에이전트에게 채점을 위임한다.
+
+- Claude Code: `Agent` 툴로 `general-purpose` 서브에이전트를 새로 띄운다. 전달하는 것은 구현 과정의 대화 이력이 아니라 아래뿐이다.
+  - 이 스테이지에서 변경된 파일의 `git diff`
+  - 이 문서의 "Checklist"와 `references/backend-security-rules.md`
+- 서브에이전트를 띄울 수 없는 하네스(Codex 등)에서는 최소한 요약·압축된 새 세션에서 채점을 시작해, 구현 당시 판단을 그대로 재확인하지 않도록 한다.
+- 아래 2~4단계의 스코프 정의·리뷰·보고도 이 서브에이전트가 수행한다. 원 세션은 서브에이전트의 채점 결과를 그대로 Output Contract에 반영하고, 결과를 임의로 완화하지 않는다.
+
+### 2. Define the scope
 
 auth/session change, protected API change, workspace/admin permission change, or data-access/ownership change.
 
-### 2. Review
+### 3. Review
 
 - **Auth/session**: session lookup path, cookie usage, unauthenticated behavior on protected routes, session expiry/invalid-session handling (`src/lib/server/auth.ts`, `src/app/api/auth/*`)
 - **Authorization**: ADMIN-only routes stay ADMIN-only, member routes don't allow cross-workspace actions, privileged mutations don't rely on client trust
@@ -30,7 +40,7 @@ auth/session change, protected API change, workspace/admin permission change, or
 - **Input validation**: Zod coverage on body/params/query for user-controlled input; error responses don't leak internals
 - **Sensitive data**: passwords/recovery codes/session IDs/cookies/secrets not logged or echoed in error payloads; secrets sourced from env, not hardcoded
 
-### 3. Report
+### 4. Report
 
 Confirmed findings, high-risk open questions, areas not fully verified, recommended follow-up.
 

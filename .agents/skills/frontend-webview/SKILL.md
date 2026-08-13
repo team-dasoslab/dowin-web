@@ -13,10 +13,11 @@ Read only the files needed for the task.
 
 Start with:
 
-1. `.agents/skills/frontend/SKILL.md`
-2. `references/webview-rules.md`
-3. `docs/dev/app-webview/2026.04.24-webview-bridge-spec.md`
-4. the current implementation files
+1. `docs/dev/common/2026.08.13-context-packets.md`의 "WebView Bridge Packet"
+2. `.agents/skills/frontend/SKILL.md`
+3. `references/webview-rules.md`
+4. `docs/dev/app-webview/2026.04.24-webview-bridge-spec.md`
+5. the current implementation files
 
 If the WebView doc and current code differ, verify the active code path and then sync the docs.
 

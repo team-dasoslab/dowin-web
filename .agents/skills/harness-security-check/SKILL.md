@@ -11,11 +11,12 @@ Use this skill when the main task is reviewing the repository's AI harness rathe
 
 Start with:
 
-1. `references/harness-security-rules.md`
-2. `AGENTS.md`
-3. `codex.md`
-4. the relevant files under `.agents/skills/**`
-5. any repo-local config that changes agent permissions or execution behavior
+1. `docs/dev/common/2026.08.13-context-packets.md`의 "Harness/Security Packet"
+2. `references/harness-security-rules.md`
+3. `AGENTS.md`
+4. `codex.md`
+5. the relevant files under `.agents/skills/**`
+6. any repo-local config that changes agent permissions or execution behavior
 
 If docs and active files disagree, verify the active files and use that as the security baseline.
 

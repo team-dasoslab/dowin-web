@@ -46,6 +46,54 @@ AI가 겪은 실패 사례를 바탕으로 스킬을 갱신하고, 그 효과를
 
 ## 변경 이력
 
+### [2026-08-13] code-review 지적 사항 반영 (pr-review-gate.mjs 버그 수정 + 서브에이전트 채점 위임 확대)
+
+- **변경 스킬:** `scripts/pr-review-gate.mjs`, `.github/workflows/pr-review-gate.yml`, `dowin-backend-quality-check`/`dowin-frontend-quality-check`(off-by-one 문구 수정), `dowin-backend-security-check`/`dowin-backend-performance-check`/`dowin-frontend-security-check`/`dowin-frontend-performance-check`(신규 "서브에이전트에게 채점 위임" 1단계 추가)
+- **변경 이유:** 이 브랜치를 `/code-review`로 검토한 결과 실제 버그가 여러 건 확인됨: (1) 워크플로우가 2-dot `git diff base.sha head.sha`를 써서 PR 열린 뒤 main에 머지된 무관한 변경까지 섞여 들어옴, (2) `.claude/settings.json` 같은 권한 설정 파일이 harness-security-check RULES에서 빠져 있어 권한 완화 PR이 감지되지 않음, (3) `src/app/api/**`와 `src/app/**` 룰이 겹쳐 백엔드 전용 PR에도 frontend-quality-check가 잘못 붙음(직접 실행해 재현 확인), (4) 같은 diff에서 Workflow를 4단계로 재번호 매기면서 "아래 2~3단계" 문구를 안 고쳐 off-by-one 발생, (5) fresh-context 서브에이전트 채점 위임이 quality-check에만 적용되고 같은 체인의 security/performance-check는 self-grading으로 남아 있었음, (6) 실행되지도 않는 Corepack/yarn 셋업 스텝, (7) `changed-files.txt`가 없을 때 스크립트가 그냥 크래시함.
+- **기대 효과:** 3-dot diff로 PR 자체 변경만 잡고, 권한 설정 파일 변경이 harness-security-check로 이어지고, 백엔드 전용 PR에 frontend 체크가 잘못 붙지 않고, 4개 -check 스킬 전부 self-grading bias 완화가 일관되게 적용되고, 워크플로우가 불필요한 셋업 없이 더 빠르고, 스크립트가 입력 누락에도 죽지 않고 안내 메시지를 남긴다.
+- **관련 실패 카테고리:** `missing_test`(직접 실행 재현 없이 머지됐던 규칙 겹침 버그), `doc_impl_drift`(재번호 매김 후 안 고친 문구)
+- **Follow-up Eval 필요 여부:** [ ] 네 / [x] 아니오
+
+### [2026-08-13] AGENTS.md 분량/중복 정리 (314→284줄)
+
+- **변경 스킬:** `AGENTS.md`
+- **변경 이유:** §8.3(A2/A4) 채점에서 지적한 대로, `AGENTS.md`가 논문 기준(Context Bloat, ≥200줄) 대비 길었고 "any 타입 금지" 규칙이 `eslint.config.mjs:30`의 `@typescript-eslint/no-explicit-any: error`와 순수 중복(Lint Leakage)이었다. beads 자동 생성 블록(`<!-- BEGIN BEADS ... -->`)은 `bd setup`이 관리하므로 건드리지 않았다.
+- **기대 효과:** "Strict Type Constraints" 항목을 린터가 이미 막는 부분(any 금지)은 참조로 줄이고, 린터가 못 막는 부분(`@ts-ignore`/`eslint-disable` 우회 금지)만 남겼다. "Skill file locations"의 스킬명 전체 재나열을 제거하고, "Trigger examples"를 스킬당 1개(핵심 게이트인 `dowin-intake`만 2개)로 줄였다. 순수 hand-authored 분량이 228줄 → 200줄로 줄었다 (beads 자동 블록 제외).
+- **관련 실패 카테고리:** `over_engineering`(불필요한 반복 서술 제거)
+- **Follow-up Eval 필요 여부:** [ ] 네 / [x] 아니오
+
+### [2026-08-13] MCP Tool Policy 문서 신설 (Linear/CodeGraph 범위)
+
+- **변경 스킬:** `docs/dev/common/2026.08.13-mcp-tool-policy.md`(신설), `docs/dev/common/2026.08.13-context-packets.md`(Harness/Security Packet에 포인터 추가)
+- **변경 이유:** §4.7/§8.5(갭 6번)에서 지적한 MCP/tool 운영 기준 부재 중, 실제로 이 저장소에 연결돼 있는 Linear/CodeGraph MCP 두 가지만 범위로 좁혀 우선 문서화하기로 사용자와 합의함 (신규 도구 승인 기준, 배포/DB 접근 범주는 이번 범위 밖).
+- **기대 효과:** Linear/CodeGraph MCP가 왜 신뢰되는지, 무슨 데이터가 오가는지, 결과를 받기 전 뭘 확인해야 하는지가 문서로 남아, 하네스 보안 리뷰(`dowin-harness-security-check`) 때 참고할 수 있다.
+- **관련 실패 카테고리:** `secret_exposure_risk`(MCP 데이터 흐름 불투명성 완화)
+- **Follow-up Eval 필요 여부:** [ ] 네 / [x] 아니오
+
+### [2026-08-13] Context Packet 문서화 (`context-packets.md`) 및 6개 스킬 연결
+
+- **변경 스킬:** `docs/dev/common/2026.08.13-context-packets.md`(신설), `dowin-backend-api-spec`/`dowin-backend`/`dowin-frontend-api-connect`(JIT Search Strategy에 포인터 추가), `frontend-webview`/`dowin-harness-security-check`/`dowin-product-updates`(Start with 목록에 포인터 추가)
+- **변경 이유:** `docs/planning/2026.07.13-ai-engineering-application-plan.md` §4.6에서 설계했던 작업유형별 Context Packet(먼저 볼 파일/금지 사항/검증 명령)이 계획 문서 안 산문으로만 있고, 각 스킬이 이를 가리키지 않아 매 작업마다 같은 탐색을 반복하고 있었다 (§8.5 갭 5번).
+- **기대 효과:** 6개 스킬이 작업 시작 시 해당 Context Packet을 먼저 확인해, 반복 탐색 비용을 줄이고 그 작업 유형에서 흔히 놓치는 금지 사항(OpenAPI 먼저 갱신, webview fallback 검증 등)을 놓치지 않는다.
+- **관련 실패 카테고리:** `scope_gap`(탐색 범위가 매번 새로 정해지는 문제)
+- **Follow-up Eval 필요 여부:** [ ] 네 / [x] 아니오
+
+### [2026-08-13] 장기 세션용 progress 파일 패턴(`Session Continuity`) 신설
+
+- **변경 스킬:** `AGENTS.md`(신규 "Session Continuity (Long-Running Tasks)" 섹션), `codex.md`(신규 "2.5. 세션 연속성" 섹션), `.gitignore`(`.dowin/progress/` 추가)
+- **변경 이유:** 세션이 끊겼다가(컨텍스트 압축, 새 대화, 다른 LLM으로 인계) 재개될 때 지금까지는 beads 이슈 상태와 git 커밋만으로 이어받았는데, 이는 "무엇을 했는지"만 알려주고 "왜 어떤 접근을 버렸는지, 뭐가 막혔는지"는 남기지 못했다 (Anthropic "Effective harnesses for long-running agents"의 progress 파일 패턴 근거, §8 리서치).
+- **기대 효과:** 여러 세션에 걸칠 것으로 예상되는 작업은 `.dowin/progress/<branch-slug>.md`(gitignore)에 시도/막힘/다음시도/열린질문을 이어붙여 기록하고, 새 세션은 재탐색 전에 이 파일부터 확인한다. 작업 종료 시 삭제하거나 장기 가치가 있으면 CHANGELOG/planning 문서/`bd remember`로 승격한다.
+- **관련 실패 카테고리:** `doc_impl_drift`(세션 간 맥락 유실로 인한 재작업 방지)
+- **Follow-up Eval 필요 여부:** [x] 네 / [ ] 아니오 — 실제로 세션 재개 상황에서 이 파일이 쓰이는지, 도움이 되는지 관찰 필요
+
+### [2026-08-13] backend/frontend-quality-check를 fresh-context 서브에이전트 채점으로 전환
+
+- **변경 스킬:** `dowin-backend-quality-check`, `dowin-frontend-quality-check` (Workflow에 "서브에이전트에게 채점 위임" 1단계 신설, Output Contract 문구 수정)
+- **변경 이유:** 리서치(`docs/planning/2026.07.13-ai-engineering-application-plan.md` §8) 결과, 구현("dowin-backend"/"dowin-frontend-_")과 채점("_-quality-check")이 스킬은 분리돼 있어도 같은 대화 컨텍스트에서 이어지는 경우가 많아, 방금 자기가 만든 코드를 스스로 채점하는 self-grading bias 위험이 있었다(Anthropic "Effective harnesses for long-running agents" 근거).
+- **기대 효과:** quality-check 스테이지가 구현 대화를 본 적 없는 새 서브에이전트(Claude Code는 `Agent` 툴 `general-purpose`)에게 diff+체크리스트만 넘겨 채점하도록 바뀌어, 평가가 구현 당시 판단을 그대로 재확인하는 것을 줄인다. 서브에이전트를 못 띄우는 하네스는 최소한 요약된 새 세션에서 시작하도록 완화 규칙을 둠.
+- **관련 실패 카테고리:** `over_engineering`(자기 채점으로 인한 안일한 pass 판정 방지)
+- **Follow-up Eval 필요 여부:** [x] 네 / [ ] 아니오 — 다음 몇 건의 quality-check 실행에서 실제로 subagent 위임이 이뤄지는지, pass/needs_revision 판정 비율이 달라지는지 관찰 필요
+
 ### [2026-08-01] 시크릿 파일 읽기 금지 + 프로덕션 명령 컨펌 하드룰 추가
 
 - **변경 스킬:** `AGENTS.md`/`codex.md`(신규 "Safety Guardrails"/"§1.5 안전 규칙" 섹션), `.claude/settings.json`(신규 `permissions.deny`), `dowin-backend-api-spec`/`dowin-backend`(mig:remote 문구 강화), `dowin-harness-security-check`(체크리스트 추가)

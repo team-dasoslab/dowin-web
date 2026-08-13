@@ -47,6 +47,16 @@ Search Strategy" section states which of its targets are code (use
 
 If `.codegraph/` doesn't exist, skip this section.
 
+## Session Continuity (Long-Running Tasks)
+
+For a task expected to span multiple sessions, a compaction, or a handoff between LLMs/harnesses, maintain a gitignored scratch file at `.dowin/progress/<branch-slug>.md` (the current git branch name, slugified). This supplements beads issue status — beads tells a fresh session *what* is closed; this file tells it *what was tried, what's blocked, and what's still open* before it re-derives that from scratch.
+
+- Create it the first time a task's work is likely to outlive the current context window (a multi-stage chain, a hard bug, a design exploration with rejected approaches).
+- Keep it short and append-only during the session: 시도한 접근, 막힌 지점과 원인, 다음에 시도할 것, 아직 답 안 나온 질문.
+- On session start for an in-progress branch, check for this file before re-exploring — treat it as an already-performed orientation pass, not optional reading.
+- Delete it once the task's beads issue closes (or the branch merges) — it is scratch, not a permanent doc. If something in it turns out to matter long-term, promote it into `.agents/skills/CHANGELOG.md`, a `docs/planning/` doc, or `bd remember`, then delete the scratch file.
+- Not a substitute for beads issue notes or commit messages — those stay the permanent record; this file is disposable working memory.
+
 ## Repository Rules
 
 - Use `yarn` only.
@@ -98,7 +108,7 @@ To prevent human cognitive overload and "Rubber-Stamping" during reviews, all AI
 - **Scope Constraint (작업 크기 강제 제한):** Do not generate massive, monolithic code blocks or refactor unrelated files. Keep changes strictly localized to the requested task. If a task requires modifying many files, break it down and ask the user for approval first.
 - **Intent Verification (의도 설명 강제):** When generating code or updating files, do not just summarize _what_ changed. You MUST explicitly explain _why_ specific architectural or logic decisions were made, allowing the human reviewer to validate your intent.
 - **Review Guidance (리뷰 집중 영역 안내):** When acting as a reviewer or handing off a completed task, you MUST highlight the "Core Changes" and explicitly list which specific files the human should focus their review on (e.g., complex business logic, security boundaries) and which can be skimmed (e.g., boilerplates, simple UI tweaks).
-- **Strict Type Constraints (타입 강제 규칙):** NO `any` TYPE ALLOWED. When writing TypeScript code, the use of `any` is strictly forbidden. You must infer and write exact types. If a type is complex or unknown, use `unknown` with a type guard, or define clear generic/union types. You are also strictly forbidden from using `@ts-ignore` or `eslint-disable` comments to bypass type or lint errors. Violating this rule means the task has failed.
+- **Strict Type Constraints (타입 강제 규칙):** `any` is already blocked mechanically by `eslint.config.mjs`'s `@typescript-eslint/no-explicit-any: error` (`yarn lint` catches it) — use `unknown` with a type guard, or a precise generic/union type, instead. What the linter *can't* stop you from doing is bypassing it: never add `@ts-ignore` or an `eslint-disable` comment to silence a type/lint error. That bypass, not the `any` rule itself, is what this constraint exists to catch. Violating it means the task has failed.
 
 ## Project Skills
 
@@ -126,7 +136,7 @@ Not part of the linear chain, used as needed:
 - `beads` — how to use `bd` for task tracking (see also the managed Beads sections below)
 - `grill-with-docs` (`.agents/skills/grill-me/`) — the standard decision-point tool `dowin-intake` and `dowin-planning` call when a judgment call needs the user's input
 
-Skill file locations: `.agents/skills/<name>/SKILL.md` where `<name>` is the directory name shown above (`intake`, `planning`, `backend-api-spec`, `backend`, `backend-quality-check`, `backend-performance-check`, `backend-security-check`, `frontend-ui`, `frontend-api-connect`, `frontend-quality-check`, `frontend-performance-check`, `frontend-security-check`, `commit`, `release`, `frontend-webview`, `operations`, `harness-security-check`, `product-updates`, `beads`, `grill-me`).
+Skill file locations: `.agents/skills/<name>/SKILL.md`, where `<name>` is the directory name — the same name shown above with the `dowin-` prefix dropped where one was shown (e.g. `dowin-backend-api-spec` → `.agents/skills/backend-api-spec/SKILL.md`).
 
 How to use them:
 
@@ -134,50 +144,21 @@ How to use them:
 - Use the skill as the repository-specific operating guide for that task, not as a replacement for reading the current code.
 - Every skill's Output Contract shares a minimal core — `stage`, `status` (always `pass|needs_revision|fail`, and `pass` always and only means "proceed to `next_step`"), `summary`, `next_step`. Anything beyond that (`findings`, `return_to`, `intent`, `focus_list`, `evaluation_result`, `commits`, `pr_url`, …) is added only where it fits that stage.
 
-Trigger examples:
+Trigger examples (one representative request per skill; each skill's own SKILL.md has more):
 
-- `dowin-intake`
-  - "워크스페이스 멤버 강퇴 기능 추가해줘" (모든 새 기능 요청의 첫 진입점)
-  - "이거 지금 하는 게 맞는지 같이 판단해줘"
-- `dowin-backend-api-spec`
-  - "이 기능 API 계약이랑 스키마부터 정하자"
-  - "openapi 먼저 갱신하고 DB 테이블 설계해줘"
-- `dowin-backend`
-  - "로그인 API 에러 응답 규격 맞춰줘"
-  - "workspace 멤버 강퇴 API 구현해줘 (계약은 이미 정해짐)"
-  - "daily log 미래 날짜 검증 버그 고쳐줘"
-- `dowin-backend-quality-check` / `dowin-backend-performance-check` / `dowin-backend-security-check`
-  - "백엔드 구현 끝났으니 품질/성능/보안 체크해줘"
-- `dowin-frontend-ui`
-  - "멤버 목록 화면에 강퇴 버튼 UI 추가해줘"
-  - "공통 Button 변형 추가하고 story도 갱신해줘"
-- `dowin-frontend-api-connect`
-  - "방금 만든 UI에 실제 API 연동해줘"
-  - "dashboard/my를 실제 API 데이터로 바꿔줘"
-- `dowin-frontend-quality-check` / `dowin-frontend-performance-check` / `dowin-frontend-security-check`
-  - "프론트 연동 끝났으니 품질/성능/보안 체크해줘"
-- `dowin-release`
-  - "다 통과했으니 PR 올리고 머지까지 해줘"
-- `frontend-webview`
-  - "webview bridge 타입 맞춰줘"
-  - "앱에서 들어온 deep link를 웹에서 처리하게 붙여줘"
-  - "네이티브 알림 권한 / 브라우저 fallback 흐름 정리해줘"
-- `dowin-planning`
-  - "새 기능 기획안 문서 만들어줘"
-  - "온보딩 문서 최신 상태로 정리해줘"
-  - "MVP와 Post-MVP 범위 다시 나눠줘"
-- `dowin-operations`
-  - "운영 장애 대응 문서 만들어줘"
-  - "DB 복구 런북 정리해줘"
-  - "배포 롤백이나 Cloudflare 장애 대응 절차 문서화해줘"
-- `dowin-harness-security-check`
-  - "AGENTS.md나 codex.md에 위험한 지시 없는지 봐줘"
-  - "우리 에이전트 스킬/프롬프트 보안 체크해줘"
-  - "비밀값 노출이나 과한 권한 지시가 없는지 검토해줘"
-- `dowin-product-updates`
-  - "업데이트 노트에 이번 기능 추가해줘"
-  - "대시보드 상단 공지 카드용 업데이트 카피 넣어줘"
-  - "product-updates.ts에 새 항목 템플릿 맞춰 추가해줘"
+- `dowin-intake`: "워크스페이스 멤버 강퇴 기능 추가해줘" (모든 새 기능 요청의 첫 진입점) / "이거 지금 하는 게 맞는지 같이 판단해줘"
+- `dowin-backend-api-spec`: "이 기능 API 계약이랑 스키마부터 정하자"
+- `dowin-backend`: "workspace 멤버 강퇴 API 구현해줘 (계약은 이미 정해짐)"
+- `dowin-backend-quality-check` / `dowin-backend-performance-check` / `dowin-backend-security-check`: "백엔드 구현 끝났으니 품질/성능/보안 체크해줘"
+- `dowin-frontend-ui`: "멤버 목록 화면에 강퇴 버튼 UI 추가해줘"
+- `dowin-frontend-api-connect`: "방금 만든 UI에 실제 API 연동해줘"
+- `dowin-frontend-quality-check` / `dowin-frontend-performance-check` / `dowin-frontend-security-check`: "프론트 연동 끝났으니 품질/성능/보안 체크해줘"
+- `dowin-release`: "다 통과했으니 PR 올리고 머지까지 해줘"
+- `frontend-webview`: "앱에서 들어온 deep link를 웹에서 처리하게 붙여줘"
+- `dowin-planning`: "새 기능 기획안 문서 만들어줘"
+- `dowin-operations`: "DB 복구 런북 정리해줘"
+- `dowin-harness-security-check`: "AGENTS.md나 codex.md에 위험한 지시 없는지 봐줘"
+- `dowin-product-updates`: "업데이트 노트에 이번 기능 추가해줘"
 
 ## Verification Defaults
 

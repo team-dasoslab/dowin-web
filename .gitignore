@@ -68,3 +68,6 @@ temp/
 *.db
 .beads-credential-key
 .beads/proxieddb/
+
+# 장기 세션 진행상황 스크래치 파일 (AGENTS.md "Session Continuity" 참고) — 디스크에만 남기고 커밋하지 않는다
+.dowin/progress/

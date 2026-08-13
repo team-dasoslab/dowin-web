@@ -17,18 +17,28 @@ Start with:
 
 ## Workflow
 
-### 1. Define the scope
+### 1. 서브에이전트에게 채점 위임 (fresh-context evaluator)
+
+같은 대화 컨텍스트에서 방금 자기가 만든 코드를 스스로 채점하면 후하게 나오는 경향이 있다 (self-grading bias). 보안 리뷰는 특히 이 편향의 비용이 커서, 구현 대화를 본 적 없는 새 서브에이전트에게 채점을 위임한다.
+
+- Claude Code: `Agent` 툴로 `general-purpose` 서브에이전트를 새로 띄운다. 전달하는 것은 구현 과정의 대화 이력이 아니라 아래뿐이다.
+  - 이 스테이지에서 변경된 파일의 `git diff`
+  - 이 문서의 "Checklist"와 `references/frontend-security-rules.md`
+- 서브에이전트를 띄울 수 없는 하네스(Codex 등)에서는 최소한 요약·압축된 새 세션에서 채점을 시작해, 구현 당시 판단을 그대로 재확인하지 않도록 한다.
+- 아래 2~4단계의 스코프 정의·리뷰·보고도 이 서브에이전트가 수행한다. 원 세션은 서브에이전트의 채점 결과를 그대로 Output Contract에 반영하고, 결과를 임의로 완화하지 않는다.
+
+### 2. Define the scope
 
 Frontend change that calls protected APIs, exposes role-gated actions, or touches WebView bridge/native permission flows.
 
-### 2. Review
+### 3. Review
 
 - protected actions are not exposed to the wrong role in visible UI flows
 - privileged mutations still depend on server-side enforcement, not just hidden UI
 - client code does not embed private keys or server secrets
 - generated API usage for sensitive operations passes the right auth context
 
-### 3. Report
+### 4. Report
 
 Confirmed findings, high-risk open questions, areas not fully verified, recommended follow-up.
 

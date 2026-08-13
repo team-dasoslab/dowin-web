@@ -48,6 +48,8 @@ For detailed file paths and doc priorities, read `references/backend-rules.md`.
 
 ## JIT Search Strategy
 
+먼저 `docs/dev/common/2026.08.13-context-packets.md`의 "Backend API Change Packet"(결제/권한 로직이면 "Billing Entitlement Packet")을 확인한다.
+
 When navigating the backend codebase with ambiguous inputs, call `codegraph_explore`
 first for anything that's code — it returns source plus callers/callees in one call.
 Use the path-based rules below only for the one non-code target (`openapi.yaml`) or

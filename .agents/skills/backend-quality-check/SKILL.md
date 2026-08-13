@@ -24,14 +24,25 @@ Start with:
 
 ## Workflow
 
-### 1. Pull the relevant checks
+### 1. 서브에이전트에게 채점 위임 (fresh-context evaluator)
+
+같은 대화 컨텍스트에서 방금 자기가 만든 코드를 스스로 채점하면 후하게 나오는 경향이 있다 (self-grading bias). 구현 대화를 본 적 없는 새 서브에이전트에게 채점을 위임한다.
+
+- Claude Code: `Agent` 툴로 `general-purpose` 서브에이전트를 새로 띄운다. 전달하는 것은 구현 과정의 대화 이력이 아니라 아래뿐이다.
+  - 이 스테이지에서 변경된 파일의 `git diff`
+  - 이 문서의 "Backend Quality Checklist"와 `references/backend-quality-rules.md`
+  - `docs/planning/2026.07.14-ai-work-evaluation-plan.md`의 O/X/N/A 체크리스트
+- 서브에이전트를 띄울 수 없는 하네스(Codex 등)에서는 최소한 요약·압축된 새 세션에서 채점을 시작해, 구현 당시 판단을 그대로 재확인하지 않도록 한다.
+- 아래 2~4단계의 검증 명령 실행과 findings 수집도 이 서브에이전트가 수행한다. 원 세션은 서브에이전트의 채점 결과를 그대로 Output Contract에 반영하고, 결과를 임의로 완화하지 않는다.
+
+### 2. Pull the relevant checks
 
 - business-rule tests for the changed domain
 - auth and ownership checks
 - error response behavior
 - API contract vs. implementation match
 
-### 2. Run verification
+### 3. Run verification
 
 ```bash
 yarn test --run <changed-test-file>
@@ -41,7 +52,7 @@ yarn lint
 yarn eslint <changed-files>
 ```
 
-### 3. Report findings
+### 4. Report findings
 
 Report failing checks, missing tests, likely regressions, and residual risk if some checks could not run.
 
@@ -55,7 +66,7 @@ Report failing checks, missing tests, likely regressions, and residual risk if s
 
 ## Output Contract
 
-Act as the "LLM-as-a-Judge" and evaluate against the O/X/N/A checklist in `docs/planning/2026.07.14-ai-work-evaluation-plan.md`.
+Relay the fresh-context 서브에이전트(1단계)가 `docs/planning/2026.07.14-ai-work-evaluation-plan.md`의 O/X/N/A 체크리스트로 채점한 결과를 그대로 정리해 보고한다.
 
 ```text
 stage: backend-quality

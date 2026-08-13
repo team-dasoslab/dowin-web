@@ -13,11 +13,12 @@ Read only what is needed.
 
 Start with:
 
-1. `src/content/product-updates.ts`
-2. `src/lib/product-updates.ts`
-3. `src/app/(protected)/updates/page.tsx`
-4. `src/app/(protected)/dashboard/my/page.tsx` when the dashboard card is affected
-5. `docs/planning/2026.03.18-feature-announcement-hub.md` when rules or scope change
+1. `docs/dev/common/2026.08.13-context-packets.md`의 "Product Update Packet"
+2. `src/content/product-updates.ts`
+3. `src/lib/product-updates.ts`
+4. `src/app/(protected)/updates/page.tsx`
+5. `src/app/(protected)/dashboard/my/page.tsx` when the dashboard card is affected
+6. `docs/planning/2026.03.18-feature-announcement-hub.md` when rules or scope change
 
 ## Core Rules
 

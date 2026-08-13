@@ -20,6 +20,8 @@ If docs conflict with code, verify the implementation and trust the current code
 
 ## JIT Search Strategy
 
+먼저 `docs/dev/common/2026.08.13-context-packets.md`의 "Backend API Change Packet"(그리고 결제/권한 계약이면 "Billing Entitlement Packet")을 확인한다 — 이 작업 유형에서 놓치기 쉬운 금지 사항과 검증 명령을 미리 정리해둔 것이다.
+
 - **API Contracts:** search the `operationId` or path in `src/api-spec/openapi.yaml` first. (Not code — codegraph doesn't index YAML.)
 - **Database Schema:** `codegraph_explore` the table/column name first — falls back to `src/db/schema.ts` and `docs/dev/common/2026.03.09-database-schema.md` if not yet defined.
 

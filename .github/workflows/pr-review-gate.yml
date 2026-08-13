@@ -1,0 +1,39 @@
+name: PR Review Gate
+
+# 순수 규칙 기반 리뷰 체크리스트를 PR Job Summary에 출력한다.
+# 외부 LLM 호출 없음, 코멘트 봇 없음, 자동 승인/차단 없음 — 참고용 안내만 제공한다.
+# 근거: docs/planning/2026.07.13-ai-engineering-application-plan.md §4.5, §8.5(2번)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+jobs:
+  review-gate:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+
+      - name: Compute changed files
+        run: |
+          # merge-base 기준 3-dot diff. base.sha는 PR이 열린/갱신된 시점의 base 브랜치
+          # 최신 커밋이라, 2-dot diff를 쓰면 PR이 열린 뒤 base 브랜치에 머지된
+          # 무관한 변경까지 섞여 들어온다.
+          git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}" > changed-files.txt
+
+      - name: Generate review gate checklist
+        run: node scripts/pr-review-gate.mjs changed-files.txt >> "$GITHUB_STEP_SUMMARY"

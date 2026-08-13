@@ -30,6 +30,8 @@ If contracts changed, regenerate the client first.
 
 ## JIT Search Strategy
 
+먼저 `docs/dev/common/2026.08.13-context-packets.md`의 "Frontend API Integration Packet"을 확인한다.
+
 - **API Integrations:** `codegraph_explore` the hook or query-key name first — it surfaces the hook plus its current consumers in one call. Falls back to browsing `src/app/<domain>/_hooks/` or `src/api/generated/` when the hook doesn't exist yet (new wiring).
 
 ## Workflow
