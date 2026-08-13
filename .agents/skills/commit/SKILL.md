@@ -60,6 +60,13 @@ git commit -m "<type>: <intent 2 요약>"
 
 Do not `git add -A` — check `git status` first and stage precisely one intent's files at a time, so unrelated changes (including a later stage's uncommitted work) never land in the same commit.
 
+### 5. Diff 크기 신호
+
+하나의 intent라도 diff가 대략 300~400줄(생성 파일/lockfile 제외)을 넘으면 리뷰 탐지율이 급락한다는 근거가 있다(Cisco/Google 코드 리뷰 연구 — `docs/planning/2026.08.14-ai-code-review-scale-research.md` §2 참고). 이 기준을 넘으면:
+
+- 정말 하나의 intent인지 다시 확인한다 — 더 쪼갤 수 있는 하위 단계가 있는지 본다.
+- 못 쪼개는 경우(예: 일괄 리팩터), 그대로 커밋하되 다음 quality-check 단계에 이 커밋이 크다는 것과 `intent_check.where_to_look`을 반드시 구체적으로 채워야 한다는 것을 인계한다.
+
 ## Checklist
 
 - Was `docs/planning/2026.04.09-commit-convention.md` actually read for this commit, not recalled from memory?
@@ -68,6 +75,7 @@ Do not `git add -A` — check `git status` first and stage precisely one intent'
 - Is the message a single line with no multi-bullet body?
 - Is exactly one intent in this commit — if not, was it split into separate commits instead of listed in one message?
 - Is the staged diff scoped to this stage's work only?
+- If this commit's diff exceeds ~300~400 lines, was a split re-checked, and if not splittable, was that flagged for the next quality-check stage?
 
 ## Output Contract
 
