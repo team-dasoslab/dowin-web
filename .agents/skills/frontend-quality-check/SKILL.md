@@ -64,6 +64,7 @@ Report failing checks, missing tests, likely regressions, and residual risk if m
 - Were related queries invalidated after mutations, and is rollback handled for optimistic updates?
 - Was mobile layout checked?
 - Were `yarn tsc --noEmit`, `yarn lint`, and `yarn test:frontend` run?
+- If this change fixes an already-deployed bug (`fix:` type) and the root cause was a pattern AI kept missing, was it logged in `.agents/skills/CHANGELOG.md`'s failure categories (not just this task's `findings`) so future sessions inherit the lesson?
 
 ## Output Contract
 

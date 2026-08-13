@@ -63,6 +63,7 @@ Report failing checks, missing tests, likely regressions, and residual risk if s
 - Are auth, ownership, and strict Zod validation applied correctly?
 - Does the implementation match `src/api-spec/openapi.yaml`?
 - Were type and lint checks run?
+- If this change fixes an already-deployed bug (`fix:` type) and the root cause was a pattern AI kept missing, was it logged in `.agents/skills/CHANGELOG.md`'s failure categories (not just this task's `findings`) so future sessions inherit the lesson?
 
 ## Output Contract
 
