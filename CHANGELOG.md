@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/team-dasoslab/dowin-web/compare/v1.15.1...v1.16.0) (2026-08-20)
+
+
+### Features
+
+* 사용자 행동 분석용 Clarity 스크립트 추가 ([068a131](https://github.com/team-dasoslab/dowin-web/commit/068a1315bd41a2a314b372e1cb8c6693b67a2217))
+
 ## [1.15.1](https://github.com/team-dasoslab/dowin-web/compare/v1.15.0...v1.15.1) (2026-08-10)
 
 
