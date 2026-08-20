@@ -4,4 +4,5 @@ export const publicRuntimeConfig = Object.freeze({
   nodeEnv,
   isDevelopment: nodeEnv === "development",
   nextPublicGaId: process.env.NEXT_PUBLIC_GA_ID ?? "",
+  nextPublicClarityId: process.env.NEXT_PUBLIC_CLARITY_ID ?? "",
 });

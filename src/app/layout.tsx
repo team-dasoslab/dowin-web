@@ -88,6 +88,7 @@ export default async function RootLayout({
   children: ReactNode;
 }) {
   const gaId = publicRuntimeConfig.nextPublicGaId;
+  const clarityId = publicRuntimeConfig.nextPublicClarityId;
   const headerList = await headers();
   const cookieStore = await cookies();
   const locale = resolveLocale({
@@ -124,6 +125,17 @@ export default async function RootLayout({
                 `}
             </Script>
           </>
+        ) : null}
+        {clarityId ? (
+          <Script id="clarity-script" strategy="afterInteractive">
+            {`
+              (function(c,l,a,r,i,t,y){
+                  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "${clarityId}");
+            `}
+          </Script>
         ) : null}
         {children}
       </body>
