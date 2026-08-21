@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/team-dasoslab/dowin-web/compare/v1.16.0...v1.16.1) (2026-08-21)
+
+
+### Bug Fixes
+
+* 워크스페이스 생성 및 참여 시 발생하는 DB 트랜잭션 에러 해결 ([115945b](https://github.com/team-dasoslab/dowin-web/commit/115945b119850569d77fa22e058cc1b83a8bfb33))
+
 ## [1.16.0](https://github.com/team-dasoslab/dowin-web/compare/v1.15.1...v1.16.0) (2026-08-20)
 
 
