@@ -32,7 +32,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           <UserAvatar
             avatarKey={member.avatarKey}
             avatarSeed={member.nickname}
@@ -40,7 +40,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
             size={32}
             className="flex-shrink-0"
           />
-          <div className="min-w-0">
+          <div className="min-w-0 space-y-1">
             <div className="flex items-center gap-1.5">
               <p className="text-sm font-bold text-text-primary truncate">
                 {member.nickname}
@@ -76,7 +76,7 @@ export function MemberCard({ member, isMe = false }: MemberCardProps) {
             size="control" 
             title={t("nudgeTitle", { name: member.nickname || tc("teamMember") })}
             disabled={isNudging}
-            className="hover:bg-transparent"
+            className="hover:bg-transparent shrink-0"
             onClick={() => {
               const confirmed = window.confirm(t("nudgeConfirm", { name: member.nickname || tc("teamMember") }));
               if (confirmed && member.userId) {

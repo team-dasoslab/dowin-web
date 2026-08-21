@@ -52,20 +52,20 @@ export function LeadMeasureSummary({
   if (layout === "inline") {
     return (
       <div className="min-w-0 flex flex-col gap-1">
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-1.5">
           <ValueTrend current={achieved} previous={lastWeekAchieved} />
           {publicId && (
             <Badge
               variant="default"
               shape="default"
               onClick={handleCopyId}
-              className="cursor-pointer font-mono font-bold hover:bg-sub-background transition-colors"
+              className="cursor-pointer font-mono font-bold hover:bg-sub-background transition-colors shrink-0"
               title={commonT("copyDone")}
             >
               {publicId}
             </Badge>
           )}
-          <p className={`min-w-0 truncate ${nameClassName}`}>{name}</p>
+          <p className={`min-w-0 flex-1 truncate ${nameClassName}`}>{name}</p>
           {guide && hasGuideActions ? (
             <LeadMeasureGuideTooltip
               active={guideActive}
@@ -109,8 +109,8 @@ export function LeadMeasureSummary({
           </Badge>
         )}
       </div>
-      <div className="flex h-[36px] items-center gap-1.5 flex-wrap">
-        <p className={`min-w-0 truncate ${nameClassName}`}>{name}</p>
+      <div className="flex h-[36px] items-center gap-1.5">
+        <p className={`min-w-0 flex-1 truncate ${nameClassName}`}>{name}</p>
         {guide && hasGuideActions ? (
           <LeadMeasureGuideTooltip
             active={guideActive}
