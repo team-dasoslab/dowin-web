@@ -211,61 +211,63 @@ export class WorkspaceStorage {
   }) {
     const actionItemPrefix = await generateWorkspacePrefix(this.db, input.workspaceName);
 
-    return await this.db.transaction(async (tx) => {
-      const [workspace] = await tx
-        .insert(workspaces)
-        .values({
-          uid: generateUid(),
-          name: input.workspaceName,
-          actionItemPrefix,
-          planCode: BILLING_PLAN.BASIC,
-          billingCustomerExternalRef: `workspace-checkout:${input.pendingUid}`,
-          billingOwnerUserId: input.userId,
-        })
-        .returning();
-
-      await tx.insert(workspaceMembers).values({
-        workspaceId: workspace.id,
-        userId: input.userId,
-        role: "ADMIN",
-      });
-
-      await tx.insert(workspaceBillingState).values({
-        workspaceId: workspace.id,
-        provider: "POLAR",
-        billingStatus: "ACTIVE",
+    const [workspace] = await this.db
+      .insert(workspaces)
+      .values({
+        uid: generateUid(),
+        name: input.workspaceName,
+        actionItemPrefix,
         planCode: BILLING_PLAN.BASIC,
-        entitlementSource: "POLAR",
-        customerKey: input.customerKey,
-        subscriptionKey: input.subscriptionKey,
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
+        billingCustomerExternalRef: `workspace-checkout:${input.pendingUid}`,
         billingOwnerUserId: input.userId,
-        lastEventId: null,
-        lastEventOccurredAt: input.now,
-        updatedAt: input.now,
-      });
+      })
+      .returning();
 
-      await tx.insert(workspaceSeatEntitlements).values({
-        workspaceId: workspace.id,
-        planCode: BILLING_PLAN.BASIC,
-        purchasedSeatCount: input.purchasedSeatCount,
-        seatSource: "POLAR",
-        updatedAt: input.now,
-      });
-
-      await tx
-        .update(pendingWorkspaceCheckouts)
-        .set({
-          status: "COMPLETED",
-          completedWorkspaceId: workspace.id,
-          completedAt: input.now,
+    try {
+      await this.db.batch([
+        this.db.insert(workspaceMembers).values({
+          workspaceId: workspace.id,
+          userId: input.userId,
+          role: "ADMIN",
+        }),
+        this.db.insert(workspaceBillingState).values({
+          workspaceId: workspace.id,
+          provider: "POLAR",
+          billingStatus: "ACTIVE",
+          planCode: BILLING_PLAN.BASIC,
+          entitlementSource: "POLAR",
+          customerKey: input.customerKey,
+          subscriptionKey: input.subscriptionKey,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          billingOwnerUserId: input.userId,
+          lastEventId: null,
+          lastEventOccurredAt: input.now,
           updatedAt: input.now,
-        })
-        .where(eq(pendingWorkspaceCheckouts.id, input.pendingId));
+        }),
+        this.db.insert(workspaceSeatEntitlements).values({
+          workspaceId: workspace.id,
+          planCode: BILLING_PLAN.BASIC,
+          purchasedSeatCount: input.purchasedSeatCount,
+          seatSource: "POLAR",
+          updatedAt: input.now,
+        }),
+        this.db
+          .update(pendingWorkspaceCheckouts)
+          .set({
+            status: "COMPLETED",
+            completedWorkspaceId: workspace.id,
+            completedAt: input.now,
+            updatedAt: input.now,
+          })
+          .where(eq(pendingWorkspaceCheckouts.id, input.pendingId)),
+      ]);
 
       return workspace;
-    });
+    } catch (error) {
+      await this.db.delete(workspaces).where(eq(workspaces.id, workspace.id));
+      throw error;
+    }
   }
 
   async updateWorkspace(
@@ -556,34 +558,47 @@ export class WorkspaceStorage {
   }): Promise<boolean> {
     const { inviteId, workspaceId, userId } = input;
 
-    return await this.db.transaction(async (tx) => {
-      const [updatedInvite] = await tx
-        .update(workspaceInvites)
-        .set({
-          usedCount: sql`${workspaceInvites.usedCount} + 1`,
-        })
-        .where(
-          and(
-            eq(workspaceInvites.id, inviteId),
-            eq(workspaceInvites.workspaceId, workspaceId),
-            eq(workspaceInvites.status, "ACTIVE"),
-            lt(workspaceInvites.usedCount, workspaceInvites.maxUses),
-          ),
-        )
-        .returning({
-          id: workspaceInvites.id,
-        });
+    const [updatedInvite] = await this.db
+      .update(workspaceInvites)
+      .set({
+        usedCount: sql`${workspaceInvites.usedCount} + 1`,
+      })
+      .where(
+        and(
+          eq(workspaceInvites.id, inviteId),
+          eq(workspaceInvites.workspaceId, workspaceId),
+          eq(workspaceInvites.status, "ACTIVE"),
+          lt(workspaceInvites.usedCount, workspaceInvites.maxUses),
+        ),
+      )
+      .returning({
+        id: workspaceInvites.id,
+      });
 
-      if (!updatedInvite) {
-        return false;
-      }
+    if (!updatedInvite) {
+      return false;
+    }
 
-      await tx.insert(workspaceMembers).values({
+    try {
+      await this.db.insert(workspaceMembers).values({
         workspaceId,
         userId,
         role: "MEMBER",
       });
       return true;
-    });
+    } catch (error) {
+      await this.db
+        .update(workspaceInvites)
+        .set({
+          usedCount: sql`${workspaceInvites.usedCount} - 1`,
+        })
+        .where(
+          and(
+            eq(workspaceInvites.id, inviteId),
+            eq(workspaceInvites.workspaceId, workspaceId),
+          ),
+        );
+      throw error;
+    }
   }
 }
