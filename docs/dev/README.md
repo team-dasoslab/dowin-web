@@ -57,8 +57,7 @@ DOWIN는 팀의 목표 실행과 주간 운영을 관리하는 서비스다. 핵
    - [`docs/dev/common/2026.03.12-security.md`](/docs/dev/common/2026.03.12-security.md)
    - [`docs/dev/common/2026.06.12-frontend-test-strategy.md`](/docs/dev/common/2026.06.12-frontend-test-strategy.md)
    - [`docs/dev/common/2026.03.09-database-schema.md`](/docs/dev/common/2026.03.09-database-schema.md)
-6. 운영 문서
-   - [`docs/dev/operations/README.md`](/docs/dev/operations/README.md)
+6. 배포 문서
    - [`docs/dev/common/2026.04.19-production-deployment-flow.md`](/docs/dev/common/2026.04.19-production-deployment-flow.md)
 7. 작업 도메인 문서
 8. 마지막으로 실제 구현 파일
@@ -215,12 +214,6 @@ yarn preview
 - 프로필 하위에는 avatar 선택, 멤버 관리, 초대코드 관리, CSV export 화면이 있다.
 - 푸시 알림은 앱 WebView에서만 사용하며, 서버는 FCM 자격 증명과 활성 디바이스 토큰이 있어야 발송할 수 있다.
 - Push는 `send-daily` 내부 라우트를 사용한다.
-
-### Billing
-
-- 신규 결제 정책은 Basic-only seat 결제다. `FREE`와 `STANDARD`는 legacy 호환값으로만 본다.
-- Billing 구현은 Polar checkout, webhook, workspace billing state, seat entitlement, customer portal 흐름을 중심으로 동작한다.
-- 구매 기록 보존은 권한 projection과 분리해야 한다. 기준 문서는 [`docs/dev/billing/2026.06.09-billing-record-retention-design.md`](/docs/dev/billing/2026.06.09-billing-record-retention-design.md)다.
 
 ### Analytics / Updates
 

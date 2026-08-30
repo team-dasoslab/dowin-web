@@ -84,7 +84,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 프로필 billing 화면에서 현재 플랜, billing 상태, 업그레이드 CTA, 결제 관리 CTA 노출 완료
 - 반복 `refund/revoked` 이력에 대한 최근 30일 위험 신호 집계와 `BILLING_REVIEW_REQUIRED` 차단 규칙 1차 적용 완료
 - billing 화면에 수동 검토 필요 배너 및 위험 신호 상태 표시 추가 완료
-- Polar customer portal 디버깅 결과, pre-authenticated portal session에는 `customer_sessions:write` scope가 있는 `POLAR_ACCESS_TOKEN`이 별도로 필요함을 확인 완료
+- 프로필 billing 화면에서 결제 관리 진입 흐름 확인 완료
 - 푸시 알림 탭 시 payload URL로 자동 라우팅 지원 및 딥링크 진입 시 워크스페이스 상태 불일치 해결 완료
 - 워크스페이스 '지난주 기록 수정 허용' 설정 추가 완료
 - 멤버 권한에 따른 체크인 메뉴 미노출 및 공통 유틸 함수 기반 권한 검사 리팩토링 완료
@@ -94,8 +94,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 
 ### 2.2. 아직 남은 것
 
-- 파일럿 관찰을 위한 이벤트 로그/지표 정의 미구현
-- GA4 기반 일일 Discord 운영 리포트는 포맷 계약까지만 앱 저장소에 반영됐고, 실제 `GA4 Data API -> 집계 -> Discord 발송` 실행은 별도 스케줄러 워커에서 담당하도록 분리 예정이다
+- 제품 관찰을 위한 이벤트 로그/지표 정의 미구현
 - 대시보드 차트/시각화 고도화 미완료
 - 프로필 탈퇴 UX는 구현됐지만 닉네임/워크스페이스 이름 변경은 여전히 `prompt` 기반이다
 - 첫 진입 온보딩 문구/CTA 용어 일관성(`워크스페이스` 중심) 정리는 진행 중이다
@@ -106,20 +105,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 앱 전용 푸시 전환 이후 개인 기록 리마인드의 실제 반응률과 후속 기록 재개율은 운영 데이터로 검증이 더 필요하다
 - 웹 브라우저에서는 알림을 지원하지 않고, 앱(WebView)에서만 네이티브 권한 + FCM 토큰 등록 흐름을 사용한다
 - 프로필 알림 토글은 앱 환경에서 현재 기기 FCM 토큰을 서버에 등록/비활성화한다
-- 유료 기능 후보는 `달성률 임계치 기반 자동 리마인드`보다 체크인 중심으로 재정의했다. 기존 리더 리포트 메뉴는 비활성화 상태이며 신규 방향에서는 제거 대상으로 본다. 핵심은 리더가 목표/성공 기준/액션 아이템 합의와 정책 설정에 집중하고, Dowin이 `위험 신호 감지 -> 자동 운영 체크인 발송 -> 팀원 1탭 반응 -> 체크인 결과 보고 -> 후속 변화 확인`을 담당하는 것이다. 신규 기획 기준은 `docs/planning/2026.06.16-service-led-team-checkin-plan.md`를 본다
-- Polar customer portal 진입은 코드에서 `POLAR_ACCESS_TOKEN` fallback 지원까지 반영됐지만, 실제 sandbox 환경에는 `customer_sessions:write` scope가 있는 토큰 설정이 아직 필요하다
-- 환불 악용 방지 문서 기준의 Basic usage event 저장은 아직 미구현이며, 결제 운영을 계속할 거면 우선순위를 높여 반드시 구현해야 한다
-  - 이유:
-    - 지금은 반복 환불/취소 이력 1차 차단까지만 가능하고, `결제 후 실제로 핵심 유료 기능을 얼마나 썼는지`를 코드로 판정할 수 없다
-    - 문서상 환불 예외 판단 기준을 실제 운영 로직으로 연결하려면 Basic usage ledger가 필요하다
-  - 함께 남은 후속:
-    - 반복 환불 이력의 운영 알림/수동 검토 흐름 고도화
-- Basic seat 결제를 실제 판매 구조로 밀고 갈 때는 구매 기록 보존과 결제 데이터 최소화 기준을 함께 구현해야 한다
-  - 기준 문서: `docs/planning/2026.06.09-billing-record-retention-research.md`
-  - 핵심:
-    - 카드 원문/CVC/CVV는 Dowin DB, 로그, 에러 리포트에 저장하지 않는다
-    - 거래/구독/seat/환불/세금 증빙용 구매 기록은 법정 보존 아카이브로 분리한다
-    - 해외 판매 가능성을 고려해 결제 아카이브는 10년 보존을 기본 설계값으로 본다
+- 체크인 중심 운영 기능은 신규 제품 가치 후보로 재정리 중이다.
 - `/profile/contact` 기준의 서비스 내부 문의 MVP는 구현 완료됐다
   - 포함 범위:
     - 문의 접수 폼
@@ -241,7 +227,6 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - `docs/dev/common/2026.03.12-domain-overview.md`
 - `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`
 - 운영 사고 대응 준비: `docs/planning/2026.04.19-production-incident-readiness-plan.md`
-- 운영 문서 시작점: `docs/dev/operations/README.md`
 
 4. 관련 도메인 설계 문서
    - 예: `docs/dev/daily-log/2026.03.12-domain-daily-log.md`
@@ -257,26 +242,16 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
    - 예: `docs/dev/dashboard/2026.03.15-frontend.md`
    - 예: `docs/dev/profile/2026.03.16-backend.md`
    - 예: `docs/dev/profile/2026.03.16-frontend.md`
-6. 전략/우선순위 문서 (필요 시)
+6. 공개 가능한 전략/우선순위 문서 (필요 시)
    - 루트 랜딩 페이지 전환안: `docs/planning/2026.03.24-root-landing-page-plan.md`
    - 서비스 기획 개요: `docs/planning/2026.03.09-service-overview.md`
    - 제품 용어 사전 + 화면별 카피 적용표: `docs/planning/2026.04.28-product-language-dictionary-and-copy-map.md`
-   - 범용 마케팅 방법론 조사: `docs/planning/2026.04.19-marketing-methodology-research.md`
-   - 초기 마케팅 방법론: `docs/planning/2026.04.19-marketing-methodology-plan.md`
    - 선행지표 태그 확장안: `docs/planning/2026.04.10-lead-measure-tag-plan.md`
    - 책 기준 정렬 점검 및 우선순위 재정의: `docs/planning/2026.04.13-book-alignment-priority-plan.md`
-   - Basic-only seat 결제/권한: `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`
-     - Basic seat checkout, 운영 접근 gate, 환불/해지, legacy `FREE`/`STANDARD` 호환 원칙 포함
-   - Basic 결제 구매 기록 보존 리서치: `docs/planning/2026.06.09-billing-record-retention-research.md`
-     - 구매 기록 10년 보존, 카드 원문 미저장, 개인정보 분리보관 기준 포함
    - 과거 Free 플랜 초기 제한안: `docs/planning/2026.04.14-free-plan-initial-limits-plan.md`
      - 현재 정책이 아니라 히스토리로만 참고
-   - 과거 Polar `FREE -> STANDARD` 결제 MVP 설계안: `docs/planning/2026.04.18-polar-billing-mvp-plan.md`
-     - billing ledger, webhook, portal, 환불 리스크 맥락만 참고
    - 알림 스케줄 커스터마이즈: `docs/planning/2026.04.14-notification-schedule-customization-plan.md`
    - Slack/Discord 봇 연동 확장안: `docs/planning/2026.04.18-slack-discord-bot-integration-plan.md`
-   - 범용화 + 무료 가치 우선 로드맵: `docs/planning/2026.03.24-monetization-generalization-roadmap.md`
-   - 수익화 전략: `docs/planning/2026.03.18-monetization-strategy.md`
    - 커밋 컨벤션 정리: `docs/planning/2026.04.09-commit-convention.md`
    - 성능 최적화 포인트: `docs/dev/performance/2026.03.17-optimization-points.md`
    - 성능 측정 기준선: `docs/dev/performance/2026.03.17-baseline.md`
@@ -605,8 +580,7 @@ PR을 머지하기 전에는 자동 검증과 별개로 짧은 보안 점검을 
 - 점수판/선행지표 문제: `src/app/(protected)/setup/*`, `src/app/api/scoreboards/*`, `src/app/api/lead-measures/*`
 - 프로필/설정 문제: `src/app/(protected)/profile/*`, `src/app/api/users/me/route.ts`, `src/domain/profile/*`
 - 업데이트 허브 문제: `src/app/(protected)/updates/page.tsx`, `src/content/product-updates.ts`, `src/lib/product-updates.ts`
-- 수익화/요금제 전략 검토: `docs/planning/2026.03.18-monetization-strategy.md`, `docs/planning/2026.03.09-service-overview.md`
-- seat 기반 결제/권한 구조 변경: `docs/planning/2026.05.20-billing-entitlement-and-workspace-architecture-plan.md`, `src/domain/workspace/plan-limits.ts`, `src/lib/server/workspace-context.ts`, `src/domain/billing/*`
+- 요금제 관련 구현 확인: `src/domain/workspace/plan-limits.ts`, `src/lib/server/workspace-context.ts`, `src/domain/billing/*`
 - 성능 최적화 작업: `docs/dev/performance/2026.03.17-optimization-points.md`, `docs/dev/performance/2026.03.17-baseline.md`, `docs/dev/performance/2026.03.17-measurement-report.md`
 
 ## 11. 현재 가장 현실적인 다음 작업
