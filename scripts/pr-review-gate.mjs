@@ -5,7 +5,7 @@
 // 사용법:
 //   node scripts/pr-review-gate.mjs                # git diff로 변경 파일 자동 계산 (origin/main 기준)
 //   node scripts/pr-review-gate.mjs changed.txt     # 파일 목록(줄바꿈 구분)을 직접 전달
-//   yarn review:gate
+//   pnpm review:gate
 
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -37,7 +37,7 @@ const RULES = [
     checks: [
       "dowin-backend-quality-check",
       "dowin-frontend-quality-check",
-      "yarn gen:api 재실행 여부 확인",
+      "pnpm gen:api 재실행 여부 확인",
     ],
   },
   {
@@ -155,7 +155,7 @@ function buildReport(changedFiles) {
 
   if (matchedByCheck.size === 0) {
     lines.push(
-      "패턴에 매칭되는 민감 경로가 없습니다. 표준 `yarn lint`/`yarn tsc --noEmit`/`yarn test`만 확인하면 됩니다.",
+      "패턴에 매칭되는 민감 경로가 없습니다. 표준 `pnpm lint`/`pnpm tsc --noEmit`/`pnpm test`만 확인하면 됩니다.",
     );
     return lines.join("\n");
   }
