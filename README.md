@@ -25,7 +25,7 @@ Dowin은 개인/팀의 목표 실행과 주간 운영을 관리하는 서비스�
 - Zod
 - Vitest, Storybook
 - OpenNext + Cloudflare Workers
-- Yarn 4.10.0
+- pnpm 10.33.2
 
 ## 프로젝트 구조
 
@@ -50,14 +50,14 @@ Dowin은 개인/팀의 목표 실행과 주간 운영을 관리하는 서비스�
 ### 1) 사전 준비
 
 - Node.js 22
-- Yarn 4
+- pnpm 10
 - mise
 
 ### 2) 설치
 
 ```bash
 mise install
-yarn install
+pnpm install
 ```
 
 ### 3) 환경 변수 설정
@@ -85,49 +85,49 @@ yarn install
 ### 4) 로컬 DB 마이그레이션
 
 ```bash
-yarn mig:local
+pnpm mig:local
 ```
 
 > **Tip: 로컬 DB 초기화가 필요할 때**
-> 개발 중 로컬 데이터가 꼬여서 데이터베이스를 완전히 초기화하고 싶다면, `.wrangler/state` 폴더를 삭제한 뒤 `yarn mig:local`을 다시 실행하세요.
+> 개발 중 로컬 데이터가 꼬여서 데이터베이스를 완전히 초기화하고 싶다면, `.wrangler/state` 폴더를 삭제한 뒤 `pnpm mig:local`을 다시 실행하세요.
 
 ### 5) 개발 서버 실행
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 - 앱: `http://localhost:4000`
 - 스웨거: `http://localhost:4000/api-docs`
-- Storybook: `yarn storybook` 실행 후 `http://localhost:6006`
+- Storybook: `pnpm storybook` 실행 후 `http://localhost:6006`
 
 > **첫 로그인 (계정 생성) 안내**: 마이그레이션 직후 DB는 비어 있습니다. 브라우저에서 `http://localhost:4000/login` 화면으로 진입하여 **직접 회원가입을 통해 테스트 계정을 생성**하고 시작하시면 됩니다.
 
 ## 주요 명령어
 
 ```bash
-yarn dev               # 개발 서버
-yarn build             # 프로덕션 빌드
-yarn start             # 빌드 결과 실행
-yarn test --run        # 전체 Vitest 1회 실행
-yarn test:frontend     # 프론트엔드 테스트 묶음
-yarn test:backend      # 백엔드/API/domain 테스트 묶음
-yarn test:e2e          # Playwright E2E 테스트
-yarn gen:api           # OpenAPI 기반 Orval 생성
-yarn mig:local         # 로컬 D1 마이그레이션 적용
-yarn mig:remote        # 원격 D1 마이그레이션 적용
-yarn storybook         # Storybook 실행
-yarn deploy            # Cloudflare 배포
+pnpm dev               # 개발 서버
+pnpm build             # 프로덕션 빌드
+pnpm start             # 빌드 결과 실행
+pnpm test --run        # 전체 Vitest 1회 실행
+pnpm test:frontend     # 프론트엔드 테스트 묶음
+pnpm test:backend      # 백엔드/API/domain 테스트 묶음
+pnpm test:e2e          # Playwright E2E 테스트
+pnpm gen:api           # OpenAPI 기반 Orval 생성
+pnpm mig:local         # 로컬 D1 마이그레이션 적용
+pnpm mig:remote        # 원격 D1 마이그레이션 적용
+pnpm storybook         # Storybook 실행
+pnpm deploy            # Cloudflare 배포
 ```
 
 ## Playwright E2E
 
-Playwright 테스트는 `e2e/` 아래에 둡니다. 기본 설정은 `playwright.config.ts`에 있으며, `yarn test:e2e` 실행 시 `yarn dev` 서버를 `http://127.0.0.1:4000`에서 자동으로 띄웁니다. 이미 같은 주소에 개발 서버가 떠 있으면 로컬에서는 그 서버를 재사용합니다.
+Playwright 테스트는 `e2e/` 아래에 둡니다. 기본 설정은 `playwright.config.ts`에 있으며, `pnpm test:e2e` 실행 시 `pnpm dev` 서버를 `http://127.0.0.1:4000`에서 자동으로 띄웁니다. 이미 같은 주소에 개발 서버가 떠 있으면 로컬에서는 그 서버를 재사용합니다.
 
 현재 E2E는 로컬 전용으로 운영합니다. macOS에 설치된 Google Chrome을 사용하므로 별도의 Playwright 브라우저 바이너리 설치가 필요하지 않습니다. 로그인 이후 흐름을 테스트하려면 로컬 DB에 `test01 / qwer1234` 테스트 계정을 준비해두세요.
 
 ```bash
-yarn test:e2e
+pnpm test:e2e
 ```
 
 ## API 계약 변경 규칙
@@ -135,7 +135,7 @@ yarn test:e2e
 백엔드 API 계약을 바꿀 때는 아래 순서를 따릅니다.
 
 1. `src/api-spec/openapi.yaml` 수정
-2. `yarn gen:api` 실행
+2. `pnpm gen:api` 실행
 3. 라우트/도메인 코드 반영
 
 ## 배포 및 체인지로그 (Release Please)
@@ -153,13 +153,13 @@ yarn test:e2e
 수동 배포가 필요할 때는 아래 명령어를 사용합니다.
 
 ```bash
-yarn deploy
+pnpm deploy
 ```
 
 시크릿은 Wrangler로 등록합니다.
 
 ```bash
-yarn wrangler secret put <KEY_NAME>
+pnpm exec wrangler secret put <KEY_NAME>
 ```
 
 ## 문서 시작점
