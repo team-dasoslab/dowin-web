@@ -141,13 +141,13 @@ pnpm test:e2e
 ## 배포 및 체인지로그 (Release Please)
 
 - 커밋 메시지 규칙(`feat:`, `fix:` 등)을 지켜서 `main`에 머지하면, **Release Please Action이 버전 넘버링과 `CHANGELOG.md`를 자동 관리**하는 PR을 띄워줍니다. 수동으로 체인지로그를 적을 필요가 없습니다.
-- Cloudflare Workers Builds(Git integration)는 `production` 브랜치만 자동 빌드/배포합니다.
+- Cloudflare Workers Builds(Git integration)는 `release` 브랜치만 자동 빌드/배포합니다.
 - `main` 브랜치는 개발 통합 브랜치입니다.
-- 실제 배포는 `main -> production` PR 머지로만 진행합니다.
+- 실제 배포는 `main -> release` PR 머지로만 진행합니다.
 - **배포 PR 제목은 `release: YYYY-MM-DD vX.Y.Z` 형식으로 작성합니다.**
-- `production` PR은 `PR CI`와 `Production DB Migration Check`를 통과해야 머지합니다.
-- `production` 브랜치에는 직접 push하지 않고 PR로만 머지합니다.
-- `production` PR이 merge되면 `Production DB Migration` 워크플로가 자동으로 production DB migration을 적용합니다.
+- `release` PR은 `PR CI`와 `Production DB Migration Check`를 통과해야 머지합니다.
+- `release` 브랜치에는 직접 push하지 않고 PR로만 머지합니다.
+- `release` PR이 merge되면 `Production DB Migration` 워크플로가 자동으로 production DB migration을 적용합니다.
 - 자세한 배포 운영 방식은 [Production Deployment Flow](/docs/dev/common/2026.04.19-production-deployment-flow.md)를 참고합니다.
 
 수동 배포가 필요할 때는 아래 명령어를 사용합니다.

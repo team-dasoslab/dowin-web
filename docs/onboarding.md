@@ -194,14 +194,14 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 ### 3.1. 현재 배포 운영 방식
 
 - `main`은 개발 통합 브랜치다.
-- `production`은 Cloudflare 자동 배포 브랜치다.
-- 실제 운영 반영은 `main -> production` PR 머지로만 진행한다.
-- `production` PR은 `PR CI`와 `Production DB Migration Check`를 통과해야 머지한다.
+- `release`는 Cloudflare 자동 배포 브랜치다.
+- 실제 운영 반영은 `main -> release` PR 머지로만 진행한다.
+- `release` PR은 `PR CI`와 `Production DB Migration Check`를 통과해야 머지한다.
 - 이 구조를 쓰는 이유는 문서 수정이나 내부 정리 커밋이 `main`에 들어가도 곧바로 프로덕션 배포되지 않게 하기 위해서다.
-- `production` PR 단계에서는 검증용 D1 DB에 migration check를 수행한다.
-- `production` PR이 merge되면 GitHub Actions `Production DB Migration` 워크플로가 production DB migration을 자동 적용한다.
+- `release` PR 단계에서는 검증용 D1 DB에 migration check를 수행한다.
+- `release` PR이 merge되면 GitHub Actions `Production DB Migration` 워크플로가 production DB migration을 자동 적용한다.
 - 해당 워크플로는 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` GitHub Secrets를 사용한다.
-- `production` PR migration check는 GitHub Actions variable `D1_MIGRATION_CHECK_DATABASE`와 `wrangler.jsonc`의 검증용 D1 바인딩을 사용한다.
+- `release` PR migration check는 GitHub Actions variable `D1_MIGRATION_CHECK_DATABASE`와 `wrangler.jsonc`의 검증용 D1 바인딩을 사용한다.
 - 현재는 PR 단계 migration 검증과 merge 후 production DB migration, Cloudflare Git integration 배포가 각각 자동화되어 있다.
 - 자세한 운영 배경과 설정 링크는 `docs/dev/common/2026.04.19-production-deployment-flow.md`를 본다.
 
