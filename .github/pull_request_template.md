@@ -10,7 +10,7 @@
 
 <!-- 변경 범위에 맞는 항목만 체크해주세요. -->
 
-- [ ] `yarn lint`
-- [ ] `yarn tsc --noEmit`
-- [ ] `yarn test:backend`
-- [ ] `yarn test:frontend`
+- [ ] `pnpm lint`
+- [ ] `pnpm tsc --noEmit`
+- [ ] `pnpm test:backend`
+- [ ] `pnpm test:frontend`
