@@ -2,7 +2,7 @@ name: Production DB Migration Check
 
 on:
   pull_request:
-    branches: [production]
+    branches: [release]
     types:
       - opened
       - synchronize
@@ -33,7 +33,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: '.node-version'
+          node-version-file: ".node-version"
 
       - name: Enable Corepack
         run: |
