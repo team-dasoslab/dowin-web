@@ -171,10 +171,10 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 
 ### 2.4. 현재 검증 기준
 
-- `yarn tsc --noEmit` 통과
-- `yarn lint` 통과
-- `yarn test --run` 통과
-- Storybook browser 테스트는 기본 콘솔 테스트에 포함되지 않고 `yarn test:storybook --run`으로 분리되어 있다
+- `pnpm tsc --noEmit` 통과
+- `pnpm lint` 통과
+- `pnpm test --run` 통과
+- Storybook browser 테스트는 기본 콘솔 테스트에 포함되지 않고 `pnpm test:storybook --run`으로 분리되어 있다
 - `AGENTS.md`, `codex.md`, `.agents/skills/**` 같은 하네스 파일이 바뀌면 머지 전 `dowin-harness-security-check`를 추가로 수행한다
 - 프론트엔드 화면/훅 테스트 작성 기준은 `docs/dev/common/2026.06.12-frontend-test-strategy.md`를 따른다
 
@@ -189,7 +189,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 - 테스트: Vitest
 - UI 문서화: Storybook
 - 배포: OpenNext + Cloudflare
-- 패키지 매니저: Yarn 4.10.0
+- 패키지 매니저: pnpm 10.33.2
 
 ### 3.1. 현재 배포 운영 방식
 
@@ -476,7 +476,7 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 
 ### 7.1. 공통
 
-- Yarn만 사용한다
+- pnpm만 사용한다
 - 문서보다 현재 구현이 우선이다
 - 변경 범위와 맞는 최소 문서만 읽는다
 - 새 구조를 만들기 전에 기존 패턴을 재사용한다
@@ -516,20 +516,20 @@ Dowin는 개인 또는 소규모 팀의 목표 실행과 주간 운영을 관리
 ### 9.1. 기본 실행
 
 ```bash
-yarn install
-yarn dev
+pnpm install
+pnpm dev
 ```
 
 ### 9.2. 자주 쓰는 명령어
 
 ```bash
-yarn storybook
-yarn test --run
-yarn test:frontend
-yarn test:backend
-yarn test:e2e
-yarn gen:api
-yarn mig:local
+pnpm storybook
+pnpm test --run
+pnpm test:frontend
+pnpm test:backend
+pnpm test:e2e
+pnpm gen:api
+pnpm mig:local
 ```
 
 ### 9.3. 현재 권장 검증 방식
@@ -539,20 +539,20 @@ yarn mig:local
 프론트 변경 예시:
 
 ```bash
-yarn eslint <changed-files>
+pnpm eslint <changed-files>
 ```
 
 백엔드 변경 예시:
 
 ```bash
-yarn test --run <changed-test-file>
+pnpm test --run <changed-test-file>
 ```
 
 주의:
 
-- `yarn test --run`은 전체 콘솔 테스트 1회 실행이다
-- 프론트엔드/백엔드만 넓게 확인할 때는 `yarn test:frontend`, `yarn test:backend`를 사용한다
-- Storybook browser 테스트가 필요하면 `yarn test:storybook --run`을 별도로 사용한다
+- `pnpm test --run`은 전체 콘솔 테스트 1회 실행이다
+- 프론트엔드/백엔드만 넓게 확인할 때는 `pnpm test:frontend`, `pnpm test:backend`를 사용한다
+- Storybook browser 테스트가 필요하면 `pnpm test:storybook --run`을 별도로 사용한다
 
 ### 9.4. 머지 전 보안 점검
 

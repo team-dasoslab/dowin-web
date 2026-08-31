@@ -69,26 +69,26 @@ DOWIN는 팀의 목표 실행과 주간 운영을 관리하는 서비스다. 핵
 ### 필수 조건
 
 - Node.js 18+
-- Yarn 4.10.0
+- pnpm 10.33.2
 - Cloudflare D1 로컬 개발 환경
 
 ### 기본 명령
 
 ```bash
-yarn install
-yarn dev
+pnpm install
+pnpm dev
 ```
 
 유용한 보조 명령은 아래와 같다.
 
 ```bash
-yarn gen:api
-yarn test --run
-yarn test:frontend
-yarn test:backend
-yarn storybook
-yarn mig:local
-yarn preview
+pnpm gen:api
+pnpm test --run
+pnpm test:frontend
+pnpm test:backend
+pnpm storybook
+pnpm mig:local
+pnpm preview
 ```
 
 ### 런타임/배포 관련 파일
@@ -164,7 +164,7 @@ yarn preview
 프론트는 OpenAPI 생성 훅 중심으로 돌아간다.
 
 1. `src/api-spec/openapi.yaml` 수정
-2. `yarn gen:api`
+2. `pnpm gen:api`
 3. `src/api/generated/**` 훅 사용
 4. 페이지 또는 `_hooks` 레이어에서 TanStack Query 상태와 UX를 조합
 
@@ -263,7 +263,7 @@ Drizzle 스키마 기준 핵심 테이블은 아래와 같다.
 
 ## 9. 작업 규칙
 
-- Yarn만 사용
+- pnpm만 사용
 - API 계약 변경 시 `openapi.yaml` 먼저 수정
 - 백엔드는 Zod 검증 사용
 - Route Handler는 `withErrorHandler` 패턴 유지
@@ -275,18 +275,18 @@ Drizzle 스키마 기준 핵심 테이블은 아래와 같다.
 
 2026-03-19에 실제로 확인한 기준이다.
 
-- `yarn tsc --noEmit`: 통과
-- `yarn lint`: 통과
-- `yarn test --run`: 통과
-- `yarn test:storybook --run`: 별도 브라우저/Storybook 테스트 경로
+- `pnpm tsc --noEmit`: 통과
+- `pnpm lint`: 통과
+- `pnpm test --run`: 통과
+- `pnpm test:storybook --run`: 별도 브라우저/Storybook 테스트 경로
 
 그래서 작업 시에는 "관련 범위만 최소 검증 후 필요 시 전역 게이트 확장" 원칙이 적절하다.
 
-- 타입 영향이 크면 `yarn tsc --noEmit`
-- API 계약 바뀌면 `yarn gen:api`
+- 타입 영향이 크면 `pnpm tsc --noEmit`
+- API 계약 바뀌면 `pnpm gen:api`
 - 도메인 로직 바뀌면 해당 `vitest` 테스트
-- 프론트 단일 파일 수정은 필요한 경우 `yarn eslint <file>`
-- Storybook browser 테스트가 필요한 UI 변경이면 `yarn test:storybook --run`
+- 프론트 단일 파일 수정은 필요한 경우 `pnpm eslint <file>`
+- Storybook browser 테스트가 필요한 UI 변경이면 `pnpm test:storybook --run`
 
 ## 11. 처음 작업할 때 추천 동선
 

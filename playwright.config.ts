@@ -18,7 +18,7 @@ export default defineConfig({
     video: "off",
   },
   webServer: {
-    command: "yarn dev",
+    command: "pnpm dev",
     url: baseURL,
     reuseExistingServer: !isCI,
     timeout: 120_000,
