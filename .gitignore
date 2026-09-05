@@ -65,6 +65,7 @@ temp/
 
 # Beads / Dolt files (added by bd init)
 .dolt/
+.beads
 *.db
 .beads-credential-key
 .beads/proxieddb/
