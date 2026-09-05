@@ -52,17 +52,17 @@ If a shared UI component is added or materially changed, add or update a story i
 ### 4. Verify
 
 ```bash
-yarn test --run <changed-or-affected-test-files>
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
+pnpm test --run <changed-or-affected-test-files>
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
 ```
 
 Broader check when substantial:
 
 ```bash
-yarn storybook
-yarn test:storybook --run
+pnpm storybook
+pnpm test:storybook --run
 ```
 
 ## Frontend UI Checklist

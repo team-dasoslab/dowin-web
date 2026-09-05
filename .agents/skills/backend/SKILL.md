@@ -38,8 +38,8 @@ If docs conflict with code, verify the implementation and trust the current code
 - SQL must use Prepared Statement patterns through Drizzle or binding.
 - Keep backend date storage and API-facing canonical date values in UTC unless a domain doc explicitly says otherwise.
 - Schema or persisted-data changes must use repository migration scripts, not manual SQL application, ad-hoc Drizzle commands, or direct Wrangler migration commands.
-  - Local schema migration flow: `yarn mig:local`
-  - Remote apply flow: `yarn mig:remote` — production-affecting; get explicit confirmation immediately before running it, every time (see `AGENTS.md` Safety Guardrails)
+  - Local schema migration flow: `pnpm mig:local`
+  - Remote apply flow: `pnpm mig:remote` — production-affecting; get explicit confirmation immediately before running it, every time (see `AGENTS.md` Safety Guardrails)
   - Do not run `drizzle-kit generate`, `drizzle-kit push`, or `wrangler d1 migrations apply` directly unless the repository instructions are changed
 - Backend changes that add heavy aggregation, repeated scans, or broader DB reads should include `dowin-backend-performance-check` before completion.
 - When creating commits, follow `docs/planning/2026.04.09-commit-convention.md`. Prefer `feat|fix|docs|chore|refactor|style` with the format `<type>: <변경 요약>`.
@@ -104,11 +104,11 @@ If an implementation point below the already-fixed contract/schema still has mor
 Use the smallest useful verification set first, then broaden:
 
 ```bash
-yarn test --run <changed-test-file>
-yarn test:backend
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
+pnpm test --run <changed-test-file>
+pnpm test:backend
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
 ```
 
 ### 6. Check performance when the path is sensitive
@@ -152,7 +152,7 @@ The rule here is about how to split and order commits so review stays clear.
 - Are prepared statements or Drizzle-safe bindings used?
 - Did every implementation point with more than one valid approach get decided by the user instead of picked silently?
 - If the changed path is aggregation-heavy or query-heavy, was a performance review done?
-- Did `yarn test --run <changed-test-file>` or `yarn test:backend`, `yarn tsc --noEmit`, and `yarn lint` run for the backend change?
+- Did `pnpm test --run <changed-test-file>` or `pnpm test:backend`, `pnpm tsc --noEmit`, and `pnpm lint` run for the backend change?
 
 ## Output Contract
 

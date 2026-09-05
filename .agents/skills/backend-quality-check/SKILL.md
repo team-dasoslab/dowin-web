@@ -45,11 +45,11 @@ Start with:
 ### 3. Run verification
 
 ```bash
-yarn test --run <changed-test-file>
-yarn test:backend
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
+pnpm test --run <changed-test-file>
+pnpm test:backend
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
 ```
 
 ### 4. Report findings
@@ -58,7 +58,7 @@ Report failing checks, missing tests, likely regressions, and residual risk if s
 
 ## Backend Quality Checklist
 
-- Were the most relevant backend tests run first, then `yarn test:backend`?
+- Were the most relevant backend tests run first, then `pnpm test:backend`?
 - Were domain business rules checked (see `references/backend-quality-rules.md` for the domain list)?
 - Are auth, ownership, and strict Zod validation applied correctly?
 - Does the implementation match `src/api-spec/openapi.yaml`?

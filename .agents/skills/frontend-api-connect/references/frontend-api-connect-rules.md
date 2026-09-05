@@ -18,14 +18,14 @@
 ## Verification Defaults
 
 ```bash
-yarn test --run <changed-or-affected-test-files>
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
+pnpm test --run <changed-or-affected-test-files>
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
 ```
 
 If API contracts changed:
 
 ```bash
-yarn gen:api
+pnpm gen:api
 ```

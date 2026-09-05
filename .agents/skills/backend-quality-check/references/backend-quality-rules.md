@@ -3,11 +3,11 @@
 ## Verification
 
 ```bash
-yarn test --run <changed-test-file>
-yarn test:backend
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
+pnpm test --run <changed-test-file>
+pnpm test:backend
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
 ```
 
 ## Domain-Specific Checks

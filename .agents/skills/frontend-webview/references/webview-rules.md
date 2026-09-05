@@ -36,12 +36,12 @@
 ## Verification Defaults
 
 ```bash
-yarn tsc --noEmit
-yarn eslint <changed-files>
+pnpm tsc --noEmit
+pnpm eslint <changed-files>
 ```
 
 If multiple bridge consumers changed:
 
 ```bash
-yarn lint
+pnpm lint
 ```

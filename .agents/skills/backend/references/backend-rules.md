@@ -23,24 +23,24 @@
 - Prefer ownership filtering in queries rather than fetch-then-check patterns.
 - Use Drizzle or bound parameters only.
 - For new features that need persisted data, design the DB schema before backend implementation.
-- Do not create or apply D1/Drizzle migrations manually. Use `yarn mig:local` for local schema migration work; `yarn mig:remote` requires explicit confirmation immediately before running it (Safety Guardrails in `AGENTS.md`), every time, regardless of prior instruction.
+- Do not create or apply D1/Drizzle migrations manually. Use `pnpm mig:local` for local schema migration work; `pnpm mig:remote` requires explicit confirmation immediately before running it (Safety Guardrails in `AGENTS.md`), every time, regardless of prior instruction.
 - Do not run `drizzle-kit generate`, `drizzle-kit push`, or `wrangler d1 migrations apply` directly unless the repository instructions are changed.
 - For query-heavy or aggregation-heavy backend changes, run `dowin-backend-performance-check` before considering the work complete.
 
 ## Verification Defaults
 
 ```bash
-yarn test --run <changed-test-file>
-yarn test:backend
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
+pnpm test --run <changed-test-file>
+pnpm test:backend
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
 ```
 
-Use focused `yarn test --run <changed-test-file>` while developing. Before handoff for backend/API/domain implementation changes, run `yarn test:backend` unless a narrower run is explicitly accepted for a small documentation-adjacent change.
+Use focused `pnpm test --run <changed-test-file>` while developing. Before handoff for backend/API/domain implementation changes, run `pnpm test:backend` unless a narrower run is explicitly accepted for a small documentation-adjacent change.
 
 If API contracts changed:
 
 ```bash
-yarn gen:api
+pnpm gen:api
 ```

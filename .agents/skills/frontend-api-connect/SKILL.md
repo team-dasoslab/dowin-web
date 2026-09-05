@@ -53,23 +53,23 @@ If a data-fetching/state-handling point has more than one valid approach (e.g. o
 ### 3. Verify
 
 ```bash
-yarn test --run <changed-or-affected-test-files>
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
+pnpm test --run <changed-or-affected-test-files>
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
 ```
 
 If the API contract changed:
 
 ```bash
-yarn gen:api
+pnpm gen:api
 ```
 
 Broader check when substantial:
 
 ```bash
-yarn test:frontend
-yarn test --run
+pnpm test:frontend
+pnpm test --run
 ```
 
 ## Frontend API Connect Checklist
@@ -79,7 +79,7 @@ yarn test --run
 - If query-string state is needed, was the choice between server `searchParams` and client `useSearchParams()` intentional, with `Suspense` when client-side?
 - Is Zod validation applied strictly to all external inputs (form data, URL searchParams)?
 - Were changed/affected frontend tests run?
-- If API contracts changed, was `yarn gen:api` run?
+- If API contracts changed, was `pnpm gen:api` run?
 - Did every data-fetching/state-handling point with more than one valid approach get decided by the user instead of picked silently?
 
 ## Output Contract

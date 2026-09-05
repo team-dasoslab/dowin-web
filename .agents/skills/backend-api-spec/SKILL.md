@@ -50,15 +50,15 @@ For a new feature with new tables, columns, relations, or constraints:
 Reflect the design in `src/db/schema.ts`, then run:
 
 ```bash
-yarn mig:local
+pnpm mig:local
 ```
 
-Do not manually create or apply migration files with direct SQL/Drizzle/Wrangler commands. `yarn mig:remote` is a production-affecting command — per `AGENTS.md`'s Safety Guardrails, get explicit confirmation immediately before running it, every time, even if the task already said to apply the migration remotely.
+Do not manually create or apply migration files with direct SQL/Drizzle/Wrangler commands. `pnpm mig:remote` is a production-affecting command — per `AGENTS.md`'s Safety Guardrails, get explicit confirmation immediately before running it, every time, even if the task already said to apply the migration remotely.
 
 ### 4. Regenerate the client
 
 ```bash
-yarn gen:api
+pnpm gen:api
 ```
 
 ## Backend API Spec Checklist
@@ -66,8 +66,8 @@ yarn gen:api
 - Was `src/api-spec/openapi.yaml` updated before any implementation?
 - If persisted data is involved, was the schema designed (table/column/constraint/index/ownership) before implementation?
 - Did every contract/schema point with more than one valid design get decided by the user instead of picked silently?
-- Was `yarn mig:local` used instead of manual migration commands?
-- Was `yarn gen:api` run after a contract change?
+- Was `pnpm mig:local` used instead of manual migration commands?
+- Was `pnpm gen:api` run after a contract change?
 
 ## Output Contract
 

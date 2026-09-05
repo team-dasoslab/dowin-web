@@ -87,15 +87,15 @@ Update:
 Run the smallest useful set first:
 
 ```bash
-yarn tsc --noEmit
-yarn eslint <changed-files>
+pnpm tsc --noEmit
+pnpm eslint <changed-files>
 ```
 
 Add broader checks when the change affects real UI behavior or routing:
 
 ```bash
-yarn lint
-yarn test:frontend
+pnpm lint
+pnpm test:frontend
 ```
 
 ## Output Contract

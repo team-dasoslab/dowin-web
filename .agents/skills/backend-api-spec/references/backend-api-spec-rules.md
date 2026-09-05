@@ -13,19 +13,19 @@
 
 - Update `src/api-spec/openapi.yaml` before any route/service/storage code changes.
 - For new persisted data, design the DB schema (table/column/constraint/index/ownership boundary) before implementation.
-- Do not create or apply D1/Drizzle migrations manually. Use `yarn mig:local` for local schema migration work; `yarn mig:remote` requires explicit confirmation immediately before running it (Safety Guardrails in `AGENTS.md`), every time, regardless of prior instruction.
+- Do not create or apply D1/Drizzle migrations manually. Use `pnpm mig:local` for local schema migration work; `pnpm mig:remote` requires explicit confirmation immediately before running it (Safety Guardrails in `AGENTS.md`), every time, regardless of prior instruction.
 - Do not run `drizzle-kit generate`, `drizzle-kit push`, or `wrangler d1 migrations apply` directly.
 - Keep backend date storage and API-facing canonical date values in UTC unless a domain doc explicitly says otherwise.
 
 ## Verification Defaults
 
 ```bash
-yarn gen:api
-yarn tsc --noEmit
+pnpm gen:api
+pnpm tsc --noEmit
 ```
 
 If the schema changed:
 
 ```bash
-yarn mig:local
+pnpm mig:local
 ```

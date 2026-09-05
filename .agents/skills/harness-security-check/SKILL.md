@@ -75,7 +75,7 @@ When reporting, prioritize:
 
 - Are secrets or private endpoints absent from prompt/config files?
 - Does `AGENTS.md`/`codex.md` still explicitly forbid reading `.env*`/`.dev.vars*` (Safety Guardrails), and does `.claude/settings.json`'s `permissions.deny` still mechanically block them for Claude Code?
-- Does `AGENTS.md`/`codex.md` still require fresh, explicit confirmation immediately before any production/remote-affecting command (`yarn mig:remote`, `yarn deploy`, `wrangler --remote`, shared-remote `git push`/`bd dolt push`)?
+- Does `AGENTS.md`/`codex.md` still require fresh, explicit confirmation immediately before any production/remote-affecting command (`pnpm mig:remote`, `pnpm deploy`, `wrangler --remote`, shared-remote `git push`/`bd dolt push`)?
 - Do instructions avoid broad auto-approval or overly permissive execution guidance?
 - Are destructive commands gated clearly and narrowly?
 - Do skills distinguish app-code security review from harness/config security review?
