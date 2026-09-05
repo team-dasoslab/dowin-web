@@ -3,13 +3,15 @@
 ## Verification
 
 ```bash
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
-yarn test:frontend
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
+pnpm test:frontend
 ```
 
-Browser-backed Storybook verification is separate via `yarn test:storybook --run`.
+Run `pnpm test:e2e` when a frontend change affects user behavior or a real data flow, including login, routing, form submission, server mutations, or another core user flow. Presentation-only copy, color, and spacing changes do not require E2E. The local suite requires the seed account documented in `README.md`; a required E2E run that is skipped or fails prevents the quality stage from returning `pass`.
+
+Browser-backed Storybook verification is separate via `pnpm test:storybook --run`.
 
 ## Checks
 

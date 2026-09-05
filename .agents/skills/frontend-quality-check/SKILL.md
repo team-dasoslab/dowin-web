@@ -44,11 +44,19 @@ Start with:
 ### 3. Run verification
 
 ```bash
-yarn tsc --noEmit
-yarn lint
-yarn eslint <changed-files>
-yarn test:frontend
+pnpm tsc --noEmit
+pnpm lint
+pnpm eslint <changed-files>
+pnpm test:frontend
 ```
+
+If the frontend change affects user behavior or a real data flow, also run:
+
+```bash
+pnpm test:e2e
+```
+
+This includes login, routing, form submission, server mutations, and other core user flows. Copy-only, color, spacing, and other presentation-only changes do not require E2E. The local Playwright suite requires the seed account documented in `README.md`; if the prerequisite is missing, report the E2E check as not run and do not return `pass` for a change that requires it.
 
 Manual checks when relevant: mobile layout, table interaction, toast and pending states.
 
@@ -63,7 +71,8 @@ Report failing checks, missing tests, likely regressions, and residual risk if m
 - Is Zod validation applied to all external inputs (forms, searchParams)?
 - Were related queries invalidated after mutations, and is rollback handled for optimistic updates?
 - Was mobile layout checked?
-- Were `yarn tsc --noEmit`, `yarn lint`, and `yarn test:frontend` run?
+- Were `pnpm tsc --noEmit`, `pnpm lint`, and `pnpm test:frontend` run?
+- If user behavior or a real data flow changed, was `pnpm test:e2e` run successfully? If not, is the stage prevented from returning `pass`?
 - If this change fixes an already-deployed bug (`fix:` type) and the root cause was a pattern AI kept missing, was it logged in `.agents/skills/CHANGELOG.md`'s failure categories (not just this task's `findings`) so future sessions inherit the lesson?
 - Was `intent_check.where_to_look` written as specific file/line pointers (not a restatement of the full diff), and did it explicitly call out any parts of the diff that match intent and need no re-review?
 
