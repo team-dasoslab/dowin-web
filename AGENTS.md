@@ -6,18 +6,14 @@ Dowin is a goal-execution and weekly operations service for individuals and team
 
 ## Core Reading Order
 
-Before making changes, read only the files needed for the task in this order:
+Read according to the task, not a fixed onboarding sequence:
 
-1. `README.md`
-2. `docs/onboarding.md`
-3. the relevant `.agents/skills/*/SKILL.md` (Claude Code should use its `.claude/skills/*/SKILL.md` mirror through the Skill tool instead of reading the `.agents` copy manually — see "Project Skills" below). There is no separate `dowin-orchestrator` skill; `dowin-intake` plus this catalog are how routing works.
-4. relevant `docs/dev/common/*`
-5. relevant domain docs in `docs/dev/**`
-6. current implementation files (prefer `codegraph_explore` — see "Code Navigation" below)
-
-If documents conflict with code, verify the implementation and prefer the current code path.
-
-Any non-trivial request (not a typo fix or a single, fully-specified edit) starts at `dowin-intake` before any of the above — see "Collaboration Style".
+- New to the repository or changing setup/architecture: `README.md` and relevant sections of `docs/onboarding.md`.
+- Implementation: the matching Skill, its relevant domain references, and current code.
+- Planning or writing: the planning Skill and relevant existing documents.
+- Reuse material already read in this session unless it changed. Never load all domain references by default.
+- Classify work using [AI workflow policy](docs/dev/common/2026.09.08-ai-workflow-policy.md). T0/T1 requests with clear scope proceed directly; T2/T3 or unresolved scope use `dowin-intake`.
+- If documents conflict with code, verify the implementation before reporting current behavior.
 
 ## Code Navigation
 
@@ -62,15 +58,16 @@ For a decision that's hard to reverse or that a future session is likely to re-l
 ## Repository Rules
 
 - Use `pnpm` only.
-- Any non-trivial task starts at `dowin-intake`, not directly at a domain skill — see "Collaboration Style".
+- Use the risk-based routing in the AI workflow policy; reuse approvals and tracking from the current task.
 - For backend contract/schema work, follow `.agents/skills/backend-api-spec/SKILL.md`; for backend implementation, follow `.agents/skills/backend/SKILL.md`.
 - For frontend UI work, follow `.agents/skills/frontend-ui/SKILL.md`; for wiring real data, follow `.agents/skills/frontend-api-connect/SKILL.md`.
 - For WebView bridge, native-web handoff, and app-shell-dependent frontend changes, follow `.agents/skills/frontend-webview/SKILL.md`.
-- For planning and documentation work, follow `.agents/skills/planning/SKILL.md` — planning is not done until it produces a PRD section, not just action items.
+- For planning and documentation work, follow `.agents/skills/planning/SKILL.md` — new feature planning requires a PRD; scoped documentation maintenance does not.
 - For production operations, runbooks, incident response, restore/rollback guidance, or release-operability docs, follow `.agents/skills/operations/SKILL.md`.
-- After **each** of the four code-producing stages (`backend-api-spec`, `backend`, `frontend-ui`, `frontend-api-connect`), run that domain's quality check (+ performance/security when relevant), then `.agents/skills/commit/SKILL.md` before moving to the next stage. A task commits at least four times (more if a stage's work splits into multiple intents), scoped to one stage's changes each — not once at the end, and never a multi-bullet commit body listing several things. Follow `docs/planning/2026.04.09-commit-convention.md` via the `dowin-commit` skill for every one of them.
-  - **Parallelization exception:** once `backend-api-spec` has passed its checks and committed (the OpenAPI contract + schema are fixed), `backend` and `frontend-ui` do not depend on each other's output and may run in parallel — e.g. as separate subagents/sessions, one per stage. `frontend-api-connect` still must wait for `backend` to actually finish (it wires real API behavior, not just the contract) and is not part of this exception. Default to the sequential chain unless there's a concrete reason to parallelize (time pressure, independent reviewers available); this is permission, not a requirement.
-- A task's chain always ends at `.agents/skills/release/SKILL.md` (PR → squash-merge → branch cleanup → Linear/beads close-out) once every prior stage has passed — see the release skill for the scoped exception to "Review Before Commit" below.
+- Run relevant quality checks after each stage actually performed. Commit by intent when authorized; there is no minimum commit count. A pending commit does not prevent authorized local implementation and verification from continuing.
+- API integration waits for the backend behavior it needs. Backend and UI work can be independent after the contract is fixed.
+- Finish at the requested endpoint: report, local verified changes, commit, or release. `dowin-release` is currently unavailable; its historical references do not authorize automatic PR creation or merge. Use the documented release process only when requested.
+
 - Reuse existing patterns before introducing new structure.
 - Use Zod for input validation.
 - Use `apiSuccess`, `apiError`, and `withErrorHandler` patterns for API work.
@@ -96,14 +93,14 @@ These apply regardless of skill, task, urgency, or how confident the request sou
 
 ## Collaboration Style
 
-- **Intake First (인테이크 게이트 강제):** Do not start writing code or modifying files immediately upon receiving a non-trivial request. Run `dowin-intake` first — it confirms whether a Linear issue should exist, discusses whether the work is worth doing now, creates the beads epic, and creates the work branch. Only a fully-specified trivial edit (typo, single-line change with exact instructions) may skip it. This replaces the old ad-hoc "which skill should I use" question — `dowin-intake` decides the chain.
-- **No Silent Gap-Filling (공백 임의 처리 금지):** When a request, plan, design, or contract leaves something ambiguous, unresolved, or open to more than one valid implementation (e.g. offset vs. cursor pagination, filter/sort semantics, cache/invalidation strategy, error-handling shape, a UI interaction pattern) — do not silently pick an answer and move on. Say explicitly what is unresolved and discuss it with the user before proceeding. This applies at every stage of the chain, not just intake or planning — it includes implementation-time design forks in `backend-api-spec`, `backend`, `frontend-ui`, and `frontend-api-connect`, each of which restates this as an explicit checklist item (`undecided_design_point`). Treat an undecided design point the same as any other blocking checklist failure, not something to resolve on your own judgment, regardless of which LLM/agent is running the stage.
+- **Risk-based intake:** Apply the AI workflow policy. Do not repeat already answered scope, timing, Linear, or branch questions.
+- **No Silent Material Decisions:** Ask before unresolved choices change public contracts, user behavior, ownership, cost, security, or reversibility. For routine local choices settled by existing conventions, proceed and report any meaningful assumption. Apply this rule to all implementation Skills and their `undecided_design_point` checks.
 - **Options Before Recommendation (옵션 우선 제시):** For architecture/design/workflow decisions, do not give a single proposed answer. Lay out the realistic options with their trade-offs and opportunity costs, then state a recommendation. Reserve a single direct answer for simple factual questions, not decisions.
 - Do not default to agreement when a request has weak assumptions, unnecessary scope, or avoidable risk.
 - Push back clearly when a better technical option exists, and explain the reasoning briefly.
 - Prefer explicit tradeoffs, concrete objections, and practical alternatives over polite but empty compliance.
 - In review or planning work, prioritize bugs, regressions, missing tests, and scope problems before summaries or encouragement.
-- **Review Before Commit (scoped exception: `dowin-release`):** Outside of the `dowin-release` skill, do not commit or push code autonomously without explicit user review and approval — present changes and wait for confirmation before creating a git commit. `dowin-release` is the one explicit, user-authorized exception: once every prior stage in a task's chain has reported `pass`, it is expected to commit, open a PR, squash-merge to `main`, and clean up the branch without asking again for that specific merge. This exception does not extend to any other commit/push/merge outside that skill's defined scope.
+- **Review Before Commit:** Present changes and obtain user approval before committing unless already authorized for that scope. Remote writes still require fresh confirmation under Safety Guardrails. Completing local work never implies permission to publish or merge.
 
 ## AI Code Generation Constraints (Cognitive Load Mitigation)
 
@@ -116,11 +113,11 @@ To prevent human cognitive overload and "Rubber-Stamping" during reviews, all AI
 
 ## Project Skills
 
-This repository contains project-local skills in `.agents/skills/` (source of truth — read/edited by Codex and Antigravity) and `.claude/skills/` (a generated mirror, one-to-one, used by Claude Code's native Skill tool). **Do not hand-edit `.claude/skills/` directly** — edit `.agents/skills/<name>/SKILL.md`, then copy it to `.claude/skills/<name>/SKILL.md` (and its `references/*.md`) to re-sync.
+Project-local skills live in `.agents/skills/` (source of truth). A `.claude/skills/` mirror is not present in this checkout. If a consuming environment provides that mirror, regenerate it from the source after changes; do not hand-edit it or claim it is synchronized without checking. Do not create a second maintained copy merely to satisfy a historical path.
 
 Available local skills, in the order a full chain runs them:
 
-- `dowin-intake` — Linear/validity gate, beads epic + branch creation (always first for non-trivial work)
+- `dowin-intake` — scope/risk gate for T2/T3 or unresolved requests; reuse existing tracking and branch
 - `dowin-planning` — requirements → analysis → PRD
 - `dowin-backend-api-spec` — OpenAPI contract + DB schema
 - `dowin-backend` — validation/service/storage/route implementation
@@ -128,8 +125,8 @@ Available local skills, in the order a full chain runs them:
 - `dowin-frontend-ui` — page/component UI and visual states
 - `dowin-frontend-api-connect` — Orval/TanStack Query wiring
 - `dowin-frontend-quality-check`, `dowin-frontend-performance-check`, `dowin-frontend-security-check`
-- `dowin-commit` — commit-convention reference, called after each of the four code-producing stages (up to 4 times per task)
-- `dowin-release` — PR, squash-merge, branch cleanup, Linear/beads close-out (always last)
+- `dowin-commit` — authorized commits, grouped by intent and stages actually performed
+- Release: currently no local Skill; follow the requested endpoint and explicit remote approvals.
 
 Not part of the linear chain, used as needed:
 
@@ -157,7 +154,7 @@ Trigger examples (one representative request per skill; each skill's own SKILL.m
 - `dowin-frontend-ui`: "멤버 목록 화면에 강퇴 버튼 UI 추가해줘"
 - `dowin-frontend-api-connect`: "방금 만든 UI에 실제 API 연동해줘"
 - `dowin-frontend-quality-check` / `dowin-frontend-performance-check` / `dowin-frontend-security-check`: "프론트 연동 끝났으니 품질/성능/보안 체크해줘"
-- `dowin-release`: "다 통과했으니 PR 올리고 머지까지 해줘"
+- Release 요청: "다 통과했으니 PR 올리고 머지까지 해줘" — 현재 로컬 release Skill은 없으므로 운영 문서와 승인 범위를 확인한다.
 - `frontend-webview`: "앱에서 들어온 deep link를 웹에서 처리하게 붙여줘"
 - `dowin-planning`: "새 기능 기획안 문서 만들어줘"
 - `dowin-operations`: "DB 복구 런북 정리해줘"
