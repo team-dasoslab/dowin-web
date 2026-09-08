@@ -7,7 +7,7 @@ description: Use this skill right after dowin-frontend-ui or dowin-frontend-api-
 
 ## Overview
 
-Use this skill immediately after `dowin-frontend-api-connect` finishes. It focuses only on the frontend path.
+Use this skill after `dowin-frontend-ui` or `dowin-frontend-api-connect` finishes. It focuses only on the frontend path.
 
 Start with:
 
@@ -22,6 +22,8 @@ Start with:
 - Use the smallest useful verification set first, then broaden.
 
 ## Workflow
+
+For a small T1 change, same-session review is sufficient; identify it honestly in the output. The independent evaluation below applies to T2/T3. Reuse the available tools rather than assuming a harness cannot delegate. An unavailable required review is a reported limitation, not a fabricated pass.
 
 ### 1. 서브에이전트에게 채점 위임 (fresh-context evaluator)
 
@@ -43,10 +45,11 @@ Start with:
 
 ### 3. Run verification
 
+Use AGENTS.md Verification Defaults. Reuse passing results only while relevant source, dependencies, configuration, and test environment remain unchanged. Repeat checks affected by subsequent edits or failures. Documentation-only changes do not require app test suites.
+
 ```bash
 pnpm tsc --noEmit
 pnpm lint
-pnpm eslint <changed-files>
 pnpm test:frontend
 ```
 
@@ -78,7 +81,7 @@ Report failing checks, missing tests, likely regressions, and residual risk if m
 
 ## Output Contract
 
-Relay the fresh-context 서브에이전트(1단계)가 `docs/planning/2026.07.14-ai-work-evaluation-plan.md`의 O/X/N/A 체크리스트로 채점한 결과를 그대로 정리해 보고한다. `intent_check`는 diff를 다시 나열하는 필드가 아니라, 사람이 실제로 봐야 할 지점을 좁혀주기 위한 필드다 — 의도와 일치하는 부분은 "재검토 불필요"로 명시해 리뷰 범위를 줄인다 (근거: `docs/planning/2026.08.14-ai-code-review-scale-research.md` §5).
+선택한 검토 방식(T1 동일 세션 또는 T2/T3 독립 검토)을 명시하고 검토자가 `docs/planning/2026.07.14-ai-work-evaluation-plan.md`의 O/X/N/A 체크리스트로 채점한 결과를 그대로 정리해 보고한다. `intent_check`는 diff를 다시 나열하는 필드가 아니라, 사람이 실제로 봐야 할 지점을 좁혀주기 위한 필드다 — 의도와 일치하는 부분은 "재검토 불필요"로 명시해 리뷰 범위를 줄인다 (근거: `docs/planning/2026.08.14-ai-code-review-scale-research.md` §5).
 
 ```text
 stage: frontend-quality
@@ -112,4 +115,4 @@ Return rules:
 
 ## Next Step
 
-`pass`면 번들 크기/렌더링 비용이 민감하면 `dowin-frontend-performance-check`, 보호된 액션·권한 노출이 걸려있으면 `dowin-frontend-security-check`를 이어서 수행한다. 모두 끝나면(또는 둘 다 해당 없으면) `dowin-commit`으로 **이 스테이지(frontend-ui 또는 frontend-api-connect)의 변경만** 커밋한다. 커밋 후: `frontend-ui` 다음이면 `dowin-frontend-api-connect`로, `frontend-api-connect` 다음이면 `dowin-release`로 이동한다.
+`pass`면 번들 크기/렌더링 비용이 민감하면 `dowin-frontend-performance-check`, 보호된 액션·권한 노출이 걸려있으면 `dowin-frontend-security-check`를 이어서 수행한다. 모든 관련 검토가 끝나면 요청에 필요한 다음 구현 단계로 이동하거나 결과를 인계한다. 커밋은 승인된 경우에만 `dowin-commit`을 사용한다. 이미 충족된 검사와 승인 여부를 인계에 포함한다.

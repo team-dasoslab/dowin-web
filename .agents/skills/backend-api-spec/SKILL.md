@@ -35,7 +35,7 @@ Open the matching domain doc and extract business rules, error cases, auth rules
 
 Update `src/api-spec/openapi.yaml` first so the contract is explicit before any implementation. Cover request/response shapes, error responses, and auth requirements.
 
-If any point in the contract has more than one valid design (e.g. offset vs. cursor pagination, filter/sort semantics, response envelope shape, error code granularity) and nothing in the request, domain doc, or existing codebase convention already settles it, stop and ask the user before writing it into `openapi.yaml`. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+Apply AGENTS.md's No Silent Material Decisions rule. Resolve routine local choices from existing conventions; ask before unresolved choices change user behavior, public contracts, ownership, cost, security, or reversibility.
 
 ### 3. Design the schema when the feature needs it
 
@@ -65,7 +65,7 @@ pnpm gen:api
 
 - Was `src/api-spec/openapi.yaml` updated before any implementation?
 - If persisted data is involved, was the schema designed (table/column/constraint/index/ownership) before implementation?
-- Did every contract/schema point with more than one valid design get decided by the user instead of picked silently?
+- Were unresolved material decisions discussed, while routine choices followed existing conventions?
 - Was `pnpm mig:local` used instead of manual migration commands?
 - Was `pnpm gen:api` run after a contract change?
 
@@ -101,4 +101,4 @@ Return rules:
 
 ## Next Step
 
-`pass`면 `dowin-backend-quality-check`(+ 스키마/인덱스가 민감하면 `dowin-backend-performance-check`, auth/ownership 스키마가 걸리면 `dowin-backend-security-check`)를 이 단계의 변경 범위에 대해 실행하고, 통과하면 `dowin-commit`으로 이 단계의 변경만 커밋한 뒤 `dowin-backend`로 이동해 validation/service/storage/route를 구현한다. 계약/스키마 단계는 아직 비즈니스 로직이 없으므로 quality-check는 주로 계약-스키마 일치와 네이밍/제약조건 타당성 확인에 그친다 — 이게 정상이다.
+`pass`면 `dowin-backend-quality-check`(+ 스키마/인덱스가 민감하면 `dowin-backend-performance-check`, auth/ownership 스키마가 걸리면 `dowin-backend-security-check`)를 이 단계의 변경 범위에 대해 실행하고, 통과하면 승인 범위에 따라 `dowin-commit`으로 이 단계의 변경만 커밋한 뒤 `dowin-backend`로 이동해 validation/service/storage/route를 구현한다. 계약/스키마 단계는 아직 비즈니스 로직이 없으므로 quality-check는 주로 계약-스키마 일치와 네이밍/제약조건 타당성 확인에 그친다 — 이게 정상이다.

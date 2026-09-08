@@ -35,6 +35,8 @@ For detailed file paths and planning priorities, read `references/planning-rules
 
 ## Workflow
 
+For scoped document maintenance, update the existing document and validate links/consistency; a new PRD or interview is not required. The requirements → analysis → PRD chain below applies to new features or material product/design changes. Reuse requirements already settled in the conversation.
+
 Planning moves through three stages: requirements → analysis → PRD. Do not skip straight to a PRD without the first two.
 
 ### 1. 요구사항 정리 (Requirements)
@@ -56,11 +58,11 @@ Cross-check the requirement against:
 - shared constraints such as auth, workspace, scoreboard, and dashboard rules
 - alternatives that might already cover the need
 
-Use the repository's existing planning sections where applicable (background/context, priority/rationale, expected impact, cost/estimation). When a judgment call comes up here (scope trade-off, MVP boundary, alternative approach), call `grill-with-docs` again rather than deciding it silently.
+Use the repository's existing planning sections where applicable (background/context, priority/rationale, expected impact, cost/estimation). For unresolved material decisions, use `grill-with-docs`. Routine documentation structure and existing conventions do not require another interview.
 
 ### 3. PRD 작성 (Produce the PRD)
 
-The planning doc is not done until it contains a PRD section covering:
+For new feature/design planning, the document must contain a PRD section covering:
 
 - 배경 및 문제 정의
 - 요구사항 (기능/비기능)
@@ -77,7 +79,7 @@ This PRD lives inside the primary planning document for the feature (`docs/plann
 - Did the document extend an existing planning thread when possible?
 - Is the frontmatter present and valid?
 - Does the plan distinguish MVP from Post-MVP?
-- **Is there an actual PRD section (배경/요구사항/범위/영향 도메인/성공 기준/오픈 이슈/action item)?**
+- **For feature/design planning, is there an actual PRD section (배경/요구사항/범위/영향 도메인/성공 기준/오픈 이슈/action item)?**
 - Are action items concrete enough for engineering work?
 - Does the plan align with existing domain rules and current Dowin product language?
 - Should `docs/onboarding.md` also be updated?
@@ -107,7 +109,7 @@ Use these planning-oriented categories when relevant:
 Return rules:
 
 - `pass`
-  - a PRD section exists and scope, boundaries, and next actions are clear enough for implementation
+  - feature planning has a PRD with clear scope and next actions; scoped documentation maintenance has its requested changes and consistency checks completed
 - `needs_revision`
   - planning is directionally correct, but scope, success criteria, or the PRD itself needs tightening
 - `fail`
@@ -123,4 +125,4 @@ If planning decisions harden into implementation constraints, update or create t
 
 ## Next Step
 
-After planning scope and action items are concrete, move to `dowin-backend` for the backend implementation phase.
+After feature planning, enter only the implementation stages needed. Documentation-only tasks finish with the requested document and validation; they do not enter backend or release automatically.

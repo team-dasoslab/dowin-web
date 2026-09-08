@@ -9,26 +9,17 @@ description: Use this skill whenever a Dowin task chain stage is about to commit
 
 This is not an implementation stage — it is the mandatory reference point every code-producing stage calls right before running `git commit`. It exists so commit messages stay consistent regardless of which stage, task, or LLM produced the change.
 
-Start with `docs/planning/2026.04.09-commit-convention.md` — that document is the source of truth; this skill does not restate it, it enforces reading it before every commit.
+Use `docs/planning/2026.04.09-commit-convention.md` as the convention source. Read it when first preparing a commit; reuse it within the session unless it changed or a convention question remains.
 
 ## When This Runs
 
-A Dowin task chain commits **at least** four times, not once at the end:
-
-1. after `dowin-backend-api-spec` + its relevant checks pass
-2. after `dowin-backend` + its relevant checks pass
-3. after `dowin-frontend-ui` + its relevant checks pass
-4. after `dowin-frontend-api-connect` + its relevant checks pass
-
-These four are the minimum checkpoints, not the maximum commit count. Within a single stage, if the work actually contains more than one distinct intent, split it into more commits — do not fold multiple intents into one commit with a multi-line body that lists them. **The description itself is the signal to split**: if you're about to write a second bullet point explaining "and also did X," stop and make X its own commit instead of a line in this one's message.
-
-Do not bundle multiple stages into one commit, and do not wait until `dowin-release` to make the first commit.
+Commit only stages actually performed, with one intent per commit and explicit authorization for the scope. There is no minimum commit count. Keep changes reviewable; authorization for local implementation is not authorization to commit or publish. A pending commit need not block independent authorized local work.
 
 ## Workflow
 
 ### 1. Read the convention
 
-Read `docs/planning/2026.04.09-commit-convention.md` before drafting the message. Do not rely on memory of past conventions in this or other repos.
+Read the convention if it has not been read in this session, changed, or does not settle the current case.
 
 ### 2. Pick the type
 
@@ -44,7 +35,7 @@ Use `feat|fix|docs|chore|refactor|style` — never `feature`. Match the type to 
 - `<type>: <변경 요약>`, one line, no body
 - Korean, describes user impact/result over implementation mechanics
 - no trailing period
-- no manual PR number (that's `dowin-release`'s job via `gh pr create`, not a hand-added `(#123)`)
+- no manual PR number; the PR platform supplies it when applicable
 - **do not write a multi-line commit body that lists several things.** A commit message body with multiple bullets ("- A 추가\n- B 수정\n- C 정리") is a sign the diff contains multiple intents. Split the diff into separate `git add`/`git commit` calls instead — one commit per bullet you were about to write.
 
 ### 4. Split before you stage, not after
@@ -69,7 +60,7 @@ Do not `git add -A` — check `git status` first and stage precisely one intent'
 
 ## Checklist
 
-- Was `docs/planning/2026.04.09-commit-convention.md` actually read for this commit, not recalled from memory?
+- Was the current convention consulted or its unchanged session context reused?
 - Is the type one of `feat|fix|docs|chore|refactor|style` (not `feature`)?
 - Does the title describe result/impact, not just "수정" / "업데이트"?
 - Is the message a single line with no multi-bullet body?
@@ -101,4 +92,4 @@ Return rules:
 
 ## Next Step
 
-커밋 후 체인의 다음 스테이지로 이동한다 (예: `backend-api-spec` 커밋 후 → `dowin-backend`). 마지막 스테이지(`frontend-api-connect`, 또는 backend-only 작업이면 `backend`)의 커밋(들) 이후에는 `dowin-release`로 이동한다.
+커밋 후 체인의 다음 스테이지로 이동한다 (예: `backend-api-spec` 커밋 후 → `dowin-backend`). 마지막 단계 이후에는 사용자가 요청한 완료 지점에서 결과를 인계한다. PR/merge는 별도 요청과 원격 승인 범위에 따른다.

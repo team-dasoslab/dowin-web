@@ -37,7 +37,7 @@ Decide whether the change belongs in `src/components/ui` (shared primitives) or 
 
 ### 2. Implement with the existing visual language
 
-If a visual/interaction point has more than one valid approach (e.g. modal vs. inline expansion, how an empty/error state is presented, confirmation-before-destructive-action pattern) and nothing already settles it, stop and ask the user before implementing it. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+Apply AGENTS.md's No Silent Material Decisions rule. Resolve routine local choices from existing conventions; ask before unresolved choices change user behavior, public contracts, ownership, cost, security, or reversibility.
 
 - preserve the current Dowin aesthetic and utility patterns
 - keep loading, empty, error, and success states explicit (placeholder/mock data is fine at this stage — real wiring comes next in `dowin-frontend-api-connect`)
@@ -76,7 +76,7 @@ pnpm test:storybook --run
 - Are all static assets inside `src/app` optimized under 200KB?
 - Was mobile layout considered?
 - If shared UI changed, was Storybook updated?
-- Did every visual/interaction point with more than one valid approach get decided by the user instead of picked silently?
+- Were unresolved material decisions discussed, while routine choices followed existing conventions?
 
 ## Output Contract
 
@@ -106,4 +106,4 @@ Return rules:
 
 ## Next Step
 
-`pass`면 `dowin-frontend-quality-check`(+ 렌더/번들 비용이 민감하면 `dowin-frontend-performance-check`, 보호된 화면이면 `dowin-frontend-security-check`)를 이 단계 변경 범위에 대해 실행하고, 통과하면 `dowin-commit`으로 이 단계만 커밋(체인의 세 번째 커밋)한 뒤 `dowin-frontend-api-connect`로 이동해 실제 데이터를 연결한다. 이 시점엔 아직 실데이터 연동이 없으므로 quality-check는 주로 UI 상태 처리와 i18n에 집중된다 — 이게 정상이다.
+`pass`면 `dowin-frontend-quality-check`(+ 렌더/번들 비용이 민감하면 `dowin-frontend-performance-check`, 보호된 화면이면 `dowin-frontend-security-check`)를 이 단계 변경 범위에 대해 실행하고, 통과하면 승인 범위에 따라 `dowin-commit`으로 이 단계만 커밋(체인의 세 번째 커밋)한 뒤 `dowin-frontend-api-connect`로 이동해 실제 데이터를 연결한다. 이 시점엔 아직 실데이터 연동이 없으므로 quality-check는 주로 UI 상태 처리와 i18n에 집중된다 — 이게 정상이다.

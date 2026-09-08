@@ -90,7 +90,7 @@ Preferred flow (contract and schema are already fixed):
 4. route handler
 5. shared lib helpers only if needed
 
-If an implementation point below the already-fixed contract/schema still has more than one valid approach (e.g. retry/backoff behavior, ordering guarantees, edge-case handling not spelled out in the domain doc) and nothing already settles it, stop and ask the user before implementing it. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+Apply AGENTS.md's No Silent Material Decisions rule. Resolve routine local choices from existing conventions; ask before unresolved choices change user behavior, public contracts, ownership, cost, security, or reversibility.
 
 ### 4. Keep repository conventions
 
@@ -150,7 +150,7 @@ The rule here is about how to split and order commits so review stays clear.
 - Are `apiSuccess` and `apiError` used consistently?
 - Is storage logic isolated from route code?
 - Are prepared statements or Drizzle-safe bindings used?
-- Did every implementation point with more than one valid approach get decided by the user instead of picked silently?
+- Were unresolved material decisions discussed, while routine choices followed existing conventions?
 - If the changed path is aggregation-heavy or query-heavy, was a performance review done?
 - Did `pnpm test --run <changed-test-file>` or `pnpm test:backend`, `pnpm tsc --noEmit`, and `pnpm lint` run for the backend change?
 
@@ -171,7 +171,7 @@ focus_list:
 failure_categories:
 - ...
 return_to: planning|backend-api-spec|backend|frontend-ui|backend-quality-check
-next_step: dowin-backend-quality-check → dowin-commit → dowin-frontend-ui (또는 backend-only면 dowin-release)
+next_step: dowin-backend-quality-check → dowin-commit → dowin-frontend-ui (또는 backend-only면 requested handoff)
 ```
 
 Use these backend-oriented categories when relevant:
@@ -204,4 +204,4 @@ Update the relevant docs when backend behavior or contracts changed materially:
 
 ## Next Step
 
-After backend behavior is implemented and verified, run `dowin-backend-quality-check` (and `dowin-backend-performance-check`/`dowin-backend-security-check` when relevant) scoped to this stage's changes. Once those pass, run `dowin-commit` to commit this stage's changes only (this is the second of four commit checkpoints in the chain), then move to `dowin-frontend-ui` to connect the user-facing flow. If the task is purely backend and requires no UI changes, move to `dowin-release` after this commit.
+After implementation, run the relevant backend quality/performance/security checks. Continue to frontend work only if requested and needed; otherwise hand off the verified result. Use `dowin-commit` when authorized. Pending commit approval does not block independent authorized local work.

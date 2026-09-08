@@ -44,7 +44,7 @@ If contracts changed, regenerate the client first.
 
 ### 2. Wire hooks into the UI
 
-If a data-fetching/state-handling point has more than one valid approach (e.g. optimistic update vs. wait-for-response, cache/invalidation strategy, retry behavior on mutation failure) and nothing already settles it, stop and ask the user before implementing it. Do not pick one on your own judgment — see `AGENTS.md`'s No Silent Gap-Filling rule.
+Apply AGENTS.md's No Silent Material Decisions rule. Resolve routine local choices from existing conventions; ask before unresolved choices change user behavior, public contracts, ownership, cost, security, or reversibility.
 
 - move mutation wiring, invalidation, toast calls, and navigation effects into domain hooks (`use...Mutation`)
 - move form state and validation into `use...Form` hooks
@@ -80,7 +80,7 @@ pnpm test --run
 - Is Zod validation applied strictly to all external inputs (form data, URL searchParams)?
 - Were changed/affected frontend tests run?
 - If API contracts changed, was `pnpm gen:api` run?
-- Did every data-fetching/state-handling point with more than one valid approach get decided by the user instead of picked silently?
+- Were unresolved material decisions discussed, while routine choices followed existing conventions?
 
 ## Output Contract
 
@@ -97,7 +97,7 @@ focus_list:
 failure_categories:
 - ...
 return_to: planning|backend-api-spec|frontend-ui|frontend-api-connect
-next_step: dowin-frontend-quality-check → dowin-commit → dowin-release
+next_step: dowin-frontend-quality-check → dowin-commit → requested handoff
 ```
 
 Use these categories when relevant: `api_contract_mismatch`, `state_handling_gap`, `rollback_gap`, `missing_test`, `doc_impl_drift`, `undecided_design_point`.
@@ -110,4 +110,4 @@ Return rules:
 
 ## Next Step
 
-연동이 끝나면 `dowin-frontend-quality-check`(+ 조건부 `dowin-frontend-performance-check`/`dowin-frontend-security-check`)를 이 단계 변경 범위에 대해 실행한다. 통과하면 `dowin-commit`으로 이 단계만 커밋(체인의 마지막 코드 커밋 스테이지 — 여러 의도가 섞여 있으면 여러 커밋)한 뒤 `dowin-release`로 이동한다.
+연동이 끝나면 `dowin-frontend-quality-check`(+ 조건부 `dowin-frontend-performance-check`/`dowin-frontend-security-check`)를 이 단계 변경 범위에 대해 실행한다. 통과하면 승인 범위에 따라 `dowin-commit`으로 이 단계만 커밋(체인의 마지막 코드 커밋 스테이지 — 여러 의도가 섞여 있으면 여러 커밋)한 뒤 요청한 완료 지점에서 인계한다.
