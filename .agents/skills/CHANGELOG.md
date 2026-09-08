@@ -46,6 +46,14 @@ AI가 겪은 실패 사례를 바탕으로 스킬을 갱신하고, 그 효과를
 
 ## 변경 이력
 
+### [2026-09-08] 위험도 기반 작업 라우팅과 완료 조건 적용
+
+- **변경 스킬:** intake, planning, commit, backend/API spec, frontend/UI integration, quality checks, AGENTS.md, codex.md
+- **변경 이유:** 승인된 문서 작업에도 반복 확인이 발생했고, 고정 커밋 수와 존재하지 않는 release 스킬이 작업 종료를 강제했다.
+- **기대 효과:** 기존 승인과 작업 상태를 재사용하고 중대한 미결정 사항만 질문한다. 앱 동작 변경의 최종 검증 및 안전 경계는 유지한다.
+- **관련 실패 카테고리:** `over_engineering`, `doc_impl_drift`, `scope_gap`
+- **Follow-up Eval 필요 여부:** [x] 네 / [ ] 아니오 — 질문·재검증 감소와 회귀 여부는 후속 작업에서 관찰해야 한다.
+
 ### [2026-08-13] code-review 지적 사항 반영 (pr-review-gate.mjs 버그 수정 + 서브에이전트 채점 위임 확대)
 
 - **변경 스킬:** `scripts/pr-review-gate.mjs`, `.github/workflows/pr-review-gate.yml`, `dowin-backend-quality-check`/`dowin-frontend-quality-check`(off-by-one 문구 수정), `dowin-backend-security-check`/`dowin-backend-performance-check`/`dowin-frontend-security-check`/`dowin-frontend-performance-check`(신규 "서브에이전트에게 채점 위임" 1단계 추가)

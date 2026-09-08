@@ -168,4 +168,4 @@ pnpm exec wrangler secret put <KEY_NAME>
 - 개발자 시작 문서: `docs/dev/README.md`
 - 제품 포지셔닝/문서 기준: `docs/dev/common/2026.05.09-product-positioning-and-writing-rules.md`
 - 도메인 개요: `docs/dev/common/2026.03.12-domain-overview.md`
-- 스킬: `.agents/skills/frontend/SKILL.md`, `.agents/skills/backend/SKILL.md`, `.agents/skills/planning/SKILL.md`, `.agents/skills/quality-check/SKILL.md`, `.agents/skills/security-check/SKILL.md`, `.agents/skills/harness-security-check/SKILL.md`, `.agents/skills/product-updates/SKILL.md`
+- 스킬: `AGENTS.md`의 Project Skills 카탈로그와 `.agents/skills/`를 참고합니다.
